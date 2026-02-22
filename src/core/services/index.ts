@@ -22,6 +22,7 @@ export { audioVideoSyncService, AudioVideoSyncService } from './audio-sync.servi
 export { subtitleService, SubtitleService } from './subtitle.service';
 export { voiceSynthesisService, VoiceSynthesisService } from './voice-synthesis.service';
 export { videoEffectService, VideoEffectService } from './video-effect.service';
+export { exportService, ExportService } from './export.service';
 
 // 重新导出类型
 export type { AIResponse, RequestConfig } from './ai.service';
@@ -58,3 +59,7 @@ export type { SyncConfig, SyncResult, SyncIssue, SyncTimeline } from './audio-sy
 export type { SubtitleConfig, SubtitleEntry, SubtitleData, SpeechRecognitionResult } from './subtitle.service';
 export type { VoiceConfig, VoiceItem, SynthesisResult } from './voice-synthesis.service';
 export type { EffectConfig, FilterEffect, TransitionEffect, AnimationEffect, ColorCorrection, EffectPreset } from './video-effect.service';
+export type { 
+  ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, 
+  ExportResult, ExportProgress 
+} from './export.service';

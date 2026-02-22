@@ -6,6 +6,7 @@
   - [智能字幕](/subtitle)
   - [语音合成](/voice)
   - [视频特效](/effects)
+  - [视频导出](/export)
 
 - API 参考
   - [剪辑服务 API](/api/clipping-service)
