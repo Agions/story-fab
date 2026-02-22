@@ -6,7 +6,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 // 导出格式
-export type ExportFormat = 'mp4' | 'webm' | 'mov' | 'mkv' | 'gif' | 'mp3' | 'wav' | 'aac';
+export type ExportFormat = 'mp4' | 'webm' | 'mov' | 'mkv';
 
 // 导出质量
 export type ExportQuality = 'low' | 'medium' | 'high' | 'ultra' | 'custom';
@@ -96,10 +96,6 @@ export const FORMAT_MIME_TYPES: Record<ExportFormat, string> = {
   webm: 'video/webm',
   mov: 'video/quicktime',
   mkv: 'video/x-matroska',
-  gif: 'image/gif',
-  mp3: 'audio/mpeg',
-  wav: 'audio/wav',
-  aac: 'audio/aac',
 };
 
 // 格式信息
@@ -108,10 +104,6 @@ export const FORMAT_INFO: Record<ExportFormat, { name: string; description: stri
   webm: { name: 'WebM', description: 'Web 优化格式，支持 VP8/VP9', container: 'WebM' },
   mov: { name: 'MOV', description: 'QuickTime 格式，适合 Mac', container: 'QuickTime' },
   mkv: { name: 'MKV', description: 'Matroska 格式，灵活性高', container: 'Matroska' },
-  gif: { name: 'GIF', description: '动态图片格式，无声音', container: 'GIF' },
-  mp3: { name: 'MP3', description: '音频格式，兼容性最好', container: 'MP3' },
-  wav: { name: 'WAV', description: '无损音频格式', container: 'WAV' },
-  aac: { name: 'AAC', description: '高级音频编码，高效率', container: 'ADTS' },
 };
 
 // 导出结果
@@ -275,41 +267,6 @@ class ExportService {
     if (this.abortController) {
       this.abortController.abort();
     }
-  }
-
-  /**
-   * 导出为纯音频
-   */
-  async exportAudioOnly(
-    timeline: any,
-    format: 'mp3' | 'wav' | 'aac' = 'mp3'
-  ): Promise<ExportResult> {
-    const originalFormat = this.config.format;
-    this.config.format = format;
-    
-    const result = await this.startExport(timeline);
-    
-    this.config.format = originalFormat;
-    return result;
-  }
-
-  /**
-   * 导出为 GIF
-   */
-  async exportAsGif(
-    timeline: any,
-    options?: { fps?: number; width?: number; quality?: number }
-  ): Promise<ExportResult> {
-    const originalConfig = { ...this.config };
-    
-    this.config.format = 'gif';
-    this.config.frameRate = options?.fps || 15;
-    this.config.resolution = options?.width ? `${options.width}p` as ExportResolution : '480p' as ExportResolution;
-    
-    const result = await this.startExport(timeline);
-    
-    this.config = originalConfig;
-    return result;
   }
 
   /**
