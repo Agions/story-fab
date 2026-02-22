@@ -31,6 +31,8 @@ export default defineConfig({
     strictPort: true,
   },
   css: {
+    devSourcemap: true,
+    minify: true,
     preprocessorOptions: {
       less: {
         javascriptEnabled: true,
