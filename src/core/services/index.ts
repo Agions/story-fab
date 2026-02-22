@@ -19,6 +19,9 @@ export { aiClipService, AIClipService } from './aiClip.service';
 export { clipWorkflowService, ClipWorkflowService } from './clip-workflow.service';
 export { commentaryMixService, CommentaryMixService } from './commentary-mix.service';
 export { audioVideoSyncService, AudioVideoSyncService } from './audio-sync.service';
+export { subtitleService, SubtitleService } from './subtitle.service';
+export { voiceSynthesisService, VoiceSynthesisService } from './voice-synthesis.service';
+export { videoEffectService, VideoEffectService } from './video-effect.service';
 
 // 重新导出类型
 export type { AIResponse, RequestConfig } from './ai.service';
@@ -52,3 +55,6 @@ export type {
 export type { ClipConfig, ClipSegment as WorkflowClipSegment, ClipResult } from './clip-workflow.service';
 export type { MixConfig, MixResult, VideoClipInfo, TimelineData } from './commentary-mix.service';
 export type { SyncConfig, SyncResult, SyncIssue, SyncTimeline } from './audio-sync.service';
+export type { SubtitleConfig, SubtitleEntry, SubtitleData, SpeechRecognitionResult } from './subtitle.service';
+export type { VoiceConfig, VoiceItem, SynthesisResult } from './voice-synthesis.service';
+export type { EffectConfig, FilterEffect, TransitionEffect, AnimationEffect, ColorCorrection, EffectPreset } from './video-effect.service';

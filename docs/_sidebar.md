@@ -4,6 +4,9 @@
   - [智能剪辑](/clipping)
   - [解说混剪](/mix)
   - [音画同步](/sync)
+  - [智能字幕](/subtitle)
+  - [语音合成](/voice)
+  - [视频特效](/effects)
 
 - API 参考
   - [剪辑服务](/api/clipping-service)
