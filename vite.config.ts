@@ -47,13 +47,19 @@ export default defineConfig({
   build: {
     target: 'esnext',
     minify: 'terser',
-    chunkSizeWarningLimit: 600,
+    sourcemap: false,
+    chunkSizeWarningLimit: 500,
+    treeshake: {
+      moduleSideEffects: false,
+      propertyReadSideEffects: false,
+    },
     terserOptions: {
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace'],
         passes: 2,
+        dead_code: true,
       },
       mangle: {
         safari10: true,
@@ -95,5 +101,9 @@ export default defineConfig({
         },
       },
     },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'antd', '@ant-design/icons'],
+    exclude: [],
   },
 })
