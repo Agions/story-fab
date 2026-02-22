@@ -18,6 +18,7 @@ export { costService, CostService } from './cost.service';
 export { aiClipService, AIClipService } from './aiClip.service';
 export { clipWorkflowService, ClipWorkflowService } from './clip-workflow.service';
 export { commentaryMixService, CommentaryMixService } from './commentary-mix.service';
+export { audioVideoSyncService, AudioVideoSyncService } from './audio-sync.service';
 
 // 重新导出类型
 export type { AIResponse, RequestConfig } from './ai.service';
@@ -50,3 +51,4 @@ export type {
 } from './aiClip.service';
 export type { ClipConfig, ClipSegment as WorkflowClipSegment, ClipResult } from './clip-workflow.service';
 export type { MixConfig, MixResult, VideoClipInfo, TimelineData } from './commentary-mix.service';
+export type { SyncConfig, SyncResult, SyncIssue, SyncTimeline } from './audio-sync.service';
