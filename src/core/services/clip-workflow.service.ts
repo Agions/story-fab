@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { videoService } from './video.service';
 import { visionService } from './vision.service';
 import { aiService } from './ai.service';
-import type { VideoInfo, VideoAnalysis, Scene, ScriptSegment } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, Scene, ScriptSegment, ExportSettings } from '@/core/types';
 
 // 剪辑配置
 interface ClipConfig {
@@ -25,6 +25,13 @@ interface ClipConfig {
   // AI 优化
   aiOptimize: boolean;
   targetDuration?: number;
+  
+  // 输出质量
+  outputQuality: 'low' | 'medium' | 'high' | '4k';
+  outputFormat: 'mp4' | 'webm' | 'mov';
+  bitrate: '2M' | '5M' | '8M' | '15M' | '30M';
+  fps: 24 | 30 | 60;
+  resolution: '720p' | '1080p' | '1440p' | '4k';
 }
 
 // 剪辑片段
@@ -66,6 +73,12 @@ const DEFAULT_CONFIG: ClipConfig = {
   autoTransition: true,
   transitionType: 'fade',
   aiOptimize: true,
+  // 输出质量 - 默认高质量
+  outputQuality: 'high',
+  outputFormat: 'mp4',
+  bitrate: '8M',
+  fps: 30,
+  resolution: '1080p',
 };
 
 class ClipWorkflowService {
@@ -250,6 +263,45 @@ class ClipWorkflowService {
       ],
       duration: segments.reduce((sum, s) => sum + s.duration, 0),
     };
+  }
+
+  /**
+   * 获取导出质量配置
+   */
+  getExportSettings(): ExportSettings {
+    const qualityMap = {
+      low: { resolution: '720p', bitrate: '2M', fps: 24 },
+      medium: { resolution: '1080p', bitrate: '5M', fps: 30 },
+      high: { resolution: '1080p', bitrate: '8M', fps: 30 },
+      '4k': { resolution: '4k', bitrate: '30M', fps: 60 },
+    };
+    
+    const quality = qualityMap[this.config.outputQuality];
+    
+    return {
+      format: this.config.outputFormat,
+      resolution: quality.resolution,
+      quality: this.config.outputQuality,
+      fps: quality.fps,
+      bitrate: quality.bitrate,
+    };
+  }
+
+  /**
+   * 优化片段质量
+   */
+  optimizeQuality(segments: ClipSegment[]): ClipSegment[] {
+    return segments.map(segment => ({
+      ...segment,
+      effects: [
+        ...(segment.effects || []),
+        // 添加质量优化效果
+        this.config.outputQuality === 'high' || this.config.outputQuality === '4k' 
+          ? 'denoise' 
+          : null,
+        'sharpen',
+      ].filter(Boolean),
+    }));
   }
 
   /**
