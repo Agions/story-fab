@@ -270,6 +270,15 @@ program.command('open')
     await openCommand.action(file, options);
   });
 
+// version 命令
+program.command('version')
+  .description('Show version information')
+  .action(() => {
+    console.log(chalk.cyan('ClipFlow CLI v' + CLI_VERSION));
+    console.log(chalk.gray('  Node: ' + process.version));
+    console.log(chalk.gray('  Platform: ' + os.platform() + ' ' + os.arch()));
+  });
+
 // 主程序
 function main() {
   if (process.argv.length > 2 && process.argv[2] !== '--help' && process.argv[2] !== '-h') {
