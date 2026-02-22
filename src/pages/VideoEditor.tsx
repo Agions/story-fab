@@ -21,6 +21,7 @@ import styles from './VideoEditor.module.less';
 import { VideoSegment, extractKeyFrames, analyzeVideo } from '@/services/videoService';
 import { saveProjectFile } from '@/services/projectService';
 import { AIClipAssistant } from '@/components/AIClipAssistant';
+import { clipWorkflowService, type ClipSegment } from '@/core/services/clip-workflow.service';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -186,6 +187,40 @@ const VideoEditor: React.FC = () => {
     message.success('已添加新片段');
   };
   
+  // 智能剪辑
+  const handleSmartClip = async () => {
+    if (!videoSrc) return;
+    
+    setAnalyzing(true);
+    try {
+      const videoInfo = {
+        path: videoSrc,
+        duration,
+        width: 1920,
+        height: 1080,
+      };
+      
+      const result = await clipWorkflowService.processVideo(videoInfo);
+      
+      // 转换剪辑结果为 VideoSegment 格式
+      const newSegments: VideoSegment[] = result.segments.map(seg => ({
+        start: seg.sourceStart,
+        end: seg.sourceEnd,
+        type: 'video',
+        content: `片段 ${segments.length + 1}`,
+      }));
+      
+      setSegments(newSegments);
+      addToHistory(newSegments);
+      
+      message.success(`智能剪辑完成: ${result.segments.length} 个片段, 移除 ${result.removedDuration.toFixed(1)}s 静音片段`);
+    } catch (error) {
+      message.error('智能剪辑失败');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+  
   // 删除片段
   const handleDeleteSegment = (index: number) => {
     const newSegments = segments.filter((_, i) => i !== index);
@@ -299,6 +334,15 @@ const VideoEditor: React.FC = () => {
             icon={<PlusOutlined />} 
             onClick={handleAddSegment}
             disabled={!videoSrc}
+          />
+        </Tooltip>
+        
+        <Tooltip title="智能剪辑">
+          <Button 
+            icon={<RobotOutlined />} 
+            onClick={handleSmartClip}
+            disabled={!videoSrc || analyzing}
+            loading={analyzing}
           />
         </Tooltip>
       </div>
