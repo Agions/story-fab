@@ -25,6 +25,7 @@ export default defineConfig({
   server: {
     port: 1420,
     strictPort: true,
+    host: true,
   },
   preview: {
     port: 1420,
@@ -33,6 +34,9 @@ export default defineConfig({
   css: {
     devSourcemap: true,
     minify: true,
+    modules: {
+      localsConvention: 'camelCase',
+    },
     preprocessorOptions: {
       less: {
         javascriptEnabled: true,
@@ -49,25 +53,8 @@ export default defineConfig({
     minify: 'terser',
     sourcemap: false,
     chunkSizeWarningLimit: 500,
-    treeshake: {
-      moduleSideEffects: false,
-      propertyReadSideEffects: false,
-    },
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace'],
-        passes: 2,
-        dead_code: true,
-      },
-      mangle: {
-        safari10: true,
-      },
-      format: {
-        comments: false,
-      },
-    },
+    reportCompressedSize: true,
+    assetsInlineLimit: 4096,
     rollupOptions: {
       output: {
         manualChunks: (id) => {
@@ -84,6 +71,7 @@ export default defineConfig({
             if (id.includes('antd/es/select') || id.includes('antd/es/tree-select')) return 'antd-select'
             if (id.includes('antd/es/modal') || id.includes('antd/es/drawer')) return 'antd-overlay'
             if (id.includes('antd/es/upload')) return 'antd-upload'
+            if (id.includes('antd/es/dropdown') || id.includes('antd/es/menu')) return 'antd-menu'
             return 'antd-core'
           }
           // 工具库
@@ -98,12 +86,16 @@ export default defineConfig({
           if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
             return 'i18n-vendor'
           }
+          // 动画
+          if (id.includes('node_modules/framer-motion')) {
+            return 'motion-vendor'
+          }
         },
       },
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'antd', '@ant-design/icons'],
+    include: ['react', 'react-dom', 'antd', '@ant-design/icons', 'axios'],
     exclude: [],
   },
 })
