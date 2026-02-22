@@ -9,6 +9,9 @@ import { program } from 'commander';
 import fs from 'fs';
 import path from 'path';
 
+// 导入命令模块
+import { capcutCommand } from './capcut.js';
+
 // 版本
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
@@ -101,12 +104,23 @@ program
   .command('export')
   .description('导出视频')
   .option('-f, --format <format>', '格式 (mp4/webm/mov)', 'mp4')
-  .option('-q, --quality <quality>', '质量 (low/medium/high)', 'high')
+  .option('-q, --quality <qualitylow/medium/high>', '质量 ()', 'high')
   .action((options) => {
     console.log(chalk.cyan('\n📤 导出视频...\n'));
     console.log(chalk.gray(`  格式: ${options.format}`));
     console.log(chalk.gray(`  质量: ${options.quality}`));
     console.log(chalk.green('\n✓ 导出完成'));
+  });
+
+// 命令: capcut
+program
+  .command('capcut [input...]')
+  .description('通过自然语言控制剪映客户端')
+  .option('-o, --open', '仅打开剪映客户端')
+  .option('-l, --list', '列出支持的命令')
+  .action((input, options) => {
+    const inputStr = input ? input.join(' ') : '';
+    capcutCommand.action(inputStr, options);
   });
 
 // 帮助
