@@ -1,54 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
-import { message, notification } from 'antd';
+import { Spin } from 'antd';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import ProjectManager from './pages/Projects';
-import ProjectEdit from './pages/ProjectEdit';
-import ProjectDetail from './pages/ProjectDetail';
-import ScriptDetail from './pages/ScriptDetail';
-import VideoEditor from './pages/VideoEditor';
-import Settings from './pages/Settings';
 import './App.css';
 
 import AppProvider from './providers/AppProvider';
 
-const App: React.FC = () => {
-  useEffect(() => {
-    console.log('ClipFlow 初始化完成');
-  }, []);
+// 懒加载页面组件 - 优化首屏加载
+const Home = lazy(() => import('./pages/Home'));
+const ProjectManager = lazy(() => import('./pages/Projects'));
+const ProjectEdit = lazy(() => import('./pages/ProjectEdit'));
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
+const ScriptDetail = lazy(() => import('./pages/ScriptDetail'));
+const VideoEditor = lazy(() => import('./pages/VideoEditor'));
+const Settings = lazy(() => import('./pages/Settings'));
 
+// 加载占位符
+const PageLoader = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <Spin size="large" />
+  </div>
+);
+
+const App: React.FC = () => {
   return (
     <AppProvider>
       <BrowserRouter>
         <Layout>
-          <Routes>
-            {/* 首页 */}
-            <Route path="/" element={<Home />} />
-            
-            {/* 项目管理 */}
-            <Route path="/projects" element={<ProjectManager />} />
-            <Route path="/project/new" element={<ProjectEdit />} />
-            <Route path="/project/edit/:projectId" element={<ProjectEdit />} />
-            <Route path="/project/:projectId" element={<ProjectDetail />} />
-            
-            {/* 视频编辑工作台 */}
-            <Route path="/editor" element={<VideoEditor />} />
-            <Route path="/editor/:projectId" element={<VideoEditor />} />
-            
-            {/* 脚本 */}
-            <Route path="/script/:scriptId" element={<ScriptDetail />} />
-            
-            {/* 设置 */}
-            <Route path="/settings" element={<Settings />} />
-            
-            {/* 重定向 */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/projects" element={<ProjectManager />} />
+              <Route path="/project/new" element={<ProjectEdit />} />
+              <Route path="/project/edit/:projectId" element={<ProjectEdit />} />
+              <Route path="/project/:projectId" element={<ProjectDetail />} />
+              <Route path="/editor" element={<VideoEditor />} />
+              <Route path="/editor/:projectId" element={<VideoEditor />} />
+              <Route path="/script/:scriptId" element={<ScriptDetail />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </Layout>
       </BrowserRouter>
     </AppProvider>
   );
 };
 
-export default App; 
+export default App;
