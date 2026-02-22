@@ -259,6 +259,17 @@ program.command('auto')
     await autoCommand.action(options);
   });
 
+// open 命令
+program.command('open')
+  .description('Open file in CapCut')
+  .argument('[file]', 'File to open')
+  .option('-c, --capcut', 'Open CapCut only')
+  .option('-r, --recent', 'Show recent files')
+  .action(async (file, options) => {
+    const { openCommand } = await import('./open.js');
+    await openCommand.action(file, options);
+  });
+
 // 主程序
 function main() {
   if (process.argv.length > 2 && process.argv[2] !== '--help' && process.argv[2] !== '-h') {
