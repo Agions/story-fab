@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "docs": "npm run docs:api && ts-node scripts/generate-docs.ts",
@@ -47,6 +47,7 @@
     "docsify-cli": "^4.4.4",
     "husky": "^8.0.3",
     "less": "^4.2.0",
+    "terser": "^5.46.0",
     "ts-node": "^10.9.1",
     "typedoc": "^0.24.8",
     "typescript": "^5.0.2",
