@@ -17,6 +17,7 @@ export { editorService, EditorService } from './editor.service';
 export { costService, CostService } from './cost.service';
 export { aiClipService, AIClipService } from './aiClip.service';
 export { clipWorkflowService, ClipWorkflowService } from './clip-workflow.service';
+export { commentaryMixService, CommentaryMixService } from './commentary-mix.service';
 
 // 重新导出类型
 export type { AIResponse, RequestConfig } from './ai.service';
@@ -48,3 +49,4 @@ export type {
   BatchClipTask
 } from './aiClip.service';
 export type { ClipConfig, ClipSegment as WorkflowClipSegment, ClipResult } from './clip-workflow.service';
+export type { MixConfig, MixResult, VideoClipInfo, TimelineData } from './commentary-mix.service';
