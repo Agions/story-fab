@@ -23,6 +23,7 @@ export { subtitleService, SubtitleService } from './subtitle.service';
 export { voiceSynthesisService, VoiceSynthesisService } from './voice-synthesis.service';
 export { videoEffectService, VideoEffectService } from './video-effect.service';
 export { exportService, ExportService } from './export.service';
+export { unifiedWorkflowService, UnifiedWorkflowService } from './unified-workflow.service';
 
 // 重新导出类型
 export type { AIResponse, RequestConfig } from './ai.service';
@@ -63,3 +64,6 @@ export type {
   ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, 
   ExportResult, ExportProgress 
 } from './export.service';
+export type {
+  UnifiedWorkflowConfig, UnifiedWorkflowState, WorkflowStep, WorkflowEventType, WorkflowEvent, WorkflowResult
+} from './unified-workflow.service';
