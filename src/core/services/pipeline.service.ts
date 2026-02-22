@@ -1,5 +1,5 @@
 /**
- * 统一工作流服务 (优化版)
+ * 管道工作流服务
  * 简化的完整视频创作工作流
  */
 
@@ -17,7 +17,7 @@ export type WorkflowStep =
   | 'error';
 
 // 工作流状态
-export interface UnifiedWorkflowState {
+export interface PipelineState {
   step: WorkflowStep;
   progress: number;        // 0-100
   currentTask: string;
@@ -26,7 +26,7 @@ export interface UnifiedWorkflowState {
 }
 
 // 工作流配置
-export interface UnifiedWorkflowConfig {
+export interface PipelineConfig {
   // 视频分析
   autoAnalyze: boolean;
   
@@ -46,7 +46,7 @@ export interface UnifiedWorkflowConfig {
 }
 
 // 默认配置
-const DEFAULT_CONFIG: UnifiedWorkflowConfig = {
+const DEFAULT_CONFIG: PipelineConfig = {
   autoAnalyze: true,
   enableSmartClip: true,
   enableCommentary: true,
@@ -88,13 +88,13 @@ export interface WorkflowResult {
   };
 }
 
-class UnifiedWorkflowService {
-  private config: UnifiedWorkflowConfig;
-  private state: UnifiedWorkflowState;
+class PipelineService {
+  private config: PipelineConfig;
+  private state: PipelineState;
   private listeners: Set<WorkflowListener> = new Set();
   private abortController: AbortController | null = null;
 
-  constructor(config: Partial<UnifiedWorkflowConfig> = {}) {
+  constructor(config: Partial<PipelineConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.state = {
       step: 'idle',
@@ -110,7 +110,7 @@ class UnifiedWorkflowService {
    */
   async execute(
     videoFile: File,
-    onProgress?: (state: UnifiedWorkflowState) => void
+    onProgress?: (state: PipelineState) => void
   ): Promise<WorkflowResult> {
     const startTime = Date.now();
     const errors: string[] = [];
@@ -218,21 +218,21 @@ class UnifiedWorkflowService {
   /**
    * 获取当前状态
    */
-  getState(): UnifiedWorkflowState {
+  getState(): PipelineState {
     return { ...this.state };
   }
 
   /**
    * 获取配置
    */
-  getConfig(): UnifiedWorkflowConfig {
+  getConfig(): PipelineConfig {
     return { ...this.config };
   }
 
   /**
    * 更新配置
    */
-  updateConfig(config: Partial<UnifiedWorkflowConfig>): void {
+  updateConfig(config: Partial<PipelineConfig>): void {
     this.config = { ...this.config, ...config };
   }
 
@@ -351,5 +351,5 @@ class UnifiedWorkflowService {
 }
 
 // 导出单例
-export const unifiedWorkflowService = new UnifiedWorkflowService();
-export default unifiedWorkflowService;
+export const pipelineServiceService = new PipelineService();
+export default pipelineServiceService;
