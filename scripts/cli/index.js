@@ -11,6 +11,7 @@ import path from 'path';
 
 // 导入命令模块
 import { capcutCommand } from './capcut.js';
+import { autoCommand } from './automator.js';
 
 // 版本
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
@@ -121,6 +122,17 @@ program
   .action((input, options) => {
     const inputStr = input ? input.join(' ') : '';
     capcutCommand.action(inputStr, options);
+  });
+
+// 命令: auto (自动化剪辑)
+program
+  .command('auto')
+  .description('自动化剪辑 - 无需手动操作')
+  .option('-w, --workflow <name>', '执行预设工作流')
+  .option('-a, --action <action>', '执行单个操作')
+  .option('-l, --list', '列出可用工作流')
+  .action((options) => {
+    autoCommand.action(options);
   });
 
 // 帮助
