@@ -1,0 +1,146 @@
+.dashboardContainer {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dashboardActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  
+  .searchInput {
+    width: 240px;
+  }
+}
+
+.projectsGrid {
+  min-height: 400px;
+}
+
+.loadingContainer {
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.projectCard {
+  transition: all 0.3s;
+  overflow: hidden;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+.thumbnailContainer {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+  cursor: pointer;
+  
+  &:hover {
+    .thumbnailOverlay {
+      opacity: 1;
+    }
+  }
+}
+
+.projectThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.thumbnailOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.viewIcon {
+  font-size: 32px;
+  color: white;
+}
+
+.projectInfo {
+  padding: 0 8px;
+}
+
+.projectMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.projectDate {
+  display: block;
+  font-size: 12px;
+}
+
+.starredIcon {
+  color: #faad14;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+  .dashboardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .dashboardActions {
+    width: 100%;
+    flex-wrap: wrap;
+    
+    .searchInput {
+      width: 100%;
+    }
+  }
+}
+
+// 暗黑模式适配
+:global(.dark) {
+  .projectCard {
+    background-color: #1f1f1f;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+  }
+  
+  .thumbnailOverlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+} 

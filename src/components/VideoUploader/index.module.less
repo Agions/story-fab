@@ -1,0 +1,184 @@
+.container {
+  width: 100%;
+}
+
+.alert {
+  margin-bottom: 16px;
+}
+
+.dragger {
+  :global(.ant-upload-drag) {
+    padding: 40px 20px;
+    background: #fafafa;
+    border: 2px dashed #d9d9d9;
+    border-radius: 8px;
+    transition: all 0.3s;
+
+    &:hover {
+      border-color: #1890ff;
+      background: #e6f7ff;
+    }
+  }
+
+  &.dragActive {
+    :global(.ant-upload-drag) {
+      border-color: #1890ff;
+      background: #e6f7ff;
+    }
+  }
+}
+
+.uploadContent {
+  text-align: center;
+}
+
+.uploadIcon {
+  font-size: 48px;
+  color: #1890ff;
+  margin-bottom: 16px;
+}
+
+.uploadTitle {
+  margin-bottom: 8px !important;
+}
+
+.uploadDesc {
+  color: rgba(0, 0, 0, 0.45);
+  margin-bottom: 16px;
+}
+
+.progress {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.videoCard {
+  :global(.ant-card-body) {
+    padding: 0;
+    display: flex;
+  }
+}
+
+.videoPreview {
+  position: relative;
+  width: 200px;
+  height: 112px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 8px 0 0 8px;
+
+  .thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+    font-size: 48px;
+    color: #bfbfbf;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:hover .overlay {
+    opacity: 1;
+  }
+}
+
+.previewBtn {
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+}
+
+.videoInfo {
+  flex: 1;
+  padding: 16px;
+}
+
+.videoName {
+  margin-bottom: 8px !important;
+}
+
+.videoMeta {
+  margin-bottom: 12px;
+}
+
+.actions {
+  margin-top: 12px;
+}
+
+.previewModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.previewContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.previewVideo {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 8px;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+}
+
+// 暗色模式适配
+:global(.dark) {
+  .dragger {
+    :global(.ant-upload-drag) {
+      background: #141414;
+      border-color: #434343;
+
+      &:hover {
+        border-color: #1890ff;
+        background: #111d2c;
+      }
+    }
+  }
+
+  .uploadDesc {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .videoPreview {
+    .placeholder {
+      background: #1f1f1f;
+      color: #434343;
+    }
+  }
+}

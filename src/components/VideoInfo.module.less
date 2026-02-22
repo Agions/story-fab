@@ -1,0 +1,150 @@
+.container {
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.container :global(.ant-card-head) {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.container :global(.ant-card-body) {
+  padding: 20px;
+}
+
+.container :global(.ant-statistic-title) {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 8px;
+}
+
+.container :global(.ant-statistic-content) {
+  display: flex;
+  align-items: center;
+}
+
+.container :global(.ant-statistic-content-value) {
+  line-height: 1.2;
+}
+
+.container :global(.anticon) {
+  margin-right: 8px;
+  font-size: 18px;
+  color: #1890ff;
+}
+
+// 适配暗色模式
+:global(.dark-theme) {
+  .container :global(.ant-card-head) {
+    background-color: #1f1f1f;
+    border-bottom: 1px solid #303030;
+  }
+  
+  .container :global(.ant-statistic-title) {
+    color: rgba(255, 255, 255, 0.65);
+  }
+  
+  .container :global(.ant-statistic-content-value) {
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+.videoInfo {
+  margin-bottom: 20px;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.thumbnail {
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  height: fit-content;
+  
+  @media (max-width: 768px) {
+    margin: 0 auto;
+  }
+}
+
+.details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.descriptions {
+  margin-bottom: 16px;
+}
+
+.statsRow {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  
+  :global(.ant-statistic) {
+    margin-bottom: 16px;
+    min-width: 120px;
+  }
+  
+  :global(.ant-statistic-title) {
+    font-size: 14px;
+  }
+  
+  :global(.ant-statistic-content) {
+    font-size: 16px;
+  }
+}
+
+.keyframes {
+  margin-top: 16px;
+  
+  h4 {
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+}
+
+.framesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+}
+
+.frameItem {
+  position: relative;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.frameTime {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: white;
+} 

@@ -1,0 +1,223 @@
+.workflowPage {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .stepsCard {
+    margin-bottom: 24px;
+    overflow-x: auto;
+
+    :global {
+      .ant-steps {
+        min-width: 800px;
+      }
+    }
+  }
+
+  .progressCard {
+    margin-bottom: 24px;
+    text-align: center;
+
+    .ant-progress {
+      margin-bottom: 8px;
+    }
+  }
+
+  .stepCard {
+    margin-bottom: 24px;
+    min-height: 400px;
+  }
+
+  .actionCard {
+    text-align: center;
+  }
+
+  .errorAlert {
+    margin-bottom: 24px;
+  }
+
+  .fileInfo {
+    margin-top: 16px;
+  }
+
+  .loadingArea {
+    text-align: center;
+    padding: 48px;
+
+    .ant-progress {
+      margin-bottom: 16px;
+    }
+  }
+
+  .analysisResult {
+    .analysisSummary {
+      margin-top: 24px;
+      padding: 16px;
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      border-radius: 8px;
+    }
+  }
+
+  .templateCard {
+    position: relative;
+    height: 100%;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    &.selected {
+      border: 2px solid #1890ff;
+      background: #e6f7ff;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .recommendedBadge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 2px 8px;
+      background: #52c41a;
+      color: white;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  }
+
+  .paramItem {
+    margin-bottom: 16px;
+
+    > span {
+      display: block;
+      margin-bottom: 8px;
+      color: #666;
+    }
+  }
+
+  .previewArea {
+    text-align: center;
+
+    .previewVideo {
+      width: 100%;
+      max-width: 800px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .previewInfo {
+      margin-top: 24px;
+      padding: 16px;
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      border-radius: 8px;
+    }
+  }
+
+  // 去重结果样式
+  .dedupResult {
+    .scoreDisplay {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+
+      .scoreHigh {
+        color: #52c41a;
+      }
+
+      .scoreMedium {
+        color: #faad14;
+      }
+
+      .scoreLow {
+        color: #f5222d;
+      }
+    }
+
+    .duplicateList {
+      margin-top: 24px;
+
+      .duplicateAlert {
+        margin-bottom: 12px;
+      }
+    }
+
+    .suggestionList {
+      margin-top: 24px;
+      padding: 16px;
+      background: #fff7e6;
+      border: 1px solid #ffd591;
+      border-radius: 8px;
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+
+        li {
+          margin-bottom: 8px;
+          color: #666;
+        }
+      }
+    }
+  }
+
+  // 唯一性报告样式
+  .uniquenessReport {
+    margin-top: 24px;
+    padding: 16px;
+    background: #f0f5ff;
+    border: 1px solid #adc6ff;
+    border-radius: 8px;
+
+    .uniquenessStatus {
+      margin-bottom: 8px;
+
+      .unique {
+        color: #52c41a;
+      }
+
+      .notUnique {
+        color: #f5222d;
+      }
+    }
+
+    .similarityScore {
+      color: #666;
+    }
+
+    .uniquenessAlert {
+      margin-top: 16px;
+    }
+  }
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .workflowPage {
+    padding: 16px;
+
+    .stepsCard {
+      :global {
+        .ant-steps {
+          min-width: auto;
+        }
+
+        .ant-steps-item-title,
+        .ant-steps-item-description {
+          display: none;
+        }
+      }
+    }
+  }
+}

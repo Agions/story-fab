@@ -1,0 +1,191 @@
+@import '../styles/variables.less';
+
+.editorLayout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.editorHeader {
+  background: #fff;
+  padding: 0 16px;
+  height: 64px;
+  line-height: 64px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  z-index: 10;
+  
+  .headerLeft, .headerCenter, .headerRight {
+    display: flex;
+    align-items: center;
+  }
+  
+  .headerLeft {
+    min-width: 200px;
+  }
+  
+  .headerRight {
+    min-width: 200px;
+    justify-content: flex-end;
+  }
+}
+
+.backButton {
+  font-weight: 500;
+}
+
+.projectTitle {
+  font-size: 16px;
+  font-weight: 500;
+  width: 220px;
+  
+  input {
+    font-weight: 500;
+  }
+}
+
+.toolbarButton {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &.active {
+    color: @primary-color;
+    background-color: rgba(24, 144, 255, 0.1);
+  }
+}
+
+.playButton {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timeDisplay {
+  min-width: 140px;
+  text-align: center;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.sider {
+  background: #fff;
+  border-right: 1px solid #f0f0f0;
+  
+  &.ant-layout-sider-collapsed {
+    .siderTitle {
+      display: none;
+    }
+  }
+}
+
+.siderHeader {
+  height: 48px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f0f0;
+  
+  .siderTitle {
+    font-weight: 500;
+    font-size: 16px;
+  }
+  
+  .collapseButton {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.content {
+  display: flex;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.mainArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.previewWrapper {
+  flex: 1;
+  background-color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.timelineWrapper {
+  height: 240px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #e8e8e8;
+  overflow: hidden;
+}
+
+.aiPanelWrapper {
+  width: 320px;
+  height: 100%;
+  border-left: 1px solid #f0f0f0;
+  background: #fff;
+  overflow-y: auto;
+}
+
+.loadingContainer {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+}
+
+// 深色模式适配
+:global(.dark) {
+  .editorHeader {
+    background: #1f1f1f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid #303030;
+  }
+  
+  .sider {
+    background: #1f1f1f;
+    border-right: 1px solid #303030;
+  }
+  
+  .siderHeader {
+    border-bottom: 1px solid #303030;
+  }
+  
+  .toolbarButton {
+    &.active {
+      background-color: rgba(24, 144, 255, 0.2);
+    }
+  }
+  
+  .timelineWrapper {
+    background-color: #141414;
+    border-top: 1px solid #303030;
+  }
+  
+  .aiPanelWrapper {
+    background: #1f1f1f;
+    border-left: 1px solid #303030;
+  }
+  
+  .loadingContainer {
+    background: #141414;
+  }
+} 

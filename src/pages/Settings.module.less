@@ -1,0 +1,599 @@
+/**
+ * 设置页面样式
+ * 提供系统设置和AI模型配置界面样式
+ * 
+ * @author Agions
+ * @date 2024
+ * @version 2.0
+ * @description 基于Ant Design的高级设置界面，支持响应式布局和深色模式
+ */
+@import '../styles/variables.less';
+
+// 基础变量定义
+@primary-color: #1890ff;
+@border-radius-base: 8px;
+@box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+@box-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+@transition-duration: 0.3s;
+
+// 深色模式变量
+@dark-bg: #141414;
+@dark-card: #1f1f1f;
+@dark-border: rgba(255, 255, 255, 0.08);
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+
+  .header {
+    margin-bottom: 24px;
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 8px;
+
+      @media (max-width: 768px) {
+        font-size: 24px;
+      }
+    }
+  }
+}
+
+.settingsCard {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  transition: all @transition-duration cubic-bezier(0.25, 0.8, 0.25, 1);
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.06);
+  }
+
+  &.darkCard {
+    background: rgba(30, 30, 30, 0.6);
+    border-color: @dark-border;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: @screen-sm) {
+    border-radius: @border-radius-base;
+  }
+}
+
+.tabs {
+  min-height: 500px;
+
+  :global {
+    .ant-tabs-nav {
+      width: 200px;
+
+      @media (max-width: 768px) {
+        width: 120px;
+      }
+    }
+
+    .ant-tabs-tab {
+      padding: 16px 20px;
+      margin: 0 0 8px 0;
+      transition: all @transition-duration;
+      border-radius: 12px;
+      font-weight: 500;
+
+      @media (max-width: 768px) {
+        padding: 12px;
+      }
+
+      &:hover {
+        background-color: rgba(24, 144, 255, 0.04);
+        color: @primary-color;
+      }
+
+      &.ant-tabs-tab-active {
+        background: linear-gradient(135deg, rgba(24, 144, 255, 0.1), rgba(114, 46, 209, 0.1));
+        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
+        color: @primary-color;
+
+        .anticon {
+          color: @primary-color;
+        }
+      }
+    }
+
+    .ant-tabs-content {
+      padding: 0 16px;
+
+      @media (max-width: 768px) {
+        padding: 0 8px;
+      }
+    }
+  }
+}
+
+.form {
+  width: 100%;
+}
+
+.modelList {
+  padding: 16px 0;
+
+  .alert {
+    margin-bottom: 24px;
+    border-radius: @border-radius-base;
+  }
+}
+
+.modelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.success {
+  color: #52c41a;
+  padding: 4px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+
+  .anticon {
+    margin-right: 6px;
+  }
+}
+
+.error {
+  color: #f5222d;
+  padding: 4px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+
+  .anticon {
+    margin-right: 6px;
+  }
+}
+
+.testButton {
+  margin-left: 8px;
+  height: 100%;
+  border: none;
+  border-radius: 0 @border-radius-base @border-radius-base 0;
+}
+
+.defaultButton {
+  margin-left: 8px;
+  border-radius: 6px;
+}
+
+.switchItem {
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+}
+
+.languageSelector {
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+  }
+
+  .anticon {
+    font-size: 20px;
+    margin-right: 12px;
+    color: @primary-color;
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .anticon {
+    font-size: 20px;
+    margin-right: 12px;
+    color: @primary-color;
+
+    @media (max-width: 768px) {
+      font-size: 18px;
+      margin-right: 8px;
+    }
+  }
+}
+
+.switchLabel {
+  flex: 1;
+  font-weight: 600;
+  font-size: 15px;
+  margin-right: 16px;
+
+  @media (max-width: 768px) {
+    margin-right: 8px;
+  }
+}
+
+.settingDescription {
+  color: var(--text-color-secondary);
+  font-size: 14px;
+  margin-top: 4px;
+  max-width: 600px;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+}
+
+.formItem {
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+  }
+
+  :global {
+    .ant-form-item-label {
+      padding-bottom: 4px;
+    }
+  }
+}
+
+.apiKeyInput {
+  width: 100%;
+  max-width: 500px;
+  border-radius: @border-radius-base;
+
+  :global {
+    .ant-input-group-addon {
+      padding: 0;
+    }
+  }
+}
+
+.validationStatus {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.optionContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.optionCard {
+  border-radius: @border-radius-base;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow @transition-duration;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.chineseModelsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.dependencyItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: var(--bg-color-secondary);
+  border-radius: 4px;
+}
+
+.dependencyInfo {
+  flex: 1;
+}
+
+.dependencyStatus {
+  margin-left: 16px;
+}
+
+.installInstruction {
+  margin-top: 24px;
+
+  .installCard {
+    margin-top: 12px;
+    background-color: var(--bg-color-secondary);
+    border-radius: 10px;
+    border: none;
+
+    code {
+      background-color: rgba(0, 0, 0, 0.06);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+  .saveButton {
+    min-width: 140px;
+    height: 48px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+  }
+}
+
+.loading {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+// 深色模式适配
+:global(.dark) {
+  .tabs {
+    :global {
+      .ant-tabs-nav {
+        background-color: @bg-card-dark;
+
+        .ant-tabs-tab {
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+          }
+
+          &.ant-tabs-tab-active {
+            background-color: rgba(24, 144, 255, 0.15);
+          }
+        }
+      }
+    }
+  }
+
+  .modelGrid {
+    .modelCard {
+      background-color: @bg-card-dark;
+      border-color: rgba(255, 255, 255, 0.1);
+
+      .apiKeyExample {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+
+  .dependencyItem {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .installInstruction {
+    .installCard {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  .actions {
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// 响应式布局适配
+@media (max-width: 768px) {
+  .tabs {
+    :global {
+      .ant-tabs-nav {
+        width: 100%;
+      }
+    }
+  }
+
+  .container {
+    .header {
+      h2 {
+        font-size: 28px;
+      }
+    }
+  }
+
+  .actions {
+    .saveButton {
+      width: 100%;
+    }
+  }
+}
+
+// 适配小屏幕
+@media (max-width: 576px) {
+  .tabs {
+    :global {
+      .ant-tabs-nav {
+        width: 100px;
+      }
+
+      .ant-tabs-tab {
+        padding: 8px;
+        font-size: 13px;
+      }
+    }
+  }
+
+  .settingRow {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .anticon {
+      margin-bottom: 8px;
+    }
+  }
+
+  .switchLabel {
+    margin-bottom: 4px;
+  }
+
+  .settingDescription {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+}
+
+.section {
+  margin-bottom: 32px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+
+  .anticon {
+    font-size: 20px;
+    margin-right: 12px;
+    color: @primary-color;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+}
+
+// 暗黑模式特定样式
+:global(.dark) {
+
+  .section,
+  .switchItem,
+  .languageSelector {
+    background: rgba(30, 30, 30, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+
+    &:hover {
+      background: #1f1f1f;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .settingsCard {
+    border-color: #303030;
+  }
+
+  .sectionTitle {
+    border-color: #303030;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .apiKeyInput {
+    background-color: #141414;
+  }
+}
+
+// 卡片切换样式
+.tabsContainer {
+  :global(.ant-tabs-nav-list) {
+    width: 100%;
+
+    @media (min-width: 992px) {
+      width: auto;
+    }
+  }
+
+  :global(.ant-tabs-tab) {
+    margin: 0;
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+    transition: all 0.3s;
+
+    @media (min-width: 992px) {
+      width: auto;
+      justify-content: flex-start;
+      padding: 12px 24px;
+    }
+
+    &:hover {
+      color: @primary-color;
+    }
+  }
+
+  :global(.ant-tabs-ink-bar) {
+    display: none;
+  }
+
+  :global(.ant-tabs-tab-active) {
+    background-color: var(--bg-color-secondary);
+    border-radius: 4px;
+
+    .ant-tabs-tab-btn {
+      color: @primary-color;
+    }
+  }
+}

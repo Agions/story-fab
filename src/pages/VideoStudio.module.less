@@ -1,0 +1,190 @@
+@import '~antd/lib/style/themes/default.less';
+
+.studioLayout {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.studioContent {
+  padding: 24px;
+  margin: 0 auto;
+  max-width: 1440px;
+}
+
+.breadcrumbContainer {
+  margin-bottom: 16px;
+}
+
+.videoPlayerContainer {
+  margin-bottom: 24px;
+}
+
+.playerCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+
+  :global(.ant-card-head) {
+    background-color: #fafafa;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  :global(.ant-card-body) {
+    padding: 0;
+  }
+}
+
+.noVideo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  background-color: #fafafa;
+  border-radius: 0 0 8px 8px;
+  min-height: 400px;
+
+  > span {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #d9d9d9;
+  }
+
+  p {
+    color: #8c8c8c;
+    margin-bottom: 24px;
+  }
+}
+
+.controlsContainer {
+  .infoCard {
+    border-radius: 8px;
+    height: 100%;
+
+    :global(.ant-empty-image) {
+      height: 80px;
+    }
+  }
+}
+
+.metadataList {
+  margin-top: 8px;
+
+  .metadataItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .metadataLabel {
+      color: #8c8c8c;
+      font-weight: 500;
+    }
+  }
+}
+
+.settingsCard {
+  border-radius: 8px;
+  margin-top: 8px;
+
+  :global(.ant-descriptions) {
+    margin-bottom: 16px;
+  }
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+/* 暗色主题适配 */
+:global(.dark-theme) {
+  .studioLayout {
+    background-color: #141414;
+  }
+
+  .playerCard {
+    background-color: #1f1f1f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    :global(.ant-card-head) {
+      background-color: #262626;
+      border-bottom: 1px solid #303030;
+    }
+  }
+
+  .noVideo {
+    background-color: #1f1f1f;
+
+    > span {
+      color: #434343;
+    }
+
+    p {
+      color: #8c8c8c;
+    }
+  }
+
+  .metadataList {
+    .metadataItem {
+      border-bottom: 1px dashed #303030;
+    }
+  }
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 768px) {
+  .studioContent {
+    padding: 16px;
+  }
+
+  .infoCard {
+    margin-top: 16px;
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d9d9d9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #bfbfbf;
+}
+
+:global(.dark-theme) {
+  ::-webkit-scrollbar-track {
+    background-color: #1f1f1f;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #434343;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #595959;
+  }
+} 

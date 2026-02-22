@@ -1,0 +1,13 @@
+node_modules
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.test.local
+*-lock.yaml
+*.lock
+
+# macOS
+.DS_Store
+**/.DS_Store

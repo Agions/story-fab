@@ -1,0 +1,91 @@
+.container {
+  padding: 16px;
+}
+
+.title {
+  margin-bottom: 16px !important;
+
+  :global(.anticon) {
+    margin-right: 8px;
+    color: #1890ff;
+  }
+}
+
+.modelCard {
+  margin-bottom: 16px;
+
+  :global(.ant-card-body) {
+    padding: 12px 16px;
+  }
+}
+
+.modelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form {
+  margin-bottom: 16px;
+}
+
+.settingsCard {
+  margin-bottom: 16px;
+
+  :global(.ant-radio-group) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    :global(.ant-radio-button-wrapper) {
+      margin: 0;
+    }
+  }
+}
+
+.actions {
+  margin-top: 24px;
+}
+
+.resultCard {
+  margin-top: 24px;
+  background: #f6ffed;
+  border-color: #b7eb8f;
+
+  :global(.ant-card-head) {
+    background: transparent;
+    border-bottom-color: #b7eb8f;
+  }
+}
+
+.scriptContent {
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  min-height: 200px;
+
+  p {
+    white-space: pre-wrap;
+    line-height: 1.8;
+  }
+}
+
+.scriptMeta {
+  margin-top: 16px;
+}
+
+// 暗色模式适配
+:global(.dark) {
+  .resultCard {
+    background: #162312;
+    border-color: #274916;
+
+    :global(.ant-card-head) {
+      border-bottom-color: #274916;
+    }
+  }
+
+  .scriptContent {
+    background: #141414;
+  }
+}

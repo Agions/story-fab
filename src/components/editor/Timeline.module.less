@@ -1,0 +1,298 @@
+@import '../../styles/variables.less';
+
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f0f0f0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.timelineToolbar {
+  height: 40px;
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.timelineControls, .zoomControls {
+  display: flex;
+  align-items: center;
+}
+
+.scaleIndicator {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+  margin-left: 8px;
+  min-width: 40px;
+}
+
+.timelineContent {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.timelineFixed {
+  width: 180px;
+  flex-shrink: 0;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+}
+
+.timelineHeader {
+  height: 30px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleButton {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.trackHeaders {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.trackHeaderPlaceholder {
+  height: 60px;
+}
+
+.timelineScrollable {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.timelineRulerContainer {
+  height: 30px;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 2;
+}
+
+.timeRuler {
+  height: 100%;
+  position: relative;
+}
+
+.rulerMark {
+  position: absolute;
+  top: 18px;
+  height: 12px;
+  width: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  
+  &.secondMark {
+    top: 10px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+}
+
+.timeLabel {
+  position: absolute;
+  top: -16px;
+  left: -12px;
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.65);
+  width: 24px;
+  text-align: center;
+}
+
+.tracksArea {
+  position: relative;
+  min-height: 180px;
+}
+
+.tracksContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.track {
+  height: 60px;
+  display: flex;
+  
+  &.video {
+    .trackHeader {
+      background-color: rgba(24, 144, 255, 0.05);
+      border-left: 4px solid rgba(24, 144, 255, 0.8);
+    }
+  }
+  
+  &.audio {
+    .trackHeader {
+      background-color: rgba(82, 196, 26, 0.05);
+      border-left: 4px solid rgba(82, 196, 26, 0.8);
+    }
+  }
+  
+  &.text {
+    .trackHeader {
+      background-color: rgba(245, 34, 45, 0.05);
+      border-left: 4px solid rgba(245, 34, 45, 0.8);
+    }
+  }
+}
+
+.trackHeader {
+  width: 180px;
+  flex-shrink: 0;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.trackName {
+  font-weight: 500;
+  font-size: 14px;
+  width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackType {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  margin-top: 4px;
+}
+
+.trackAction {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.trackContent {
+  flex: 1;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.01),
+    rgba(0, 0, 0, 0.01) 10px,
+    rgba(0, 0, 0, 0.02) 10px,
+    rgba(0, 0, 0, 0.02) 20px
+  );
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 60px;
+  position: relative;
+}
+
+.playhead {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.playheadHead {
+  width: 14px;
+  height: 14px;
+  background-color: #ff4d4f;
+  border-radius: 2px;
+  transform: translateX(-7px) translateY(-7px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateX(-7px) translateY(-7px) scale(1.1);
+  }
+}
+
+.playheadLine {
+  width: 1px;
+  height: 100%;
+  background-color: #ff4d4f;
+  transform: translateX(-0.5px);
+}
+
+// 深色模式适配
+:global(.dark) {
+  .timelineContainer {
+    background-color: #141414;
+    border-top: 1px solid #303030;
+  }
+  
+  .timelineToolbar, .timelineFixed, .timelineRulerContainer {
+    background-color: #1f1f1f;
+    border-color: #303030;
+  }
+  
+  .trackHeader {
+    background-color: #1f1f1f;
+    border-color: #303030;
+  }
+  
+  .track {
+    &.video .trackHeader {
+      background-color: rgba(24, 144, 255, 0.1);
+    }
+    
+    &.audio .trackHeader {
+      background-color: rgba(82, 196, 26, 0.1);
+    }
+    
+    &.text .trackHeader {
+      background-color: rgba(245, 34, 45, 0.1);
+    }
+  }
+  
+  .trackContent {
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.01),
+      rgba(255, 255, 255, 0.01) 10px,
+      rgba(255, 255, 255, 0.02) 10px,
+      rgba(255, 255, 255, 0.02) 20px
+    );
+    border-color: #303030;
+  }
+  
+  .timeLabel {
+    color: rgba(255, 255, 255, 0.65);
+  }
+  
+  .scaleIndicator {
+    color: rgba(255, 255, 255, 0.65);
+  }
+  
+  .rulerMark {
+    background-color: rgba(255, 255, 255, 0.1);
+    
+    &.secondMark {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+} 

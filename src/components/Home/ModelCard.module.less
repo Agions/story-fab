@@ -1,0 +1,171 @@
+.modelCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  padding: 16px;
+  height: 180px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  
+  &:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.09);
+    transform: translateY(-3px);
+    border-color: #e6f7ff;
+  }
+  
+  &.selected {
+    border: 2px solid #1890ff;
+    background-color: rgba(24, 144, 255, 0.05);
+    
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      border-width: 0 24px 24px 0;
+      border-style: solid;
+      border-color: #1890ff transparent;
+    }
+  }
+  
+  &.disabled {
+    background-color: #f9f9f9;
+    opacity: 0.9;
+    
+    &:hover {
+      cursor: pointer;
+      opacity: 1;
+      background-color: #f9f9f9;
+      border-color: #ffa39e;
+    }
+  }
+}
+
+.modelIcon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  color: #1890ff;
+  display: flex;
+  align-items: center;
+}
+
+.modelInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.modelName {
+  margin: 0 0 4px 0 !important;
+  font-size: 18px !important;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modelProvider {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.selectedIcon {
+  color: #1890ff;
+  margin-left: 8px;
+  font-size: 16px;
+}
+
+.modelStatus {
+  margin-top: auto;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modelActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// 申请API密钥按钮样式
+.applyKeyButton {
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: #ff4d4f;
+    transform: scale(1.05);
+  }
+}
+
+// 模态框样式
+.applyModal {
+  :global(.ant-modal-body) {
+    padding: 24px;
+  }
+}
+
+.applyOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.applyButton {
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.dividerText {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  margin: 8px 0;
+  position: relative;
+  
+  &:before, &:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 35%;
+    height: 1px;
+    background-color: #f0f0f0;
+  }
+  
+  &:before {
+    left: 0;
+  }
+  
+  &:after {
+    right: 0;
+  }
+}
+
+// 添加动画效果
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// 未配置的模型添加高亮动画
+.disabled .modelActions button {
+  animation: pulse 2s infinite;
+} 

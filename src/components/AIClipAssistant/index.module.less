@@ -1,0 +1,317 @@
+.aiClipAssistant {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.headerCard {
+  margin-bottom: 24px;
+  text-align: center;
+
+  h4 {
+    margin-bottom: 8px;
+
+    .anticon {
+      color: #1890ff;
+      margin-right: 8px;
+    }
+  }
+}
+
+.errorAlert {
+  margin-bottom: 24px;
+}
+
+.steps {
+  margin-bottom: 32px;
+
+  :global {
+    .ant-steps-item {
+      cursor: pointer;
+    }
+  }
+}
+
+.stepContent {
+  min-height: 400px;
+}
+
+// 配置步骤
+.configCard {
+  .configItem {
+    margin-bottom: 16px;
+
+    .configDesc {
+      margin-top: 4px;
+      margin-bottom: 0;
+      font-size: 12px;
+    }
+  }
+
+  .radioGroup {
+    display: flex;
+    margin-top: 8px;
+
+    .ant-radio-button-wrapper {
+      flex: 1;
+      text-align: center;
+    }
+  }
+
+  .actionButtons {
+    margin-top: 32px;
+    text-align: center;
+  }
+}
+
+// 分析步骤
+.analyzeCard {
+  .analyzingState {
+    text-align: center;
+    padding: 48px;
+
+    .ant-spin {
+      margin-bottom: 24px;
+    }
+
+    h5 {
+      margin-bottom: 24px;
+    }
+
+    .ant-progress {
+      max-width: 400px;
+      margin: 0 auto 16px;
+    }
+  }
+
+  .analysisResult {
+    .statCard {
+      text-align: center;
+
+      .statValue {
+        font-size: 28px;
+        font-weight: bold;
+        color: #1890ff;
+        margin-bottom: 4px;
+      }
+
+      .statLabel {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.45);
+      }
+    }
+
+    .timelineVisualization {
+      margin: 24px 0;
+      padding: 16px;
+      background: #f5f5f5;
+      border-radius: 8px;
+
+      .timelineBar {
+        position: relative;
+        height: 40px;
+        background: #e8e8e8;
+        border-radius: 4px;
+        overflow: hidden;
+
+        .cutPoint {
+          position: absolute;
+          top: 0;
+          width: 4px;
+          height: 100%;
+          border-radius: 2px;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover {
+            width: 6px;
+            z-index: 1;
+          }
+
+          &.scene {
+            background: #52c41a;
+          }
+
+          &.silence {
+            background: #ff4d4f;
+          }
+
+          &.keyframe {
+            background: #1890ff;
+          }
+
+          &.emotion {
+            background: #722ed1;
+          }
+        }
+      }
+
+      .timelineLabels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+      }
+    }
+
+    .legend {
+      margin-top: 16px;
+
+      .legendItem {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 16px;
+        font-size: 12px;
+
+        .legendDot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          margin-right: 4px;
+
+          &.scene {
+            background: #52c41a;
+          }
+
+          &.silence {
+            background: #ff4d4f;
+          }
+
+          &.keyframe {
+            background: #1890ff;
+          }
+
+          &.emotion {
+            background: #722ed1;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 建议步骤
+.suggestionsCard {
+  .suggestionsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .suggestionsList {
+    .suggestionItem {
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+
+      &:hover {
+        background: #f5f5f5;
+      }
+
+      &.selected {
+        border-color: #1890ff;
+        background: #e6f7ff;
+      }
+
+      .suggestionIcon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #1890ff;
+      }
+    }
+  }
+
+  .actionButtons {
+    margin-top: 24px;
+    text-align: center;
+  }
+}
+
+// 预览步骤
+.previewCard {
+  .previewStats {
+    margin-bottom: 24px;
+
+    .statistic {
+      text-align: center;
+      padding: 16px;
+      background: #f5f5f5;
+      border-radius: 8px;
+
+      .statisticValue {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1890ff;
+      }
+
+      .statisticTitle {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.45);
+        margin-top: 4px;
+      }
+    }
+  }
+
+  .segmentsPreview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+
+    .segmentCard {
+      .segmentTime {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.65);
+        margin-bottom: 4px;
+      }
+
+      .segmentDuration {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.45);
+        margin-bottom: 8px;
+      }
+
+      .segmentThumbnail {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .actionButtons {
+    margin-top: 24px;
+    text-align: center;
+  }
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .aiClipAssistant {
+    padding: 16px;
+  }
+
+  .configCard {
+    .ant-row {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    .ant-col {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-bottom: 16px;
+    }
+  }
+
+  .segmentsPreview {
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -1,0 +1,145 @@
+.container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+}
+
+.titleArea h2 {
+  margin: 0;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.workflowContainer {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.contentArea {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepCard {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: white;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.stepMenu {
+  border-right: none !important;
+  background: transparent !important;
+}
+
+.stepMenu :global(.ant-menu-item) {
+  height: 60px !important;
+  line-height: 60px !important;
+  border-radius: 12px !important;
+  margin-bottom: 8px !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.stepMenu :global(.ant-menu-item-selected) {
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.1), rgba(114, 46, 209, 0.1)) !important;
+  color: #1890ff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
+}
+
+.activeContent {
+  padding: 32px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  min-height: 600px;
+}
+
+.placeholderSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  text-align: center;
+  gap: 24px;
+  color: #8c8c8c;
+}
+
+.placeholderSection .iconWrapper {
+  font-size: 64px;
+  background: linear-gradient(135deg, #1890ff 0%, #722ed1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0.8;
+}
+
+/* Animations and Buttons */
+.premiumBtn {
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.premiumBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+}
+
+:global(.dark-theme) {
+  .header {
+    background: rgba(30, 30, 30, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .stepCard {
+    background: #141414;
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .activeContent {
+    background: #141414;
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .titleArea h2 {
+    background: linear-gradient(135deg, #40a9ff, #9254de);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}

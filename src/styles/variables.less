@@ -1,0 +1,108 @@
+// 基础颜色
+@white: #fff;
+@black: #000;
+
+// 颜色变量 - 主色系统
+@primary-color: #1E88E5;  // 更新为App.tsx中使用的主色
+@secondary-color: #5C6BC0;
+@success-color: #26A69A;  // 更新为App.tsx中使用的色值
+@warning-color: #FF9800;  // 更新为App.tsx中使用的色值
+@error-color: #FF5252;    // 更新为App.tsx中使用的色值
+@info-color: #42A5F5;     // 更新为App.tsx中使用的色值
+
+// 中性色
+@heading-color: rgba(0, 0, 0, 0.87);  // 更深的文本颜色
+@text-color: rgba(0, 0, 0, 0.65);
+@text-color-secondary: rgba(0, 0, 0, 0.45);
+@disabled-color: rgba(0, 0, 0, 0.25);
+@border-color-base: #e0e0e0;  // 略微柔和的边框颜色
+@background-color-base: #f5f7fa;  // 更新为Layout中使用的背景色
+@background-color-light: #fafafa;
+@component-background: #ffffff;
+
+// 辅助色
+@cyan-color: #13c2c2;
+@purple-color: #722ed1;
+@orange-color: #FA8C16;
+@accent-color: #FF5252;  // 强调色，用于突出元素
+
+// 品牌色变体
+@primary-color-light: lighten(@primary-color, 15%);
+@primary-color-dark: darken(@primary-color, 10%);
+
+// 字体变量
+@font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+@font-size-base: 14px;
+@font-size-small: 12px;
+@font-size-large: 16px;
+@font-size-h1: 38px;
+@font-size-h2: 30px;
+@font-size-h3: 24px;
+@font-size-h4: 20px;
+@font-weight-light: 300;
+@font-weight-normal: 400;
+@font-weight-medium: 500;
+@font-weight-bold: 700;
+@line-height-base: 1.6;
+
+// 尺寸变量
+@border-radius-base: 8px;  // 增大圆角尺寸，提供更现代的外观
+@border-radius-small: 4px;
+@border-radius-large: 12px;
+@spacing-unit: 8px;
+@spacing-small: @spacing-unit;
+@spacing-medium: @spacing-unit * 2;
+@spacing-large: @spacing-unit * 3;
+@spacing-xl: @spacing-unit * 4;
+@spacing-xxl: @spacing-unit * 6;
+
+// 暗黑模式变量
+@dark-background: #121212;
+@dark-component-background: #1f1f1f;
+@dark-text-color: rgba(255, 255, 255, 0.87);
+@dark-text-color-secondary: rgba(255, 255, 255, 0.45);
+@dark-border-color: #424242;
+
+// 新增暗色模式背景层级
+@bg-card-dark: #1f1f1f;
+@bg-elevated-dark: #2d2d2d;
+@bg-lightest: #f9f9fa;
+
+// 动画变量
+@animation-duration-base: 0.3s;
+@animation-duration-slow: 0.5s;
+@animation-duration-fast: 0.2s;
+@ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+@ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+@ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+
+// 阴影
+@box-shadow-base: 0 2px 8px rgba(0, 0, 0, 0.08);
+@box-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+@box-shadow-active: 0 6px 16px rgba(0, 0, 0, 0.16);
+@box-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.03), 
+                  0 2px 4px rgba(0, 0, 0, 0.03), 
+                  0 4px 8px rgba(0, 0, 0, 0.03);  // 更柔和的阴影，用于卡片
+
+// 组件尺寸
+@component-height-small: 32px;
+@component-height-base: 40px;
+@component-height-large: 48px;
+
+// 媒体查询断点
+@screen-xs: 480px;
+@screen-sm: 576px;
+@screen-md: 768px;
+@screen-lg: 992px;
+@screen-xl: 1200px;
+@screen-xxl: 1600px;
+
+// 布局尺寸
+@layout-header-height: 64px;
+@layout-sider-width: 220px;
+@layout-content-max-width: 1200px;
+@container-padding: 24px;
+
+// 交互状态
+@hover-opacity: 0.85;
+@active-opacity: 0.7;

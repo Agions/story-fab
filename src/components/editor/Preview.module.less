@@ -1,0 +1,88 @@
+@import '../../styles/variables.less';
+
+.previewContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.previewContent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  margin: 0 auto;
+}
+
+.previewVideo {
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.emptyPreview {
+  width: 640px;
+  height: 360px;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.previewPlaceholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.previewControls {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 10;
+  
+  button {
+    color: rgba(255, 255, 255, 0.85);
+    &:hover {
+      color: rgba(255, 255, 255, 1);
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    &[disabled] {
+      color: rgba(255, 255, 255, 0.3);
+      background-color: transparent;
+    }
+  }
+}
+
+.zoomLevel {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  min-width: 40px;
+  text-align: center;
+}
+
+// 全屏模式样式
+:global(:-webkit-full-screen) {
+  .previewContainer {
+    background-color: #000;
+  }
+  
+  .previewControls {
+    bottom: 32px;
+  }
+} 

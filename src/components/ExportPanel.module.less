@@ -1,0 +1,53 @@
+.exportPanel {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  padding: 8px 0;
+}
+
+.filenameSection {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.label {
+  font-weight: 500;
+  margin-right: 10px;
+  min-width: 70px;
+  
+  @media (max-width: 576px) {
+    margin-bottom: 8px;
+  }
+}
+
+.filenameInput {
+  flex: 1;
+  max-width: 400px;
+  
+  @media (max-width: 576px) {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.formatSection {
+  display: flex;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
+}
+
+.formatDesc {
+  color: #8c8c8c;
+  font-size: 12px;
+} 

@@ -1,0 +1,176 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  h3 {
+    margin: 0;
+  }
+}
+
+.card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stepsContainer {
+  margin-bottom: 24px;
+}
+
+.stepsContent {
+  margin-top: 24px;
+}
+
+.stepCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  
+  h4 {
+    display: flex;
+    align-items: center;
+    
+    .anticon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.stepActions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.analyzeContent {
+  margin-bottom: 24px;
+}
+
+.keyFrames {
+  margin-top: 24px;
+  
+  h5 {
+    margin-bottom: 16px;
+  }
+}
+
+.keyFramesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.keyFrameImage {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    h3 {
+      margin-bottom: 16px;
+    }
+    
+    button {
+      margin-bottom: 8px;
+    }
+  }
+  
+  .stepActions {
+    justify-content: center;
+  }
+}
+
+/* 暗黑模式适配 */
+:global(.dark) {
+  .card, .stepCard {
+    background-color: #1f1f1f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .keyFrameImage {
+    border-color: #303030;
+  }
+}
+
+.backButton {
+  padding: 0;
+}
+
+.content {
+  padding: 16px 0;
+}
+
+.steps {
+  margin-bottom: 24px;
+}
+
+.stepsAction {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.formContainer {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.formButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+}
+
+// 模型选择样式
+.modelOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modelIcon {
+  color: #1890ff;
+  font-size: 16px;
+}
+
+.modelProvider {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  margin-left: 4px;
+}
+
+.modelDisabled {
+  font-size: 12px;
+  background-color: rgba(255, 77, 79, 0.1);
+  color: #ff4d4f;
+  padding: 1px 6px;
+  border-radius: 2px;
+  margin-left: auto;
+}
+
+:global(.dark) {
+  .modelProvider {
+    color: rgba(255, 255, 255, 0.45);
+  }
+} 

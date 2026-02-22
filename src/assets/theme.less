@@ -1,0 +1,198 @@
+// 全局主题变量
+:root {
+  // 浅色主题默认变量
+  --text-color-primary: rgba(0, 0, 0, 0.85);
+  --text-color-secondary: rgba(0, 0, 0, 0.65);
+  --text-color-disabled: rgba(0, 0, 0, 0.35);
+  --bg-color-primary: #ffffff;
+  --bg-color-secondary: #f0f2f5;
+  --bg-color-component: #ffffff;
+  --border-color: #d9d9d9;
+  --form-label-color: rgba(0, 0, 0, 0.85);
+}
+
+// 深色主题
+.dark-theme {
+  // 文本颜色
+  --text-color-primary: rgba(255, 255, 255, 0.85);
+  --text-color-secondary: rgba(255, 255, 255, 0.65);
+  --text-color-disabled: rgba(255, 255, 255, 0.35);
+  
+  // 背景颜色
+  --bg-color-primary: #141414;
+  --bg-color-secondary: #1f1f1f;
+  --bg-color-component: #1f1f1f;
+  
+  // 边框颜色
+  --border-color: #303030;
+  
+  // 表单标签颜色
+  --form-label-color: rgba(255, 255, 255, 0.85);
+  
+  // 强制修复一些Ant Design组件在深色模式下的样式问题
+  .ant-form-item-label > label {
+    color: var(--form-label-color) !important;
+  }
+  
+  .ant-typography {
+    color: var(--text-color-primary);
+  }
+  
+  .ant-card {
+    background-color: var(--bg-color-component);
+    border-color: var(--border-color);
+  }
+  
+  .ant-input {
+    background-color: #2d2d2d;
+    color: var(--text-color-primary);
+    border-color: var(--border-color);
+    
+    &:hover, &:focus {
+      border-color: #1890ff;
+    }
+    
+    &::placeholder {
+      color: var(--text-color-disabled);
+    }
+  }
+  
+  .ant-alert {
+    background-color: #232323;
+    border-color: #303030;
+    
+    &-info {
+      background-color: rgba(24, 144, 255, 0.1);
+      border-color: rgba(24, 144, 255, 0.2);
+    }
+    
+    &-error {
+      background-color: rgba(255, 77, 79, 0.1);
+      border-color: rgba(255, 77, 79, 0.2);
+    }
+    
+    &-warning {
+      background-color: rgba(250, 173, 20, 0.1);
+      border-color: rgba(250, 173, 20, 0.2);
+    }
+    
+    &-success {
+      background-color: rgba(82, 196, 26, 0.1);
+      border-color: rgba(82, 196, 26, 0.2);
+    }
+  }
+  
+  .ant-modal-content,
+  .ant-modal-header {
+    background-color: var(--bg-color-component);
+    border-color: var(--border-color);
+  }
+  
+  .ant-modal-title {
+    color: var(--text-color-primary);
+  }
+  
+  .ant-modal-close {
+    color: var(--text-color-secondary);
+    
+    &:hover {
+      color: var(--text-color-primary);
+    }
+  }
+  
+  // 表格和列表样式
+  .ant-table {
+    background-color: var(--bg-color-component);
+    color: var(--text-color-primary);
+    
+    .ant-table-thead > tr > th {
+      background-color: var(--bg-color-secondary);
+      color: var(--text-color-primary);
+      border-bottom-color: var(--border-color);
+    }
+    
+    .ant-table-tbody > tr > td {
+      border-bottom-color: var(--border-color);
+    }
+  }
+  
+  .ant-list-item {
+    border-bottom-color: var(--border-color);
+  }
+  
+  // 图标颜色
+  .anticon {
+    color: var(--text-color-primary);
+  }
+  
+  // 标签和徽章
+  .ant-tag {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+    
+    &-blue {
+      color: #1890ff;
+      background-color: rgba(24, 144, 255, 0.1);
+      border-color: rgba(24, 144, 255, 0.2);
+    }
+  }
+  
+  .ant-badge-count {
+    color: #fff;
+  }
+  
+  // 按钮样式
+  .ant-btn {
+    &:not(.ant-btn-primary):not(.ant-btn-dangerous) {
+      background-color: transparent;
+      border-color: var(--border-color);
+      color: var(--text-color-primary);
+      
+      &:hover, &:focus {
+        color: #1890ff;
+        border-color: #1890ff;
+      }
+    }
+    
+    &-link {
+      color: #1890ff;
+      
+      &:hover {
+        color: #40a9ff;
+      }
+    }
+  }
+  
+  // 下拉菜单
+  .ant-select {
+    .ant-select-selector {
+      background-color: #2d2d2d;
+      border-color: var(--border-color);
+      color: var(--text-color-primary);
+    }
+    
+    .ant-select-arrow {
+      color: var(--text-color-secondary);
+    }
+  }
+  
+  // 弹出层
+  .ant-dropdown-menu,
+  .ant-select-dropdown {
+    background-color: #2d2d2d;
+    
+    .ant-dropdown-menu-item,
+    .ant-select-item {
+      color: var(--text-color-primary);
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+      
+      &-selected {
+        background-color: rgba(24, 144, 255, 0.08);
+        color: #1890ff;
+      }
+    }
+  }
+} 

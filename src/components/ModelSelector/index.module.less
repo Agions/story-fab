@@ -1,0 +1,173 @@
+.container {
+  padding: 16px;
+}
+
+.header {
+  margin-bottom: 16px;
+
+  .title {
+    margin-bottom: 8px;
+
+    :global(.anticon) {
+      margin-right: 8px;
+      color: #1890ff;
+    }
+  }
+}
+
+.alert {
+  margin-bottom: 16px;
+}
+
+.recommendations {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 8px;
+
+  .sectionTitle {
+    display: block;
+    margin-bottom: 8px;
+
+    :global(.anticon) {
+      color: #52c41a;
+    }
+  }
+}
+
+.filters {
+  margin-bottom: 16px;
+
+  .searchInput {
+    width: 100%;
+  }
+}
+
+.modelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.compactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.modelCard {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &.selected {
+    border-color: #1890ff;
+    background: #e6f7ff;
+  }
+
+  &.unavailable {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  :global(.ant-card-body) {
+    padding: 12px;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.modelInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.providerAvatar {
+  flex-shrink: 0;
+}
+
+.modelMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.modelName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.checkIcon {
+  color: #52c41a;
+  font-size: 16px;
+}
+
+.providerName {
+  font-size: 12px;
+}
+
+.proIcon {
+  color: #faad14;
+}
+
+.description {
+  margin: 8px 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.featureTag {
+  font-size: 11px;
+}
+
+.divider {
+  margin: 8px 0;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer {
+  margin-top: 16px;
+  text-align: center;
+}
+
+// 暗色模式适配
+:global(.dark) {
+  .recommendations {
+    background: #162312;
+    border-color: #274916;
+  }
+
+  .modelCard {
+    &.selected {
+      background: #111d2c;
+    }
+  }
+
+  .description {
+    color: rgba(255, 255, 255, 0.65);
+  }
+}

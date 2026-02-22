@@ -1,0 +1,190 @@
+// 高级主题样式增强
+// 这个文件包含了更高级的视觉设计效果，用于提升整体用户体验
+
+// 渐变效果
+.gradient-primary {
+  background: linear-gradient(135deg, #1890ff, #722ed1);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+// 卡片悬停动效
+.hover-card {
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// 浮动效果
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+// 闪光按钮效果
+.shine-button {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    bottom: -50%;
+    left: -50%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+    transform: rotateZ(60deg) translate(-5em, 7.5em);
+    animation: shine 3s infinite;
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: rotateZ(60deg) translate(-5em, 7.5em);
+  }
+  100% {
+    transform: rotateZ(60deg) translate(1em, -9em);
+  }
+}
+
+// 3D 卡片效果
+.card-3d {
+  perspective: 1000px;
+  
+  .inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  
+  &:hover .inner {
+    transform: rotateY(5deg) rotateX(5deg);
+  }
+}
+
+// 暗色模式下的霓虹效果
+.neon-text {
+  text-shadow: 0 0 5px rgba(24, 144, 255, 0.5), 
+               0 0 10px rgba(24, 144, 255, 0.5), 
+               0 0 15px rgba(24, 144, 255, 0.5);
+}
+
+.neon-border {
+  border: 1px solid #1890ff;
+  box-shadow: 0 0 5px #1890ff, 
+              0 0 10px rgba(24, 144, 255, 0.8);
+}
+
+// 毛玻璃效果
+.glass-effect {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-effect {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// 内容区块渐变背景
+.gradient-bg-section {
+  position: relative;
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.05) 0%, rgba(114, 46, 209, 0.05) 100%);
+  padding: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(24, 144, 255, 0.1) 0%, transparent 70%);
+  }
+}
+
+// 图标悬停效果
+.icon-hover {
+  transition: all 0.3s;
+  
+  &:hover {
+    transform: scale(1.2);
+    color: #1890ff;
+  }
+}
+
+// 暗色模式下特定组件样式修改
+.dark {
+  // 输入框特殊效果
+  .custom-input {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+      border-color: #1890ff;
+    }
+  }
+  
+  // 按钮特殊效果
+  .custom-button {
+    background: rgba(24, 144, 255, 0.1);
+    border: 1px solid rgba(24, 144, 255, 0.3);
+    
+    &:hover {
+      background: rgba(24, 144, 255, 0.2);
+      border: 1px solid rgba(24, 144, 255, 0.5);
+    }
+  }
+}
+
+// 页面切换动画
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms, transform 300ms;
+} 

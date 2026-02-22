@@ -1,0 +1,451 @@
+@import '../styles/variables.less';
+
+.dashboardContainer {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  background: linear-gradient(to bottom, rgba(240, 245, 255, 0.5), rgba(255, 255, 255, 0.8));
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+    border-radius: 8px;
+  }
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  
+  h2 {
+    margin-bottom: 6px;
+    font-size: 28px;
+    background: linear-gradient(90deg, @primary-color, #4096ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+  }
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .newProjectButton {
+      margin-top: 16px;
+      align-self: flex-start;
+      box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+.statsRow {
+  margin-bottom: 32px;
+  
+  :global(.ant-card) {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+  }
+  
+  .statistic {
+    :global(.ant-statistic-title) {
+      font-size: 15px;
+      margin-bottom: 10px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.65);
+    }
+    
+    :global(.ant-statistic-content) {
+      background: linear-gradient(90deg, @primary-color, #4096ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 28px;
+      font-weight: 600;
+      
+      .anticon {
+        margin-right: 10px;
+        font-size: 22px;
+      }
+    }
+  }
+}
+
+.projectToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    :global(.ant-segmented) {
+      margin-top: 12px;
+    }
+  }
+}
+
+.projectGrid {
+  margin-bottom: 32px;
+}
+
+.projectCard {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 100%;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  :global(.ant-card-body) {
+    padding: 16px;
+  }
+  
+  :global(.ant-card-actions) {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+  }
+}
+
+.thumbnailContainer {
+  position: relative;
+  overflow: hidden;
+  height: 0;
+  padding-top: 56.25%; // 16:9 ratio
+  cursor: pointer;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 70%, rgba(0, 0, 0, 0.4));
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    .thumbnail {
+      transform: scale(1.08);
+    }
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+.thumbnail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.starButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.95);
+    transform: scale(1.1);
+  }
+}
+
+.projectTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  font-weight: 600;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.85);
+  margin-bottom: 6px;
+}
+
+.projectInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.projectTags {
+  :global(.ant-tag) {
+    margin-right: 6px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    padding: 1px 8px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(24, 144, 255, 0.1);
+    color: @primary-color;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(24, 144, 255, 0.2);
+      transform: scale(1.05);
+    }
+  }
+}
+
+.projectList {
+  margin-bottom: 32px;
+  
+  :global(.ant-list-item) {
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+  }
+}
+
+.listThumbnailContainer {
+  position: relative;
+  width: 120px;
+  height: 68px;
+  border-radius: 4px;
+  overflow: hidden;
+  
+  @media (max-width: 576px) {
+    width: 80px;
+    height: 45px;
+  }
+}
+
+.listThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.listDuration {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 10px;
+}
+
+.emptyState {
+  margin: 48px 0;
+  
+  button {
+    margin-top: 16px;
+  }
+}
+
+.quickTools {
+  margin-bottom: 32px;
+  
+  :global(.ant-card-head-title) {
+    font-size: 18px;
+    font-weight: 500;
+  }
+}
+
+.toolCard {
+  text-align: center;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: linear-gradient(145deg, #ffffff, #f5f8ff);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    
+    .toolIcon {
+      transform: scale(1.15) rotate(5deg);
+      color: #4096ff;
+    }
+    
+    .toolTitle {
+      color: @primary-color;
+    }
+  }
+  
+  .toolIcon {
+    font-size: 36px;
+    color: @primary-color;
+    margin-bottom: 16px;
+    transition: all 0.4s ease;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .toolTitle {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 6px;
+    transition: color 0.3s ease;
+  }
+  
+  .toolDesc {
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 13px;
+    max-width: 80%;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+// 暗黑模式适配
+:global(.dark) {
+  .dashboardContainer {
+    background: linear-gradient(to bottom, rgba(20, 28, 45, 0.5), rgba(30, 38, 55, 0.8));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .dashboardHeader {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    
+    h2 {
+      background: linear-gradient(90deg, #4096ff, #1677ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+  
+  .statsRow {
+    :global(.ant-card) {
+      background: rgba(30, 38, 55, 0.8);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      
+      &:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      }
+    }
+    
+    .statistic {
+      :global(.ant-statistic-title) {
+        color: rgba(255, 255, 255, 0.65);
+      }
+    }
+  }
+  
+  .projectCard, .toolCard {
+    background: @dark-card;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    
+    &:hover {
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    }
+    
+    :global(.ant-card-actions) {
+      background-color: rgba(255, 255, 255, 0.03);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  }
+  
+  .projectTitle {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .projectTags {
+    :global(.ant-tag) {
+      background: rgba(24, 144, 255, 0.15);
+      color: #4096ff;
+      
+      &:hover {
+        background: rgba(24, 144, 255, 0.25);
+      }
+    }
+  }
+  
+  .projectList {
+    :global(.ant-list-item) {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+  
+  .toolCard {
+    background: linear-gradient(145deg, #1f2937, #111827);
+    
+    .toolTitle {
+      color: rgba(255, 255, 255, 0.85);
+    }
+    
+    .toolDesc {
+      color: rgba(255, 255, 255, 0.45);
+    }
+  }
+  
+  .starButton {
+    background-color: rgba(0, 0, 0, 0.6);
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+  }
+}

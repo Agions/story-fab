@@ -1,0 +1,366 @@
+.container {
+  margin-top: 16px;
+  
+  .empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.description {
+  margin-bottom: 24px;
+}
+
+.timeline {
+  margin: 24px 0;
+}
+
+.timelineItem {
+  padding-bottom: 16px;
+}
+
+.segmentCard {
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.segmentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.timeRange {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.timeInput {
+  margin-bottom: 0;
+  margin-right: 12px;
+  
+  input {
+    width: 80px;
+  }
+}
+
+.typeSelector {
+  margin-bottom: 16px;
+  
+  button {
+    margin-right: 2px;
+  }
+}
+
+.contentTextarea {
+  resize: vertical;
+}
+
+.addButton {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.preview {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+.previewContent {
+  margin-top: 16px;
+}
+
+.previewSegment {
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.previewTime {
+  color: #1890ff;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.previewType {
+  color: #666;
+  margin-right: 8px;
+}
+
+.previewText {
+  font-size: 15px;
+}
+
+.scriptEditor {
+  width: 100%;
+}
+
+.editorCard {
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.statsBar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+}
+
+.segmentsTable {
+  margin-bottom: 24px;
+  
+  :global(.ant-table-cell) {
+    vertical-align: top;
+  }
+}
+
+.contentCell {
+  max-height: 100px;
+  overflow-y: auto;
+  white-space: pre-line;
+}
+
+.emptyContent {
+  color: rgba(0, 0, 0, 0.25);
+  font-style: italic;
+}
+
+.editForm {
+  margin-top: 24px;
+}
+
+.editCard {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+.timeInputs {
+  display: flex;
+  gap: 16px;
+  
+  :global(.ant-form-item) {
+    flex: 1;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.previewContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  background-color: #000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.previewVideo {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+}
+
+.previewLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  color: #fff;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .timeInputs {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+/* 暗黑模式适配 */
+:global(.dark) {
+  .statsBar {
+    color: rgba(255, 255, 255, 0.65);
+  }
+  
+  .emptyContent {
+    color: rgba(255, 255, 255, 0.25);
+  }
+  
+  .editCard {
+    background-color: #1f1f1f;
+  }
+}
+
+// 动画效果
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(24, 144, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0);
+  }
+}
+
+// 当前编辑中的行高亮
+:global {
+  .ant-table-row.editing {
+    background-color: #e6f7ff;
+    
+    td {
+      animation: pulse 2s infinite;
+    }
+  }
+}
+
+.timeline {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  
+  :global(.ant-timeline-item-content) {
+    margin-left: 16px;
+    width: calc(100% - 32px);
+    min-height: 40px;
+  }
+}
+
+.segmentItem {
+  padding: 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  background-color: #fafafa;
+  margin-bottom: 16px;
+  transition: all 0.3s;
+  
+  &:hover {
+    background-color: #f0f7ff;
+    border-color: #d7e6ff;
+  }
+}
+
+.segmentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.timeRange {
+  font-weight: 500;
+  color: #1677ff;
+}
+
+.segmentContent {
+  padding: 8px;
+  background-color: white;
+  border-radius: 4px;
+  border-left: 3px solid #1677ff;
+  min-height: 60px;
+  white-space: pre-wrap;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 32px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.segmentList {
+  margin-top: 16px;
+}
+
+.segment {
+  margin-bottom: 16px;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  padding: 16px;
+  background-color: #fff;
+  transition: all 0.3s;
+  
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+}
+
+.segmentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.segmentTime {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.segmentType {
+  margin-left: 8px;
+}
+
+.segmentContent {
+  margin-top: 8px;
+  white-space: pre-line;
+}
+
+.editForm {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.timeInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeSeparator {
+  margin: 0 8px;
+}
+
+:global(.dark-theme) {
+  .segment {
+    background-color: #1f1f1f;
+    border-color: #303030;
+    
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  .segmentTime {
+    color: #1890ff;
+  }
+  
+  .segmentContent {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .editForm {
+    background-color: #141414;
+  }
+} 

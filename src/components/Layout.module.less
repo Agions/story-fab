@@ -1,0 +1,212 @@
+@import '../styles/variables.less';
+
+.layout {
+  min-height: 100vh;
+}
+
+.sider {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  position: fixed;
+  left: 0;
+  height: 100vh;
+  overflow: auto;
+  z-index: 10;
+  background-color: #fff;
+  border-right: none;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  background: linear-gradient(180deg, #ffffff, #f9fafc);
+
+  /* 滚动条样式优化 */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.logo {
+  height: @layout-header-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 @spacing-medium;
+  color: @primary-color;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  margin: 0;
+  overflow: hidden;
+  transition: all 0.3s;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(24, 144, 255, 0.3), transparent);
+  }
+  
+  /* 品牌文字加上渐变 */
+  h4 {
+    background: linear-gradient(90deg, @primary-color, @secondary-color);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: @font-weight-bold;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+  }
+}
+
+.menu {
+  border-right: none;
+  padding: @spacing-medium @spacing-small;
+  
+  /* 菜单项样式增强 */
+  :global {
+    .ant-menu-item {
+      border-radius: 10px;
+      margin: @spacing-small 0;
+      height: 48px;
+      line-height: 48px;
+      font-weight: @font-weight-medium;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: rgba(24, 144, 255, 0.05);
+        transform: translateX(4px);
+      }
+      
+      &.ant-menu-item-selected {
+        background-color: rgba(24, 144, 255, 0.1);
+        font-weight: @font-weight-bold;
+        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
+        
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 10px;
+          bottom: 10px;
+          width: 3px;
+          background: linear-gradient(to bottom, #1890ff, #722ed1);
+          border-radius: 0 3px 3px 0;
+          box-shadow: 0 0 8px rgba(24, 144, 255, 0.5);
+        }
+        
+        .anticon {
+          color: #1890ff;
+        }
+      }
+      
+      .anticon {
+        transition: all 0.3s ease;
+        font-size: 18px;
+        margin-right: 12px;
+      }
+    }
+  }
+}
+
+.content {
+  padding: @container-padding;
+  overflow: auto;
+  background-color: @background-color-base;
+  min-height: calc(100vh - @layout-header-height);
+  margin-left: @layout-sider-width;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #f8fafc, #f5f7fa);
+  
+  /* 适应侧边栏折叠状态 */
+  .siderCollapsed & {
+    margin-left: 80px;
+  }
+}
+
+.contentWrapper {
+  max-width: @layout-content-max-width;
+  margin: 0 auto;
+  background: @component-background;
+  padding: @container-padding;
+  border-radius: @border-radius-large;
+  box-shadow: @box-shadow-card;
+  min-height: calc(100vh - 112px);
+}
+
+.collapseButton {
+  position: absolute;
+  bottom: @spacing-large;
+  width: 100%;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  padding: 0 @container-padding;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  height: @layout-header-height;
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  margin-left: @layout-sider-width;
+  transition: all 0.3s;
+  
+  /* 适应侧边栏折叠状态 */
+  .siderCollapsed & {
+    margin-left: 80px;
+  }
+}
+
+.headerTitle {
+  font-size: 18px;
+  font-weight: @font-weight-medium;
+  color: @primary-color;
+  position: relative;
+  padding-left: @spacing-large;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 18px;
+    background: @primary-color;
+    border-radius: 2px;
+  }
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: @spacing-small;
+  
+  .ant-btn {
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+      color: @primary-color;
+    }
+  }
+  
+  .userButton {
+    padding: @spacing-small @spacing-medium;
+    border-radius: @border-radius-base;
+    transition: all 0.3s;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+  }
+}

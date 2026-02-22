@@ -1,0 +1,100 @@
+.videoTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.toolbar {
+  margin-bottom: 8px;
+}
+
+.timeDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.currentTime {
+  font-size: 18px;
+  color: #1890ff;
+}
+
+.timelineSlider {
+  padding: 0 16px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.tracksContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border-radius: 4px;
+  padding: 16px;
+  min-height: 200px;
+  overflow-x: auto;
+}
+
+.track {
+  display: flex;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.trackHeader {
+  width: 120px;
+  padding: 12px;
+  background: #fafafa;
+  border-right: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+
+.trackContent {
+  flex: 1;
+  position: relative;
+  height: 60px;
+  background: #f5f5f5;
+}
+
+.clip {
+  position: absolute;
+  top: 8px;
+  height: 44px;
+  background: #1890ff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+
+  &:hover {
+    background: #40a9ff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.selected {
+    background: #52c41a;
+    box-shadow: 0 0 0 2px #1890ff;
+  }
+}
+
+.clipContent {
+  padding: 4px 8px;
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clipInfo {
+  margin-top: 16px;
+}

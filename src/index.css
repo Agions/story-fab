@@ -1,0 +1,102 @@
+/* ClipFlow X Global Typography and Styles (2026) */
+:root {
+  /* UI System Tokens */
+  --bg-dark-0: #08080A;
+  --bg-dark-1: #121217;
+  --bg-dark-2: #1A1A22;
+  --bg-panel: rgba(26, 26, 34, 0.65);
+  
+  --brand-cyan: #00E5FF;
+  --brand-cyan-glow: rgba(0, 229, 255, 0.4);
+  --brand-orange: #FF5A00;
+  
+  --text-primary: #EDEDF0;
+  --text-secondary: #9B9C9E;
+  --text-muted: #56565C;
+  
+  --border-dim: #2A2A35;
+  --border-focus: #3D3D4F;
+  
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  
+  --blur-md: blur(12px);
+
+  /* Typography */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'OPPOSans', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: var(--bg-dark-0);
+  background-image: radial-gradient(circle at top right, rgba(0, 229, 255, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(255, 90, 0, 0.03) 0%, transparent 40%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+}
+
+/* 滚动条深色高质感样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark-0);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-focus);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Antd overriding for dark mode matching */
+.ant-layout {
+  background: transparent !important;
+}
+
+.ant-modal-content {
+  background-color: var(--bg-dark-1) !important;
+  border: 1px solid var(--border-dim) !important;
+  backdrop-filter: var(--blur-md);
+  color: var(--text-primary) !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, var(--brand-cyan), #00A6BE) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px var(--brand-cyan-glow) !important;
+}
+.ant-btn-primary:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+
+.ant-input {
+  background-color: var(--bg-dark-2) !important;
+  border-color: var(--border-dim) !important;
+  color: var(--text-primary) !important;
+}
+.ant-input:focus {
+  border-color: var(--brand-cyan) !important;
+  box-shadow: 0 0 0 2px var(--brand-cyan-glow) !important;
+}

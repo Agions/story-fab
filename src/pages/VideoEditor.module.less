@@ -1,0 +1,253 @@
+.editorLayout {
+  height: 100%;
+  background-color: #f5f7fa;
+}
+
+.editorContent {
+  padding: 24px;
+}
+
+// 工具栏
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+  .leftTools, .rightTools {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+// 卡片样式
+.playerCard {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  
+  .playerWrapper {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    background-color: #000;
+    
+    .videoPlayer {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+  
+  .emptyPlayer {
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+  }
+}
+
+// 播放器控制
+.playerControls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  
+  .timeDisplay {
+    color: white;
+    min-width: 100px;
+  }
+  
+  .progressBar {
+    flex: 1;
+  }
+}
+
+// 时间轴
+.timelineContainer {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  
+  .timeline {
+    position: relative;
+    height: 44px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    
+    .timelineSegment {
+      position: absolute;
+      height: 100%;
+      top: 0;
+      background-color: #1E88E5;
+      opacity: 0.7;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      
+      &.selected {
+        background-color: #FF5252;
+        opacity: 0.8;
+        z-index: 2;
+      }
+      
+      .segmentLabel {
+        color: white;
+        font-weight: bold;
+      }
+      
+      .segmentHandle {
+        position: absolute;
+        width: 8px;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.5);
+        cursor: col-resize;
+        
+        &:first-child {
+          left: 0;
+        }
+        
+        &:last-child {
+          right: 0;
+        }
+      }
+    }
+    
+    .playhead {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 2px;
+      background-color: #FF5252;
+      z-index: 3;
+      pointer-events: none;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -4px;
+        width: 10px;
+        height: 10px;
+        background-color: #FF5252;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+// 片段列表
+.segmentList {
+  padding: 16px 0;
+  
+  .segmentCard {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    &.selected {
+      border-color: #FF5252;
+      border-width: 2px;
+    }
+    
+    .segmentHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .segmentTime {
+      margin-bottom: 8px;
+    }
+    
+    .segmentContent {
+      color: #666;
+    }
+  }
+  
+  .addSegmentButton {
+    margin-top: 16px;
+  }
+}
+
+// 关键帧
+.keyframesContainer {
+  padding: 16px 0;
+  
+  .keyframeList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+    
+    .keyframeItem {
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      
+      .keyframeImage {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+// 设置面板
+.settingsPanel {
+  padding: 16px 0;
+  
+  .settingCard {
+    border-radius: 8px;
+    
+    .settingItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// 编辑器标签页
+.editorTabs {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+// 节标题
+.sectionTitle {
+  margin-bottom: 16px !important;
+  border-left: 3px solid #1E88E5;
+  padding-left: 8px;
+} 
