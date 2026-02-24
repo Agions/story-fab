@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, Row, Col, Typography, Tag, Avatar, Radio, Space, Badge, Tooltip, Button, Input, Segmented, Spin } from 'antd';
-import { CheckCircleFilled, RobotOutlined, LoadingOutlined, QuestionCircleOutlined, CodeOutlined, TranslationOutlined, VideoCameraOutlined, EditOutlined, FireOutlined, StarOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Typography, Tag, Avatar, Radio, Space, Tooltip, Button, Input, Segmented, Spin } from 'antd';
+import { CheckCircleFilled, RobotOutlined, QuestionCircleOutlined, CodeOutlined, VideoCameraOutlined, EditOutlined, FireOutlined, StarOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import styles from './AIModelSelector.module.less';
 

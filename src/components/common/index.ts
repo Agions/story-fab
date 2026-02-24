@@ -10,6 +10,7 @@ export { default as Sidebar } from './Sidebar';
 export { default as EmptyState } from './EmptyState';
 export { default as LoadingState } from './LoadingState';
 export { default as ErrorBoundary } from './ErrorBoundary';
+export { default as ProcessingProgress } from './ProcessingProgress';
 
 // 待创建的基础组件
 export { default as Card } from './Card';

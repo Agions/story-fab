@@ -3,8 +3,8 @@
  * 专为 AI 智能剪辑设计的专业布局
  * 三大核心功能：视频解说 | 第一人称 | AI混剪
  */
-import React, { useState } from 'react';
-import { Layout, Button, Tooltip, Space, Dropdown, Typography, Divider, Select, Slider, message, Badge } from 'antd';
+import React from 'react';
+import { Layout, Button, Tooltip, Space, Typography, Divider, Select, Slider, message } from 'antd';
 import {
   ScissorOutlined,
   AudioOutlined,
@@ -25,7 +25,7 @@ import { useAIEditor, AIFeatureType } from './AIPanel/AIEditorContext';
 import styles from './AILayout.module.less';
 
 const { Header, Sider, Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 interface AILayoutProps {
@@ -68,7 +68,7 @@ const aiFeatures = [
 const AILayout: React.FC<AILayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const { state, setFeature } = useAIEditor();
-  const { isPlaying, selectedFeature, projectName, currentVideo } = state;
+  const { isPlaying, selectedFeature, currentVideo } = state;
 
   // 处理核心功能切换
   const handleFunctionClick = (functionKey: string) => {

@@ -8,20 +8,17 @@
  *   - subtitle.asr (语音字幕 - 语音转文字)
  * 流转到: ScriptGenerate
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { 
-  Card, Button, Space, Typography, Progress, List, 
-  Tag, Alert, Divider, Switch, Tabs, Empty, Spin, message 
+  Card, Button, Space, Typography, List, 
+  Tag, Alert, Divider, Switch, Empty, message 
 } from 'antd';
 import {
   CloudSyncOutlined,
   PlayCircleOutlined,
   FileTextOutlined,
   AudioOutlined,
-  CheckCircleOutlined,
   SyncOutlined,
-  SettingOutlined,
-  ExclamationCircleOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
