@@ -5,8 +5,8 @@
  * 流转到: VideoUpload
  */
 import React, { useState } from 'react';
-import { Form, Input, Select, Button, Card, Space, Typography, message } from 'antd';
-import { PlusOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { Form, Input, Select, Button, Card, Space, Typography, message, Divider, Tag } from 'antd';
+import { PlusOutlined, ArrowRightOutlined, CheckCircleOutlined, VideoCameraOutlined, BookOutlined, CustomerServiceOutlined, NewsOutlined, SettingOutlined } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import type { ProjectData } from '@/core/types';
 import styles from './ClipFlow.module.less';
@@ -18,19 +18,85 @@ interface ProjectCreateProps {
   onNext?: () => void;
 }
 
+// 项目模板配置
+const PROJECT_TEMPLATES = [
+  {
+    id: 'marketing',
+    name: '营销推广',
+    icon: <VideoCameraOutlined />,
+    desc: '产品宣传、活动推广',
+    color: '#1890ff',
+    settings: {
+      videoQuality: 'high' as const,
+      outputFormat: 'mp4' as const,
+      resolution: '1080p' as const,
+      frameRate: 30,
+      subtitleEnabled: true,
+    },
+  },
+  {
+    id: 'education',
+    name: '教育培训',
+    icon: <BookOutlined />,
+    desc: '课程讲解、技能培训',
+    color: '#52c41a',
+    settings: {
+      videoQuality: 'high' as const,
+      outputFormat: 'mp4' as const,
+      resolution: '1080p' as const,
+      frameRate: 30,
+      subtitleEnabled: true,
+    },
+  },
+  {
+    id: 'entertainment',
+    name: '娱乐内容',
+    icon: <CustomerServiceOutlined />,
+    desc: '搞笑集锦、影视解说',
+    color: '#fa8c16',
+    settings: {
+      videoQuality: 'medium' as const,
+      outputFormat: 'mp4' as const,
+      resolution: '1080p' as const,
+      frameRate: 30,
+      subtitleEnabled: true,
+    },
+  },
+  {
+    id: 'news',
+    name: '新闻资讯',
+    icon: <NewsOutlined />,
+    desc: '热点解读、时事评论',
+    color: '#eb2f96',
+    settings: {
+      videoQuality: 'high' as const,
+      outputFormat: 'mp4' as const,
+      resolution: '1080p' as const,
+      frameRate: 30,
+      subtitleEnabled: true,
+    },
+  },
+  {
+    id: 'custom',
+    name: '自定义',
+    icon: <SettingOutlined />,
+    desc: '自定义设置',
+    color: '#722ed1',
+    settings: {
+      videoQuality: 'high' as const,
+      outputFormat: 'mp4' as const,
+      resolution: '1080p' as const,
+      frameRate: 30,
+      subtitleEnabled: true,
+    },
+  },
+];
+
 const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
   const { state, setProject, goToNextStep } = useClipFlow();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-
-  // 项目类型选项
-  const projectTypeOptions = [
-    { value: 'marketing', label: '营销推广', desc: '产品宣传、活动推广' },
-    { value: 'education', label: '教育培训', desc: '课程讲解、技能培训' },
-    { value: 'entertainment', label: '娱乐内容', desc: '搞笑集锦、影视解说' },
-    { value: 'news', label: '新闻资讯', desc: '热点解读、时事评论' },
-    { value: 'custom', label: '自定义', desc: '其他类型项目' },
-  ];
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('marketing');
 
   // 处理创建项目
   const handleCreateProject = async (values: {
@@ -40,6 +106,9 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
   }) => {
     setLoading(true);
     try {
+      // 获取选中的模板设置
+      const template = PROJECT_TEMPLATES.find(t => t.id === values.type) || PROJECT_TEMPLATES[4];
+      
       // 创建项目数据
       const newProject: ProjectData = {
         id: `project_${Date.now()}`,
@@ -51,13 +120,9 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         settings: {
-          videoQuality: 'high',
-          outputFormat: 'mp4',
-          resolution: '1080p',
-          frameRate: 30,
+          ...template.settings,
           audioCodec: 'aac',
           videoCodec: 'h264',
-          subtitleEnabled: true,
           subtitleStyle: {
             fontFamily: '思源黑体',
             fontSize: 24,
@@ -99,37 +164,57 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
           </Paragraph>
         </div>
 
-        <Card>
-          <Space direction="vertical" style={{ width: '100%' }} size="large">
-            <div>
-              <Text type="secondary">项目名称</Text>
-              <Title level={5} style={{ margin: '4px 0 0' }}>
-                {state.project.name}
-              </Title>
+        <Card className={styles.projectInfoCard}>
+          <div className={styles.projectHeader}>
+            <div className={styles.projectIcon}>
+              {PROJECT_TEMPLATES.find(t => t.id === state.project?.settings?.videoQuality)?.icon || <VideoCameraOutlined />}
             </div>
-            {state.project.description && (
-              <div>
-                <Text type="secondary">项目描述</Text>
-                <Paragraph style={{ margin: '4px 0 0' }}>
-                  {state.project.description}
-                </Paragraph>
-              </div>
-            )}
-            <div>
-              <Text type="secondary">创建时间</Text>
-              <Paragraph style={{ margin: '4px 0 0' }}>
+            <div className={styles.projectMeta}>
+              <div className={styles.projectName}>{state.project.name}</div>
+              {state.project.description && (
+                <div className={styles.projectDesc}>{state.project.description}</div>
+              )}
+            </div>
+          </div>
+          
+          <div className={styles.infoList}>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>项目类型</span>
+              <span className={styles.infoValue}>
+                <Tag color="blue">{PROJECT_TEMPLATES.find(t => t.id === state.project?.settings?.videoQuality)?.name || '自定义'}</Tag>
+              </span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>创建时间</span>
+              <span className={styles.infoValue}>
                 {new Date(state.project.createdAt).toLocaleString('zh-CN')}
-              </Paragraph>
+              </span>
             </div>
-            <Button 
-              type="primary" 
-              icon={<ArrowRightOutlined />}
-              onClick={goToNextStep}
-              block
-            >
-              下一步：上传视频
-            </Button>
-          </Space>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>输出格式</span>
+              <span className={styles.infoValue}>
+                {state.project.settings?.outputFormat?.toUpperCase() || 'MP4'}
+              </span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>分辨率</span>
+              <span className={styles.infoValue}>
+                {state.project.settings?.resolution || '1080p'}
+              </span>
+            </div>
+          </div>
+          
+          <Divider />
+          
+          <Button 
+            type="primary" 
+            icon={<ArrowRightOutlined />}
+            onClick={goToNextStep}
+            block
+            size="large"
+          >
+            下一步：上传视频
+          </Button>
         </Card>
       </div>
     );
@@ -141,11 +226,37 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
       <div className={styles.stepTitle}>
         <Title level={4}>创建新项目</Title>
         <Paragraph>
-          为您的视频剪辑项目设置基本信息
+          选择项目模板，快速创建您的视频剪辑项目
         </Paragraph>
       </div>
 
-      <Card>
+      {/* 项目模板选择 */}
+      <div className={styles.templateGrid}>
+        {PROJECT_TEMPLATES.map((template) => (
+          <div
+            key={template.id}
+            className={`${styles.templateCard} ${selectedTemplate === template.id ? styles.active : ''}`}
+            onClick={() => {
+              setSelectedTemplate(template.id);
+              form.setFieldValue('type', template.id);
+            }}
+          >
+            <span 
+              className={styles.templateIcon}
+              style={{ color: template.color }}
+            >
+              {template.icon}
+            </span>
+            <div className={styles.templateName}>{template.name}</div>
+            <div className={styles.templateDesc}>{template.desc}</div>
+            {selectedTemplate === template.id && (
+              <CheckCircleOutlined style={{ color: template.color, marginTop: 8 }} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      <Card className={styles.formCard}>
         <Form
           form={form}
           layout="vertical"
@@ -166,6 +277,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
               placeholder="例如：产品宣传视频" 
               maxLength={50}
               showCount
+              size="large"
             />
           </Form.Item>
 
@@ -173,19 +285,9 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
             name="type"
             label="项目类型"
             rules={[{ required: true, message: '请选择项目类型' }]}
+            hidden
           >
-            <Select placeholder="选择项目类型">
-              {projectTypeOptions.map((opt) => (
-                <Select.Option key={opt.value} value={opt.value}>
-                  <Space direction="vertical" size={0}>
-                    <span>{opt.label}</span>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {opt.desc}
-                    </Text>
-                  </Space>
-                </Select.Option>
-              ))}
-            </Select>
+            <Select />
           </Form.Item>
 
           <Form.Item

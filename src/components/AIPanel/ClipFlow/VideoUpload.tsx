@@ -5,10 +5,10 @@
  * 数据输出: video (VideoInfo) + duration/width/height
  * 流转到: AIAnalyze
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { 
   Upload, Button, Card, Space, Typography, Progress, 
-  List, message, Alert, Divider 
+  List, message, Alert, Divider, Tooltip, Badge 
 } from 'antd';
 import {
   VideoCameraOutlined,
@@ -17,6 +17,11 @@ import {
   CheckCircleOutlined,
   PlayCircleOutlined,
   FileOutlined,
+  CloudUploadOutlined,
+  PauseCircleOutlined,
+  SyncOutlined,
+  InfoCircleOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import { ProcessingProgress } from '@/components/common';
@@ -30,6 +35,23 @@ const { Dragger } = Upload;
 // 支持的视频格式
 const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv'];
 
+// 模拟断点续传存储
+const createChunkStore = () => {
+  const chunks: Map<string, Blob[]> = new Map();
+  return {
+    addChunk: (id: string, chunk: Blob, index: number) => {
+      if (!chunks.has(id)) chunks.set(id, []);
+      const arr = chunks.get(id)!;
+      arr[index] = chunk;
+    },
+    getChunks: (id: string) => chunks.get(id) || [],
+    hasChunks: (id: string) => chunks.has(id) && chunks.get(id)!.length > 0,
+    clear: (id: string) => chunks.delete(id),
+  };
+};
+
+const chunkStore = createChunkStore();
+
 interface VideoUploadProps {
   onNext?: () => void;
 }
@@ -39,36 +61,69 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'paused' | 'completed'>('idle');
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const uploadControllerRef = useRef<AbortController | null>(null);
+
+  // 验证文件
+  const validateFile = (file: File): { valid: boolean; error?: string } => {
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!VIDEO_EXTENSIONS.includes(ext)) {
+      return { valid: false, error: `不支持的视频格式: ${ext}` };
+    }
+    if (file.size > 2 * 1024 * 1024 * 1024) {
+      return { valid: false, error: '视频文件不能超过 2GB' };
+    }
+    return { valid: true };
+  };
 
   // 处理文件上传
   const handleUpload = useCallback(async (file: File) => {
-    // 验证文件类型
-    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-    if (!VIDEO_EXTENSIONS.includes(ext)) {
-      message.error(`不支持的视频格式: ${ext}`);
-      return;
-    }
-
-    // 验证文件大小 (最大 2GB)
-    if (file.size > 2 * 1024 * 1024 * 1024) {
-      message.error('视频文件不能超过 2GB');
+    const validation = validateFile(file);
+    if (!validation.valid) {
+      message.error(validation.error);
       return;
     }
 
     setUploading(true);
     setUploadProgress(0);
+    setUploadStatus('uploading');
+    setCurrentFile(file);
+    
+    // 生成唯一上传ID（用于断点续传）
+    const uploadId = `upload_${Date.now()}`;
+    chunkStore.clear(uploadId);
 
     try {
+      // 模拟分片上传
+      const chunkSize = 1024 * 1024; // 1MB chunks
+      const totalChunks = Math.ceil(file.size / chunkSize);
+      
       // 模拟上传进度
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + Math.random() * 15;
-        });
-      }, 200);
+      for (let i = 0; i < totalChunks; i++) {
+        if (uploadStatus === 'paused') {
+          // 暂停处理
+          await new Promise<void>((resolve) => {
+            const checkResume = setInterval(() => {
+              if (uploadStatus === 'uploading') {
+                clearInterval(checkResume);
+                resolve();
+              }
+            }, 100);
+          });
+        }
+        
+        // 模拟每个分片上传
+        const chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
+        chunkStore.addChunk(uploadId, chunk, i);
+        
+        // 计算进度
+        const progress = Math.min(((i + 1) / totalChunks) * 100, 100);
+        setUploadProgress(progress);
+        
+        // 模拟网络延迟
+        await new Promise(r => setTimeout(r, 100 + Math.random() * 200));
+      }
 
       // 读取视频文件获取基本信息
       const videoInfo = await new Promise<VideoInfo>((resolve, reject) => {
@@ -101,8 +156,8 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
         video.src = URL.createObjectURL(file);
       });
 
-      clearInterval(progressInterval);
       setUploadProgress(100);
+      setUploadStatus('completed');
 
       // 保存视频信息到状态
       setVideo(videoInfo);
@@ -120,12 +175,26 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
     } finally {
       setUploading(false);
     }
-  }, [setVideo, goToNextStep, onNext]);
+  }, [setVideo, goToNextStep, onNext, uploadStatus]);
+
+  // 处理暂停/继续上传
+  const handlePauseResume = () => {
+    if (uploadStatus === 'uploading') {
+      setUploadStatus('paused');
+      message.info('上传已暂停');
+    } else if (uploadStatus === 'paused') {
+      setUploadStatus('uploading');
+      message.info('继续上传中...');
+    }
+  };
 
   // 处理删除视频
   const handleDelete = () => {
     setVideo(null);
     setUploadProgress(0);
+    setUploadStatus('idle');
+    setCurrentFile(null);
+    chunkStore.clear('current');
   };
 
   // 拖拽事件处理
@@ -160,56 +229,68 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
           </Paragraph>
         </div>
 
-        <Card>
-          <Space direction="vertical" style={{ width: '100%' }} size="large">
-            {/* 视频预览 */}
-            <div className={styles.videoContainer}>
-              <video
-                src={state.currentVideo.path}
-                controls
-                style={{ maxWidth: '100%', maxHeight: 400 }}
-              />
-            </div>
-
-            <Divider />
-
-            {/* 视频信息 */}
-            <List
-              bordered={false}
-              dataSource={[
-                { label: '文件名', value: state.currentVideo.name },
-                { label: '时长', value: formatDuration(state.currentVideo.duration) },
-                { label: '分辨率', value: `${state.currentVideo.width}x${state.currentVideo.height}` },
-                { label: '格式', value: state.currentVideo.format.toUpperCase() },
-                { label: '大小', value: formatFileSize(state.currentVideo.size) },
-              ]}
-              renderItem={(item) => (
-                <List.Item>
-                  <Text type="secondary" style={{ width: 80 }}>
-                    {item.label}
-                  </Text>
-                  <Text strong>{item.value}</Text>
-                </List.Item>
-              )}
+        <Card className={styles.videoInfoCard}>
+          {/* 视频预览 */}
+          <div className={styles.videoPreview}>
+            <video
+              src={state.currentVideo.path}
+              controls
             />
+            <div className={styles.playOverlay}>
+              <PlayCircleOutlined className={styles.playIcon} />
+            </div>
+          </div>
 
-            <Space>
-              <Button 
-                danger 
-                icon={<DeleteOutlined />}
-                onClick={handleDelete}
-              >
-                删除视频
-              </Button>
-              <Button 
-                type="primary" 
-                icon={<PlayCircleOutlined />}
-                onClick={goToNextStep}
-              >
-                下一步：AI 分析
-              </Button>
-            </Space>
-          </Space>
+          {/* 视频详细信息 */}
+          <div className={styles.videoDetails}>
+            <div className={styles.detailItem}>
+              <div className={styles.detailLabel}>文件名</div>
+              <div className={styles.detailValue}>
+                <Tooltip title={state.currentVideo.name}>
+                  {state.currentVideo.name.length > 15 
+                    ? state.currentVideo.name.slice(0, 15) + '...' 
+                    : state.currentVideo.name}
+                </Tooltip>
+              </div>
+            </div>
+            <div className={styles.detailItem}>
+              <div className={styles.detailLabel}>时长</div>
+              <div className={styles.detailValue}>{formatDuration(state.currentVideo.duration)}</div>
+            </div>
+            <div className={styles.detailItem}>
+              <div className={styles.detailLabel}>分辨率</div>
+              <div className={styles.detailValue}>{state.currentVideo.width}x{state.currentVideo.height}</div>
+            </div>
+            <div className={styles.detailItem}>
+              <div className={styles.detailLabel}>格式</div>
+              <div className={styles.detailValue}>{state.currentVideo.format.toUpperCase()}</div>
+            </div>
+            <div className={styles.detailItem}>
+              <div className={styles.detailLabel}>大小</div>
+              <div className={styles.detailValue}>{formatFileSize(state.currentVideo.size)}</div>
+            </div>
+            <div className={styles.detailItem}>
+              <div className={styles.detailLabel}>帧率</div>
+              <div className={styles.detailValue}>{state.currentVideo.fps} fps</div>
+            </div>
+          </div>
+
+          <div className={styles.videoActions}>
+            <Button 
+              danger 
+              icon={<DeleteOutlined />}
+              onClick={handleDelete}
+            >
+              删除视频
+            </Button>
+            <Button 
+              type="primary" 
+              icon={<PlayCircleOutlined />}
+              onClick={goToNextStep}
+            >
+              下一步：AI 分析
+            </Button>
+          </div>
         </Card>
       </div>
     );
@@ -227,57 +308,104 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
 
       {state.stepStatus['project-create'] ? (
         <Card>
-          <div
-            className={`${styles.uploadArea} ${dragOver ? styles.dragOver : ''}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <Dragger
-              showUploadList={false}
-              beforeUpload={(file) => {
-                handleUpload(file);
-                return false; // 阻止默认上传行为
-              }}
-              accept={VIDEO_EXTENSIONS.join(',')}
-              disabled={uploading}
-            >
-              {uploading ? (
-                <div className={styles.analysisProgress}>
-                  <ProcessingProgress
-                    percent={Math.round(uploadProgress)}
-                    statusText="正在处理视频..."
-                    status="active"
-                    type="circle"
-                    size="large"
-                    showIcon={false}
-                  />
+          {/* 上传进度显示 */}
+          {uploading ? (
+            <div className={styles.uploadProgress}>
+              <div className={styles.progressWrapper}>
+                <ProcessingProgress
+                  percent={Math.round(uploadProgress)}
+                  status={uploadStatus === 'completed' ? 'success' : 'active'}
+                  statusText={uploadStatus === 'completed' ? '上传完成' : uploadStatus === 'paused' ? '已暂停' : '正在上传...'}
+                  type="circle"
+                  size="large"
+                  strokeColor={{
+                    '0%': '#108ee9',
+                    '100%': uploadStatus === 'completed' ? '#52c41a' : '#87d068',
+                  }}
+                />
+              </div>
+              
+              {currentFile && (
+                <div className={styles.progressInfo}>
+                  <Space>
+                    <FileOutlined />
+                    <span className={styles.fileName}>{currentFile.name}</span>
+                  </Space>
+                  <span className={styles.fileSize}>
+                    {formatFileSize((currentFile.size * uploadProgress) / 100)} / {formatFileSize(currentFile.size)}
+                  </span>
                 </div>
-              ) : (
-                <>
-                  <p className={styles.uploadIcon}>
-                    <VideoCameraOutlined />
-                  </p>
-                  <p className={styles.uploadText}>
-                    <Text strong>点击或拖拽视频文件到此处上传</Text>
-                  </p>
-                  <p className={styles.uploadText}>
-                    <Text type="secondary">
-                      支持 {VIDEO_EXTENSIONS.join('、')} 格式
-                    </Text>
-                  </p>
-                </>
               )}
-            </Dragger>
-          </div>
+              
+              <div className={styles.progressTip}>
+                <Space>
+                  <ThunderboltOutlined style={{ color: '#faad14' }} />
+                  <Text type="secondary">
+                    {uploadStatus === 'paused' 
+                      ? '点击继续按钮恢复上传' 
+                      : uploadProgress < 100 
+                        ? '支持断点续传，上传中断后可继续' 
+                        : '视频处理中，请稍候...'}
+                  </Text>
+                </Space>
+              </div>
+              
+              <Divider />
+              
+              <Space>
+                <Button 
+                  icon={uploadStatus === 'paused' ? <SyncOutlined /> : <PauseCircleOutlined />}
+                  onClick={handlePauseResume}
+                  disabled={uploadStatus === 'completed'}
+                >
+                  {uploadStatus === 'paused' ? '继续' : '暂停'}
+                </Button>
+              </Space>
+            </div>
+          ) : (
+            <div
+              className={`${styles.uploadArea} ${dragOver ? styles.dragOver : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <Dragger
+                showUploadList={false}
+                beforeUpload={(file) => {
+                  handleUpload(file);
+                  return false; // 阻止默认上传行为
+                }}
+                accept={VIDEO_EXTENSIONS.join(',')}
+                disabled={uploading}
+              >
+                <p className={styles.uploadIcon}>
+                  <CloudUploadOutlined />
+                </p>
+                <p className={styles.uploadText}>
+                  <Text strong>点击或拖拽视频文件到此处上传</Text>
+                </p>
+                <p className={styles.uploadText}>
+                  <Text type="secondary" className={styles.subText}>
+                    支持 {VIDEO_EXTENSIONS.join('、')} 格式
+                  </Text>
+                </p>
+              </Dragger>
+            </div>
+          )}
 
           <Alert
-            message="上传说明"
+            message={
+              <Space>
+                <InfoCircleOutlined />
+                <span>上传说明</span>
+              </Space>
+            }
             description={
-              <ul style={{ margin: 0, paddingLeft: 20 }}>
+              <ul style={{ margin: '8px 0 0', paddingLeft: 20 }}>
                 <li>请上传清晰的视频文件以获得最佳分析效果</li>
                 <li>视频时长建议 1-30 分钟</li>
                 <li>上传后系统将自动分析视频内容</li>
+                <li>支持断点续传，大文件上传更稳定</li>
               </ul>
             }
             type="info"

@@ -77,37 +77,310 @@
   }
 }
 
-/* 上传区域 */
-.uploadArea {
-  border: 2px dashed #d9d9d9;
-  border-radius: 8px;
-  padding: 40px;
-  text-align: center;
+/* ==================== 1. 创建项目优化样式 ==================== */
+
+/* 项目模板选择 */
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.templateCard {
+  padding: 20px;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  text-align: center;
+  background: #fff;
   
   &:hover {
+    border-color: #1890ff;
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  &.active {
     border-color: #1890ff;
     background: rgba(24, 144, 255, 0.04);
   }
   
+  .templateIcon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  
+  .templateName {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  
+  .templateDesc {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* 表单优化 */
+.formCard {
+  :global {
+    .ant-form-item-label > label {
+      font-weight: 500;
+    }
+  }
+  
+  .inputCount {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* 项目信息卡片 */
+.projectInfoCard {
+  .projectHeader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    
+    .projectIcon {
+      font-size: 48px;
+      color: #1890ff;
+    }
+    
+    .projectMeta {
+      flex: 1;
+      
+      .projectName {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      
+      .projectDesc {
+        color: rgba(0, 0, 0, 0.45);
+      }
+    }
+  }
+  
+  .infoList {
+    .infoItem {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f5f5f5;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .infoLabel {
+        color: rgba(0, 0, 0, 0.45);
+      }
+      
+      .infoValue {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+/* ==================== 2. 上传视频优化样式 ==================== */
+
+/* 上传区域 */
+.uploadArea {
+  border: 2px dashed #d9d9d9;
+  border-radius: 12px;
+  padding: 48px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: linear-gradient(135deg, #fafafa 0%, #fff 100%);
+  
+  &:hover {
+    border-color: #1890ff;
+    background: linear-gradient(135deg, rgba(24, 144, 255, 0.04) 0%, rgba(24, 144, 255, 0.08) 100%);
+  }
+  
   &.dragOver {
     border-color: #1890ff;
-    background: rgba(24, 144, 255, 0.08);
+    background: linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.12) 100%);
+    transform: scale(1.01);
   }
   
   .uploadIcon {
-    font-size: 48px;
-    color: rgba(0, 0, 0, 0.25);
-    margin-bottom: 16px;
+    font-size: 64px;
+    color: rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    
+    &:hover {
+      color: #1890ff;
+      transform: scale(1.1);
+    }
   }
   
   .uploadText {
-    font-size: 14px;
+    font-size: 16px;
     color: rgba(0, 0, 0, 0.65);
+    margin-bottom: 8px;
     
     p {
       margin: 8px 0 0;
+    }
+    
+    .subText {
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.35);
+    }
+  }
+}
+
+/* 上传进度 */
+.uploadProgress {
+  padding: 32px;
+  
+  .progressWrapper {
+    max-width: 300px;
+    margin: 0 auto 24px;
+  }
+  
+  .progressInfo {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 13px;
+    
+    .fileName {
+      color: rgba(0, 0, 0, 0.65);
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .fileSize {
+      color: rgba(0, 0, 0, 0.45);
+    }
+  }
+  
+  .progressTip {
+    margin-top: 16px;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* 视频信息卡片 */
+.videoInfoCard {
+  .videoPreview {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    
+    video {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    
+    .playOverlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.3s;
+      cursor: pointer;
+      
+      &:hover {
+        opacity: 1;
+      }
+      
+      .playIcon {
+        font-size: 48px;
+        color: #fff;
+      }
+    }
+  }
+  
+  .videoDetails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    
+    .detailItem {
+      padding: 12px;
+      background: #fafafa;
+      border-radius: 8px;
+      text-align: center;
+      
+      .detailLabel {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.45);
+        margin-bottom: 4px;
+      }
+      
+      .detailValue {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.85);
+      }
+    }
+  }
+  
+  .videoActions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+  }
+}
+
+/* ==================== 3. AI分析优化样式 ==================== */
+
+/* 分析配置卡片 */
+.analysisConfig {
+  margin-bottom: 20px;
+  
+  .configCard {
+    border-radius: 12px;
+    
+    .configItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f5f5f5;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .configLabel {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        .configIcon {
+          font-size: 18px;
+          color: #1890ff;
+        }
+      }
     }
   }
 }
@@ -115,16 +388,18 @@
 /* 分析进度 */
 .analysisProgress {
   text-align: center;
-  padding: 40px;
+  padding: 48px;
   
   .progressIcon {
-    font-size: 48px;
+    font-size: 56px;
     color: #1890ff;
     margin-bottom: 24px;
   }
   
   .progressText {
-    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
   }
   
   .progressStatus {
@@ -133,6 +408,758 @@
     .ant-progress-text {
       font-size: 16px;
       font-weight: 500;
+    }
+  }
+  
+  .taskList {
+    margin-top: 32px;
+    text-align: left;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    
+    .taskItem {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      color: rgba(0, 0, 0, 0.45);
+      
+      &.active {
+        color: #1890ff;
+        font-weight: 500;
+      }
+      
+      &.completed {
+        color: #52c41a;
+      }
+      
+      .taskIcon {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+/* 分析结果 */
+.analysisResult {
+  .resultSummary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    
+    .summaryCard {
+      flex: 1;
+      min-width: 140px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+      border-radius: 12px;
+      text-align: center;
+      
+      .summaryValue {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1890ff;
+        margin-bottom: 4px;
+      }
+      
+      .summaryLabel {
+        font-size: 13px;
+        color: rgba(0, 0, 0, 0.65);
+      }
+    }
+  }
+  
+  .sceneList {
+    margin-top: 20px;
+    
+    .sceneItem {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      transition: all 0.3s;
+      
+      &:hover {
+        border-color: #1890ff;
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+      }
+      
+      .sceneThumbnail {
+        width: 80px;
+        height: 45px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      
+      .sceneInfo {
+        flex: 1;
+        
+        .sceneTime {
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.45);
+          font-family: monospace;
+        }
+        
+        .sceneDesc {
+          font-weight: 500;
+          margin-top: 4px;
+        }
+      }
+    }
+  }
+}
+
+/* 字幕预览 */
+.subtitlePreview {
+  .subtitleItem {
+    padding: 12px 16px;
+    border-left: 3px solid #1890ff;
+    background: #fafafa;
+    margin-bottom: 8px;
+    border-radius: 0 8px 8px 0;
+    transition: all 0.2s;
+    
+    &:hover {
+      background: #f0f5ff;
+      border-left-color: #52c41a;
+    }
+    
+    .timeRange {
+      font-size: 12px;
+      color: #1890ff;
+      font-family: monospace;
+      margin-bottom: 4px;
+    }
+    
+    .subtitleText {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  }
+}
+
+/* ==================== 4. 生成文案优化样式 ==================== */
+
+/* 功能选择卡片 */
+.functionSelect {
+  margin-bottom: 24px;
+  
+  .functionCard {
+    padding: 20px 24px;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: #1890ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    }
+    
+    &.active {
+      border-color: #1890ff;
+      background: linear-gradient(135deg, rgba(24, 144, 255, 0.04) 0%, rgba(24, 144, 255, 0.08) 100%);
+    }
+    
+    .functionHeader {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      
+      .functionIcon {
+        font-size: 32px;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%);
+      }
+      
+      .functionInfo {
+        flex: 1;
+        
+        .functionName {
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+        
+        .functionDesc {
+          font-size: 13px;
+          color: rgba(0, 0, 0, 0.45);
+        }
+      }
+      
+      .checkBadge {
+        font-size: 20px;
+        color: #52c41a;
+      }
+    }
+  }
+}
+
+/* 文案配置 */
+.scriptConfig {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  
+  .configItem {
+    flex: 1;
+    min-width: 150px;
+    
+    .configLabel {
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: block;
+    }
+  }
+}
+
+/* 文案编辑器 */
+.scriptEditorWrapper {
+  .editorToolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    
+    .toolbarLeft {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .toolbarRight {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.45);
+    }
+  }
+  
+  .editorContent {
+    min-height: 300px;
+    padding: 16px;
+    border: 1px solid #e8e8e8;
+    border-radius: 0 0 8px 8px;
+    background: #fff;
+    
+    textarea {
+      border: none;
+      outline: none;
+      resize: none;
+      width: 100%;
+      font-family: '思源黑体', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.8;
+      
+      &::placeholder {
+        color: rgba(0, 0, 0, 0.25);
+      }
+    }
+  }
+}
+
+/* 配音选择 */
+.voiceSelect {
+  .voiceList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    
+    .voiceItem {
+      padding: 16px;
+      border: 2px solid #e8e8e8;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      
+      &:hover {
+        border-color: #1890ff;
+        background: #f0f5ff;
+      }
+      
+      &.active {
+        border-color: #1890ff;
+        background: linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.04) 100%);
+      }
+      
+      .voiceName {
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      
+      .voiceTags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        
+        .voiceTag {
+          font-size: 11px;
+          padding: 2px 8px;
+          background: #f0f0f0;
+          border-radius: 4px;
+          color: rgba(0, 0, 0, 0.65);
+        }
+      }
+    }
+  }
+  
+  .voicePreview {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 12px;
+    text-align: center;
+    
+    .previewBtn {
+      margin-bottom: 12px;
+    }
+    
+    .previewTip {
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.45);
+    }
+  }
+}
+
+/* ==================== 5. 视频合成优化样式 ==================== */
+
+/* 合成预览 */
+.synthesizePreview {
+  .videoContainer {
+    position: relative;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    video {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    
+    .previewOverlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transition: opacity 0.3s;
+      cursor: pointer;
+      
+      &:hover {
+        opacity: 1;
+      }
+      
+      .overlayIcon {
+        font-size: 56px;
+        color: #fff;
+        margin-bottom: 12px;
+      }
+      
+      .overlayText {
+        color: #fff;
+        font-size: 14px;
+      }
+    }
+  }
+  
+  .timeline {
+    margin-top: 16px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 8px;
+    
+    .timelineBar {
+      height: 4px;
+      background: #e8e8e8;
+      border-radius: 2px;
+      position: relative;
+      
+      .timelineProgress {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        background: linear-gradient(90deg, #1890ff, #52c41a);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+    }
+  }
+}
+
+/* 合成配置标签页 */
+.synthesizeConfig {
+  .configTabs {
+    :global {
+      .ant-tabs-nav {
+        margin-bottom: 16px;
+      }
+      
+      .ant-tabs-tab {
+        padding: 12px 16px;
+        
+        .anticon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+  
+  .configContent {
+    .configSection {
+      margin-bottom: 20px;
+      
+      .sectionTitle {
+        font-weight: 500;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .sliderWrapper {
+        padding: 0 8px;
+        
+        .sliderLabel {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 8px;
+          font-size: 13px;
+          color: rgba(0, 0, 0, 0.65);
+        }
+      }
+    }
+  }
+}
+
+/* 合成进度 */
+.synthesizeProgress {
+  text-align: center;
+  padding: 32px;
+  
+  .progressSteps {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-bottom: 32px;
+    
+    .stepItem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.5;
+      transition: all 0.3s;
+      
+      &.active {
+        opacity: 1;
+        
+        .stepIcon {
+          color: #1890ff;
+          transform: scale(1.1);
+        }
+      }
+      
+      &.completed {
+        opacity: 1;
+        
+        .stepIcon {
+          color: #52c41a;
+        }
+      }
+      
+      .stepIcon {
+        font-size: 28px;
+        transition: all 0.3s;
+      }
+      
+      .stepLabel {
+        font-size: 13px;
+        color: rgba(0, 0, 0, 0.65);
+      }
+    }
+  }
+}
+
+/* ==================== 6. 导出优化样式 ==================== */
+
+/* 导出预览 */
+.exportPreview {
+  .previewCard {
+    border-radius: 12px;
+    overflow: hidden;
+    
+    .previewVideo {
+      position: relative;
+      background: #000;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      video {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
+  }
+}
+
+/* 导出设置 */
+.exportSettings {
+  .settingsCard {
+    border-radius: 12px;
+  }
+  
+  .settingGroup {
+    margin-bottom: 24px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .groupTitle {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+  
+  .settingItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .settingLabel {
+      .labelText {
+        font-weight: 500;
+      }
+      
+      .labelDesc {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.45);
+        margin-top: 2px;
+      }
+    }
+    
+    .settingControl {
+      min-width: 150px;
+    }
+  }
+  
+  /* 文件大小估算 */
+  .fileEstimate {
+    padding: 16px;
+    background: linear-gradient(135deg, #f6ffed 0%, #f0f5ff 100%);
+    border-radius: 10px;
+    margin-top: 16px;
+    
+    .estimateGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      
+      .estimateItem {
+        text-align: center;
+        
+        .estimateValue {
+          font-size: 18px;
+          font-weight: 600;
+          color: #52c41a;
+        }
+        
+        .estimateLabel {
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.45);
+          margin-top: 4px;
+        }
+      }
+    }
+  }
+}
+
+/* 导出进度 */
+.exportProgress {
+  .exportSteps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+    
+    .exportStep {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #fafafa;
+      border-radius: 8px;
+      
+      &.active {
+        background: linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%);
+      }
+      
+      &.completed {
+        background: #f6ffed;
+        
+        .stepIcon {
+          color: #52c41a;
+        }
+      }
+      
+      .stepIcon {
+        font-size: 18px;
+        color: rgba(0, 0, 0, 0.25);
+      }
+      
+      .stepLabel {
+        flex: 1;
+        font-size: 14px;
+      }
+      
+      .stepPercent {
+        font-weight: 500;
+        color: #1890ff;
+      }
+    }
+  }
+}
+
+/* 导出完成 */
+.flowComplete {
+  text-align: center;
+  padding: 48px 40px;
+  
+  .completeIcon {
+    font-size: 80px;
+    color: #52c41a;
+    margin-bottom: 24px;
+    animation: bounceIn 0.6s ease;
+  }
+  
+  @keyframes bounceIn {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .completeTitle {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  
+  .completeDesc {
+    color: rgba(0, 0, 0, 0.65);
+    margin-bottom: 32px;
+    font-size: 15px;
+  }
+  
+  .completeInfo {
+    max-width: 400px;
+    margin: 0 auto 32px;
+    text-align: left;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 12px;
+    
+    .infoRow {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .infoLabel {
+        color: rgba(0, 0, 0, 0.45);
+      }
+      
+      .infoValue {
+        font-weight: 500;
+      }
+    }
+  }
+  
+  .completeActions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    
+    .primaryBtn {
+      height: 44px;
+      padding: 0 32px;
+      font-size: 15px;
+    }
+    
+    .secondaryBtn {
+      height: 44px;
+      padding: 0 24px;
+      font-size: 15px;
+    }
+  }
+  
+  .shareButtons {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    
+    .shareBtn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
   }
 }
@@ -189,80 +1216,4 @@
 .synthesisPreview {
   .videoContainer {
     background: #000;
-    border-radius: 8px;
-    overflow: hidden;
-    aspect-ratio: 16/9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    video {
-      max-width: 100%;
-      max-height: 100%;
-    }
-  }
-  
-  .audioContainer {
-    margin-top: 16px;
-    padding: 16px;
-    background: #f5f5f5;
-    border-radius: 8px;
-  }
-}
-
-/* 导出设置 */
-.exportSettings {
-  .settingGroup {
-    margin-bottom: 24px;
-    
-    .groupTitle {
-      font-weight: 500;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-  }
-  
-  .settingItem {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-    
-    .label {
-      width: 100px;
-      color: rgba(0, 0, 0, 0.65);
-    }
-    
-    .control {
-      flex: 1;
-    }
-  }
-}
-
-/* 流程完成 */
-.flowComplete {
-  text-align: center;
-  padding: 60px 40px;
-  
-  .completeIcon {
-    font-size: 72px;
-    color: #52c41a;
-    margin-bottom: 24px;
-  }
-  
-  .completeTitle {
-    font-size: 24px;
-    margin-bottom: 16px;
-  }
-  
-  .completeDesc {
-    color: rgba(0, 0, 0, 0.45);
-    margin-bottom: 32px;
-  }
-  
-  .actions {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-  }
-}
+    border
