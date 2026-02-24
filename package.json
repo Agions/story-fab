@@ -20,7 +20,9 @@
     "docs": "npm run docs:api && ts-node scripts/generate-docs.ts",
     "docs:api": "typedoc --out docs/api src/",
     "docs:check": "ts-node scripts/check-docs.ts",
-    "docs:dev": "docsify serve docs"
+    "docs:dev": "docsify serve docs",
+    "docs:deploy": "docsify-cli init docs --themeable true --logo 'https://raw.githubusercontent.com/agions/clip-flow/main/public/logo.png' && cd docs && npm run build",
+    "docs:build": "docsify-cli build docs"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
