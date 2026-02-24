@@ -17,24 +17,21 @@
  */
 import React, { useState, useCallback } from 'react';
 import { 
-  Card, Button, Space, Typography, List, Tag, 
-  Tabs, Input, Alert, Divider, Select, Radio, message, Empty, Progress, Badge 
+  Card, Button, Space, Typography, Input, Alert, Divider, Select, message, Empty, Badge 
 } from 'antd';
 import {
   FileTextOutlined,
   UserOutlined,
   EditOutlined,
-  SoundOutlined,
   CopyOutlined,
   SyncOutlined,
   CheckCircleOutlined,
   PlayCircleOutlined,
   VideoCameraOutlined,
-  LoadingOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import { aiService } from '@/core/services';
-import { ProcessingProgress, PreviewModal } from '@/components/common';
+import { ProcessingProgress } from '@/components/common';
 import type { ScriptData, ScriptSegment, ScriptMetadata, AIModel, AIModelSettings } from '@/core/types';
 import styles from './ClipFlow.module.less';
 
@@ -92,8 +89,6 @@ const generateMockScript = (
   style: string, 
   length: string
 ): ScriptData => {
-  const lengthConfig = scriptLengths.find(l => l.value === length) || scriptLengths[1];
-  
   const templates: Record<AIFunctionType, { title: string; content: string }> = {
     'video-narration': {
       title: '视频解说文案',

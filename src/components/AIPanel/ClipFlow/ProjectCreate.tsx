@@ -5,13 +5,13 @@
  * 流转到: VideoUpload
  */
 import React, { useState } from 'react';
-import { Form, Input, Select, Button, Card, Space, Typography, message, Divider, Tag } from 'antd';
-import { PlusOutlined, ArrowRightOutlined, CheckCircleOutlined, VideoCameraOutlined, BookOutlined, CustomerServiceOutlined, NewsOutlined, SettingOutlined } from '@ant-design/icons';
+import { Form, Input, Select, Button, Card, Typography, message, Divider, Tag } from 'antd';
+import { PlusOutlined, ArrowRightOutlined, CheckCircleOutlined, VideoCameraOutlined, BookOutlined, CustomerServiceOutlined, FileTextOutlined, SettingOutlined } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import type { ProjectData } from '@/core/types';
 import styles from './ClipFlow.module.less';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 
 interface ProjectCreateProps {
@@ -30,7 +30,7 @@ const PROJECT_TEMPLATES = [
       videoQuality: 'high' as const,
       outputFormat: 'mp4' as const,
       resolution: '1080p' as const,
-      frameRate: 30,
+      frameRate: 30 as 24 | 30 | 60,
       subtitleEnabled: true,
     },
   },
@@ -44,7 +44,7 @@ const PROJECT_TEMPLATES = [
       videoQuality: 'high' as const,
       outputFormat: 'mp4' as const,
       resolution: '1080p' as const,
-      frameRate: 30,
+      frameRate: 30 as 24 | 30 | 60,
       subtitleEnabled: true,
     },
   },
@@ -58,21 +58,21 @@ const PROJECT_TEMPLATES = [
       videoQuality: 'medium' as const,
       outputFormat: 'mp4' as const,
       resolution: '1080p' as const,
-      frameRate: 30,
+      frameRate: 30 as 24 | 30 | 60,
       subtitleEnabled: true,
     },
   },
   {
     id: 'news',
     name: '新闻资讯',
-    icon: <NewsOutlined />,
+    icon: <FileTextOutlined />,
     desc: '热点解读、时事评论',
     color: '#eb2f96',
     settings: {
       videoQuality: 'high' as const,
       outputFormat: 'mp4' as const,
       resolution: '1080p' as const,
-      frameRate: 30,
+      frameRate: 30 as 24 | 30 | 60,
       subtitleEnabled: true,
     },
   },
@@ -86,7 +86,7 @@ const PROJECT_TEMPLATES = [
       videoQuality: 'high' as const,
       outputFormat: 'mp4' as const,
       resolution: '1080p' as const,
-      frameRate: 30,
+      frameRate: 30 as 24 | 30 | 60,
       subtitleEnabled: true,
     },
   },
