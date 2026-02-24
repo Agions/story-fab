@@ -11,7 +11,7 @@
 
 // 基础变量定义
 @primary-color: #1890ff;
-@border-radius-base: 8px;
+@radius-md: 8px;
 @box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 @box-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
 @transition-duration: 0.3s;
@@ -65,7 +65,7 @@
   }
 
   @media (max-width: @screen-sm) {
-    border-radius: @border-radius-base;
+    border-radius: @radius-md;
   }
 }
 
@@ -127,7 +127,7 @@
 
   .alert {
     margin-bottom: 24px;
-    border-radius: @border-radius-base;
+    border-radius: @radius-md;
   }
 }
 
@@ -170,7 +170,7 @@
   margin-left: 8px;
   height: 100%;
   border: none;
-  border-radius: 0 @border-radius-base @border-radius-base 0;
+  border-radius: 0 @radius-md @radius-md 0;
 }
 
 .defaultButton {
@@ -280,7 +280,7 @@
 .apiKeyInput {
   width: 100%;
   max-width: 500px;
-  border-radius: @border-radius-base;
+  border-radius: @radius-md;
 
   :global {
     .ant-input-group-addon {
@@ -305,7 +305,7 @@
 }
 
 .optionCard {
-  border-radius: @border-radius-base;
+  border-radius: @radius-md;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   transition: box-shadow @transition-duration;
 
@@ -385,7 +385,7 @@
   .tabs {
     :global {
       .ant-tabs-nav {
-        background-color: @bg-card-dark;
+        background-color: @bg-darker;
 
         .ant-tabs-tab {
           &:hover {
@@ -402,7 +402,7 @@
 
   .modelGrid {
     .modelCard {
-      background-color: @bg-card-dark;
+      background-color: @bg-darker;
       border-color: rgba(255, 255, 255, 0.1);
 
       .apiKeyExample {

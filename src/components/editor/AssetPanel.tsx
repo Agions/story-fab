@@ -24,6 +24,7 @@ import {
   FilterOutlined,
   MoreOutlined
 } from '@ant-design/icons';
+import { formatDuration, formatFileSize } from '@/shared';
 import styles from './AssetPanel.module.less';
 
 const { TabPane } = Tabs;
@@ -122,19 +123,6 @@ const AssetPanel: React.FC<AssetPanelProps> = () => {
   const addToTimeline = (asset: Asset) => {
     console.log('添加到时间轴', asset);
     // 这里将来会实现与Timeline组件的交互
-  };
-  
-  // 格式化时长显示
-  const formatDuration = (seconds?: number): string => {
-    if (!seconds) return '';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-  
-  // 格式化文件大小
-  const formatSize = (mb: number): string => {
-    return mb < 1 ? `${Math.round(mb * 1000)} KB` : `${mb.toFixed(1)} MB`;
   };
   
   // 渲染素材缩略图或图标
@@ -267,7 +255,7 @@ const AssetPanel: React.FC<AssetPanelProps> = () => {
                     <div className={styles.assetName}>{asset.name}</div>
                   </Tooltip>
                   <div className={styles.assetDetails}>
-                    <span className={styles.assetSize}>{formatSize(asset.size)}</span>
+                    <span className={styles.assetSize}>{formatFileSize(asset.size)}</span>
                     {asset.tags.map(tag => (
                       <Tag key={tag} className={styles.assetTag}>{tag}</Tag>
                     ))}

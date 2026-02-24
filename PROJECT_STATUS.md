@@ -11,22 +11,23 @@
 - [x] Tauri 配置
 - [x] 19 个核心服务
 - [x] 11 个页面
-- [x] 40 个组件
+- [x] 40+ 个组件
 - [x] CLI 工具
 - [x] 文档
+- [x] .eslintrc.json 配置
+- [x] .prettierrc 配置
+- [x] .gitignore 配置
 
 ### 1.2 待完善 ⏳
-- [ ] .gitignore 优化
-- [ ] .eslintrc 配置
-- [ ] .prettierrc 配置
 - [ ] GitHub Actions CI/CD
 
 ## 2. 构建优化
 
 ### 2.1 当前状态
-- 构建大小: 1.4MB
+- 构建大小: ~1.4MB
 - 构建时间: ~26s
 - Chunk 数量: 26
+- 首屏懒加载: 已实现
 
 ### 2.2 优化目标
 - 构建大小: < 1.3MB
@@ -52,10 +53,23 @@
 - README.md
 - docsify 在线文档
 - CLI.md
+- API 文档
 
 ### 4.2 待添加
-- [ ] API 文档
 - [ ] 贡献指南
 
+## 5. 代码质量
+
+### 5.1 懒加载
+- [x] 页面级懒加载已实现 (App.tsx)
+- [x] 使用 React.lazy + Suspense
+
+### 5.2 Store 架构
+- 主 Store: /src/store.ts (useStore)
+- 项目 Store: /src/store/index.ts (useStore)
+- 通知 Store: /src/store/app.ts (useAppStore)
+- 核心 Store: /src/core/store/ (useAppStore, useProjectStore, useUserStore)
+
 ---
-*更新于: 2026-02-22*
+
+*更新于: 2026-02-24*

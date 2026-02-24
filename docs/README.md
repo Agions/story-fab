@@ -1,83 +1,126 @@
 # ClipFlow 文档
 
-> ClipFlow - 智能 AI 视频创作平台
+> ClipFlow - 智能 AI 视频创作平台详细文档
 
-## 概述
+## 目录
 
-ClipFlow 是一款面向影视创作者和内容创作者的专业 AI 视频内容创作平台，提供智能脚本生成、视频分析和混剪功能。
-
-## 主要特性
-
-| 特性 | 说明 |
+| 文档 | 说明 |
 |------|------|
-| 🎬 智能剪辑 | AI 自动识别场景、智能剪辑 |
-| 📝 脚本生成 | 多模型 AI 自动生成解说脚本 |
-| 🎭 特效滤镜 | 丰富的视频特效和滤镜 |
-| 🔊 音画同步 | 自动音视频同步校正 |
-| 📄 字幕支持 | 语音转字幕、多语言支持 |
-| 🎤 语音合成 | 文字转语音、配音功能 |
+| [README](./README.md) | 项目概述和快速开始 |
+| [ARCHITECTURE](./ARCHITECTURE.md) | 系统架构和技术栈 |
+| [API](./API.md) | API 接口文档 |
+| [CHANGELOG](./CHANGELOG.md) | 更新日志 |
+| [REFORM_PLAN](./REFORM_PLAN.md) | 重构计划 |
 
-## 快速开始
+---
 
-### 安装依赖
+## 项目概述
 
-```bash
-# 克隆项目
-git clone https://github.com/Agions/clip-flow.git
-cd clip-flow
+ClipFlow 是一款面向影视创作者和内容创作者的专业 AI 视频内容创作平台，提供智能脚本生成、视频分析、自动混剪和原创性保障。
 
-# 安装依赖
-npm install
-```
+### 核心功能
 
-### 启动开发服务器
+- 🤖 **多模型 AI 脚本生成** — 8 大 AI 提供商、7 种脚本模板、6 种风格可选
+- 🎬 **智能视频分析** — 场景检测（颜色直方图 Chi-Square 算法）、关键帧提取、内容摘要
+- ✂️ **AI 智能剪辑** — 场景切换检测、静音移除、节奏调整、自动转场
+- 🔒 **原创性保障** — 内容指纹 + 语义去重 + 8种去重变体 + 唯一性检测
+- 💰 **成本追踪** — 实时 Token 用量和 API 调用成本统计
+- 🖥️ **跨平台** — 基于 Tauri 的桌面应用，支持 macOS / Windows / Linux
 
-```bash
-npm run dev
-```
+---
 
-访问 http://localhost:1420
-
-### 构建生产版本
-
-```bash
-npm run build
-```
-
-## 项目结构
+## 9 步智能工作流
 
 ```
-clip-flow/
-├── src/
-│   ├── components/     # React 组件
-│   ├── core/
-│   │   └── services/   # 核心服务
-│   ├── pages/          # 页面组件
-│   └── ...
-├── docs/               # 文档
-├── public/             # 静态资源
-└── package.json
+上传 → 分析 → 模板选择 → 脚本生成 → 去重优化 → 唯一性保障 → 脚本编辑 → 时间轴 → 导出
 ```
 
-## 核心服务
+### Step 1: 视频上传
 
-- **ClipWorkflowService** - 智能剪辑
-- **CommentaryMixService** - 解说混剪
-- **AudioVideoSyncService** - 音画同步
-- **SubtitleService** - 字幕生成
-- **VoiceSynthesisService** - 语音合成
-- **VideoEffectService** - 视频特效
+- **输入**: 视频文件（MP4 / MOV / WebM / AVI，最大 1GB）
+- **处理**: 拖拽上传、格式检测、元数据提取
+- **输出**: `VideoInfo` — 标准化视频信息对象
+
+### Step 2: 智能分析
+
+- **输入**: 视频数据
+- **处理**: 颜色直方图差异场景检测、关键帧采样、对象识别
+- **输出**: `VideoAnalysis` — 场景列表、关键帧、分析摘要
+
+### Step 3: 模板选择
+
+- **输入**: 视频分析 + 用户偏好
+- **处理**: 基于视频特征自动推荐模板
+- **输出**: `ScriptTemplate` — 7种模板（专业/轻松/幽默/情感/技术/营销/叙事）
+
+### Step 4: AI 脚本生成
+
+- **输入**: 模板结构 + 视频分析 + 风格参数
+- **处理**: 按模板段落逐段调用 AI 生成解说词
+- **输出**: `ScriptData` — 完整脚本
+
+### Step 5: 去重优化
+
+- **输入**: 生成的脚本
+- **处理**: 三重检测 + 8种变体策略自动修复
+- **输出**: 去重后脚本 + 原创性报告
+
+### Step 6: 唯一性保障
+
+- **输入**: 去重后脚本
+- **处理**: 内容指纹生成 → 历史库对比 → 相似度超标自动重写
+- **输出**: 唯一性验证通过的脚本
+
+### Step 7: 脚本编辑
+
+- **输入**: 唯一性验证后的脚本
+- **处理**: 富文本编辑器、版本历史、实时统计
+- **输出**: 最终脚本
+
+### Step 8: 时间轴编辑
+
+- **输入**: 脚本 + 视频分析 + 视频信息
+- **处理**: 自动匹配脚本段落与视频场景
+- **输出**: `TimelineData` — 多轨时间轴
+
+### Step 9: 导出发布
+
+- **输入**: 时间轴 + 导出设置
+- **处理**: 自动生成 SRT 字幕 → FFmpeg 编码
+- **输出**: 成品视频（MP4 / WebM / MOV）
+
+---
+
+## 支持的 AI 模型
+
+| 提供商 | 模型 | 特点 |
+|--------|------|------|
+| OpenAI | GPT-5 | 综合能力最强 |
+| Anthropic | Claude Opus 4.6 | 长文本理解优秀 |
+| Google | Gemini 3 | 多模态能力 |
+| 百度 | ERNIE 5.5 | 中文优化 |
+| 阿里 | Qwen 3.5 | 性价比高 |
+| 智谱 | GLM-5 | 多模态理解 |
+| 讯飞 | Spark X1 | 语音集成 |
+| MiniMax | MiniMax-01 | 长文本生成 |
+
+---
 
 ## 技术栈
 
-- React 18 + TypeScript
-- Ant Design 5
-- Vite
-- Zustand
-- Tauri (桌面端)
+| 类别 | 技术 |
+|------|------|
+| 前端框架 | React 18 + TypeScript 5 |
+| 构建工具 | Vite 4 |
+| UI 组件 | Ant Design 5 |
+| 状态管理 | Zustand 4 |
+| 动画 | Framer Motion |
+| 桌面端 | Tauri (Rust) |
+| 视频处理 | FFmpeg |
+
+---
 
 ## 相关链接
 
 - [GitHub](https://github.com/Agions/clip-flow)
 - [问题反馈](https://github.com/Agions/clip-flow/issues)
-- [Star](https://github.com/Agions/clip-flow) ⭐

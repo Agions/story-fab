@@ -2,7 +2,7 @@
 
 .container {
   width: 100%;
-  margin-bottom: @spacing-large;
+  margin-bottom: @spacing-xl;
   position: relative;
   
   &::before {
@@ -36,11 +36,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: @spacing-large;
+  margin-bottom: @spacing-xl;
   flex-wrap: wrap;
-  gap: @spacing-medium;
+  gap: @spacing-lg;
   padding-bottom: 12px;
-  border-bottom: 1px solid fade(@border-color-base, 30%);
+  border-bottom: 1px solid fade(@border-color, 30%);
   position: relative;
   
   &::after {
@@ -71,7 +71,7 @@
   letter-spacing: 0.5px;
   
   .helpIcon {
-    margin-left: @spacing-small;
+    margin-left: @spacing-sm;
     font-size: 16px;
     color: @primary-color;
     cursor: pointer;
@@ -87,11 +87,11 @@
 .controls {
   display: flex;
   align-items: center;
-  gap: @spacing-medium;
+  gap: @spacing-lg;
   
   @media (max-width: @screen-sm) {
     width: 100%;
-    margin-top: @spacing-small;
+    margin-top: @spacing-sm;
   }
 }
 
@@ -104,11 +104,11 @@
 }
 
 .viewToggle {
-  margin-left: @spacing-small;
+  margin-left: @spacing-sm;
 }
 
 .categorySelector {
-  margin-bottom: @spacing-large;
+  margin-bottom: @spacing-xl;
   
   :global {
     .ant-segmented {
@@ -175,7 +175,7 @@
 }
 
 .content {
-  margin-top: @spacing-medium;
+  margin-top: @spacing-lg;
   position: relative;
   min-height: 200px;
   transition: opacity 0.3s ease;
@@ -210,7 +210,7 @@
 
 // 卡片视图样式
 .modelGrid {
-  margin-top: @spacing-medium;
+  margin-top: @spacing-lg;
 }
 
 .modelCard {
@@ -247,7 +247,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: @spacing-medium;
+  margin-bottom: @spacing-lg;
 }
 
 .checkIcon {
@@ -259,14 +259,14 @@
   color: @text-color-secondary;
   font-size: 13px;
   min-height: 38px;
-  margin-bottom: @spacing-medium !important;
+  margin-bottom: @spacing-lg !important;
 }
 
 .providerInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: @spacing-medium;
+  margin-bottom: @spacing-lg;
 }
 
 .categories {
@@ -286,7 +286,7 @@
 }
 
 .proTag {
-  margin-left: @spacing-small;
+  margin-left: @spacing-sm;
   font-size: 12px;
   line-height: 16px;
   height: 18px;
@@ -309,7 +309,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: @spacing-medium;
+  margin-bottom: @spacing-lg;
   min-height: 26px;
 }
 
@@ -332,8 +332,8 @@
 // 列表视图样式
 .modelList {
   background-color: white;
-  border-radius: @border-radius-base;
-  padding: @spacing-small;
+  border-radius: @radius-md;
+  padding: @spacing-sm;
   
   @media (max-width: @screen-sm) {
     padding: 0;
@@ -347,7 +347,7 @@
 }
 
 .modelListItem {
-  padding: @spacing-small;
+  padding: @spacing-sm;
   margin-bottom: 8px;
   border-radius: 10px;
   transition: all 0.3s ease;
@@ -370,7 +370,7 @@
       
       .ant-radio + * {
         padding-right: 0;
-        padding-left: @spacing-small;
+        padding-left: @spacing-sm;
       }
       
       .ant-radio-checked .ant-radio-inner {
@@ -409,7 +409,7 @@
     color: @primary-color;
     padding: 0 4px;
     border-radius: 4px;
-    margin-left: @spacing-small;
+    margin-left: @spacing-sm;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -425,10 +425,10 @@
 }
 
 .footer {
-  margin-top: @spacing-large;
+  margin-top: @spacing-xl;
   text-align: center;
   padding-top: 16px;
-  border-top: 1px dashed fade(@border-color-base, 30%);
+  border-top: 1px dashed fade(@border-color, 30%);
   
   :global {
     .ant-btn-link {

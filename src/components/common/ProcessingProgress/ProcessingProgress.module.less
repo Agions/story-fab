@@ -1,0 +1,39 @@
+/**
+ * 进度显示组件样式
+ */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.loadingIcon {
+  font-size: 16px;
+  color: #1890ff;
+}
+
+.successIcon {
+  font-size: 16px;
+  color: #52c41a;
+}
+
+.errorIcon {
+  font-size: 16px;
+  color: #ff4d4f;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulsing {
+  animation: pulse 2s ease-in-out infinite;
+}

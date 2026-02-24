@@ -1,0 +1,244 @@
+/**
+ * AI 剪辑布局样式
+ */
+.aiLayout {
+  min-height: 100vh;
+  background: #000;
+}
+
+/* 顶部工具栏 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 16px;
+  background: #1a1a1a !important;
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.logo:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.logoIcon {
+  font-size: 20px;
+}
+
+.logoText {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.projectName {
+  color: #ccc !important;
+  font-size: 14px;
+}
+
+.headerCenter {
+  display: flex;
+  align-items: center;
+}
+
+.playBtn {
+  font-size: 24px !important;
+  color: #1890ff !important;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+}
+
+/* AI 功能面板 */
+.aiPanel {
+  background: #1a1a1a !important;
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  border-bottom: 1px solid #333;
+}
+
+/* 核心功能列表 - 三大核心功能 */
+.functionList {
+  padding: 12px;
+}
+
+.functionItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+.functionItem:hover {
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.functionItem:active {
+  transform: scale(0.98);
+}
+
+.functionIcon {
+  font-size: 24px;
+  margin-top: 2px;
+}
+
+.functionInfo {
+  flex: 1;
+}
+
+.functionLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.functionDesc {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.4;
+}
+
+/* AI 工具列表 */
+.featureList {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+
+.featureItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.featureItem.active {
+  background: rgba(24, 144, 255, 0.2);
+  border: 1px solid #1890ff;
+}
+
+.featureIcon {
+  font-size: 20px;
+  color: #1890ff;
+  margin-top: 2px;
+}
+
+.featureInfo {
+  flex: 1;
+}
+
+.featureLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.featureDesc {
+  font-size: 12px;
+  color: #888;
+}
+
+.panelFooter {
+  padding: 12px 16px;
+  border-top: 1px solid #333;
+  text-align: center;
+}
+
+/* 主内容区 */
+.mainContent {
+  flex: 1;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 属性面板 */
+.propsPanel {
+  background: #1a1a1a !important;
+  border-left: 1px solid #333;
+}
+
+.propsContent {
+  padding: 16px;
+}
+
+.propsSection {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+}
+
+.propItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.propItem .ant-typography {
+  color: #ccc;
+}
+
+.applyBtn {
+  margin-top: 24px;
+  height: 40px;
+  font-size: 14px;
+}

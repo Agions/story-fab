@@ -14,6 +14,7 @@ import {
   SortAscendingOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { formatDuration, formatDate } from '@/shared';
 import styles from './Dashboard.module.less';
 
 const { Title, Text } = Typography;
@@ -151,21 +152,6 @@ const Dashboard: React.FC = () => {
       };
       setProjects([duplicatedProject, ...projects]);
     }
-  };
-
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('zh-CN', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
   };
 
   const filteredProjects = projects

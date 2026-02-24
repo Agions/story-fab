@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Statistic, Row, Col } from 'antd';
 import { VideoCameraOutlined, ClockCircleOutlined, FileOutlined } from '@ant-design/icons';
+import { formatDuration } from '@/shared';
 import styles from './VideoInfo.module.less';
 
 interface VideoInfoProps {
@@ -24,15 +25,6 @@ const VideoInfo: React.FC<VideoInfoProps> = ({
   path,
   metadata 
 }) => {
-  // 格式化时间为分:秒
-  const formatDuration = (seconds?: number): string => {
-    if (!seconds) return '未知';
-    
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-  
   // 格式化路径，只显示最后的文件名部分
   const formatPath = (path?: string): string => {
     if (!path) return '未知路径';
@@ -86,7 +78,7 @@ const VideoInfo: React.FC<VideoInfoProps> = ({
               <Col span={8}>
                 <Statistic 
                   title="帧率"
-                  value={`${metadata.fps.toFixed(2)} FPS`}
+                  value={`${metadata.fps} fps`}
                   valueStyle={{ fontSize: '16px' }}
                 />
               </Col>
@@ -95,7 +87,7 @@ const VideoInfo: React.FC<VideoInfoProps> = ({
             {metadata.codec && (
               <Col span={8}>
                 <Statistic 
-                  title="编码"
+                  title="编码格式"
                   value={metadata.codec}
                   valueStyle={{ fontSize: '16px' }}
                 />
@@ -108,4 +100,4 @@ const VideoInfo: React.FC<VideoInfoProps> = ({
   );
 };
 
-export default VideoInfo; 
+export default VideoInfo;

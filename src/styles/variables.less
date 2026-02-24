@@ -15,10 +15,10 @@
 @text-color: rgba(0, 0, 0, 0.65);
 @text-color-secondary: rgba(0, 0, 0, 0.45);
 @disabled-color: rgba(0, 0, 0, 0.25);
-@border-color-base: #e0e0e0;  // 略微柔和的边框颜色
-@background-color-base: #f5f7fa;  // 更新为Layout中使用的背景色
+@border-color: #e0e0e0;  // 略微柔和的边框颜色
+@bg-light: #f5f7fa;  // 更新为Layout中使用的背景色
 @background-color-light: #fafafa;
-@component-background: #ffffff;
+@bg-white: #ffffff;
 
 // 辅助色
 @cyan-color: #13c2c2;
@@ -41,18 +41,18 @@
 @font-size-h4: 20px;
 @font-weight-light: 300;
 @font-weight-normal: 400;
-@font-weight-medium: 500;
+@font-weight-normal: 500;
 @font-weight-bold: 700;
 @line-height-base: 1.6;
 
 // 尺寸变量
-@border-radius-base: 8px;  // 增大圆角尺寸，提供更现代的外观
+@radius-md: 8px;  // 增大圆角尺寸，提供更现代的外观
 @border-radius-small: 4px;
-@border-radius-large: 12px;
+@radius-lg: 12px;
 @spacing-unit: 8px;
-@spacing-small: @spacing-unit;
-@spacing-medium: @spacing-unit * 2;
-@spacing-large: @spacing-unit * 3;
+@spacing-sm: @spacing-unit;
+@spacing-lg: @spacing-unit * 2;
+@spacing-xl: @spacing-unit * 3;
 @spacing-xl: @spacing-unit * 4;
 @spacing-xxl: @spacing-unit * 6;
 
@@ -64,7 +64,7 @@
 @dark-border-color: #424242;
 
 // 新增暗色模式背景层级
-@bg-card-dark: #1f1f1f;
+@bg-darker: #1f1f1f;
 @bg-elevated-dark: #2d2d2d;
 @bg-lightest: #f9f9fa;
 
@@ -80,7 +80,7 @@
 @box-shadow-base: 0 2px 8px rgba(0, 0, 0, 0.08);
 @box-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
 @box-shadow-active: 0 6px 16px rgba(0, 0, 0, 0.16);
-@box-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.03), 
+@shadow-md: 0 1px 2px rgba(0, 0, 0, 0.03), 
                   0 2px 4px rgba(0, 0, 0, 0.03), 
                   0 4px 8px rgba(0, 0, 0, 0.03);  // 更柔和的阴影，用于卡片
 
@@ -100,7 +100,7 @@
 // 布局尺寸
 @layout-header-height: 64px;
 @layout-sider-width: 220px;
-@layout-content-max-width: 1200px;
+@content-max-width: 1200px;
 @container-padding: 24px;
 
 // 交互状态

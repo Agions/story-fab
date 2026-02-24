@@ -6,11 +6,7 @@
   "author": "Agions <agions@example.com>",
   "license": "MIT",
   "type": "module",
-  "bin": {
-    "clipflow": "./scripts/cli/index.js"
-  },
   "scripts": {
-    "cli": "node scripts/cli/index.js",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
