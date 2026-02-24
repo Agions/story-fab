@@ -11,6 +11,7 @@ export { default as EmptyState } from './EmptyState';
 export { default as LoadingState } from './LoadingState';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as ProcessingProgress } from './ProcessingProgress';
+export { default as PreviewModal } from './PreviewModal';
 
 // 待创建的基础组件
 export { default as Card } from './Card';
