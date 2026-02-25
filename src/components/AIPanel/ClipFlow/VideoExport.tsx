@@ -1,16 +1,10 @@
 /**
- * 步骤6: 导出视频
- * 
- * 数据输入: 
- *   - synthesis (从 VideoSynthesize 来)
- *   - exportSettings
- * 数据输出: 
- *   - exported file (最终导出文件)
+ * 步骤6: 导出视频 - 优化版
  */
 import React, { useState } from 'react';
 import { 
   Card, Button, Space, Typography, Select, Slider, 
-  Switch, Alert, Divider, Progress, message, Result, List, Tag 
+  Switch, Alert, Divider, Progress, message, Result, List, Tag, Row, Col, Radio, Tooltip, Badge
 } from 'antd';
 import {
   ExportOutlined,
@@ -19,6 +13,10 @@ import {
   SettingOutlined,
   PlayCircleOutlined,
   FileOutlined,
+  VideoCameraOutlined,
+  AudioOutlined,
+  ThunderboltOutlined,
+  CheckSquareOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import type { ExportSettings } from '@/core/types';
@@ -27,33 +25,35 @@ import styles from './ClipFlow.module.less';
 const { Title, Text, Paragraph } = Typography;
 
 // 导出格式
-const formatOptions = [
-  { value: 'mp4', label: 'MP4', desc: '通用格式，兼容性好' },
-  { value: 'mov', label: 'MOV', desc: 'Apple 格式，画质好' },
-  { value: 'webm', label: 'WEBM', desc: 'Web 格式，适合在线' },
+const FORMAT_OPTIONS = [
+  { value: 'mp4', label: 'MP4', desc: '通用格式，兼容性最好', icon: '🎬' },
+  { value: 'mov', label: 'MOV', desc: 'Apple 格式，画质优秀', icon: '🍎' },
+  { value: 'webm', label: 'WEBM', desc: 'Web 格式，适合在线播放', icon: '🌐' },
+  { value: 'avi', label: 'AVI', desc: '老旧格式，体积较大', icon: '📼' },
 ];
 
 // 质量选项
-const qualityOptions = [
-  { value: 'low', label: '低', desc: '文件小，适合移动端', bitrate: '1Mbps' },
-  { value: 'medium', label: '中', desc: '平衡画质和大小', bitrate: '5Mbps' },
-  { value: 'high', label: '高', desc: '高清画质', bitrate: '10Mbps' },
-  { value: 'ultra', label: '超清', desc: '4K 超高清', bitrate: '30Mbps' },
+const QUALITY_OPTIONS = [
+  { value: 'low', label: '流畅', desc: '文件小，省流量', bitrate: '1-2Mbps', size: '~10MB/min' },
+  { value: 'medium', label: '标清', desc: '平衡画质和大小', bitrate: '3-5Mbps', size: '~30MB/min' },
+  { value: 'high', label: '高清', desc: '清晰画质', bitrate: '8-12Mbps', size: '~60MB/min' },
+  { value: 'ultra', label: '超清', desc: '4K 超高清', bitrate: '25-35Mbps', size: '~200MB/min' },
 ];
 
 // 分辨率选项
-const resolutionOptions = [
-  { value: '720p', label: '720p', desc: '1280x720' },
-  { value: '1080p', label: '1080p', desc: '1920x1080' },
-  { value: '2k', label: '2K', desc: '2560x1440' },
-  { value: '4k', label: '4K', desc: '3840x2160' },
+const RESOLUTION_OPTIONS = [
+  { value: '480p', label: '480p', desc: '854x480', ratio: '16:9' },
+  { value: '720p', label: '720p HD', desc: '1280x720', ratio: '16:9' },
+  { value: '1080p', label: '1080p Full HD', desc: '1920x1080', ratio: '16:9' },
+  { value: '1440p', label: '2K QHD', desc: '2560x1440', ratio: '16:9' },
+  { value: '2160p', label: '4K UHD', desc: '3840x2160', ratio: '16:9' },
 ];
 
 // 帧率选项
-const frameRateOptions = [
-  { value: 24, label: '24 fps', desc: '电影标准' },
-  { value: 30, label: '30 fps', desc: '常用' },
-  { value: 60, label: '60 fps', desc: '流畅' },
+const FPS_OPTIONS = [
+  { value: 24, label: '24 fps', desc: '电影感', icon: '🎬' },
+  { value: 30, label: '30 fps', desc: '标准', icon: '📺' },
+  { value: 60, label: '60 fps', desc: '流畅', icon: '⚡' },
 ];
 
 interface VideoExportProps {
@@ -61,16 +61,11 @@ interface VideoExportProps {
 }
 
 const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
-  const { 
-    state, 
-    setExportSettings,
-    goToNextStep,
-    dispatch,
-  } = useClipFlow();
-
+  const { state, setExportSettings, goToNextStep, dispatch } = useClipFlow();
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exported, setExported] = useState(false);
+  const [activeTab, setActiveTab] = useState('basic');
 
   // 导出配置
   const [config, setConfig] = useState<ExportSettings>({
@@ -82,9 +77,18 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
     burnSubtitles: state.exportSettings?.burnSubtitles ?? true,
   });
 
+  // 预估文件大小
+  const estimateFileSize = () => {
+    if (!state.currentVideo?.duration) return '0 MB';
+    const bitrateMap: Record<string, number> = { low: 1.5, medium: 4, high: 10, ultra: 30 };
+    const bitrate = bitrateMap[config.quality] || 5;
+    const sizeMB = (bitrate * state.currentVideo.duration) / 8;
+    return sizeMB > 1000 ? `${(sizeMB / 1000).toFixed(1)} GB` : `${sizeMB.toFixed(1)} MB`;
+  };
+
   // 处理导出
   const handleExport = async () => {
-    if (!state.synthesisData.finalVideoUrl) {
+    if (!state.synthesisData?.finalVideoUrl) {
       message.warning('请先完成视频合成');
       return;
     }
@@ -93,38 +97,21 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
     setProgress(0);
 
     try {
-      // 1. 编码视频
-      setProgress(20);
-      await new Promise(r => setTimeout(r, 1000));
-      
-      // 2. 编码音频
-      setProgress(40);
-      await new Promise(r => setTimeout(r, 800));
-      
-      // 3. 烧录字幕
-      if (config.burnSubtitles) {
-        setProgress(60);
-        await new Promise(r => setTimeout(r, 800));
-      }
-      
-      // 4. 添加元数据
-      setProgress(80);
-      await new Promise(r => setTimeout(r, 500));
-      
-      // 5. 完成
+      // 模拟导出过程
+      setProgress(10); await new Promise(r => setTimeout(r, 500));
+      setProgress(30); await new Promise(r => setTimeout(r, 800));
+      setProgress(50); await new Promise(r => setTimeout(r, 600));
+      setProgress(70); await new Promise(r => setTimeout(r, 700));
+      setProgress(90); await new Promise(r => setTimeout(r, 500));
       setProgress(100);
-      
-      // 保存导出设置
+
+      // 保存设置
       setExportSettings(config);
-      
       setExported(true);
-      dispatch({ 
-        type: 'SET_STEP_COMPLETE', 
-        payload: { step: 'export', complete: true } 
-      });
-      
       message.success('视频导出成功！');
+
     } catch (error) {
+      console.error('导出失败:', error);
       message.error('导出失败，请重试');
     } finally {
       setExporting(false);
@@ -132,257 +119,252 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
   };
 
   // 检查前置条件
-  const canExport = state.stepStatus['video-synthesize'];
-  const hasVideo = state.synthesisData.finalVideoUrl;
+  const hasSynthesis = !!state.synthesisData?.finalVideoUrl;
 
-  // 估算文件大小
-  const estimateFileSize = (): string => {
-    if (!state.duration) return '未知';
-    
-    const bitrateMap: Record<string, number> = {
-      'low': 1,
-      'medium': 5,
-      'high': 10,
-      'ultra': 30,
-    };
-    
-    const bitrate = bitrateMap[config.quality] || 5;
-    const sizeMB = (bitrate * state.duration) / 8;
-    
-    if (sizeMB > 1024) {
-      return `${(sizeMB / 1024).toFixed(1)} GB`;
-    }
-    return `${sizeMB.toFixed(1)} MB`;
-  };
+  if (!hasSynthesis) {
+    return (
+      <Alert
+        message="请先完成视频合成"
+        description="请先完成视频合成步骤"
+        type="warning"
+        showIcon
+        action={
+          <Button type="primary" onClick={() => dispatch({ type: 'SET_STEP', payload: 'video-synthesize' })}>
+            去合成
+          </Button>
+        }
+      />
+    );
+  }
 
+  // 导出完成
+  if (exported) {
+    return (
+      <Card>
+        <Result
+          status="success"
+          icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+          title="🎉 视频导出成功！"
+          subTitle={
+            <Space direction="vertical">
+              <Text>文件格式: {config.format.toUpperCase()}</Text>
+              <Text>分辨率: {config.resolution}</Text>
+              <Text>预估大小: {estimateFileSize()}</Text>
+            </Space>
+          }
+          extra={[
+            <Button key="preview" icon={<PlayCircleOutlined />}>预览</Button>,
+            <Button key="download" type="primary" icon={<DownloadOutlined />}>下载视频</Button>,
+            <Button key="share" icon={<ExportOutlined />}>分享</Button>,
+          ]}
+        />
+      </Card>
+    );
+  }
+
+  // 导出中
+  if (exporting) {
+    return (
+      <Card>
+        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <Progress 
+            type="circle" 
+            percent={progress} 
+            status="active"
+            strokeColor={{ '0%': '#108ee9', '100%': '#52c41a' }}
+          />
+          <div style={{ marginTop: 24 }}>
+            <Title level={4}>
+              {progress < 30 ? '🎬 视频编码中...' : 
+               progress < 60 ? '🔊 音频编码中...' : 
+               progress < 90 ? '💾 生成文件...' : 
+               '✨ 导出完成！'}
+            </Title>
+          </div>
+          <Text type="secondary">请耐心等待...</Text>
+        </div>
+      </Card>
+    );
+  }
+
+  // 配置界面
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepTitle}>
-        <Title level={4}>导出视频</Title>
-        <Paragraph>
-          配置导出参数，生成最终视频文件
-        </Paragraph>
+        <Space>
+          <Title level={4} style={{ margin: 0 }}>📤 导出设置</Title>
+          <Tag icon={<VideoCameraOutlined />}>{config.format.toUpperCase()}</Tag>
+          <Tag>{config.resolution}</Tag>
+          <Tag>{config.frameRate}fps</Tag>
+        </Space>
       </div>
 
-      {!canExport ? (
-        <Alert
-          message="请先完成视频合成"
-          description="请先完成视频合成，然后导出"
-          type="warning"
-          showIcon
-        />
-      ) : exported ? (
-        // 导出完成
-        <div className={styles.flowComplete}>
-          <CheckCircleOutlined className={styles.completeIcon} />
-          <Title level={3} className={styles.completeTitle}>
-            导出完成！
-          </Title>
-          <Paragraph className={styles.completeDesc}>
-            您的视频已成功导出，可以下载或分享
-          </Paragraph>
-          
-          <Card style={{ maxWidth: 400, margin: '0 auto 24px' }}>
-            <List
-              size="small"
-              dataSource={[
-                { label: '文件名', value: `${state.project?.name || '视频'}.${config.format}` },
-                { label: '格式', value: config.format.toUpperCase() },
-                { label: '分辨率', value: config.resolution },
-                { label: '质量', value: config.quality },
-                { label: '预估大小', value: estimateFileSize() },
-              ]}
-              renderItem={(item) => (
-                <List.Item>
-                  <Text type="secondary">{item.label}</Text>
-                  <Text>{item.value}</Text>
-                </List.Item>
-              )}
-            />
-          </Card>
-          
-          <div className={styles.actions}>
-            <Button 
-              type="primary" 
-              icon={<DownloadOutlined />}
-              size="large"
-              onClick={() => message.info('下载功能开发中...')}
+      <Row gutter={16}>
+        {/* 左侧：设置 */}
+        <Col xs={24} lg={14}>
+          {/* 格式选择 */}
+          <Card title="🎬 输出格式" size="small" style={{ marginBottom: 16 }}>
+            <Radio.Group 
+              value={config.format}
+              onChange={(e) => setConfig({ ...config, format: e.target.value })}
+              style={{ width: '100%' }}
             >
-              下载视频
-            </Button>
-            <Button 
-              icon={<PlayCircleOutlined />}
-              onClick={() => {
-                if (onComplete) {
-                  onComplete();
-                }
-              }}
-            >
-              预览视频
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* 预览 */}
-          <Card title="导出预览" style={{ marginBottom: 16 }}>
-            {hasVideo ? (
-              <div className={styles.videoContainer}>
-                <video
-                  src={state.synthesisData.finalVideoUrl}
-                  controls
-                  style={{ maxWidth: '100%', maxHeight: 250 }}
-                />
-              </div>
-            ) : (
-              <Text type="secondary">暂无预览</Text>
-            )}
+              <Space direction="vertical" style={{ width: '100%' }}>
+                {FORMAT_OPTIONS.map(fmt => (
+                  <Radio key={fmt.value} value={fmt.value} style={{ width: '100%', marginRight: 0, padding: '10px', border: `1px solid ${config.format === fmt.value ? '#1890ff' : '#e8e8e8'}`, borderRadius: 8 }}>
+                    <Space>
+                      <span style={{ fontSize: 18 }}>{fmt.icon}</span>
+                      <div>
+                        <Text strong>{fmt.label}</Text>
+                        <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>{fmt.desc}</Text>
+                      </div>
+                    </Space>
+                  </Radio>
+                ))}
+              </Space>
+            </Radio.Group>
           </Card>
 
-          {/* 导出设置 */}
-          <Card title={<Space><SettingOutlined />导出设置</Space>}>
+          {/* 质量和分辨率 */}
+          <Card size="small" style={{ marginBottom: 16 }}>
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
-              {/* 格式 */}
-              <div>
-                <Text strong style={{ display: 'block', marginBottom: 8 }}>视频格式</Text>
-                <Select
-                  value={config.format}
-                  onChange={(v) => setConfig({ ...config, format: v })}
-                  style={{ width: '100%' }}
-                >
-                  {formatOptions.map(f => (
-                    <Select.Option key={f.value} value={f.value}>
-                      <Space>
-                        <FileOutlined />
-                        {f.label}
-                        <Text type="secondary" style={{ fontSize: 12 }}>{f.desc}</Text>
-                      </Space>
-                    </Select.Option>
-                  ))}
-                </Select>
-              </div>
-
-              {/* 质量 */}
-              <div>
-                <Text strong style={{ display: 'block', marginBottom: 8 }}>视频质量</Text>
-                <Select
-                  value={config.quality}
-                  onChange={(v) => setConfig({ ...config, quality: v })}
-                  style={{ width: '100%' }}
-                >
-                  {qualityOptions.map(q => (
-                    <Select.Option key={q.value} value={q.value}>
-                      <Space>
-                        {q.label}
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          {q.desc} ({q.bitrate})
-                        </Text>
-                      </Space>
-                    </Select.Option>
-                  ))}
-                </Select>
-              </div>
-
               {/* 分辨率 */}
               <div>
-                <Text strong style={{ display: 'block', marginBottom: 8 }}>分辨率</Text>
-                <Select
+                <Text strong style={{ marginBottom: 8, display: 'block' }}>📐 分辨率</Text>
+                <Radio.Group 
                   value={config.resolution}
-                  onChange={(v) => setConfig({ ...config, resolution: v })}
-                  style={{ width: '100%' }}
+                  onChange={(e) => setConfig({ ...config, resolution: e.target.value })}
                 >
-                  {resolutionOptions.map(r => (
-                    <Select.Option key={r.value} value={r.value}>
-                      {r.label} ({r.desc})
-                    </Select.Option>
-                  ))}
-                </Select>
+                  <Space wrap>
+                    {RESOLUTION_OPTIONS.map(res => (
+                      <Radio.Button key={res.value} value={res.value}>
+                        {res.label}
+                      </Radio.Button>
+                    ))}
+                  </Space>
+                </Radio.Group>
               </div>
 
               {/* 帧率 */}
               <div>
-                <Text strong style={{ display: 'block', marginBottom: 8 }}>帧率</Text>
-                <Select
+                <Text strong style={{ marginBottom: 8, display: 'block' }}>⚡ 帧率</Text>
+                <Radio.Group 
                   value={config.frameRate}
-                  onChange={(v) => setConfig({ ...config, frameRate: v })}
-                  style={{ width: '100%' }}
+                  onChange={(e) => setConfig({ ...config, frameRate: e.target.value })}
                 >
-                  {frameRateOptions.map(f => (
-                    <Select.Option key={f.value} value={f.value}>
-                      {f.label} - {f.desc}
-                    </Select.Option>
-                  ))}
-                </Select>
+                  <Space>
+                    {FPS_OPTIONS.map(fps => (
+                      <Radio key={fps.value} value={fps.value}>
+                        {fps.label} <Text type="secondary" style={{ fontSize: 12 }}>({fps.desc})</Text>
+                      </Radio>
+                    ))}
+                  </Space>
+                </Radio.Group>
               </div>
 
-              <Divider />
+              {/* 质量 */}
+              <div>
+                <Text strong style={{ marginBottom: 8, display: 'block' }}>🎯 质量</Text>
+                <Radio.Group 
+                  value={config.quality}
+                  onChange={(e) => setConfig({ ...config, quality: e.target.value })}
+                  style={{ width: '100%' }}
+                >
+                  <Row gutter={[8, 8]}>
+                    {QUALITY_OPTIONS.map(q => (
+                      <Col span={12} key={q.value}>
+                        <div 
+                          style={{ 
+                            padding: 12, 
+                            border: `2px solid ${config.quality === q.value ? '#1890ff' : '#e8e8e8'}`,
+                            borderRadius: 8,
+                            background: config.quality === q.value ? '#e6f7ff' : '#fff',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setConfig({ ...config, quality: q.value })}
+                        >
+                          <Text strong>{q.label}</Text>
+                          <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>{q.desc}</Text>
+                          <Text type="secondary" style={{ fontSize: 11 }}>{q.bitrate}</Text>
+                        </div>
+                      </Col>
+                    ))}
+                  </Row>
+                </Radio.Group>
+              </div>
+            </Space>
+          </Card>
 
-              {/* 字幕选项 */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text>包含字幕</Text>
+          {/* 字幕选项 */}
+          <Card title="📝 字幕选项" size="small">
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <div>
                 <Switch 
                   checked={config.includeSubtitles}
                   onChange={(v) => setConfig({ ...config, includeSubtitles: v })}
                 />
+                <Text style={{ marginLeft: 8 }}>包含字幕文件</Text>
               </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text>烧录字幕到视频</Text>
+              <div>
                 <Switch 
                   checked={config.burnSubtitles}
                   onChange={(v) => setConfig({ ...config, burnSubtitles: v })}
-                  disabled={!config.includeSubtitles}
                 />
+                <Text style={{ marginLeft: 8 }}>烧录字幕到视频</Text>
+                <Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
+                  (烧录后字幕将永久显示在画面上)
+                </Text>
               </div>
+            </Space>
+          </Card>
+        </Col>
 
-              <Divider />
-
-              {/* 文件信息 */}
-              <Card size="small" style={{ background: '#f5f5f5' }}>
-                <Space direction="vertical" style={{ width: '100%' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text>预估文件大小</Text>
-                    <Text strong>{estimateFileSize()}</Text>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text>预估时长</Text>
-                    <Text strong>{Math.floor(state.duration / 60)}:{Math.floor(state.duration % 60).toString().padStart(2, '0')}</Text>
-                  </div>
-                </Space>
-              </Card>
+        {/* 右侧：预览 */}
+        <Col xs={24} lg={10}>
+          {/* 导出信息 */}
+          <Card title="📋 导出信息" size="small" style={{ marginBottom: 16 }}>
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Text type="secondary">原始视频</Text>
+                <Text>{state.currentVideo?.name || '-'}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Text type="secondary">时长</Text>
+                <Text>{Math.floor(state.currentVideo?.duration || 0)} 秒</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Text type="secondary">格式</Text>
+                <Tag>{config.format.toUpperCase()}</Tag>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Text type="secondary">分辨率</Text>
+                <Tag>{config.resolution}</Tag>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Text type="secondary">帧率</Text>
+                <Text>{config.frameRate} fps</Text>
+              </div>
+              <Divider style={{ margin: '12px 0' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text strong>预估大小</Text>
+                <Badge count={estimateFileSize()} style={{ backgroundColor: '#1890ff' }} />
+              </div>
             </Space>
           </Card>
 
-          {/* 导出进度 */}
-          {exporting && (
-            <Card style={{ marginTop: 16 }}>
-              <Progress 
-                percent={progress} 
-                status="active"
-                strokeColor={{
-                  '0%': '#108ee9',
-                  '100%': '#52c41a',
-                }}
-              />
-              <Text type="secondary">正在导出视频，请勿关闭页面...</Text>
-            </Card>
-          )}
-
-          <Divider />
-
-          <Button 
-            type="primary" 
-            icon={<ExportOutlined />}
-            onClick={handleExport}
-            loading={exporting}
-            disabled={!hasVideo}
-            size="large"
-            block
-          >
-            导出视频
-          </Button>
-        </>
-      )}
+          {/* 快捷导出 */}
+          <Card title="⚡ 快速导出" size="small">
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <Button block type="primary" icon={<DownloadOutlined />} onClick={handleExport}>
+                一键导出 (MP4/1080p/高清)
+              </Button>
+              <Button block icon={<ExportOutlined />} onClick={handleExport}>
+                自定义导出
+              </Button>
+            </Space>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };
