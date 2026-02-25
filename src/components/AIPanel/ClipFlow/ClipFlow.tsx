@@ -1,25 +1,17 @@
 /**
- * AI 剪辑流程组件
+ * AI 剪辑流程组件 - 优化版
  * 完整流程：创建项目 -> 上传视频 -> AI分析 -> 生成文案 -> 视频合成 -> 导出
  * 
  * 三大核心功能：
  * 1. AI 视频解说 - 对视频内容进行专业解说
  * 2. AI 第一人称解说 - 以第一人称视角讲述  
  * 3. AI 混剪 - 自动识别精彩片段并添加旁白
- * 
- * 数据流转关系：
- * 1. 创建项目 → project (项目信息)
- * 2. 上传视频 → video (视频文件) + duration/width/height
- * 3. AI分析 → analysis (场景/关键帧/物体/情感) + subtitle (OCR/ASR字幕)
- * 4. 生成文案 → script (解说/第一人称/混剪文案) 基于 analysis + subtitle
- * 5. 视频合成 → synthesis (最终视频) 基于 video + script + voice
- * 6. 导出 → export (文件) 基于 synthesis + exportSettings
  */
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Steps, Card, Button, Space, Result, Spin, message, 
-  Alert, Progress, Typography, Divider, List, Tag 
+  Alert, Progress, Typography, Divider, List, Tag, Tooltip, Badge 
 } from 'antd';
 import {
   PlusOutlined,
@@ -33,6 +25,9 @@ import {
   ArrowLeftOutlined,
   RedoOutlined,
   UserOutlined,
+  ScissorOutlined,
+  PlayCircleOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import { useClipFlow, ClipFlowStep, ClipFlowState } from '../AIEditorContext';
 import styles from './ClipFlow.module.less';
@@ -45,37 +40,44 @@ const stepConfig: Record<ClipFlowStep, {
   description: string;
   icon: React.ReactNode;
   tip?: string;
+  color: string;
 }> = {
   'project-create': {
     title: '创建项目',
     description: '设置项目名称和基本配置',
     icon: <PlusOutlined />,
+    color: '#1890ff',
   },
   'video-upload': {
     title: '上传视频',
     description: '选择要剪辑的视频文件',
     icon: <VideoCameraOutlined />,
+    color: '#52c41a',
   },
   'ai-analyze': {
     title: 'AI 分析',
     description: '智能识别内容、生成字幕',
     icon: <CloudSyncOutlined />,
+    color: '#722ed1',
   },
   'script-generate': {
     title: '生成文案',
     description: '三大核心功能：解说/第一人称/混剪',
     icon: <FileTextOutlined />,
     tip: '🎯 选择：视频解说 | 第一人称 | AI混剪',
+    color: '#fa8c16',
   },
   'video-synthesize': {
     title: '视频合成',
     description: '音画同步、添加特效',
     icon: <EditOutlined />,
+    color: '#eb2f96',
   },
   'export': {
     title: '导出视频',
     description: '导出最终成片',
     icon: <ExportOutlined />,
+    color: '#13c2c2',
   },
 };
 
@@ -111,11 +113,8 @@ const canProceedToStep = (state: ClipFlowState, targetStep: ClipFlowStep): boole
 };
 
 interface ClipFlowProps {
-  // 子组件渲染
   children?: React.ReactNode;
-  // 是否显示顶部步骤条
   showSteps?: boolean;
-  // 是否显示底部导航
   showNavigation?: boolean;
 }
 
@@ -140,7 +139,6 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
   React.useEffect(() => {
     if (projectId) {
       // 如果有项目 ID，说明项目已创建
-      // 这里可以添加加载项目的逻辑
     }
   }, [projectId]);
 
@@ -151,7 +149,57 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
     }
   };
 
-  // 渲染步骤条
+  // 获取当前步骤的颜色
+  const getCurrentStepColor = () => {
+    return stepConfig[state.currentStep]?.color || '#1890ff';
+  };
+
+  // 渲染功能标签
+  const renderFunctionTags = () => (
+    <div style={{ 
+      marginBottom: 16, 
+      textAlign: 'center',
+      display: 'flex',
+      justifyContent: 'center',
+      gap: 12,
+      flexWrap: 'wrap'
+    }}>
+      <Tooltip title="专业解说，适合教程、评测类内容">
+        <Badge.Ribbon text="视频解说" color="blue" placement="start">
+          <Card size="small" hoverable style={{ width: 140, cursor: 'pointer' }}>
+            <Space>
+              <VideoCameraOutlined style={{ fontSize: 20, color: '#1890ff' }} />
+              <Text strong>AI 解说</Text>
+            </Space>
+          </Card>
+        </Badge.Ribbon>
+      </Tooltip>
+      
+      <Tooltip title="第一人称视角，像主播一样与观众互动">
+        <Badge.Ribbon text="第一人称" color="green" placement="start">
+          <Card size="small" hoverable style={{ width: 140, cursor: 'pointer' }}>
+            <Space>
+              <UserOutlined style={{ fontSize: 20, color: '#52c41a' }} />
+              <Text strong>第一人称</Text>
+            </Space>
+          </Card>
+        </Badge.Ribbon>
+      </Tooltip>
+      
+      <Tooltip title="自动识别精彩片段，生成节奏感强的混剪">
+        <Badge.Ribbon text="AI 混剪" color="orange" placement="start">
+          <Card size="small" hoverable style={{ width: 140, cursor: 'pointer' }}>
+            <Space>
+              <ScissorOutlined style={{ fontSize: 20, color: '#fa8c16' }} />
+              <Text strong>AI 混剪</Text>
+            </Space>
+          </Card>
+        </Badge.Ribbon>
+      </Tooltip>
+    </div>
+  );
+
+  // 渲染步骤条 - 优化版
   const renderSteps = () => {
     const steps: ClipFlowStep[] = [
       'project-create',
@@ -164,24 +212,32 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
 
     return (
       <div className={styles.stepsContainer}>
-        <div style={{ marginBottom: 16, textAlign: 'center' }}>
-          <Space size="middle">
-            <Tag color="blue" icon={<VideoCameraOutlined />}>视频解说</Tag>
-            <Tag color="green" icon={<UserOutlined />}>第一人称</Tag>
-            <Tag color="orange" icon={<EditOutlined />}>AI混剪</Tag>
-          </Space>
-        </div>
+        {/* 功能标签展示 - 仅在文案生成步骤显示 */}
+        {state.currentStep === 'script-generate' && renderFunctionTags()}
+        
         <Steps
           current={getStepIndex(state.currentStep)}
           size="small"
-          items={steps.map((step) => ({
-            key: step,
-            title: stepConfig[step].title,
-            description: state.stepStatus[step] ? '已完成' : stepConfig[step].description,
-            icon: state.stepStatus[step] 
-              ? <CheckCircleOutlined style={{ color: '#52c41a' }} />
-              : stepConfig[step].icon,
-          }))}
+          items={steps.map((step, index) => {
+            const isCompleted = state.stepStatus[step];
+            const isCurrent = state.currentStep === step;
+            const config = stepConfig[step];
+            
+            return {
+              key: step,
+              title: (
+                <Space>
+                  {config.title}
+                  {isCompleted && <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 12 }} />}
+                </Space>
+              ),
+              description: isCompleted ? '已完成' : config.description,
+              icon: isCompleted 
+                ? <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 18 }} />
+                : <span style={{ color: isCurrent ? config.color : undefined }}>{config.icon}</span>,
+              className: isCurrent ? 'current-step' : '',
+            };
+          })}
           onChange={(current) => {
             const targetStep = steps[current];
             if (canProceedToStep(state, targetStep)) {
@@ -190,8 +246,18 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
           }}
           className={styles.steps}
         />
+        
+        {/* 当前步骤提示 */}
         {stepConfig[state.currentStep].tip && (
-          <div style={{ textAlign: 'center', marginTop: 8 }}>
+          <div style={{ 
+            textAlign: 'center', 
+            marginTop: 12,
+            padding: '8px 16px',
+            background: `${getCurrentStepColor()}10`,
+            borderRadius: 8,
+            border: `1px solid ${getCurrentStepColor()}30`
+          }}>
+            <InfoCircleOutlined style={{ color: getCurrentStepColor(), marginRight: 8 }} />
             <Text type="secondary">{stepConfig[state.currentStep].tip}</Text>
           </div>
         )}
@@ -199,7 +265,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
     );
   };
 
-  // 渲染导航按钮
+  // 渲染导航按钮 - 优化版
   const renderNavigation = () => {
     const steps: ClipFlowStep[] = [
       'project-create',
@@ -213,6 +279,9 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
     const isFirst = currentIndex === 0;
     const isLast = currentIndex === steps.length - 1;
 
+    // 获取下一步名称
+    const nextStepName = !isLast ? stepConfig[steps[currentIndex + 1]]?.title : '';
+
     return (
       <div className={styles.navigation}>
         <Space>
@@ -220,9 +289,35 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
             <Button 
               icon={<ArrowLeftOutlined />} 
               onClick={goToPrevStep}
+              size="large"
             >
               上一步
             </Button>
+          )}
+          
+          {/* 重置当前步骤按钮 */}
+          <Tooltip title="重新开始当前步骤">
+            <Button 
+              icon={<RedoOutlined />}
+              onClick={() => setStep(steps[currentIndex])}
+              size="large"
+            >
+              重置
+            </Button>
+          </Tooltip>
+        </Space>
+        
+        <Space>
+          {/* 预览按钮 */}
+          {state.stepStatus[state.currentStep] && state.currentStep !== 'export' && (
+            <Tooltip title="预览当前步骤结果">
+              <Button 
+                icon={<PlayCircleOutlined />}
+                size="large"
+              >
+                预览
+              </Button>
+            </Tooltip>
           )}
           
           {isLast ? (
@@ -230,6 +325,10 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
               type="primary" 
               icon={<ExportOutlined />}
               disabled={!state.stepStatus['video-synthesize']}
+              size="large"
+              style={{ 
+                background: state.stepStatus['video-synthesize'] ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined 
+              }}
             >
               完成导出
             </Button>
@@ -237,24 +336,33 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
             <Button 
               type="primary" 
               icon={<ArrowRightOutlined />}
+              iconPosition="end"
               disabled={!canProceed()}
               onClick={goToNextStep}
+              size="large"
+              style={{ 
+                background: canProceed() ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined 
+              }}
             >
-              下一步
+              {nextStepName ? `去${nextStepName}` : '下一步'}
             </Button>
           )}
         </Space>
         
+        {/* 进度信息 */}
         <div className={styles.progress}>
-          <Text type="secondary">
-            已完成 {completedSteps}/{totalSteps} 步
-          </Text>
-          <Progress 
-            percent={Math.round((completedSteps / totalSteps) * 100)} 
-            size="small"
-            showInfo={false}
-            strokeColor="#52c41a"
-          />
+          <Space>
+            <Text type="secondary">
+              进度: {completedSteps}/{totalSteps}
+            </Text>
+            <Progress 
+              percent={Math.round((completedSteps / totalSteps) * 100)} 
+              size="small"
+              showInfo={false}
+              strokeColor="linear-gradient(90deg, #667eea, #764ba2)"
+              style={{ width: 100 }}
+            />
+          </Space>
         </div>
       </div>
     );
@@ -273,11 +381,54 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
           type="warning"
           showIcon
           className={styles.alert}
+          action={
+            <Button size="small" onClick={() => setStep(currentStep)}>
+              查看
+            </Button>
+          }
+        />
+      );
+    }
+    
+    // 显示成功状态
+    if (stepStatus[currentStep]) {
+      return (
+        <Alert
+          message={`✅ ${stepConfig[currentStep].title}已完成`}
+          description="点击下一步继续，或点击预览查看结果"
+          type="success"
+          showIcon
+          className={styles.alert}
+          style={{ background: '#f6ffed', borderColor: '#b7eb8f' }}
         />
       );
     }
     
     return null;
+  };
+
+  // 渲染空状态引导
+  const renderEmptyGuide = () => {
+    if (state.stepStatus['project-create']) return null;
+    
+    return (
+      <Card style={{ marginBottom: 16, textAlign: 'center' }}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Title level={4}>🎬 欢迎使用 ClipFlow AI 剪辑</Title>
+          <Paragraph>
+            三大核心功能：AI 视频解说、AI 第一人称解说、AI 混剪
+          </Paragraph>
+          <Space>
+            <Tag color="blue"><VideoCameraOutlined /> AI 解说</Tag>
+            <Tag color="green"><UserOutlined /> 第一人称</Tag>
+            <Tag color="orange"><ScissorOutlined /> AI 混剪</Tag>
+          </Space>
+          <Text type="secondary">
+            从左侧选择功能开始，或点击下方按钮创建新项目
+          </Text>
+        </Space>
+      </Card>
+    );
   };
 
   return (
@@ -286,6 +437,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
       {renderStepStatus()}
       
       <div className={styles.content}>
+        {renderEmptyGuide()}
         {children}
       </div>
       
