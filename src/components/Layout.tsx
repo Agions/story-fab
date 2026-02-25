@@ -9,6 +9,14 @@ import {
   BellOutlined,
   UserOutlined,
   QuestionCircleOutlined,
+  VideoCameraOutlined,
+  CloudUploadOutlined,
+  ScissorOutlined,
+  AudioOutlined,
+  DashboardOutlined,
+  PlayCircleOutlined,
+  FileTextOutlined,
+  ExportOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Layout.module.less';
@@ -39,12 +47,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [collapsed]);
 
   const getSelectedKey = () => {
-    if (location.pathname === '/') return '/';
-    if (location.pathname.startsWith('/projects') || location.pathname.startsWith('/project') || location.pathname.startsWith('/editor')) return '/projects';
-    if (location.pathname.startsWith('/settings')) return '/settings';
+    const path = location.pathname;
+    if (path === '/') return '/';
+    if (path.startsWith('/projects') || path.startsWith('/project')) return '/projects';
+    if (path.startsWith('/editor')) return '/editor';
+    if (path.startsWith('/dashboard')) return '/dashboard';
+    if (path.startsWith('/settings')) return '/settings';
     return '/';
   };
 
+  // 工作流程菜单
   const menuItems = [
     {
       key: '/',
@@ -53,10 +65,73 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       onClick: () => navigate('/')
     },
     {
-      key: '/projects',
-      icon: <ProjectOutlined />,
-      label: '项目管理',
-      onClick: () => navigate('/projects')
+      key: 'workflow',
+      icon: <VideoCameraOutlined />,
+      label: '工作流程',
+      children: [
+        {
+          key: '/projects',
+          icon: <ProjectOutlined />,
+          label: '项目管理',
+          onClick: () => navigate('/projects')
+        },
+        {
+          key: '/project/new',
+          icon: <CloudUploadOutlined />,
+          label: '创建项目',
+          onClick: () => navigate('/project/new')
+        },
+        {
+          key: '/dashboard',
+          icon: <DashboardOutlined />,
+          label: 'AI 工作台',
+          onClick: () => navigate('/dashboard')
+        }
+      ]
+    },
+    {
+      key: 'editor',
+      icon: <PlayCircleOutlined />,
+      label: '视频编辑',
+      children: [
+        {
+          key: '/editor',
+          icon: <VideoCameraOutlined />,
+          label: '视频工作台',
+          onClick: () => navigate('/editor')
+        },
+        {
+          key: '/script/new',
+          icon: <FileTextOutlined />,
+          label: '文案编辑',
+          onClick: () => navigate('/script/new')
+        }
+      ]
+    },
+    {
+      key: 'tools',
+      icon: <ScissorOutlined />,
+      label: 'AI 工具',
+      children: [
+        {
+          key: '/ai-clip',
+          icon: <ScissorOutlined />,
+          label: 'AI 剪辑',
+          onClick: () => navigate('/ai-clip')
+        },
+        {
+          key: '/ai-narrate',
+          icon: <AudioOutlined />,
+          label: 'AI 解说',
+          onClick: () => navigate('/ai-narrate')
+        },
+        {
+          key: '/ai-mix',
+          icon: <CloudUploadOutlined />,
+          label: 'AI 混剪',
+          onClick: () => navigate('/ai-mix')
+        }
+      ]
     },
     {
       key: '/settings',
@@ -74,6 +149,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (path.startsWith('/project/edit')) return '编辑项目';
     if (path.startsWith('/project/')) return '项目详情';
     if (path.startsWith('/editor')) return '视频工作台';
+    if (path.startsWith('/dashboard')) return 'AI 工作台';
+    if (path.startsWith('/script')) return '文案编辑';
+    if (path.startsWith('/ai-clip')) return 'AI 剪辑';
+    if (path.startsWith('/ai-narrate')) return 'AI 解说';
+    if (path.startsWith('/ai-mix')) return 'AI 混剪';
     if (path.startsWith('/settings')) return '系统设置';
     return 'ClipFlow';
   };
