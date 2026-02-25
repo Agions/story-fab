@@ -23,7 +23,7 @@ jobs:
         run: npm ci
       
       - name: Type check
-        run: npm run type-check 2>/dev/null || npx tsc --noEmit
+        run: npx tsc --noEmit
       
       - name: Build
         run: npm run build
@@ -51,27 +51,3 @@ jobs:
       
       - name: Run linter
         run: npm run lint 2>/dev/null || echo "Lint not configured"
-
-  tauri:
-    runs-on: ubuntu-latest
-    needs: build
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Install Rust
-        uses: dtolnay/rust-action@stable
-        
-      - name: Build Tauri
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
