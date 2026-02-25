@@ -54,23 +54,11 @@ export default defineConfig({
     sourcemap: false,
     chunkSizeWarningLimit: 400,
     reportCompressedSize: true,
-    assetsInlineLimit: 2048,
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-        passes: 2,
-      },
-      mangle: {
-        safari10: true,
-      },
-      format: {
-        comments: false,
-      },
-    },
+    assetsInlineLimit: 4096,
+    // 动态导入实现路由懒加载
     rollupOptions: {
       output: {
+        // 更好的代码分割
         manualChunks: (id) => {
           // React 核心
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
