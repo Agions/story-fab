@@ -18,6 +18,7 @@ import {
   CloseOutlined,
   DownloadOutlined,
 } from '@ant-design/icons';
+import { formatDuration } from '@/shared';
 import styles from './PreviewModal.module.less';
 
 const { Text, Title, Paragraph } = Typography;
@@ -115,7 +116,6 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
     setIsPlaying(!isPlaying);
   };
 
-import { formatDuration } from '@/shared';
 
   // 获取 Tab 项
   const getTabItems = () => {
