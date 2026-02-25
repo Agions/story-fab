@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "ClipFlow",
-    "version": "0.1.0"
+    "version": "2.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -46,11 +46,7 @@
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "",
-      "deb": {
-        "depends": []
-      },
-      "externalBin": [],
+      "targets": [],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -58,33 +54,17 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.ClipFlow.dev",
-      "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
-      "shortDescription": "",
-      "targets": "all",
+      "identifier": "com.clipflow.app",
       "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "digestAlgorithm": "sha256"
       }
     },
     "security": {
       "csp": null
     },
-    "updater": {
-      "active": false
-    },
     "windows": [
       {
-        "title": "ClipFlow - 视频脚本编辑工具",
+        "title": "ClipFlow - AI 视频创作平台",
         "width": 1200,
         "height": 800,
         "minWidth": 800,
