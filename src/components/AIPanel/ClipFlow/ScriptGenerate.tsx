@@ -480,7 +480,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
           {/* 右侧：文案编辑和预览 */}
           <Col xs={24} lg={14}>
             <Card
-              title={<Space><FileTextOutlined /> 文案编辑</>}
+              title={<><FileTextOutlined /> 文案编辑</>}
               extra={
                 <Space>
                   <Tooltip title="复制文案">

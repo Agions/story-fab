@@ -32,7 +32,7 @@ export default defineConfig({
     strictPort: true,
   },
   css: {
-    devSourcemap: true,
+    devSourcemap: false,
     minify: true,
     modules: {
       localsConvention: 'camelCase',
@@ -52,9 +52,23 @@ export default defineConfig({
     target: 'esnext',
     minify: 'terser',
     sourcemap: false,
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 400,
     reportCompressedSize: true,
-    assetsInlineLimit: 4096,
+    assetsInlineLimit: 2048,
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        passes: 2,
+      },
+      mangle: {
+        safari10: true,
+      },
+      format: {
+        comments: false,
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: (id) => {
@@ -62,20 +76,22 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
             return 'react-vendor'
           }
-          // Ant Design - 进一步拆分
+          // Ant Design 组件按功能拆分
           if (id.includes('node_modules/antd') || id.includes('node_modules/@ant-design')) {
             if (id.includes('antd/es/locale')) return 'antd-locale'
-            if (id.includes('antd/es/date-picker') || id.includes('antd/es/calendar')) return 'antd-date'
+            if (id.includes('antd/es/date-picker') || id.includes('antd/es/calendar') || id.includes('antd/es/time-picker')) return 'antd-date'
             if (id.includes('antd/es/table')) return 'antd-table'
-            if (id.includes('antd/es/form')) return 'antd-form'
-            if (id.includes('antd/es/select') || id.includes('antd/es/tree-select')) return 'antd-select'
-            if (id.includes('antd/es/modal') || id.includes('antd/es/drawer')) return 'antd-overlay'
+            if (id.includes('antd/es/form') || id.includes('antd/es/input')) return 'antd-form'
+            if (id.includes('antd/es/select') || id.includes('antd/es/tree-select') || id.includes('antd/es/cascader')) return 'antd-select'
+            if (id.includes('antd/es/modal') || id.includes('antd/es/drawer') || id.includes('antd/es/popconfirm')) return 'antd-overlay'
             if (id.includes('antd/es/upload')) return 'antd-upload'
-            if (id.includes('antd/es/dropdown') || id.includes('antd/es/menu')) return 'antd-menu'
+            if (id.includes('antd/es/dropdown') || id.includes('antd/es/menu') || id.includes('antd/es/tabs')) return 'antd-nav'
+            if (id.includes('antd/es/button') || id.includes('antd/es/icon')) return 'antd-basic'
+            if (id.includes('antd/es/card') || id.includes('antd/es/list') || id.includes('antd/es/carousel')) return 'antd-display'
             return 'antd-core'
           }
           // 工具库
-          if (id.includes('node_modules/lodash') || id.includes('node_modules/axios')) {
+          if (id.includes('node_modules/lodash') || id.includes('node_modules/axios') || id.includes('node_modules/dayjs')) {
             return 'utils-vendor'
           }
           // 路由
@@ -90,12 +106,25 @@ export default defineConfig({
           if (id.includes('node_modules/framer-motion')) {
             return 'motion-vendor'
           }
+          // Tauri
+          if (id.includes('node_modules/@tauri-apps')) {
+            return 'tauri-vendor'
+          }
         },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'antd', '@ant-design/icons', 'axios'],
+    include: ['react', 'react-dom', 'antd', '@ant-design/icons', 'axios', 'dayjs', 'zustand'],
     exclude: [],
+  },
+  compressHTML: {
+    collapseWhitespace: true,
+    removeComments: true,
+    removeRedundantAttributes: true,
+    useShortDoctype: true,
   },
 })
