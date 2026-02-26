@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Card,
   Button,
@@ -107,15 +107,15 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
 
   // ============ Workflow 模式处理方法 ============
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditedContent(e.target.value);
-  };
+  }, []);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedTitle(e.target.value);
-  };
+  }, []);
 
-  const handleWorkflowSave = () => {
+  const handleWorkflowSave = useCallback(() => {
     if (isWorkflowMode) {
       const updatedScript: ScriptData = {
         ...props.script!,
@@ -127,12 +127,12 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
       props.onScriptUpdate?.(updatedScript);
       message.success('脚本已保存');
     }
-  };
+  }, [isWorkflowMode, props, editedTitle, editedContent]);
 
   // ============ 原始模式处理方法 ============
 
   // 添加新片段
-  const handleAddSegment = () => {
+  const handleAddSegment = useCallback(() => {
     const lastSegment = segments.length > 0 ? segments[segments.length - 1] : null;
     const startTime = lastSegment ? lastSegment.end : 0;
     const endTime = startTime + 30;
@@ -145,10 +145,10 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
     });
 
     setEditingIndex(segments.length);
-  };
+  }, [segments, editForm]);
 
   // 编辑片段
-  const handleEditSegment = (index: number) => {
+  const handleEditSegment = useCallback((index: number) => {
     const segment = segments[index];
 
     editForm.setFieldsValue({
@@ -159,10 +159,10 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
     });
 
     setEditingIndex(index);
-  };
+  }, [segments, editForm]);
 
   // 保存编辑片段
-  const handleSaveSegment = () => {
+  const handleSaveSegment = useCallback(() => {
     editForm.validateFields().then(values => {
       const start = parseFloat(values.start);
       const end = parseFloat(values.end);
@@ -187,16 +187,16 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
       setEditingIndex(null);
       editForm.resetFields();
     });
-  };
+  }, [segments, editingIndex, editForm]);
 
   // 取消编辑
-  const handleCancelEdit = () => {
+  const handleCancelEdit = useCallback(() => {
     setEditingIndex(null);
     editForm.resetFields();
-  };
+  }, [editForm]);
 
   // 删除片段
-  const handleDeleteSegment = (index: number) => {
+  const handleDeleteSegment = useCallback((index: number) => {
     Modal.confirm({
       title: '确认删除',
       content: '确定要删除这个片段吗？',
@@ -206,10 +206,10 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
         setSegments(newSegments);
       }
     });
-  };
+  }, [segments]);
 
   // 预览片段
-  const handlePreviewSegment = async (index: number) => {
+  const handlePreviewSegment = useCallback(async (index: number) => {
     if (isWorkflowMode) return;
 
     try {
@@ -225,21 +225,21 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
     } finally {
       setPreviewLoading(false);
     }
-  };
+  }, [isWorkflowMode, segments, props]);
 
   // 导出脚本
-  const handleExport = () => {
+  const handleExport = useCallback(() => {
     if (isWorkflowMode) return;
     setExportMenuVisible(true);
-  };
+  }, [isWorkflowMode]);
 
   // 打开 AI 优化模态框
-  const handleOpenAIModal = () => {
+  const handleOpenAIModal = useCallback(() => {
     setAiModalVisible(true);
-  };
+  }, []);
 
   // AI 优化脚本
-  const handleAIImprove = async () => {
+  const handleAIImprove = useCallback(async () => {
     try {
       message.info('正在使用 AI 优化脚本...');
       setAiModalVisible(false);
@@ -250,18 +250,18 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
       console.error('AI 优化脚本失败:', error);
       message.error('AI 优化脚本失败');
     }
-  };
+  }, []);
 
   // 保存脚本（原始模式）
-  const handleOriginalSave = () => {
+  const handleOriginalSave = useCallback(() => {
     if (!isWorkflowMode) {
       props.onSave(segments);
       message.success('脚本已保存');
     }
-  };
+  }, [isWorkflowMode, props, segments]);
 
   // 表格列定义
-  const columns = [
+  const columns = useMemo(() => [
     {
       title: '时间',
       key: 'time',
@@ -336,7 +336,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
         </Space>
       )
     }
-  ];
+  ], [handleEditSegment, handlePreviewSegment, handleDeleteSegment]);
 
   // ============ 渲染 ============
 
@@ -629,4 +629,4 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
   );
 };
 
-export default ScriptEditor;
+export default React.memo(ScriptEditor);

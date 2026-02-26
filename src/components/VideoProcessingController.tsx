@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, Row, Col, Select, Slider, InputNumber, Switch, Button, Tooltip, Space, Collapse, Tag, message, Progress, Popconfirm } from 'antd';
 import { PlusOutlined, DeleteOutlined, PlayCircleOutlined, ScissorOutlined, SaveOutlined, SoundOutlined, TransactionOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api/tauri';
@@ -82,6 +82,13 @@ interface VideoProcessingControllerProps {
   defaultAudioProcess?: string;
 }
 
+// 计算片段总时长
+const calculateTotalDuration = (segments: VideoSegment[]): number => {
+  return segments.reduce((total, segment) => {
+    return total + (segment.end - segment.start);
+  }, 0);
+};
+
 const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
   videoPath,
   segments,
@@ -126,7 +133,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
   }, []);
 
   // 添加批处理项目
-  const addBatchItem = () => {
+  const addBatchItem = useCallback(() => {
     if (!segments || segments.length === 0) {
       message.warning('没有可用的脚本片段');
       return;
@@ -140,65 +147,22 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     };
     
     setBatchItems([...batchItems, newBatchItem]);
-  };
+  }, [segments, batchItems.length]);
 
   // 移除批处理项目
-  const removeBatchItem = (id: string) => {
+  const removeBatchItem = useCallback((id: string) => {
     setBatchItems(batchItems.filter(item => item.id !== id));
-  };
+  }, [batchItems]);
 
   // 重命名批处理项目
-  const renameBatchItem = (id: string, newName: string) => {
+  const renameBatchItem = useCallback((id: string, newName: string) => {
     setBatchItems(batchItems.map(item => 
       item.id === id ? { ...item, name: newName } : item
     ));
-  };
-
-  // 开始批量处理
-  const startBatchProcessing = async () => {
-    if (batchItems.length === 0) {
-      message.warning('请先添加批处理项目');
-      return;
-    }
-    
-    setProcessingBatch(true);
-    setCurrentBatchItem(0);
-    setBatchProgress(0);
-    
-    const newOutputPaths = [];
-    
-    for (let i = 0; i < batchItems.length; i++) {
-      setCurrentBatchItem(i);
-      const item = batchItems[i];
-      
-      try {
-        // 调用处理单个项目的函数
-        const outputPath = await processVideo(item.segments, item.name);
-        newOutputPaths.push(outputPath);
-        
-        // 更新批处理项状态
-        setBatchItems(prevItems => prevItems.map((prevItem, idx) => 
-          idx === i ? { ...prevItem, completed: true } : prevItem
-        ));
-        
-        // 更新总体进度
-        setBatchProgress(((i + 1) / batchItems.length) * 100);
-      } catch (error) {
-        console.error(`处理批次项 ${i+1} 失败:`, error);
-        message.error(`处理 "${item.name}" 失败`);
-        
-        // 继续处理下一个
-        continue;
-      }
-    }
-    
-    setOutputPaths(newOutputPaths);
-    setProcessingBatch(false);
-    message.success(`完成批量处理，共 ${newOutputPaths.length} 个文件`);
-  };
+  }, [batchItems]);
 
   // 处理单个视频
-  const processVideo = async (segmentsToProcess: VideoSegment[], itemName?: string): Promise<string> => {
+  const processVideo = useCallback(async (segmentsToProcess: VideoSegment[], itemName?: string): Promise<string> => {
     // 让用户选择保存位置
     try {
       const fileName = itemName ? 
@@ -255,10 +219,53 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       message.error('视频处理失败: ' + error);
       throw error;
     }
-  };
+  }, [exportFormat, videoQuality, customSettings, audioVolume, audioProcess, transitionType, transitionDuration, useSubtitles, videoPath, onProcessingComplete]);
+
+  // 开始批量处理
+  const startBatchProcessing = useCallback(async () => {
+    if (batchItems.length === 0) {
+      message.warning('请先添加批处理项目');
+      return;
+    }
+    
+    setProcessingBatch(true);
+    setCurrentBatchItem(0);
+    setBatchProgress(0);
+    
+    const newOutputPaths = [];
+    
+    for (let i = 0; i < batchItems.length; i++) {
+      setCurrentBatchItem(i);
+      const item = batchItems[i];
+      
+      try {
+        // 调用处理单个项目的函数
+        const outputPath = await processVideo(item.segments, item.name);
+        newOutputPaths.push(outputPath);
+        
+        // 更新批处理项状态
+        setBatchItems(prevItems => prevItems.map((prevItem, idx) => 
+          idx === i ? { ...prevItem, completed: true } : prevItem
+        ));
+        
+        // 更新总体进度
+        setBatchProgress(((i + 1) / batchItems.length) * 100);
+      } catch (error) {
+        console.error(`处理批次项 ${i+1} 失败:`, error);
+        message.error(`处理 "${item.name}" 失败`);
+        
+        // 继续处理下一个
+        continue;
+      }
+    }
+    
+    setOutputPaths(newOutputPaths);
+    setProcessingBatch(false);
+    message.success(`完成批量处理，共 ${newOutputPaths.length} 个文件`);
+  }, [batchItems, processVideo]);
 
   // 处理当前加载的视频
-  const handleProcessCurrentVideo = async () => {
+  const handleProcessCurrentVideo = useCallback(async () => {
     if (!segments || segments.length === 0) {
       message.warning('没有可用的脚本片段');
       return;
@@ -270,7 +277,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     } catch (error) {
       // 错误已在processVideo内部处理
     }
-  };
+  }, [segments, processVideo]);
 
   return (
     <div className={styles.container}>
@@ -611,11 +618,4 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
   );
 };
 
-// 计算片段总时长
-const calculateTotalDuration = (segments: VideoSegment[]): number => {
-  return segments.reduce((total, segment) => {
-    return total + (segment.end - segment.start);
-  }, 0);
-};
-
-export default VideoProcessingController; 
+export default React.memo(VideoProcessingController); 

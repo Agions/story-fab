@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { 
   Button, 
   Progress, 
@@ -151,7 +151,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
   }, [previewUrl]);
 
   // 控制视频播放/暂停
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
 
@@ -161,26 +161,26 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       video.play();
     }
     setIsPlaying(!isPlaying);
-  };
+  }, [isPlaying]);
 
   // 跳转到指定时间
-  const seekTo = (time: number) => {
+  const seekTo = useCallback((time: number) => {
     const video = videoRef.current;
     if (!video) return;
 
     video.currentTime = time;
     setCurrentTime(time);
-  };
+  }, []);
 
   // 格式化时间显示
-  const formatTime = (time: number) => {
+  const formatTime = useCallback((time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
   // 计算片段在时间轴上的位置和宽度
-  const getSegmentStyle = (segment: ScriptSegment): SegmentStyleProps => {
+  const getSegmentStyle = useCallback((segment: ScriptSegment): SegmentStyleProps => {
     const left = `${(segment.startTime / duration) * 100}%`;
     const width = `${((segment.endTime - segment.startTime) / duration) * 100}%`;
     
@@ -193,16 +193,16 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     }
     
     return { left, width, color };
-  };
+  }, [duration]);
 
   // 点击片段时跳转到对应时间点
-  const handleSegmentClick = (segment: ScriptSegment) => {
+  const handleSegmentClick = useCallback((segment: ScriptSegment) => {
     seekTo(segment.startTime);
     setSelectedSegment(segment);
-  };
+  }, [seekTo]);
 
   // 预览片段
-  const handlePreviewSegment = async (segment: ScriptSegment) => {
+  const handlePreviewSegment = useCallback(async (segment: ScriptSegment) => {
     setPreviewLoading(true);
     setPreviewSegment(segment);
     setShowPreviewModal(true);
@@ -232,22 +232,22 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     } finally {
       setPreviewLoading(false);
     }
-  };
+  }, [videoPath, transitionType, transitionDuration, audioVolume, useSubtitles]);
 
   // 关闭预览
-  const handleClosePreview = () => {
+  const handleClosePreview = useCallback(() => {
     setShowPreviewModal(false);
     setPreviewUrl('');
     setPreviewSegment(null);
-  };
+  }, []);
 
   // 导出设置确认
-  const showExportSettings = () => {
+  const showExportSettings = useCallback(() => {
     setShowConfirmModal(true);
-  };
+  }, []);
 
   // 处理视频导出
-  const handleExportVideo = async () => {
+  const handleExportVideo = useCallback(async () => {
     setShowConfirmModal(false);
     
     if (!editedSegments || editedSegments.length === 0) {
@@ -312,10 +312,10 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     } finally {
       setProcessing(false);
     }
-  };
+  }, [editedSegments, exportFormat, videoPath, videoQuality, transitionType, transitionDuration, audioVolume, useSubtitles, onEditComplete]);
 
   // 计算时间轴上的时间位置
-  const getTimeFromPosition = (clientX: number): number => {
+  const getTimeFromPosition = useCallback((clientX: number): number => {
     if (!timelineRef.current) return 0;
     
     const rect = timelineRef.current.getBoundingClientRect();
@@ -323,22 +323,21 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     const percentage = Math.max(0, Math.min(1, relativeX / rect.width));
     
     return percentage * duration;
-  };
+  }, [duration]);
   
-  // 开始拖拽
-  const handleDragStart = (segmentId: string, type: 'move' | 'start' | 'end', e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDragging(true);
-    setDragType(type);
-    setDragSegmentId(segmentId);
+  // 结束拖拽
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+    setDragType(null);
+    setDragSegmentId(null);
     
-    // 添加拖拽事件监听器
-    document.addEventListener('mousemove', handleDragMove);
-    document.addEventListener('mouseup', handleDragEnd);
-  };
+    // 移除拖拽事件监听器
+    document.removeEventListener('mousemove', handleDragMove);
+    document.removeEventListener('mouseup', handleDragEnd);
+  }, []);
   
   // 拖拽移动
-  const handleDragMove = (e: MouseEvent) => {
+  const handleDragMove = useCallback((e: MouseEvent) => {
     if (!isDragging || !dragSegmentId || !dragType) return;
     
     const currentTime = getTimeFromPosition(e.clientX);
@@ -390,27 +389,33 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
         };
       })
     );
-  };
+  }, [isDragging, dragSegmentId, dragType, getTimeFromPosition, duration]);
   
-  // 结束拖拽
-  const handleDragEnd = () => {
-    setIsDragging(false);
-    setDragType(null);
-    setDragSegmentId(null);
+  // 开始拖拽
+  const handleDragStart = useCallback((segmentId: string, type: 'move' | 'start' | 'end', e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDragging(true);
+    setDragType(type);
+    setDragSegmentId(segmentId);
     
-    // 移除拖拽事件监听器
-    document.removeEventListener('mousemove', handleDragMove);
-    document.removeEventListener('mouseup', handleDragEnd);
-  };
+    // 添加拖拽事件监听器
+    document.addEventListener('mousemove', handleDragMove);
+    document.addEventListener('mouseup', handleDragEnd);
+  }, [handleDragMove, handleDragEnd]);
   
   // 将修改后的片段保存到父组件
-  const handleSaveSegments = () => {
+  const handleSaveSegments = useCallback(() => {
     if (onEditComplete) {
       // 更新父组件中的片段
       onEditComplete(editedSegments);
     }
     message.success('片段时间已更新');
-  };
+  }, [editedSegments, onEditComplete]);
+
+  // 缓存片段样式映射
+  const segmentStyles = useMemo(() => {
+    return editedSegments.map(segment => getSegmentStyle(segment));
+  }, [editedSegments, getSegmentStyle]);
 
   return (
     <div className={styles.editorContainer}>
@@ -453,7 +458,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
         
         <div className={styles.timelineContainer} ref={timelineRef}>
           {editedSegments.map((segment, index) => {
-            const { left, width, color } = getSegmentStyle(segment);
+            const { left, width, color } = segmentStyles[index];
             return (
               <Tooltip 
                 key={segment.id} 
@@ -724,4 +729,4 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
   );
 };
 
-export default VideoEditor; 
+export default React.memo(VideoEditor); 

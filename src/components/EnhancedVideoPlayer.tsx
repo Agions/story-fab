@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Button, Tooltip, Slider, Space, Row, Col, Radio, InputNumber, Statistic, Card } from 'antd';
 import { 
   PlayCircleOutlined, 
@@ -140,7 +140,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   };
 
   // 播放/暂停切换
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     
@@ -151,10 +151,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         console.error('播放失败:', err);
       });
     }
-  };
+  }, [isPlaying]);
 
   // 调整进度
-  const handleSeek = (value: number) => {
+  const handleSeek = useCallback((value: number) => {
     const video = videoRef.current;
     if (!video) return;
     
@@ -164,10 +164,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     if (onTimeUpdate) {
       onTimeUpdate(value);
     }
-  };
+  }, [onTimeUpdate]);
 
   // 调整音量
-  const handleVolumeChange = (value: number) => {
+  const handleVolumeChange = useCallback((value: number) => {
     const video = videoRef.current;
     if (!video) return;
     
@@ -181,29 +181,29 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       setIsMuted(false);
       video.muted = false;
     }
-  };
+  }, [isMuted]);
 
   // 静音切换
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     
     const newMutedState = !isMuted;
     setIsMuted(newMutedState);
     video.muted = newMutedState;
-  };
+  }, [isMuted]);
 
   // 调整播放速度
-  const handleRateChange = (value: number) => {
+  const handleRateChange = useCallback((value: number) => {
     const video = videoRef.current;
     if (!video) return;
     
     setPlaybackRate(value);
     video.playbackRate = value;
-  };
+  }, []);
 
   // 全屏切换
-  const toggleFullscreen = () => {
+  const toggleFullscreen = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
     
@@ -220,7 +220,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
           .catch(err => console.error('退出全屏失败:', err));
       }
     }
-  };
+  }, [isFullscreen]);
   
   // 进入/退出全屏时更新状态
   useEffect(() => {
@@ -235,7 +235,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   }, []);
 
   // 帧级控制：前进一帧
-  const stepForward = () => {
+  const stepForward = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     
@@ -248,10 +248,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     
     // 前进一帧
     video.currentTime = Math.min(video.duration, video.currentTime + frameDuration);
-  };
+  }, [frameRate]);
 
   // 帧级控制：后退一帧
-  const stepBackward = () => {
+  const stepBackward = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     
@@ -264,24 +264,24 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     
     // 后退一帧
     video.currentTime = Math.max(0, video.currentTime - frameDuration);
-  };
+  }, [frameRate]);
 
   // 快进5秒
-  const fastForward = () => {
+  const fastForward = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = Math.min(video.duration, video.currentTime + 5);
-  };
+  }, []);
 
   // 快退5秒
-  const fastBackward = () => {
+  const fastBackward = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = Math.max(0, video.currentTime - 5);
-  };
+  }, []);
 
   // 截取当前帧
-  const captureFrame = () => {
+  const captureFrame = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     
@@ -307,10 +307,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     } catch (e) {
       console.error('截图失败:', e);
     }
-  };
+  }, []);
 
   // 格式化时间显示
-  const formatTime = (seconds: number): string => {
+  const formatTime = useCallback((seconds: number): string => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
@@ -324,7 +324,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     parts.push(secs.toString().padStart(2, '0'));
     
     return parts.join(':');
-  };
+  }, []);
 
   return (
     <div 
@@ -547,4 +547,4 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   );
 };
 
-export default EnhancedVideoPlayer; 
+export default React.memo(EnhancedVideoPlayer); 
