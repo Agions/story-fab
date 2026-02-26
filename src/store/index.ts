@@ -8,6 +8,7 @@ export * from './types';
 
 // Store 导出
 export { useAppStore } from './appStore';
+export { useAppStore as useStore } from './appStore';
 export { useProjectStore } from './projectStore';
 export { useEditorStore } from './editorStore';
 
