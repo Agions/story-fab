@@ -33,7 +33,6 @@ export default defineConfig({
   },
   css: {
     devSourcemap: false,
-    minify: true,
     modules: {
       localsConvention: 'camelCase',
     },
@@ -55,10 +54,8 @@ export default defineConfig({
     chunkSizeWarningLimit: 400,
     reportCompressedSize: true,
     assetsInlineLimit: 4096,
-    // 动态导入实现路由懒加载
     rollupOptions: {
       output: {
-        // 更好的代码分割
         manualChunks: (id) => {
           // React 核心
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
@@ -107,12 +104,5 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'antd', '@ant-design/icons', 'axios', 'dayjs', 'zustand'],
-    exclude: [],
-  },
-  compressHTML: {
-    collapseWhitespace: true,
-    removeComments: true,
-    removeRedundantAttributes: true,
-    useShortDoctype: true,
   },
 })
