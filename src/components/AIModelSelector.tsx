@@ -158,37 +158,8 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [viewMode]);
 
-  // 过滤模型
-  const filteredModels = models.filter(model => {
-    // 类别过滤
-    if (activeCategory !== 'all' && !model.category.includes(activeCategory)) {
-      return false;
-    }
-    
-    // 搜索过滤
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        model.name.toLowerCase().includes(query) ||
-        model.provider.toLowerCase().includes(query) ||
-        model.description.toLowerCase().includes(query) ||
-        model.features.some(f => f.toLowerCase().includes(query))
-      );
-    }
-    
-    return true;
-  });
-
-  // 处理模型选择
-  const handleModelSelect = (modelId: string) => {
-    setSelectedModelId(modelId);
-    if (onChange) {
-      onChange(modelId);
-    }
-  };
-
   // 获取提供商显示名称
-  const getProviderName = (provider: ModelProvider): string => {
+  const getProviderName = useCallback((provider: ModelProvider): string => {
     const providerMap: Record<ModelProvider, string> = {
       'openai': 'OpenAI',
       'anthropic': 'Anthropic',
@@ -200,10 +171,10 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
       'zhipu': '智谱AI'
     };
     return providerMap[provider] || provider;
-  };
+  }, []);
 
   // 获取类别图标
-  const getCategoryIcon = (cat: ModelCategory) => {
+  const getCategoryIcon = useCallback((cat: ModelCategory) => {
     switch (cat) {
       case 'text': return <EditOutlined />;
       case 'code': return <CodeOutlined />;
@@ -211,20 +182,51 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
       case 'video': return <VideoCameraOutlined />;
       default: return <QuestionCircleOutlined />;
     }
-  };
+  }, []);
 
   // 获取特性图标
-  const getFeatureIcon = (feature: string) => {
+  const getFeatureIcon = useCallback((feature: string) => {
     const lowerFeature = feature.toLowerCase();
     if (lowerFeature.includes('视觉') || lowerFeature.includes('图像')) return <RobotOutlined />;
     if (lowerFeature.includes('代码')) return <CodeOutlined />;
     if (lowerFeature.includes('高级') || lowerFeature.includes('强大')) return <ThunderboltOutlined />;
     if (lowerFeature.includes('创意')) return <StarOutlined />;
     return <FireOutlined />;
-  };
+  }, []);
+
+  // 过滤模型
+  const filteredModels = useMemo(() => {
+    return models.filter(model => {
+      // 类别过滤
+      if (activeCategory !== 'all' && !model.category.includes(activeCategory)) {
+        return false;
+      }
+      
+      // 搜索过滤
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return (
+          model.name.toLowerCase().includes(query) ||
+          model.provider.toLowerCase().includes(query) ||
+          model.description.toLowerCase().includes(query) ||
+          model.features.some(f => f.toLowerCase().includes(query))
+        );
+      }
+      
+      return true;
+    });
+  }, [activeCategory, searchQuery]);
+
+  // 处理模型选择
+  const handleModelSelect = useCallback((modelId: string) => {
+    setSelectedModelId(modelId);
+    if (onChange) {
+      onChange(modelId);
+    }
+  }, [onChange]);
 
   // 渲染卡片模式UI
-  const renderCardView = () => (
+  const renderCardView = useCallback(() => (
     <Row gutter={[16, 16]} className={styles.modelGrid}>
       {filteredModels.map((model, index) => (
         <Col xs={24} sm={12} md={8} lg={6} key={model.id}>
@@ -314,10 +316,10 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
         </Col>
       ))}
     </Row>
-  );
+  ), [filteredModels, selectedModelId, handleModelSelect, getProviderName, getCategoryIcon, getFeatureIcon]);
 
   // 渲染列表模式UI
-  const renderListView = () => (
+  const renderListView = useCallback(() => (
     <div className={styles.modelList}>
       <Radio.Group 
         value={selectedModelId} 
@@ -364,10 +366,10 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
         ))}
       </Radio.Group>
     </div>
-  );
+  ), [filteredModels, selectedModelId, handleModelSelect, getProviderName]);
 
   // 渲染类别选择器
-  const renderCategorySelector = () => (
+  const renderCategorySelector = useCallback(() => (
     <motion.div 
       className={styles.categorySelector}
       initial={{ opacity: 0, y: -10 }}
@@ -396,18 +398,18 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
         ]}
       />
     </motion.div>
-  );
+  ), [activeCategory]);
 
   // 加载状态引用
   const loadingRef = useRef<boolean>(false);
   
   // 模拟加载效果
-  const simulateLoading = () => {
+  const simulateLoading = useCallback(() => {
     loadingRef.current = true;
     setTimeout(() => {
       loadingRef.current = false;
     }, 500);
-  };
+  }, []);
 
   // 主渲染函数
   return (
@@ -502,4 +504,4 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
   );
 };
 
-export default AIModelSelector;
+export default React.memo(AIModelSelector);
