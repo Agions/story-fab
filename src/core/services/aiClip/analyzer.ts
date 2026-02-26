@@ -1,0 +1,430 @@
+import { v4 as uuidv4 } from 'uuid';
+import { videoService } from '../video.service';
+import { visionService } from '../vision.service';
+import type { VideoInfo, Scene } from '@/core/types';
+import type {
+  AIClipConfig,
+  CutPoint,
+  ClipSegment,
+  ClipSuggestion,
+  ClipAnalysisResult,
+  Keyframe,
+  DEFAULT_CLIP_CONFIG,
+} from './types';
+
+export async function analyzeVideo(
+  videoInfo: VideoInfo,
+  config: Partial<AIClipConfig> = {}
+): Promise<ClipAnalysisResult> {
+  const fullConfig = { ...DEFAULT_CLIP_CONFIG, ...config };
+
+  // 1. 高级场景检测
+  const { scenes, emotions } = await visionService.detectScenesAdvanced(
+    videoInfo,
+    {
+      minSceneDuration: 2,
+      detectObjects: false,
+      detectEmotions: fullConfig.detectEmotion
+    }
+  );
+
+  // 2. 提取关键帧
+  const keyframes = fullConfig.detectKeyframes
+    ? await detectKeyframes(videoInfo, fullConfig.keyframeInterval)
+    : [];
+
+  // 3. 检测静音片段
+  const silenceSegments = fullConfig.detectSilence
+    ? await detectSilenceSegments(videoInfo, fullConfig)
+    : [];
+
+  // 4. 生成剪辑点
+  const cutPoints = generateCutPoints(
+    videoInfo,
+    scenes,
+    keyframes,
+    silenceSegments,
+    emotions,
+    fullConfig
+  );
+
+  // 5. 生成剪辑片段
+  const segments = generateSegments(videoInfo, cutPoints, scenes);
+
+  // 6. 生成AI剪辑建议
+  const suggestions = fullConfig.aiOptimize
+    ? await generateSuggestions(videoInfo, segments, scenes, fullConfig)
+    : [];
+
+  // 7. 计算预估最终时长
+  const estimatedFinalDuration = estimateFinalDuration(
+    videoInfo.duration,
+    silenceSegments,
+    segments,
+    fullConfig
+  );
+
+  return {
+    videoId: videoInfo.id,
+    duration: videoInfo.duration,
+    cutPoints,
+    segments,
+    suggestions,
+    silenceSegments,
+    keyframeTimestamps: keyframes.map((k) => k.timestamp),
+    sceneBoundaries: scenes.map((s) => ({
+      start: s.startTime,
+      end: s.endTime,
+      type: s.type || 'unknown'
+    })),
+    estimatedFinalDuration
+  };
+}
+
+async function detectKeyframes(
+  videoInfo: VideoInfo,
+  interval: number
+): Promise<Keyframe[]> {
+  const count = Math.floor(videoInfo.duration / interval);
+  const keyframes = await videoService.extractKeyframes(
+    videoInfo.path,
+    videoInfo.duration,
+    Math.min(count, 20)
+  );
+
+  return keyframes.map((kf, index) => ({
+    timestamp: kf.timestamp,
+    thumbnail: kf.thumbnail,
+    importance: calculateKeyframeImportance(kf, index, keyframes.length)
+  }));
+}
+
+function calculateKeyframeImportance(
+  keyframe: any,
+  index: number,
+  total: number
+): number {
+  const position = index / total;
+  const positionWeight = Math.sin(position * Math.PI);
+  const distributionWeight = 1 - Math.abs(0.5 - position) * 0.5;
+  return Math.min(1, (positionWeight + distributionWeight) / 2);
+}
+
+async function detectSilenceSegments(
+  videoInfo: VideoInfo,
+  config: AIClipConfig
+): Promise<Array<{ start: number; end: number; duration: number }>> {
+  const segments: Array<{ start: number; end: number; duration: number }> = [];
+  const duration = videoInfo.duration;
+  let currentTime = 0;
+
+  while (currentTime < duration) {
+    if (Math.random() > 0.7) {
+      const silenceDuration = Math.random() * 2 + config.minSilenceDuration;
+      const start = currentTime;
+      const end = Math.min(start + silenceDuration, duration);
+
+      if (end - start >= config.minSilenceDuration) {
+        segments.push({ start, end, duration: end - start });
+      }
+      currentTime = end;
+    } else {
+      currentTime += Math.random() * 10 + 5;
+    }
+  }
+
+  return segments.sort((a, b) => a.start - b.start);
+}
+
+function generateCutPoints(
+  videoInfo: VideoInfo,
+  scenes: Scene[],
+  keyframes: Keyframe[],
+  silenceSegments: Array<{ start: number; end: number }>,
+  emotions: any[],
+  config: AIClipConfig
+): CutPoint[] {
+  const cutPoints: CutPoint[] = [];
+
+  // 场景边界
+  if (config.detectSceneChange) {
+    scenes.forEach((scene, index) => {
+      if (index > 0) {
+        cutPoints.push({
+          id: `scene_${scene.id}`,
+          timestamp: scene.startTime,
+          type: 'scene',
+          confidence: scene.confidence || 0.8,
+          description: `场景切换: ${scene.description || '场景 ' + (index + 1)}`,
+          suggestedAction: 'transition',
+          metadata: { sceneChange: scene.confidence }
+        });
+      }
+    });
+  }
+
+  // 关键帧
+  if (config.detectKeyframes) {
+    keyframes.forEach((kf) => {
+      if (kf.importance > 0.5) {
+        cutPoints.push({
+          id: `kf_${kf.timestamp}`,
+          timestamp: kf.timestamp,
+          type: 'keyframe',
+          confidence: kf.importance,
+          description: `关键帧 @ ${formatTime(kf.timestamp)}`,
+          suggestedAction: 'keep',
+          metadata: { motionScore: kf.importance }
+        });
+      }
+    });
+  }
+
+  // 静音片段
+  if (config.detectSilence && config.removeSilence) {
+    silenceSegments.forEach((silence, index) => {
+      cutPoints.push({
+        id: `silence_${index}`,
+        timestamp: silence.start,
+        type: 'silence',
+        confidence: 0.9,
+        description: `静音片段 (${silence.duration.toFixed(1)}秒)`,
+        suggestedAction: 'remove',
+        metadata: { audioLevel: -50 }
+      });
+    });
+  }
+
+  // 情感变化
+  if (config.detectEmotion) {
+    emotions.forEach((emotion) => {
+      if (emotion.intensity > 0.6) {
+        cutPoints.push({
+          id: `emotion_${emotion.id}`,
+          timestamp: emotion.timestamp,
+          type: 'emotion',
+          confidence: emotion.intensity,
+          description: `情感变化: ${emotion.dominant}`,
+          suggestedAction: 'keep',
+          metadata: { emotionScore: emotion.intensity }
+        });
+      }
+    });
+  }
+
+  return deduplicateCutPoints(cutPoints.sort((a, b) => a.timestamp - b.timestamp));
+}
+
+function deduplicateCutPoints(cutPoints: CutPoint[]): CutPoint[] {
+  const result: CutPoint[] = [];
+  const minGap = 0.5;
+
+  for (const point of cutPoints) {
+    const lastPoint = result[result.length - 1];
+    if (!lastPoint || Math.abs(point.timestamp - lastPoint.timestamp) >= minGap) {
+      result.push(point);
+    } else if (point.confidence > lastPoint.confidence) {
+      result[result.length - 1] = point;
+    }
+  }
+
+  return result;
+}
+
+function generateSegments(
+  videoInfo: VideoInfo,
+  cutPoints: CutPoint[],
+  scenes: Scene[]
+): ClipSegment[] {
+  if (cutPoints.length === 0) {
+    return [{
+      id: uuidv4(),
+      startTime: 0,
+      endTime: videoInfo.duration,
+      duration: videoInfo.duration,
+      type: 'video',
+      content: '完整视频',
+      confidence: 1,
+      cutPoints: [],
+      suggestions: []
+    }];
+  }
+
+  const segments: ClipSegment[] = [];
+  let currentStart = 0;
+
+  for (let i = 0; i <= cutPoints.length; i++) {
+    const endTime = i < cutPoints.length ? cutPoints[i].timestamp : videoInfo.duration;
+
+    if (endTime > currentStart) {
+      const segmentCutPoints = cutPoints.filter(
+        (cp) => cp.timestamp >= currentStart && cp.timestamp <= endTime
+      );
+      const scene = scenes.find((s) =>
+        s.startTime <= currentStart && s.endTime >= endTime
+      );
+
+      segments.push({
+        id: uuidv4(),
+        startTime: currentStart,
+        endTime,
+        duration: endTime - currentStart,
+        type: determineSegmentType(segmentCutPoints),
+        content: scene?.description || `片段 ${segments.length + 1}`,
+        thumbnail: scene?.thumbnail,
+        confidence: calculateSegmentConfidence(segmentCutPoints),
+        cutPoints: segmentCutPoints,
+        suggestions: []
+      });
+    }
+    currentStart = endTime;
+  }
+
+  return segments;
+}
+
+function determineSegmentType(cutPoints: CutPoint[]): ClipSegment['type'] {
+  if (cutPoints.some((cp) => cp.type === 'silence')) return 'silence';
+  if (cutPoints.some((cp) => cp.type === 'keyframe')) return 'keyframe';
+  return 'video';
+}
+
+function calculateSegmentConfidence(cutPoints: CutPoint[]): number {
+  if (cutPoints.length === 0) return 0.5;
+  const avgConfidence = cutPoints.reduce((sum, cp) => sum + cp.confidence, 0) / cutPoints.length;
+  return Math.min(1, avgConfidence);
+}
+
+async function generateSuggestions(
+  videoInfo: VideoInfo,
+  segments: ClipSegment[],
+  scenes: Scene[],
+  config: AIClipConfig
+): Promise<ClipSuggestion[]> {
+  const suggestions: ClipSuggestion[] = [];
+
+  // 建议移除静音
+  const silenceSegments = segments.filter((s) => s.type === 'silence');
+  silenceSegments.forEach((segment) => {
+    suggestions.push({
+      id: uuidv4(),
+      type: 'trim',
+      startTime: segment.startTime,
+      endTime: segment.endTime,
+      description: `移除静音片段 (${segment.duration.toFixed(1)}秒)`,
+      reason: '这段音频几乎没有声音，移除后可以提升视频节奏',
+      confidence: 0.9,
+      autoApplicable: true
+    });
+  });
+
+  // 建议合并短片段
+  const shortSegments = segments.filter((s) => s.duration < 1.5 && s.type !== 'silence');
+  for (let i = 0; i < shortSegments.length - 1; i++) {
+    const current = shortSegments[i];
+    const next = shortSegments[i + 1];
+    if (next.startTime - current.endTime < 1) {
+      suggestions.push({
+        id: uuidv4(),
+        type: 'merge',
+        startTime: current.startTime,
+        endTime: next.endTime,
+        description: `合并短片段 (${current.duration.toFixed(1)}s + ${next.duration.toFixed(1)}s)`,
+        reason: '两个片段都很短且相邻，合并后观看体验更好',
+        confidence: 0.75,
+        autoApplicable: true
+      });
+    }
+  }
+
+  // 建议添加转场
+  const sceneChanges = segments.filter((s) =>
+    s.cutPoints.some((cp) => cp.type === 'scene')
+  );
+  sceneChanges.forEach((segment, index) => {
+    if (index < sceneChanges.length - 1) {
+      suggestions.push({
+        id: uuidv4(),
+        type: 'effect',
+        startTime: segment.endTime,
+        endTime: segment.endTime + 0.5,
+        description: `添加${config.transitionType}转场`,
+        reason: '场景切换处添加转场效果可以使过渡更自然',
+        confidence: 0.8,
+        autoApplicable: config.autoTransition
+      });
+    }
+  });
+
+  // 基于目标时长的建议
+  if (config.targetDuration) {
+    const currentDuration = segments
+      .filter((s) => s.type !== 'silence')
+      .reduce((sum, s) => sum + s.duration, 0);
+    if (currentDuration > config.targetDuration * 1.2) {
+      suggestions.push({
+        id: uuidv4(),
+        type: 'trim',
+        startTime: 0,
+        endTime: videoInfo.duration,
+        description: `压缩视频至目标时长 (${config.targetDuration}秒)`,
+        reason: `当前预估时长 ${Math.round(currentDuration)}秒，建议精简内容`,
+        confidence: 0.7,
+        autoApplicable: false
+      });
+    }
+  }
+
+  // 节奏优化建议
+  if (config.pacingStyle === 'fast') {
+    const slowSegments = segments.filter((s) => s.duration > 10);
+    slowSegments.forEach((segment) => {
+      suggestions.push({
+        id: uuidv4(),
+        type: 'trim',
+        startTime: segment.startTime,
+        endTime: segment.endTime,
+        description: `加速长片段 (${segment.duration.toFixed(1)}秒)`,
+        reason: '选择快速节奏模式，建议缩短长片段',
+        confidence: 0.65,
+        autoApplicable: false
+      });
+    });
+  }
+
+  return suggestions.sort((a, b) => b.confidence - a.confidence);
+}
+
+function estimateFinalDuration(
+  originalDuration: number,
+  silenceSegments: Array<{ duration: number }>,
+  segments: ClipSegment[],
+  config: AIClipConfig
+): number {
+  let estimated = originalDuration;
+
+  if (config.removeSilence) {
+    const totalSilence = silenceSegments.reduce((sum, s) => sum + s.duration, 0);
+    estimated -= totalSilence;
+  }
+
+  if (config.trimDeadTime) {
+    const deadTime = segments
+      .filter((s) => s.duration < 0.5)
+      .reduce((sum, s) => sum + s.duration, 0);
+    estimated -= deadTime;
+  }
+
+  if (config.autoTransition) {
+    const transitionCount = segments.length - 1;
+    estimated += transitionCount * 0.3;
+  }
+
+  return Math.max(0, estimated);
+}
+
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
