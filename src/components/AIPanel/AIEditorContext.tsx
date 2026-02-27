@@ -351,7 +351,7 @@ function clipFlowReducer(state: ClipFlowState, action: ClipFlowAction): ClipFlow
     case 'RESET':
       return initialState;
     
-    case 'RESET_STEP':
+    case 'RESET_STEP': {
       // 重置指定步骤及其后续步骤
       const steps: ClipFlowStep[] = [
         'project-create',
@@ -380,7 +380,8 @@ function clipFlowReducer(state: ClipFlowState, action: ClipFlowAction): ClipFlow
         exportSettings: null,
         error: null,
       };
-    
+    }
+
     default:
       return state;
   }
