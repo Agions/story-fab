@@ -7,3 +7,6 @@ export * from './types';
 export * from './appStore';
 export * from './projectStore';
 export * from './editorStore';
+
+// 兼容旧版 useStore
+export { useAppStore as useStore } from './appStore';
