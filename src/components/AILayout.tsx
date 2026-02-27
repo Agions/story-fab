@@ -67,7 +67,7 @@ const aiFeatures = [
 
 const AILayout: React.FC<AILayoutProps> = ({ children }) => {
   const navigate = useNavigate();
-  const { state, setFeature } = useAIEditor();
+  const { state, setFeature, setPlaying } = useAIEditor();
   const { isPlaying, selectedFeature, currentVideo } = state;
 
   // 处理核心功能切换
@@ -289,7 +289,6 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
                 type="text" 
                 icon={isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
                 onClick={() => {
-                  const { setPlaying } = useAIEditor();
                   setPlaying(!isPlaying);
                 }}
                 className={styles.playBtn}
