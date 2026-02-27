@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import './App.css';
 
 import AppProvider from './providers/AppProvider';
+import ErrorBoundary from './ErrorBoundary';
 
 // 懒加载页面组件 - 优化首屏加载
 const Home = lazy(() => import('./pages/Home'));
@@ -26,32 +27,34 @@ const PageLoader = () => (
 
 const App: React.FC = () => {
   return (
-    <AppProvider>
-      <BrowserRouter>
-        <Layout>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/projects" element={<ProjectManager />} />
-              <Route path="/project/new" element={<ProjectEdit />} />
-              <Route path="/project/edit/:projectId" element={<ProjectEdit />} />
-              <Route path="/project/:projectId" element={<ProjectDetail />} />
-              <Route path="/editor" element={<VideoEditor />} />
-              <Route path="/editor/:projectId" element={<VideoEditor />} />
-              <Route path="/script/new" element={<ScriptDetail />} />
-              <Route path="/script/:scriptId" element={<ScriptDetail />} />
-              <Route path="/ai-editor" element={<AIVideoEditor />} />
-              <Route path="/ai-clip" element={<AIVideoEditor />} />
-              <Route path="/ai-narrate" element={<AIVideoEditor />} />
-              <Route path="/ai-mix" element={<AIVideoEditor />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </Layout>
-      </BrowserRouter>
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <BrowserRouter>
+          <Layout>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/projects" element={<ProjectManager />} />
+                <Route path="/project/new" element={<ProjectEdit />} />
+                <Route path="/project/edit/:projectId" element={<ProjectEdit />} />
+                <Route path="/project/:projectId" element={<ProjectDetail />} />
+                <Route path="/editor" element={<VideoEditor />} />
+                <Route path="/editor/:projectId" element={<VideoEditor />} />
+                <Route path="/script/new" element={<ScriptDetail />} />
+                <Route path="/script/:scriptId" element={<ScriptDetail />} />
+                <Route path="/ai-editor" element={<AIVideoEditor />} />
+                <Route path="/ai-clip" element={<AIVideoEditor />} />
+                <Route path="/ai-narrate" element={<AIVideoEditor />} />
+                <Route path="/ai-mix" element={<AIVideoEditor />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </Layout>
+        </BrowserRouter>
+      </AppProvider>
+    </ErrorBoundary>
   );
 };
 
