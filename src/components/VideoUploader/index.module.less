@@ -24,6 +24,9 @@
     :global(.ant-upload-drag) {
       border-color: #1890ff;
       background: #e6f7ff;
+      border-style: solid;
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
     }
   }
 }
@@ -36,6 +39,12 @@
   font-size: 48px;
   color: #1890ff;
   margin-bottom: 16px;
+  transition: all 0.3s;
+
+  &.uploadIconActive {
+    color: #52c41a;
+    transform: scale(1.1);
+  }
 }
 
 .uploadTitle {

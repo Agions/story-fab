@@ -66,6 +66,58 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
 
   const [previewVisible, setPreviewVisible] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [dragFile, setDragFile] = useState<File | null>(null);
+
+  // 处理拖拽事件
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+    setDragFile(e.dataTransfer.files[0] || null);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // 只有当离开上传区域时才重置状态
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
+      setDragActive(false);
+      setDragFile(null);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      // 验证文件类型
+      const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
+      if (!SUPPORTED_FORMATS.includes(fileExt)) {
+        message.error(`不支持的文件格式，仅支持 ${SUPPORTED_FORMATS.join(', ')}`);
+        setDragFile(null);
+        return;
+      }
+      // 验证文件大小
+      if (file.size > MAX_FILE_SIZE) {
+        message.error(`文件过大，最大支持 ${formatFileSize(MAX_FILE_SIZE)}`);
+        setDragFile(null);
+        return;
+      }
+      setDragFile(file);
+      handleFileSelect(file);
+    }
+    setDragFile(null);
+  }, [handleFileSelect]);
 
   // 处理文件选择
   const handleFileSelect = useCallback(async (file: File) => {
@@ -94,26 +146,42 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
       showUploadList={false}
       disabled={disabled || isUploading}
       className={`${styles.dragger} ${dragActive ? styles.dragActive : ''}`}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className={styles.uploadContent}
       >
-        <div className={styles.uploadIcon}>
+        <div className={`${styles.uploadIcon} ${dragActive ? styles.uploadIconActive : ''}`}>
           {isUploading ? (
             <VideoCameraOutlined spin />
+          ) : dragActive ? (
+            <FileOutlined />
           ) : (
             <UploadOutlined />
           )}
         </div>
         <Title level={5} className={styles.uploadTitle}>
-          {isUploading ? '正在上传视频...' : '点击或拖拽视频到此处'}
+          {isUploading ? '正在上传视频...' : dragActive ? '释放鼠标上传视频' : '点击或拖拽视频到此处'}
         </Title>
         <Paragraph className={styles.uploadDesc}>
-          支持 {SUPPORTED_FORMATS.join(', ')} 格式
-          <br />
-          最大支持 {formatFileSize(MAX_FILE_SIZE)}
+          {dragFile ? (
+            <>
+              已选择文件: <strong>{dragFile.name}</strong>
+              <br />
+              大小: {formatFileSize(dragFile.size)}
+            </>
+          ) : (
+            <>
+              支持 {SUPPORTED_FORMATS.join(', ')} 格式
+              <br />
+              最大支持 {formatFileSize(MAX_FILE_SIZE)}
+            </>
+          )}
         </Paragraph>
 
         {isUploading && (

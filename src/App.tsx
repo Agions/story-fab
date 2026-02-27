@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
 import { Spin } from 'antd';
 import Layout from './components/Layout';
+import { LoadingSkeleton } from './components/common';
 import './App.css';
 
 import AppProvider from './providers/AppProvider';
@@ -18,10 +19,10 @@ const VideoEditor = lazy(() => import('./pages/VideoEditor'));
 const AIVideoEditor = lazy(() => import('./pages/AIVideoEditor'));
 const Settings = lazy(() => import('./pages/Settings'));
 
-// 加载占位符
+// 加载占位符 - 骨架屏
 const PageLoader = () => (
-  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-    <Spin size="large" />
+  <div style={{ padding: '24px' }}>
+    <LoadingSkeleton variant="detail" paragraphRows={4} active />
   </div>
 );
 
