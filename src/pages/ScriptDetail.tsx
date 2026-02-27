@@ -83,7 +83,7 @@ const ScriptDetail: React.FC = () => {
       await saveProjectToFile(updatedProject);
       
       message.success('保存成功');
-    } catch (error) {
+    } catch {
       console.error('保存失败:', error);
       message.error('保存失败');
     } finally {
@@ -103,7 +103,7 @@ const ScriptDetail: React.FC = () => {
         },
         `${project.name}_脚本_${new Date().toISOString().slice(0, 10)}.txt`
       );
-    } catch (error) {
+    } catch {
       console.error('导出脚本失败:', error);
       message.error('导出失败');
     }
@@ -138,7 +138,7 @@ const ScriptDetail: React.FC = () => {
           
           message.success('删除成功');
           navigate(`/projects/${project.id}`);
-        } catch (error) {
+        } catch {
           console.error('删除脚本失败:', error);
           message.error('删除失败');
         }

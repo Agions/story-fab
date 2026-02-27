@@ -143,7 +143,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       setProgress(100);
       setGeneratedScript(script);
       onGenerate?.(script);
-    } catch (error) {
+    } catch {
       console.error('生成失败:', error);
     } finally {
       setIsGenerating(false);

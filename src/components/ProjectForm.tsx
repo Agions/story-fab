@@ -20,7 +20,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     try {
       await onSubmit(values);
       message.success('保存成功');
-    } catch (error) {
+    } catch {
       message.error('保存失败');
     }
   };

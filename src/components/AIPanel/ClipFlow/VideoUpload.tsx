@@ -169,7 +169,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
       } else {
         setTimeout(() => goToNextStep(), 500);
       }
-    } catch (error) {
+    } catch {
       message.error('视频处理失败，请重试');
       console.error(error);
     } finally {

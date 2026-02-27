@@ -38,7 +38,7 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
         setSubmitting(false);
         setSubmitted(true);
       }, 1000);
-    } catch (error) {
+    } catch {
       console.error('表单验证失败:', error);
     }
   };

@@ -74,7 +74,7 @@ const VideoEditorPage: React.FC = () => {
 
       await saveProjectFile(projectId || 'new', JSON.stringify(projectToSave));
       message.success('项目保存成功');
-    } catch (error) {
+    } catch {
       console.error('保存失败:', error);
       message.error('保存失败，请重试');
     } finally {
@@ -88,7 +88,7 @@ const VideoEditorPage: React.FC = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       message.success('视频导出成功');
-    } catch (error) {
+    } catch {
       console.error('导出失败:', error);
       message.error('导出失败，请重试');
     } finally {

@@ -64,7 +64,7 @@ const ProjectDetail: React.FC = () => {
           deleteProject(id);
           message.success('项目已删除');
           navigate('/projects');
-        } catch (error) {
+        } catch {
           message.error('删除项目失败');
         }
       }

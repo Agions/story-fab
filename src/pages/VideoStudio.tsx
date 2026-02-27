@@ -158,7 +158,7 @@ const VideoStudio: React.FC = () => {
           setScript(scriptData);
         }
         
-      } catch (error) {
+      } catch {
         console.error('加载项目失败:', error);
         message.error('加载项目失败');
       } finally {

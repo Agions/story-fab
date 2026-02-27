@@ -146,7 +146,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
       } else {
         goToNextStep();
       }
-    } catch (error) {
+    } catch {
       message.error('项目创建失败');
     } finally {
       setLoading(false);

@@ -226,7 +226,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       // 将文件路径转换为可加载URL
       const fileUrl = convertFileSrc(tempPath);
       setPreviewUrl(fileUrl);
-    } catch (error) {
+    } catch {
       console.error('生成预览失败:', error);
       message.error('生成预览失败: ' + error);
     } finally {
@@ -306,7 +306,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       }
       
       message.success('视频剪辑完成');
-    } catch (error) {
+    } catch {
       console.error('导出视频失败:', error);
       message.error('导出视频失败');
     } finally {

@@ -180,7 +180,7 @@ const ProjectEdit: React.FC = () => {
       
       // 进入下一步
       setCurrentStep(2);
-    } catch (error) {
+    } catch {
       console.error('视频分析失败:', error);
       message.error('视频分析失败，请稍后再试');
     } finally {
@@ -223,7 +223,7 @@ const ProjectEdit: React.FC = () => {
       }
       
       return resultSegments;
-    } catch (error) {
+    } catch {
       console.error('解析脚本失败:', error);
       return [];
     }
@@ -284,7 +284,7 @@ const ProjectEdit: React.FC = () => {
       if (isNewProject) {
         navigate(`/project/${projectData.id}`);
       }
-    } catch (error) {
+    } catch {
       console.error('保存项目失败:', error);
       message.error('保存项目失败，请稍后再试');
     } finally {

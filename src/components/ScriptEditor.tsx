@@ -219,7 +219,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
       const previewPath = await previewSegment(videoPath, segment);
       setPreviewSrc(convertFileSrc(previewPath));
       setPreviewVisible(true);
-    } catch (error) {
+    } catch {
       console.error('生成预览失败:', error);
       message.error('生成预览失败');
     } finally {
@@ -246,7 +246,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
       setTimeout(() => {
         message.success('脚本优化完成');
       }, 2000);
-    } catch (error) {
+    } catch {
       console.error('AI 优化脚本失败:', error);
       message.error('AI 优化脚本失败');
     }

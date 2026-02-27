@@ -126,7 +126,7 @@ export const EditorPage: React.FC = () => {
       URL.revokeObjectURL(url);
       message.success('导出成功！');
       setShowExportModal(false);
-    } catch (error) {
+    } catch {
       message.error('导出失败');
     }
   };

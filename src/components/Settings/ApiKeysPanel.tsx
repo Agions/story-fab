@@ -38,7 +38,7 @@ const ApiKeysPanel: React.FC<ApiKeysPanelProps> = ({ apiKeys, onUpdateKey, onDel
       } else {
         message.error(result.error || '验证失败');
       }
-    } catch (error) {
+    } catch {
       message.error('验证出错');
     } finally {
       setTestingProvider(null);

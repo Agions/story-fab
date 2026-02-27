@@ -42,7 +42,7 @@ const ProjectList: React.FC = () => {
       if (projectsData) {
         setProjects(projectsData);
       }
-    } catch (error) {
+    } catch {
       console.error('加载项目失败:', error);
       message.error('加载项目失败');
     } finally {
@@ -79,7 +79,7 @@ const ProjectList: React.FC = () => {
           await saveAppData('projects', updatedProjects);
           setProjects(updatedProjects);
           message.success('项目已删除');
-        } catch (error) {
+        } catch {
           console.error('删除项目失败:', error);
           message.error('删除项目失败');
         }

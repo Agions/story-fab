@@ -59,14 +59,14 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
         const videoMetadata = await analyzeVideo(filePath);
         setMetadata(videoMetadata);
         onVideoSelect(filePath, videoMetadata);
-      } catch (error) {
+      } catch {
         console.error('分析视频失败:', error);
         // 即使分析失败也允许选择视频
         onVideoSelect(filePath);
       } finally {
         setIsAnalyzing(false);
       }
-    } catch (error) {
+    } catch {
       console.error('选择视频失败:', error);
       message.error('选择视频失败，请重试');
     }
@@ -92,7 +92,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
     
     try {
       await invoke('open_file', { path: videoPath });
-    } catch (error) {
+    } catch {
       console.error('打开视频失败:', error);
       message.error('无法打开视频，请确保系统有关联的视频播放器');
     }

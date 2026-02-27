@@ -105,7 +105,7 @@ const VideoEditor: React.FC = () => {
         setKeyframes(frames.map(frame => frame.path));
         
         message.success('视频加载成功');
-      } catch (error) {
+      } catch {
         console.error('视频分析失败:', error);
         message.error('视频分析失败，请检查文件格式');
       } finally {
@@ -259,7 +259,7 @@ const VideoEditor: React.FC = () => {
       await saveProjectFile(projectId || 'new', JSON.stringify(projectToSave));
       
       message.success('项目保存成功');
-    } catch (error) {
+    } catch {
       console.error('保存失败:', error);
       message.error('保存失败，请重试');
     } finally {
@@ -277,7 +277,7 @@ const VideoEditor: React.FC = () => {
       
       // 导出视频逻辑
       message.success('视频导出成功');
-    } catch (error) {
+    } catch {
       console.error('导出失败:', error);
       message.error('导出失败，请重试');
     } finally {

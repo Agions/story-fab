@@ -92,7 +92,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
         setCopied(true);
         message.success('已复制到剪贴板');
         setTimeout(() => setCopied(false), 2000);
-      } catch (error) {
+      } catch {
         message.error('复制失败');
       }
     }

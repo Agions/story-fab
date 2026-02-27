@@ -42,7 +42,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
         };
         await onExport(settings);
         message.success('导出成功');
-      } catch (error) {
+      } catch {
         console.error('导出失败:', error);
         message.error('导出失败，请稍后重试');
       } finally {
@@ -63,7 +63,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
       if (success) {
         message.success(`脚本已成功导出为${exportFormat.toUpperCase()}格式`);
       }
-    } catch (error) {
+    } catch {
       console.error('导出失败:', error);
       message.error('导出失败，请稍后重试');
     } finally {

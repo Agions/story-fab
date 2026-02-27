@@ -211,7 +211,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
         else goToNextStep();
       }, 800);
 
-    } catch (error) {
+    } catch {
       console.error('分析失败:', error);
       message.error('分析过程出错，请重试');
     } finally {

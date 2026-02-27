@@ -110,7 +110,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
       setExported(true);
       message.success('视频导出成功！');
 
-    } catch (error) {
+    } catch {
       console.error('导出失败:', error);
       message.error('导出失败，请重试');
     } finally {

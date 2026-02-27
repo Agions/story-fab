@@ -65,7 +65,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
       setTimeout(() => {
         message.success('脚本优化完成');
       }, 2000);
-    } catch (error) {
+    } catch {
       console.error('AI 优化脚本失败:', error);
       message.error('AI 优化脚本失败');
     }

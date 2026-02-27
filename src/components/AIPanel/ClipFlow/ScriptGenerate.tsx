@@ -291,7 +291,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
         setProgress(100);
         message.success('文案生成成功（智能模板）');
       }
-    } catch (error) {
+    } catch {
       console.error('文案生成失败:', error);
       message.error('文案生成失败，请重试');
     } finally {

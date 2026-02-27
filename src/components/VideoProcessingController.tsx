@@ -214,7 +214,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       }
       
       return outputPath;
-    } catch (error) {
+    } catch {
       console.error('视频处理失败:', error);
       message.error('视频处理失败: ' + error);
       throw error;
@@ -250,7 +250,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         
         // 更新总体进度
         setBatchProgress(((i + 1) / batchItems.length) * 100);
-      } catch (error) {
+      } catch {
         console.error(`处理批次项 ${i+1} 失败:`, error);
         message.error(`处理 "${item.name}" 失败`);
         
@@ -274,7 +274,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     try {
       const outputPath = await processVideo(segments);
       message.success('视频处理完成');
-    } catch (error) {
+    } catch {
       // 错误已在processVideo内部处理
     }
   }, [segments, processVideo]);

@@ -114,7 +114,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
       
       setProgress(100);
       message.success('配音生成成功！');
-    } catch (error) {
+    } catch {
       console.error('配音生成失败:', error);
       message.error('配音生成失败');
     } finally {
@@ -182,7 +182,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
         else goToNextStep();
       }, 500);
 
-    } catch (error) {
+    } catch {
       console.error('合成失败:', error);
       message.error('视频合成失败');
     } finally {

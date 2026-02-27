@@ -173,7 +173,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       setGeneratedScript(script);
       onGenerate?.(script);
       message.success('脚本生成成功');
-    } catch (error) {
+    } catch {
       message.error('脚本生成失败');
     } finally {
       setIsGenerating(false);
