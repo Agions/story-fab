@@ -157,32 +157,94 @@ export abstract class BaseService {
   }
 
   /**
-   * 带重试的请求
+   * 带重试的请求 - 增强版
    */
   protected async retryRequest<T>(
     requestFn: () => Promise<T>,
     retries?: number,
-    delay?: number
+    delay?: number,
+    retryOn?: (error: ServiceError) => boolean
   ): Promise<T> {
     const maxRetries = retries ?? this.config.retries ?? 3;
     const retryDelay = delay ?? this.config.retryDelay ?? 1000;
+    const shouldRetry = retryOn ?? this.config.retryOn ?? defaultRetryOn;
     
-    let lastError: Error | undefined;
+    let lastError: ServiceError | undefined;
     
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await requestFn();
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
+        const serviceError = this.normalizeError(error);
+        lastError = serviceError;
         
-        if (attempt < maxRetries) {
-          console.warn(`[${this.name}] 请求失败，${maxRetries - attempt}秒后重试...`);
-          await this.delay(retryDelay * (attempt + 1));
+        // 检查是否应该重试
+        const shouldRetryAttempt = attempt < maxRetries && shouldRetry(serviceError);
+        
+        if (shouldRetryAttempt) {
+          const backoffMs = retryDelay * Math.pow(2, attempt); // 指数退避
+          this.log('warn', `请求失败 (尝试 ${attempt + 1}/${maxRetries + 1}), ${backoffMs}ms 后重试...`, serviceError.message);
+          await this.delay(backoffMs);
+        } else if (attempt < maxRetries) {
+          // 即使不重试，也记录错误
+          this.log('error', `请求失败:`, serviceError.message);
         }
       }
     }
     
     throw lastError;
+  }
+
+  /**
+   * 统一响应格式处理
+   */
+  protected formatResponse<T>(data: T, requestId?: string): ApiResponse<T> {
+    return {
+      success: true,
+      data,
+      timestamp: new Date().toISOString(),
+      requestId
+    };
+  }
+
+  /**
+   * 统一错误响应
+   */
+  protected formatError(error: ServiceError, requestId?: string): ApiResponse {
+    return {
+      success: false,
+      error: {
+        code: error.code || 'UNKNOWN_ERROR',
+        message: error.message
+      },
+      timestamp: new Date().toISOString(),
+      requestId
+    };
+  }
+
+  /**
+   * 包装 Promise 为统一响应格式
+   */
+  protected async withResponse<T>(
+    requestFn: () => Promise<T>,
+    context?: string
+  ): Promise<ApiResponse<T>> {
+    const requestId = this.generateRequestId();
+    try {
+      const data = await requestFn();
+      return this.formatResponse(data, requestId);
+    } catch (error) {
+      const serviceError = this.normalizeError(error);
+      this.log('error', `${context || '请求'}失败:`, serviceError.message);
+      return this.formatError(serviceError, requestId) as ApiResponse<T>;
+    }
+  }
+
+  /**
+   * 生成请求 ID
+   */
+  private generateRequestId(): string {
+    return `${this.name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /**
@@ -218,6 +280,71 @@ export abstract class BaseService {
         console.error(prefix, message, ...args);
         break;
     }
+  }
+
+  /**
+   * 封装 fetch 请求 - 带超时和错误处理
+   */
+  protected async fetch<T = unknown>(
+    url: string,
+    options: RequestInit & { timeout?: number } = {}
+  ): Promise<T> {
+    const { timeout = this.config.timeout, ...fetchOptions } = options;
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, {
+        ...fetchOptions,
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => '');
+        throw new ServiceError(
+          `HTTP ${response.status}: ${response.statusText}${errorText ? ` - ${errorText}` : ''}`,
+          'HTTP_ERROR',
+          response.status,
+          undefined,
+          RETRYABLE_STATUS_CODES.includes(response.status)
+        );
+      }
+      
+      return await response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error instanceof ServiceError) {
+        throw error;
+      }
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new ServiceError('请求超时', 'TIMEOUT', 408, error, true);
+        }
+        throw new ServiceError(error.message, 'NETWORK_ERROR', undefined, error, true);
+      }
+      
+      throw new ServiceError(String(error));
+    }
+  }
+
+  /**
+   * 封装 fetch 请求 - 带重试
+   */
+  protected fetchWithRetry<T = unknown>(
+    url: string,
+    options: RequestInit & { timeout?: number } = {}
+  ): Promise<T> {
+    return this.retryRequest(
+      () => this.fetch<T>(url, options),
+      this.config.retries,
+      this.config.retryDelay,
+      this.config.retryOn
+    );
   }
 }
 
