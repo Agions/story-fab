@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { message } from 'antd';
 import { open } from '@tauri-apps/api/dialog';
 import { VideoSegment, extractKeyFrames, analyzeVideo } from '@/services/videoService';

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Button, Tooltip, Space } from 'antd';
+import { Button, Tooltip } from 'antd';
 import {
   UploadOutlined,
   UndoOutlined,

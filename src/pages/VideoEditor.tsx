@@ -21,7 +21,7 @@ import styles from './VideoEditor.module.less';
 import { VideoSegment, extractKeyFrames, analyzeVideo } from '@/services/videoService';
 import { saveProjectFile } from '@/services/projectService';
 import { AIClipAssistant } from '@/components/AIClipAssistant';
-import { clipWorkflowService, type ClipSegment } from '@/core/services/clip-workflow.service';
+import { clipWorkflowService } from '@/core/services/clip-workflow.service';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -214,7 +214,7 @@ const VideoEditor: React.FC = () => {
       addToHistory(newSegments);
       
       message.success(`智能剪辑完成: ${result.segments.length} 个片段, 移除 ${result.removedDuration.toFixed(1)}s 静音片段`);
-    } catch (error) {
+    } catch {
       message.error('智能剪辑失败');
     } finally {
       setAnalyzing(false);
