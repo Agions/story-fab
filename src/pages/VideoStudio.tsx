@@ -64,7 +64,7 @@ const formatDate = (dateStr: string): string => {
   try {
     const date = new Date(dateStr);
     return formatDistanceToNow(date, { addSuffix: true, locale: zhCN });
-  } catch (e) {
+  } catch {
     return dateStr;
   }
 };

@@ -4,7 +4,7 @@ import { open } from '@tauri-apps/api/dialog';
 import { VideoSegment, extractKeyFrames, analyzeVideo } from '@/services/videoService';
 import { clipWorkflowService } from '@/core/services/clip-workflow.service';
 
-export const useVideoEditor = (projectId: string | undefined) => {
+export const useVideoEditor = (_projectId: string | undefined) => {
   // 视频状态
   const [videoSrc, setVideoSrc] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -170,7 +170,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
       addToHistory(newSegments);
 
       message.success(`智能剪辑完成: ${result.segments.length} 个片段`);
-    } catch (error) {
+    } catch {
       message.error('智能剪辑失败');
     } finally {
       setAnalyzing(false);

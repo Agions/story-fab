@@ -1,11 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Layout, Tabs, Row, Col, message } from 'antd';
-import { RobotOutlined, SaveOutlined } from '@ant-design/icons';
+import { RobotOutlined } from '@ant-design/icons';
 
 import { saveProjectFile } from '@/services/projectService';
 import { useVideoEditor } from './hooks/useVideoEditor';
-import { useAutoSave } from '@/core/hooks';
 
 import Toolbar from './components/Toolbar';
 import VideoPlayer from './components/VideoPlayer';
@@ -22,7 +21,6 @@ const { TabPane } = Tabs;
 
 const VideoEditorPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const [activeTab, setActiveTab] = useState('trim');
 
   const {
     // 状态
