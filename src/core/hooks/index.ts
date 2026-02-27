@@ -10,7 +10,8 @@ export { useEditor } from './useEditor';
 export { useSmartModel } from './useSmartModel';
 export { useAIClip } from './useAIClip';
 
-// 重新导出便于使用
+export { useAutoSave, useAutoSaveRegister } from './useAutoSave';
+export type { AutoSaveConfig, AutoSaveState } from './useAutoSave';
 export type { UseModelReturn, UseModelCostReturn } from './useModel';
 export type { UseProjectReturn } from './useProject';
 export type { UseVideoReturn } from './useVideo';
