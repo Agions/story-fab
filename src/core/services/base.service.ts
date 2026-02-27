@@ -13,11 +13,37 @@ export class ServiceError extends Error {
     message: string,
     public code?: string,
     public statusCode?: number,
-    public originalError?: Error
+    public originalError?: Error,
+    public retryable?: boolean
   ) {
     super(message);
     this.name = 'ServiceError';
   }
+}
+
+/**
+ * 统一响应格式
+ */
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+  };
+  timestamp: string;
+  requestId?: string;
+}
+
+/**
+ * 分页响应格式
+ */
+export interface PaginatedResponse<T = unknown> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
 }
 
 /**
@@ -28,6 +54,7 @@ export interface RequestConfig {
   retries?: number;
   retryDelay?: number;
   headers?: Record<string, string>;
+  retryOn?: (error: ServiceError) => boolean;
 }
 
 /**
@@ -37,6 +64,21 @@ const DEFAULT_CONFIG: RequestConfig = {
   timeout: 30000,
   retries: 3,
   retryDelay: 1000
+};
+
+/**
+ * 可重试的状态码
+ */
+const RETRYABLE_STATUS_CODES = [408, 429, 500, 502, 503, 504];
+
+/**
+ * 默认的重试判断函数
+ */
+const defaultRetryOn = (error: ServiceError): boolean => {
+  // 网络错误可以重试
+  if (!error.statusCode) return true;
+  // 特定状态码可以重试
+  return RETRYABLE_STATUS_CODES.includes(error.statusCode);
 };
 
 /**
