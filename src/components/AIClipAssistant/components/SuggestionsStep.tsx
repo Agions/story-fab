@@ -7,7 +7,7 @@ import {
   ExperimentOutlined,
   CheckCircleOutlined
 } from '@ant-design/icons';
-import type { ClipSuggestion, ClipAnalysisResult } from '@/core/services/aiClip.service';
+import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
 import styles from '../index.module.less';
 
 const { Text } = Typography;

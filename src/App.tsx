@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
-import { Spin } from 'antd';
+
 import Layout from './components/Layout';
 import { LoadingSkeleton } from './components/common';
 import './App.css';

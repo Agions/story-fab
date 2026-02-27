@@ -51,7 +51,7 @@
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
     "docsify-cli": "^4.4.4",
-    "eslint": "^9.39.3",
+    "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "husky": "^9.1.7",
