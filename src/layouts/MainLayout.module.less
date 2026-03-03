@@ -180,14 +180,196 @@
   }
 }
 
+// ==============================================
 // 响应式设计
+// ==============================================
+
 @media (max-width: 768px) {
   .header {
     padding: 0 16px;
   }
-  
+
   .contentInner {
     padding: 16px;
+  }
+
+  // 移动端侧边栏隐藏
+  .sider {
+    display: none;
+  }
+
+  .mainContainer {
+    padding-top: 56px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header {
+    padding: 0 12px;
+  }
+
+  .contentInner {
+    padding: 12px;
+  }
+
+  .logoText {
+    font-size: 16px;
+  }
+
+  .logoIcon {
+    font-size: 20px;
+    margin-right: 6px;
+  }
+}
+
+// 移动端底部导航
+.mobileBottomNav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom);
+
+  :global(.dark) & {
+    background: #1c1c1c;
+    border-top-color: rgba(255, 255, 255, 0.06);
+  }
+
+  @media (max-width: 767px) {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+}
+
+.mobileNavItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  :global(.dark) & {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  .anticon {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+
+  &.active {
+    color: #1E88E5;
+
+    :global(.dark) & {
+      color: #90CAF9;
+    }
+  }
+}
+
+// 移动端主内容区适配
+.mobileContent {
+  @media (max-width: 767px) {
+    padding-bottom: 70px;
+  }
+}
+
+// 移动端抽屉
+.mobileDrawerMenu {
+  :global(.ant-drawer-body) {
+    padding: 0;
+  }
+
+  :global(.ant-menu-item) {
+    padding-left: 24px !important;
+    height: 48px;
+    line-height: 48px;
+  }
+}
+
+// 汉堡菜单按钮
+.hamburgerButton {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  margin-right: 12px;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  :global(.dark) &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  @media (max-width: 767px) {
+    display: flex;
+  }
+
+  span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.65);
+    position: relative;
+    transition: all 0.3s ease;
+
+    :global(.dark) & {
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      left: 0;
+      transition: all 0.3s ease;
+    }
+
+    &::before {
+      top: -6px;
+    }
+
+    &::after {
+      top: 6px;
+    }
+  }
+
+  &.active span {
+    background: transparent;
+
+    &::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    &::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
   }
 }
 

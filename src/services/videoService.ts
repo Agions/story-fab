@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 

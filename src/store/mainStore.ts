@@ -24,17 +24,19 @@ interface AppState {
 export const useStore = create<AppState>()(
   persist(
     (set) => ({
-      // 初始 AI 模型为文心一言
-      selectedAIModel: 'wenxin',
-      
-      // 初始化各个 AI 模型的设置
+      // 初始 AI 模型为 OpenAI GPT-5.3
+      selectedAIModel: 'openai',
+
+      // 初始化各个 AI 模型的设置 - 2026年3月最新
       aiModelsSettings: {
-        wenxin: { enabled: false },
-        qianwen: { enabled: false },
-        spark: { enabled: false },
-        chatglm: { enabled: false },
-        doubao: { enabled: false },
-        deepseek: { enabled: false }
+        openai: { enabled: false },
+        anthropic: { enabled: false },
+        google: { enabled: false },
+        alibaba: { enabled: false },
+        zhipu: { enabled: false },
+        iflytek: { enabled: false },
+        deepseek: { enabled: false },
+        moonshot: { enabled: false }
       },
       
       // 设置选中的 AI 模型

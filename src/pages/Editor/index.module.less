@@ -420,3 +420,301 @@
     height: 180px;
   }
 }
+
+// 深色模式适配 - Tech Dark Theme with Neon Glow
+:global(.dark) {
+  .editorPage {
+    background: @bg-primary;
+    color: @text-primary;
+  }
+
+  .toolbar {
+    background: @bg-secondary;
+    border-bottom: 1px solid @border-primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 15px rgba(99, 102, 241, 0.08);
+
+    :global {
+      .ant-btn {
+        background: transparent;
+        border: none;
+        color: @text-secondary;
+        transition: all 0.3s ease;
+
+        &:hover {
+          color: @primary-color;
+          background: @bg-tertiary;
+          text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+        }
+
+        &:disabled {
+          color: #666;
+        }
+      }
+
+      .ant-divider {
+        background: @border-primary;
+      }
+    }
+  }
+
+  .zoomText {
+    color: @text-secondary;
+  }
+
+  .sidebar {
+    background: @bg-secondary;
+    border-right: 1px solid @border-primary;
+    box-shadow: 2px 0 10px rgba(99, 102, 241, 0.05);
+
+    :global {
+      .ant-tabs {
+        .ant-tabs-nav {
+          background: @bg-tertiary;
+          border-bottom: 1px solid @border-primary;
+
+          .ant-tabs-tab {
+            color: @text-secondary;
+            transition: all 0.3s ease;
+
+            &:hover {
+              color: @primary-color;
+              text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+            }
+
+            &.ant-tabs-tab-active {
+              color: @primary-color;
+              text-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .panelContent {
+    color: @text-secondary;
+  }
+
+  .effectButton {
+    background: @bg-tertiary;
+    border: 1px solid @border-primary;
+    color: @text-secondary;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: @primary-color;
+      color: @primary-color;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+    }
+  }
+
+  .previewContainer {
+    background: @bg-primary;
+    box-shadow: inset 0 0 60px rgba(99, 102, 241, 0.05);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+    }
+  }
+
+  .previewVideo {
+    background: @bg-secondary;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
+  }
+
+  .emptyPreview {
+    color: @text-secondary;
+
+    .emptyIcon {
+      color: @primary-color;
+      text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+  }
+
+  .playbackControls {
+    :global {
+      .ant-btn {
+        background: @bg-tertiary;
+        border: 1px solid @border-primary;
+        color: @text-primary;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(99, 102, 241, 0.15);
+          border-color: @primary-color;
+          color: @primary-color;
+          box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+        }
+
+        &.ant-btn-primary {
+          background: @primary-color;
+          border-color: @primary-color;
+          box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+
+          &:hover {
+            background: lighten(@primary-color, 5%);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+          }
+        }
+      }
+    }
+  }
+
+  .timeDisplay {
+    font-size: 14px;
+  }
+
+  .currentTime {
+    color: @primary-color;
+    text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+  }
+
+  .timeSeparator {
+    color: @text-secondary;
+  }
+
+  .totalTime {
+    color: @text-secondary;
+  }
+
+  .playbackRate {
+    :global {
+      .ant-select {
+        .ant-select-selector {
+          background: @bg-tertiary !important;
+          border-color: @border-primary !important;
+          color: @text-primary !important;
+          transition: all 0.3s ease;
+
+          &:hover {
+            border-color: @primary-color !important;
+            box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+          }
+        }
+      }
+    }
+  }
+
+  .progressSlider {
+    :global {
+      .ant-slider-rail {
+        background: @bg-tertiary;
+      }
+
+      .ant-slider-track {
+        background: @primary-color;
+        box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+      }
+
+      .ant-slider-handle {
+        border-color: @primary-color;
+        background: @primary-color;
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+
+        &:hover {
+          box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+        }
+      }
+    }
+  }
+
+  .timelineContainer {
+    background: @bg-secondary;
+    border-top: 1px solid @border-primary;
+    box-shadow: 0 -4px 20px rgba(99, 102, 241, 0.08);
+  }
+
+  .timelineHeader {
+    background: @bg-tertiary;
+    border-bottom: 1px solid @border-primary;
+
+    :global {
+      .ant-btn {
+        background: transparent;
+        border: none;
+        color: @text-secondary;
+        font-size: 12px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          color: @primary-color;
+          background: @bg-secondary;
+          text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+        }
+      }
+    }
+  }
+
+  .trackHeader {
+    background: @bg-tertiary;
+    border-right: 1px solid @border-primary;
+    color: @text-secondary;
+  }
+
+  .trackContent {
+    background: @bg-primary;
+  }
+
+  .clip {
+    background: linear-gradient(135deg, @primary-color 0%, lighten(@primary-color, 10%) 100%);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, lighten(@primary-color, 5%) 0%, lighten(@primary-color, 15%) 100%);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+
+    &.selected {
+      box-shadow: 0 0 0 2px @text-primary, 0 0 15px rgba(99, 102, 241, 0.6);
+    }
+  }
+
+  .clipLabel {
+    color: @text-primary;
+  }
+
+  .textItem {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, #34d399 0%, #6ee7b7 100%);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+    }
+  }
+
+  .textContent {
+    color: @text-primary;
+  }
+
+  .playhead {
+    background: #ef4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+
+    &::before {
+      background: #ef4444;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+    }
+  }
+
+  .exportPreview {
+    background: @bg-tertiary;
+    border: 1px solid @border-primary;
+
+    p {
+      color: @text-secondary;
+    }
+  }
+}

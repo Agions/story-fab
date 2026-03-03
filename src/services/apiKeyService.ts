@@ -34,6 +34,11 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
         // Anthropic 需要 POST 请求验证
         break;
 
+      case 'google':
+        // Google AI Studio API 验证
+        await axios.get('https://generativelanguage.googleapis.com/v1/models?key=' + apiKey);
+        break;
+
       case 'baidu':
       case 'alibaba':
       case 'iflytek':

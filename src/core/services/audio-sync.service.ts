@@ -60,7 +60,7 @@ const DEFAULT_CONFIG: SyncConfig = {
   adaptiveSensitivity: 0.5,
 };
 
-class AudioVideoSyncService {
+export class AudioVideoSyncService {
   private config: SyncConfig;
 
   constructor(config: Partial<SyncConfig> = {}) {

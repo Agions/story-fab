@@ -1,3 +1,12 @@
+// Dark theme color variables
+@bg-primary: #0a0a0f;
+@bg-secondary: #12121a;
+@bg-tertiary: #1a1a24;
+@primary-color: #6366f1;
+@border-primary: #2a2a3a;
+@text-primary: #f1f5f9;
+@text-secondary: #94a3b8;
+
 .container {
   padding: 20px;
 }
@@ -49,4 +58,94 @@
   font-size: 12px;
   height: 22px;
   line-height: 22px;
-} 
+}
+
+// Dark mode styles with neon glow effects
+:global(.dark) {
+  .container {
+    background: @bg-primary;
+    color: @text-primary;
+  }
+
+  .header {
+    background: @bg-secondary;
+    border-bottom: 1px solid @border-primary;
+  }
+
+  .infoCard {
+    background: @bg-secondary;
+    border: 1px solid @border-primary;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+  }
+
+  .stats {
+    color: @text-secondary;
+  }
+
+  .editorContainer {
+    background: @bg-secondary;
+    border: 1px solid @border-primary;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+  }
+
+  .title {
+    color: @text-primary;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  }
+
+  .tabs {
+    background: @bg-secondary;
+    border-bottom: 1px solid @border-primary;
+
+    :global(.ant-tabs-nav) {
+      &::before {
+        border-bottom-color: @border-primary;
+      }
+    }
+
+    :global(.ant-tabs-tab) {
+      color: @text-secondary;
+
+      &:hover {
+        color: @primary-color;
+      }
+
+      :global(.ant-tabs-tab-btn) {
+        &:focus {
+          color: @primary-color;
+        }
+      }
+    }
+
+    :global(.ant-tabs-tab-active) {
+      :global(.ant-tabs-tab-btn) {
+        color: @primary-color;
+        text-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+      }
+    }
+
+    :global(.ant-tabs-ink-bar) {
+      background: @primary-color;
+      box-shadow: 0 0 10px @primary-color, 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+  }
+
+  .loading {
+    background: @bg-primary;
+    color: @text-secondary;
+  }
+
+  .scriptInfo {
+    color: @text-secondary;
+  }
+
+  .modelTag {
+    background: rgba(99, 102, 241, 0.2);
+    color: @primary-color;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+  }
+}

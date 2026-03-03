@@ -63,7 +63,7 @@ const MODEL_PROVIDERS: Record<string, ModelProvider> = {
   }
 };
 
-class AIService extends BaseService {
+export class AIService extends BaseService {
   private abortControllers: Map<string, AbortController> = new Map();
 
   constructor() {

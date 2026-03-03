@@ -1,3 +1,12 @@
+// 科技暗黑主题颜色变量
+@bg-primary: #0a0a0f;
+@bg-secondary: #12121a;
+@bg-tertiary: #1a1a24;
+@primary-color: #6366f1;
+@border-primary: #2a2a3a;
+@text-primary: #f1f5f9;
+@text-secondary: #94a3b8;
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -9,7 +18,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  
+
   h3 {
     margin: 0;
   }
@@ -32,11 +41,11 @@
 .stepCard {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  
+
   h4 {
     display: flex;
     align-items: center;
-    
+
     .anticon {
       margin-right: 8px;
     }
@@ -55,7 +64,7 @@
 
 .keyFrames {
   margin-top: 24px;
-  
+
   h5 {
     margin-bottom: 16px;
   }
@@ -74,7 +83,7 @@
   border-radius: 4px;
   border: 1px solid #f0f0f0;
   transition: all 0.3s;
-  
+
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -86,30 +95,111 @@
   .header {
     flex-direction: column;
     align-items: flex-start;
-    
+
     h3 {
       margin-bottom: 16px;
     }
-    
+
     button {
       margin-bottom: 8px;
     }
   }
-  
+
   .stepActions {
     justify-content: center;
   }
 }
 
-/* 暗黑模式适配 */
+/* 暗黑模式 - 科技霓虹风格 */
 :global(.dark) {
-  .card, .stepCard {
-    background-color: #1f1f1f;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  .container {
+    background-color: @bg-primary;
   }
-  
+
+  .card, .stepCard {
+    background-color: @bg-secondary;
+    border: 1px solid @border-primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
+                0 0 20px rgba(99, 102, 241, 0.05);
+  }
+
+  .header h3 {
+    color: @text-primary;
+  }
+
   .keyFrameImage {
-    border-color: #303030;
+    border-color: @border-primary;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+
+    &:hover {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4),
+                  0 0 40px rgba(99, 102, 241, 0.2);
+      border-color: @primary-color;
+    }
+  }
+
+  .modelProvider {
+    color: @text-secondary;
+  }
+
+  // 霓虹发光效果
+  .card, .stepCard {
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2),
+                  0 0 30px rgba(99, 102, 241, 0.15),
+                  inset 0 0 30px rgba(99, 102, 241, 0.03);
+    }
+  }
+
+  // 步骤容器霓虹效果
+  .stepsContainer {
+    :global(.ant-steps-item-process) .ant-steps-item-icon {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.6),
+                  0 0 40px rgba(99, 102, 241, 0.3);
+    }
+
+    :global(.ant-steps-item-finish) .ant-steps-item-icon {
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+  }
+
+  // 按钮霓虹效果
+  :global(.ant-btn-primary) {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+
+    &:hover, &:focus {
+      box-shadow: 0 0 25px rgba(99, 102, 241, 0.6),
+                  0 0 50px rgba(99, 102, 241, 0.3);
+    }
+  }
+
+  // 输入框霓虹效果
+  :global(.ant-input), :global(.ant-input-affix-wrapper) {
+    &:focus, &:hover {
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+    }
+
+    &:focus {
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3),
+                  0 0 30px rgba(99, 102, 241, 0.1);
+    }
+  }
+
+  // 选择框霓虹效果
+  :global(.ant-select-focused) .ant-select-selector {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3) !important;
+  }
+
+  // 卡片标题发光
+  .stepCard h4 {
+    color: @text-primary;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+  }
+
+  // 关键帧标题
+  .keyFrames h5 {
+    color: @text-primary;
+    text-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
   }
 }
 
@@ -150,8 +240,9 @@
 }
 
 .modelIcon {
-  color: #1890ff;
+  color: @primary-color;
   font-size: 16px;
+  filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.5));
 }
 
 .modelProvider {
@@ -171,6 +262,10 @@
 
 :global(.dark) {
   .modelProvider {
-    color: rgba(255, 255, 255, 0.45);
+    color: @text-secondary;
   }
-} 
+
+  .modelIcon {
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+  }
+}

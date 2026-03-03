@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Typography, Space, Spin, message, Divider, Modal, Tag } from 'antd';
 import { ArrowLeftOutlined, SaveOutlined, DeleteOutlined, ExportOutlined, RobotOutlined } from '@ant-design/icons';
-import { useStore } from '@/store';
+import { useProjectStore } from '@/store/index';
 import ScriptEditor from '@/components/ScriptEditor';
 import { exportScriptToFile, saveProjectToFile } from '@/services/tauriService';
 import styles from './ScriptDetail.module.less';
@@ -12,7 +12,7 @@ const { Title, Text } = Typography;
 const ScriptDetail: React.FC = () => {
   const { projectId, scriptId } = useParams<{ projectId: string; scriptId: string }>();
   const navigate = useNavigate();
-  const { projects, updateProject } = useStore();
+  const { projects, updateProject } = useProjectStore();
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<any>(null);
   const [script, setScript] = useState<any>(null);

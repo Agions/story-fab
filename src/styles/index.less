@@ -1,13 +1,14 @@
 @import 'antd/dist/reset.css';
 @import './theme.less';
 
+// 基础样式变量 - 与 assets/theme.less 保持一致
 :root {
   // 主要颜色系统，提升品牌一致性
-  --primary-color: #1890ff;
-  --primary-color-hover: #40a9ff;
-  --primary-color-active: #096dd9;
-  --primary-color-light: #e6f7ff;
-  
+  --primary-color: #6366f1;
+  --primary-color-hover: #7c7ff7;
+  --primary-color-active: #5558e3;
+  --primary-color-light: rgba(99, 102, 241, 0.15);
+
   // 基础UI颜色
   --bg-color: #f0f2f5;
   --card-bg-color: #fff;
@@ -16,18 +17,18 @@
   --disabled-text-color: rgba(0, 0, 0, 0.25);
   --border-color: #f0f0f0;
   --border-radius: 6px; // 统一圆角
-  
+
   // 功能色
-  --error-color: #ff4d4f;
-  --success-color: #52c41a;
-  --warning-color: #faad14;
-  --info-color: #1890ff;
-  
+  --error-color: #ef4444;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --info-color: #3b82f6;
+
   // 阴影和效果
   --box-shadow: 0 2px 8px rgba(0, 21, 41, 0.08);
   --box-shadow-hover: 0 4px 16px rgba(0, 21, 41, 0.12);
   --transition-duration: 0.3s;
-  
+
   // 字体设置
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   --font-size-base: 14px;
@@ -39,50 +40,50 @@
   --font-weight-medium: 500;
   --font-weight-bold: 600;
   --line-height-base: 1.5715;
-  
+
   // 间距系统
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  
+
   // 其他UI元素
   --section-bg-color: #fafafa;
 }
 
-// 暗色主题优化
+// 暗色主题优化 - 科技暗黑配色
 body.dark-theme {
-  --primary-color: #1890ff;
-  --primary-color-hover: #40a9ff;
-  --primary-color-active: #096dd9;
-  --primary-color-light: #1d39c4;
-  
-  --bg-color: #141414;
-  --card-bg-color: #1f1f1f;
-  --text-color: rgba(255, 255, 255, 0.95);
-  --secondary-text-color: rgba(255, 255, 255, 0.85);
-  --disabled-text-color: rgba(255, 255, 255, 0.45);
-  --border-color: #434343;
-  
-  --error-color: #ff7875;
-  --success-color: #73d13d;
-  --warning-color: #ffc53d;
-  --info-color: #40a9ff;
-  
-  --section-bg-color: #141414;
+  --primary-color: #6366f1;
+  --primary-color-hover: #7c7ff7;
+  --primary-color-active: #5558e3;
+  --primary-color-light: rgba(99, 102, 241, 0.15);
+
+  --bg-color: #0a0a0f;
+  --card-bg-color: #12121a;
+  --text-color: #f1f5f9;
+  --secondary-text-color: #94a3b8;
+  --disabled-text-color: #475569;
+  --border-color: #2a2a3a;
+
+  --error-color: #ef4444;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --info-color: #3b82f6;
+
+  --section-bg-color: #12121a;
   --box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
   --box-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.65);
 
   // 修改暗色主题滚动条样式
   &::-webkit-scrollbar {
-    background-color: #1f1f1f;
+    background-color: #1a1a24;
   }
-  
+
   &::-webkit-scrollbar-thumb {
-    background-color: #434343;
+    background-color: #3a3a4a;
     &:hover {
-      background-color: #555;
+      background-color: #4a4a5a;
     }
   }
 }
@@ -406,16 +407,663 @@ label {
   }
 }
 
+// ==============================================
+// ClipFlow 响应式工具类
+// ==============================================
+
+// 响应式显示/隐藏工具类
+// 超小屏幕 (< 576px) - 手机
+.responsive-show-xs {
+  display: none !important;
+}
+
+.responsive-hide-xs {
+  display: block !important;
+}
+
+.responsive-stack-xs {
+  flex-direction: row;
+}
+
+// 小屏幕 (576px - 767px) - 大屏手机
+@media (max-width: 575px) {
+  .responsive-show-xs {
+    display: block !important;
+  }
+
+  .responsive-hide-xs {
+    display: none !important;
+  }
+
+  .responsive-stack-xs {
+    flex-direction: column;
+  }
+}
+
+// 中等屏幕 (768px - 991px) - 平板
+@media (max-width: 767px) {
+  .responsive-show-sm {
+    display: none !important;
+  }
+
+  .responsive-hide-sm {
+    display: block !important;
+  }
+
+  .responsive-stack-sm {
+    flex-direction: column;
+  }
+}
+
+.responsive-show-sm {
+  display: block !important;
+}
+
+.responsive-hide-sm {
+  display: block !important;
+}
+
+.responsive-stack-sm {
+  flex-direction: row;
+}
+
+// 大屏幕 (992px+) - 桌面
+@media (min-width: 992px) {
+  .responsive-show-md {
+    display: block !important;
+  }
+
+  .responsive-hide-md {
+    display: none !important;
+  }
+
+  .responsive-stack-md {
+    flex-direction: column;
+  }
+}
+
+.responsive-show-md {
+  display: none !important;
+}
+
+.responsive-hide-md {
+  display: block !important;
+}
+
+.responsive-stack-md {
+  flex-direction: row;
+}
+
+// 响应式弹性布局 - 移动端列模式
+.responsive-stack {
+  display: flex;
+  flex-direction: row;
+}
+
+@media (max-width: 767px) {
+  .responsive-stack {
+    flex-direction: column;
+  }
+}
+
+// 响应式网格
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 575px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// 响应式间距
+.responsive-padding {
+  padding: 24px;
+}
+
+@media (max-width: 767px) {
+  .responsive-padding {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 575px) {
+  .responsive-padding {
+    padding: 12px;
+  }
+}
+
+// 响应式边距
+.responsive-margin {
+  margin: 24px;
+}
+
+@media (max-width: 767px) {
+  .responsive-margin {
+    margin: 16px;
+  }
+}
+
+@media (max-width: 575px) {
+  .responsive-margin {
+    margin: 12px;
+  }
+}
+
+// ==============================================
+// 移动端交互优化
+// ==============================================
+
+// 移动端安全区域
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+// 触摸友好按钮 - 最小44px点击区域
+.touch-friendly {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 响应式卡片
+.responsive-card {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+
+  @media (max-width: 575px) {
+    border-radius: 8px;
+  }
+}
+
+// 响应式文本截断
+.responsive-text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 575px) {
+  .responsive-text-ellipsis {
+    max-width: 120px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  .responsive-text-ellipsis {
+    max-width: 180px;
+  }
+}
+
+// 响应式表格容器
+.responsive-table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  table {
+    min-width: 600px;
+  }
+
+  @media (min-width: 992px) {
+    overflow-x: visible;
+
+    table {
+      min-width: auto;
+    }
+  }
+}
+
+// 响应式Flex容器
+.responsive-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  @media (max-width: 575px) {
+    gap: 8px;
+  }
+}
+
+.responsive-flex-item {
+  flex: 1;
+  min-width: 200px;
+
+  @media (max-width: 575px) {
+    min-width: 100%;
+  }
+}
+
+// 响应式图标按钮
+.responsive-icon-button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  @media (max-width: 575px) {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+}
+
+// 响应式头部
+.responsive-header {
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (max-width: 767px) {
+    height: 56px;
+    padding: 0 16px;
+  }
+
+  @media (max-width: 575px) {
+    height: 52px;
+    padding: 0 12px;
+  }
+}
+
+// 响应式侧边栏覆盖层
+.sidebar-overlay {
+  display: none;
+
+  @media (max-width: 767px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+
+    &.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+// 底部导航栏 (移动端)
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--card-bg-color);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom);
+
+  @media (max-width: 767px) {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  color: var(--secondary-text-color);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  .anticon {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+
+  &.active {
+    color: var(--primary-color);
+  }
+}
+
+// 汉堡菜单按钮
+.hamburger-menu {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  :global(.dark) &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  @media (max-width: 767px) {
+    display: flex;
+  }
+
+  .hamburger-line {
+    width: 20px;
+    height: 2px;
+    background: var(--text-color);
+    position: relative;
+    transition: all 0.3s ease;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: var(--text-color);
+      left: 0;
+      transition: all 0.3s ease;
+    }
+
+    &::before {
+      top: -6px;
+    }
+
+    &::after {
+      top: 6px;
+    }
+  }
+
+  &.active .hamburger-line {
+    background: transparent;
+
+    &::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    &::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+  }
+}
+
+// 移动端全屏抽屉
+.mobile-drawer {
+  :global(.ant-drawer-content) {
+    background: var(--card-bg-color);
+  }
+
+  :global(.ant-drawer-header) {
+    background: var(--card-bg-color);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  :global(.ant-drawer-body) {
+    padding: 0;
+  }
+}
+
+// 响应式关闭按钮
+.responsive-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+
+  @media (max-width: 575px) {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  :global(.dark) &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// 响应式模态框
+.responsive-modal {
+  :global(.ant-modal-content) {
+    @media (max-width: 575px) {
+      margin: 8px;
+      width: calc(100% - 16px) !important;
+    }
+  }
+
+  :global(.ant-modal-body) {
+    @media (max-width: 575px) {
+      padding: 16px;
+    }
+  }
+}
+
+// 防止水平滚动
+.prevent-horizontal-scroll {
+  overflow-x: hidden;
+}
+
+// 响应式列表项
+.responsive-list-item {
+  padding: 16px;
+
+  @media (max-width: 575px) {
+    padding: 12px;
+  }
+}
+
+// 响应式分割线
+.responsive-divider {
+  margin: 16px 0;
+
+  @media (max-width: 575px) {
+    margin: 12px 0;
+  }
+}
+
+// 响应式空状态
+.responsive-empty {
+  padding: 48px 24px;
+  text-align: center;
+
+  @media (max-width: 575px) {
+    padding: 32px 16px;
+  }
+
+  :global(.ant-empty-description) {
+    @media (max-width: 575px) {
+      font-size: 13px;
+    }
+  }
+}
+
+// 响应式加载状态
+.responsive-loading {
+  padding: 24px;
+
+  @media (max-width: 575px) {
+    padding: 16px;
+  }
+}
+
+// 响应式进度条
+.responsive-progress {
+  :global(.ant-progress-text) {
+    @media (max-width: 575px) {
+      font-size: 12px;
+    }
+  }
+}
+
+// 移动端滑动手势支持
+.touch-swipe-container {
+  touch-action: pan-y pinch-zoom;
+  overflow: hidden;
+}
+
+// 响应式警告提示
+.responsive-alert {
+  @media (max-width: 575px) {
+    padding: 12px;
+
+    :global(.ant-alert-message) {
+      font-size: 14px;
+    }
+
+    :global(.ant-alert-description) {
+      font-size: 13px;
+    }
+  }
+}
+
+// ==============================================
+// 修复常见移动端问题
+// ==============================================
+
+// 修复iOS点击高亮
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+// 修复移动端输入框缩放
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="number"],
+textarea {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="search"],
+  input[type="number"],
+  textarea {
+    font-size: 14px;
+  }
+}
+
+// 修复移动端滚动
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+// 响应式溢出处理
+.responsive-overflow {
+  overflow: hidden;
+
+  @media (min-width: 992px) {
+    overflow: visible;
+  }
+}
+
+// 响应式固定定位
+.responsive-fixed {
+  position: fixed;
+
+  @media (min-width: 992px) {
+    position: static;
+  }
+}
+
+// 暗色模式适配
+body.dark-theme {
+  .hamburger-menu {
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .hamburger-line {
+      background: var(--text-color);
+
+      &::before,
+      &::after {
+        background: var(--text-color);
+      }
+    }
+  }
+
+  .responsive-close {
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .bottom-nav {
+    background: var(--card-bg-color);
+    border-top-color: var(--border-color);
+  }
+
+  .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
 // 响应式设计优化
 @media (max-width: 768px) {
   .ant-layout-header {
     padding: 0 var(--spacing-sm);
   }
-  
+
   .ant-layout-content {
     padding: var(--spacing-sm);
   }
-  
+
   .responsive-hide-sm {
     display: none;
   }

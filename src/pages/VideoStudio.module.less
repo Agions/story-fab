@@ -145,6 +145,166 @@
   }
 }
 
+/* 新科技暗色主题 - 带霓虹光效 */
+:global(.dark) {
+  // 基础背景
+  .studioLayout {
+    background-color: #0a0a0f;
+  }
+
+  .studioContent {
+    background-color: transparent;
+  }
+
+  // 面包屑
+  .breadcrumbContainer {
+    :global(.ant-breadcrumb) {
+      a {
+        color: #94a3b8;
+
+        &:hover {
+          color: #6366f1;
+        }
+      }
+
+      :global(.ant-breadcrumb-separator) {
+        color: #94a3b8;
+      }
+    }
+  }
+
+  // 视频播放器容器
+  .videoPlayerContainer {
+    // 霓虹光效容器
+  }
+
+  // 播放器卡片 - 带霓虹边框和光效
+  .playerCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.1), 0 0 0 1px rgba(99, 102, 241, 0.05);
+
+    &:hover {
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2), 0 0 20px rgba(99, 102, 241, 0.15);
+    }
+
+    :global(.ant-card-head) {
+      background-color: #1a1a24;
+      border-bottom: 1px solid #2a2a3a;
+      color: #f1f5f9;
+    }
+
+    :global(.ant-card-body) {
+      padding: 0;
+    }
+  }
+
+  // 无视频状态
+  .noVideo {
+    background-color: #12121a;
+    border-radius: 0 0 12px 12px;
+
+    > span {
+      color: #94a3b8;
+      opacity: 0.5;
+    }
+
+    p {
+      color: #94a3b8;
+    }
+  }
+
+  // 控制容器
+  .controlsContainer {
+    .infoCard {
+      background-color: #12121a;
+      border: 1px solid #2a2a3a;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(99, 102, 241, 0.08);
+
+      :global(.ant-empty-image) {
+        height: 80px;
+      }
+    }
+  }
+
+  // 元数据列表
+  .metadataList {
+    margin-top: 8px;
+
+    .metadataItem {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed #2a2a3a;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .metadataLabel {
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .metadataValue {
+        color: #f1f5f9;
+      }
+    }
+  }
+
+  // 设置卡片 - 带霓虹光效
+  .settingsCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+    margin-top: 8px;
+    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.08);
+
+    :global(.ant-descriptions) {
+      margin-bottom: 16px;
+
+      :global(.ant-descriptions-item-label) {
+        color: #94a3b8;
+      }
+
+      :global(.ant-descriptions-item-content) {
+        color: #f1f5f9;
+      }
+    }
+  }
+
+  // 操作按钮 - 霓虹光效
+  .actionButtons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+
+    button {
+      background-color: #6366f1;
+      border: none;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+
+      &:hover {
+        background-color: #818cf8;
+        box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5), 0 0 20px rgba(99, 102, 241, 0.3);
+      }
+    }
+  }
+
+  // 加载容器
+  .loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    background-color: #0a0a0f;
+    color: #f1f5f9;
+  }
+}
+
 /* 响应式设计 */
 @media screen and (max-width: 768px) {
   .studioContent {
@@ -186,5 +346,26 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background-color: #595959;
+  }
+}
+
+/* 新科技暗色主题滚动条 */
+:global(.dark) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #12121a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #2a2a3a;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #3a3a4a;
   }
 } 

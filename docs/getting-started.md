@@ -1,136 +1,104 @@
 # 快速开始
 
-5 分钟快速上手 ClipFlow！
+> 本指南将帮助您快速上手 ClipFlow AI 视频创作平台
 
 ## 环境要求
 
-- Node.js 18+
-- npm 9+ 或 yarn 1.22+
-- 推荐使用 pnpm 7+
+| 要求    | 最低版本          |
+| ------- | ----------------- |
+| Node.js | >= 18.0.0         |
+| npm     | >= 9.0.0          |
+| Rust    | 最新稳定版 (可选) |
 
-## 安装部署
+## 安装步骤
+
+### 1. 克隆项目
 
 ```bash
-# 克隆项目
-git clone https://github.com/Agions/ClipFlow.git
+git clone https://github.com/agions/clipflow.git
 cd ClipFlow
-
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-
-# 启动 Tauri 桌面端 (可选)
-npm run tauri dev
 ```
 
-## 访问方式
+### 2. 安装依赖
 
-- **Web 端**: http://localhost:5173
-- **桌面端**: 自动打开应用窗口
+```bash
+npm install
+```
 
----
+### 3. 启动开发服务器
 
-## 快速使用流程
+```bash
+npm run dev
+```
 
-### 第一步：创建项目
+应用将在 http://localhost:1420 启动
 
-1. 打开 ClipFlow 应用
-2. 点击侧边栏「创建项目」或顶部按钮
-3. 输入项目名称
-4. 选择项目模板：
-   - 🎬 营销推广 - 产品宣传、活动推广
-   - 📚 教育培训 - 课程讲解、技能培训
-   - 🎭 娱乐内容 - 搞笑集锦、影视解说
-   - 📰 新闻资讯 - 热点解读、时事评论
-   - ⚙️ 自定义 - 完全自定义设置
+### 4. 构建桌面应用 (可选)
 
-### 第二步：上传视频
+```bash
+npm run tauri build
+```
 
-支持方式：
-- 💻 点击「上传视频」按钮选择文件
-- 📂 拖拽视频文件到上传区域
-- 📦 批量上传多个视频
+## 配置 API 密钥
 
-支持格式：MP4, MOV, AVI, MKV, WEBM, FLV
-最大文件：2GB
+首次使用前，需要配置 AI 模型 API 密钥：
 
-### 第三步：AI 分析
+### 配置步骤
 
-系统自动完成以下分析：
-- 🔍 **场景检测** - 智能识别视频中的不同场景
-- 🎯 **物体识别** - 检测视频中的物体和人物
-- 😊 **情感分析** - 分析人物情感和情绪变化
-- 📝 **OCR 字幕** - 识别视频中的文字内容
-- 🎤 **ASR 语音** - 语音转文字生成字幕
+1. 打开应用，点击左侧导航 **设置**
+2. 在 **API 密钥管理** 中选择要配置的模型
+3. 输入对应的 API 密钥
+4. 点击 **验证** 确认密钥有效
 
-### 第四步：选择核心功能
+### 支持的模型
 
-三大核心功能任你选择：
+| 模型      | 获取地址                                                 |
+| --------- | -------------------------------------------------------- |
+| OpenAI    | [platform.openai.com](https://platform.openai.com)       |
+| Anthropic | [anthropic.com](https://www.anthropic.com)               |
+| Google    | [aistudio.google.com](https://aistudio.google.com)       |
+| DeepSeek  | [platform.deepseek.com](https://platform.deepseek.com)   |
+| 阿里云    | [dashscope.aliyuncs.com](https://dashscope.aliyuncs.com) |
+| 智谱      | [open.bigmodel.cn](https://open.bigmodel.cn)             |
+| 月之暗面  | [platform.moonshot.cn](https://platform.moonshot.cn)     |
 
-#### 🎬 AI 视频解说
-适合：教程、评测、产品介绍
-- AI 自动生成专业解说文案
-- 多种配音音色可选
-- 音画自动同步
+## 创建第一个项目
 
-#### 👤 AI 第一人称解说
-适合：Vlog、个人分享
-- 第一人称视角叙述
-- 更贴近观众，情感丰富
-- 多种人设可选
+```
+1. 点击首页【创建新项目】→ 2. 上传视频素材 → 3. 选择 AI 功能
+→ 4. 等待 AI 处理 → 5. 预览并导出视频
+```
 
-#### ✂️ AI 混剪
-适合：精彩集锦、混剪视频
-- 自动识别高光片段
-- 节奏感强的背景音乐
-- 自动生成旁白说明
+### 详细步骤
 
-### 第五步：视频合成配置
+1. **创建项目** - 点击首页「创建新项目」按钮
+2. **上传素材** - 拖拽或点击上传视频文件
+3. **选择功能** - 选择 AI 剪辑/解说/混剪
+4. **AI 处理** - 等待 AI 完成分析或生成
+5. **预览导出** - 预览效果并导出最终视频
 
-- 🎤 **配音设置** - 选择音色、调整语速和音量
-- 📝 **字幕设置** - 位置、样式、是否烧录
-- ✨ **特效风格** - 电影感/鲜艳/复古/冷暖色调
+## 平台特定问题
 
-### 第六步：导出
+### Windows
 
-1. 选择导出格式 (MP4/MOV/WEBM)
-2. 设置分辨率 (480p~4K)
-3. 选择画质 (流畅/标清/高清/超清)
-4. 设置帧率 (24/30/60 fps)
-5. 导出完成下载成品
+> 如果遇到构建问题，确保已安装 Visual Studio Build Tools
 
----
+### macOS
 
-## 快捷键
+```bash
+# 安装 Xcode Command Line Tools
+xcode-select --install
+```
 
-| 快捷键 | 功能 |
-|--------|------|
-| Ctrl + S | 保存项目 |
-| Ctrl + Z | 撤销 |
-| Ctrl + Y | 重做 |
-| Space | 播放/暂停预览 |
-| Ctrl + B | 粗体 (文案编辑) |
-| Ctrl + I | 斜体 (文案编辑) |
+### Linux
 
----
-
-## 三大核心功能详解
-
-| 功能 | 适用场景 | 输出 |
-|------|----------|------|
-| AI 视频解说 | 教程、评测、产品介绍 | 专业解说视频 |
-| AI 第一人称 | Vlog、个人分享 | 互动感强视频 |
-| AI 混剪 | 集锦、回顾 | 高能混剪视频 |
-
----
+```bash
+# Ubuntu/Debian
+sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev
+```
 
 ## 下一步
 
-- 了解更多 [功能特性](./features.md)
-- 查看 [工作流程](./workflow.md)
-- 查阅 [常见问题](./faq.md)
+- 📖 查看 [功能特性](features.md) 了解更多功能
+- 🔄 查看 [工作流程](workflow.md) 了解创作流程
+- ❓ 查看 [常见问题](faq.md) 解决疑问

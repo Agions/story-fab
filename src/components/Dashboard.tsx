@@ -43,54 +43,11 @@ const Dashboard: React.FC = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    // 模拟从API获取项目数据
+    // 从API获取项目数据
     setLoading(true);
-    setTimeout(() => {
-      const mockProjects: ProjectType[] = [
-        {
-          id: '1',
-          title: '短剧第一集',
-          thumbnail: 'https://picsum.photos/seed/1/300/200',
-          createdAt: '2023-08-25T15:30:00',
-          updatedAt: '2023-08-27T10:15:00',
-          duration: 180,
-          resolution: '1080p',
-          starred: true
-        },
-        {
-          id: '2',
-          title: '商业广告',
-          thumbnail: 'https://picsum.photos/seed/2/300/200',
-          createdAt: '2023-08-20T09:45:00',
-          updatedAt: '2023-08-21T14:30:00',
-          duration: 45,
-          resolution: '4K',
-          starred: false
-        },
-        {
-          id: '3',
-          title: '产品展示视频',
-          thumbnail: 'https://picsum.photos/seed/3/300/200',
-          createdAt: '2023-08-15T12:00:00',
-          updatedAt: '2023-08-18T16:20:00',
-          duration: 120,
-          resolution: '1080p',
-          starred: false
-        },
-        {
-          id: '4',
-          title: '旅行花絮',
-          thumbnail: 'https://picsum.photos/seed/4/300/200',
-          createdAt: '2023-08-10T08:30:00',
-          updatedAt: '2023-08-10T20:45:00',
-          duration: 240,
-          resolution: '1080p',
-          starred: true
-        }
-      ];
-      setProjects(mockProjects);
-      setLoading(false);
-    }, 1000);
+    // TODO: 连接实际API获取项目数据
+    setProjects([]);
+    setLoading(false);
   }, []);
 
   const handleCreateProject = (values: any) => {

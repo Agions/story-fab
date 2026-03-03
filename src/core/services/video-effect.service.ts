@@ -70,7 +70,7 @@ const DEFAULT_CONFIG: EffectConfig = {
   colorCorrection: { enabled: false, brightness: 0, contrast: 0, saturation: 0, hue: 0, temperature: 0, tint: 0 },
 };
 
-class VideoEffectService {
+export class VideoEffectService {
   private config: EffectConfig;
 
   constructor(config: Partial<EffectConfig> = {}) {

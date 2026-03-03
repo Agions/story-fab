@@ -26,7 +26,7 @@ import { saveToStorage, loadFromStorage, clearStorage } from './storage';
 import { DEFAULT_EDITOR_CONFIG, type EditorConfig, type EditorAction, type EditorHistory } from './types';
 import type { Timeline, VideoSegment, ScriptSegment, ExportSettings } from '@/core/types';
 
-class EditorService {
+export class EditorService {
   private config: EditorConfig;
   private history: EditorHistory;
   private listeners: Set<(timeline: Timeline) => void> = new Set();

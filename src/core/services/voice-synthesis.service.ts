@@ -60,7 +60,7 @@ const DEFAULT_CONFIG: VoiceConfig = {
   format: 'audio/wav',
 };
 
-class VoiceSynthesisService {
+export class VoiceSynthesisService {
   private config: VoiceConfig;
   private synthesis: SpeechSynthesis;
   private audioContext: AudioContext | null = null;

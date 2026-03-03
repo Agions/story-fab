@@ -51,68 +51,8 @@ interface Project {
   tags: string[];
 }
 
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    title: '热门短剧《再见爱人》片段1',
-    thumbnail: 'https://picsum.photos/300/169?random=1',
-    duration: 75, // 秒
-    updatedAt: new Date(2025, 4, 15, 14, 30),
-    size: 45.8, // MB
-    starred: true,
-    tags: ['情感', '热门']
-  },
-  {
-    id: '2',
-    title: '搞笑段子合集：春节特辑',
-    thumbnail: 'https://picsum.photos/300/169?random=2',
-    duration: 120,
-    updatedAt: new Date(2025, 4, 14, 9, 15),
-    size: 68.2,
-    starred: false,
-    tags: ['搞笑', '节日']
-  },
-  {
-    id: '3',
-    title: '城市日出航拍素材',
-    thumbnail: 'https://picsum.photos/300/169?random=3',
-    duration: 45,
-    updatedAt: new Date(2025, 4, 12, 16, 45),
-    size: 102.5,
-    starred: true,
-    tags: ['风景', '航拍']
-  },
-  {
-    id: '4',
-    title: '《都市传说》第三集片段',
-    thumbnail: 'https://picsum.photos/300/169?random=4',
-    duration: 90,
-    updatedAt: new Date(2025, 4, 10, 11, 20),
-    size: 54.1,
-    starred: false,
-    tags: ['剧情', '悬疑']
-  },
-  {
-    id: '5',
-    title: '产品宣传片：智能家居',
-    thumbnail: 'https://picsum.photos/300/169?random=5',
-    duration: 60,
-    updatedAt: new Date(2025, 4, 8, 10, 30),
-    size: 38.7,
-    starred: false,
-    tags: ['商业', '科技']
-  },
-  {
-    id: '6',
-    title: '旅行Vlog：桂林山水',
-    thumbnail: 'https://picsum.photos/300/169?random=6',
-    duration: 180,
-    updatedAt: new Date(2025, 4, 5, 18, 10),
-    size: 215.3,
-    starred: true,
-    tags: ['旅行', 'Vlog']
-  }
-];
+// 项目数据 (从存储或API获取)
+const mockProjects: Project[] = [];
 
 // 格式化时间显示
 const formatTime = (date: Date): string => {

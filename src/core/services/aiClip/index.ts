@@ -8,7 +8,7 @@ import { batchProcess, getBatchTask, cancelTask, applySuggestions, smartClip } f
 import { exportClipConfig, importClipConfig } from './config';
 import { DEFAULT_CLIP_CONFIG, type AIClipConfig } from './types';
 
-class AIClipService {
+export class AIClipService {
   async analyzeVideo(videoInfo: any, config?: Partial<AIClipConfig>) {
     return analyzeVideo(videoInfo, config);
   }

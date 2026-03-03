@@ -1,9 +1,14 @@
 /**
  * 导出服务
  * 支持多种格式的音视频导出
+ * 集成 Tauri 后端进行实际视频处理
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { invoke } from '@tauri-apps/api/core';
+import { listen, UnlistenFn } from '@tauri-apps/api/event';
+import { ensureFFmpegInstalled } from '@/services/videoService';
+import { message } from 'antd';
 
 // 导出格式
 export type ExportFormat = 'mp4' | 'webm' | 'mov' | 'mkv';
@@ -156,13 +161,383 @@ const DEFAULT_CONFIG: ExportConfig = {
   watermarkOpacity: 0.7,
 };
 
-class ExportService {
+// Tauri 事件监听器集合
+type ProgressListener = (progress: ExportProgress) => void;
+
+export class ExportService {
   private config: ExportConfig;
   private isExporting: boolean = false;
   private abortController: AbortController | null = null;
+  private progressListeners: Map<string, UnlistenFn> = new Map();
 
   constructor(config: Partial<ExportConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+  }
+
+  /**
+   * 视频转码
+   * 使用 Tauri 后端进行视频格式转换和质量调整
+   */
+  async transcodeVideo(
+    inputPath: string,
+    outputPath: string,
+    quality?: ExportQuality,
+    format?: ExportFormat,
+    onProgress?: (progress: ExportProgress) => void
+  ): Promise<ExportResult> {
+    if (this.isExporting) {
+      throw new Error('已有导出任务正在进行中');
+    }
+
+    this.isExporting = true;
+    this.abortController = new AbortController();
+
+    const startTime = Date.now();
+    const result: ExportResult = {
+      id: uuidv4(),
+      success: false,
+      duration: 0,
+      format: format || this.config.format,
+      quality: quality || this.config.quality,
+    };
+
+    try {
+      // 检查 FFmpeg 是否安装
+      if (!(await ensureFFmpegInstalled())) {
+        throw new Error('未安装 FFmpeg');
+      }
+
+      // 准备阶段
+      onProgress?.({ stage: 'preparing', progress: 0 });
+
+      // 发送转码命令到 Tauri 后端
+      const success = await invoke<boolean>('transcode_video', {
+        inputPath,
+        outputPath,
+        quality: quality || this.config.quality,
+        format: format || this.config.format,
+      });
+
+      if (!success) {
+        throw new Error('视频转码失败');
+      }
+
+      // 获取输出文件大小
+      try {
+        const fileInfo = await invoke<{ size: number }>('analyze_video', { path: outputPath });
+        result.fileSize = fileInfo.size as unknown as number;
+      } catch {
+        // 文件大小获取失败不影响导出成功
+      }
+
+      // 完成
+      onProgress?.({ stage: 'complete', progress: 100 });
+
+      result.success = true;
+      result.filePath = outputPath;
+      result.duration = (Date.now() - startTime) / 1000;
+      result.metadata = {
+        title: this.config.title,
+        author: this.config.author,
+        createdAt: new Date().toISOString(),
+      };
+
+      message.success('视频转码完成');
+      return result;
+    } catch (error) {
+      result.success = false;
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      result.error = errorMessage;
+      onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
+
+      // 友好的错误提示
+      let userMessage = '视频转码失败';
+      if (errorMessage.includes('未安装FFmpeg')) {
+        userMessage = '转码失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
+      } else if (errorMessage.includes('转码失败')) {
+        userMessage = '视频转码失败，请检查输入文件是否有效。';
+      }
+
+      message.error(userMessage);
+      return result;
+    } finally {
+      this.isExporting = false;
+      this.abortController = null;
+    }
+  }
+
+  /**
+   * 视频剪辑
+   * 使用 Tauri 后端进行视频片段裁剪
+   */
+  async cutVideo(
+    inputPath: string,
+    outputPath: string,
+    segments: Array<{ start: number; end: number; type?: string; content?: string }>,
+    options?: {
+      quality?: ExportQuality;
+      format?: ExportFormat;
+      transition?: string;
+      transitionDuration?: number;
+      volume?: number;
+      addSubtitles?: boolean;
+    },
+    onProgress?: (progress: ExportProgress) => void
+  ): Promise<ExportResult> {
+    if (this.isExporting) {
+      throw new Error('已有导出任务正在进行中');
+    }
+
+    if (!inputPath) {
+      throw new Error('输入视频路径不能为空');
+    }
+
+    if (!outputPath) {
+      throw new Error('输出视频路径不能为空');
+    }
+
+    if (!segments || segments.length === 0) {
+      throw new Error('请至少提供一个视频片段');
+    }
+
+    this.isExporting = true;
+    this.abortController = new AbortController();
+
+    const startTime = Date.now();
+    const result: ExportResult = {
+      id: uuidv4(),
+      success: false,
+      duration: 0,
+      format: options?.format || this.config.format,
+      quality: options?.quality || this.config.quality,
+    };
+
+    // 监听进度事件
+    let unlistenProgress: UnlistenFn | null = null;
+
+    try {
+      // 检查 FFmpeg 是否安装
+      if (!(await ensureFFmpegInstalled())) {
+        throw new Error('未安装 FFmpeg');
+      }
+
+      // 设置进度监听
+      unlistenProgress = await listen<number>('cut_progress', (event) => {
+        const progress = event.payload;
+        if (progress < 0.6) {
+          onProgress?.({ stage: 'encoding', progress: progress * 100 });
+        } else if (progress < 0.9) {
+          onProgress?.({ stage: 'muxing', progress: 60 + (progress - 0.6) * 100 });
+        } else {
+          onProgress?.({ stage: 'complete', progress: Math.min(progress * 100, 100) });
+        }
+      });
+
+      // 准备阶段
+      onProgress?.({ stage: 'preparing', progress: 0 });
+
+      // 发送剪辑命令到 Tauri 后端
+      const outputFilePath = await invoke<string>('cut_video', {
+        params: {
+          input_path: inputPath,
+          output_path: outputPath,
+          segments: segments.map(s => ({
+            start: s.start,
+            end: s.end,
+            type_field: s.type,
+            content: s.content,
+          })),
+          quality: options?.quality || this.config.quality,
+          format: options?.format || this.config.format,
+          transition: options?.transition,
+          transition_duration: options?.transitionDuration,
+          volume: options?.volume,
+          add_subtitles: options?.addSubtitles,
+        },
+      });
+
+      // 完成
+      onProgress?.({ stage: 'complete', progress: 100 });
+
+      result.success = true;
+      result.filePath = outputFilePath;
+      result.duration = (Date.now() - startTime) / 1000;
+      result.metadata = {
+        title: this.config.title,
+        author: this.config.author,
+        createdAt: new Date().toISOString(),
+      };
+
+      message.success('视频剪辑完成');
+      return result;
+    } catch (error) {
+      result.success = false;
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      result.error = errorMessage;
+      onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
+
+      // 友好的错误提示
+      let userMessage = '视频剪辑失败';
+      if (errorMessage.includes('未安装FFmpeg')) {
+        userMessage = '剪辑失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
+      } else if (errorMessage.includes('没有提供有效的片段信息')) {
+        userMessage = '剪辑失败：请提供有效的视频片段信息。';
+      } else if (errorMessage.includes('无效的片段时间范围')) {
+        userMessage = '剪辑失败：片段时间范围无效。';
+      }
+
+      message.error(userMessage);
+      return result;
+    } finally {
+      // 清理监听器
+      if (unlistenProgress) {
+        unlistenProgress();
+      }
+      this.isExporting = false;
+      this.abortController = null;
+    }
+  }
+
+  /**
+   * 合并多个视频
+   * 使用 Tauri 后端合并多个视频文件
+   */
+  async mergeVideos(
+    inputPaths: string[],
+    outputPath: string,
+    onProgress?: (progress: ExportProgress) => void
+  ): Promise<ExportResult> {
+    if (this.isExporting) {
+      throw new Error('已有导出任务正在进行中');
+    }
+
+    if (!inputPaths || inputPaths.length === 0) {
+      throw new Error('请至少提供一个视频文件');
+    }
+
+    if (!outputPath) {
+      throw new Error('输出视频路径不能为空');
+    }
+
+    this.isExporting = true;
+    this.abortController = new AbortController();
+
+    const startTime = Date.now();
+    const result: ExportResult = {
+      id: uuidv4(),
+      success: false,
+      duration: 0,
+      format: this.config.format,
+      quality: this.config.quality,
+    };
+
+    try {
+      // 检查 FFmpeg 是否安装
+      if (!(await ensureFFmpegInstalled())) {
+        throw new Error('未安装 FFmpeg');
+      }
+
+      // 准备阶段
+      onProgress?.({ stage: 'preparing', progress: 0 });
+      onProgress?.({ stage: 'encoding', progress: 30 });
+
+      // 发送合并命令到 Tauri 后端
+      const success = await invoke<boolean>('merge_videos', {
+        inputPaths,
+        outputPath,
+      });
+
+      if (!success) {
+        throw new Error('视频合并失败');
+      }
+
+      // 完成
+      onProgress?.({ stage: 'muxing', progress: 80 });
+      onProgress?.({ stage: 'complete', progress: 100 });
+
+      result.success = true;
+      result.filePath = outputPath;
+      result.duration = (Date.now() - startTime) / 1000;
+      result.metadata = {
+        title: this.config.title,
+        author: this.config.author,
+        createdAt: new Date().toISOString(),
+      };
+
+      message.success('视频合并完成');
+      return result;
+    } catch (error) {
+      result.success = false;
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      result.error = errorMessage;
+      onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
+
+      // 友好的错误提示
+      let userMessage = '视频合并失败';
+      if (errorMessage.includes('未安装FFmpeg')) {
+        userMessage = '合并失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
+      } else if (errorMessage.includes('输入路径列表不能为空')) {
+        userMessage = '合并失败：请提供有效的视频文件列表。';
+      }
+
+      message.error(userMessage);
+      return result;
+    } finally {
+      this.isExporting = false;
+      this.abortController = null;
+    }
+  }
+
+  /**
+   * 批量转码多个视频
+   */
+  async batchTranscode(
+    tasks: Array<{
+      inputPath: string;
+      outputPath: string;
+      quality?: ExportQuality;
+      format?: ExportFormat;
+    }>,
+    onProgress?: (completed: number, total: number, result: ExportResult) => void
+  ): Promise<ExportResult[]> {
+    const results: ExportResult[] = [];
+    const total = tasks.length;
+
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i];
+
+      // 检查是否已取消
+      if (this.abortController?.signal.aborted) {
+        const canceledResult: ExportResult = {
+          id: uuidv4(),
+          success: false,
+          duration: 0,
+          format: task.format || this.config.format,
+          quality: task.quality || this.config.quality,
+          error: '任务已取消',
+        };
+        results.push(canceledResult);
+        onProgress?.(i + 1, total, canceledResult);
+        continue;
+      }
+
+      const result = await this.transcodeVideo(
+        task.inputPath,
+        task.outputPath,
+        task.quality,
+        task.format,
+        (progress) => {
+          // 单个任务的进度回调
+          const overallProgress = ((i + progress.progress / 100) / total) * 100;
+          onProgress?.(i, total, { ...result, success: false });
+        }
+      );
+
+      results.push(result);
+      onProgress?.(i + 1, total, result);
+    }
+
+    return results;
   }
 
   /**
@@ -194,9 +569,15 @@ class ExportService {
 
   /**
    * 开始导出
+   * 使用 Tauri 后端进行视频导出
+   * @param timeline 时间轴数据，包含视频片段信息
+   * @param onProgress 进度回调函数
    */
   async startExport(
-    timeline: any,
+    timeline: {
+      segments?: Array<{ start: number; end: number; sourceFile?: string }>;
+      outputPath?: string;
+    },
     onProgress?: (progress: ExportProgress) => void
   ): Promise<ExportResult> {
     if (this.isExporting) {
@@ -215,32 +596,92 @@ class ExportService {
       quality: this.config.quality,
     };
 
+    // 监听进度事件
+    let unlistenProgress: UnlistenFn | null = null;
+
     try {
+      // 检查 FFmpeg 是否安装
+      if (!(await ensureFFmpegInstalled())) {
+        throw new Error('未安装 FFmpeg');
+      }
+
       // 准备阶段
       onProgress?.({ stage: 'preparing', progress: 0 });
 
-      // 编码阶段
-      onProgress?.({ stage: 'encoding', progress: 10 });
-      
-      // 模拟编码过程
-      for (let i = 10; i < 80; i += 10) {
-        if (this.abortController?.signal.aborted) {
-          throw new Error('导出已取消');
+      // 如果有时间轴片段信息，使用剪辑功能
+      if (timeline.segments && timeline.segments.length > 0) {
+        const outputPath = timeline.outputPath || `export/${Date.now()}.${this.config.format}`;
+
+        // 设置进度监听
+        unlistenProgress = await listen<number>('cut_progress', (event) => {
+          const progress = event.payload;
+          if (progress < 0.6) {
+            onProgress?.({ stage: 'encoding', progress: progress * 100 });
+          } else if (progress < 0.9) {
+            onProgress?.({ stage: 'muxing', progress: 60 + (progress - 0.6) * 100 });
+          } else {
+            onProgress?.({ stage: 'complete', progress: Math.min(progress * 100, 100) });
+          }
+        });
+
+        // 编码阶段
+        onProgress?.({ stage: 'encoding', progress: 10 });
+
+        // 发送剪辑命令
+        const outputFilePath = await invoke<string>('cut_video', {
+          params: {
+            input_path: timeline.segments[0]?.sourceFile || '',
+            output_path: outputPath,
+            segments: timeline.segments.map(s => ({
+              start: s.start,
+              end: s.end,
+              type_field: null,
+              content: null,
+            })),
+            quality: this.config.quality,
+            format: this.config.format,
+            transition: null,
+            transition_duration: null,
+            volume: null,
+            add_subtitles: false,
+          },
+        });
+
+        // 混流阶段
+        onProgress?.({ stage: 'muxing', progress: 80 });
+
+        // 完成
+        onProgress?.({ stage: 'complete', progress: 100 });
+
+        result.success = true;
+        result.filePath = outputFilePath;
+      } else {
+        // 如果没有片段信息，使用转码功能
+        onProgress?.({ stage: 'encoding', progress: 10 });
+
+        const outputPath = timeline.outputPath || `export/${Date.now()}.${this.config.format}`;
+
+        const success = await invoke<boolean>('transcode_video', {
+          inputPath: '',
+          outputPath,
+          quality: this.config.quality,
+          format: this.config.format,
+        });
+
+        if (!success) {
+          throw new Error('视频导出失败');
         }
-        await this.delay(100);
-        onProgress?.({ stage: 'encoding', progress: i });
+
+        // 混流阶段
+        onProgress?.({ stage: 'muxing', progress: 80 });
+
+        // 完成
+        onProgress?.({ stage: 'complete', progress: 100 });
+
+        result.success = true;
+        result.filePath = outputPath;
       }
 
-      // 混流阶段
-      onProgress?.({ stage: 'muxing', progress: 80 });
-
-      await this.delay(200);
-
-      // 完成
-      onProgress?.({ stage: 'complete', progress: 100 });
-
-      result.success = true;
-      result.filePath = `export/${Date.now()}.${this.config.format}`;
       result.duration = (Date.now() - startTime) / 1000;
       result.metadata = {
         title: this.config.title,
@@ -248,13 +689,29 @@ class ExportService {
         createdAt: new Date().toISOString(),
       };
 
+      message.success('视频导出完成');
       return result;
     } catch (error) {
       result.success = false;
-      result.error = error instanceof Error ? error.message : '未知错误';
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      result.error = errorMessage;
       onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
+
+      // 友好的错误提示
+      let userMessage = '视频导出失败';
+      if (errorMessage.includes('未安装FFmpeg')) {
+        userMessage = '导出失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
+      } else if (errorMessage.includes('导出失败')) {
+        userMessage = '视频导出失败，请检查输入文件是否有效。';
+      }
+
+      message.error(userMessage);
       return result;
     } finally {
+      // 清理监听器
+      if (unlistenProgress) {
+        unlistenProgress();
+      }
       this.isExporting = false;
       this.abortController = null;
     }
@@ -326,10 +783,213 @@ class ExportService {
   }
 
   /**
-   * 私有方法：延迟
+   * 导出时间轴（完整流程）
+   * 将时间轴中的所有片段合并为一个完整的视频文件
+   * @param timeline 时间轴数据
+   * @param onProgress 进度回调
    */
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  async exportTimeline(
+    timeline: {
+      segments: Array<{
+        start: number;
+        end: number;
+        sourceFile: string;
+      }>;
+      outputPath: string;
+    },
+    onProgress?: (progress: ExportProgress) => void
+  ): Promise<ExportResult> {
+    if (this.isExporting) {
+      throw new Error('已有导出任务正在进行中');
+    }
+
+    if (!timeline.segments || timeline.segments.length === 0) {
+      throw new Error('时间轴中没有视频片段');
+    }
+
+    this.isExporting = true;
+    this.abortController = new AbortController();
+
+    const startTime = Date.now();
+    const result: ExportResult = {
+      id: uuidv4(),
+      success: false,
+      duration: 0,
+      format: this.config.format,
+      quality: this.config.quality,
+    };
+
+    // 监听进度事件
+    let unlistenProgress: UnlistenFn | null = null;
+
+    try {
+      // 检查 FFmpeg 是否安装
+      if (!(await ensureFFmpegInstalled())) {
+        throw new Error('未安装 FFmpeg');
+      }
+
+      // 准备阶段
+      onProgress?.({ stage: 'preparing', progress: 0 });
+
+      const { segments, outputPath } = timeline;
+
+      // 如果只有一个片段，直接剪辑
+      if (segments.length === 1) {
+        const segment = segments[0];
+
+        // 设置进度监听
+        unlistenProgress = await listen<number>('cut_progress', (event) => {
+          const progress = event.payload;
+          if (progress < 0.6) {
+            onProgress?.({ stage: 'encoding', progress: progress * 100 });
+          } else if (progress < 0.9) {
+            onProgress?.({ stage: 'muxing', progress: 60 + (progress - 0.6) * 100 });
+          } else {
+            onProgress?.({ stage: 'complete', progress: Math.min(progress * 100, 100) });
+          }
+        });
+
+        const outputFilePath = await invoke<string>('cut_video', {
+          params: {
+            input_path: segment.sourceFile,
+            output_path: outputPath,
+            segments: [{
+              start: segment.start,
+              end: segment.end,
+              type_field: null,
+              content: null,
+            }],
+            quality: this.config.quality,
+            format: this.config.format,
+            transition: null,
+            transition_duration: null,
+            volume: null,
+            add_subtitles: false,
+          },
+        });
+
+        result.success = true;
+        result.filePath = outputFilePath;
+      } else {
+        // 多个片段：先分别剪辑，再合并
+
+        // 设置进度监听
+        unlistenProgress = await listen<number>('cut_progress', (event) => {
+          const progress = event.payload;
+          // 剪辑阶段占 80% 进度
+          onProgress?.({ stage: 'encoding', progress: progress * 80 });
+        });
+
+        // 临时文件目录
+        const tempDir = `${outputPath}.temp`;
+
+        // 分别剪辑每个片段
+        const tempFiles: string[] = [];
+        for (let i = 0; i < segments.length; i++) {
+          if (this.abortController?.signal.aborted) {
+            throw new Error('导出已取消');
+          }
+
+          const segment = segments[i];
+          const tempOutputPath = `${tempDir}/segment_${i}.${this.config.format}`;
+
+          await invoke<string>('cut_video', {
+            params: {
+              input_path: segment.sourceFile,
+              output_path: tempOutputPath,
+              segments: [{
+                start: segment.start,
+                end: segment.end,
+                type_field: null,
+                content: null,
+              }],
+              quality: this.config.quality,
+              format: this.config.format,
+              transition: null,
+              transition_duration: null,
+              volume: null,
+              add_subtitles: false,
+            },
+          });
+
+          tempFiles.push(tempOutputPath);
+
+          // 报告进度
+          const cutProgress = ((i + 1) / segments.length) * 0.8;
+          onProgress?.({ stage: 'encoding', progress: cutProgress * 100 });
+        }
+
+        // 合并阶段
+        onProgress?.({ stage: 'muxing', progress: 80 });
+
+        // 合并所有片段
+        const success = await invoke<boolean>('merge_videos', {
+          inputPaths: tempFiles,
+          outputPath,
+        });
+
+        if (!success) {
+          throw new Error('视频合并失败');
+        }
+
+        // 清理临时文件
+        for (const tempFile of tempFiles) {
+          try {
+            await invoke('remove_file', { path: tempFile });
+          } catch {
+            // 忽略清理错误
+          }
+        }
+
+        result.success = true;
+        result.filePath = outputPath;
+      }
+
+      // 完成
+      onProgress?.({ stage: 'complete', progress: 100 });
+
+      result.duration = (Date.now() - startTime) / 1000;
+      result.metadata = {
+        title: this.config.title,
+        author: this.config.author,
+        createdAt: new Date().toISOString(),
+      };
+
+      message.success('视频导出完成');
+      return result;
+    } catch (error) {
+      result.success = false;
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      result.error = errorMessage;
+      onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
+
+      // 友好的错误提示
+      let userMessage = '视频导出失败';
+      if (errorMessage.includes('未安装FFmpeg')) {
+        userMessage = '导出失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
+      } else if (errorMessage.includes('导出已取消')) {
+        userMessage = '导出已取消';
+      } else if (errorMessage.includes('合并失败')) {
+        userMessage = '视频合并失败，请检查片段文件是否有效。';
+      }
+
+      message.error(userMessage);
+      return result;
+    } finally {
+      // 清理监听器
+      if (unlistenProgress) {
+        unlistenProgress();
+      }
+      this.isExporting = false;
+      this.abortController = null;
+    }
+  }
+
+  /**
+   * 检查当前导出状态
+   */
+  isCurrentlyExporting(): boolean {
+    return this.isExporting;
   }
 }
 

@@ -66,7 +66,7 @@ const MainLayout: React.FC = () => {
     const checkTauriSupport = async () => {
       try {
         // 简单地检查是否可以导入Tauri API
-        await import('@tauri-apps/api/app');
+        await import('@tauri-apps/api/tauri');
         setTauriSupported(true);
       } catch {
         console.warn('Tauri功能不可用:', error);

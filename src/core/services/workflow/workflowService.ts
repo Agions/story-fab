@@ -20,7 +20,7 @@ import type {
   STEP_PROGRESS,
 } from './types';
 
-class WorkflowService {
+export class WorkflowService {
   private state: WorkflowState;
   private callbacks: WorkflowCallbacks = {};
   private abortController: AbortController | null = null;

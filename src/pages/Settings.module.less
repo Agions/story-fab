@@ -16,10 +16,19 @@
 @box-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
 @transition-duration: 0.3s;
 
-// 深色模式变量
-@dark-bg: #141414;
-@dark-card: #1f1f1f;
-@dark-border: rgba(255, 255, 255, 0.08);
+// 深色模式变量 - 科技暗黑主题
+@dark-bg-primary: #0a0a0f;
+@dark-bg-secondary: #12121a;
+@dark-bg-tertiary: #1a1a24;
+@dark-primary: #6366f1;
+@dark-border: #2a2a3a;
+@dark-text-primary: #f1f5f9;
+@dark-text-secondary: #94a3b8;
+
+// 霓虹发光效果
+@neon-glow: 0 0 20px rgba(99, 102, 241, 0.4);
+@neon-glow-soft: 0 0 15px rgba(99, 102, 241, 0.25);
+@neon-border: 0 0 1px 1px rgba(99, 102, 241, 0.3);
 
 .container {
   max-width: 1200px;
@@ -380,20 +389,50 @@
   min-height: 400px;
 }
 
-// 深色模式适配
+// 深色模式适配 - 科技暗黑主题
 :global(.dark) {
+  .container {
+    background: @dark-bg-primary;
+
+    .header {
+      h2 {
+        color: @dark-text-primary;
+      }
+    }
+  }
+
+  .settingsCard {
+    background: rgba(18, 18, 26, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid @dark-border;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), @neon-glow-soft;
+
+    &:hover {
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5), @neon-glow;
+    }
+  }
+
   .tabs {
     :global {
       .ant-tabs-nav {
-        background-color: @bg-darker;
+        background-color: @dark-bg-secondary;
 
         .ant-tabs-tab {
+          color: @dark-text-secondary;
+
           &:hover {
-            background-color: rgba(255, 255, 255, 0.08);
+            background-color: rgba(99, 102, 241, 0.1);
+            color: @dark-primary;
           }
 
           &.ant-tabs-tab-active {
-            background-color: rgba(24, 144, 255, 0.15);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+            box-shadow: @neon-glow-soft;
+            color: @dark-primary;
+
+            .anticon {
+              color: @dark-primary;
+            }
           }
         }
       }
@@ -402,37 +441,192 @@
 
   .modelGrid {
     .modelCard {
-      background-color: @bg-darker;
-      border-color: rgba(255, 255, 255, 0.1);
+      background-color: @dark-bg-tertiary;
+      border-color: @dark-border;
 
       .apiKeyExample {
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: rgba(99, 102, 241, 0.1);
+        color: @dark-text-secondary;
       }
     }
   }
 
+  .switchItem {
+    background: rgba(26, 26, 36, 0.6);
+    border-color: @dark-border;
+
+    &:hover {
+      background: @dark-bg-tertiary;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), @neon-glow-soft;
+    }
+  }
+
+  .languageSelector {
+    background: rgba(26, 26, 36, 0.6);
+    border-color: @dark-border;
+
+    &:hover {
+      background: @dark-bg-tertiary;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), @neon-glow-soft;
+    }
+
+    .anticon {
+      color: @dark-primary;
+    }
+  }
+
+  .settingRow {
+    .anticon {
+      color: @dark-primary;
+    }
+  }
+
+  .switchLabel {
+    color: @dark-text-primary;
+  }
+
+  .settingDescription {
+    color: @dark-text-secondary;
+  }
+
   .dependencyItem {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(26, 26, 36, 0.6);
+    border-color: @dark-border;
+    color: @dark-text-primary;
   }
 
   .installInstruction {
     .installCard {
-      background-color: rgba(255, 255, 255, 0.03);
+      background-color: rgba(26, 26, 36, 0.6);
+      border: 1px solid @dark-border;
+
+      code {
+        background-color: rgba(99, 102, 241, 0.15);
+        color: @dark-primary;
+      }
     }
   }
 
   .actions {
-    border-top-color: rgba(255, 255, 255, 0.1);
+    border-top-color: @dark-border;
+
+    .saveButton {
+      background: @gradient-primary;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3), @neon-glow-soft;
+
+      &:hover {
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4), @neon-glow;
+      }
+    }
+  }
+
+  .formItem {
+    :global {
+      .ant-form-item-label {
+        > label {
+          color: @dark-text-primary;
+        }
+      }
+    }
+  }
+
+  .apiKeyInput {
+    background-color: @dark-bg-secondary;
+    border-color: @dark-border;
+
+    &:hover, &:focus {
+      border-color: @dark-primary;
+      box-shadow: @neon-glow-soft;
+    }
+  }
+
+  .success {
+    color: #10b981;
+  }
+
+  .error {
+    color: #ef4444;
+  }
+
+  .sectionTitle {
+    border-color: @dark-border;
+    color: @dark-text-primary;
+
+    .anticon {
+      color: @dark-primary;
+    }
+  }
+
+  .tabsContainer {
+    :global(.ant-tabs-tab-active) {
+      background-color: rgba(99, 102, 241, 0.15);
+
+      .ant-tabs-tab-btn {
+        color: @dark-primary;
+      }
+    }
+  }
+
+  .section {
+    background: rgba(18, 18, 26, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid @dark-border;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      background: rgba(26, 26, 36, 0.8);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), @neon-glow-soft;
+    }
+  }
+
+  .modelList {
+    .alert {
+      background: rgba(26, 26, 36, 0.6);
+      border-color: @dark-border;
+
+      :global(.ant-alert-message) {
+        color: @dark-text-primary;
+      }
+
+      :global(.ant-alert-description) {
+        color: @dark-text-secondary;
+      }
+    }
+  }
+
+  .loading {
+    color: @dark-text-secondary;
+  }
+
+  .optionCard {
+    background: rgba(26, 26, 36, 0.6);
+    border-color: @dark-border;
+  }
+
+  .chineseModelsGrid {
+    .modelCard {
+      background: rgba(26, 26, 36, 0.6);
+      border-color: @dark-border;
+    }
+  }
+
+  .validationStatus {
+    color: @dark-text-secondary;
   }
 }
 
 // 响应式布局适配
 @media (max-width: 768px) {
   .tabs {
+    min-height: auto;
+
     :global {
       .ant-tabs-nav {
         width: 100%;
+      }
+
+      .ant-tabs-content-holder {
+        overflow-x: hidden;
       }
     }
   }
@@ -448,6 +642,15 @@
   .actions {
     .saveButton {
       width: 100%;
+    }
+  }
+
+  // 移动端设置卡片优化
+  .settingsCard {
+    margin-bottom: 16px;
+
+    :global(.ant-card-body) {
+      padding: 16px;
     }
   }
 }
@@ -527,32 +730,44 @@
   }
 }
 
-// 暗黑模式特定样式
+// 暗黑模式特定样式 - 科技暗黑主题
 :global(.dark) {
 
-  .section,
-  .switchItem,
-  .languageSelector {
-    background: rgba(30, 30, 30, 0.6);
-    border-color: rgba(255, 255, 255, 0.08);
+  .section {
+    background: rgba(18, 18, 26, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid @dark-border;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 
     &:hover {
-      background: #1f1f1f;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+      background: rgba(26, 26, 36, 0.8);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), @neon-glow-soft;
+    }
+  }
+
+  .switchItem,
+  .languageSelector {
+    background: rgba(26, 26, 36, 0.6);
+    border-color: @dark-border;
+
+    &:hover {
+      background: @dark-bg-tertiary;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), @neon-glow-soft;
     }
   }
 
   .settingsCard {
-    border-color: #303030;
+    border-color: @dark-border;
   }
 
   .sectionTitle {
-    border-color: #303030;
-    color: rgba(255, 255, 255, 0.85);
+    border-color: @dark-border;
+    color: @dark-text-primary;
   }
 
   .apiKeyInput {
-    background-color: #141414;
+    background-color: @dark-bg-secondary;
+    border-color: @dark-border;
   }
 }
 

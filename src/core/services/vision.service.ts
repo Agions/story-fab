@@ -79,7 +79,7 @@ const EMOTION_DIMENSIONS = [
   { id: 'calm', name: '平静', score: 0 }
 ];
 
-class VisionService {
+export class VisionService {
   /**
    * 高级场景检测
    * 使用多维度分析提高准确性

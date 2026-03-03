@@ -1,5 +1,5 @@
-import { invoke } from '@tauri-apps/api/tauri';
-import { readTextFile, writeTextFile, BaseDirectory, exists } from '@tauri-apps/api/fs';
+import { invoke } from '@tauri-apps/api/core';
+import { readTextFile, writeTextFile, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
 import { message } from 'antd';
 import { getConfigDir, writeFile, fileExists } from './fileOperations';
 

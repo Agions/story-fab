@@ -12,20 +12,8 @@ interface NotificationCenterProps {
 const NotificationCenter: React.FC<NotificationCenterProps> = ({ open, onClose }) => {
   const { notifications, clearNotifications } = useAppStore();
 
-  const mockNotifications = [
-    {
-      id: 1,
-      title: '项目导出完成',
-      content: '您的项目"视频解说脚本"已成功导出',
-      time: '10分钟前',
-    },
-    {
-      id: 2,
-      title: '新功能上线',
-      content: '我们新增了AI智能分析功能，快来体验吧！',
-      time: '1小时前',
-    },
-  ];
+  // 通知数据 (从store获取)
+  const notificationList = [];
 
   return (
     <Drawer
@@ -40,11 +28,11 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ open, onClose }
         </Button>
       }
     >
-      {mockNotifications.length > 0 ? (
+      {notificationList.length > 0 ? (
         <List
           className={styles.notificationList}
           itemLayout="vertical"
-          dataSource={mockNotifications}
+          dataSource={notificationList}
           renderItem={(item) => (
             <List.Item className={styles.notificationItem}>
               <div className={styles.notificationHeader}>

@@ -15,7 +15,7 @@ const STORAGE_KEYS = {
   EXPORT_HISTORY: 'reelforge_export_history'
 };
 
-class StorageService {
+export class StorageService {
   /**
    * 项目存储
    */

@@ -4,7 +4,7 @@ import {
   Typography, Button, Card, Row, Col, Input, Select,
   Table, Tag, Space, Modal, message, Empty, Dropdown, Progress, Tooltip
 } from 'antd';
-import { useStore } from '@/store/index';
+import { useProjectStore } from '@/store';
 import { Project } from '@/types';
 import {
   PlusOutlined,
@@ -24,7 +24,7 @@ const { Search } = Input;
 
 const ProjectManager: React.FC = () => {
   const navigate = useNavigate();
-  const { projects: storeProjects, deleteProject } = useStore();
+  const { projects: storeProjects, deleteProject } = useProjectStore();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');

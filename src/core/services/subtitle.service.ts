@@ -58,7 +58,7 @@ const DEFAULT_CONFIG: SubtitleConfig = {
   profanityFilter: false,
 };
 
-class SubtitleService {
+export class SubtitleService {
   private config: SubtitleConfig;
   private recognition: any = null;
   private isListening: boolean = false;

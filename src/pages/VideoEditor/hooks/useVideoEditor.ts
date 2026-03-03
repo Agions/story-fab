@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { message } from 'antd';
-import { open } from '@tauri-apps/api/dialog';
+import { open } from '@tauri-apps/plugin-dialog';
 import { VideoSegment, extractKeyFrames, analyzeVideo } from '@/services/videoService';
 import { clipWorkflowService } from '@/core/services/clip-workflow.service';
 

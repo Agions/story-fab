@@ -68,8 +68,46 @@ const Editor: React.FC<EditorProps> = () => {
         resolution: { width: 1920, height: 1080 },
         fps: 30,
         tracks: [
-          { id: 'video-1', name: '视频轨道 1', type: 'video', clips: [] },
-          { id: 'audio-1', name: '音频轨道 1', type: 'audio', clips: [] },
+          {
+            id: 'video-1',
+            name: '视频轨道 1',
+            type: 'video',
+            clips: [],
+            isMuted: false,
+            isLocked: false,
+            isVisible: true,
+            volume: 100
+          },
+          {
+            id: 'audio-1',
+            name: '音频轨道 1',
+            type: 'audio',
+            clips: [],
+            isMuted: false,
+            isLocked: false,
+            isVisible: true,
+            volume: 100
+          },
+          {
+            id: 'subtitle-1',
+            name: '字幕轨道 1',
+            type: 'subtitle',
+            clips: [],
+            isMuted: false,
+            isLocked: false,
+            isVisible: true,
+            volume: 100
+          },
+          {
+            id: 'effect-1',
+            name: '特效轨道 1',
+            type: 'effect',
+            clips: [],
+            isMuted: false,
+            isLocked: false,
+            isVisible: true,
+            volume: 100
+          }
         ]
       });
       setDuration(120);

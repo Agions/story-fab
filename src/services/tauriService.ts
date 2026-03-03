@@ -1,9 +1,9 @@
-import { invoke } from '@tauri-apps/api/tauri';
-import { open, save } from '@tauri-apps/api/dialog';
-import { readTextFile, writeTextFile, BaseDirectory, createDir, exists } from '@tauri-apps/api/fs';
+import { invoke } from '@tauri-apps/api/core';
+import { open, save } from '@tauri-apps/plugin-dialog';
+import { readTextFile, writeTextFile, BaseDirectory, mkdir, exists } from '@tauri-apps/plugin-fs';
 import { message } from 'antd';
 import { appConfigDir } from '@tauri-apps/api/path';
-import { open as openExternal } from '@tauri-apps/api/shell';
+import { open as openExternal } from '@tauri-apps/plugin-shell';
 
 // 确保应用数据目录
 export const ensureAppDataDir = async (): Promise<void> => {
@@ -31,7 +31,7 @@ export const ensureAppDataDir = async (): Promise<void> => {
     if (!dirExists) {
       console.log('应用数据目录不存在，创建目录:', appDir);
       try {
-        await createDir(appDir, { dir: BaseDirectory.AppData, recursive: true });
+        await mkdir(appDir, { dir: BaseDirectory.AppData, recursive: true });
       } catch (createError) {
         console.error('创建目录失败:', createError);
         throw new Error(`创建目录失败: ${createError instanceof Error ? createError.message : '未知错误'}`);
@@ -236,7 +236,7 @@ export const getConfigDir = async (): Promise<string> => {
     // 确保目录存在
     const configExists = await exists(configDir);
     if (!configExists) {
-      await createDir(configDir, { recursive: true });
+      await mkdir(configDir, { recursive: true });
     }
     return configDir;
   } catch (error) {

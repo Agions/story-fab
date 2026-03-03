@@ -2,9 +2,17 @@
  * 核心类型定义
  */
 
-// AI 模型类型
-export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'baidu' | 'alibaba' | 'zhipu' | 'iflytek' | 'tencent';
-export type ModelCategory = 'text' | 'code' | 'image' | 'video' | 'all';
+// AI 模型类型 - 2026年3月最新
+export type ModelProvider =
+  | 'openai'
+  | 'anthropic'
+  | 'google'
+  | 'alibaba'
+  | 'zhipu'
+  | 'iflytek'
+  | 'deepseek'
+  | 'moonshot';
+export type ModelCategory = 'text' | 'code' | 'image' | 'video' | 'audio' | 'all';
 
 // AI 模型
 export interface AIModel {

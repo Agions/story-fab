@@ -20,7 +20,7 @@ import {
   LoadingOutlined,
   BulbOutlined,
   FontSizeOutlined,
-  ThunderOutlined,
+  ThunderboltOutlined,
   AlignLeftOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
@@ -392,7 +392,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
         </TabPane>
 
         {/* 特效设置 */}
-        <TabPane tab={<><ThunderOutlined /> 特效设置</>} key="effect">
+        <TabPane tab={<><ThunderboltOutlined /> 特效设置</>} key="effect">
           <Card size="small">
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               <div>

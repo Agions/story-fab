@@ -29,7 +29,7 @@ import {
   ClockCircleOutlined
 } from '@ant-design/icons';
 import { VideoSegment, formatDuration, previewSegment } from '@/services/videoService';
-import { convertFileSrc } from '@tauri-apps/api/tauri';
+import { convertFileSrc } from '@tauri-apps/api/core';
 import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
 import styles from './ScriptEditor.module.less';
 

@@ -1,12 +1,12 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
+import { Routes, Route, HashRouter, Navigate } from 'react-router-dom';
 
 import Layout from './components/Layout';
 import { LoadingSkeleton } from './components/common';
 import './App.css';
 
 import AppProvider from './providers/AppProvider';
-import ErrorBoundary from './ErrorBoundary';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // 懒加载页面组件 - 优化首屏加载
 const Home = lazy(() => import('./pages/Home'));
@@ -30,7 +30,7 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <AppProvider>
-        <BrowserRouter>
+        <HashRouter>
           <Layout>
             <Suspense fallback={<PageLoader />}>
               <Routes>
@@ -53,7 +53,7 @@ const App: React.FC = () => {
               </Routes>
             </Suspense>
           </Layout>
-        </BrowserRouter>
+        </HashRouter>
       </AppProvider>
     </ErrorBoundary>
   );

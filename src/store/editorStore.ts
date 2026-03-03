@@ -72,5 +72,3 @@ export const useEditorStore = create<EditorState>()(
     }
   )
 );
-
-export default useEditorStore;

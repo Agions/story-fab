@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, Upload, message, Space, Card, Spin } from 'antd';
 import { UploadOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import { open } from '@tauri-apps/api/dialog';
-import { invoke } from '@tauri-apps/api/tauri';
-import { convertFileSrc } from '@tauri-apps/api/tauri';
+import { open } from '@tauri-apps/plugin-dialog';
+import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { analyzeVideo, VideoMetadata, formatDuration, formatResolution } from '@/services/videoService';
 import styles from './VideoSelector.module.less';
 
@@ -14,9 +13,15 @@ interface VideoSelectorProps {
   loading?: boolean;
 }
 
+// 检测是否在 Tauri 环境中
+const isTauri = () => {
+  return typeof window !== 'undefined' && '__TAURI__' in window;
+};
+
 /**
  * 视频选择器组件
  * 支持选择本地视频文件，并显示视频预览及基本信息
+ * 同时支持桌面端 (Tauri) 和 Web 端
  */
 const VideoSelector: React.FC<VideoSelectorProps> = ({
   initialVideoPath,
@@ -25,14 +30,29 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
   loading = false
 }) => {
   const [videoPath, setVideoPath] = useState<string | null>(initialVideoPath || null);
-  const [videoSrc, setVideoSrc] = useState<string | null>(initialVideoPath ? convertFileSrc(initialVideoPath) : null);
+  const [videoSrc, setVideoSrc] = useState<string | null>(initialVideoPath ? (isTauri() ? convertFileSrc(initialVideoPath) : initialVideoPath) : null);
   const [metadata, setMetadata] = useState<VideoMetadata | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 获取文件名（兼容 Web 和 Tauri 环境）
+  const getFileName = (path: string | null) => {
+    if (!path) return '';
+    // Web 环境下的 blob URL 或文件路径
+    if (path.startsWith('blob:') || path.startsWith('http')) {
+      return '视频文件';
+    }
+    // Tauri 环境下的文件路径
+    return path.split('/').pop() || path;
+  };
+
+  // 支持的视频格式
+  const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv'];
 
   /**
-   * 选择视频文件
+   * 选择视频文件 - Tauri 桌面端
    */
-  const handleSelectVideo = async () => {
+  const handleSelectVideoTauri = async () => {
     try {
       // 打开文件选择对话框
       const selected = await open({
@@ -52,7 +72,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
       const filePath = selected as string;
       setVideoPath(filePath);
       setVideoSrc(convertFileSrc(filePath));
-      
+
       // 分析视频获取元数据
       setIsAnalyzing(true);
       try {
@@ -69,6 +89,66 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
     } catch {
       console.error('选择视频失败:', error);
       message.error('选择视频失败，请重试');
+    }
+  };
+
+  /**
+   * 选择视频文件 - Web 端
+   */
+  const handleSelectVideoWeb = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 验证文件类型
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!VIDEO_EXTENSIONS.includes(ext)) {
+      message.error(`不支持的视频格式: ${ext}，请选择 ${VIDEO_EXTENSIONS.join(', ')} 格式`);
+      return;
+    }
+
+    // 使用 Web API 读取视频文件
+    const fileUrl = URL.createObjectURL(file);
+    setVideoPath(file.name);
+    setVideoSrc(fileUrl);
+
+    // 获取视频元数据
+    setIsAnalyzing(true);
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(video.src);
+      const webMetadata: VideoMetadata = {
+        duration: video.duration,
+        width: video.videoWidth,
+        height: video.videoHeight,
+        fps: 30,
+        codec: file.type,
+        size: file.size,
+      };
+      setMetadata(webMetadata);
+      onVideoSelect(fileUrl, webMetadata);
+      setIsAnalyzing(false);
+    };
+
+    video.onerror = () => {
+      URL.revokeObjectURL(video.src);
+      message.error('无法读取视频文件');
+      setIsAnalyzing(false);
+    };
+
+    video.src = fileUrl;
+  };
+
+  /**
+   * 选择视频文件 - 自动判断环境
+   */
+  const handleSelectVideo = () => {
+    if (isTauri()) {
+      handleSelectVideoTauri();
+    } else {
+      // Web 环境下触发文件输入
+      fileInputRef.current?.click();
     }
   };
 
@@ -100,6 +180,14 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
 
   return (
     <div className={styles.videoSelector}>
+      {/* 隐藏的文件输入 - 仅 Web 端使用 */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={VIDEO_EXTENSIONS.join(',')}
+        style={{ display: 'none' }}
+        onChange={handleSelectVideoWeb}
+      />
       <Spin spinning={loading || isAnalyzing} tip={isAnalyzing ? "分析视频中..." : "加载中..."}>
         {!videoPath ? (
           <div className={styles.uploadArea} onClick={handleSelectVideo}>
@@ -119,7 +207,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
             
             {metadata && (
               <Card className={styles.metadataCard} size="small" title="视频信息">
-                <p><strong>文件名:</strong> {videoPath.split('/').pop()}</p>
+                <p><strong>文件名:</strong> {getFileName(videoPath)}</p>
                 <p><strong>时长:</strong> {formatDuration(metadata.duration)}</p>
                 <p><strong>分辨率:</strong> {formatResolution(metadata.width, metadata.height)}</p>
                 <p><strong>帧率:</strong> {metadata.fps} fps</p>

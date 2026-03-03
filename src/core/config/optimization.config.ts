@@ -12,29 +12,29 @@ export const COST_OPTIMIZATION = {
       primary: 'qwen3.5-turbo',
       fallback: 'kimi-k2.5',
       maxTokens: 500,
-      temperature: 0.3
+      temperature: 0.3,
     },
     // 标准任务 (100-1000 tokens)
     standard: {
       primary: 'qwen3.5-plus',
       fallback: 'kimi-k2.5',
       maxTokens: 2000,
-      temperature: 0.5
+      temperature: 0.5,
     },
     // 复杂任务 (> 1000 tokens)
     complex: {
       primary: 'qwen3.5-max',
       fallback: 'gpt-5',
       maxTokens: 4000,
-      temperature: 0.7
+      temperature: 0.7,
     },
     // 创意任务
     creative: {
       primary: 'kimi-k2.5',
-      fallback: 'claude-4-sonnet',
+      fallback: 'claude-4.6',
       maxTokens: 3000,
-      temperature: 0.8
-    }
+      temperature: 0.8,
+    },
   },
 
   // 缓存配置
@@ -43,20 +43,20 @@ export const COST_OPTIMIZATION = {
     prompt: {
       enabled: true,
       ttl: 24 * 60 * 60 * 1000, // 24小时
-      maxSize: 1000
+      maxSize: 1000,
     },
     // 响应缓存
     response: {
       enabled: true,
       ttl: 7 * 24 * 60 * 60 * 1000, // 7天
-      maxSize: 500
+      maxSize: 500,
     },
     // 视频缓存
     video: {
       enabled: true,
       ttl: 30 * 24 * 60 * 60 * 1000, // 30天
-      maxSize: 100
-    }
+      maxSize: 100,
+    },
   },
 
   // 批处理配置
@@ -65,8 +65,8 @@ export const COST_OPTIMIZATION = {
     maxSize: 10,
     maxWait: 100, // ms
     retryCount: 3,
-    retryDelay: 1000 // ms
-  }
+    retryDelay: 1000, // ms
+  },
 };
 
 // 代码优化配置
@@ -78,7 +78,7 @@ export const CODE_OPTIMIZATION = {
     // 预加载距离
     preloadDistance: 2, // 路由距离
     // 虚拟列表阈值
-    virtualListThreshold: 50 // 项目数
+    virtualListThreshold: 50, // 项目数
   },
 
   // 图片优化
@@ -91,8 +91,8 @@ export const CODE_OPTIMIZATION = {
     quality: {
       low: 60,
       medium: 75,
-      high: 85
-    }
+      high: 85,
+    },
   },
 
   // 代码分割
@@ -102,12 +102,8 @@ export const CODE_OPTIMIZATION = {
     // 组件级分割
     components: true,
     // 库级分割
-    vendors: [
-      'antd',
-      'framer-motion',
-      'lodash-es'
-    ]
-  }
+    vendors: ['antd', 'framer-motion', 'lodash-es'],
+  },
 };
 
 // 质量优化配置
@@ -122,7 +118,7 @@ export const QUALITY_OPTIMIZATION = {
     // 自动添加约束
     addConstraints: true,
     // 最大长度限制
-    maxLength: 2000
+    maxLength: 2000,
   },
 
   // 多模型投票
@@ -132,7 +128,7 @@ export const QUALITY_OPTIMIZATION = {
     // 投票策略
     strategy: 'quality', // 'quality' | 'speed' | 'cost'
     // 超时时间
-    timeout: 30000
+    timeout: 30000,
   },
 
   // 后处理
@@ -145,8 +141,8 @@ export const QUALITY_OPTIMIZATION = {
     // 稳定化
     stabilize: false, // 性能开销大
     // 调色
-    colorGrade: true
-  }
+    colorGrade: true,
+  },
 };
 
 // 性能优化配置
@@ -158,7 +154,7 @@ export const PERFORMANCE_OPTIMIZATION = {
     // 最大并发生成
     maxGenerations: 2,
     // 队列超时
-    queueTimeout: 60000
+    queueTimeout: 60000,
   },
 
   // 防抖节流
@@ -168,7 +164,7 @@ export const PERFORMANCE_OPTIMIZATION = {
     // 搜索防抖
     search: 500,
     // 调整节流
-    resize: 200
+    resize: 200,
   },
 
   // 预加载
@@ -178,8 +174,8 @@ export const PERFORMANCE_OPTIMIZATION = {
     // 数据预加载
     data: true,
     // 资源预加载
-    assets: ['fonts', 'icons']
-  }
+    assets: ['fonts', 'icons'],
+  },
 };
 
 // 视频生成优化
@@ -193,27 +189,27 @@ export const VIDEO_OPTIMIZATION = {
         resolution: '1080p',
         fps: 30,
         quality: 'medium',
-        estimatedCost: 1.0
+        estimatedCost: 1.0,
       },
       promotional: {
         resolution: '2k',
         fps: 30,
         quality: 'high',
-        estimatedCost: 2.5
+        estimatedCost: 2.5,
       },
       cinematic: {
         resolution: '4k',
         fps: 24,
         quality: 'ultra',
-        estimatedCost: 5.0
+        estimatedCost: 5.0,
       },
       social: {
         resolution: '1080p',
         fps: 30,
         quality: 'low',
-        estimatedCost: 0.5
-      }
-    }
+        estimatedCost: 0.5,
+      },
+    },
   },
 
   // 本地生成优先
@@ -226,9 +222,9 @@ export const VIDEO_OPTIMIZATION = {
     // 切换阈值
     switchThreshold: {
       queueLength: 5,
-      waitTime: 30000
-    }
-  }
+      waitTime: 30000,
+    },
+  },
 };
 
 // 导出统一配置
@@ -237,7 +233,7 @@ export const OPTIMIZATION_CONFIG = {
   code: CODE_OPTIMIZATION,
   quality: QUALITY_OPTIMIZATION,
   performance: PERFORMANCE_OPTIMIZATION,
-  video: VIDEO_OPTIMIZATION
+  video: VIDEO_OPTIMIZATION,
 };
 
 export default OPTIMIZATION_CONFIG;

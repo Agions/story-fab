@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useStore } from '@/store/index';
+import { useProjectStore, useStore } from '@/store/index';
 import VideoInfo from '@/components/VideoInfo';
 import ScriptEditor from '@/components/ScriptEditor';
 import VideoProcessingController from '@/components/VideoProcessingController';
@@ -28,7 +28,8 @@ const { Title, Text } = Typography;
 const ProjectDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { projects, updateProject, deleteProject, selectedAIModel, aiModelsSettings } = useStore();
+  const { projects, updateProject, deleteProject } = useProjectStore();
+  const { selectedAIModel, aiModelsSettings } = useStore();
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState<string>('analyze');
   const [project, setProject] = useState<any>(null);

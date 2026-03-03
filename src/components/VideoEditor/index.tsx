@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useEffect, memo } from 'react';
 import { Card, Typography, message } from 'antd';
-import { invoke } from '@tauri-apps/api/tauri';
-import { save } from '@tauri-apps/api/dialog';
-import { convertFileSrc } from '@tauri-apps/api/tauri';
+import { invoke, convertFileSrc } from '@tauri-apps/api/core';
+import { save } from '@tauri-apps/plugin-dialog';
 import { ScriptSegment } from '@/types';
 
 import VideoPlayer from './VideoPlayer';

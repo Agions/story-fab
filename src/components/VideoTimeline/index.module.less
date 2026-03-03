@@ -5,10 +5,23 @@
   padding: 16px;
   background: #f5f5f5;
   border-radius: 8px;
+
+  @media (max-width: 576px) {
+    padding: 12px;
+    gap: 12px;
+    border-radius: 0;
+  }
 }
 
 .toolbar {
   margin-bottom: 8px;
+
+  @media (max-width: 576px) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
 }
 
 .timeDisplay {
@@ -41,6 +54,12 @@
   padding: 16px;
   min-height: 200px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 576px) {
+    padding: 12px;
+    min-height: 150px;
+  }
 }
 
 .track {
@@ -56,6 +75,12 @@
   background: #fafafa;
   border-right: 1px solid #e8e8e8;
   flex-shrink: 0;
+
+  @media (max-width: 576px) {
+    width: 80px;
+    padding: 8px;
+    font-size: 12px;
+  }
 }
 
 .trackContent {

@@ -70,5 +70,3 @@ export const useProjectStore = create<ProjectState>()(
     }
   )
 );
-
-export default useProjectStore;

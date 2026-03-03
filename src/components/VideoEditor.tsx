@@ -30,9 +30,8 @@ import {
   TransactionOutlined,
   DragOutlined
 } from '@ant-design/icons';
-import { invoke } from '@tauri-apps/api/tauri';
-import { open, save } from '@tauri-apps/api/dialog';
-import { convertFileSrc } from '@tauri-apps/api/tauri';
+import { invoke, convertFileSrc } from '@tauri-apps/api/core';
+import { open, save } from '@tauri-apps/plugin-dialog';
 import { ScriptSegment } from '@/types';
 import styles from './VideoEditor.module.less';
 

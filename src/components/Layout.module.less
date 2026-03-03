@@ -20,12 +20,12 @@
   &::-webkit-scrollbar {
     width: 4px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background-color: rgba(0, 0, 0, 0.05);
   }
@@ -43,7 +43,7 @@
   overflow: hidden;
   transition: all 0.3s;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -51,12 +51,12 @@
     left: 15%;
     right: 15%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(24, 144, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.4), transparent);
   }
-  
+
   /* 品牌文字加上渐变 */
   h4 {
-    background: linear-gradient(90deg, @primary-color, @secondary-color);
+    background: linear-gradient(90deg, @primary-color, #8b5cf6);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -69,7 +69,7 @@
 .menu {
   border-right: none;
   padding: @spacing-lg @spacing-sm;
-  
+
   /* 菜单项样式增强 */
   :global {
     .ant-menu-item {
@@ -79,17 +79,17 @@
       line-height: 48px;
       font-weight: @font-weight-normal;
       transition: all 0.3s ease;
-      
+
       &:hover {
-        background-color: rgba(24, 144, 255, 0.05);
+        background-color: rgba(99, 102, 241, 0.08);
         transform: translateX(4px);
       }
-      
+
       &.ant-menu-item-selected {
-        background-color: rgba(24, 144, 255, 0.1);
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.08) 100%);
         font-weight: @font-weight-bold;
-        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
-        
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+
         &::before {
           content: '';
           position: absolute;
@@ -97,16 +97,17 @@
           top: 10px;
           bottom: 10px;
           width: 3px;
-          background: linear-gradient(to bottom, #1890ff, #722ed1);
+          background: linear-gradient(180deg, #6366f1, #8b5cf6);
           border-radius: 0 3px 3px 0;
-          box-shadow: 0 0 8px rgba(24, 144, 255, 0.5);
+          box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
         }
-        
+
         .anticon {
-          color: #1890ff;
+          color: #6366f1;
+          filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
         }
       }
-      
+
       .anticon {
         transition: all 0.3s ease;
         font-size: 18px;
@@ -124,7 +125,7 @@
   margin-left: @layout-sider-width;
   transition: all 0.3s ease;
   background: linear-gradient(135deg, #f8fafc, #f5f7fa);
-  
+
   /* 适应侧边栏折叠状态 */
   .siderCollapsed & {
     margin-left: 80px;
@@ -161,7 +162,7 @@
   z-index: 9;
   margin-left: @layout-sider-width;
   transition: all 0.3s;
-  
+
   /* 适应侧边栏折叠状态 */
   .siderCollapsed & {
     margin-left: 80px;
@@ -174,7 +175,7 @@
   color: @primary-color;
   position: relative;
   padding-left: @spacing-xl;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -192,21 +193,132 @@
   display: flex;
   align-items: center;
   gap: @spacing-sm;
-  
+
   .ant-btn {
     &:hover {
       background-color: rgba(0, 0, 0, 0.03);
       color: @primary-color;
     }
   }
-  
+
   .userButton {
     padding: @spacing-sm @spacing-lg;
     border-radius: @radius-md;
     transition: all 0.3s;
-    
+
     &:hover {
       background-color: rgba(0, 0, 0, 0.03);
+    }
+  }
+}
+
+// ==============================================
+// 科技暗黑模式适配
+// ==============================================
+:global(.dark) {
+  .sider {
+    background: linear-gradient(180deg, @bg-secondary 0%, @bg-primary 100%);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    border-right: 1px solid @border-primary;
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  .logo {
+    border-bottom-color: @border-primary;
+
+    &::after {
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+    }
+
+    h4 {
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+  }
+
+  .menu {
+    :global {
+      .ant-menu-item {
+        color: @text-secondary;
+
+        &:hover {
+          background-color: rgba(99, 102, 241, 0.12);
+          color: @text-primary;
+        }
+
+        &.ant-menu-item-selected {
+          background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.1) 100%);
+          color: @text-primary;
+
+          &::before {
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+          }
+
+          .anticon {
+            color: #a5b4fc;
+            filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+          }
+        }
+
+        .anticon {
+          color: @text-secondary;
+        }
+      }
+    }
+  }
+
+  .content {
+    background: linear-gradient(180deg, @bg-primary 0%, @bg-secondary 100%);
+    background-image:
+      linear-gradient(rgba(99, 102, 241, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .contentWrapper {
+    background: @bg-secondary;
+    border: 1px solid @border-primary;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .header {
+    background: @bg-secondary;
+    border-bottom: 1px solid @border-primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .headerTitle {
+    color: @text-primary;
+
+    &::before {
+      background: linear-gradient(180deg, #6366f1, #8b5cf6);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+  }
+
+  .headerControls {
+    .ant-btn {
+      color: @text-secondary;
+
+      &:hover {
+        background-color: rgba(99, 102, 241, 0.1);
+        color: #6366f1;
+      }
+    }
+
+    .userButton {
+      &:hover {
+        background-color: rgba(99, 102, 241, 0.1);
+      }
     }
   }
 }

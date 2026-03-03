@@ -1,6 +1,6 @@
-import { invoke } from '@tauri-apps/api/tauri';
-import { open, save } from '@tauri-apps/api/dialog';
-import { readTextFile, writeTextFile, exists, createDir } from '@tauri-apps/api/fs';
+import { invoke } from '@tauri-apps/api/core';
+import { open, save } from '@tauri-apps/plugin-dialog';
+import { readTextFile, writeTextFile, exists, mkdir } from '@tauri-apps/plugin-fs';
 import { message } from 'antd';
 import { appConfigDir } from '@tauri-apps/api/path';
 
@@ -68,7 +68,7 @@ export const getConfigDir = async (): Promise<string> => {
     const configDir = await appConfigDir();
     const configExists = await exists(configDir);
     if (!configExists) {
-      await createDir(configDir, { recursive: true });
+      await mkdir(configDir, { recursive: true });
     }
     return configDir;
   } catch (error) {

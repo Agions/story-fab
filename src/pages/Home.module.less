@@ -4,6 +4,14 @@
   margin: 0 auto;
   padding: 32px;
   overflow-x: hidden;
+
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+  }
+
+  @media (max-width: 576px) {
+    padding: 16px 12px;
+  }
 }
 
 .header {
@@ -11,7 +19,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
-  
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
   h2 {
     margin-bottom: 10px;
     font-weight: 700;
@@ -20,13 +34,21 @@
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+
+    @media (max-width: 576px) {
+      font-size: 22px;
+    }
   }
-  
+
   p {
     margin-bottom: 0;
     color: rgba(0, 0, 0, 0.65);
     font-size: 16px;
     line-height: 1.6;
+
+    @media (max-width: 576px) {
+      font-size: 14px;
+    }
   }
 }
 
@@ -36,19 +58,33 @@
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
-  
+
+  @media (max-width: 576px) {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
   &:hover {
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
   }
-  
+
   :global(.ant-card-head) {
     border-bottom: 1px solid #f0f0f0;
     padding: 20px 28px;
     background: linear-gradient(to right, rgba(24, 144, 255, 0.03), rgba(114, 46, 209, 0.03));
+
+    @media (max-width: 576px) {
+      padding: 16px;
+    }
   }
-  
+
   :global(.ant-card-body) {
     padding: 28px;
+
+    @media (max-width: 576px) {
+      padding: 16px;
+    }
   }
 }
 
@@ -1783,5 +1819,471 @@
   
   .welcomeCard, .sectionCard, .featureCard, .workflowCard, .ctaSection {
     border-radius: 8px;
+  }
+}
+
+/* 新科技暗色主题 - 带霓虹光效 */
+:global(.dark) {
+  // 基础背景
+  .container {
+    background-color: transparent;
+  }
+
+  // 头部区域
+  .header {
+    h2 {
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    p {
+      color: #94a3b8;
+    }
+  }
+
+  // 横幅 - 霓虹光效
+  .banner {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15), 0 0 40px rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+
+    &:before {
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0) 70%);
+    }
+
+    &:after {
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 70%);
+    }
+
+    h1 {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  // 标语
+  .slogan {
+    color: #94a3b8;
+  }
+
+  // 项目卡片 - 霓虹光效
+  .projectsCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.1), 0 0 0 1px rgba(99, 102, 241, 0.05);
+
+    &:hover {
+      box-shadow: 0 12px 36px rgba(99, 102, 241, 0.2), 0 0 30px rgba(99, 102, 241, 0.15);
+    }
+
+    :global(.ant-card-head) {
+      border-bottom-color: #2a2a3a;
+      background: linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+      color: #f1f5f9;
+    }
+
+    :global(.ant-card-body) {
+      background-color: #12121a;
+    }
+  }
+
+  // 项目卡片 - 霓虹悬停效果
+  .projectCard {
+    background-color: #1a1a24;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.08);
+
+    &:hover {
+      transform: translateY(-6px);
+      background-color: #1e1e2a;
+      box-shadow: 0 12px 32px rgba(99, 102, 241, 0.2), 0 0 25px rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    :global(.ant-card-actions) {
+      background-color: #12121a;
+      border-top-color: #2a2a3a;
+
+      li {
+        a {
+          color: #94a3b8;
+
+          &:hover {
+            color: #6366f1;
+          }
+        }
+      }
+    }
+
+    :global(.ant-card-cover) {
+      img {
+        // Image styles
+      }
+    }
+  }
+
+  // 项目信息
+  .projectInfo {
+    h5 {
+      color: #f1f5f9;
+    }
+  }
+
+  // 项目日期
+  .projectDate {
+    color: #94a3b8;
+
+    .anticon {
+      color: #6366f1;
+    }
+  }
+
+  // 欢迎卡片 - 霓虹光效
+  .welcomeCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.1);
+
+    .welcomeAvatar {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: #fff;
+    }
+
+    .greeting {
+      color: #94a3b8;
+    }
+
+    .welcomeTitle {
+      color: #f1f5f9;
+    }
+
+    .welcomeText {
+      color: #94a3b8;
+    }
+  }
+
+  // 统计信息
+  .statistics {
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: 8px;
+
+    .statistic {
+      :global(.ant-statistic-title) {
+        color: #94a3b8;
+      }
+
+      :global(.ant-statistic-content) {
+        color: #6366f1;
+        text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+      }
+    }
+  }
+
+  // 区块卡片
+  .sectionCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.08);
+
+    :global(.ant-card-head) {
+      background-color: #1a1a24;
+      border-bottom-color: #2a2a3a;
+      color: #f1f5f9;
+    }
+
+    :global(.ant-card-body) {
+      background-color: #12121a;
+    }
+  }
+
+  // 功能卡片 - 霓虹光效
+  .featureCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+    transition: all 0.3s;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2), 0 0 20px rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    h4 {
+      color: #f1f5f9;
+    }
+
+    p {
+      color: #94a3b8;
+    }
+  }
+
+  // 功能图标 - 霓虹发光
+  .featureIcon {
+    color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  }
+
+  // 工作流程卡片
+  .workflowCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+    }
+
+    h4 {
+      color: #f1f5f9;
+    }
+
+    p {
+      color: #94a3b8;
+    }
+  }
+
+  // 步骤编号 - 霓虹发光
+  .stepNumber {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+
+  // CTA 区域 - 霓虹光效
+  .ctaSection {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+
+    h3 {
+      color: #f1f5f9;
+    }
+
+    .ctaText {
+      color: #94a3b8;
+    }
+  }
+
+  // CTA 按钮 - 霓虹发光
+  .ctaButton {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4), 0 0 20px rgba(99, 102, 241, 0.2);
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.6), 0 0 30px rgba(99, 102, 241, 0.3);
+    }
+  }
+
+  // 主要按钮 - 霓虹光效
+  .primaryButton {
+    background-color: #6366f1;
+    border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+
+    &:hover {
+      background-color: #818cf8;
+      border-color: #818cf8;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5), 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+  }
+
+  // 次要按钮
+  .secondaryButton {
+    border-color: #2a2a3a;
+    color: #94a3b8;
+
+    &:hover {
+      color: #6366f1;
+      border-color: #6366f1;
+      background-color: rgba(99, 102, 241, 0.1);
+    }
+  }
+
+  // 区域标题
+  .sectionTitle {
+    color: #f1f5f9;
+
+    &::after {
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+
+    :global(.anticon) {
+      color: #6366f1;
+      text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+  }
+
+  // 英雄区域
+  .hero {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+
+    .heroTitle {
+      color: #f1f5f9;
+    }
+
+    .heroHighlight {
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .heroDesc {
+      color: #94a3b8;
+    }
+
+    .heroButton {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+
+      &:hover {
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.5), 0 0 20px rgba(99, 102, 241, 0.3);
+      }
+    }
+  }
+
+  // 统计卡片
+  .statsCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+    }
+
+    .statIcon {
+      color: #6366f1;
+      text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+  }
+
+  // 项目封面
+  .projectCover {
+    background: linear-gradient(135deg, #12121a, #1a1a24);
+
+    .defaultCover {
+      color: #2a2a3a;
+    }
+  }
+
+  // 项目元数据
+  .projectMeta {
+    color: #94a3b8;
+  }
+
+  // 模型配置区域 - 霓虹光效
+  .modelConfigArea {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.1);
+  }
+
+  // 模型卡片
+  .modelCard {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+    }
+
+    &.selectedModel {
+      border-color: #a855f7;
+      background-color: rgba(168, 85, 247, 0.1);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+
+      &::after {
+        background-color: #a855f7;
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+      }
+    }
+  }
+
+  // 模型图标 - 霓虹发光
+  .modelIcon {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+  }
+
+  // 模型名称和提供商
+  .modelName {
+    color: #f1f5f9;
+  }
+
+  .modelProvider {
+    color: #94a3b8;
+  }
+
+  .modelDesc {
+    color: #94a3b8;
+  }
+
+  // 特色介绍
+  .modelIntro {
+    color: #94a3b8;
+  }
+
+  // AI 模型选择区域
+  .aiModelSection {
+    background-color: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+
+    h3 {
+      .anticon {
+        color: #a855f7;
+        text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+      }
+    }
+  }
+
+  // 分割线
+  .features {
+    :global(.ant-divider) {
+      color: #f1f5f9;
+
+      :global(.ant-divider-inner-text) {
+        color: #f1f5f9;
+      }
+    }
+  }
+
+  // 底部
+  .footer {
+    color: #94a3b8;
+
+    a {
+      color: #6366f1;
+
+      &:hover {
+        color: #818cf8;
+        text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+      }
+    }
+  }
+
+  // 错误容器
+  .errorContainer {
+    color: #f1f5f9;
+  }
+
+  // 空项目
+  .emptyProjects {
+    color: #94a3b8;
   }
 }

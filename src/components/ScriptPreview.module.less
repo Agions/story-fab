@@ -3,7 +3,14 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: all 0.3s;
-  
+
+  @media (max-width: 576px) {
+    border-radius: 0;
+    box-shadow: none;
+    border-left: none;
+    border-right: none;
+  }
+
   &:hover {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   }

@@ -42,44 +42,42 @@ export interface CostBudget {
   };
 }
 
-// 模型成本配置 (USD per 1K tokens)
+// 模型成本配置 (USD per 1K tokens) - 2026年3月最新
 const MODEL_COSTS: Record<string, { input: number; output: number }> = {
   // OpenAI
-  'gpt-5': { input: 0.005, output: 0.015 },
-  'gpt-5-mini': { input: 0.0005, output: 0.0015 },
+  'gpt-5.3': { input: 0.007, output: 0.021 },
 
   // Anthropic
-  'claude-4-sonnet': { input: 0.003, output: 0.015 },
-  'claude-4-opus': { input: 0.015, output: 0.075 },
+  'claude-4.6': { input: 0.018, output: 0.09 },
 
-  // 百度
-  'ernie-5.0': { input: 0.0012, output: 0.0012 },
-  'ernie-speed': { input: 0.0001, output: 0.0001 },
+  // Google
+  'gemini-3.1-pro': { input: 0.0035, output: 0.0105 },
 
   // 阿里
-  'qwen3.5-max': { input: 0.002, output: 0.006 },
-  'qwen3.5-plus': { input: 0.0008, output: 0.002 },
-  'qwen3.5-turbo': { input: 0.0003, output: 0.0006 },
-
-  // 月之暗面
-  'kimi-k2.5': { input: 0.001, output: 0.003 },
+  'qwen-3.5': { input: 0.004, output: 0.012 },
 
   // 智谱
   'glm-5': { input: 0.001, output: 0.003 },
 
-  // MiniMax
-  'minimax-m2.5': { input: 0.001, output: 0.003 }
+  // 讯飞
+  'spark-x1': { input: 0.003, output: 0.009 },
+
+  // DeepSeek
+  'deepseek-r1': { input: 0.002, output: 0.006 },
+
+  // 月之暗面
+  'kimi-k2.5': { input: 0.003, output: 0.009 },
 };
 
 // 视频生成成本 (USD per minute)
 const VIDEO_COSTS: Record<string, number> = {
-  'vidu': 0.5,
-  'seedance': 0.4,
-  'kling': 0.3,
-  'local': 0 // 本地免费
+  vidu: 0.5,
+  seedance: 0.4,
+  kling: 0.3,
+  local: 0, // 本地免费
 };
 
-class CostService {
+export class CostService {
   private records: CostRecord[] = [];
   private budget: CostBudget = {
     daily: 50,
@@ -88,8 +86,8 @@ class CostService {
     alerts: {
       daily: 80,
       weekly: 80,
-      monthly: 80
-    }
+      monthly: 80,
+    },
   };
   private listeners: Set<(stats: CostStats) => void> = new Set();
 
@@ -104,8 +102,8 @@ class CostService {
     metadata?: Record<string, any>
   ): CostRecord {
     const costConfig = MODEL_COSTS[model] || { input: 0.001, output: 0.003 };
-    const cost = (inputTokens / 1000) * costConfig.input +
-                 (outputTokens / 1000) * costConfig.output;
+    const cost =
+      (inputTokens / 1000) * costConfig.input + (outputTokens / 1000) * costConfig.output;
 
     const record: CostRecord = {
       id: `llm_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
@@ -116,7 +114,7 @@ class CostService {
       outputTokens,
       cost,
       timestamp: new Date().toISOString(),
-      metadata
+      metadata,
     };
 
     this.records.push(record);
@@ -145,7 +143,7 @@ class CostService {
       cost,
       duration: duration * 1000,
       timestamp: new Date().toISOString(),
-      metadata: { ...metadata, resolution }
+      metadata: { ...metadata, resolution },
     };
 
     this.records.push(record);
@@ -171,7 +169,7 @@ class CostService {
       thisMonth: 0,
       byType: {},
       byProvider: {},
-      byModel: {}
+      byModel: {},
     };
 
     for (const record of this.records) {
@@ -246,29 +244,29 @@ class CostService {
       simple: [
         { model: 'qwen3.5-turbo', provider: 'alibaba', cost: 0.0003 },
         { model: 'ernie-speed', provider: 'baidu', cost: 0.0001 },
-        { model: 'kimi-k2.5', provider: 'moonshot', cost: 0.001 }
+        { model: 'kimi-k2.5', provider: 'moonshot', cost: 0.001 },
       ],
       standard: [
         { model: 'qwen3.5-plus', provider: 'alibaba', cost: 0.0008 },
         { model: 'kimi-k2.5', provider: 'moonshot', cost: 0.001 },
-        { model: 'glm-5', provider: 'zhipu', cost: 0.001 }
+        { model: 'glm-5', provider: 'zhipu', cost: 0.001 },
       ],
       complex: [
         { model: 'qwen3.5-max', provider: 'alibaba', cost: 0.002 },
-        { model: 'gpt-5', provider: 'openai', cost: 0.005 },
-        { model: 'claude-4-sonnet', provider: 'anthropic', cost: 0.003 }
+        { model: 'gpt-5.3', provider: 'openai', cost: 0.007 },
+        { model: 'claude-4.6', provider: 'anthropic', cost: 0.018 },
       ],
       creative: [
         { model: 'kimi-k2.5', provider: 'moonshot', cost: 0.001 },
-        { model: 'claude-4-sonnet', provider: 'anthropic', cost: 0.003 },
-        { model: 'gpt-5', provider: 'openai', cost: 0.005 }
-      ]
+        { model: 'claude-4.6', provider: 'anthropic', cost: 0.018 },
+        { model: 'gpt-5.3', provider: 'openai', cost: 0.007 },
+      ],
     };
 
     const options = suggestions[taskComplexity] || suggestions.standard;
 
     if (budgetConstraint === 'low') {
-      const cheapest = options.reduce((min, curr) => curr.cost < min.cost ? curr : min);
+      const cheapest = options.reduce((min, curr) => (curr.cost < min.cost ? curr : min));
       return { ...cheapest, estimatedCost: cheapest.cost };
     }
 
@@ -298,18 +296,22 @@ class CostService {
 
     // LLM 成本占比过高
     if (llmCost / totalCost > 0.6) {
-      suggestions.push('💡 LLM 成本占比超过 60%，建议：\n' +
+      suggestions.push(
+        '💡 LLM 成本占比超过 60%，建议：\n' +
         '  - 启用响应缓存\n' +
         '  - 使用模型分级策略（简单任务用 Turbo 模型）\n' +
-        '  - 压缩提示词长度');
+        '  - 压缩提示词长度'
+      );
     }
 
     // 视频成本占比过高
     if (videoCost / totalCost > 0.3) {
-      suggestions.push('💡 视频生成成本较高，建议：\n' +
+      suggestions.push(
+        '💡 视频生成成本较高，建议：\n' +
         '  - 使用智能参数选择\n' +
         '  - 优先使用本地生成\n' +
-        '  - 降低分辨率和帧率');
+        '  - 降低分辨率和帧率'
+      );
     }
 
     // 检查高成本模型使用
@@ -347,13 +349,19 @@ class CostService {
 ## 成本分布
 
 ### 按类型
-${Object.entries(stats.byType).map(([type, cost]) => `- ${type}: $${cost.toFixed(2)}`).join('\n')}
+${Object.entries(stats.byType)
+        .map(([type, cost]) => `- ${type}: $${cost.toFixed(2)}`)
+        .join('\n')}
 
 ### 按提供商
-${Object.entries(stats.byProvider).map(([provider, cost]) => `- ${provider}: $${cost.toFixed(2)}`).join('\n')}
+${Object.entries(stats.byProvider)
+        .map(([provider, cost]) => `- ${provider}: $${cost.toFixed(2)}`)
+        .join('\n')}
 
 ### 按模型
-${Object.entries(stats.byModel).map(([model, cost]) => `- ${model}: $${cost.toFixed(2)}`).join('\n')}
+${Object.entries(stats.byModel)
+        .map(([model, cost]) => `- ${model}: $${cost.toFixed(2)}`)
+        .join('\n')}
 
 ## 优化建议
 
@@ -426,6 +434,3 @@ ${suggestions.join('\n\n')}
 // 导出单例
 export const costService = new CostService();
 export default CostService;
-
-// 导出类型
-export type { CostRecord, CostStats, CostBudget };

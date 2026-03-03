@@ -88,7 +88,7 @@ export interface WorkflowResult {
   };
 }
 
-class PipelineService {
+export class PipelineService {
   private config: PipelineConfig;
   private state: PipelineState;
   private listeners: Set<WorkflowListener> = new Set();
@@ -351,5 +351,5 @@ class PipelineService {
 }
 
 // 导出单例
-export const pipelineServiceService = new PipelineService();
-export default pipelineServiceService;
+export const pipelineService = new PipelineService();
+export default pipelineService;

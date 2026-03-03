@@ -2,6 +2,34 @@
   border-radius: 6px;
   transition: all 0.2s ease;
 
+  // 移动端触摸友好尺寸
+  @media (max-width: 576px) {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 16px;
+
+    &.small {
+      min-height: 36px;
+      min-width: 36px;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    &.medium {
+      min-height: 44px;
+      min-width: 44px;
+      padding: 10px 16px;
+      font-size: 14px;
+    }
+
+    &.large {
+      min-height: 48px;
+      min-width: 48px;
+      padding: 12px 20px;
+      font-size: 15px;
+    }
+  }
+
   &.small {
     padding: 4px 12px;
     font-size: 12px;

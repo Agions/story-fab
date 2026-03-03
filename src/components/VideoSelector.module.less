@@ -2,6 +2,10 @@
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
+
+  @media (max-width: 576px) {
+    border-radius: 0;
+  }
 }
 
 .uploadArea {
@@ -15,18 +19,29 @@
   cursor: pointer;
   padding: 32px;
   transition: all 0.3s;
-  
+
+  @media (max-width: 576px) {
+    padding: 24px 16px;
+    min-height: 160px;
+  }
+
   &:hover {
     border-color: #1890ff;
     background-color: #f0f7ff;
   }
-  
+
   p {
     margin: 0;
+
     &.uploadTip {
       font-size: 12px;
       color: rgba(0, 0, 0, 0.45);
       margin-top: 8px;
+
+      @media (max-width: 576px) {
+        font-size: 11px;
+        text-align: center;
+      }
     }
   }
 }
@@ -36,7 +51,12 @@
   color: #d9d9d9;
   margin-bottom: 16px;
   transition: all 0.3s;
-  
+
+  @media (max-width: 576px) {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+
   .uploadArea:hover & {
     color: #1890ff;
   }
@@ -47,6 +67,10 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  @media (max-width: 576px) {
+    gap: 12px;
+  }
 }
 
 .videoPreview {

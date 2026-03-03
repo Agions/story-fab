@@ -57,7 +57,7 @@ const ApiKeysPanel: React.FC<ApiKeysPanelProps> = ({ apiKeys, onUpdateKey, onDel
     });
   };
 
-  const providers: ModelProvider[] = ['openai', 'anthropic', 'deepseek', 'baidu', 'alibaba', 'iflytek', 'zhipu', 'moonshot'];
+  const providers: ModelProvider[] = ['openai', 'anthropic', 'google', 'deepseek', 'alibaba', 'zhipu', 'moonshot'];
 
   return (
     <Card title="API 密钥管理" extra={<Tag color="blue">安全存储</Tag>}>

@@ -1,4 +1,4 @@
-import { readTextFile, writeTextFile, exists } from '@tauri-apps/api/fs';
+import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { message } from 'antd';
 import { getConfigDir } from './fileOperations';
 

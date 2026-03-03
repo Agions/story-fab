@@ -1,16 +1,15 @@
 {
   "name": "clip-flow",
   "private": true,
-  "version": "2.0.0",
+  "version": "1.0.0-beta",
   "description": "ClipFlow (电影工坊) - AI-powered video content creation platform for filmmakers and content creators",
-  "author": "Agions <agions@example.com>",
+  "author": "Agions <agions@qq.com>",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:prod": "vite build --mode production",
-    "build:analyze": "vite build --analyze",
     "preview": "vite preview",
     "tauri": "tauri",
     "type-check": "tsc --noEmit",
@@ -19,11 +18,17 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,less}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,less}\"",
     "clean": "rm -rf dist",
-    "analyze": "vite build --analyze"
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
-    "@tauri-apps/api": "^1.6.0",
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-fs": "^2.0.0",
+    "@tauri-apps/plugin-shell": "^2.0.0",
     "@types/styled-components": "^5.1.36",
     "antd": "^5.29.3",
     "axios": "^1.13.5",
@@ -39,7 +44,9 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.6.0",
+    "@tauri-apps/cli": "^2.0.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/node": "^22.13.10",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
@@ -55,11 +62,13 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "husky": "^9.1.7",
+    "jsdom": "^26.0.0",
     "less": "^4.2.2",
     "terser": "^5.46.0",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.1",
     "typescript": "^5.7.3",
-    "vite": "^6.2.1"
+    "vite": "^6.2.1",
+    "vitest": "^2.1.8"
   }
 }

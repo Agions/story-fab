@@ -340,7 +340,7 @@ class VideoService {
   private async executeFFmpeg(command: string): Promise<{ success: boolean; output: string }> {
     // 尝试 Tauri 环境
     try {
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke<string>('execute_ffmpeg', { command });
       return { success: true, output: result };
     } catch {

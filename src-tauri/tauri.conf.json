@@ -1,79 +1,52 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "productName": "ClipFlow",
+  "version": "1.0.0-beta",
+  "identifier": "com.clipflow.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
   },
-  "package": {
-    "productName": "ClipFlow",
-    "version": "2.0.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "fs": {
-        "all": true,
-        "readFile": true,
-        "writeFile": true,
-        "readDir": true,
-        "exists": true,
-        "createDir": true,
-        "scope": [
-          "$APPDATA/*",
-          "$APPDATA/ClipFlow/*",
-          "$APPCONFIG/*",
-          "$TEMP/*",
-          "$RESOURCE/*"
-        ]
-      },
-      "path": {
-        "all": true
-      },
-      "clipboard": {
-        "all": true
-      },
-      "dialog": {
-        "all": true
-      },
-      "window": {
-        "all": true
-      },
-      "shell": {
-        "open": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "category": "DeveloperTool",
-      "targets": [],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "com.clipflow.app",
-      "windows": {
-        "digestAlgorithm": "sha256"
-      }
-    },
-    "security": {
-      "csp": null
-    },
+  "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "ClipFlow - AI 视频创作平台",
         "width": 1200,
         "height": 800,
-        "minWidth": 800,
-        "minHeight": 600,
         "center": true,
-        "fullscreen": false,
-        "resizable": true,
-        "theme": "Light"
+        "label": "main"
       }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "resources": {
+      "../dist": "dist"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "dialog": {},
+    "fs": {
+      "scope": {
+        "allow": ["$APP/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$HOME/**", "**"]
+      }
+    },
+    "shell": {
+      "open": true
+    }
   }
 }

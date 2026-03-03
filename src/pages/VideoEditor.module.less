@@ -1,3 +1,5 @@
+@import '../styles/variables.less';
+
 .editorLayout {
   height: 100%;
   background-color: #f5f7fa;
@@ -12,10 +14,11 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 24px;
-  padding: 16px;
+  padding: 12px 16px;
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 
   .leftTools, .rightTools {
     display: flex;
@@ -26,29 +29,33 @@
 // 卡片样式
 .playerCard {
   margin-bottom: 16px;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
   .playerWrapper {
     position: relative;
     width: 100%;
     height: 480px;
     background-color: #000;
-    
+    border-radius: 8px;
+    overflow: hidden;
+
     .videoPlayer {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
   }
-  
+
   .emptyPlayer {
     height: 480px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #f5f5f5;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf6 100%);
+    border-radius: 8px;
   }
 }
 
@@ -58,18 +65,20 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 8px 16px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
   color: white;
-  
+
   .timeDisplay {
     color: white;
     min-width: 100px;
+    font-family: @font-family-code;
+    font-size: 13px;
   }
-  
+
   .progressBar {
     flex: 1;
   }
@@ -78,76 +87,94 @@
 // 时间轴
 .timelineContainer {
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
   .timeline {
     position: relative;
     height: 44px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
+    background: linear-gradient(180deg, #f0f2f5 0%, #e8eaed 100%);
+    border-radius: 6px;
     overflow: hidden;
-    
+
     .timelineSegment {
       position: absolute;
       height: 100%;
       top: 0;
-      background-color: #1E88E5;
-      opacity: 0.7;
+      background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+      opacity: 0.8;
       border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      
-      &.selected {
-        background-color: #FF5252;
-        opacity: 0.8;
-        z-index: 2;
+      transition: all 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+        box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
       }
-      
+
+      &.selected {
+        background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
+        opacity: 0.9;
+        z-index: 2;
+        box-shadow: 0 0 15px rgba(244, 63, 94, 0.5);
+      }
+
       .segmentLabel {
         color: white;
-        font-weight: bold;
+        font-weight: 600;
+        font-size: 12px;
       }
-      
+
       .segmentHandle {
         position: absolute;
         width: 8px;
         height: 100%;
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: rgba(255, 255, 255, 0.4);
         cursor: col-resize;
-        
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.7);
+        }
+
         &:first-child {
           left: 0;
+          border-radius: 4px 0 0 4px;
         }
-        
+
         &:last-child {
           right: 0;
+          border-radius: 0 4px 4px 0;
         }
       }
     }
-    
+
     .playhead {
       position: absolute;
       top: 0;
       height: 100%;
       width: 2px;
-      background-color: #FF5252;
+      background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
       z-index: 3;
       pointer-events: none;
-      
+      box-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
+
       &::before {
         content: '';
         position: absolute;
-        top: -5px;
+        top: -4px;
         left: -4px;
         width: 10px;
         height: 10px;
-        background-color: #FF5252;
+        background: #f43f5e;
         border-radius: 50%;
+        box-shadow: 0 0 10px rgba(244, 63, 94, 0.8);
       }
     }
   }
@@ -156,39 +183,42 @@
 // 片段列表
 .segmentList {
   padding: 16px 0;
-  
+
   .segmentCard {
-    margin-bottom: 16px;
-    border-radius: 8px;
+    margin-bottom: 12px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.3s;
-    
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: rgba(99, 102, 241, 0.3);
     }
-    
+
     &.selected {
-      border-color: #FF5252;
+      border-color: #f43f5e;
       border-width: 2px;
+      background: rgba(244, 63, 94, 0.05);
     }
-    
+
     .segmentHeader {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
     }
-    
+
     .segmentTime {
       margin-bottom: 8px;
     }
-    
+
     .segmentContent {
       color: #666;
     }
   }
-  
+
   .addSegmentButton {
     margin-top: 16px;
   }
@@ -197,18 +227,26 @@
 // 关键帧
 .keyframesContainer {
   padding: 16px 0;
-  
+
   .keyframeList {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px;
+    gap: 12px;
     margin-top: 16px;
-    
+
     .keyframeItem {
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 6px;
       overflow: hidden;
-      
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: rgba(99, 102, 241, 0.4);
+      }
+
       .keyframeImage {
         width: 100%;
         height: auto;
@@ -221,16 +259,17 @@
 // 设置面板
 .settingsPanel {
   padding: 16px 0;
-  
+
   .settingCard {
-    border-radius: 8px;
-    
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
     .settingItem {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
-      
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -241,13 +280,170 @@
 // 编辑器标签页
 .editorTabs {
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 // 节标题
 .sectionTitle {
   margin-bottom: 16px !important;
-  border-left: 3px solid #1E88E5;
-  padding-left: 8px;
-} 
+  border-left: 3px solid #6366f1;
+  padding-left: 10px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+// AI 剪辑面板
+.aiClipPanel {
+  padding: 8px 0;
+}
+
+// 效果面板
+.effectsPanel {
+  padding: 8px 0;
+}
+
+// ==============================================
+// 科技暗黑模式适配
+// ==============================================
+:global(.dark) {
+  .editorLayout {
+    background-color: @bg-primary;
+  }
+
+  .editorContent {
+    background-color: @bg-primary;
+  }
+
+  // 工具栏 - 霓虹发光边框
+  .toolbar {
+    background-color: @bg-secondary;
+    border: 1px solid @border-primary;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+  }
+
+  // 播放器卡片
+  .playerCard {
+    background-color: @bg-secondary;
+    border: 1px solid @border-primary;
+
+    :global(.ant-card-head) {
+      border-bottom-color: @border-primary;
+    }
+
+    :global(.ant-card-head-title) {
+      color: @text-primary;
+    }
+
+    .emptyPlayer {
+      background: linear-gradient(135deg, @bg-tertiary 0%, @bg-secondary 100%);
+    }
+  }
+
+  // 播放器控制
+  .playerControls {
+    background: linear-gradient(to top, rgba(10, 10, 15, 0.95) 0%, rgba(10, 10, 15, 0.8) 100%);
+    border-top: 1px solid rgba(99, 102, 241, 0.2);
+  }
+
+  // 时间轴
+  .timelineContainer {
+    background-color: @bg-secondary;
+    border: 1px solid @border-primary;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    .timeline {
+      background: linear-gradient(180deg, @bg-tertiary 0%, @bg-elevated 100%);
+
+      .timelineSegment {
+        background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+
+        &.selected {
+          background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
+        }
+      }
+    }
+  }
+
+  // 片段列表
+  .segmentList {
+    .segmentCard {
+      background-color: @bg-tertiary;
+      border: 1px solid @border-primary;
+
+      &:hover {
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+      }
+
+      &.selected {
+        border-color: #f43f5e;
+        background: rgba(244, 63, 94, 0.1);
+        box-shadow: 0 0 15px rgba(244, 63, 94, 0.2);
+      }
+    }
+  }
+
+  // 关键帧
+  .keyframesContainer {
+    .keyframeList {
+      .keyframeItem {
+        border-color: @border-primary;
+
+        &:hover {
+          border-color: rgba(99, 102, 241, 0.5);
+          box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+      }
+    }
+  }
+
+  // 设置面板
+  .settingsPanel {
+    .settingCard {
+      background-color: @bg-tertiary;
+      border: 1px solid @border-primary;
+    }
+  }
+
+  // 编辑器标签页
+  .editorTabs {
+    background-color: @bg-secondary;
+    border: 1px solid @border-primary;
+
+    :global(.ant-tabs-nav) {
+      &::before {
+        border-bottom-color: @border-primary;
+      }
+    }
+
+    :global(.ant-tabs-tab) {
+      color: @text-secondary;
+
+      &:hover {
+        color: #6366f1;
+      }
+
+      &.ant-tabs-tab-active {
+        .ant-tabs-tab-btn {
+          color: #6366f1;
+        }
+      }
+    }
+
+    :global(.ant-tabs-ink-bar) {
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    }
+  }
+
+  // 节标题
+  .sectionTitle {
+    color: @text-primary;
+    border-left-color: #6366f1;
+  }
+}

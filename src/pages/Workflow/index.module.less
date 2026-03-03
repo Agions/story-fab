@@ -1,3 +1,18 @@
+// Dark theme color variables
+@bg-primary: #0a0a0f;
+@bg-secondary: #12121a;
+@bg-tertiary: #1a1a24;
+@primary-color: #6366f1;
+@border-primary: #2a2a3a;
+@text-primary: #f1f5f9;
+@text-secondary: #94a3b8;
+
+// Neon glow effects
+@neon-primary: 0 0 10px rgba(99, 102, 241, 0.5), 0 0 20px rgba(99, 102, 241, 0.3);
+@neon-success: 0 0 10px rgba(82, 196, 26, 0.5), 0 0 20px rgba(82, 196, 26, 0.3);
+@neon-warning: 0 0 10px rgba(250, 173, 20, 0.5), 0 0 20px rgba(250, 173, 20, 0.3);
+@neon-error: 0 0 10px rgba(245, 34, 45, 0.5), 0 0 20px rgba(245, 34, 45, 0.3);
+
 .workflowPage {
   padding: 24px;
   max-width: 1400px;
@@ -198,6 +213,278 @@
 
     .uniquenessAlert {
       margin-top: 16px;
+    }
+  }
+
+  // Dark mode styles
+  :global(.dark) & {
+    background: @bg-primary;
+    color: @text-primary;
+
+    .stepsCard {
+      :global {
+        .ant-steps-item-title,
+        .ant-steps-item-description {
+          color: @text-secondary !important;
+        }
+
+        .ant-steps-item-icon {
+          background: @bg-tertiary !important;
+          border-color: @border-primary !important;
+        }
+
+        .ant-steps-item-process .ant-steps-item-icon {
+          background: @primary-color !important;
+          border-color: @primary-color !important;
+          box-shadow: @neon-primary;
+        }
+
+        .ant-steps-item-finish .ant-steps-item-icon {
+          border-color: #52c41a !important;
+
+          .ant-steps-icon {
+            color: #52c41a !important;
+          }
+        }
+
+        .ant-steps-item-process .ant-steps-item-title,
+        .ant-steps-item-process .ant-steps-item-description {
+          color: @text-primary !important;
+        }
+
+        .ant-steps-tail::after {
+          background: @border-primary !important;
+        }
+      }
+    }
+
+    .stepCard {
+      background: @bg-secondary;
+      border: 1px solid @border-primary;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+
+      :global {
+        .ant-card-head {
+          border-bottom-color: @border-primary;
+
+          .ant-card-head-title {
+            color: @text-primary;
+          }
+        }
+
+        .ant-card-body {
+          color: @text-secondary;
+        }
+      }
+    }
+
+    .progressCard,
+    .actionCard,
+    .errorAlert {
+      :global {
+        .ant-card {
+          background: @bg-secondary;
+          border-color: @border-primary;
+        }
+
+        .ant-progress-text {
+          color: @text-primary !important;
+        }
+
+        .ant-progress-inner {
+          background: @bg-tertiary !important;
+        }
+      }
+    }
+
+    .templateCard {
+      background: @bg-tertiary;
+      border: 1px solid @border-primary;
+
+      &:hover {
+        box-shadow: @neon-primary;
+        border-color: @primary-color;
+      }
+
+      &.selected {
+        border: 2px solid @primary-color;
+        background: rgba(99, 102, 241, 0.1);
+        box-shadow: @neon-primary;
+      }
+
+      .tag {
+        background: @bg-secondary;
+        color: @text-secondary;
+      }
+
+      .recommendedBadge {
+        background: linear-gradient(135deg, @primary-color, #818cf8);
+        box-shadow: @neon-primary;
+      }
+    }
+
+    .paramItem {
+      > span {
+        color: @text-secondary;
+      }
+
+      :global {
+        .ant-input,
+        .ant-input-number,
+        .ant-select-selector {
+          background: @bg-tertiary !important;
+          border-color: @border-primary !important;
+          color: @text-primary !important;
+        }
+
+        .ant-input::placeholder {
+          color: @text-secondary !important;
+        }
+
+        .ant-input:hover,
+        .ant-input:focus,
+        .ant-input-number:hover,
+        .ant-input-number:focus,
+        .ant-select-selector:hover {
+          border-color: @primary-color !important;
+          box-shadow: @neon-primary;
+        }
+      }
+    }
+
+    .previewArea {
+      .previewVideo {
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), @neon-primary;
+      }
+
+      .previewInfo {
+        background: rgba(82, 196, 26, 0.1);
+        border-color: #52c41a;
+        color: @text-primary;
+      }
+    }
+
+    .analysisResult {
+      .analysisSummary {
+        background: rgba(82, 196, 26, 0.1);
+        border-color: #52c41a;
+        color: @text-primary;
+      }
+    }
+
+    .dedupResult {
+      .scoreDisplay {
+        .scoreHigh {
+          color: #52c41a;
+          text-shadow: @neon-success;
+        }
+
+        .scoreMedium {
+          color: #faad14;
+          text-shadow: @neon-warning;
+        }
+
+        .scoreLow {
+          color: #f5222d;
+          text-shadow: @neon-error;
+        }
+      }
+
+      .suggestionList {
+        background: rgba(250, 173, 20, 0.1);
+        border-color: #faad14;
+        color: @text-primary;
+
+        ul li {
+          color: @text-secondary;
+        }
+      }
+
+      :global {
+        .ant-alert-warning {
+          background: rgba(250, 173, 20, 0.1);
+          border-color: #faad14;
+
+          .ant-alert-message {
+            color: @text-primary;
+          }
+        }
+      }
+    }
+
+    .uniquenessReport {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: @primary-color;
+
+      .uniquenessStatus {
+        .unique {
+          color: #52c41a;
+          text-shadow: @neon-success;
+        }
+
+        .notUnique {
+          color: #f5222d;
+          text-shadow: @neon-error;
+        }
+      }
+
+      .similarityScore {
+        color: @text-secondary;
+      }
+
+      :global {
+        .ant-alert-error {
+          background: rgba(245, 34, 45, 0.1);
+          border-color: #f5222d;
+
+          .ant-alert-message {
+            color: @text-primary;
+          }
+        }
+
+        .ant-alert-success {
+          background: rgba(82, 196, 26, 0.1);
+          border-color: #52c41a;
+
+          .ant-alert-message {
+            color: @text-primary;
+          }
+        }
+      }
+    }
+
+    .loadingArea {
+      :global {
+        .ant-spin-text {
+          color: @text-secondary;
+        }
+      }
+    }
+
+    :global {
+      .ant-btn-primary {
+        background: linear-gradient(135deg, @primary-color, #818cf8);
+        border-color: @primary-color;
+        box-shadow: @neon-primary;
+
+        &:hover {
+          background: linear-gradient(135deg, #818cf8, #a5b4fc);
+          box-shadow: 0 0 15px rgba(99, 102, 241, 0.6), 0 0 30px rgba(99, 102, 241, 0.4);
+        }
+      }
+
+      .ant-btn-default {
+        background: @bg-tertiary;
+        border-color: @border-primary;
+        color: @text-primary;
+
+        &:hover {
+          border-color: @primary-color;
+          color: @primary-color;
+          box-shadow: @neon-primary;
+        }
+      }
     }
   }
 }

@@ -45,3 +45,31 @@ coverage/
 *.tgz
 .cache
 .parcel-cache/
+
+# Editor directories and files
+.DS_Store
+*.sublime-*
+
+# Temporary files
+*.temp
+*.tmp
+tmp/
+temp/
+
+# Video/Audio cache
+*.mp4.part
+*.avi.part
+*.mov.part
+audio_cache/
+video_cache/
+
+# AI Model cache
+models/
+model_cache/
+*.gguf
+*.safetensors
+
+# Debug
+*.map
+*.stack
+

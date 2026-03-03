@@ -2,8 +2,8 @@
  * Tauri工具函数
  * 提供与Tauri API相关的工具函数
  */
-import { readTextFile, writeTextFile, exists } from '@tauri-apps/api/fs';
-import { open } from '@tauri-apps/api/dialog';
+import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
+import { open } from '@tauri-apps/plugin-dialog';
 
 /**
  * 选择文件

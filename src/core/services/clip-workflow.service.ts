@@ -81,7 +81,7 @@ const DEFAULT_CONFIG: ClipConfig = {
   resolution: '1080p',
 };
 
-class ClipWorkflowService {
+export class ClipWorkflowService {
   private config: ClipConfig;
 
   constructor(config: Partial<ClipConfig> = {}) {

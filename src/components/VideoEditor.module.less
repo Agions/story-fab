@@ -3,6 +3,11 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  overflow-x: hidden;
+
+  @media (max-width: 576px) {
+    gap: 12px;
+  }
 }
 
 .videoContainer {
@@ -12,6 +17,10 @@
   border-radius: 8px;
   overflow: hidden;
   aspect-ratio: 16/9;
+
+  @media (max-width: 576px) {
+    border-radius: 0;
+  }
 }
 
 .videoPlayer {
@@ -28,6 +37,13 @@
   border-radius: 8px;
   padding: 10px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 576px) {
+    height: 70px;
+    padding: 8px;
+    border-radius: 0;
+  }
 }
 
 .segmentMarker {
@@ -89,6 +105,13 @@
   gap: 10px;
   align-items: center;
   margin-top: 10px;
+
+  @media (max-width: 576px) {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
 }
 
 .sliderContainer {
@@ -101,6 +124,12 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 20px;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+  }
 }
 
 .emptyEditor {
@@ -110,6 +139,10 @@
   justify-content: center;
   padding: 50px 20px;
   text-align: center;
+
+  @media (max-width: 576px) {
+    padding: 32px 16px;
+  }
 }
 
 .segmentDetails {

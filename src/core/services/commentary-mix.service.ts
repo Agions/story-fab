@@ -80,7 +80,7 @@ const DEFAULT_CONFIG: MixConfig = {
   aspectRatio: '16:9',
 };
 
-class CommentaryMixService {
+export class CommentaryMixService {
   private config: MixConfig;
 
   constructor(config: Partial<MixConfig> = {}) {

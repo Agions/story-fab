@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, Row, Col, Select, Slider, InputNumber, Switch, Button, Tooltip, Space, Collapse, Tag, message, Progress, Popconfirm } from 'antd';
 import { PlusOutlined, DeleteOutlined, PlayCircleOutlined, ScissorOutlined, SaveOutlined, SoundOutlined, TransactionOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import styles from './VideoProcessingController.module.less';
 
 const { Option } = Select;

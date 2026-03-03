@@ -1,3 +1,12 @@
+// Dark theme colors
+@bg-primary: #0a0a0f;
+@bg-secondary: #12121a;
+@bg-tertiary: #1a1a24;
+@primary-color: #6366f1;
+@border-primary: #2a2a3a;
+@text-primary: #f1f5f9;
+@text-secondary: #94a3b8;
+
 .container {
   padding: 20px;
 }
@@ -18,7 +27,7 @@
 .projectCard {
   margin-bottom: 16px;
   transition: all 0.3s;
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -40,4 +49,43 @@
 
 .cardInfo {
   margin-bottom: 8px;
-} 
+}
+
+// Dark mode styles with neon glow effects
+:global(.dark) {
+  .container {
+    background-color: @bg-primary;
+  }
+
+  .header {
+    h2 {
+      color: @text-primary;
+    }
+  }
+
+  .projectCard {
+    background-color: @bg-secondary;
+    border: 1px solid @border-primary;
+
+    &:hover {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4),
+                  0 4px 12px rgba(0, 0, 0, 0.3);
+      border-color: @primary-color;
+    }
+  }
+
+  .cardCover {
+    background-color: @bg-tertiary;
+  }
+
+  .cardIcon {
+    color: @primary-color;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.8),
+                 0 0 20px rgba(99, 102, 241, 0.5),
+                 0 0 30px rgba(99, 102, 241, 0.3);
+  }
+
+  .cardInfo {
+    color: @text-secondary;
+  }
+}

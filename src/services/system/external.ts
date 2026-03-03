@@ -1,4 +1,4 @@
-import { open as openExternal } from '@tauri-apps/api/shell';
+import { open as openExternal } from '@tauri-apps/plugin-shell';
 import { message } from 'antd';
 
 /**
@@ -45,7 +45,7 @@ export const openExternalUrl = async (url: string): Promise<boolean> => {
  */
 export const checkFFmpeg = async (): Promise<{ installed: boolean; version?: string }> => {
   try {
-    const { invoke } = await import('@tauri-apps/api/tauri');
+    const { invoke } = await import('@tauri-apps/api/core');
     const result = await invoke<{ installed: boolean; version?: string }>('check_ffmpeg');
     return result;
   } catch (error) {

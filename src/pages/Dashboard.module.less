@@ -1,7 +1,7 @@
 @import '../styles/variables.less';
 
 .dashboardContainer {
-  max-width: 1320px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 32px 24px;
   background: linear-gradient(to bottom, rgba(240, 245, 255, 0.5), rgba(255, 255, 255, 0.8));
@@ -13,6 +13,12 @@
     padding: 20px 16px;
     border-radius: 8px;
   }
+
+  @media (max-width: 576px) {
+    padding: 16px 12px;
+    border-radius: 0;
+    box-shadow: none;
+  }
 }
 
 .dashboardHeader {
@@ -22,20 +28,20 @@
   margin-bottom: 32px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  
+
   h2 {
     margin-bottom: 6px;
     font-size: 28px;
-    background: linear-gradient(90deg, @primary-color, #4096ff);
+    background: linear-gradient(90deg, @primary-color, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 0.5px;
   }
-  
+
   @media (max-width: 576px) {
     flex-direction: column;
     align-items: flex-start;
-    
+
     .newProjectButton {
       margin-top: 16px;
       align-self: flex-start;
@@ -46,37 +52,73 @@
 
 .statsRow {
   margin-bottom: 32px;
-  
+
+  // 移动端响应式网格
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  @media (max-width: 991px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 575px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
   :global(.ant-card) {
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
+    @media (max-width: 576px) {
+      border-radius: 8px;
+      margin-bottom: 0;
+    }
+
     &:hover {
       transform: translateY(-4px);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      border-color: rgba(99, 102, 241, 0.3);
     }
   }
-  
+
   .statistic {
     :global(.ant-statistic-title) {
       font-size: 15px;
       margin-bottom: 10px;
       font-weight: 500;
       color: rgba(0, 0, 0, 0.65);
+
+      @media (max-width: 576px) {
+        font-size: 13px;
+      }
     }
-    
+
     :global(.ant-statistic-content) {
-      background: linear-gradient(90deg, @primary-color, #4096ff);
+      background: linear-gradient(90deg, @primary-color, #8b5cf6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       font-size: 28px;
       font-weight: 600;
-      
+
+      @media (max-width: 576px) {
+        font-size: 24px;
+      }
+
       .anticon {
         margin-right: 10px;
         font-size: 22px;
+
+        @media (max-width: 576px) {
+          font-size: 18px;
+          margin-right: 6px;
+        }
       }
     }
   }
@@ -87,11 +129,11 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-  
+
   @media (max-width: 576px) {
     flex-direction: column;
     align-items: flex-start;
-    
+
     :global(.ant-segmented) {
       margin-top: 12px;
     }
@@ -100,6 +142,22 @@
 
 .projectGrid {
   margin-bottom: 32px;
+
+  // 移动端响应式项目卡片网格
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+
+  @media (max-width: 991px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 575px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
 }
 
 .projectCard {
@@ -107,21 +165,45 @@
   border-radius: 12px;
   overflow: hidden;
   height: 100%;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  
+
+  @media (max-width: 576px) {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+
+    @media (max-width: 576px) {
+      transform: translateY(-2px);
+    }
   }
-  
+
   :global(.ant-card-body) {
     padding: 16px;
+
+    @media (max-width: 576px) {
+      padding: 12px;
+    }
   }
-  
+
   :global(.ant-card-actions) {
     background-color: rgba(0, 0, 0, 0.02);
     border-top: 1px solid rgba(0, 0, 0, 0.04);
+
+    @media (max-width: 576px) {
+      padding: 8px 0;
+    }
+
+    li {
+      @media (max-width: 576px) {
+        margin: 4px 0;
+      }
+    }
   }
 }
 
@@ -131,7 +213,7 @@
   height: 0;
   padding-top: 56.25%; // 16:9 ratio
   cursor: pointer;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -144,12 +226,12 @@
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  
+
   &:hover {
     .thumbnail {
       transform: scale(1.08);
     }
-    
+
     &::before {
       opacity: 1;
     }
@@ -170,18 +252,19 @@
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12px;
+  font-weight: 500;
 }
 
 .starButton {
   position: absolute;
   top: 8px;
   right: 8px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   width: 28px;
   height: 28px;
@@ -189,11 +272,11 @@
   align-items: center;
   justify-content: center;
   border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: all 0.2s;
-  
+
   &:hover {
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: #fff;
     transform: scale(1.1);
   }
 }
@@ -204,7 +287,7 @@
   text-overflow: ellipsis;
   max-width: 100%;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 15px;
   color: rgba(0, 0, 0, 0.85);
   margin-bottom: 6px;
 }
@@ -220,16 +303,16 @@
   :global(.ant-tag) {
     margin-right: 6px;
     margin-bottom: 4px;
-    font-size: 12px;
-    padding: 1px 8px;
-    border-radius: 12px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
     border: none;
-    background: rgba(24, 144, 255, 0.1);
+    background: rgba(99, 102, 241, 0.1);
     color: @primary-color;
     transition: all 0.2s ease;
-    
+
     &:hover {
-      background: rgba(24, 144, 255, 0.2);
+      background: rgba(99, 102, 241, 0.2);
       transform: scale(1.05);
     }
   }
@@ -237,14 +320,16 @@
 
 .projectList {
   margin-bottom: 32px;
-  
+
   :global(.ant-list-item) {
     padding: 12px;
     border-radius: 8px;
     transition: all 0.3s;
-    
+    border: 1px solid transparent;
+
     &:hover {
-      background-color: rgba(0, 0, 0, 0.02);
+      background-color: rgba(99, 102, 241, 0.04);
+      border-color: rgba(99, 102, 241, 0.15);
     }
   }
 }
@@ -253,9 +338,9 @@
   position: relative;
   width: 120px;
   height: 68px;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
-  
+
   @media (max-width: 576px) {
     width: 80px;
     height: 45px;
@@ -272,7 +357,7 @@
   position: absolute;
   bottom: 4px;
   right: 4px;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 1px 4px;
   border-radius: 2px;
@@ -281,7 +366,7 @@
 
 .emptyState {
   margin: 48px 0;
-  
+
   button {
     margin-top: 16px;
   }
@@ -289,10 +374,39 @@
 
 .quickTools {
   margin-bottom: 32px;
-  
+
+  @media (max-width: 576px) {
+    margin-bottom: 24px;
+  }
+
   :global(.ant-card-head-title) {
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
+
+    @media (max-width: 576px) {
+      font-size: 16px;
+    }
+  }
+}
+
+// 快速工具卡片移动端网格
+.quickToolsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  @media (max-width: 991px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 767px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 575px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 }
 
@@ -306,43 +420,70 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   background: linear-gradient(145deg, #ffffff, #f5f8ff);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  
+
+  @media (max-width: 576px) {
+    height: 120px;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
   &:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    
+    border-color: rgba(99, 102, 241, 0.3);
+
+    @media (max-width: 576px) {
+      transform: translateY(-2px);
+    }
+
     .toolIcon {
       transform: scale(1.15) rotate(5deg);
-      color: #4096ff;
+      color: #6366f1;
+      filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
     }
-    
+
     .toolTitle {
       color: @primary-color;
     }
   }
-  
+
   .toolIcon {
     font-size: 36px;
     color: @primary-color;
     margin-bottom: 16px;
     transition: all 0.4s ease;
     animation: float 3s ease-in-out infinite;
+
+    @media (max-width: 576px) {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
   }
-  
+
   .toolTitle {
     font-weight: 600;
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 6px;
     transition: color 0.3s ease;
+
+    @media (max-width: 576px) {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
   }
-  
+
   .toolDesc {
     color: rgba(0, 0, 0, 0.5);
     font-size: 13px;
     max-width: 80%;
+
+    @media (max-width: 576px) {
+      font-size: 11px;
+      display: none;
+    }
   }
 }
 
@@ -358,94 +499,130 @@
   }
 }
 
-// 暗黑模式适配
+// ==============================================
+// 科技暗黑模式适配
+// ==============================================
 :global(.dark) {
   .dashboardContainer {
-    background: linear-gradient(to bottom, rgba(20, 28, 45, 0.5), rgba(30, 38, 55, 0.8));
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(180deg, @bg-primary 0%, @bg-secondary 100%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid @border-primary;
   }
-  
+
   .dashboardHeader {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    
+    border-bottom: 1px solid @border-primary;
+
     h2 {
-      background: linear-gradient(90deg, #4096ff, #1677ff);
+      background: linear-gradient(90deg, #6366f1, #a855f7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
   }
-  
+
   .statsRow {
     :global(.ant-card) {
-      background: rgba(30, 38, 55, 0.8);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      
+      background: @bg-secondary;
+      border: 1px solid @border-primary;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
       &:hover {
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.15), 0 8px 20px rgba(0, 0, 0, 0.3);
       }
     }
-    
+
     .statistic {
       :global(.ant-statistic-title) {
-        color: rgba(255, 255, 255, 0.65);
+        color: @text-secondary;
+      }
+
+      :global(.ant-statistic-content) {
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
     }
   }
-  
-  .projectCard, .toolCard {
-    background: @dark-card;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-    
+
+  .projectCard {
+    background: @bg-secondary;
+    border: 1px solid @border-primary;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
     &:hover {
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.15), 0 10px 24px rgba(0, 0, 0, 0.4);
     }
-    
+
     :global(.ant-card-actions) {
-      background-color: rgba(255, 255, 255, 0.03);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background-color: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid @border-primary;
+
+      li {
+        &:hover {
+          background: rgba(99, 102, 241, 0.1);
+        }
+      }
     }
   }
-  
+
   .projectTitle {
-    color: rgba(255, 255, 255, 0.85);
+    color: @text-primary;
   }
-  
+
   .projectTags {
     :global(.ant-tag) {
-      background: rgba(24, 144, 255, 0.15);
-      color: #4096ff;
-      
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+
       &:hover {
-        background: rgba(24, 144, 255, 0.25);
+        background: rgba(99, 102, 241, 0.25);
+        border-color: rgba(99, 102, 241, 0.5);
       }
     }
   }
-  
+
   .projectList {
     :global(.ant-list-item) {
+      background: @bg-secondary;
+      border: 1px solid @border-primary;
+
       &:hover {
-        background-color: rgba(255, 255, 255, 0.05);
+        background: rgba(99, 102, 241, 0.08);
+        border-color: rgba(99, 102, 241, 0.25);
       }
     }
   }
-  
+
   .toolCard {
-    background: linear-gradient(145deg, #1f2937, #111827);
-    
-    .toolTitle {
-      color: rgba(255, 255, 255, 0.85);
+    background: linear-gradient(145deg, @bg-secondary, @bg-tertiary);
+    border: 1px solid @border-primary;
+
+    &:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2), 0 12px 24px rgba(0, 0, 0, 0.4);
     }
-    
+
+    .toolTitle {
+      color: @text-primary;
+    }
+
     .toolDesc {
-      color: rgba(255, 255, 255, 0.45);
+      color: @text-secondary;
     }
   }
-  
+
   .starButton {
     background-color: rgba(0, 0, 0, 0.6);
-    
+
     &:hover {
       background-color: rgba(0, 0, 0, 0.8);
     }
+  }
+
+  .duration,
+  .listDuration {
+    background-color: rgba(0, 0, 0, 0.8);
   }
 }
