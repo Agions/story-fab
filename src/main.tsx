@@ -22,9 +22,10 @@ if (!rootElement) {
 }
 
 const root = ReactDOM.createRoot(rootElement);
+const RootWrapper = import.meta.env.DEV ? React.Fragment : React.StrictMode;
 
 root.render(
-  <React.StrictMode>
+  <RootWrapper>
     <App />
-  </React.StrictMode>
+  </RootWrapper>
 ); 

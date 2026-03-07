@@ -1,13 +1,15 @@
-docsify-sidebar-collapse
+- 概览
+  - [文档首页](/)
 
-- Getting Started
-  - [Home](README)
-  - [Quick Start](getting-started)
+- 快速开始
+  - [安装与环境](getting-started/installation.md)
+  - [5 分钟上手](getting-started/quick-start.md)
 
-- Guides
-  - [Features](features)
-  - [Workflow](workflow)
-  - [FAQ](faq)
+- 使用指南
+  - [核心流程](guides/core-workflow.md)
+  - [模型配置](guides/model-config.md)
+  - [项目管理](guides/project-management.md)
 
-- Reference
-  - [Changelog](CHANGELOG)
+- 参考文档
+  - [常见问题](reference/faq.md)
+  - [更新日志](CHANGELOG.md)

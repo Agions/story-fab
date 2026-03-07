@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   Card,
   Form,
@@ -12,6 +12,7 @@ import {
   Spin,
   Result,
   Select,
+  Switch,
   Tag,
 } from 'antd';
 import { ArrowLeftOutlined, SaveOutlined, VideoCameraOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
@@ -61,9 +62,31 @@ const createDefaultProjectName = () => {
   return `未命名项目-${timestamp}`;
 };
 
+const PROJECT_AUTO_SAVE_KEY = 'clipflow-project-auto-save-enabled';
+
+const buildDraftFingerprint = (payload: {
+  id?: string;
+  name?: string;
+  description?: string;
+  videoPath?: string;
+  keyFrameCount?: number;
+  scriptCount?: number;
+  hasMetadata?: boolean;
+}) =>
+  JSON.stringify({
+    id: payload.id || '',
+    name: normalizeText(payload.name) || '',
+    description: normalizeText(payload.description),
+    videoPath: payload.videoPath || '',
+    keyFrameCount: payload.keyFrameCount || 0,
+    scriptCount: payload.scriptCount || 0,
+    hasMetadata: Boolean(payload.hasMetadata),
+  });
+
 const ProjectEdit: React.FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addRecentProject } = useSettings();
   const [form] = Form.useForm();
 
@@ -90,14 +113,18 @@ const ProjectEdit: React.FC = () => {
   });
   const [autoSaveState, setAutoSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [lastAutoSaveAt, setLastAutoSaveAt] = useState('');
-
-  const watchedName = Form.useWatch('name', form);
-  const watchedDescription = Form.useWatch('description', form);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(() => {
+    try {
+      return window.localStorage.getItem(PROJECT_AUTO_SAVE_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
 
   const draftTimerRef = useRef<number | null>(null);
   const lastDraftFingerprintRef = useRef('');
-  const routeSyncedRef = useRef(false);
   const recentProjectTrackedRef = useRef('');
+  const draftProjectIdRef = useRef<string>(projectId || '');
 
   const canAccessStep = useCallback((step: number) => {
     if (step <= 0) return true;
@@ -167,9 +194,13 @@ const ProjectEdit: React.FC = () => {
     const now = new Date().toISOString();
     const normalizedName = normalizeText(formData.name) || defaultProjectName;
     const normalizedDescription = normalizeText(formData.description);
+    const resolvedProjectId = project?.id || draftProjectIdRef.current || uuid();
+    if (!draftProjectIdRef.current) {
+      draftProjectIdRef.current = resolvedProjectId;
+    }
 
     const projectData: ProjectData = {
-      id: project?.id || uuid(),
+      id: resolvedProjectId,
       name: normalizedName,
       description: normalizedDescription,
       videoPath,
@@ -204,20 +235,18 @@ const ProjectEdit: React.FC = () => {
 
     const data = buildProjectData();
     await saveProjectToFile(data.id, data);
-    setProject(data);
+    const shouldSyncProjectState = !silent || !project || project.id !== data.id;
+    if (shouldSyncProjectState) {
+      setProject(data);
+    }
     if (recentProjectTrackedRef.current !== data.id) {
       addRecentProject(data.id);
       recentProjectTrackedRef.current = data.id;
     }
 
-    if (!projectId && !routeSyncedRef.current && !silent) {
-      routeSyncedRef.current = true;
-      navigate(`/project/edit/${data.id}`, { replace: true });
-    }
-
     if (!silent) message.success('项目保存成功');
     return data;
-  }, [addRecentProject, buildProjectData, form, navigate, projectId, videoPath]);
+  }, [addRecentProject, buildProjectData, form, videoPath]);
 
   useEffect(() => {
     if (!projectId) {
@@ -231,6 +260,7 @@ const ProjectEdit: React.FC = () => {
     loadProjectFromFile<ProjectData>(projectId)
       .then((projectData) => {
         const normalizedProject = normalizeProjectData(projectData);
+        draftProjectIdRef.current = normalizedProject.id;
         setProject(normalizedProject);
         form.setFieldsValue({
           name: normalizedProject.name,
@@ -251,6 +281,17 @@ const ProjectEdit: React.FC = () => {
           setCurrentStep(1);
         }
 
+        // 初始化草稿基线，避免进入编辑页后立即触发自动保存引发视觉跳动
+        lastDraftFingerprintRef.current = buildDraftFingerprint({
+          id: normalizedProject.id,
+          name: normalizedProject.name,
+          description: normalizedProject.description,
+          videoPath: normalizedProject.videoPath,
+          keyFrameCount: normalizedProject.keyFrames?.length || 0,
+          scriptCount: normalizedProject.script?.length || 0,
+          hasMetadata: Boolean(normalizedProject.metadata),
+        });
+
         setError(null);
       })
       .catch((err: unknown) => {
@@ -265,12 +306,12 @@ const ProjectEdit: React.FC = () => {
   }, [defaultProjectName, form, projectId]);
 
   useEffect(() => {
-    if (initialLoading || loading || saving || !videoPath) return;
+    if (!autoSaveEnabled || initialLoading || loading || saving || !videoPath) return;
 
-    const currentFingerprint = JSON.stringify({
+    const currentFingerprint = buildDraftFingerprint({
       id: project?.id || projectId || '',
-      name: normalizeText(watchedName) || defaultProjectName,
-      description: normalizeText(watchedDescription),
+      name: '',
+      description: '',
       videoPath,
       keyFrameCount: keyFrames.length,
       scriptCount: scriptSegments.length,
@@ -317,9 +358,7 @@ const ProjectEdit: React.FC = () => {
     scriptSegments,
     videoMetadata,
     videoPath,
-    watchedDescription,
-    watchedName,
-    defaultProjectName,
+    autoSaveEnabled,
     project?.id,
     projectId,
   ]);
@@ -432,9 +471,11 @@ const ProjectEdit: React.FC = () => {
         ? `/project/${projectData.id}`
         : `/project/edit/${projectData.id}`;
 
-      if (isNewProject || saveBehavior === 'detail') {
+      if (isNewProject || saveBehavior === 'detail' || !projectId) {
         setIsNewProject(false);
-        navigate(targetRoute);
+        if (location.pathname !== targetRoute) {
+          navigate(targetRoute, { replace: true });
+        }
       }
     } catch (saveError) {
       console.error('保存项目失败:', saveError);
@@ -457,7 +498,21 @@ const ProjectEdit: React.FC = () => {
     }
   };
 
+  const handleAutoSaveToggle = (checked: boolean) => {
+    setAutoSaveEnabled(checked);
+    if (!checked) {
+      setAutoSaveState('idle');
+      setLastAutoSaveAt('');
+    }
+    try {
+      window.localStorage.setItem(PROJECT_AUTO_SAVE_KEY, checked ? '1' : '0');
+    } catch (storageError) {
+      console.error('保存自动保存开关失败:', storageError);
+    }
+  };
+
   const getAutoSaveTag = () => {
+    if (!autoSaveEnabled) return <Tag color="default">自动保存已关闭</Tag>;
     if (!videoPath) return <Tag color="default">未开始自动保存</Tag>;
     if (autoSaveState === 'saving') return <Tag color="processing">草稿自动保存中...</Tag>;
     if (autoSaveState === 'saved') return <Tag color="success">{lastAutoSaveAt ? `草稿已保存 ${lastAutoSaveAt}` : '草稿已保存'}</Tag>;
@@ -592,6 +647,10 @@ const ProjectEdit: React.FC = () => {
                   { value: 'detail', label: '跳转项目详情' },
                 ]}
               />
+            </div>
+            <div className={styles.saveBehaviorControl}>
+              <span className={styles.saveBehaviorLabel}>自动保存：</span>
+              <Switch size="small" checked={autoSaveEnabled} onChange={handleAutoSaveToggle} />
             </div>
             <Button
               type="primary"
