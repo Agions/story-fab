@@ -44,8 +44,7 @@ export function rewriteSegment(
 
   return {
     ...segment,
-    content,
-    updatedAt: new Date().toISOString()
+    content
   };
 }
 
@@ -54,8 +53,8 @@ export function completeRewrite(content: string): string {
 
   for (const [word, alternatives] of Object.entries(SYNONYMS)) {
     const regex = new RegExp(word, 'g');
-    if (regex.test(rewritten)) {
-      const replacement = alternatives[Math.floor(Math.random() * alternatives.length)];
+      if (regex.test(rewritten)) {
+      const replacement = alternatives[Math.floor(Math.random() * alternatives.length)] ?? word;
       rewritten = rewritten.replace(regex, replacement);
     }
   }
@@ -75,7 +74,7 @@ export function majorRewrite(content: string): string {
   for (const [word, alternatives] of Object.entries(SYNONYMS)) {
     const regex = new RegExp(word, 'g');
     if (regex.test(rewritten) && Math.random() > 0.5) {
-      const replacement = alternatives[Math.floor(Math.random() * alternatives.length)];
+      const replacement = alternatives[Math.floor(Math.random() * alternatives.length)] ?? word;
       rewritten = rewritten.replace(regex, replacement);
     }
   }
@@ -85,7 +84,7 @@ export function majorRewrite(content: string): string {
 
 export function minorRewrite(content: string): string {
   const transitions = ['此外', '同时', '另外', '值得一提的是'];
-  const transition = transitions[Math.floor(Math.random() * transitions.length)];
+  const transition = transitions[Math.floor(Math.random() * transitions.length)] ?? '此外';
 
   if (!content.startsWith(transition)) {
     return `${transition}，${content}`;
@@ -109,8 +108,7 @@ export function replaceTemplatePhrases(segment: ScriptSegment): ScriptSegment {
 
   return {
     ...segment,
-    content,
-    updatedAt: new Date().toISOString()
+    content
   };
 }
 
@@ -167,7 +165,7 @@ function getAlternativePhrase(category: string, original: string): string {
   const filtered = alternatives.filter((a) => a !== original);
 
   if (filtered.length > 0) {
-    return filtered[Math.floor(Math.random() * filtered.length)];
+    return filtered[Math.floor(Math.random() * filtered.length)] ?? original;
   }
 
   return original;

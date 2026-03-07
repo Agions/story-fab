@@ -11,7 +11,7 @@ import {
   RobotOutlined,
   DollarOutlined
 } from '@ant-design/icons';
-import { motion } from 'framer-motion';
+import { motion } from '@/components/common/motion-shim';
 import { MODEL_PROVIDERS } from '@/core/config/models.config';
 import type { AIModel, ModelProvider } from '@/core/types';
 import styles from './index.module.less';
@@ -103,7 +103,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
               </Tooltip>
             )}
             {!isAvailable && (
-              <Tag color="default" size="small">未配置</Tag>
+              <Tag color="default">未配置</Tag>
             )}
           </Space>
         </div>
@@ -125,7 +125,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
             <div className={styles.cardFooter}>
               <Space size="small">
                 <Tooltip title={`上下文: ${(model.contextWindow / 1000).toFixed(0)}K tokens`}>
-                  <Tag icon={<RobotOutlined />} size="small">
+                  <Tag icon={<RobotOutlined />}>
                     {(model.contextWindow / 1000).toFixed(0)}K
                   </Tag>
                 </Tooltip>

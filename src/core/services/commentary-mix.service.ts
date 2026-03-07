@@ -7,7 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { visionService } from './vision.service';
 import { aiService } from './ai.service';
 import { videoService } from './video.service';
-import type { VideoInfo, VideoAnalysis, ScriptData, ScriptSegment } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, ScriptData, ScriptSegment, Scene } from '@/core/types';
+import { DEFAULT_MODEL_ID, getModelById } from '@/core/config/models.config';
 
 // 混剪配置
 interface MixConfig {
@@ -59,13 +60,33 @@ interface VideoClipInfo {
 
 // 时间轴数据
 interface TimelineData {
-  tracks: Array<{
-    id: string;
-    type: 'video' | 'audio' | 'subtitle' | 'effect';
-    clips: any[];
-  }>;
+  tracks: TimelineTrack[];
   duration: number;
 }
+
+type TimelineTrack = {
+  id: string;
+  type: 'video' | 'audio' | 'subtitle' | 'effect';
+  clips: TimelineClip[];
+};
+
+type TimelineClip =
+  | {
+      id: string;
+      sourceId: string;
+      startTime: number;
+      endTime: number;
+      sourceStart: number;
+      sourceEnd: number;
+      transition?: MixConfig['transitionType'];
+      transitionDuration: number;
+    }
+  | {
+      id: string;
+      text: string;
+      startTime: number;
+      endTime: number;
+    };
 
 // 默认配置
 const DEFAULT_CONFIG: MixConfig = {
@@ -131,8 +152,12 @@ export class CommentaryMixService {
     const analyses: VideoAnalysis[] = [];
     
     for (const video of videos) {
-      const analysis = await visionService.analyzeVideo(video);
-      analysis.videoId = video.id || uuidv4();
+      const { scenes, objects, emotions } = await visionService.detectScenesAdvanced(video, {
+        minSceneDuration: 3,
+        detectObjects: true,
+        detectEmotions: true,
+      });
+      const analysis = await visionService.generateAnalysisReport(video, scenes, objects, emotions);
       analyses.push(analysis);
     }
     
@@ -202,8 +227,8 @@ export class CommentaryMixService {
           endTime: scene.endTime,
           duration,
           sceneType: scene.type || 'general',
-          emotion: scene.emotion,
-          motionLevel: scene.motionScore,
+          emotion: scene.dominantEmotion,
+          motionLevel: scene.features?.motionScore,
         });
       }
     }
@@ -214,7 +239,7 @@ export class CommentaryMixService {
   /**
    * 分割长片段
    */
-  private splitLongClip(sourceId: string, scene: any): VideoClipInfo[] {
+  private splitLongClip(sourceId: string, scene: Scene): VideoClipInfo[] {
     const clips: VideoClipInfo[] = [];
     const duration = scene.endTime - scene.startTime;
     const maxDuration = this.config.maxClipDuration;
@@ -303,27 +328,27 @@ export class CommentaryMixService {
     `.trim();
     
     try {
-      const response = await aiService.generateScript(prompt, {
+      const model = getModelById(DEFAULT_MODEL_ID);
+      if (!model) {
+        throw new Error(`默认模型不存在: ${DEFAULT_MODEL_ID}`);
+      }
+      const response = await aiService.generateScript(model, {
+        enabled: true,
+        apiKey: '',
+        model: model.id,
+      }, {
+        topic: '混剪解说脚本',
         style: this.config.scriptStyle,
+        tone: this.config.scriptStyle,
         length: this.config.scriptLength,
+        audience: '通用',
+        language: 'zh-CN',
+        requirements: prompt,
       });
       
       return response;
-    } catch (error) {
-      // 返回空脚本
-      return {
-        id: uuidv4(),
-        title: '解说脚本',
-        segments: clips.map((clip, i) => ({
-          id: uuidv4(),
-          order: i,
-          text: '',
-          startTime: clip.startTime,
-          endTime: clip.endTime,
-          duration: clip.duration,
-        })),
-        totalDuration: clips.reduce((s, c) => s + c.duration, 0),
-      };
+    } catch {
+      return this.buildFallbackScript(clips);
     }
   }
 
@@ -351,7 +376,7 @@ export class CommentaryMixService {
         type: 'subtitle' as const,
         clips: (script.segments || []).map(seg => ({
           id: seg.id,
-          text: seg.text,
+          text: seg.content,
           startTime: seg.startTime,
           endTime: seg.endTime,
         })),
@@ -375,6 +400,36 @@ export class CommentaryMixService {
    */
   getConfig(): MixConfig {
     return { ...this.config };
+  }
+
+  private buildFallbackScript(clips: VideoClipInfo[]): ScriptData {
+    const segments: ScriptSegment[] = clips.map((clip) => ({
+      id: uuidv4(),
+      startTime: clip.startTime,
+      endTime: clip.endTime,
+      content: '',
+      type: 'narration',
+    }));
+    return {
+      id: uuidv4(),
+      title: '解说脚本',
+      content: segments.map((segment) => segment.content).join('\n'),
+      segments,
+      metadata: {
+        style: this.config.scriptStyle,
+        tone: this.config.scriptStyle,
+        length: this.config.scriptLength,
+        targetAudience: '通用',
+        language: 'zh-CN',
+        wordCount: 0,
+        estimatedDuration: clips.reduce((sum, clip) => sum + clip.duration, 0),
+        generatedBy: 'fallback',
+        generatedAt: new Date().toISOString(),
+        template: 'commentary-mix-fallback',
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
   }
 }
 

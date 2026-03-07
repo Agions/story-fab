@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Typography, Button, Card, Row, Col,
-  Space, Tag, Timeline, Progress
+  Space, Tag, Timeline, Progress, Spin
 } from 'antd';
 import {
   VideoCameraOutlined,
@@ -22,8 +22,27 @@ import {
   LineChartOutlined,
 } from '@ant-design/icons';
 import { useTheme } from '@/context/ThemeContext';
+import { useSettings } from '@/context/SettingsContext';
+import { getFileSizeBytes, listProjects } from '@/services/tauriService';
+import {
+  extractProjectMediaMetrics,
+  pickPreferredSizeMb,
+  resolveProjectVideoPath,
+  type RawProjectRecord,
+} from '@/shared';
 
 const { Title, Paragraph, Text } = Typography;
+
+interface HomeProjectItem {
+  id: string;
+  name?: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt: string;
+  status?: 'draft' | 'processing' | 'completed' | 'archived';
+  durationSec?: number;
+  sizeMb?: number;
+}
 
 // 工作流步骤 - 科技暗黑配色
 const workflowSteps = [
@@ -35,49 +54,138 @@ const workflowSteps = [
   { icon: <ExportOutlined />, title: '导出发布', desc: '720p ~ 4K', color: '#f43f5e' },
 ];
 
-// 统计卡片数据
-const statsData = [
-  { title: '总项目', value: 12, icon: <VideoCameraOutlined />, color: '#6366f1', suffix: '个' },
-  { title: '已完成', value: 8, icon: <CheckCircleOutlined />, color: '#10b981', suffix: '个' },
-  { title: '本月创作', value: 5, icon: <RocketOutlined />, color: '#f59e0b', suffix: '个' },
-  { title: '节省时间', value: 24, icon: <ClockCircleOutlined />, color: '#06b6d4', suffix: '小时' },
-];
-
-// 最近动态数据
-const recentActivities = [
-  {
-    color: '#10b981',
-    title: '产品宣传视频',
-    desc: '导出完成 · MP4 · 1080p',
-    time: '2 小时前',
-  },
-  {
-    color: '#6366f1',
-    title: '教学系列 EP03',
-    desc: '脚本生成完成 · Qwen 3.5',
-    time: '5 小时前',
-  },
-  {
-    color: '#f59e0b',
-    title: '社交媒体短视频',
-    desc: 'AI 分析中 · 场景检测',
-    time: '昨天',
-    processing: true,
-  },
-  {
-    color: '#6366f1',
-    title: '品牌故事片',
-    desc: '项目创建',
-    time: '3 天前',
-  },
-];
-
 // AI 模型标签 - 2026年3月最新模型
-const aiModels = ['GPT-5.3', 'Claude 4.6', 'Gemini 3 Ultra', 'Qwen 3.5', 'GLM-5', 'Kimi k2.5', 'Spark X1', 'DeepSeek R1'];
+const aiModels = ['GPT-5.3 Codex', 'o3', 'Claude Sonnet 4.6', 'Gemini 3.1 Pro Preview', 'Gemini 3.1 Flash Lite Preview', 'Qwen-Max-Latest', 'GLM-5', 'Kimi K2.5'];
 
 const Home = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
+  const { settings } = useSettings();
+  const [projects, setProjects] = useState<HomeProjectItem[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const loadProjects = async () => {
+      setProjectsLoading(true);
+      try {
+        const rawProjects = await listProjects<RawProjectRecord>();
+        if (!active) {
+          return;
+        }
+        const enriched = await Promise.all((Array.isArray(rawProjects) ? rawProjects : [])
+          .filter((project) => typeof project.id === 'string')
+          .map(async (project) => {
+            const metrics = extractProjectMediaMetrics(project);
+            const videoPath = resolveProjectVideoPath(project);
+            const exactSizeMb = videoPath ? (await getFileSizeBytes(videoPath)) / 1024 / 1024 : 0;
+            const sizeMb = pickPreferredSizeMb(exactSizeMb, metrics.explicitSizeMb, metrics.estimatedSizeMb);
+            return {
+              id: String(project.id),
+              name: typeof project.name === 'string' ? project.name : '未命名项目',
+              description: typeof project.description === 'string' ? project.description : '',
+              createdAt: typeof project.createdAt === 'string' ? project.createdAt : new Date().toISOString(),
+              updatedAt: typeof project.updatedAt === 'string'
+                ? project.updatedAt
+                : (typeof project.createdAt === 'string' ? project.createdAt : new Date().toISOString()),
+              status: project.status === 'completed' || project.status === 'processing' || project.status === 'archived'
+                ? project.status
+                : 'draft',
+              durationSec: metrics.durationSec,
+              sizeMb,
+            } satisfies HomeProjectItem;
+          }));
+        setProjects(enriched);
+      } catch (error) {
+        console.error('加载首页项目列表失败:', error);
+      } finally {
+        if (active) {
+          setProjectsLoading(false);
+        }
+      }
+    };
+    void loadProjects();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const recentProjects = useMemo(() => {
+    const projectMap = new Map(projects.map((project) => [project.id, project]));
+    const orderedByRecent = settings.recentProjects
+      .map((projectId) => projectMap.get(projectId))
+      .filter((project): project is HomeProjectItem => Boolean(project))
+      .slice(0, 4);
+
+    if (orderedByRecent.length > 0) {
+      return orderedByRecent;
+    }
+
+    return [...projects]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 4);
+  }, [projects, settings.recentProjects]);
+
+  const getRelativeTime = (dateText: string) => {
+    const time = new Date(dateText).getTime();
+    const now = Date.now();
+    const diff = now - time;
+    if (diff < 60 * 60 * 1000) return `${Math.max(1, Math.floor(diff / (60 * 1000)))} 分钟前`;
+    if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / (60 * 60 * 1000))} 小时前`;
+    if (diff < 7 * 24 * 60 * 60 * 1000) return `${Math.floor(diff / (24 * 60 * 60 * 1000))} 天前`;
+    return new Date(dateText).toLocaleDateString('zh-CN');
+  };
+
+  const statsData = useMemo(() => {
+    const total = projects.length;
+    const completed = projects.filter((project) => project.status === 'completed').length;
+    const totalDurationMinutes = projects.reduce((sum, project) => sum + (project.durationSec || 0), 0) / 60;
+    const totalSizeGb = projects.reduce((sum, project) => sum + (project.sizeMb || 0), 0) / 1024;
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const createdThisMonth = projects.filter((project) => {
+      if (!project.createdAt) {
+        return false;
+      }
+      const createdAt = new Date(project.createdAt);
+      return createdAt.getFullYear() === currentYear && createdAt.getMonth() === currentMonth;
+    }).length;
+    return [
+      { title: '总项目', value: total, icon: <VideoCameraOutlined />, color: '#6366f1', suffix: '个' },
+      { title: '已完成', value: completed, icon: <CheckCircleOutlined />, color: '#10b981', suffix: '个' },
+      { title: '本月创作', value: createdThisMonth, icon: <RocketOutlined />, color: '#f59e0b', suffix: '个' },
+      { title: '总时长', value: Number(totalDurationMinutes.toFixed(1)), icon: <ClockCircleOutlined />, color: '#06b6d4', suffix: '分钟' },
+      { title: '存储容量', value: Number(totalSizeGb.toFixed(2)), icon: <ProjectOutlined />, color: '#8b5cf6', suffix: 'GB' },
+    ];
+  }, [projects]);
+
+  const recentActivities = useMemo(() => {
+    const ordered = [...projects]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 4);
+
+    if (ordered.length === 0) {
+      return [{
+        color: '#6366f1',
+        title: '开始创建你的第一个项目',
+        desc: '点击“创建新项目”进入完整 AI 工作流',
+        time: '现在',
+        processing: false,
+      }];
+    }
+
+    return ordered.map((project) => {
+      const isCompleted = project.status === 'completed';
+      const isProcessing = project.status === 'processing';
+      return {
+        color: isCompleted ? '#10b981' : isProcessing ? '#f59e0b' : '#6366f1',
+        title: project.name || '未命名项目',
+        desc: isCompleted ? '项目已完成' : isProcessing ? '处理中' : '草稿已更新',
+        time: getRelativeTime(project.updatedAt),
+        processing: isProcessing,
+      };
+    });
+  }, [projects]);
 
   const hours = new Date().getHours();
   const greeting = hours < 12 ? '早上好' : hours < 18 ? '下午好' : '晚上好';
@@ -205,7 +313,7 @@ const Home = () => {
       {/* 统计卡片 - 发光边框效果 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         {statsData.map((item, idx) => (
-          <Col xs={12} sm={6} key={idx}>
+          <Col xs={12} sm={8} lg={4} key={idx}>
             <Card
               bordered={false}
               style={{
@@ -272,6 +380,66 @@ const Home = () => {
           </Col>
         ))}
       </Row>
+
+      <Card
+        bordered={false}
+        style={{ ...cardStyle, marginBottom: 24, borderRadius: 12 }}
+        title={
+          <Space>
+            <ClockCircleOutlined style={{ color: '#6366f1' }} />
+            <span style={{ fontWeight: 600 }}>最近项目</span>
+          </Space>
+        }
+        extra={
+          <Button type="link" onClick={() => navigate('/projects')}>
+            查看全部
+          </Button>
+        }
+      >
+        {projectsLoading ? (
+          <div style={{ padding: '16px 0', textAlign: 'center' }}>
+            <Spin />
+          </div>
+        ) : recentProjects.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <Text type="secondary">暂无项目，先创建一个项目开始创作。</Text>
+            <div style={{ marginTop: 10 }}>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/project/new')}>
+                创建项目
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Row gutter={[12, 12]}>
+            {recentProjects.map((project) => (
+              <Col xs={24} sm={12} md={12} lg={6} key={project.id}>
+                <Card
+                  hoverable
+                  style={{
+                    borderRadius: 10,
+                    border: isDarkMode ? '1px solid #2a2a3a' : '1px solid #f0f0f0',
+                  }}
+                  styles={{ body: { padding: 14 } }}
+                  onClick={() => navigate(`/project/edit/${project.id}`)}
+                >
+                  <Text strong ellipsis style={{ display: 'block' }}>
+                    {project.name || '未命名项目'}
+                  </Text>
+                  <Text type="secondary" ellipsis style={{ fontSize: 12, display: 'block', marginTop: 4 }}>
+                    {project.description || '无项目描述'}
+                  </Text>
+                  <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Tag color="blue">{project.status === 'completed' ? '已完成' : '草稿'}</Tag>
+                    <Text type="secondary" style={{ fontSize: 11 }}>
+                      {new Date(project.updatedAt).toLocaleDateString('zh-CN')}
+                    </Text>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+      </Card>
 
       <Row gutter={[16, 16]}>
         {/* 工作流程概览 - 霓虹边框 */}

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Button, Upload, message, Space, Card, Spin } from 'antd';
+import { Button, message, Space, Card, Spin } from 'antd';
 import { UploadOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { open } from '@tauri-apps/plugin-dialog';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
@@ -14,7 +14,7 @@ interface VideoSelectorProps {
 }
 
 // 检测是否在 Tauri 环境中
-const isTauri = () => {
+const isTauri = (): boolean => {
   return typeof window !== 'undefined' && '__TAURI__' in window;
 };
 
@@ -36,7 +36,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 获取文件名（兼容 Web 和 Tauri 环境）
-  const getFileName = (path: string | null) => {
+  const getFileName = (path: string | null): string => {
     if (!path) return '';
     // Web 环境下的 blob URL 或文件路径
     if (path.startsWith('blob:') || path.startsWith('http')) {
@@ -79,14 +79,14 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
         const videoMetadata = await analyzeVideo(filePath);
         setMetadata(videoMetadata);
         onVideoSelect(filePath, videoMetadata);
-      } catch {
+      } catch (error) {
         console.error('分析视频失败:', error);
         // 即使分析失败也允许选择视频
         onVideoSelect(filePath);
       } finally {
         setIsAnalyzing(false);
       }
-    } catch {
+    } catch (error) {
       console.error('选择视频失败:', error);
       message.error('选择视频失败，请重试');
     }
@@ -124,7 +124,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
         height: video.videoHeight,
         fps: 30,
         codec: file.type,
-        size: file.size,
+        bitrate: video.duration > 0 ? Math.round((file.size * 8) / video.duration) : 0,
       };
       setMetadata(webMetadata);
       onVideoSelect(fileUrl, webMetadata);
@@ -172,7 +172,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
     
     try {
       await invoke('open_file', { path: videoPath });
-    } catch {
+    } catch (error) {
       console.error('打开视频失败:', error);
       message.error('无法打开视频，请确保系统有关联的视频播放器');
     }

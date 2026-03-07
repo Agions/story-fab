@@ -6,14 +6,27 @@ export * from './config';
 import { analyzeVideo } from './analyzer';
 import { batchProcess, getBatchTask, cancelTask, applySuggestions, smartClip } from './batchProcessor';
 import { exportClipConfig, importClipConfig } from './config';
-import { DEFAULT_CLIP_CONFIG, type AIClipConfig } from './types';
+import {
+  DEFAULT_CLIP_CONFIG,
+  type AIClipConfig,
+  type BatchClipTask,
+  type ClipAnalysisResult,
+  type ClipSegment,
+  type ClipSuggestion,
+} from './types';
+import type { VideoInfo } from '@/core/types';
 
 export class AIClipService {
-  async analyzeVideo(videoInfo: any, config?: Partial<AIClipConfig>) {
+  async analyzeVideo(videoInfo: VideoInfo, config?: Partial<AIClipConfig>): Promise<ClipAnalysisResult> {
     return analyzeVideo(videoInfo, config);
   }
 
-  async batchProcess(projectId: string, videos: any[], config: AIClipConfig, onProgress?: any) {
+  async batchProcess(
+    projectId: string,
+    videos: VideoInfo[],
+    config: AIClipConfig,
+    onProgress?: (task: BatchClipTask) => void
+  ) {
     return batchProcess(projectId, videos, config, onProgress);
   }
 
@@ -25,11 +38,15 @@ export class AIClipService {
     return cancelTask(taskId);
   }
 
-  async applySuggestions(videoInfo: any, suggestions: any[], selectedIds: string[]) {
+  async applySuggestions(videoInfo: VideoInfo, suggestions: ClipSuggestion[], selectedIds: string[]): Promise<ClipSegment[]> {
     return applySuggestions(videoInfo, suggestions, selectedIds);
   }
 
-  async smartClip(videoInfo: any, targetDuration?: number, style?: 'fast' | 'normal' | 'slow') {
+  async smartClip(
+    videoInfo: VideoInfo,
+    targetDuration?: number,
+    style?: 'fast' | 'normal' | 'slow'
+  ): Promise<ClipAnalysisResult> {
     return smartClip(videoInfo, targetDuration, style);
   }
 

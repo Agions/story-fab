@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
-import { Card, Button, Radio, Form, Input, Select, message, Typography, Alert, Spin, Space, Tooltip } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Card, Button, Radio, Form, Select, Input, message, Typography, Alert, Spin, Space, Tooltip } from 'antd';
 import { FileTextOutlined, RobotOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { scriptApi } from '@/services/api';
 import { v4 as uuidv4 } from 'uuid';
 import { aiService } from '@/services/aiService';
+import { getLegacyModelCompatMap } from '@/services/aiModelAdapter';
 import { useStore } from '@/store';
-import type { Script, VideoAnalysis, AIModelType, AIModel } from '@/types';
-import { AI_MODEL_INFO } from '@/types';
+import type { Script, VideoAnalysis, AIModelType } from '@/types';
+import type { ModelProvider } from '@/core/types';
+import { MODEL_PROVIDERS } from '@/core/config/models.config';
+import { PROVIDER_NAMES } from '@/constants/models';
+import useLocalStorage from '@/hooks/useLocalStorage';
 import styles from './ScriptGenerator.module.less';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+
+const MODEL_COMPAT_MAP = getLegacyModelCompatMap();
+
+type SupportedProvider = keyof typeof MODEL_COMPAT_MAP;
+
+interface GuidedFormValues {
+  style?: 'informative' | 'entertaining' | 'dramatic' | 'casual';
+  tone?: 'neutral' | 'enthusiastic' | 'serious' | 'humorous' | 'inspirational';
+  focusPoints?: number[];
+  additionalInstructions?: string;
+}
 
 interface ScriptGeneratorProps {
   projectId: string;
@@ -26,10 +40,26 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<GuidedFormValues>();
   const [generationMethod, setGenerationMethod] = useState<'auto' | 'guided'>('auto');
   const { aiModelsSettings, selectedAIModel } = useStore();
-  const [selectedModel, setSelectedModel] = useState<AIModelType>(selectedAIModel);
+  const [apiKeys] = useLocalStorage<Partial<Record<ModelProvider, { key: string; isValid?: boolean }>>>('api_keys', {});
+  const [selectedModel, setSelectedModel] = useState<SupportedProvider>(selectedAIModel as SupportedProvider);
+
+  const providerOptions = useMemo(
+    () => (Object.keys(MODEL_COMPAT_MAP) as SupportedProvider[]),
+    []
+  );
+  const configuredProviders = useMemo(
+    () => providerOptions.filter((provider) => Boolean(apiKeys[provider]?.key?.trim())),
+    [apiKeys, providerOptions]
+  );
+
+  useEffect(() => {
+    if (!configuredProviders.includes(selectedModel) && configuredProviders.length > 0) {
+      setSelectedModel(configuredProviders[0]);
+    }
+  }, [configuredProviders, selectedModel]);
 
   const handleGenerate = async () => {
     try {
@@ -37,20 +67,30 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       setError(null);
       
       // 获取所选AI模型配置
-      const modelSettings = aiModelsSettings[selectedModel];
-      if (!modelSettings?.enabled || !modelSettings?.apiKey) {
-        throw new Error(`${AI_MODEL_INFO[selectedModel].name}模型尚未启用或API密钥未配置`);
+      const keyFromSettings = aiModelsSettings[selectedModel]?.apiKey;
+      const keyFromApiKeys = apiKeys[selectedModel]?.key?.trim();
+      const resolvedApiKey = keyFromApiKeys || keyFromSettings;
+      if (!resolvedApiKey) {
+        throw new Error(`${PROVIDER_NAMES[selectedModel]}模型尚未启用或API密钥未配置`);
       }
 
       // 获取表单值，用于引导生成
       const formValues = generationMethod === 'guided' ? form.getFieldsValue() : {};
+      const compatibleModel = MODEL_COMPAT_MAP[selectedModel];
+      const settings = generationMethod === 'guided'
+        ? {
+            style: formValues.style,
+            tone: formValues.tone,
+            instruction: formValues.additionalInstructions
+          }
+        : undefined;
       
       // 调用AI服务生成脚本内容
       const scriptContent = await aiService.generateScript(
-        selectedModel,
-        modelSettings.apiKey as string,
+        compatibleModel,
+        resolvedApiKey,
         analysis,
-        formValues
+        settings
       );
       
       // 解析脚本内容为结构化数据
@@ -66,13 +106,13 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
         })),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        modelUsed: AI_MODEL_INFO[selectedModel].name
+        modelUsed: PROVIDER_NAMES[selectedModel]
       };
       
       message.success('脚本生成成功');
       onScriptGenerated(script);
-    } catch (error: any) {
-      setError(error.message || '脚本生成失败');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : '脚本生成失败');
       message.error('脚本生成失败，请稍后重试');
     } finally {
       setLoading(false);
@@ -80,13 +120,13 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
   };
 
   // 处理AI模型变更
-  const handleModelChange = (value: AIModelType) => {
+  const handleModelChange = (value: SupportedProvider) => {
     setSelectedModel(value);
     
     // 检查是否有API密钥
     const modelSettings = aiModelsSettings[value];
     if (!modelSettings?.enabled) {
-      message.warning(`您尚未配置${AI_MODEL_INFO[value].name}的API密钥，请前往"设置"页面进行配置`);
+      message.warning(`您尚未配置${PROVIDER_NAMES[value]}的API密钥，请前往"设置"页面进行配置`);
     }
   };
 
@@ -123,17 +163,17 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
             onChange={handleModelChange}
             style={{ width: '100%' }}
           >
-            {Object.entries(AI_MODEL_INFO).map(([key, model]) => (
+            {providerOptions.map((provider) => (
               <Option 
-                key={key} 
-                value={key}
-                disabled={!aiModelsSettings[key as AIModelType]?.enabled}
+                key={provider} 
+                value={provider}
+                disabled={!configuredProviders.includes(provider)}
               >
                 <Space>
                   <RobotOutlined />
-                  <span>{model.name}</span>
-                  <span style={{ color: '#999' }}>({model.provider})</span>
-                  {!aiModelsSettings[key as AIModelType]?.enabled && (
+                  <span>{PROVIDER_NAMES[provider]}</span>
+                  <span style={{ color: '#999' }}>({MODEL_PROVIDERS[provider].name})</span>
+                  {!configuredProviders.includes(provider) && (
                     <span style={{ color: '#f5222d' }}>未配置</span>
                   )}
                 </Space>
@@ -146,7 +186,7 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       <div className={styles.generationMethod}>
         <Radio.Group
           value={generationMethod}
-          onChange={(e) => setGenerationMethod(e.target.value)}
+          onChange={(e) => setGenerationMethod(e.target.value as 'auto' | 'guided')}
           className={styles.radioGroup}
         >
           <Radio.Button value="auto">自动生成</Radio.Button>
@@ -194,7 +234,7 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
             <Select mode="multiple" placeholder="选择要重点关注的内容">
               {analysis.keyMoments.map((moment, index) => (
                 <Option key={index} value={index}>
-                  {moment.description} ({Math.floor(moment.timestamp / 60)}:{moment.timestamp % 60})
+                  {moment.description} ({Math.floor(moment.timestamp / 60)}:{Math.floor(moment.timestamp % 60).toString().padStart(2, '0')})
                 </Option>
               ))}
             </Select>
@@ -225,7 +265,7 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       {loading && (
         <div className={styles.spinner}>
           <Spin indicator={<RobotOutlined spin className={styles.loadingIcon} />} />
-          <span className={styles.loadingText}>AI 正在使用{AI_MODEL_INFO[selectedModel].name}创作中...</span>
+          <span className={styles.loadingText}>AI 正在使用{PROVIDER_NAMES[selectedModel]}创作中...</span>
         </div>
       )}
     </Card>

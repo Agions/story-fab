@@ -7,10 +7,10 @@
  *   - subtitle.ocr (OCR 字幕)
  *   - subtitle.asr (ASR 字幕)
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Card, Button, Space, Typography, List, 
-  Tag, Alert, Divider, Switch, Empty, message, Progress, Row, Col, Checkbox, Tooltip, Badge, Collapse
+  Tag, Alert, Divider, Checkbox, message, Row, Col, Badge
 } from 'antd';
 import {
   CloudSyncOutlined,
@@ -21,21 +21,17 @@ import {
   EyeOutlined,
   SettingOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined,
-  BulbOutlined,
   SmileOutlined,
   AimOutlined,
   TableOutlined,
-  ExperimentOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
-import { visionService } from '@/core/services';
-import { ProcessingProgress, PreviewModal } from '@/components/common';
-import type { VideoAnalysis, Scene, Keyframe } from '@/core/types';
+import { visionService } from '@/core/services/vision.service';
+import { ProcessingProgress } from '@/components/common';
+import type { Scene } from '@/core/types';
 import styles from './ClipFlow.module.less';
 
 const { Title, Text, Paragraph } = Typography;
-const { Panel } = Collapse;
 
 // 格式化时间
 const formatTime = (seconds: number): string => {
@@ -211,7 +207,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
         else goToNextStep();
       }, 800);
 
-    } catch {
+    } catch (error) {
       console.error('分析失败:', error);
       message.error('分析过程出错，请重试');
     } finally {
@@ -320,9 +316,9 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
                   </List.Item>
                 )}
               />
-              {state.analysis?.scenes?.length > 5 && (
+              {(state.analysis?.scenes?.length ?? 0) > 5 && (
                 <div style={{ textAlign: 'center', marginTop: 8 }}>
-                  <Text type="secondary">还有 {state.analysis.scenes.length - 5} 个场景...</Text>
+                  <Text type="secondary">还有 {(state.analysis?.scenes?.length ?? 0) - 5} 个场景...</Text>
                 </div>
               )}
             </Card>
@@ -349,7 +345,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
               <List
                 size="small"
                 dataSource={state.subtitleData.asr?.slice(0, 3) || []}
-                renderItem={(item: any) => (
+                renderItem={(item: { startTime: number; text: string }) => (
                   <List.Item>
                     <Text type="secondary" style={{ marginRight: 8 }}>
                       {formatTime(item.startTime)}

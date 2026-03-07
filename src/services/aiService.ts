@@ -1,12 +1,11 @@
 /**
  * AI 服务 - 统一封装多种 AI 模型 API
- * 支持：文心一言、通义千问、讯飞星火、智谱清言、豆包、DeepSeek
+ * 支持：通义千问、讯飞星火、智谱清言、DeepSeek、Moonshot Kimi
  */
 import axios from 'axios';
 import { message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import { getApiKey } from './tauriService';
-import { AIModelType } from '@/types';
 import { VideoMetadata } from './videoService';
 
 // ============================================
@@ -40,18 +39,48 @@ export interface Script {
 }
 
 interface AIModelConfig {
-  type: AIModelType;
+  type: LegacyAIModelType;
   apiKey?: string;
   baseUrl?: string;
 }
+
+export type LegacyAIModelType =
+  | 'openai'
+  | 'anthropic'
+  | 'google'
+  | 'qianwen'
+  | 'spark'
+  | 'chatglm'
+  | 'deepseek'
+  | 'moonshot';
 
 // AI 模型配置
 interface ModelConfig {
   url: string;
   model: string;
   headers: (apiKey: string) => Record<string, string>;
-  transformRequest: (prompt: string) => any;
-  transformResponse: (data: any) => string;
+  transformRequest: (prompt: string, options?: Record<string, unknown>) => unknown;
+  transformResponse: (data: unknown) => string;
+}
+
+interface AnalysisMoment {
+  timestamp: number;
+  description: string;
+  importance: number;
+}
+
+interface AnalysisEmotion {
+  timestamp: number;
+  type: string;
+  intensity: number;
+}
+
+interface AnalysisInput {
+  keyMoments?: AnalysisMoment[];
+  emotions?: AnalysisEmotion[];
+  summary?: string;
+  title?: string;
+  duration?: number;
 }
 
 // ============================================
@@ -59,7 +88,10 @@ interface ModelConfig {
 // ============================================
 
 export class AIServiceError extends Error {
-  constructor(message: string, public statusCode?: number) {
+  constructor(
+    message: string,
+    public statusCode?: number
+  ) {
     super(message);
     this.name = 'AIServiceError';
   }
@@ -69,55 +101,114 @@ export class AIServiceError extends Error {
 // 模型配置
 // ============================================
 
-const MODEL_CONFIGS: Record<AIModelType, ModelConfig> = {
-  wenxin: {
-    url: 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro',
-    model: 'ernie-4.0',
-    headers: (apiKey) => ({ 'Content-Type': 'application/json' }),
-    transformRequest: (prompt) => ({ messages: [{ role: 'user', content: prompt }] }),
-    transformResponse: (data) => data.result,
+const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
+  openai: {
+    url: 'https://api.openai.com/v1/chat/completions',
+    model: 'gpt-5.3-codex',
+    headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
+    transformRequest: prompt => ({
+      model: 'gpt-5.3-codex',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 4000,
+    }),
+    transformResponse: data =>
+      (data as { choices: Array<{ message: { content: string } }> }).choices[0].message.content,
+  },
+  anthropic: {
+    url: 'https://api.anthropic.com/v1/messages',
+    model: 'claude-sonnet-4-6',
+    headers: apiKey => ({
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    }),
+    transformRequest: prompt => ({
+      model: 'claude-sonnet-4-6',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 4000,
+    }),
+    transformResponse: data =>
+      (data as { content?: Array<{ type?: string; text?: string }> }).content?.find(
+        item => item.type === 'text'
+      )?.text || '',
+  },
+  google: {
+    url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent',
+    model: 'gemini-3.1-pro-preview',
+    headers: (_apiKey: string) => ({ 'Content-Type': 'application/json' }),
+    transformRequest: prompt => ({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 4000 },
+    }),
+    transformResponse: data =>
+      (data as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> })
+        .candidates?.[0]?.content?.parts?.[0]?.text || '',
   },
   qianwen: {
     url: 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
-    model: 'qwen3.5-plus',
-    headers: (apiKey) => ({ 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' }),
-    transformRequest: (prompt) => ({ model: 'qwen3.5-plus', input: { prompt } }),
-    transformResponse: (data) => data.output.text,
+    model: 'qwen-max-latest',
+    headers: apiKey => ({ Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' }),
+    transformRequest: prompt => ({ model: 'qwen-max-latest', input: { prompt } }),
+    transformResponse: data => (data as { output: { text: string } }).output.text,
   },
   spark: {
     url: 'https://spark-api.xf-yun.com/v2.1/chat',
     model: 'general',
-    headers: (apiKey) => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }),
+    headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
     transformRequest: (prompt, options) => ({
       header: { app_id: options?.appId || '', uid: 'ClipFlow_user' },
       parameter: { chat: { domain: 'general', temperature: 0.7, max_tokens: 4096 } },
       payload: { message: { text: [{ role: 'user', content: prompt }] } },
     }),
-    transformResponse: (data) => {
-      if (data.header?.code !== 0) throw new AIServiceError(`讯飞星火API错误: ${data.header.message}`);
-      return data.payload.choices[0].text;
+    transformResponse: data => {
+      const typed = data as {
+        header?: { code?: number; message?: string };
+        payload?: { choices?: Array<{ text: string }> };
+      };
+      if (typed.header?.code !== 0)
+        throw new AIServiceError(`讯飞星火API错误: ${typed.header?.message || '未知错误'}`);
+      return typed.payload?.choices?.[0]?.text || '';
     },
   },
   chatglm: {
     url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
-    model: 'glm-4',
-    headers: (apiKey) => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }),
-    transformRequest: (prompt) => ({ model: 'glm-4', messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 4096 }),
-    transformResponse: (data) => data.choices[0].content,
-  },
-  doubao: {
-    url: 'https://api.doubao.com/v1/chat/completions',
-    model: 'doubao-pro',
-    headers: (apiKey) => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }),
-    transformRequest: (prompt) => ({ model: 'doubao-pro', messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 4096 }),
-    transformResponse: (data) => data.output.text,
+    model: 'glm-5',
+    headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
+    transformRequest: prompt => ({
+      model: 'glm-5',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 4096,
+    }),
+    transformResponse: data => (data as { choices: Array<{ content: string }> }).choices[0].content,
   },
   deepseek: {
     url: 'https://api.deepseek.com/v1/chat/completions',
     model: 'deepseek-chat',
-    headers: (apiKey) => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }),
-    transformRequest: (prompt) => ({ model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 4000 }),
-    transformResponse: (data) => data.choices[0].message.content,
+    headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
+    transformRequest: prompt => ({
+      model: 'deepseek-chat',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 4000,
+    }),
+    transformResponse: data =>
+      (data as { choices: Array<{ message: { content: string } }> }).choices[0].message.content,
+  },
+  moonshot: {
+    url: 'https://api.moonshot.cn/v1/chat/completions',
+    model: 'kimi-k2-0905-preview',
+    headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
+    transformRequest: prompt => ({
+      model: 'kimi-k2-0905-preview',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 4000,
+    }),
+    transformResponse: data =>
+      (data as { choices: Array<{ message: { content: string } }> }).choices[0].message.content,
   },
 };
 
@@ -146,18 +237,26 @@ const TONE_GUIDANCE: Record<string, string> = {
   inspirational: '使用励志、鼓舞人心的语气',
 };
 
-const buildPrompt = (analysis: any, options?: ScriptGenerationSettings): string => {
+const buildPrompt = (analysis: AnalysisInput, options?: ScriptGenerationSettings): string => {
   const { keyMoments = [], emotions = [], summary, title, duration } = analysis;
-  
-  const keyMomentsText = keyMoments.map((m: any) => 
-    `时间点: ${Math.floor(m.timestamp / 60)}分${m.timestamp % 60}秒, 描述: ${m.description}, 重要性: ${m.importance}/10`
-  ).join('\n');
-  
-  const emotionsText = emotions.map((e: any) => 
-    `时间点: ${Math.floor(e.timestamp / 60)}分${e.timestamp % 60}秒, 情感: ${e.type}, 强度: ${e.intensity}`
-  ).join('\n');
 
-  const styleGuidance = options?.style ? STYLE_GUIDANCE[options.style] : '请生成一个专业、信息丰富的解说脚本';
+  const keyMomentsText = keyMoments
+    .map(
+      m =>
+        `时间点: ${Math.floor(m.timestamp / 60)}分${m.timestamp % 60}秒, 描述: ${m.description}, 重要性: ${m.importance}/10`
+    )
+    .join('\n');
+
+  const emotionsText = emotions
+    .map(
+      e =>
+        `时间点: ${Math.floor(e.timestamp / 60)}分${e.timestamp % 60}秒, 情感: ${e.type}, 强度: ${e.intensity}`
+    )
+    .join('\n');
+
+  const styleGuidance = options?.style
+    ? STYLE_GUIDANCE[options.style]
+    : '请生成一个专业、信息丰富的解说脚本';
   const toneGuidance = options?.tone ? TONE_GUIDANCE[options.tone] : '使用中立、专业的语气';
 
   return `请根据以下视频分析信息，为我创建一个视频解说脚本。
@@ -189,26 +288,35 @@ ${emotionsText || '无'}
 // ============================================
 
 const callAI = async (
-  modelType: AIModelType,
+  modelType: LegacyAIModelType,
   apiKey: string,
   prompt: string,
-  options?: any
+  options?: unknown
 ): Promise<string> => {
   const config = MODEL_CONFIGS[modelType];
   if (!config) throw new AIServiceError(`不支持的模型类型: ${modelType}`);
 
-  const url = modelType === 'wenxin' ? `${config.url}?access_token=${apiKey}` : config.url;
-  const headers = modelType === 'wenxin' ? config.headers('') : config.headers(apiKey);
-  
+  const url = modelType === 'google' ? `${config.url}?key=${encodeURIComponent(apiKey)}` : config.url;
+  const headers = config.headers(apiKey);
+
   try {
-    const response = await axios.post(url, config.transformRequest(prompt, options), { headers });
+    const requestOptions =
+      options && typeof options === 'object' ? (options as Record<string, unknown>) : undefined;
+    const response = await axios.post(url, config.transformRequest(prompt, requestOptions), {
+      headers,
+    });
     return config.transformResponse(response.data);
-  } catch (error: any) {
-    const errMsg = error.response?.data?.error?.message || 
-                   error.response?.data?.error_msg || 
-                   error.response?.data?.header?.message ||
-                   `${modelType} API调用失败`;
-    throw new AIServiceError(errMsg, error.response?.status);
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { data?: Record<string, unknown>; status?: number } };
+    const data = axiosError.response?.data || {};
+    const dataError = data.error as { message?: string } | undefined;
+    const header = data.header as { message?: string } | undefined;
+    const errMsg =
+      dataError?.message ||
+      (typeof data.error_msg === 'string' ? data.error_msg : undefined) ||
+      header?.message ||
+      `${modelType} API调用失败`;
+    throw new AIServiceError(errMsg, axiosError.response?.status);
   }
 };
 
@@ -219,9 +327,9 @@ const callAI = async (
 export const aiService = {
   // 统一调用接口
   generateScript: async (
-    modelType: AIModelType,
+    modelType: LegacyAIModelType,
     apiKey: string,
-    analysis: any,
+    analysis: AnalysisInput,
     options?: ScriptGenerationSettings
   ): Promise<string> => {
     const prompt = buildPrompt(analysis, options);
@@ -236,7 +344,7 @@ export const aiService = {
     const lines = scriptText.split('\n');
     const segments: ScriptSegment[] = [];
     const timestampRegex = /\[(\d{1,2}):(\d{2})(?::(\d{2}))?\]/;
-    
+
     let currentContent = '';
     let currentStartTime = 0;
     let currentEndTime = 0;
@@ -270,12 +378,18 @@ export const aiService = {
         currentEndTime = currentStartTime + 10;
         currentContent = trimmed.replace(timestampRegex, '').trim();
         hasCurrentSegment = true;
-        
+
         if (currentContent.includes('旁白') || currentContent.toLowerCase().includes('narration')) {
           currentType = 'narration';
-        } else if (currentContent.includes('对话') || currentContent.toLowerCase().includes('dialogue')) {
+        } else if (
+          currentContent.includes('对话') ||
+          currentContent.toLowerCase().includes('dialogue')
+        ) {
           currentType = 'dialogue';
-        } else if (currentContent.includes('描述') || currentContent.toLowerCase().includes('description')) {
+        } else if (
+          currentContent.includes('描述') ||
+          currentContent.toLowerCase().includes('description')
+        ) {
           currentType = 'description';
         }
       } else if (hasCurrentSegment) {
@@ -323,6 +437,31 @@ export const generateScriptWithAI = async (
       throw new Error('未配置API密钥');
     }
 
+    const normalizeStyle = (style: string | undefined): ScriptGenerationSettings['style'] => {
+      if (
+        style === 'informative' ||
+        style === 'entertaining' ||
+        style === 'dramatic' ||
+        style === 'casual'
+      ) {
+        return style;
+      }
+      return undefined;
+    };
+
+    const normalizeTone = (tone: string | undefined): ScriptGenerationSettings['tone'] => {
+      if (
+        tone === 'neutral' ||
+        tone === 'enthusiastic' ||
+        tone === 'serious' ||
+        tone === 'humorous' ||
+        tone === 'inspirational'
+      ) {
+        return tone;
+      }
+      return undefined;
+    };
+
     const analysis = {
       title: '视频内容',
       duration: videoMetadata.duration,
@@ -331,9 +470,9 @@ export const generateScriptWithAI = async (
       emotions: [],
     };
 
-    return aiService.generateScript('deepseek', apiKey, analysis, {
-      style: preferences.style as any,
-      tone: preferences.tone as any,
+    return aiService.generateScript('openai', apiKey, analysis, {
+      style: normalizeStyle(preferences.style),
+      tone: normalizeTone(preferences.tone),
     });
   } catch (error) {
     console.error('脚本生成失败:', error);
@@ -357,7 +496,7 @@ export const improveScriptWithAI = async (
   }
 
   const prompt = `请根据以下指示优化视频脚本:\n\n原始脚本:\n${originalScript}\n\n优化指示:\n${instructions}`;
-  return callAI('deepseek', apiKey, prompt);
+  return callAI('openai', apiKey, prompt);
 };
 
 export default aiService;

@@ -86,6 +86,11 @@ body.dark-mode ::-webkit-scrollbar-track {
   100% { transform: scale(1); }
 }
 
+@keyframes clipflow-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* 加载动画 */
 .page-loading {
   position: fixed;
@@ -105,24 +110,7 @@ body.dark-mode .page-loading {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-/* 丝滑动画效果 */
-.ant-card, 
-.ant-btn, 
-.ant-input, 
-.ant-select, 
-.ant-dropdown, 
-.ant-modal,
-.ant-notification,
-.ant-message {
-  animation: fadeIn 0.3s;
-}
-
-.ant-list-item, 
-.ant-table-row, 
-.ant-collapse-item, 
-.ant-menu-item {
-  animation: slideUp 0.3s;
-}
+/* 性能优化：避免路由切换时对全量组件做入场动画 */
 
 /* 卡片悬浮效果 */
 .ant-card-hoverable {
@@ -138,10 +126,7 @@ body.dark-mode .ant-card-hoverable:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* 页面内容淡入效果 */
-.ant-layout-content > div {
-  animation: fadeIn 0.5s;
-}
+/* 页面内容不做全局淡入，减少左侧菜单切页卡顿 */
 
 /* 按钮点击波纹效果增强 */
 .ant-btn::after {

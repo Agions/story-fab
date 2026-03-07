@@ -6,25 +6,22 @@
  */
 import React, { useState, useCallback } from 'react';
 import { 
-  Card, Button, Space, Typography, List, Tag, 
-  Switch, Slider, Select, Alert, Divider, Progress, message, Empty, Tabs, Row, Col, Tooltip, Badge, Radio
+  Card, Button, Space, Typography, Tag,
+  Switch, Slider, Alert, Progress, message, Tabs, Row, Col, Badge, Radio
 } from 'antd';
 import {
-  EditOutlined,
   PlayCircleOutlined,
   SoundOutlined,
   VideoCameraOutlined,
   SyncOutlined,
-  CheckCircleOutlined,
-  SettingOutlined,
-  LoadingOutlined,
-  BulbOutlined,
   FontSizeOutlined,
   ThunderboltOutlined,
-  AlignLeftOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
-import { voiceSynthesisService, videoEffectService, audioVideoSyncService, subtitleService } from '@/core/services';
+import { voiceSynthesisService } from '@/core/services/voice-synthesis.service';
+import { videoEffectService } from '@/core/services/video-effect.service';
+import { audioVideoSyncService } from '@/core/services/audio-sync.service';
+import { subtitleService } from '@/core/services/subtitle.service';
 import styles from './ClipFlow.module.less';
 
 const { Title, Text, Paragraph } = Typography;
@@ -60,6 +57,27 @@ interface VideoSynthesizeProps {
   onNext?: () => void;
 }
 
+interface SynthesizeConfig {
+  voiceId: string;
+  voiceSpeed: number;
+  voiceVolume: number;
+  enableVoice: boolean;
+  enableSubtitle: boolean;
+  subtitlePosition: 'bottom' | 'center' | 'top';
+  enableEffect: boolean;
+  effectStyle: string;
+  syncAudioVideo: boolean;
+}
+
+const EFFECT_PRESET_MAP: Record<string, string | null> = {
+  none: null,
+  cinematic: 'smooth-fade',
+  vivid: 'vibrant',
+  retro: 'vintage',
+  cool: 'cool',
+  warm: 'warm',
+};
+
 const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
   const { state, setVoice, setSynthesis, goToNextStep, dispatch } = useClipFlow();
   const [synthesizing, setSynthesizing] = useState(false);
@@ -67,7 +85,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
   const [activeTab, setActiveTab] = useState('voice');
   
   // 合成配置
-  const [config, setConfig] = useState({
+  const [config, setConfig] = useState<SynthesizeConfig>({
     voiceId: 'female_zh',
     voiceSpeed: 100,
     voiceVolume: 80,
@@ -97,24 +115,19 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
     try {
       // 模拟配音生成
       setProgress(30);
-      await voiceSynthesisService.generateVoice(scriptContent, {
-        voiceId: config.voiceId,
-        speed: config.voiceSpeed / 100,
-        volume: config.voiceVolume / 100,
-        language: config.voiceId.includes('en') ? 'en-US' : 'zh-CN',
-      });
+      const voiceResult = await voiceSynthesisService.synthesize(scriptContent);
       
       setProgress(60);
-      setVoice({
-        id: `voice_${Date.now()}`,
-        path: '/mock/voice.mp3',
-        duration: scriptContent.length / 5,
-        settings: { voiceId: config.voiceId, speed: config.voiceSpeed / 100, volume: config.voiceVolume / 100 },
+      const generatedAudioUrl = voiceResult.audioUrl || `/mock/voice_${Date.now()}.mp3`;
+      setVoice(generatedAudioUrl, {
+        voiceId: config.voiceId,
+        speed: config.voiceSpeed / 100,
+        volume: config.voiceVolume / 100
       });
       
       setProgress(100);
       message.success('配音生成成功！');
-    } catch {
+    } catch (error) {
       console.error('配音生成失败:', error);
       message.error('配音生成失败');
     } finally {
@@ -140,7 +153,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
 
     try {
       // 1. 生成配音
-      if (config.enableVoice && !state.voiceData.audioPath) {
+      if (config.enableVoice && !state.voiceData.audioUrl) {
         setProgress(20);
         await handleGenerateVoice();
       }
@@ -148,33 +161,34 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
       // 2. 生成字幕
       if (config.enableSubtitle) {
         setProgress(40);
-        await subtitleService.generateSubtitles(scriptContent, { position: config.subtitlePosition });
+        await subtitleService.generateFromAudio(state.voiceData.audioUrl || state.currentVideo.path);
       }
 
       // 3. 应用特效
       if (config.enableEffect) {
         setProgress(60);
-        await videoEffectService.applyEffect(state.currentVideo.path, config.effectStyle);
+        const presetId = EFFECT_PRESET_MAP[config.effectStyle];
+        if (presetId) {
+          videoEffectService.applyPreset(presetId);
+        } else {
+          videoEffectService.reset();
+        }
       }
 
       // 4. 音画同步
       if (config.syncAudioVideo) {
         setProgress(80);
-        await audioVideoSyncService.sync(state.currentVideo.path, state.voiceData.audioPath || '');
+        await audioVideoSyncService.autoSync(state.currentVideo.path, state.voiceData.audioUrl || undefined);
       }
 
       // 5. 完成
       setProgress(100);
-      setSynthesis({
-        id: `synthesis_${Date.now()}`,
-        videoPath: state.currentVideo.path,
-        voicePath: state.voiceData.audioPath,
-        subtitlePath: '/mock/subtitle.srt',
-        effect: config.effectStyle,
-        createdAt: new Date().toISOString(),
+      setSynthesis(`${state.currentVideo.path}?synthesized=${Date.now()}`, {
+        syncAudioVideo: config.syncAudioVideo,
+        addSubtitles: config.enableSubtitle,
+        addWatermark: false
       });
 
-      dispatch({ type: 'SET_STEP_COMPLETE', payload: { step: 'video-synthesize', complete: true } });
       message.success('视频合成完成！');
 
       setTimeout(() => {
@@ -182,7 +196,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
         else goToNextStep();
       }, 500);
 
-    } catch {
+    } catch (error) {
       console.error('合成失败:', error);
       message.error('视频合成失败');
     } finally {
@@ -193,7 +207,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
   // 检查前置条件
   const hasVideo = !!state.currentVideo;
   const hasScript = !!getCurrentScriptContent();
-  const hasVoice = !!state.voiceData.audioPath;
+  const hasVoice = !!state.voiceData.audioUrl;
   const canProceed = hasVideo && (hasScript || !config.enableVoice);
 
   if (!hasVideo) {
@@ -229,7 +243,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
   }
 
   // 已合成
-  if (state.synthesis && state.stepStatus['video-synthesize']) {
+  if (state.synthesisData?.finalVideoUrl && state.stepStatus['video-synthesize']) {
     return (
       <div className={styles.stepContent}>
         <div className={styles.stepTitle}>
@@ -330,7 +344,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
                         min={50} 
                         max={150} 
                         value={config.voiceSpeed}
-                        onChange={(v) => setConfig({ ...config, voiceSpeed: v })}
+                        onChange={(value) => setConfig({ ...config, voiceSpeed: Array.isArray(value) ? value[0] : value })}
                       />
                     </Col>
                     <Col span={12}>
@@ -339,7 +353,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
                         min={0} 
                         max={100} 
                         value={config.voiceVolume}
-                        onChange={(v) => setConfig({ ...config, voiceVolume: v })}
+                        onChange={(value) => setConfig({ ...config, voiceVolume: Array.isArray(value) ? value[0] : value })}
                       />
                     </Col>
                   </Row>

@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
 import { message } from 'antd';
-import { useWorkflow, useModel, useAIClip } from '@/core/hooks';
-import { scriptTemplateService } from '@/core/services';
-import type { ScriptTemplate, AIModel, WorkflowStep } from '@/core/types';
-import { WORKFLOW_STEPS } from '../constants';
+import { useWorkflow, useModel } from '@/core/hooks';
+import { scriptTemplateService } from '@/core/templates/script.templates';
+import type { ScriptTemplate, AIModel } from '@/core/types';
+import { DEFAULT_WORKFLOW_MODE, type WorkflowMode } from '@/core/workflow/featureBlueprint';
+import { getWorkflowSteps } from '../constants';
 
 export interface AIClipConfig {
   enabled: boolean;
@@ -28,6 +29,10 @@ export const useWorkflowPage = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ScriptTemplate | null>(null);
   const [selectedModel, setSelectedModel] = useState<AIModel | null>(null);
+  const [workflowMode, setWorkflowMode] = useState<WorkflowMode>(DEFAULT_WORKFLOW_MODE);
+  const [autoOriginalOverlay, setAutoOriginalOverlay] = useState(true);
+  const [overlayMixMode, setOverlayMixMode] = useState<'pip' | 'full'>('pip');
+  const [overlayOpacity, setOverlayOpacity] = useState(0.72);
   const [scriptParams, setScriptParams] = useState<ScriptParams>({
     style: 'professional',
     tone: 'friendly',
@@ -46,7 +51,6 @@ export const useWorkflowPage = () => {
 
   // Hooks
   const {
-    state,
     isRunning,
     isPaused,
     isCompleted,
@@ -66,7 +70,7 @@ export const useWorkflowPage = () => {
     jumpToStep,
   } = useWorkflow({
     onStepChange: (step) => {
-      const stepInfo = WORKFLOW_STEPS.find((s) => s.key === step);
+      const stepInfo = getWorkflowSteps(workflowMode).find((s) => s.key === step);
       message.info(`进入步骤: ${stepInfo?.title}`);
     },
     onError: (err) => {
@@ -80,7 +84,8 @@ export const useWorkflowPage = () => {
   const { allModels: models } = useModel();
   const templates = scriptTemplateService.getAllTemplates();
 
-  const currentStepIndex = WORKFLOW_STEPS.findIndex((s) => s.key === currentStep);
+  const workflowSteps = getWorkflowSteps(workflowMode);
+  const currentStepIndex = workflowSteps.findIndex((s) => s.key === currentStep);
 
   // 开始工作流
   const handleStart = useCallback(async () => {
@@ -91,8 +96,14 @@ export const useWorkflowPage = () => {
 
     try {
       await start('project_' + Date.now(), selectedFile, {
+        mode: workflowMode,
+        autoOriginalOverlay,
+        overlayMixMode,
+        overlayOpacity,
         autoAnalyze: true,
         autoGenerateScript: true,
+        autoDedup: true,
+        enforceUniqueness: true,
         preferredTemplate: selectedTemplate?.id,
         model: selectedModel,
         scriptParams,
@@ -101,7 +112,7 @@ export const useWorkflowPage = () => {
     } catch (err) {
       // 错误已在回调中处理
     }
-  }, [selectedFile, selectedModel, selectedTemplate, scriptParams, aiClipConfig, start]);
+  }, [selectedFile, selectedModel, selectedTemplate, scriptParams, aiClipConfig, start, workflowMode, autoOriginalOverlay, overlayMixMode, overlayOpacity]);
 
   // 更新脚本参数
   const updateScriptParams = useCallback((updates: Partial<ScriptParams>) => {
@@ -110,7 +121,7 @@ export const useWorkflowPage = () => {
 
   // 更新 AI 剪辑配置
   const updateAIClipConfig = useCallback((updates: Partial<AIClipConfig>) => {
-    setAIClipConfig((prev) => ({ ...prev, ...updates }));
+    setAiClipConfig((prev) => ({ ...prev, ...updates }));
   }, []);
 
   return {
@@ -118,6 +129,10 @@ export const useWorkflowPage = () => {
     selectedFile,
     selectedTemplate,
     selectedModel,
+    workflowMode,
+    autoOriginalOverlay,
+    overlayMixMode,
+    overlayOpacity,
     scriptParams,
     aiClipConfig,
     isRunning,
@@ -136,6 +151,10 @@ export const useWorkflowPage = () => {
     setSelectedFile,
     setSelectedTemplate,
     setSelectedModel,
+    setWorkflowMode,
+    setAutoOriginalOverlay,
+    setOverlayMixMode,
+    setOverlayOpacity,
     updateScriptParams,
     updateAIClipConfig,
 

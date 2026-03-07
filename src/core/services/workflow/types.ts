@@ -7,6 +7,9 @@ import type {
   AIModel,
   Scene,
 } from '@/core/types';
+import type { OriginalityReport } from '@/core/templates/dedup';
+import type { ContentFingerprint, UniquenessCheckResult } from '@/core/services/uniqueness.service';
+import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
 
 // 工作流步骤
 export type WorkflowStep =
@@ -16,6 +19,7 @@ export type WorkflowStep =
   | 'script-generate'
   | 'script-dedup'
   | 'script-edit'
+  | 'ai-clip'
   | 'timeline-edit'
   | 'preview'
   | 'export';
@@ -24,7 +28,7 @@ export type WorkflowStep =
 export interface TimelineData {
   tracks: Array<{
     id: string;
-    type: 'video' | 'audio' | 'subtitle';
+    type: 'video' | 'audio' | 'subtitle' | 'effect';
     clips: Array<{
       id: string;
       startTime: number;
@@ -37,6 +41,40 @@ export interface TimelineData {
     }>;
   }>;
   duration: number;
+  alignment?: {
+    averageConfidence: number;
+    maxDriftSeconds: number;
+    items: Array<{
+      sceneId: string;
+      segmentId: string;
+      driftSeconds: number;
+      confidence: number;
+    }>;
+  };
+  originalOverlayPlan?: Array<{
+    sceneId: string;
+    startTime: number;
+    endTime: number;
+    reason: 'motion' | 'emotion' | 'transition' | 'anchor';
+  }>;
+  directorPlan?: {
+    pacingFactor: number;
+    beatCount: number;
+    preferredTransition: 'fade' | 'cut' | 'dissolve';
+    confidence: number;
+  };
+  overlayQuality?: {
+    score: number;
+    riskLevel: 'low' | 'medium' | 'high';
+    overlapRatio: number;
+    denseOverlayRatio: number;
+    suggestions: string[];
+  };
+  overlayOptimizationPreview?: {
+    predictedScore: number;
+    passes: number;
+    enableOverlay: boolean;
+  };
 }
 
 // 工作流数据
@@ -51,23 +89,47 @@ export interface WorkflowData {
   editedScript?: ScriptData;
   timeline?: TimelineData;
   exportSettings?: ExportSettings;
-  originalityReport?: {
-    score: number;
-    duplicates: any[];
-    suggestions: string[];
-  };
+  originalityReport?: OriginalityReport;
   uniquenessReport?: {
-    fingerprint: any;
-    check: {
-      isUnique: boolean;
-      similarity: number;
-      suggestions: string[];
-    };
+    fingerprint: ContentFingerprint;
+    check: UniquenessCheckResult;
     history: {
       totalScripts: number;
       recentScripts: number;
     };
   };
+  alignmentReport?: TimelineData['alignment'];
+  alignmentGateReport?: {
+    threshold: {
+      minConfidence: number;
+      maxDriftSeconds: number;
+    };
+    before: {
+      averageConfidence: number;
+      maxDriftSeconds: number;
+      lowConfidenceCount: number;
+      highDriftCount: number;
+    };
+    after: {
+      averageConfidence: number;
+      maxDriftSeconds: number;
+      lowConfidenceCount: number;
+      highDriftCount: number;
+    };
+    autoFixedSegments: number;
+    failedSegmentsBefore: Array<{
+      segmentId: string;
+      driftSeconds: number;
+      confidence: number;
+    }>;
+    failedSegmentsAfter: Array<{
+      segmentId: string;
+      driftSeconds: number;
+      confidence: number;
+    }>;
+    passed: boolean;
+  };
+  originalOverlayPlan?: TimelineData['originalOverlayPlan'];
 }
 
 // 工作流状态
@@ -81,6 +143,11 @@ export interface WorkflowState {
 
 // 工作流配置
 export interface WorkflowConfig {
+  mode?: WorkflowMode;
+  autoOriginalOverlay?: boolean;
+  overlayMixMode?: 'pip' | 'full';
+  overlayOpacity?: number;
+  commentarySyncStrategy?: 'strict' | 'balanced';
   autoAnalyze: boolean;
   autoGenerateScript: boolean;
   autoDedup: boolean;
@@ -135,6 +202,7 @@ export const STEP_PROGRESS: Record<WorkflowStep, number> = {
   'script-generate': 40,
   'script-dedup': 50,
   'script-edit': 60,
+  'ai-clip': 65,
   'timeline-edit': 70,
   preview: 90,
   export: 95,

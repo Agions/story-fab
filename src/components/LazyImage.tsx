@@ -3,7 +3,7 @@
  * Provides optimized loading for images, videos, and heavy components
  */
 
-import React, { useState, useEffect, useRef, ReactNode } from 'react';
+import React, { useState, useEffect, useRef, type ReactNode } from 'react';
 
 interface LazyImageProps {
   src: string;
@@ -174,7 +174,7 @@ export const LazyVideo: React.FC<LazyVideoProps> = ({
   style,
 }) => {
   const [isInView, setIsInView] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -187,8 +187,8 @@ export const LazyVideo: React.FC<LazyVideoProps> = ({
       { threshold: 0.1, rootMargin: '100px' }
     );
 
-    if (videoRef.current) {
-      observer.observe(videoRef.current);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
 
     return () => observer.disconnect();
@@ -197,7 +197,7 @@ export const LazyVideo: React.FC<LazyVideoProps> = ({
   if (!isInView) {
     return (
       <div
-        ref={videoRef}
+        ref={containerRef}
         style={{
           backgroundColor: '#000',
           minHeight: '200px',
@@ -214,7 +214,6 @@ export const LazyVideo: React.FC<LazyVideoProps> = ({
 
   return (
     <video
-      ref={videoRef}
       src={src}
       poster={poster}
       autoPlay={autoPlay}

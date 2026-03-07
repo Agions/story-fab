@@ -32,6 +32,11 @@ interface ProjectType {
   starred: boolean;
 }
 
+interface CreateProjectFormValues {
+  title: string;
+  resolution: string;
+}
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -50,7 +55,7 @@ const Dashboard: React.FC = () => {
     setLoading(false);
   }, []);
 
-  const handleCreateProject = (values: any) => {
+  const handleCreateProject = (values: CreateProjectFormValues) => {
     console.log('创建新项目:', values);
     // 这里应该实现实际的项目创建逻辑
     setShowCreateModal(false);
@@ -151,7 +156,7 @@ const Dashboard: React.FC = () => {
                   if (sortBy === option.value) {
                     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
                   } else {
-                    setSortBy(option.value as any);
+                    setSortBy(option.value as 'updatedAt' | 'createdAt' | 'title');
                     setSortOrder('desc');
                   }
                 }

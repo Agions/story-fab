@@ -7,13 +7,15 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ModelCard.module.less';
 
 // API密钥申请链接
-const API_LINKS = {
-  wenxin: 'https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Nlks5zkzu',
-  qianwen: 'https://help.aliyun.com/zh/dashscope/developer-reference/activate-dashscope-and-create-an-api-key',
-  spark: 'https://www.xfyun.cn/doc/spark/Guide.html',
-  chatglm: 'https://open.bigmodel.cn/dev/api#apikey',
-  doubao: 'https://www.doubao.com/docs/api/',
-  deepseek: 'https://platform.deepseek.com/api'
+const API_LINKS: Partial<Record<AIModelType, string>> = {
+  openai: 'https://platform.openai.com/docs/quickstart',
+  anthropic: 'https://docs.anthropic.com/en/api/getting-started',
+  google: 'https://ai.google.dev/gemini-api/docs/api-key',
+  alibaba: 'https://help.aliyun.com/zh/dashscope/developer-reference/activate-dashscope-and-create-an-api-key',
+  zhipu: 'https://open.bigmodel.cn/dev/api#apikey',
+  iflytek: 'https://www.xfyun.cn/doc/spark/Guide.html',
+  deepseek: 'https://platform.deepseek.com/api',
+  moonshot: 'https://platform.moonshot.cn/docs'
 };
 
 const { Text, Title } = Typography;
@@ -54,13 +56,15 @@ const ModelCard: React.FC<ModelCardProps> = ({
   // 处理申请API密钥
   const handleRequestApiKey = (e: React.MouseEvent) => {
     e.stopPropagation();
+    onRequestApiKey?.(modelType);
     // 显示申请选项模态框
     setIsModalVisible(true);
   };
 
   // 处理直接跳转到API密钥申请页面
   const handleGoToApiPage = () => {
-    window.open(API_LINKS[modelType], '_blank');
+    const link = API_LINKS[modelType] ?? '/settings';
+    window.open(link, '_blank');
     setIsModalVisible(false);
   };
 

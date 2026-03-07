@@ -17,12 +17,12 @@ interface ApiKeyRequestProps {
 const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
   visible,
   onClose,
-  modelType = 'wenxin'
+  modelType
 }) => {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [selectedType, setSelectedType] = useState<AIModelType>(modelType);
+  const [selectedType, setSelectedType] = useState<AIModelType>(modelType ?? 'openai');
   
   // 获取当前选择的模型信息
   const modelInfo = AI_MODEL_INFO[selectedType];
@@ -38,7 +38,7 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
         setSubmitting(false);
         setSubmitted(true);
       }, 1000);
-    } catch {
+    } catch (error) {
       console.error('表单验证失败:', error);
     }
   };

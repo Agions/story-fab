@@ -12,7 +12,6 @@ import {
   Space,
   Typography,
   Tag,
-  Tooltip,
   message,
   Alert
 } from 'antd';
@@ -25,7 +24,7 @@ import {
   DeleteOutlined,
   EyeOutlined
 } from '@ant-design/icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/components/common/motion-shim';
 import { useVideo } from '@/core/hooks/useVideo';
 import type { VideoInfo } from '@/core/types';
 import { formatDuration, formatFileSize } from '@/shared';
@@ -60,8 +59,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     isUploading,
     uploadProgress,
     uploadVideo,
-    error,
-    extractThumbnail
+    error
   } = useVideo();
 
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -92,6 +90,16 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     e.stopPropagation();
   }, []);
 
+  // 处理文件选择
+  const handleFileSelect = useCallback(async (file: File) => {
+    const videoInfo = await uploadVideo(file);
+    if (videoInfo) {
+      onUpload?.(videoInfo);
+      message.success('视频上传成功');
+    }
+    return false; // 阻止默认上传行为
+  }, [uploadVideo, onUpload]);
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -119,16 +127,6 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     setDragFile(null);
   }, [handleFileSelect]);
 
-  // 处理文件选择
-  const handleFileSelect = useCallback(async (file: File) => {
-    const videoInfo = await uploadVideo(file);
-    if (videoInfo) {
-      onUpload?.(videoInfo);
-      message.success('视频上传成功');
-    }
-    return false; // 阻止默认上传行为
-  }, [uploadVideo, onUpload]);
-
   // 处理删除
   const handleRemove = useCallback(() => {
     onRemove?.();
@@ -140,62 +138,65 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
 
   // 上传区域
   const renderUploadArea = () => (
-    <Dragger
-      accept={SUPPORTED_FORMATS.join(',')}
-      beforeUpload={handleFileSelect}
-      showUploadList={false}
-      disabled={disabled || isUploading}
-      className={`${styles.dragger} ${dragActive ? styles.dragActive : ''}`}
+    <div
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className={styles.uploadContent}
+      <Dragger
+        accept={SUPPORTED_FORMATS.join(',')}
+        beforeUpload={handleFileSelect}
+        showUploadList={false}
+        disabled={disabled || isUploading}
+        className={`${styles.dragger} ${dragActive ? styles.dragActive : ''}`}
       >
-        <div className={`${styles.uploadIcon} ${dragActive ? styles.uploadIconActive : ''}`}>
-          {isUploading ? (
-            <VideoCameraOutlined spin />
-          ) : dragActive ? (
-            <FileOutlined />
-          ) : (
-            <UploadOutlined />
-          )}
-        </div>
-        <Title level={5} className={styles.uploadTitle}>
-          {isUploading ? '正在上传视频...' : dragActive ? '释放鼠标上传视频' : '点击或拖拽视频到此处'}
-        </Title>
-        <Paragraph className={styles.uploadDesc}>
-          {dragFile ? (
-            <>
-              已选择文件: <strong>{dragFile.name}</strong>
-              <br />
-              大小: {formatFileSize(dragFile.size)}
-            </>
-          ) : (
-            <>
-              支持 {SUPPORTED_FORMATS.join(', ')} 格式
-              <br />
-              最大支持 {formatFileSize(MAX_FILE_SIZE)}
-            </>
-          )}
-        </Paragraph>
-
-        {isUploading && (
-          <div className={styles.progress}>
-            <Progress
-              percent={uploadProgress}
-              status="active"
-              strokeColor={{ from: '#108ee9', to: '#87d068' }}
-            />
-            <Text type="secondary">{uploadProgress}%</Text>
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className={styles.uploadContent}
+        >
+          <div className={`${styles.uploadIcon} ${dragActive ? styles.uploadIconActive : ''}`}>
+            {isUploading ? (
+              <VideoCameraOutlined spin />
+            ) : dragActive ? (
+              <FileOutlined />
+            ) : (
+              <UploadOutlined />
+            )}
           </div>
-        )}
-      </motion.div>
-    </Dragger>
+          <Title level={5} className={styles.uploadTitle}>
+            {isUploading ? '正在上传视频...' : dragActive ? '释放鼠标上传视频' : '点击或拖拽视频到此处'}
+          </Title>
+          <Paragraph className={styles.uploadDesc}>
+            {dragFile ? (
+              <>
+                已选择文件: <strong>{dragFile.name}</strong>
+                <br />
+                大小: {formatFileSize(dragFile.size)}
+              </>
+            ) : (
+              <>
+                支持 {SUPPORTED_FORMATS.join(', ')} 格式
+                <br />
+                最大支持 {formatFileSize(MAX_FILE_SIZE)}
+              </>
+            )}
+          </Paragraph>
+
+          {isUploading && (
+            <div className={styles.progress}>
+              <Progress
+                percent={uploadProgress}
+                status="active"
+                strokeColor={{ from: '#108ee9', to: '#87d068' }}
+              />
+              <Text type="secondary">{uploadProgress}%</Text>
+            </div>
+          )}
+        </motion.div>
+      </Dragger>
+    </div>
   );
 
   // 视频信息卡片

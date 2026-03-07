@@ -3,7 +3,8 @@
  * Includes: memoization helpers, performance monitoring, lazy loading
  */
 
-import { useMemo, useCallback, useRef, useEffect, DependencyList, RefObject } from 'react';
+import React, { useMemo, useCallback, useRef, useEffect, DependencyList, RefObject } from 'react';
+import { logger } from './logger';
 
 /**
  * Creates a memoized callback that only changes if dependencies change
@@ -100,7 +101,7 @@ export const PerformanceMonitor = {
     const start = performance.now();
     fn();
     const end = performance.now();
-    console.log(`[Performance] ${name}: ${(end - start).toFixed(2)}ms`);
+    logger.debug(`[Performance] ${name}: ${(end - start).toFixed(2)}ms`);
   },
 
   /**
@@ -110,7 +111,7 @@ export const PerformanceMonitor = {
     const start = performance.now();
     const result = await fn();
     const end = performance.now();
-    console.log(`[Performance] ${name}: ${(end - start).toFixed(2)}ms`);
+    logger.debug(`[Performance] ${name}: ${(end - start).toFixed(2)}ms`);
     return result;
   },
 
@@ -134,7 +135,7 @@ export const PerformanceMonitor = {
   logMemoryUsage: (): void => {
     const memory = PerformanceMonitor.getMemoryUsage();
     if (memory) {
-      console.log(
+      logger.debug(
         `[Memory] Used: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB / ` +
           `${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB`
       );
@@ -214,15 +215,15 @@ export function shouldRender<T>(value: T, threshold: number): boolean {
  */
 export function onRenderCallback(
   id: string,
-  phase: 'mount' | 'update',
+  _phase: 'mount' | 'update',
   actualDuration: number,
   baseDuration: number,
-  startTime: number,
-  commitTime: number
+  _startTime: number,
+  _commitTime: number
 ): void {
   // Log slow renders (renders taking more than 16ms)
   if (actualDuration > 16) {
-    console.warn(
+    logger.warn(
       `[Performance] Slow render in "${id}": ` +
         `${actualDuration.toFixed(2)}ms (base: ${baseDuration.toFixed(2)}ms)`
     );
@@ -244,13 +245,10 @@ export function createMemoizedComponent<P extends object>(
   Component: React.ComponentType<P>,
   compare?: (prev: P, next: P) => boolean
 ): React.FC<P> {
-  return (props: P) => {
-    // Using React.memo internally
-    const MemoizedComponent = useMemo(
-      () => Component,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
-    );
-    return <MemoizedComponent {...props} />;
+  const StableMemo = compare ? React.memo(Component, compare) : React.memo(Component);
+  const MemoizedComponent = (props: P) => {
+    return React.createElement(StableMemo as unknown as React.ComponentType<P>, props);
   };
+  MemoizedComponent.displayName = `Memoized(${Component.displayName || Component.name || 'Component'})`;
+  return MemoizedComponent;
 }

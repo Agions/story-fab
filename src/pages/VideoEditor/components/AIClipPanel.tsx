@@ -2,7 +2,8 @@ import React, { memo } from 'react';
 import { Typography, Empty } from 'antd';
 import { RobotOutlined } from '@ant-design/icons';
 import { AIClipAssistant } from '@/components/AIClipAssistant';
-import styles from '../VideoEditor.module.less';
+import type { ClipAnalysisResult, ClipSegment } from '@/core/services/aiClip.service';
+import styles from '../index.module.less';
 
 const { Title } = Typography;
 
@@ -10,8 +11,8 @@ interface AIClipPanelProps {
   projectId: string | undefined;
   videoSrc: string;
   duration: number;
-  onAnalysisComplete: (result: any) => void;
-  onApplySuggestions: (segments: any[]) => void;
+  onAnalysisComplete: (result: ClipAnalysisResult) => void;
+  onApplySuggestions: (segments: ClipSegment[]) => void;
 }
 
 const AIClipPanel: React.FC<AIClipPanelProps> = ({

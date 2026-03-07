@@ -4,8 +4,17 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { editorService, type EditorAction, type EditorConfig } from '@/core/services/editor.service';
-import type { Timeline, VideoClip, ExportSettings, ScriptSegment, VideoSegment } from '@/core/types';
+import {
+  editorService,
+  saveToStorage,
+  type EditorConfig,
+  type Timeline,
+  type VideoClip,
+  type VideoSegment,
+  type TextItem,
+  type AudioClip,
+} from '@/core/services/editor.service';
+import type { ExportSettings, ScriptSegment } from '@/core/types';
 
 // 剪辑状态
 export interface EditorState {
@@ -39,9 +48,9 @@ export interface EditorOperations {
 
   // 效果操作
   addTransition: (fromClipId: string, toClipId: string, type: string, duration: number) => void;
-  addEffect: (clipId: string, effect: string, params: Record<string, any>) => void;
-  addText: (trackId: string, text: any, position: number) => void;
-  addAudio: (trackId: string, audio: any, position: number) => void;
+  addEffect: (clipId: string, effect: string, params: Record<string, unknown>) => void;
+  addText: (trackId: string, text: TextItem, position: number) => void;
+  addAudio: (trackId: string, audio: AudioClip, position: number) => void;
 
   // 轨道操作
   createTrack: (type: 'video' | 'audio' | 'text' | 'effect') => string;
@@ -235,19 +244,19 @@ export function useEditor(config?: Partial<EditorConfig>): {
   const addTransition = useCallback((
     fromClipId: string,
     toClipId: string,
-    type: string,
+    transitionType: string,
     duration: number
   ) => {
     editorService.dispatch({
       type: 'ADD_TRANSITION',
       fromClipId,
       toClipId,
-      type,
+      transitionType,
       duration
     });
   }, []);
 
-  const addEffect = useCallback((clipId: string, effect: string, params: Record<string, any>) => {
+  const addEffect = useCallback((clipId: string, effect: string, params: Record<string, unknown>) => {
     editorService.dispatch({
       type: 'ADD_EFFECT',
       clipId,
@@ -256,7 +265,7 @@ export function useEditor(config?: Partial<EditorConfig>): {
     });
   }, []);
 
-  const addText = useCallback((trackId: string, text: any, position: number) => {
+  const addText = useCallback((trackId: string, text: TextItem, position: number) => {
     editorService.dispatch({
       type: 'ADD_TEXT',
       trackId,
@@ -265,7 +274,7 @@ export function useEditor(config?: Partial<EditorConfig>): {
     });
   }, []);
 
-  const addAudio = useCallback((trackId: string, audio: any, position: number) => {
+  const addAudio = useCallback((trackId: string, audio: AudioClip, position: number) => {
     editorService.dispatch({
       type: 'ADD_AUDIO',
       trackId,
@@ -289,7 +298,7 @@ export function useEditor(config?: Partial<EditorConfig>): {
       ...prev,
       timeline: prev.timeline ? {
         ...prev.timeline,
-        videoTracks: prev.timeline.videoTracks.map(track =>
+        videoTracks: prev.timeline.videoTracks.map((track) =>
           track.id === trackId ? { ...track, visible: !track.visible } : track
         )
       } : null
@@ -301,7 +310,7 @@ export function useEditor(config?: Partial<EditorConfig>): {
       ...prev,
       timeline: prev.timeline ? {
         ...prev.timeline,
-        videoTracks: prev.timeline.videoTracks.map(track =>
+        videoTracks: prev.timeline.videoTracks.map((track) =>
           track.id === trackId ? { ...track, locked: !track.locked } : track
         )
       } : null
@@ -370,7 +379,7 @@ export function useEditor(config?: Partial<EditorConfig>): {
 
   // 项目操作
   const saveProject = useCallback(() => {
-    editorService.saveToStorage();
+    saveToStorage(editorService.getTimeline());
   }, []);
 
   const loadProject = useCallback(() => {

@@ -1,22 +1,29 @@
 import React, { useState } from 'react';
 import { Card, Radio, Button, Input, Space, message, Tooltip } from 'antd';
-import { ExportOutlined, FileTextOutlined, FileMarkdownOutlined, FilePdfOutlined, FileExcelOutlined, GlobalOutlined } from '@ant-design/icons';
+import type { RadioChangeEvent } from 'antd/es/radio';
+import { ExportOutlined, FileTextOutlined, FilePdfOutlined, GlobalOutlined } from '@ant-design/icons';
 import { ExportFormat, exportScript } from '@/services/exportService';
 import { Script } from '@/services/aiService';
+import { logger } from '@/utils/logger';
 import styles from './ExportPanel.module.less';
+
+export interface ScriptExportSettings {
+  format: ExportFormat;
+  filename: string;
+}
 
 interface ExportPanelProps {
   script?: Script;
-  onExport?: (settings: any) => Promise<string> | void;
+  onExport?: (settings: ScriptExportSettings) => Promise<string> | void;
 }
 
 const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
   const [exportFormat, setExportFormat] = useState<ExportFormat>(ExportFormat.TXT);
-  const [filename, setFilename] = useState<string>(`脚本_${script.id}`);
+  const [filename, setFilename] = useState<string>(`脚本_${script?.id ?? Date.now()}`);
   const [exporting, setExporting] = useState(false);
   
   // 处理导出格式变更
-  const handleFormatChange = (e: any) => {
+  const handleFormatChange = (e: RadioChangeEvent) => {
     setExportFormat(e.target.value);
   };
   
@@ -42,9 +49,10 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
         };
         await onExport(settings);
         message.success('导出成功');
-      } catch {
-        console.error('导出失败:', error);
-        message.error('导出失败，请稍后重试');
+      } catch (error) {
+        logger.error('导出失败:', error);
+        const detail = error instanceof Error ? error.message : '导出失败，请稍后重试';
+        message.error(detail);
       } finally {
         setExporting(false);
       }
@@ -63,27 +71,12 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
       if (success) {
         message.success(`脚本已成功导出为${exportFormat.toUpperCase()}格式`);
       }
-    } catch {
-      console.error('导出失败:', error);
-      message.error('导出失败，请稍后重试');
+    } catch (error) {
+      logger.error('导出失败:', error);
+      const detail = error instanceof Error ? error.message : '导出失败，请稍后重试';
+      message.error(detail);
     } finally {
       setExporting(false);
-    }
-  };
-  
-  // 根据格式返回对应图标
-  const getFormatIcon = (format: ExportFormat) => {
-    switch (format) {
-      case ExportFormat.TXT:
-        return <FileTextOutlined />;
-      case ExportFormat.SRT:
-        return <FileTextOutlined />;
-      case ExportFormat.PDF:
-        return <FilePdfOutlined />;
-      case ExportFormat.HTML:
-        return <GlobalOutlined />;
-      default:
-        return <FileTextOutlined />;
     }
   };
   

@@ -3,8 +3,6 @@
  * 提供多种去重策略，自动随机选择
  */
 
-import type { ScriptData, ScriptSegment } from '@/core/types';
-
 // 去重策略变体类型
 export type DedupVariantType =
   | 'conservative'   // 保守型：最小改动
@@ -159,7 +157,7 @@ const STRATEGIES: Record<string, (content: string) => string> = {
     for (const [word, alternatives] of Object.entries(synonyms)) {
       const regex = new RegExp(word, 'g');
       if (regex.test(result) && Math.random() < 0.5) {
-        const replacement = alternatives[Math.floor(Math.random() * alternatives.length)];
+        const replacement = alternatives[Math.floor(Math.random() * alternatives.length)] ?? word;
         result = result.replace(regex, replacement);
       }
     }
@@ -240,7 +238,7 @@ const STRATEGIES: Record<string, (content: string) => string> = {
       const alternatives = group.slice(1);
       const regex = new RegExp(original, 'g');
       if (regex.test(result) && Math.random() < 0.5) {
-        const replacement = alternatives[Math.floor(Math.random() * alternatives.length)];
+        const replacement = alternatives[Math.floor(Math.random() * alternatives.length)] ?? original;
         result = result.replace(regex, replacement);
       }
     }
@@ -327,6 +325,9 @@ class DedupVariantService {
     }
 
     const selected = available[Math.floor(Math.random() * available.length)];
+    if (!selected) {
+      return DEDUP_VARIANTS.balanced;
+    }
     this.usedVariants.add(selected.id);
     return selected;
   }
@@ -423,6 +424,3 @@ class DedupVariantService {
 
 export const dedupVariantService = new DedupVariantService();
 export default dedupVariantService;
-
-// 导出类型
-export type { DedupVariant, DedupVariantType };

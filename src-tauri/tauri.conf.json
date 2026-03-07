@@ -6,7 +6,7 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://localhost:1430",
     "frontendDist": "../dist"
   },
   "app": {
@@ -37,16 +37,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "plugins": {
-    "dialog": {},
-    "fs": {
-      "scope": {
-        "allow": ["$APP/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$HOME/**", "**"]
-      }
-    },
-    "shell": {
-      "open": true
-    }
   }
 }

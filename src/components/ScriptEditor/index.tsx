@@ -1,12 +1,21 @@
-import React, { memo } from 'react';
-import { Card, Empty, Typography } from 'antd';
+import React, { memo, lazy, Suspense } from 'react';
+import { Card, Empty, Typography, Spin } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { ScriptEditorProps, isWorkflowProps } from './types';
-import WorkflowEditor from './WorkflowEditor';
-import OriginalEditor from './OriginalEditor';
-import styles from './ScriptEditor.module.less';
+import styles from '../ScriptEditor.module.less';
 
 const { Text } = Typography;
+const WorkflowEditor = lazy(() => import('./WorkflowEditor'));
+const OriginalEditor = lazy(() => import('./OriginalEditor'));
+
+const EditorFallback: React.FC = () => (
+  <Card className={styles.scriptEditor}>
+    <div className={styles.emptyState}>
+      <Spin size="large" />
+      <Text type="secondary">编辑器模块加载中...</Text>
+    </div>
+  </Card>
+);
 
 /**
  * 脚本编辑器组件
@@ -33,30 +42,29 @@ const ScriptEditor: React.FC<ScriptEditorProps> = (props) => {
     }
 
     return (
-      <WorkflowEditor
-        script={script}
-        scenes={scenes}
-        onSave={onSave}
-        onScriptUpdate={onScriptUpdate}
-      />
+      <Suspense fallback={<EditorFallback />}>
+        <WorkflowEditor
+          script={script}
+          scenes={scenes}
+          onSave={onSave}
+          onScriptUpdate={onScriptUpdate}
+        />
+      </Suspense>
     );
   }
 
   // 原始模式渲染
-  const { videoPath, initialSegments, onSave, onExport } = props as {
-    videoPath: string;
-    initialSegments?: any[];
-    onSave: (segments: any[]) => void;
-    onExport?: (format: string) => void;
-  };
+  const { videoPath, initialSegments, onSave, onExport } = props;
 
   return (
-    <OriginalEditor
-      videoPath={videoPath}
-      initialSegments={initialSegments}
-      onSave={onSave}
-      onExport={onExport}
-    />
+    <Suspense fallback={<EditorFallback />}>
+      <OriginalEditor
+        videoPath={videoPath}
+        initialSegments={initialSegments}
+        onSave={onSave}
+        onExport={onExport}
+      />
+    </Suspense>
   );
 };
 

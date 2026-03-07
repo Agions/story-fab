@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Typography, Button, Card, Row, Col, Input, Select,
-  Table, Tag, Space, Modal, message, Empty, Dropdown, Progress, Tooltip
+  Tag, Space, Modal, message, Empty, Dropdown, Progress, Tooltip, Spin
 } from 'antd';
-import { useProjectStore } from '@/store';
-import { Project } from '@/types';
+import { useSettings } from '@/context/SettingsContext';
+import { listProjects, deleteProject as deleteProjectFile } from '@/services/tauriService';
+import type { ProjectUIStatus, ProjectUIStats, ProjectView } from './types';
 import {
   PlusOutlined,
   EditOutlined,
@@ -21,53 +22,102 @@ import {
 
 const { Title, Text } = Typography;
 const { Search } = Input;
+const loadProjectsListView = () => import('./components/ProjectsListView');
+const ProjectsListView = lazy(loadProjectsListView);
+
+type ProjectStatusFilter = 'all' | ProjectUIStatus;
+
+const asProjectView = (record: Record<string, unknown>): ProjectView => ({
+  id: String(record.id),
+  name: String(record.name || '未命名项目'),
+  description: typeof record.description === 'string' ? record.description : '',
+  status: (record.status === 'processing' || record.status === 'completed') ? record.status : 'draft',
+  createdAt: String(record.createdAt || new Date().toISOString()),
+  updatedAt: String(record.updatedAt || record.createdAt || new Date().toISOString()),
+  scripts: Array.isArray(record.scripts) ? record.scripts : [],
+  videos: Array.isArray(record.videos) ? record.videos : [],
+  videoPath: typeof record.videoPath === 'string' ? record.videoPath : '',
+});
 
 const ProjectManager: React.FC = () => {
   const navigate = useNavigate();
-  const { projects: storeProjects, deleteProject } = useProjectStore();
+  const { settings, addRecentProject } = useSettings();
+  const [projects, setProjects] = useState<ProjectView[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchText, setSearchText] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<ProjectStatusFilter>('all');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate initial loading time for smooth UI transition
-    const timer = setTimeout(() => {
+  const loadProjectData = async () => {
+    try {
+      setLoading(true);
+      const data = await listProjects<Record<string, unknown>>();
+      const mapped = (Array.isArray(data) ? data : [])
+        .filter((item) => typeof item.id === 'string')
+        .map(asProjectView);
+      setProjects(mapped);
+    } catch (error) {
+      console.error('加载项目列表失败:', error);
+      message.error('加载项目列表失败，请稍后重试');
+      setProjects([]);
+    } finally {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    }
+  };
+
+  useEffect(() => {
+    void loadProjectData();
   }, []);
 
-  const statusConfig: Record<string, { color: string; text: string }> = {
+  const statusConfig: Record<ProjectUIStatus, { color: string; text: string }> = {
     draft: { color: 'default', text: '草稿' },
     processing: { color: 'processing', text: '制作中' },
     completed: { color: 'success', text: '已完成' },
-    exported: { color: 'purple', text: '已导出' },
   };
 
-  // Helper to map a Project from useStore to UI fields structure
-  const getProjectUIStatus = (project: Project) => {
-    let scriptCount = project.scripts?.length || 0;
-    let videoCount = project.videoUrl ? 1 : 0;
-    let status = 'draft';
+  const getProjectUIStatus = (project: ProjectView): ProjectUIStats => {
+    const scriptCount = Array.isArray(project.scripts) ? project.scripts.length : 0;
+    const videoCount = Array.isArray(project.videos) && project.videos.length > 0
+      ? project.videos.length
+      : (project.videoPath ? 1 : 0);
+    const status: ProjectUIStatus = project.status === 'completed'
+      ? 'completed'
+      : project.status === 'processing'
+        ? 'processing'
+        : 'draft';
     let progress = 0;
-
-    if (project.analysis) {
-      progress = 50;
-      status = 'processing';
-      if (scriptCount > 0) {
-        progress = 100;
-        status = 'completed';
-      }
-    } else if (project.videoUrl) {
-      progress = 25;
-      status = 'draft';
+    if (status === 'completed') {
+      progress = 100;
+    } else if (status === 'processing') {
+      progress = 65;
+    } else if (scriptCount > 0 && videoCount > 0) {
+      progress = 45;
+    } else if (videoCount > 0) {
+      progress = 20;
     }
 
     return { scriptCount, videoCount, status, progress };
   };
 
-  const filteredProjects = storeProjects.filter(p => {
+  const orderedProjects = useMemo(() => {
+    const recentOrder = new Map(settings.recentProjects.map((id, index) => [id, index]));
+    return [...projects].sort((a, b) => {
+      const aOrder = recentOrder.get(a.id);
+      const bOrder = recentOrder.get(b.id);
+      if (aOrder !== undefined && bOrder !== undefined) {
+        return aOrder - bOrder;
+      }
+      if (aOrder !== undefined) {
+        return -1;
+      }
+      if (bOrder !== undefined) {
+        return 1;
+      }
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+  }, [projects, settings.recentProjects]);
+
+  const filteredProjects = orderedProjects.filter(p => {
     const matchSearch = !searchText || p.name.includes(searchText) || p.description?.includes(searchText);
     const uiStatus = getProjectUIStatus(p).status;
     const matchStatus = statusFilter === 'all' || uiStatus === statusFilter;
@@ -81,9 +131,19 @@ const ProjectManager: React.FC = () => {
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
-      onOk: () => {
-        deleteProject(id);
-        message.success('项目已删除');
+      onOk: async () => {
+        try {
+          const ok = await deleteProjectFile(id);
+          if (!ok) {
+            message.error('删除项目失败');
+            return;
+          }
+          message.success('项目已删除');
+          await loadProjectData();
+        } catch (error) {
+          console.error('删除项目失败:', error);
+          message.error('删除项目失败，请稍后重试');
+        }
       }
     });
   };
@@ -98,7 +158,7 @@ const ProjectManager: React.FC = () => {
     return date.toLocaleDateString('zh-CN');
   };
 
-  const projectActions = (project: Project) => ({
+  const projectActions = (project: ProjectView) => ({
     items: [
       { key: 'edit', label: '编辑项目', icon: <EditOutlined />, onClick: () => navigate(`/project/edit/${project.id}`) },
       { key: 'editor', label: '进入工作台', icon: <PlayCircleOutlined />, onClick: () => navigate(`/editor/${project.id}`) },
@@ -188,79 +248,26 @@ const ProjectManager: React.FC = () => {
     </Row>
   );
 
-  // 列表视图
+  // 列表视图（按需懒加载）
   const ListView = () => (
-    <Table
-      dataSource={filteredProjects}
-      rowKey="id"
-      loading={loading}
-      pagination={{ pageSize: 10 }}
-      onRow={(record) => ({ onClick: () => navigate(`/project/${record.id}`), style: { cursor: 'pointer' } })}
-      columns={[
-        {
-          title: '项目名称',
-          dataIndex: 'name',
-          render: (name: string, record: Project) => (
-            <div>
-              <Text strong>{name}</Text>
-              <div><Text type="secondary" style={{ fontSize: 12 }}>{record.description}</Text></div>
-            </div>
-          )
-        },
-        {
-          title: '状态',
-          key: 'status',
-          width: 100,
-          render: (_: any, record: Project) => {
-            const uiStatus = getProjectUIStatus(record).status;
-            return <Tag color={statusConfig[uiStatus]?.color}>{statusConfig[uiStatus]?.text}</Tag>;
-          }
-        },
-        {
-          title: '进度',
-          key: 'progress',
-          width: 140,
-          render: (_: any, record: Project) => {
-            const progress = getProjectUIStatus(record).progress;
-            return <Progress percent={progress} size="small" strokeColor={{ from: '#667eea', to: '#764ba2' }} />;
-          }
-        },
-        {
-          title: '素材',
-          key: 'assets',
-          width: 100,
-          render: (_: any, record: Project) => {
-            const uiStatus = getProjectUIStatus(record);
-            return (
-              <Space size={8}>
-                <Text type="secondary" style={{ fontSize: 12 }}><VideoCameraOutlined /> {uiStatus.videoCount}</Text>
-                <Text type="secondary" style={{ fontSize: 12 }}><FolderOpenOutlined /> {uiStatus.scriptCount}</Text>
-              </Space>
-            );
-          }
-        },
-        {
-          title: '更新时间',
-          dataIndex: 'updatedAt',
-          width: 120,
-          render: (d: string) => <Text type="secondary" style={{ fontSize: 12 }}>{formatDate(d)}</Text>
-        },
-        {
-          title: '操作',
-          width: 120,
-          render: (_: any, record: Project) => (
-            <Space>
-              <Tooltip title="进入工作台">
-                <Button type="text" icon={<PlayCircleOutlined />} onClick={e => { e.stopPropagation(); navigate(`/editor/${record.id}`); }} />
-              </Tooltip>
-              <Dropdown menu={projectActions(record)} trigger={['click']}>
-                <Button type="text" icon={<EllipsisOutlined />} onClick={e => e.stopPropagation()} />
-              </Dropdown>
-            </Space>
-          )
-        },
-      ]}
-    />
+    <Suspense fallback={<div style={{ padding: 24, textAlign: 'center' }}><Spin size="large" /></div>}>
+      <ProjectsListView
+        projects={filteredProjects}
+        loading={loading}
+        statusConfig={statusConfig}
+        getProjectUIStatus={getProjectUIStatus}
+        formatDate={formatDate}
+        onOpenProject={(projectId) => {
+          addRecentProject(projectId);
+          navigate(`/project/${projectId}`);
+        }}
+        onOpenEditor={(projectId) => {
+          addRecentProject(projectId);
+          navigate(`/editor/${projectId}`);
+        }}
+        projectActions={projectActions}
+      />
+    </Suspense>
   );
 
   return (
@@ -278,14 +285,16 @@ const ProjectManager: React.FC = () => {
             />
             <Select
               value={statusFilter}
-              onChange={setStatusFilter}
+              onChange={(value) => setStatusFilter(value as ProjectStatusFilter)}
               style={{ width: 120 }}
+              getPopupContainer={() => document.body}
+              popupClassName="projects-filter-select-popup"
+              dropdownStyle={{ zIndex: 3200 }}
               options={[
                 { value: 'all', label: '全部状态' },
                 { value: 'draft', label: '草稿' },
                 { value: 'processing', label: '制作中' },
                 { value: 'completed', label: '已完成' },
-                { value: 'exported', label: '已导出' },
               ]}
             />
           </Space>
@@ -304,6 +313,9 @@ const ProjectManager: React.FC = () => {
                   icon={<UnorderedListOutlined />}
                   type={viewMode === 'list' ? 'primary' : 'default'}
                   onClick={() => setViewMode('list')}
+                  onMouseEnter={() => {
+                    void loadProjectsListView();
+                  }}
                 />
               </Tooltip>
             </Button.Group>
@@ -324,13 +336,12 @@ const ProjectManager: React.FC = () => {
 
       {/* 项目统计 */}
       <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        {[
-          { label: '全部', value: storeProjects.length, color: '#667eea', filter: 'all' },
-          { label: '草稿', value: storeProjects.filter(p => getProjectUIStatus(p).status === 'draft').length, color: '#8c8c8c', filter: 'draft' },
-          { label: '制作中', value: storeProjects.filter(p => getProjectUIStatus(p).status === 'processing').length, color: '#1890ff', filter: 'processing' },
-          { label: '已完成', value: storeProjects.filter(p => getProjectUIStatus(p).status === 'completed').length, color: '#52c41a', filter: 'completed' },
-          { label: '已导出', value: storeProjects.filter(p => getProjectUIStatus(p).status === 'exported').length, color: '#722ed1', filter: 'exported' },
-        ].map((item, idx) => (
+        {([
+          { label: '全部', value: projects.length, color: '#667eea', filter: 'all' },
+          { label: '草稿', value: projects.filter(p => getProjectUIStatus(p).status === 'draft').length, color: '#8c8c8c', filter: 'draft' },
+          { label: '制作中', value: projects.filter(p => getProjectUIStatus(p).status === 'processing').length, color: '#1890ff', filter: 'processing' },
+          { label: '已完成', value: projects.filter(p => getProjectUIStatus(p).status === 'completed').length, color: '#52c41a', filter: 'completed' },
+        ] as Array<{ label: string; value: number; color: string; filter: ProjectStatusFilter }>).map((item, idx) => (
           <Col key={idx}>
             <Tag
               style={{ 

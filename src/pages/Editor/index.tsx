@@ -18,7 +18,7 @@ import {
   Select,
   message,
   Modal,
-  Progress
+  Progress,
 } from 'antd';
 import {
   PlayCircleFilled,
@@ -33,15 +33,21 @@ import {
   ZoomInOutlined,
   ZoomOutOutlined,
   ExportOutlined,
-  SettingOutlined,
   PlusOutlined,
   FileAddOutlined,
   SaveOutlined,
-  FolderOpenOutlined
+  FolderOpenOutlined,
 } from '@ant-design/icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from '@/components/common/motion-shim';
 import { useEditor } from '@/core/hooks';
-import type { VideoClip, ExportSettings } from '@/core/types';
+import type {
+  AudioTrack,
+  EditorExportSettings as ExportSettings,
+  TextItem,
+  TextTrack,
+  VideoClip,
+  VideoTrack,
+} from '@/core/services/editor/types';
 import styles from './index.module.less';
 
 const { Content, Sider } = Layout;
@@ -54,7 +60,7 @@ const TRANSITION_OPTIONS = [
   { value: 'dissolve', label: '交叉溶解' },
   { value: 'wipe', label: '擦除' },
   { value: 'slide', label: '滑动' },
-  { value: 'zoom', label: '缩放' }
+  { value: 'zoom', label: '缩放' },
 ];
 
 // 导出设置选项
@@ -63,7 +69,7 @@ const EXPORT_SETTINGS: ExportSettings = {
   resolution: '1080p',
   quality: 'high',
   fps: 30,
-  bitrate: '8M'
+  bitrate: '8M',
 };
 
 export const EditorPage: React.FC = () => {
@@ -75,6 +81,10 @@ export const EditorPage: React.FC = () => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportSettings, setExportSettings] = useState<ExportSettings>(EXPORT_SETTINGS);
   const [playbackRate, setPlaybackRate] = useState(1);
+
+  const isPanelKey = (key: string): key is 'media' | 'effects' | 'text' | 'audio' => {
+    return key === 'media' || key === 'effects' || key === 'text' || key === 'audio';
+  };
 
   // 视频预览引用
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -156,18 +166,10 @@ export const EditorPage: React.FC = () => {
     <div className={styles.toolbar}>
       <Space>
         <Tooltip title="撤销">
-          <Button
-            icon={<UndoOutlined />}
-            onClick={operations.undo}
-            disabled={!state.canUndo}
-          />
+          <Button icon={<UndoOutlined />} onClick={operations.undo} disabled={!state.canUndo} />
         </Tooltip>
         <Tooltip title="重做">
-          <Button
-            icon={<RedoOutlined />}
-            onClick={operations.redo}
-            disabled={!state.canRedo}
-          />
+          <Button icon={<RedoOutlined />} onClick={operations.redo} disabled={!state.canRedo} />
         </Tooltip>
         <Divider type="vertical" />
         <Tooltip title="分割">
@@ -196,11 +198,7 @@ export const EditorPage: React.FC = () => {
         <Button icon={<FolderOpenOutlined />} onClick={operations.loadProject}>
           打开
         </Button>
-        <Button
-          type="primary"
-          icon={<ExportOutlined />}
-          onClick={() => setShowExportModal(true)}
-        >
+        <Button type="primary" icon={<ExportOutlined />} onClick={() => setShowExportModal(true)}>
           导出
         </Button>
       </Space>
@@ -228,10 +226,7 @@ export const EditorPage: React.FC = () => {
       {/* 播放控制 */}
       <div className={styles.playbackControls}>
         <Space>
-          <Button
-            icon={<StepBackwardFilled />}
-            onClick={() => operations.seek(0)}
-          />
+          <Button icon={<StepBackwardFilled />} onClick={() => operations.seek(0)} />
           <Button
             type="primary"
             size="large"
@@ -253,7 +248,7 @@ export const EditorPage: React.FC = () => {
         <div className={styles.playbackRate}>
           <Select
             value={playbackRate}
-            onChange={(value) => {
+            onChange={value => {
               setPlaybackRate(value);
               operations.setPlaybackRate(value);
             }}
@@ -275,7 +270,7 @@ export const EditorPage: React.FC = () => {
         max={state.timeline?.duration || 100}
         value={state.currentTime}
         onChange={operations.seek}
-        tooltip={{ formatter: (value) => formatTime(value || 0) }}
+        tooltip={{ formatter: value => formatTime(value || 0) }}
       />
     </div>
   );
@@ -310,65 +305,71 @@ export const EditorPage: React.FC = () => {
       </div>
 
       <div className={styles.timelineTracks}>
-        {state.timeline?.videoTracks.map((track, index) => (
-          <div key={track.id} className={styles.track}>
-            <div className={styles.trackHeader}>
-              <span>视频 {index + 1}</span>
+        {state.timeline?.videoTracks.map(
+          (track: VideoTrack, index: number) => (
+            <div key={track.id} className={styles.track}>
+              <div className={styles.trackHeader}>
+                <span>视频 {index + 1}</span>
+              </div>
+              <div className={styles.trackContent}>
+                {track.clips.map((clip: VideoClip) => (
+                  <motion.div
+                    key={clip.id}
+                    className={`${styles.clip} ${state.selectedClipId === clip.id ? styles.selected : ''}`}
+                    style={{
+                      left: `${(clip.startTime / (state.timeline?.duration || 1)) * 100}%`,
+                      width: `${((clip.endTime - clip.startTime) / (state.timeline?.duration || 1)) * 100}%`,
+                    }}
+                    onClick={() => operations.selectClip(clip.id)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className={styles.clipContent}>
+                      <span className={styles.clipLabel}>片段</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-            <div className={styles.trackContent}>
-              {track.clips.map((clip) => (
-                <motion.div
-                  key={clip.id}
-                  className={`${styles.clip} ${state.selectedClipId === clip.id ? styles.selected : ''}`}
-                  style={{
-                    left: `${(clip.startTime / (state.timeline?.duration || 1)) * 100}%`,
-                    width: `${((clip.endTime - clip.startTime) / (state.timeline?.duration || 1)) * 100}%`
-                  }}
-                  onClick={() => operations.selectClip(clip.id)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className={styles.clipContent}>
-                    <span className={styles.clipLabel}>片段</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        ))}
+          )
+        )}
 
-        {state.timeline?.audioTracks.map((track, index) => (
-          <div key={track.id} className={styles.track}>
-            <div className={styles.trackHeader}>
-              <span>音频 {index + 1}</span>
+        {state.timeline?.audioTracks.map(
+          (track: AudioTrack, index: number) => (
+            <div key={track.id} className={styles.track}>
+              <div className={styles.trackHeader}>
+                <span>音频 {index + 1}</span>
+              </div>
+              <div className={styles.trackContent}>{/* 音频片段 */}</div>
             </div>
-            <div className={styles.trackContent}>
-              {/* 音频片段 */}
-            </div>
-          </div>
-        ))}
+          )
+        )}
 
-        {state.timeline?.textTracks.map((track, index) => (
-          <div key={track.id} className={styles.track}>
-            <div className={styles.trackHeader}>
-              <span>字幕 {index + 1}</span>
+        {state.timeline?.textTracks.map(
+          (track: TextTrack, index: number) => (
+            <div key={track.id} className={styles.track}>
+              <div className={styles.trackHeader}>
+                <span>字幕 {index + 1}</span>
+              </div>
+              <div className={styles.trackContent}>
+                {track.items.map(
+                  (item: TextItem) => (
+                    <motion.div
+                      key={item.id}
+                      className={styles.textItem}
+                      style={{
+                        left: `${(item.startTime / (state.timeline?.duration || 1)) * 100}%`,
+                        width: `${((item.endTime - item.startTime) / (state.timeline?.duration || 1)) * 100}%`,
+                      }}
+                    >
+                      <span className={styles.textContent}>{item.content.slice(0, 20)}...</span>
+                    </motion.div>
+                  )
+                )}
+              </div>
             </div>
-            <div className={styles.trackContent}>
-              {track.items.map((item) => (
-                <motion.div
-                  key={item.id}
-                  className={styles.textItem}
-                  style={{
-                    left: `${(item.startTime / (state.timeline?.duration || 1)) * 100}%`,
-                    width: `${((item.endTime - item.startTime) / (state.timeline?.duration || 1)) * 100}%`
-                  }}
-                >
-                  <span className={styles.textContent}>{item.content.slice(0, 20)}...</span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        ))}
+          )
+        )}
       </div>
 
       {/* 播放头 */}
@@ -382,7 +383,7 @@ export const EditorPage: React.FC = () => {
   // 渲染侧边栏
   const renderSidebar = () => (
     <Sider width={300} className={styles.sidebar}>
-      <Tabs activeKey={activePanel} onChange={(key) => setActivePanel(key as any)}>
+      <Tabs activeKey={activePanel} onChange={key => isPanelKey(key) && setActivePanel(key)}>
         <TabPane tab="媒体" key="media">
           <div className={styles.panelContent}>
             <p>媒体库</p>
@@ -393,7 +394,7 @@ export const EditorPage: React.FC = () => {
           <div className={styles.panelContent}>
             <p>转场效果</p>
             <div className={styles.effectGrid}>
-              {TRANSITION_OPTIONS.map((effect) => (
+              {TRANSITION_OPTIONS.map(effect => (
                 <Button
                   key={effect.value}
                   className={styles.effectButton}
@@ -446,7 +447,7 @@ export const EditorPage: React.FC = () => {
             <label>格式</label>
             <Select
               value={exportSettings.format}
-              onChange={(value) => setExportSettings({ ...exportSettings, format: value })}
+              onChange={value => setExportSettings({ ...exportSettings, format: value })}
               style={{ width: '100%' }}
             >
               <Option value="mp4">MP4</Option>
@@ -458,7 +459,7 @@ export const EditorPage: React.FC = () => {
             <label>分辨率</label>
             <Select
               value={exportSettings.resolution}
-              onChange={(value) => setExportSettings({ ...exportSettings, resolution: value })}
+              onChange={value => setExportSettings({ ...exportSettings, resolution: value })}
               style={{ width: '100%' }}
             >
               <Option value="720p">720p HD</Option>
@@ -471,7 +472,7 @@ export const EditorPage: React.FC = () => {
             <label>质量</label>
             <Select
               value={exportSettings.quality}
-              onChange={(value) => setExportSettings({ ...exportSettings, quality: value })}
+              onChange={value => setExportSettings({ ...exportSettings, quality: value })}
               style={{ width: '100%' }}
             >
               <Option value="low">低</Option>

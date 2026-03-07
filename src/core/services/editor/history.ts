@@ -1,5 +1,4 @@
-import type { Timeline } from '@/core/types';
-import type { EditorHistory } from './types';
+import type { EditorHistory, Timeline } from './types';
 
 export function createHistory(present: Timeline): EditorHistory {
   return {

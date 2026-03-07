@@ -185,7 +185,11 @@ export interface ScriptData {
 export interface ProjectData {
   id: string;
   name: string;
+  templateId?: string;
+  templateName?: string;
   description?: string;
+  videoPath?: string;
+  videoUrl?: string;
   status: 'draft' | 'completed' | 'archived';
   videos: VideoInfo[];
   scripts: ScriptData[];

@@ -53,8 +53,10 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
     }
 
     return { isValid: true };
-  } catch (error: any) {
-    const errorMessage = error.response?.data?.error?.message || 'API 密钥验证失败';
+  } catch (error: unknown) {
+    const errorMessage = axios.isAxiosError(error)
+      ? (error.response?.data as { error?: { message?: string } } | undefined)?.error?.message || 'API 密钥验证失败'
+      : 'API 密钥验证失败';
     return { isValid: false, error: errorMessage };
   }
 };

@@ -7,7 +7,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { ProjectData, VideoInfo, ScriptData, ProjectSettings, TaskStatus } from '@/core/types';
 
-interface UseProjectReturn {
+export interface UseProjectReturn {
   // 当前项目
   project: ProjectData | null;
   
@@ -56,16 +56,12 @@ const DEFAULT_SETTINGS: ProjectSettings = {
   subtitleStyle: {
     fontFamily: 'Arial',
     fontSize: 24,
-    fontColor: '#FFFFFF',
+    color: '#FFFFFF',
     backgroundColor: '#000000',
-    backgroundOpacity: 0.5,
     outline: true,
     outlineColor: '#000000',
-    outlineWidth: 2,
     position: 'bottom',
-    alignment: 'center',
-    lineSpacing: 1.5,
-    letterSpacing: 0
+    alignment: 'center'
   }
 };
 
@@ -122,6 +118,8 @@ export function useProject(projectId?: string): UseProjectReturn {
       name: name || '未命名项目',
       description,
       status: 'draft',
+      videos: [],
+      scripts: [],
       settings: { ...DEFAULT_SETTINGS },
       createdAt: now,
       updatedAt: now
@@ -234,25 +232,28 @@ export function useProject(projectId?: string): UseProjectReturn {
   
   // 设置视频
   const setVideo = useCallback((videoInfo: VideoInfo) => {
-    updateProject({ video: videoInfo });
+    updateProject({ videos: [videoInfo] });
   }, [updateProject]);
   
   // 移除视频
   const removeVideo = useCallback(() => {
-    updateProject({ video: undefined });
+    updateProject({ videos: [] });
   }, [updateProject]);
   
   // 设置脚本
   const setScript = useCallback((script: ScriptData) => {
-    updateProject({ script });
+    updateProject({ scripts: [script] });
   }, [updateProject]);
   
   // 更新脚本
   const updateScript = useCallback((updates: Partial<ScriptData>) => {
-    if (!project?.script) return;
-    
+    if (!project?.scripts?.length) return;
+
+    const currentScript = project.scripts[0];
+    if (!currentScript) return;
+
     updateProject({
-      script: { ...project.script, ...updates, updatedAt: new Date().toISOString() }
+      scripts: [{ ...currentScript, ...updates, updatedAt: new Date().toISOString() }]
     });
   }, [project, updateProject]);
   
@@ -261,7 +262,7 @@ export function useProject(projectId?: string): UseProjectReturn {
     if (!project) return;
     
     updateProject({
-      settings: { ...project.settings, ...settings }
+      settings: { ...(project.settings || DEFAULT_SETTINGS), ...settings } as ProjectSettings
     });
   }, [project, updateProject]);
   

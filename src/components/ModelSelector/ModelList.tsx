@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Spin, Empty } from 'antd';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from '@/components/common/motion-shim';
 import { ModelCard } from './ModelCard';
 import type { AIModel } from '@/core/types';
 import styles from './index.module.less';

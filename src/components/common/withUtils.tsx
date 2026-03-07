@@ -2,7 +2,7 @@
  * 高阶组件增强
  * 提供组件能力扩展
  */
-import React, { ComponentType, forwardRef, useState } from 'react';
+import React, { type ComponentType, forwardRef, useState } from 'react';
 
 /**
  * withLoading HOC
@@ -12,7 +12,7 @@ export function withLoading<P extends object>(
   WrappedComponent: ComponentType<P>,
   LoadingComponent?: ComponentType
 ) {
-  const WithLoading = forwardRef<any, P & { loading?: boolean }>((props, ref) => {
+  const WithLoading = forwardRef<unknown, P & { loading?: boolean }>((props, ref) => {
     const { loading, ...rest } = props;
     
     if (loading) {
@@ -36,7 +36,7 @@ export function withError<P extends object>(
   WrappedComponent: ComponentType<P>,
   ErrorComponent?: ComponentType<{ error: Error; retry: () => void }>
 ) {
-  const WithError = forwardRef<any, P & { error?: Error | null; onError?: (error: Error) => void }>((props, ref) => {
+  const WithError = forwardRef<unknown, P & { error?: Error | null; onError?: (error: Error) => void }>((props, ref) => {
     const { error, onError, ...rest } = props;
     
     if (error) {
@@ -60,9 +60,9 @@ export function withProps<P extends object, T extends Partial<P>>(
   WrappedComponent: ComponentType<P>,
   additionalProps: T
 ) {
-  const WithProps = forwardRef<any, Omit<P, keyof T>>((props, ref) => {
-    return <WrappedComponent ref={ref} {...props} {...additionalProps} />;
-  });
+  const WithProps = (props: Omit<P, keyof T>) => {
+    return <WrappedComponent {...(props as P)} {...additionalProps} />;
+  };
   
   WithProps.displayName = `withProps(${WrappedComponent.displayName || WrappedComponent.name})`;
   return WithProps;
@@ -77,17 +77,19 @@ export function createCompoundComponent<T extends string>({
   components,
 }: {
   displayName: string;
-  components: Record<T, ComponentType<any>>;
+  components: Record<T, ComponentType<unknown>>;
 }) {
   const CompoundComponent = Object.assign(
-    (props: any) => {
-      const { children, ...rest } = props;
+    (props: { children?: ((components: Record<T, ComponentType<unknown>>) => React.ReactNode) | React.ReactNode }) => {
+      const { children } = props;
       return children instanceof Function 
         ? children(components) 
         : null;
     },
     components
-  );
+  ) as ((props: { children?: ((components: Record<T, ComponentType<unknown>>) => React.ReactNode) | React.ReactNode }) => React.ReactNode)
+    & Record<T, ComponentType<unknown>>
+    & { displayName?: string };
   
   CompoundComponent.displayName = displayName;
   return CompoundComponent;

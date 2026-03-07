@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, memo } from 'react';
 import { Card, Typography, message } from 'antd';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
+import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { save } from '@tauri-apps/plugin-dialog';
 import { ScriptSegment } from '@/types';
 
@@ -8,7 +9,7 @@ import VideoPlayer from './VideoPlayer';
 import Timeline from './Timeline';
 import SegmentDetails from './SegmentDetails';
 import EditorControls from './EditorControls';
-import ExportSettings, { ExportSettingsState, TransitionType } from './ExportSettings';
+import ExportSettings, { ExportSettingsState } from './ExportSettings';
 import PreviewModal from './PreviewModal';
 
 import styles from './VideoEditor.module.less';
@@ -123,9 +124,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
 
       const fileUrl = convertFileSrc(tempPath);
       setPreviewUrl(fileUrl);
-    } catch {
+    } catch (error) {
       console.error('生成预览失败:', error);
-      message.error('生成预览失败: ' + error);
+      message.error(`生成预览失败: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setPreviewLoading(false);
     }
@@ -168,9 +169,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       setProcessing(true);
       setProcessProgress(0);
 
-      const unlistenHandler = await (window as any).__TAURI__.event.listen(
+      const unlistenHandler: UnlistenFn = await listen<number>(
         'cut_progress',
-        (event: { payload: number }) => {
+        (event) => {
           setProcessProgress(Math.round(event.payload * 100));
         }
       );
@@ -190,11 +191,6 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
         transitionDuration: exportSettings.transitionDuration,
         volume: exportSettings.audioVolume / 100,
         addSubtitles: exportSettings.useSubtitles,
-      }).catch(error => {
-        console.error('视频剪辑失败:', error);
-        message.error('视频剪辑失败: ' + error);
-        setProcessing(false);
-        return null;
       });
 
       unlistenHandler();
@@ -204,9 +200,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       }
 
       message.success('视频剪辑完成');
-    } catch {
+    } catch (error) {
       console.error('导出视频失败:', error);
-      message.error('导出视频失败');
+      message.error(`导出视频失败: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setProcessing(false);
     }
@@ -236,7 +232,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
   const handleDragMove = useCallback((e: MouseEvent) => {
     if (!isDragging || !dragSegmentId || !dragType) return;
 
-    const currentTime = getTimeFromPosition(e.clientX);
+    const timelineTime = getTimeFromPosition(e.clientX);
 
     setEditedSegments(prev =>
       prev.map(segment => {
@@ -249,8 +245,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
         switch (dragType) {
           case 'move': {
             const segmentDuration = original.endTime - original.startTime;
-            newStart = currentTime;
-            newEnd = currentTime + segmentDuration;
+            newStart = timelineTime;
+            newEnd = timelineTime + segmentDuration;
 
             if (newStart < 0) {
               newStart = 0;
@@ -263,12 +259,12 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
             break;
           }
           case 'start': {
-            newStart = Math.min(currentTime, original.endTime - 0.5);
+            newStart = Math.min(timelineTime, original.endTime - 0.5);
             newStart = Math.max(0, newStart);
             break;
           }
           case 'end': {
-            newEnd = Math.max(currentTime, original.startTime + 0.5);
+            newEnd = Math.max(timelineTime, original.startTime + 0.5);
             newEnd = Math.min(duration, newEnd);
             break;
           }

@@ -1,5 +1,4 @@
-import type { Timeline, VideoTrack, AudioTrack, TextTrack, EffectTrack } from '@/core/types';
-import type { EditorConfig } from './types';
+import type { AudioTrack, EditorConfig, EffectTrack, TextTrack, Timeline, VideoTrack } from './types';
 
 export function createTrack(
   timeline: Timeline,
@@ -7,36 +6,59 @@ export function createTrack(
   config: EditorConfig
 ): { timeline: Timeline; trackId: string } {
   const id = `${type}_${Date.now()}`;
-  const track = {
-    id,
-    name: `${type} Track`,
-    clips: [],
-    visible: true,
-    locked: false,
-    volume: type === 'audio' ? 1 : undefined
-  };
-
   let updatedTimeline = timeline;
 
   switch (type) {
     case 'video':
       if (timeline.videoTracks.length < config.maxVideoTracks) {
-        updatedTimeline = { ...timeline, videoTracks: [...timeline.videoTracks, track as VideoTrack] };
+        const track: VideoTrack = {
+          id,
+          name: `${type} Track`,
+          clips: [],
+          visible: true,
+          locked: false
+        };
+        updatedTimeline = { ...timeline, videoTracks: [...timeline.videoTracks, track] };
       }
       break;
     case 'audio':
       if (timeline.audioTracks.length < config.maxAudioTracks) {
-        updatedTimeline = { ...timeline, audioTracks: [...timeline.audioTracks, track as AudioTrack] };
+        const track: AudioTrack = {
+          id,
+          name: `${type} Track`,
+          clips: [],
+          visible: true,
+          locked: false,
+          volume: 1
+        };
+        updatedTimeline = { ...timeline, audioTracks: [...timeline.audioTracks, track] };
       }
       break;
     case 'text':
       if (timeline.textTracks.length < config.maxTextTracks) {
-        updatedTimeline = { ...timeline, textTracks: [...timeline.textTracks, track as TextTrack] };
+        const track: TextTrack = {
+          id,
+          name: `${type} Track`,
+          items: [],
+          visible: true,
+          locked: false
+        };
+        updatedTimeline = { ...timeline, textTracks: [...timeline.textTracks, track] };
       }
       break;
     case 'effect':
       if (timeline.effectTracks.length < config.maxEffectTracks) {
-        updatedTimeline = { ...timeline, effectTracks: [...timeline.effectTracks, track as EffectTrack] };
+        const track: EffectTrack = {
+          id,
+          name: `${type} Track`,
+          effects: [],
+          visible: true,
+          locked: false
+        };
+        updatedTimeline = {
+          ...timeline,
+          effectTracks: [...timeline.effectTracks, track]
+        };
       }
       break;
   }
@@ -45,11 +67,19 @@ export function createTrack(
 }
 
 export function generateTimelineFromScript(
-  scriptSegments: any[],
-  videoSegments: any[],
+  scriptSegments: Array<{ content: string }>,
+  videoSegments: Array<{ id: string; startTime: number; endTime: number }>,
   createTrackFn: (type: 'video' | 'text') => string,
-  addClipFn: (trackId: string, clip: any, position: number) => void,
-  addTextFn: (trackId: string, text: any, position: number) => void
+  addClipFn: (
+    trackId: string,
+    clip: { id: string; sourceId: string; sourceStart: number; sourceEnd: number; startTime: number; endTime: number; effects: unknown[] },
+    position: number
+  ) => void,
+  addTextFn: (
+    trackId: string,
+    text: { id: string; content: string; startTime: number; endTime: number; style: Record<string, unknown> },
+    position: number
+  ) => void
 ): Timeline {
   const videoTrackId = createTrackFn('video');
   const textTrackId = createTrackFn('text');

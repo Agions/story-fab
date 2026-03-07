@@ -3,14 +3,14 @@
  */
 import { useState, useCallback } from 'react';
 import { useProjectStore } from '@/store';
-import type { Project, ProjectFormData } from '../types';
+import type { Project } from '@/store/types';
+import type { ProjectFormData } from '../types';
 
 export function useProject() {
   const {
     projects,
     currentProject,
     loading,
-    setProjects,
     addProject,
     updateProject,
     deleteProject,
@@ -30,15 +30,6 @@ export function useProject() {
         name: data.name,
         description: data.description,
         status: 'draft',
-        videos: [],
-        scripts: [],
-        settings: {
-          resolution: data.resolution || '1080p',
-          frameRate: data.frameRate || 30,
-          quality: 'high',
-          outputFormat: 'mp4',
-          template: data.template,
-        },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };

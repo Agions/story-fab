@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { ClipFlowProvider } from '@/components/AIPanel/AIEditorContext';
 import 'antd/dist/reset.css';
 import './index.css';
 import './styles/index.less';
@@ -27,10 +25,6 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <ThemeProvider>
-      <ClipFlowProvider>
-        <App />
-      </ClipFlowProvider>
-    </ThemeProvider>
+    <App />
   </React.StrictMode>
 ); 

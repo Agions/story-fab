@@ -4,10 +4,8 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { videoService } from './video.service';
 import { visionService } from './vision.service';
-import { aiService } from './ai.service';
-import type { VideoInfo, VideoAnalysis, Scene, ScriptSegment, ExportSettings } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
 
 // 剪辑配置
 interface ClipConfig {
@@ -27,11 +25,11 @@ interface ClipConfig {
   targetDuration?: number;
   
   // 输出质量
-  outputQuality: 'low' | 'medium' | 'high' | '4k';
+  outputQuality: 'low' | 'medium' | 'high' | 'ultra';
   outputFormat: 'mp4' | 'webm' | 'mov';
   bitrate: '2M' | '5M' | '8M' | '15M' | '30M';
   fps: 24 | 30 | 60;
-  resolution: '720p' | '1080p' | '1440p' | '4k';
+  resolution: '720p' | '1080p' | '2k' | '4k';
 }
 
 // 剪辑片段
@@ -143,7 +141,12 @@ export class ClipWorkflowService {
    * 分析视频
    */
   private async analyzeVideo(videoInfo: VideoInfo): Promise<VideoAnalysis> {
-    return visionService.analyzeVideo(videoInfo);
+    const { scenes, objects, emotions } = await visionService.detectScenesAdvanced(videoInfo, {
+      minSceneDuration: 3,
+      detectObjects: true,
+      detectEmotions: true,
+    });
+    return visionService.generateAnalysisReport(videoInfo, scenes, objects, emotions);
   }
 
   /**
@@ -153,7 +156,7 @@ export class ClipWorkflowService {
     const scenes = analysis.scenes || [];
     return scenes.map(scene => ({
       time: scene.startTime,
-      confidence: scene.score || 0.8,
+      confidence: scene.confidence || 0.8,
     }));
   }
 
@@ -161,13 +164,8 @@ export class ClipWorkflowService {
    * 检测静音段落
    */
   private async detectSilence(analysis: VideoAnalysis): Promise<Array<{ start: number; end: number }>> {
-    const audioSegments = analysis.audioSegments || [];
-    return audioSegments
-      .filter(seg => seg.volume < this.config.silenceThreshold)
-      .map(seg => ({
-        start: seg.startTime,
-        end: seg.endTime,
-      }));
+    // 当前 VideoAnalysis 结构未包含音频分段，返回空数组保守处理
+    return [];
   }
 
   /**
@@ -181,7 +179,7 @@ export class ClipWorkflowService {
   ): ClipSegment[] {
     const segments: ClipSegment[] = [];
     let currentTime = 0;
-    const duration = analysis.duration || 0;
+    const duration = this.getAnalysisDuration(analysis);
     
     // 基于场景切换生成片段
     const cutTimes = [0, ...sceneChanges.map(s => s.time), duration];
@@ -215,7 +213,7 @@ export class ClipWorkflowService {
       if (scriptSegments) {
         const relatedScript = scriptSegments[i];
         if (relatedScript) {
-          segment.text = relatedScript.text;
+          segment.text = relatedScript.content;
         }
       }
       
@@ -269,11 +267,11 @@ export class ClipWorkflowService {
    * 获取导出质量配置
    */
   getExportSettings(): ExportSettings {
-    const qualityMap = {
-      low: { resolution: '720p', bitrate: '2M', fps: 24 },
-      medium: { resolution: '1080p', bitrate: '5M', fps: 30 },
-      high: { resolution: '1080p', bitrate: '8M', fps: 30 },
-      '4k': { resolution: '4k', bitrate: '30M', fps: 60 },
+    const qualityMap: Record<ClipConfig['outputQuality'], { resolution: ExportSettings['resolution']; frameRate: ExportSettings['frameRate']; quality: ExportSettings['quality'] }> = {
+      low: { resolution: '720p', frameRate: 24, quality: 'low' },
+      medium: { resolution: '1080p', frameRate: 30, quality: 'medium' },
+      high: { resolution: '1080p', frameRate: 30, quality: 'high' },
+      ultra: { resolution: '4k', frameRate: 60, quality: 'ultra' },
     };
     
     const quality = qualityMap[this.config.outputQuality];
@@ -281,9 +279,10 @@ export class ClipWorkflowService {
     return {
       format: this.config.outputFormat,
       resolution: quality.resolution,
-      quality: this.config.outputQuality,
-      fps: quality.fps,
-      bitrate: quality.bitrate,
+      quality: quality.quality,
+      frameRate: quality.frameRate,
+      includeSubtitles: true,
+      burnSubtitles: true,
     };
   }
 
@@ -296,11 +295,11 @@ export class ClipWorkflowService {
       effects: [
         ...(segment.effects || []),
         // 添加质量优化效果
-        this.config.outputQuality === 'high' || this.config.outputQuality === '4k' 
+        this.config.outputQuality === 'high' || this.config.outputQuality === 'ultra'
           ? 'denoise' 
           : null,
         'sharpen',
-      ].filter(Boolean),
+      ].filter((effect): effect is string => Boolean(effect)),
     }));
   }
 
@@ -316,6 +315,13 @@ export class ClipWorkflowService {
    */
   getConfig(): ClipConfig {
     return { ...this.config };
+  }
+
+  private getAnalysisDuration(analysis: VideoAnalysis): number {
+    if (!analysis.scenes || analysis.scenes.length === 0) {
+      return 0;
+    }
+    return Math.max(...analysis.scenes.map((scene) => scene.endTime));
   }
 }
 

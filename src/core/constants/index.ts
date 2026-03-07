@@ -2,6 +2,7 @@
  * 常量定义
  * 集中管理所有常量
  */
+import { AI_MODELS as CORE_MODELS } from '@/core/config/models.config';
 
 // 脚本风格
 export const SCRIPT_STYLES = [
@@ -60,8 +61,8 @@ export const ROUTES = {
   HOME: '/',
   DASHBOARD: '/dashboard',
   PROJECTS: '/projects',
-  PROJECT_DETAIL: '/projects/:id',
-  PROJECT_EDIT: '/projects/:id/edit',
+  PROJECT_DETAIL: '/project/:projectId',
+  PROJECT_EDIT: '/project/edit/:projectId',
   EDITOR: '/editor',
   SETTINGS: '/settings',
   VIDEO_STUDIO: '/video-studio'
@@ -80,136 +81,75 @@ export const DEFAULTS = {
   DEFAULT_STYLE: 'professional'
 } as const;
 
-// LLM 模型配置（2026年3月最新）
-// 数据来源：各厂商官方 API 文档
-export const LLM_MODELS = {
-  // OpenAI - GPT-5.3 (2026-03)
-  // API: https://api.openai.com/v1/chat/completions
-  OPENAI: {
-    provider: 'openai',
-    name: 'GPT-5.3',
-    modelId: 'gpt-5.3',
-    version: '2026-03',
-    maxTokens: 8192,
-    contextWindow: 200000,
-    supportsStreaming: true,
-    supportsFunctionCalling: true,
-    pricing: { input: 0.007, output: 0.021 }, // USD
-    capabilities: ['text', 'code', 'analysis', 'creative', 'vision', 'video'],
-    recommended: true
-  },
+const MODEL_VERSION = '2026-03-06' as const;
 
-  // Anthropic - Claude 4.6 Opus (2026-03)
-  // API: https://api.anthropic.com/v1/messages
-  ANTHROPIC: {
-    provider: 'anthropic',
-    name: 'Claude 4.6 Opus',
-    modelId: 'claude-4.6',
-    version: '2026-03',
-    maxTokens: 8192,
-    contextWindow: 300000,
-    supportsStreaming: true,
-    supportsFunctionCalling: true,
-    pricing: { input: 0.018, output: 0.09 }, // USD
-    capabilities: ['text', 'code', 'analysis', 'creative', 'vision'],
-    recommended: true
-  },
+type CoreModelId =
+  | 'gpt-5.3-codex'
+  | 'o3'
+  | 'claude-sonnet-4-6'
+  | 'gemini-3.1-pro-preview'
+  | 'gemini-3.1-flash-lite-preview'
+  | 'qwen-max-latest'
+  | 'glm-5'
+  | 'spark-custom'
+  | 'deepseek-chat'
+  | 'deepseek-reasoner'
+  | 'kimi-k2-0905-preview'
+  | 'kimi-k2-turbo-preview';
 
-  // Google - Gemini 3.1 Pro (2026-03)
-  // API: https://generativelanguage.googleapis.com/v1beta
-  GOOGLE: {
-    provider: 'google',
-    name: 'Gemini 3.1 Pro',
-    modelId: 'gemini-3.1-pro',
-    version: '2026-03',
-    maxTokens: 8192,
-    contextWindow: 1000000,
-    supportsStreaming: true,
-    supportsFunctionCalling: true,
-    pricing: { input: 0.0035, output: 0.0105 }, // USD
-    capabilities: ['text', 'code', 'analysis', 'creative', 'vision', 'video'],
-    recommended: true
-  },
+const MODEL_KEY_MAP: Record<string, CoreModelId> = {
+  OPENAI: 'gpt-5.3-codex',
+  OPENAI_REASONING: 'o3',
+  ANTHROPIC: 'claude-sonnet-4-6',
+  GOOGLE: 'gemini-3.1-pro-preview',
+  ALIBABA: 'qwen-max-latest',
+  ZHIPU: 'glm-5',
+  IFLYTEK: 'spark-custom',
+  DEEPSEEK: 'deepseek-chat',
+  DEEPSEEK_REASONER: 'deepseek-reasoner',
+  MOONSHOT: 'kimi-k2-0905-preview',
+};
 
-  // 阿里通义 - Qwen 3.5 (2026-03)
-  // API: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
-  ALIBABA: {
-    provider: 'alibaba',
-    name: 'Qwen 3.5',
-    modelId: 'qwen-3.5',
-    version: '2026-03',
-    maxTokens: 8192,
-    contextWindow: 128000,
-    supportsStreaming: true,
-    supportsFunctionCalling: true,
-    pricing: { input: 0.004, output: 0.012 },
-    capabilities: ['text', 'code', 'analysis', 'creative', 'vision', 'video'],
-    recommended: true
-  },
+const asCapability = (category: string): string => {
+  if (category === 'image') return 'vision';
+  return category;
+};
 
-  // 智谱 AI - GLM-5 (2026-03)
-  // API: https://open.bigmodel.cn/api/paas/v4/chat/completions
-  ZHIPU: {
-    provider: 'zhipu',
-    name: 'GLM-5',
-    modelId: 'glm-5',
-    version: '2026-03',
-    maxTokens: 4096,
-    contextWindow: 200000,
-    supportsStreaming: true,
-    supportsFunctionCalling: true,
-    pricing: { input: 0.001, output: 0.003 },
-    capabilities: ['text', 'code', 'analysis', 'vision', 'video'],
-    recommended: true
-  },
-
-  // 讯飞 - Spark X1 (2026-03)
-  // API: https://spark-api.xf-yun.com/v3.5/chat
-  IFLYTEK: {
-    provider: 'iflytek',
-    name: 'Spark X1',
-    modelId: 'spark-x1',
-    version: '2026-03',
-    maxTokens: 4096,
-    contextWindow: 14000,
-    supportsStreaming: true,
-    supportsFunctionCalling: false,
-    pricing: { input: 0.003, output: 0.009 },
-    capabilities: ['text', 'code', 'analysis', 'audio'],
-    recommended: false
-  },
-
-  // DeepSeek - R1 (2026-03)
-  // API: https://api.deepseek.com/v1/chat/completions
-  DEEPSEEK: {
-    provider: 'deepseek',
-    name: 'DeepSeek R1',
-    modelId: 'deepseek-r1',
-    version: '2026-03',
-    maxTokens: 4096,
-    contextWindow: 64000,
-    supportsStreaming: true,
-    supportsFunctionCalling: true,
-    pricing: { input: 0.002, output: 0.006 },
-    capabilities: ['text', 'code', 'analysis', 'reasoning'],
-    recommended: true
-  },
-
-  // 月之暗面 - Kimi k2.5 (2026-03)
-  // API: https://api.moonshot.cn/v1/chat/completions
-  MOONSHOT: {
-    provider: 'moonshot',
-    name: 'Kimi k2.5',
-    modelId: 'kimi-k2.5',
-    version: '2026-03',
-    maxTokens: 8192,
-    contextWindow: 48000,
-    supportsStreaming: true,
-    supportsFunctionCalling: true,
-    pricing: { input: 0.003, output: 0.009 },
-    capabilities: ['text', 'code', 'analysis', 'creative', 'long-context'],
-    recommended: true
+const buildLLMModel = (modelId: CoreModelId) => {
+  const model = CORE_MODELS.find((item) => item.id === modelId);
+  if (!model) {
+    throw new Error(`Model not found in core config: ${modelId}`);
   }
+
+  const supportsFunctionCalling = model.provider !== 'iflytek';
+
+  return {
+    provider: model.provider,
+    name: model.name,
+    modelId: model.id,
+    version: MODEL_VERSION,
+    maxTokens: model.tokenLimit,
+    contextWindow: model.contextWindow,
+    supportsStreaming: true,
+    supportsFunctionCalling,
+    pricing: { input: 0, output: 0 },
+    capabilities: model.category.map(asCapability),
+    recommended: model.isPro !== false,
+  };
+};
+
+// LLM 模型配置（从 core/config/models.config.ts 派生）
+export const LLM_MODELS = {
+  OPENAI: buildLLMModel(MODEL_KEY_MAP.OPENAI),
+  OPENAI_REASONING: buildLLMModel(MODEL_KEY_MAP.OPENAI_REASONING),
+  ANTHROPIC: buildLLMModel(MODEL_KEY_MAP.ANTHROPIC),
+  GOOGLE: buildLLMModel(MODEL_KEY_MAP.GOOGLE),
+  ALIBABA: buildLLMModel(MODEL_KEY_MAP.ALIBABA),
+  ZHIPU: buildLLMModel(MODEL_KEY_MAP.ZHIPU),
+  IFLYTEK: buildLLMModel(MODEL_KEY_MAP.IFLYTEK),
+  DEEPSEEK: buildLLMModel(MODEL_KEY_MAP.DEEPSEEK),
+  DEEPSEEK_REASONER: buildLLMModel(MODEL_KEY_MAP.DEEPSEEK_REASONER),
+  MOONSHOT: buildLLMModel(MODEL_KEY_MAP.MOONSHOT),
 } as const;
 
 // 默认模型（国内推荐）
@@ -222,7 +162,7 @@ export const MODEL_RECOMMENDATIONS = {
     LLM_MODELS.OPENAI,
     LLM_MODELS.ANTHROPIC,
     LLM_MODELS.ALIBABA,
-    LLM_MODELS.MOONSHOT
+    LLM_MODELS.DEEPSEEK
   ],
   // 视频分析
   videoAnalysis: [
@@ -234,17 +174,17 @@ export const MODEL_RECOMMENDATIONS = {
   longContext: [
     LLM_MODELS.GOOGLE,
     LLM_MODELS.ANTHROPIC,
-    LLM_MODELS.ZHIPU
+    LLM_MODELS.OPENAI
   ],
   // 成本敏感
   costEffective: [
-    LLM_MODELS.ZHIPU,
+    LLM_MODELS.DEEPSEEK,
     LLM_MODELS.ALIBABA,
-    LLM_MODELS.DEEPSEEK
+    LLM_MODELS.GOOGLE
   ],
   // 高质量
   highQuality: [
-    LLM_MODELS.OPENAI,
+    LLM_MODELS.OPENAI_REASONING,
     LLM_MODELS.ANTHROPIC,
     LLM_MODELS.GOOGLE
   ]

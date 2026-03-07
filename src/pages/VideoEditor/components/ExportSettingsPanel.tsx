@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Card, Typography, Dropdown, Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
-import styles from '../VideoEditor.module.less';
+import styles from '../index.module.less';
 
 const { Text, Title } = Typography;
 

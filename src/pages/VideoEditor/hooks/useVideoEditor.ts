@@ -3,8 +3,11 @@ import { message } from 'antd';
 import { open } from '@tauri-apps/plugin-dialog';
 import { VideoSegment, extractKeyFrames, analyzeVideo } from '@/services/videoService';
 import { clipWorkflowService } from '@/core/services/clip-workflow.service';
+import type { VideoInfo } from '@/core/types';
+import type { ClipSegment } from '@/core/services/aiClip.service';
+import { logger } from '@/utils/logger';
 
-export const useVideoEditor = (_projectId: string | undefined) => {
+export const useVideoEditor = (projectId: string | undefined) => {
   // 视频状态
   const [videoSrc, setVideoSrc] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -82,14 +85,14 @@ export const useVideoEditor = (_projectId: string | undefined) => {
 
         message.success('视频加载成功');
       } catch (error) {
-        console.error('视频分析失败:', error);
+        logger.error('视频分析失败:', error);
         message.error('视频分析失败，请检查文件格式');
       } finally {
         setAnalyzing(false);
         setLoading(false);
       }
     } catch (err) {
-      console.error('选择文件失败:', err);
+      logger.error('选择文件失败:', err);
     }
   }, [addToHistory]);
 
@@ -150,11 +153,17 @@ export const useVideoEditor = (_projectId: string | undefined) => {
 
     setAnalyzing(true);
     try {
-      const videoInfo = {
+      const videoInfo: VideoInfo = {
+        id: projectId || 'new',
         path: videoSrc,
+        name: '当前视频',
         duration,
         width: 1920,
         height: 1080,
+        fps: 30,
+        format: outputFormat,
+        size: 0,
+        createdAt: new Date().toISOString(),
       };
 
       const result = await clipWorkflowService.processVideo(videoInfo);
@@ -175,10 +184,10 @@ export const useVideoEditor = (_projectId: string | undefined) => {
     } finally {
       setAnalyzing(false);
     }
-  }, [videoSrc, duration, segments, addToHistory]);
+  }, [projectId, videoSrc, duration, outputFormat, segments, addToHistory]);
 
   // 应用 AI 建议
-  const handleApplyAISuggestions = useCallback((aiSegments: any[]) => {
+  const handleApplyAISuggestions = useCallback((aiSegments: ClipSegment[]) => {
     const newSegments = aiSegments.map(s => ({
       start: s.startTime,
       end: s.endTime,

@@ -13,6 +13,16 @@ interface SceneType {
   description: string;
 }
 
+interface SceneFeatureSet {
+  brightness: number;
+  motion: number;
+  complexity: number;
+  dominantColors: string[];
+  hasText: boolean;
+  hasFaces: boolean;
+  tags: string[];
+}
+
 // 预定义场景类型
 const SCENE_TYPES: SceneType[] = [
   {
@@ -239,7 +249,7 @@ export class VisionService {
    * 匹配场景类型
    */
   private matchSceneType(
-    features: any,
+    features: SceneFeatureSet,
     position: number
   ): { id: string; description: string; keywords: string[]; confidence: number } {
     // 基于特征和位置匹配场景类型

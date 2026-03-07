@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { analyzeVideo } from './analyzer';
 import type { VideoInfo } from '@/core/types';
-import type { AIClipConfig, BatchClipTask, ClipSegment } from './types';
+import type { AIClipConfig, BatchClipTask, ClipAnalysisResult, ClipSegment, ClipSuggestion } from './types';
 
 const tasks = new Map<string, BatchClipTask>();
 const abortControllers = new Map<string, AbortController>();
@@ -67,7 +67,7 @@ export function cancelTask(taskId: string): void {
 
 export async function applySuggestions(
   videoInfo: VideoInfo,
-  suggestions: any[],
+  suggestions: ClipSuggestion[],
   selectedIds: string[]
 ): Promise<ClipSegment[]> {
   const selectedSuggestions = suggestions.filter((s) => selectedIds.includes(s.id));
@@ -134,7 +134,7 @@ export async function smartClip(
   videoInfo: VideoInfo,
   targetDuration?: number,
   style: 'fast' | 'normal' | 'slow' = 'normal'
-): Promise<any> {
+): Promise<ClipAnalysisResult> {
   const config: AIClipConfig = {
     detectSceneChange: true,
     detectSilence: true,

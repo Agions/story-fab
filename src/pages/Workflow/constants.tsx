@@ -7,11 +7,15 @@ import {
   DownloadOutlined,
   ScissorOutlined,
   UploadOutlined,
+  UserOutlined,
+  AudioOutlined,
 } from '@ant-design/icons';
-import type { WorkflowStep } from '@/core/types';
+import type { WorkflowStep } from '@/core/services/workflow';
+import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
+import { WORKFLOW_MODE_DEFINITIONS } from '@/core/workflow/featureBlueprint';
 
-export const WORKFLOW_STEPS: Array<{
-  key: WorkflowStep | 'ai-clip';
+const BASE_WORKFLOW_STEPS: Array<{
+  key: WorkflowStep;
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -77,3 +81,19 @@ export const WORKFLOW_STEPS: Array<{
     icon: <DownloadOutlined />,
   },
 ];
+
+export const WORKFLOW_MODE_OPTIONS: Array<{
+  value: WorkflowMode;
+  label: string;
+  icon: React.ReactNode;
+}> = [
+  { value: 'ai-commentary', label: 'AI 解说', icon: <AudioOutlined /> },
+  { value: 'ai-mixclip', label: 'AI 混剪', icon: <ScissorOutlined /> },
+  { value: 'ai-first-person', label: '第一人称', icon: <UserOutlined /> },
+];
+
+export const getWorkflowSteps = (mode: WorkflowMode) => {
+  const modeConfig = WORKFLOW_MODE_DEFINITIONS[mode];
+  const allowedStepKeys = new Set(modeConfig.steps);
+  return BASE_WORKFLOW_STEPS.filter((step) => allowedStepKeys.has(step.key));
+};

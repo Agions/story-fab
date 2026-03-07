@@ -4,11 +4,13 @@
  * 数据输出: project (ProjectData)
  * 流转到: VideoUpload
  */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Form, Input, Select, Button, Card, Typography, message, Divider, Tag } from 'antd';
 import { PlusOutlined, ArrowRightOutlined, CheckCircleOutlined, VideoCameraOutlined, BookOutlined, CustomerServiceOutlined, FileTextOutlined, SettingOutlined } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import type { ProjectData } from '@/core/types';
+import { saveProjectToFile } from '@/services/tauriService';
+import { useSettings } from '@/context/SettingsContext';
 import styles from './ClipFlow.module.less';
 
 const { Title, Paragraph } = Typography;
@@ -92,11 +94,45 @@ const PROJECT_TEMPLATES = [
   },
 ];
 
+const getTemplateById = (templateId?: string) => {
+  return PROJECT_TEMPLATES.find((template) => template.id === templateId) || PROJECT_TEMPLATES[4];
+};
+
+const normalizeText = (value?: string) => value?.trim().replace(/\s+/g, ' ') || '';
+
+const createDefaultProjectName = () => {
+  const now = new Date();
+  const pad = (num: number) => String(num).padStart(2, '0');
+  const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+  return `未命名项目-${timestamp}`;
+};
+
 const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
   const { state, setProject, goToNextStep } = useClipFlow();
+  const { addRecentProject } = useSettings();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [selectedTemplate, setSelectedTemplate] = useState<string>('marketing');
+  const [defaultProjectName] = useState<string>(() => createDefaultProjectName());
+
+  const currentTemplate = useMemo(() => {
+    if (!state.project) {
+      return PROJECT_TEMPLATES[0];
+    }
+    if (state.project.templateId) {
+      return getTemplateById(state.project.templateId);
+    }
+    const templateByName = PROJECT_TEMPLATES.find((template) => template.name === state.project?.templateName);
+    if (templateByName) {
+      return templateByName;
+    }
+    return PROJECT_TEMPLATES.find((template) => (
+      template.settings.videoQuality === state.project?.settings?.videoQuality &&
+      template.settings.outputFormat === state.project?.settings?.outputFormat &&
+      template.settings.resolution === state.project?.settings?.resolution &&
+      template.settings.frameRate === state.project?.settings?.frameRate
+    )) || PROJECT_TEMPLATES[4];
+  }, [state.project]);
 
   // 处理创建项目
   const handleCreateProject = async (values: {
@@ -104,21 +140,32 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
     type: string;
     description?: string;
   }) => {
+    if (loading) {
+      return;
+    }
+
     setLoading(true);
     try {
       // 获取选中的模板设置
-      const template = PROJECT_TEMPLATES.find(t => t.id === values.type) || PROJECT_TEMPLATES[4];
+      const template = getTemplateById(values.type || selectedTemplate);
+      const normalizedName = normalizeText(values.name) || createDefaultProjectName();
+      const normalizedDescription = normalizeText(values.description);
+      const now = new Date().toISOString();
       
       // 创建项目数据
       const newProject: ProjectData = {
         id: `project_${Date.now()}`,
-        name: values.name,
-        description: values.description,
+        name: normalizedName,
+        templateId: template.id,
+        templateName: template.name,
+        description: normalizedDescription || undefined,
+        videoPath: '',
+        videoUrl: undefined,
         status: 'draft',
         videos: [],
         scripts: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now,
+        updatedAt: now,
         settings: {
           ...template.settings,
           audioCodec: 'aac',
@@ -136,8 +183,10 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
         },
       };
 
-      // 保存到状态
+      await saveProjectToFile(newProject.id, newProject);
+      addRecentProject(newProject.id);
       setProject(newProject);
+      form.setFieldValue('name', normalizedName);
       message.success('项目创建成功');
       
       // 跳转到下一步
@@ -146,8 +195,9 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
       } else {
         goToNextStep();
       }
-    } catch {
-      message.error('项目创建失败');
+    } catch (error) {
+      console.error('项目创建失败:', error);
+      message.error(error instanceof Error ? error.message : '项目创建失败');
     } finally {
       setLoading(false);
     }
@@ -167,7 +217,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
         <Card className={styles.projectInfoCard}>
           <div className={styles.projectHeader}>
             <div className={styles.projectIcon}>
-              {PROJECT_TEMPLATES.find(t => t.id === state.project?.settings?.videoQuality)?.icon || <VideoCameraOutlined />}
+              {currentTemplate.icon || <VideoCameraOutlined />}
             </div>
             <div className={styles.projectMeta}>
               <div className={styles.projectName}>{state.project.name}</div>
@@ -181,7 +231,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>项目类型</span>
               <span className={styles.infoValue}>
-                <Tag color="blue">{PROJECT_TEMPLATES.find(t => t.id === state.project?.settings?.videoQuality)?.name || '自定义'}</Tag>
+                <Tag color="blue">{currentTemplate.name || '自定义'}</Tag>
               </span>
             </div>
             <div className={styles.infoItem}>
@@ -263,14 +313,22 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
           onFinish={handleCreateProject}
           initialValues={{
             type: 'marketing',
+            name: defaultProjectName,
           }}
         >
           <Form.Item
             name="name"
             label="项目名称"
             rules={[
-              { required: true, message: '请输入项目名称' },
-              { min: 2, message: '项目名称至少2个字符' },
+              {
+                validator: (_, value: string) => {
+                  const normalizedValue = normalizeText(value);
+                  if (normalizedValue && normalizedValue.length < 2) {
+                    return Promise.reject(new Error('项目名称至少2个字符'));
+                  }
+                  return Promise.resolve();
+                },
+              },
             ]}
           >
             <Input 

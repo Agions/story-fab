@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
-import { Card, Tabs, List, Button, Space, Input, Tag, Typography, Modal, message } from 'antd';
+import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import { Card, Tabs, List, Button, Space, Input, Tag, Typography, Modal, message, type TabsProps } from 'antd';
 import {
   EditOutlined,
   SaveOutlined,
@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
 import { formatDuration } from '@/services/videoService';
-import styles from './ScriptEditor.module.less';
+import styles from '../ScriptEditor.module.less';
 
 const { Text, Paragraph, Title } = Typography;
 const { TextArea } = Input;
@@ -65,11 +65,97 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
       setTimeout(() => {
         message.success('脚本优化完成');
       }, 2000);
-    } catch {
+    } catch (error) {
       console.error('AI 优化脚本失败:', error);
       message.error('AI 优化脚本失败');
     }
   }, []);
+
+  const tabItems = useMemo<TabsProps['items']>(() => [
+    {
+      key: 'content',
+      label: '脚本内容',
+      children: (
+        <div className={styles.workflowEditor}>
+          <div className={styles.titleInput}>
+            <Text type="secondary">标题</Text>
+            <Input
+              value={editedTitle}
+              onChange={handleTitleChange}
+              placeholder="输入脚本标题"
+              size="large"
+            />
+          </div>
+          <div className={styles.contentInput}>
+            <Text type="secondary">内容</Text>
+            <TextArea
+              value={editedContent}
+              onChange={handleContentChange}
+              placeholder="输入脚本内容..."
+              rows={15}
+              className={styles.scriptTextArea}
+            />
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'segments',
+      label: '片段列表',
+      children: (
+        <List
+          dataSource={script.segments || []}
+          renderItem={(segment: ScriptSegment) => (
+            <List.Item
+              actions={[
+                <Button key="edit" type="text" icon={<EditOutlined />} />,
+                <Button key="delete" type="text" danger icon={<DeleteOutlined />} />,
+              ]}
+            >
+              <List.Item.Meta
+                title={
+                  <Space>
+                    <Tag color="blue">{segment.type}</Tag>
+                    <Text>
+                      {formatDuration(segment.startTime)} - {formatDuration(segment.endTime)}
+                    </Text>
+                  </Space>
+                }
+                description={<Paragraph ellipsis={{ rows: 2 }}>{segment.content}</Paragraph>}
+              />
+            </List.Item>
+          )}
+        />
+      )
+    },
+    ...(scenes && scenes.length > 0 ? [{
+      key: 'scenes',
+      label: `场景 (${scenes.length})`,
+      children: (
+        <List
+          dataSource={scenes}
+          renderItem={(scene: Scene) => (
+            <List.Item>
+              <List.Item.Meta
+                title={
+                  <Space>
+                    <ClockCircleOutlined />
+                    <Text>
+                      {formatDuration(scene.startTime)} - {formatDuration(scene.endTime)}
+                    </Text>
+                    {scene.tags?.map(tag => (
+                      <Tag key={tag}>{tag}</Tag>
+                    ))}
+                  </Space>
+                }
+                description={scene.description}
+              />
+            </List.Item>
+          )}
+        />
+      )
+    }] : [])
+  ], [editedContent, editedTitle, handleContentChange, handleTitleChange, scenes, script.segments]);
 
   return (
     <div className={styles.scriptEditor}>
@@ -87,87 +173,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
           </Space>
         }
       >
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          <TabPane tab="脚本内容" key="content">
-            <div className={styles.workflowEditor}>
-              <div className={styles.titleInput}>
-                <Text type="secondary">标题</Text>
-                <Input
-                  value={editedTitle}
-                  onChange={handleTitleChange}
-                  placeholder="输入脚本标题"
-                  size="large"
-                />
-              </div>
-              <div className={styles.contentInput}>
-                <Text type="secondary">内容</Text>
-                <TextArea
-                  value={editedContent}
-                  onChange={handleContentChange}
-                  placeholder="输入脚本内容..."
-                  rows={15}
-                  className={styles.scriptTextArea}
-                />
-              </div>
-            </div>
-          </TabPane>
-
-          <TabPane tab="片段列表" key="segments">
-            <List
-              dataSource={script.segments || []}
-              renderItem={(segment: ScriptSegment, index) => (
-                <List.Item
-                  actions={[
-                    <Button key="edit" type="text" icon={<EditOutlined />} />,
-                    <Button key="delete" type="text" danger icon={<DeleteOutlined />} />,
-                  ]}
-                >
-                  <List.Item.Meta
-                    title={
-                      <Space>
-                        <Tag color="blue">{segment.type}</Tag>
-                        <Text>
-                          {formatDuration(segment.startTime)} - {formatDuration(segment.endTime)}
-                        </Text>
-                      </Space>
-                    }
-                    description={
-                      <Paragraph ellipsis={{ rows: 2 }}>
-                        {segment.content}
-                      </Paragraph>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
-          </TabPane>
-
-          {scenes && scenes.length > 0 && (
-            <TabPane tab={`场景 (${scenes.length})`} key="scenes">
-              <List
-                dataSource={scenes}
-                renderItem={(scene: Scene) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      title={
-                        <Space>
-                          <ClockCircleOutlined />
-                          <Text>
-                            {formatDuration(scene.startTime)} - {formatDuration(scene.endTime)}
-                          </Text>
-                          {scene.tags?.map(tag => (
-                            <Tag key={tag} size="small">{tag}</Tag>
-                          ))}
-                        </Space>
-                      }
-                      description={scene.description}
-                    />
-                  </List.Item>
-                )}
-              />
-            </TabPane>
-          )}
-        </Tabs>
+        <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} />
       </Card>
 
       {/* AI 优化模态框 */}

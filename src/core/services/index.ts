@@ -21,6 +21,10 @@ export { clipWorkflowService, ClipWorkflowService } from './clip-workflow.servic
 export { commentaryMixService, CommentaryMixService } from './commentary-mix.service';
 export { audioVideoSyncService, AudioVideoSyncService } from './audio-sync.service';
 export { subtitleService, SubtitleService } from './subtitle.service';
+export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './scene-commentary-alignment.service';
+export { aiDirectorService, AIDirectorService } from './ai-director.service';
+export { overlayQualityService, OverlayQualityService } from './overlay-quality.service';
+export { optimizeOverlayIteratively } from './overlay-optimization.service';
 export { voiceSynthesisService, VoiceSynthesisService } from './voice-synthesis.service';
 export { videoEffectService, VideoEffectService } from './video-effect.service';
 export { exportService, ExportService } from './export.service';
@@ -55,10 +59,14 @@ export type {
   ClipAnalysisResult,
   BatchClipTask
 } from './aiClip.service';
-export type { ClipConfig, ClipSegment as WorkflowClipSegment, ClipResult } from './clip-workflow.service';
-export type { MixConfig, MixResult, VideoClipInfo, TimelineData } from './commentary-mix.service';
+export type { ClipSegment as WorkflowClipSegment, ClipResult } from './clip-workflow.service';
+export type { MixResult } from './commentary-mix.service';
 export type { SyncConfig, SyncResult, SyncIssue, SyncTimeline } from './audio-sync.service';
 export type { SubtitleConfig, SubtitleEntry, SubtitleData, SpeechRecognitionResult } from './subtitle.service';
+export type { SceneCommentaryAlignment, OriginalOverlayPlanItem } from './scene-commentary-alignment.service';
+export type { AIDirectorPlanInput, AIDirectorPlanOutput, AutonomousRenderInput } from './ai-director.service';
+export type { OverlayWindow, SubtitleWindow, OverlayQualityReport } from './overlay-quality.service';
+export type { OverlayMarker, OverlayOptimizationInput, OverlayOptimizationResult } from './overlay-optimization.service';
 export type { VoiceConfig, VoiceItem, SynthesisResult } from './voice-synthesis.service';
 export type { EffectConfig, FilterEffect, TransitionEffect, AnimationEffect, ColorCorrection, EffectPreset } from './video-effect.service';
 export type { 
@@ -66,5 +74,5 @@ export type {
   ExportResult, ExportProgress 
 } from './export.service';
 export type {
-  PipelineConfig, PipelineState, WorkflowStep, WorkflowEventType, WorkflowEvent, WorkflowResult
+  PipelineConfig, PipelineState, WorkflowStep as PipelineWorkflowStep, WorkflowEventType, WorkflowEvent, WorkflowResult
 } from './pipeline.service';

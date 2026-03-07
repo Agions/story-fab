@@ -14,7 +14,7 @@ export interface ScriptEditorWorkflowProps {
   script?: ScriptData;
   scenes?: Scene[];
   onSave: (script: ScriptData) => void;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   onScriptUpdate?: (script: ScriptData) => void;
 }
 

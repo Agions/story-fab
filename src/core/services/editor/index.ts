@@ -23,14 +23,22 @@ import { createHistory, pushHistory, undo, redo, canUndo, canRedo } from './hist
 import { createTrack } from './trackManager';
 import { exportTimeline, getExportPreview } from './export';
 import { saveToStorage, loadFromStorage, clearStorage } from './storage';
-import { DEFAULT_EDITOR_CONFIG, type EditorConfig, type EditorAction, type EditorHistory } from './types';
-import type { Timeline, VideoSegment, ScriptSegment, ExportSettings } from '@/core/types';
+import {
+  DEFAULT_EDITOR_CONFIG,
+  type EditorAction,
+  type EditorConfig,
+  type EditorExportSettings,
+  type EditorHistory,
+  type ScriptSegment,
+  type Timeline,
+  type VideoSegment
+} from './types';
 
 export class EditorService {
   private config: EditorConfig;
   private history: EditorHistory;
   private listeners: Set<(timeline: Timeline) => void> = new Set();
-  private autoSaveTimer: NodeJS.Timeout | null = null;
+  private autoSaveTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(config: Partial<EditorConfig> = {}) {
     this.config = { ...DEFAULT_EDITOR_CONFIG, ...config };
@@ -73,7 +81,13 @@ export class EditorService {
       case 'SPLIT_CLIP':
         return splitClip(timeline, action.clipId, action.splitTime);
       case 'ADD_TRANSITION':
-        return addTransition(timeline, action.fromClipId, action.toClipId, action.type, action.duration);
+        return addTransition(
+          timeline,
+          action.fromClipId,
+          action.toClipId,
+          action.transitionType,
+          action.duration
+        );
       case 'ADD_EFFECT':
         return addEffect(timeline, action.clipId, action.effect, action.params);
       case 'ADD_TEXT':
@@ -123,8 +137,8 @@ export class EditorService {
   }
 
   generateTimelineFromScript(
-    scriptSegments: ScriptSegment[],
-    videoSegments: VideoSegment[]
+    _scriptSegments: ScriptSegment[],
+    _videoSegments: VideoSegment[]
   ): Timeline {
     // 简化的实现
     const timeline = createEmptyTimeline();
@@ -133,7 +147,7 @@ export class EditorService {
     return timeline;
   }
 
-  async exportTimeline(settings?: Partial<ExportSettings>): Promise<Blob> {
+  async exportTimeline(settings?: Partial<EditorExportSettings>): Promise<Blob> {
     return exportTimeline(this.history.present, settings, this.config.defaultExportSettings);
   }
 
@@ -166,6 +180,7 @@ export class EditorService {
 
   clear(): void {
     this.history = createHistory(createEmptyTimeline());
+    clearStorage();
     this.notify();
   }
 

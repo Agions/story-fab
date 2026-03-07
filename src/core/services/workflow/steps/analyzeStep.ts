@@ -9,7 +9,7 @@ export interface AnalyzeStepResult {
 export async function executeAnalyzeStep(
   videoInfo: VideoInfo,
   projectId: string,
-  updateProgress: (progress: number) => void
+  updateProgress: (progress: number) => void = () => {}
 ): Promise<AnalyzeStepResult> {
   // 使用视觉识别服务进行高级分析
   const { scenes, objects, emotions } = await visionService.detectScenesAdvanced(
@@ -32,7 +32,7 @@ export async function executeAnalyzeStep(
   );
 
   // 保存分析结果
-  const project = storageService.projects.get(projectId);
+  const project = storageService.projects.getById(projectId);
   if (project) {
     project.analysis = analysis;
     storageService.projects.save(project);

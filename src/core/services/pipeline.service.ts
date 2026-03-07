@@ -78,7 +78,7 @@ type WorkflowListener = (event: WorkflowEvent) => void;
 // 工作流结果
 export interface WorkflowResult {
   success: boolean;
-  timeline?: any;
+  timeline?: Record<string, unknown>;
   outputPath?: string;
   duration: number;
   metadata: {

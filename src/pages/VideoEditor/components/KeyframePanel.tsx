@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { Typography, Empty } from 'antd';
-import styles from '../VideoEditor.module.less';
+import styles from '../index.module.less';
 
 const { Title } = Typography;
 

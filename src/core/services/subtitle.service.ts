@@ -5,10 +5,40 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
+interface SpeechRecognitionAlternativeLike {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionResultLike {
+  0: SpeechRecognitionAlternativeLike;
+  isFinal: boolean;
+}
+
+interface SpeechRecognitionEventLike {
+  results: ArrayLike<SpeechRecognitionResultLike>;
+}
+
+interface SpeechRecognitionLike {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  start(): void;
+  stop(): void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+type SpeechRecognitionWindow = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
+
 // 字幕配置
 export interface SubtitleConfig {
   // 语言
-  language: 'zh' | 'en' | 'ja' | 'ko' | 'auto';
+  language: 'zh' | 'en' | 'ko' | 'auto';
   
   // 输出格式
   format: 'srt' | 'vtt' | 'ass' | 'txt';
@@ -19,7 +49,7 @@ export interface SubtitleConfig {
   profanityFilter: boolean;// 脏话过滤
   
   // 翻译
-  translateTo?: 'zh' | 'en' | 'ja';
+  translateTo?: 'zh' | 'en';
 }
 
 // 字幕条目
@@ -60,7 +90,7 @@ const DEFAULT_CONFIG: SubtitleConfig = {
 
 export class SubtitleService {
   private config: SubtitleConfig;
-  private recognition: any = null;
+  private recognition: SpeechRecognitionLike | null = null;
   private isListening: boolean = false;
 
   constructor(config: Partial<SubtitleConfig> = {}) {
@@ -73,8 +103,8 @@ export class SubtitleService {
    */
   private initRecognition(): void {
     // 使用 Web Speech API
-    const SpeechRecognition = (window as any).SpeechRecognition || 
-                              (window as any).webkitSpeechRecognition;
+    const speechWindow = window as SpeechRecognitionWindow;
+    const SpeechRecognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
     
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
@@ -90,9 +120,7 @@ export class SubtitleService {
   private getLanguageCode(lang: string): string {
     const langMap: Record<string, string> = {
       'zh': 'zh-CN',
-      'en': 'en-US',
-      'ja': 'ja-JP',
-      'ko': 'ko-KR',
+      'en': 'en-US',      'ko': 'ko-KR',
       'auto': 'zh-CN',
     };
     return langMap[lang] || 'zh-CN';
@@ -107,7 +135,7 @@ export class SubtitleService {
       return;
     }
 
-    this.recognition.onresult = (event: any) => {
+    this.recognition.onresult = (event: SpeechRecognitionEventLike) => {
       const result = event.results[event.results.length - 1];
       callback({
         transcript: result[0].transcript,

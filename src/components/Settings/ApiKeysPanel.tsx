@@ -6,6 +6,7 @@ import { Card, Form, Input, Button, Space, Tag, message, Spin, Typography, Alert
 import { KeyOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { validateApiKey } from '@/services/apiKeyService';
 import { ModelProvider, PROVIDER_NAMES } from '@/constants/models';
+import { MODEL_PROVIDERS } from '@/core/config/models.config';
 
 const { Text } = Typography;
 
@@ -57,7 +58,7 @@ const ApiKeysPanel: React.FC<ApiKeysPanelProps> = ({ apiKeys, onUpdateKey, onDel
     });
   };
 
-  const providers: ModelProvider[] = ['openai', 'anthropic', 'google', 'deepseek', 'alibaba', 'zhipu', 'moonshot'];
+  const providers: ModelProvider[] = Object.keys(MODEL_PROVIDERS) as ModelProvider[];
 
   return (
     <Card title="API 密钥管理" extra={<Tag color="blue">安全存储</Tag>}>

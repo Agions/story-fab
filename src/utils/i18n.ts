@@ -141,13 +141,8 @@ const translations: Translations = {
 };
 
 // 获取浏览器语言
-const getBrowserLanguage = (): Language => {
-  const navigatorLang = navigator.language.toLowerCase();
-  return navigatorLang.startsWith('zh') ? 'zh' : 'en';
-};
-
-// 默认语言
-const defaultLanguage = getBrowserLanguage();
+// 默认语言（固定中文）
+const defaultLanguage: Language = 'zh';
 
 // 语言相关的日期格式化选项
 const dateFormatOptions: Record<Language, Intl.DateTimeFormatOptions> = {
@@ -187,12 +182,14 @@ const fileSizeUnits = {
 
 // 创建自定义的useTranslation钩子
 export function useTranslation() {
-  const [language, setLanguage] = useState<Language>(
-    localStorage.getItem('app_language') as Language || defaultLanguage
-  );
+  const [language, setLanguage] = useState<Language>(defaultLanguage);
 
   useEffect(() => {
-    localStorage.setItem('app_language', language);
+    if (language !== 'zh') {
+      setLanguage('zh');
+      return;
+    }
+    localStorage.setItem('app_language', 'zh');
   }, [language]);
 
   // 翻译函数
@@ -211,7 +208,7 @@ export function useTranslation() {
 
   // 切换语言
   const changeLanguage = useCallback((newLang: Language) => {
-    setLanguage(newLang);
+    setLanguage(newLang === 'zh' ? 'zh' : 'zh');
   }, []);
 
   // 格式化日期

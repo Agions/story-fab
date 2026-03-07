@@ -3,10 +3,11 @@
  * 集成视觉识别、脚本生成、视频混剪的完整流程
  */
 
-import React from 'react';
-import { Steps, Card, Alert, Progress, Space, Typography } from 'antd';
+import React, { useState } from 'react';
+import { Steps, Card, Alert, Progress, Space, Typography, Segmented, Switch, Tag, Select, Slider } from 'antd';
 import { useWorkflowPage } from './hooks/useWorkflowPage';
-import { WORKFLOW_STEPS } from './constants';
+import { WORKFLOW_MODE_OPTIONS, getWorkflowSteps } from './constants';
+import { WORKFLOW_MODE_DEFINITIONS } from '@/core/workflow/featureBlueprint';
 import {
   UploadStep,
   AnalyzeStep,
@@ -27,10 +28,15 @@ const { Title, Text, Paragraph } = Typography;
 const { Step } = Steps;
 
 export const WorkflowPage: React.FC = () => {
+  const [focusedSegmentId, setFocusedSegmentId] = useState<string | undefined>(undefined);
   const {
     selectedFile,
     selectedTemplate,
     selectedModel,
+    workflowMode,
+    autoOriginalOverlay,
+    overlayMixMode,
+    overlayOpacity,
     scriptParams,
     aiClipConfig,
     isRunning,
@@ -47,6 +53,10 @@ export const WorkflowPage: React.FC = () => {
     setSelectedFile,
     setSelectedTemplate,
     setSelectedModel,
+    setWorkflowMode,
+    setAutoOriginalOverlay,
+    setOverlayMixMode,
+    setOverlayOpacity,
     updateScriptParams,
     updateAIClipConfig,
     handleStart,
@@ -59,6 +69,9 @@ export const WorkflowPage: React.FC = () => {
     reset,
     jumpToStep,
   } = useWorkflowPage();
+  const workflowSteps = getWorkflowSteps(workflowMode);
+  const modeDefinition = WORKFLOW_MODE_DEFINITIONS[workflowMode];
+  const modeDescription = modeDefinition.description;
 
   // 渲染步骤内容
   const renderStepContent = () => {
@@ -93,7 +106,10 @@ export const WorkflowPage: React.FC = () => {
             scriptParams={scriptParams}
             isRunning={isRunning}
             progress={progress}
-            onModelSelect={setSelectedModel}
+            onModelSelect={(modelId) => {
+              const nextModel = models.find((m) => m.id === modelId) || null;
+              setSelectedModel(nextModel);
+            }}
             onParamsChange={updateScriptParams}
           />
         );
@@ -119,7 +135,11 @@ export const WorkflowPage: React.FC = () => {
             timeline={data.timeline}
             videoInfo={data.videoInfo}
             script={data.editedScript || data.generatedScript}
-            onSave={() => editTimeline(true)}
+            focusedSegmentId={focusedSegmentId}
+            onFocusConsumed={() => setFocusedSegmentId(undefined)}
+            onSave={() => {
+              editTimeline(true);
+            }}
           />
         );
 
@@ -129,7 +149,20 @@ export const WorkflowPage: React.FC = () => {
         );
 
       case 'export':
-        return <ExportStep onExport={exportVideo} />;
+        return (
+          <ExportStep
+            onExport={exportVideo}
+            alignmentGateReport={data.alignmentGateReport}
+            onJumpToTimeline={() => {
+              setFocusedSegmentId(undefined);
+              jumpToStep('timeline-edit');
+            }}
+            onLocateSegment={(segmentId) => {
+              setFocusedSegmentId(segmentId);
+              jumpToStep('timeline-edit');
+            }}
+          />
+        );
 
       default:
         return null;
@@ -138,13 +171,65 @@ export const WorkflowPage: React.FC = () => {
 
   return (
     <div className={styles.workflowPage}>
-      <Title level={2}>解说混剪工作流</Title>
-      <Paragraph type="secondary">一站式视频解说创作工具，从视频分析到最终导出</Paragraph>
+      <Title level={2}>AI 自主剪辑工作台</Title>
+      <Paragraph type="secondary">AI 主导创作，人类负责审核与微调的精品视频生产流程</Paragraph>
+      <Card className={styles.stepsCard}>
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Space align="center" style={{ justifyContent: 'space-between', width: '100%' }}>
+            <Segmented
+              value={workflowMode}
+              options={WORKFLOW_MODE_OPTIONS.map((item) => ({
+                value: item.value,
+                label: (
+                  <Space size={6}>
+                    {item.icon}
+                    {item.label}
+                  </Space>
+                ),
+              }))}
+              onChange={(value) => setWorkflowMode(value as typeof workflowMode)}
+            />
+            <Space>
+              <Text type="secondary">自动添加原画</Text>
+              <Switch checked={autoOriginalOverlay} onChange={setAutoOriginalOverlay} />
+            </Space>
+          </Space>
+          <Space align="center" style={{ width: '100%', justifyContent: 'space-between' }}>
+            <Space align="center">
+              <Text type="secondary">原画模式</Text>
+              <Select
+                value={overlayMixMode}
+                style={{ width: 130 }}
+                options={[
+                  { label: '画中画', value: 'pip' },
+                  { label: '全屏叠加', value: 'full' },
+                ]}
+                onChange={(value) => setOverlayMixMode(value as 'pip' | 'full')}
+              />
+            </Space>
+            <Space align="center" style={{ minWidth: 260 }}>
+              <Text type="secondary">原画透明度</Text>
+              <Slider
+                min={0.1}
+                max={1}
+                step={0.05}
+                value={overlayOpacity}
+                onChange={(value) => setOverlayOpacity(value as number)}
+                style={{ width: 160 }}
+              />
+            </Space>
+          </Space>
+          <Text type="secondary">{modeDescription}</Text>
+          <Tag color={modeDefinition.autonomy === 'full-auto' ? 'gold' : 'blue'}>
+            {modeDefinition.autonomy === 'full-auto' ? '全自动 AI 导演' : 'AI 导演 + 人工审核'}
+          </Tag>
+        </Space>
+      </Card>
 
       {/* 步骤条 */}
       <Card className={styles.stepsCard}>
         <Steps current={currentStepIndex} direction="horizontal" size="small">
-          {WORKFLOW_STEPS.map((step) => (
+          {workflowSteps.map((step) => (
             <Step key={step.key} title={step.title} description={step.description} icon={step.icon} />
           ))}
         </Steps>
@@ -174,7 +259,7 @@ export const WorkflowPage: React.FC = () => {
             }}
           />
           <Text type="secondary">
-            当前步骤: {WORKFLOW_STEPS.find((s) => s.key === currentStep)?.title}
+            当前步骤: {workflowSteps.find((s) => s.key === currentStep)?.title}
           </Text>
         </Card>
       )}
@@ -186,6 +271,7 @@ export const WorkflowPage: React.FC = () => {
       <WorkflowActions
         currentStep={currentStep}
         currentStepIndex={currentStepIndex}
+        stepKeys={workflowSteps.map((step) => step.key)}
         isRunning={isRunning}
         isPaused={isPaused}
         isCompleted={isCompleted}

@@ -1,37 +1,131 @@
 import { videoService } from '../../video.service';
 import { storageService } from '../../storage.service';
-import type { VideoInfo, ScriptData, ExportSettings, TimelineData } from '@/core/types';
+import { aiDirectorService } from '../../ai-director.service';
+import { optimizeOverlayIteratively, type OverlayMarker } from '../../overlay-optimization.service';
+import type { VideoInfo, ScriptData, ExportSettings } from '@/core/types';
+import type { TimelineData } from '../types';
 
 export async function executeExportStep(
   projectId: string,
   videoInfo: VideoInfo,
   timeline: TimelineData,
   editedScript: ScriptData | undefined,
-  settings: ExportSettings
+  settings: ExportSettings,
+  autonomousOptions?: {
+    overlayMixMode?: 'pip' | 'full';
+    overlayOpacity?: number;
+  }
 ): Promise<string> {
+  let iterativeResult = {
+    passes: 0,
+    predictedScore: timeline.overlayQuality?.score ?? 100,
+    enableOverlay: false,
+    final: {
+      mixMode: autonomousOptions?.overlayMixMode || 'pip',
+      opacity: autonomousOptions?.overlayOpacity ?? 0.72,
+      markers: [] as OverlayMarker[],
+    },
+  };
+
   // 生成字幕文件
   let subtitlePath: string | undefined;
   if (settings.includeSubtitles !== false && editedScript) {
     const srtContent = generateSRT(editedScript, timeline);
     subtitlePath = `exports/${projectId}_subtitle.srt`;
-    storageService.save(`srt-${projectId}`, srtContent);
+    storageService.set(`srt-${projectId}`, srtContent);
   }
 
   // 构建输出路径
   const outputPath = `exports/${projectId}_${Date.now()}.${settings.format || 'mp4'}`;
 
-  // 调用视频服务导出
-  const exportedPath = await videoService.exportVideo(
-    videoInfo.path,
-    outputPath,
-    {
-      format: settings.format,
-      quality: settings.quality,
-      resolution: settings.resolution,
-      includeSubtitles: !!subtitlePath,
-      subtitlePath,
+  let exportedPath = outputPath;
+  const videoTrack = timeline.tracks.find((track) => track.type === 'video');
+  const hasLocalInput = !!videoInfo.path && !videoInfo.path.startsWith('blob:');
+  const canUseAutonomousRender = !!videoTrack?.clips?.length && hasLocalInput;
+
+  if (canUseAutonomousRender) {
+    const sortedClips = [...videoTrack.clips].sort((a, b) => a.sourceStart - b.sourceStart);
+    const startTime = sortedClips[0]?.sourceStart ?? 0;
+    const endTime = sortedClips[sortedClips.length - 1]?.sourceEnd ?? videoInfo.duration;
+    const autonomousSegments = sortedClips
+      .filter((clip) => typeof clip.sourceStart === 'number' && typeof clip.sourceEnd === 'number')
+      .map((clip) => ({
+        start: clip.sourceStart,
+        end: clip.sourceEnd,
+      }))
+      .filter((segment) => segment.end > segment.start);
+    const subtitleTrack = timeline.tracks.find((track) => track.type === 'subtitle');
+    const subtitles =
+      editedScript && subtitleTrack
+        ? subtitleTrack.clips
+            .map((clip) => {
+              const segmentText =
+                editedScript.segments.find((segment) => segment.id === clip.scriptSegmentId)?.content || '';
+              return {
+                start: clip.startTime,
+                end: clip.endTime,
+                text: segmentText,
+              };
+            })
+            .filter((item) => item.end > item.start && item.text.trim().length > 0)
+        : [];
+    const overlayMarkers = (timeline.originalOverlayPlan || []).map((item) => ({
+      start: item.startTime,
+      end: item.endTime,
+      label: item.reason,
+    }));
+    iterativeResult = optimizeOverlayIteratively({
+      markers: overlayMarkers,
+      subtitles: subtitles.map((item) => ({ start: item.start, end: item.end })),
+      qualityScore: timeline.overlayQuality?.score ?? 100,
+      baseOpacity: autonomousOptions?.overlayOpacity ?? 0.72,
+      preferredMode: autonomousOptions?.overlayMixMode || 'pip',
+      duration: timeline.duration,
+    });
+
+    try {
+      exportedPath = await aiDirectorService.renderAutonomousCut({
+        inputPath: videoInfo.path,
+        outputPath,
+        startTime,
+        endTime,
+        transition: timeline.directorPlan?.preferredTransition || 'cut',
+        transitionDuration: timeline.directorPlan?.preferredTransition === 'cut' ? 0 : 0.35,
+        burnSubtitles: settings.burnSubtitles !== false,
+        subtitles,
+        applyOverlayMarkers: iterativeResult.enableOverlay,
+        overlayMixMode: iterativeResult.final.mixMode,
+        overlayOpacity: iterativeResult.final.opacity,
+        overlayMarkers: iterativeResult.final.markers,
+        segments: autonomousSegments,
+      });
+    } catch {
+      // Tauri 命令失败时回退到当前导出实现
+      exportedPath = await videoService.exportVideo(
+        videoInfo.path,
+        outputPath,
+        {
+          format: settings.format,
+          quality: settings.quality,
+          resolution: settings.resolution,
+          includeSubtitles: !!subtitlePath,
+          subtitlePath,
+        }
+      );
     }
-  );
+  } else {
+    exportedPath = await videoService.exportVideo(
+      videoInfo.path,
+      outputPath,
+      {
+        format: settings.format,
+        quality: settings.quality,
+        resolution: settings.resolution,
+        includeSubtitles: !!subtitlePath,
+        subtitlePath,
+      }
+    );
+  }
 
   // 保存导出记录
   const exportRecord = {
@@ -45,6 +139,11 @@ export async function executeExportStep(
     timeline: {
       totalClips: timeline.tracks.reduce((sum, t) => sum + t.clips.length, 0),
       duration: timeline.duration,
+      overlayQuality: timeline.overlayQuality?.score,
+      overlayOptimizationApplied: iterativeResult.passes > 0,
+      overlayOptimizationPasses: iterativeResult.passes,
+      predictedOverlayQualityAfterOptimization: iterativeResult.predictedScore,
+      overlayDisabledBySafetyGate: !iterativeResult.enableOverlay,
     },
     createdAt: new Date().toISOString(),
   };

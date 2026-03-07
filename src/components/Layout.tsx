@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout as AntLayout, Menu, Button, Tooltip, Avatar, Typography, Dropdown, Badge, Space, Drawer } from 'antd';
+import type { MenuProps } from 'antd';
 import {
   HomeOutlined,
   ProjectOutlined,
@@ -104,7 +105,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       { type: 'divider' as const },
       { key: 'logout', label: '退出登录', danger: true }
     ],
-    onClick: (e: any) => {
+    onClick: (e: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
       if (e.key === 'preferences') navigate('/settings');
     }
   };

@@ -2,6 +2,7 @@
  * 设置页面专用 Hooks
  */
 import { useState, useCallback } from 'react';
+import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';
 
 /**
  * 应用设置类型
@@ -12,6 +13,7 @@ export interface AppSettings {
   language: string;
   theme: string;
   defaultModel: string;
+  projectSaveBehavior: ProjectSaveBehavior;
   outputPath: string;
   recentProjects: string[];
 }
@@ -51,6 +53,7 @@ export function useSettingsStore() {
   const [language, setLanguage] = useLocalStorage('clipflow-language', 'zh-CN');
   const [theme, setTheme] = useLocalStorage('clipflow-theme', 'light');
   const [defaultModel, setDefaultModel] = useLocalStorage('clipflow-default-model', 'deepseek-chat');
+  const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
   const [outputPath, setOutputPath] = useLocalStorage('clipflow-output-path', '');
   const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('clipflow-recent-projects', []);
 
@@ -60,6 +63,7 @@ export function useSettingsStore() {
     language,
     theme,
     defaultModel,
+    projectSaveBehavior,
     outputPath,
     recentProjects,
   };
@@ -70,9 +74,10 @@ export function useSettingsStore() {
     if (newSettings.language !== undefined) setLanguage(newSettings.language);
     if (newSettings.theme !== undefined) setTheme(newSettings.theme);
     if (newSettings.defaultModel !== undefined) setDefaultModel(newSettings.defaultModel);
+    if (newSettings.projectSaveBehavior !== undefined) setProjectSaveBehavior(newSettings.projectSaveBehavior);
     if (newSettings.outputPath !== undefined) setOutputPath(newSettings.outputPath);
     if (newSettings.recentProjects !== undefined) setRecentProjects(newSettings.recentProjects);
-  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setOutputPath, setRecentProjects]);
+  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath, setRecentProjects]);
 
   const resetSettings = useCallback(() => {
     setAutoSave(true);
@@ -80,9 +85,10 @@ export function useSettingsStore() {
     setLanguage('zh-CN');
     setTheme('light');
     setDefaultModel('deepseek-chat');
+    setProjectSaveBehavior('stay');
     setOutputPath('');
     setRecentProjects([]);
-  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setOutputPath, setRecentProjects]);
+  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath, setRecentProjects]);
 
   const addRecentProject = useCallback((projectId: string) => {
     setRecentProjects(prev => {
@@ -139,6 +145,7 @@ export function useAppSettings() {
   const [language, setLanguage] = useLocalStorage('clipflow-language', 'zh-CN');
   const [theme, setTheme] = useLocalStorage('clipflow-theme', 'light');
   const [defaultModel, setDefaultModel] = useLocalStorage('clipflow-default-model', 'deepseek-chat');
+  const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
   const [outputPath, setOutputPath] = useLocalStorage('clipflow-output-path', '');
 
   const resetAll = useCallback(() => {
@@ -147,8 +154,9 @@ export function useAppSettings() {
     setLanguage('zh-CN');
     setTheme('light');
     setDefaultModel('deepseek-chat');
+    setProjectSaveBehavior('stay');
     setOutputPath('');
-  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setOutputPath]);
+  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath]);
 
   return {
     autoSave, setAutoSave,
@@ -156,6 +164,7 @@ export function useAppSettings() {
     language, setLanguage,
     theme, setTheme,
     defaultModel, setDefaultModel,
+    projectSaveBehavior, setProjectSaveBehavior,
     outputPath, setOutputPath,
     resetAll,
   };

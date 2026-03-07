@@ -14,7 +14,9 @@ import {
   Empty, 
   Tooltip,
   Input,
-  Segmented
+  Segmented,
+  message,
+  Modal
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -35,7 +37,15 @@ import {
   SearchOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import styles from './Dashboard.module.less';
+import { listProjects, deleteProject as deleteProjectFile, getFileSizeBytes } from '@/services/tauriService';
+import { useSettings } from '@/context/SettingsContext';
+import {
+  extractProjectMediaMetrics,
+  pickPreferredSizeMb,
+  resolveProjectVideoPath,
+  type RawProjectRecord,
+} from '@/shared';
+import styles from './index.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 const { Search } = Input;
@@ -45,29 +55,27 @@ interface Project {
   title: string;
   thumbnail: string;
   duration: number;
-  updatedAt: Date;
+  updatedAt: string;
   size: number;
   starred: boolean;
   tags: string[];
 }
 
-// 项目数据 (从存储或API获取)
-const mockProjects: Project[] = [];
-
 // 格式化时间显示
-const formatTime = (date: Date): string => {
+const formatTime = (date: Date | string): string => {
+  const targetDate = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+  const diffMs = now.getTime() - targetDate.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   
   if (diffDays === 0) {
-    return '今天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    return '今天 ' + targetDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
   } else if (diffDays === 1) {
-    return '昨天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    return '昨天 ' + targetDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
   } else if (diffDays < 7) {
     return `${diffDays}天前`;
   } else {
-    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+    return targetDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
   }
 };
 
@@ -80,17 +88,55 @@ const formatDuration = (seconds: number): string => {
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const { addRecentProject } = useSettings();
+  const [projects, setProjects] = useState<Project[]>([]);
   const [viewMode, setViewMode] = useState<string | number>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects);
+  const [loading, setLoading] = useState(false);
   
+  const loadProjects = async () => {
+    try {
+      setLoading(true);
+      const rawProjects = await listProjects<RawProjectRecord>();
+      const mapped = await Promise.all(rawProjects
+        .filter((project) => typeof project.id === 'string')
+        .map(async (project, index) => {
+          const metrics = extractProjectMediaMetrics(project);
+          const videoPath = resolveProjectVideoPath(project);
+          const exactSizeMb = videoPath ? (await getFileSizeBytes(videoPath)) / 1024 / 1024 : 0;
+          const size = pickPreferredSizeMb(exactSizeMb, metrics.explicitSizeMb, metrics.estimatedSizeMb);
+
+          return {
+            id: String(project.id),
+            title: String(project.name || '未命名项目'),
+            thumbnail: `https://picsum.photos/seed/${project.id || index}/300/200`,
+            updatedAt: String(project.updatedAt || project.createdAt || new Date().toISOString()),
+            duration: metrics.durationSec,
+            size,
+            starred: false,
+            tags: [String(project.status || 'draft')],
+          } satisfies Project;
+        }));
+      setProjects(mapped);
+    } catch (error) {
+      console.error('加载项目失败:', error);
+      message.error('加载项目失败，请稍后重试');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 统计数据
   const totalProjects = projects.length;
   const totalDuration = projects.reduce((sum, project) => sum + project.duration, 0);
   const totalSize = projects.reduce((sum, project) => sum + project.size, 0);
   
   // 搜索和过滤项目
+  useEffect(() => {
+    void loadProjects();
+  }, []);
+
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setFilteredProjects(projects);
@@ -114,17 +160,38 @@ const Dashboard: React.FC = () => {
   
   // 删除项目
   const deleteProject = (id: string) => {
-    setProjects(projects.filter(project => project.id !== id));
+    Modal.confirm({
+      title: '确认删除项目',
+      content: '删除后不可恢复，确认继续？',
+      okText: '删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          const ok = await deleteProjectFile(id);
+          if (ok) {
+            message.success('项目已删除');
+            await loadProjects();
+          } else {
+            message.error('删除项目失败');
+          }
+        } catch (error) {
+          console.error('删除项目失败:', error);
+          message.error('删除项目失败，请稍后重试');
+        }
+      },
+    });
   };
   
   // 创建新项目
   const createNewProject = () => {
-    navigate('/editor/new');
+    navigate('/project/new');
   };
   
   // 打开项目
   const openProject = (id: string) => {
-    navigate(`/editor/${id}`);
+    addRecentProject(id);
+    navigate(`/project/edit/${id}`);
   };
   
   // 项目操作菜单
@@ -140,7 +207,7 @@ const Dashboard: React.FC = () => {
         key: '2',
         label: '复制项目',
         icon: <CopyOutlined />,
-        onClick: () => console.log('复制项目', id)
+        onClick: () => message.info('复制项目功能即将上线')
       },
       {
         key: '3',
@@ -359,7 +426,11 @@ const Dashboard: React.FC = () => {
       </div>
       
       {/* 项目列表 */}
-      {filteredProjects.length > 0 ? (
+      {loading ? (
+        <div className={styles.emptyState}>
+          <Empty description="正在加载项目..." />
+        </div>
+      ) : filteredProjects.length > 0 ? (
         viewMode === 'grid' ? (
           <Row gutter={[16, 16]} className={styles.projectGrid}>
             {filteredProjects.map(renderGridItem)}

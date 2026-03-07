@@ -3,7 +3,13 @@
  * 统一的 HTTP 请求管理
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig
+} from 'axios';
 import { message } from 'antd';
 
 // 请求配置
@@ -14,7 +20,7 @@ interface RequestConfig extends AxiosRequestConfig {
 }
 
 // 响应数据
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   code: number;
   data: T;
   message: string;
@@ -23,10 +29,8 @@ interface ApiResponse<T = any> {
 
 class ApiClient {
   private client: AxiosInstance;
-  private baseURL: string;
 
   constructor(baseURL: string = '') {
-    this.baseURL = baseURL;
     this.client = axios.create({
       baseURL,
       timeout: 30000,
@@ -41,14 +45,14 @@ class ApiClient {
   /**
    * 设置拦截器
    */
-  private setupInterceptors() {
+  private setupInterceptors(): void {
     // 请求拦截器
     this.client.interceptors.request.use(
-      (config) => {
+      (config: InternalAxiosRequestConfig & RequestConfig) => {
         // 添加认证 token
         const token = localStorage.getItem('reelforge_token');
-        if (token && !config.headers?.skipAuth) {
-          config.headers = config.headers || {};
+        if (token && !config.skipAuth) {
+          config.headers = config.headers ?? {};
           config.headers.Authorization = `Bearer ${token}`;
         }
 
@@ -78,8 +82,9 @@ class ApiClient {
   /**
    * 错误处理
    */
-  private handleError(error: AxiosError) {
-    if (error.config?.skipErrorHandler) {
+  private handleError(error: AxiosError): void {
+    const config = error.config as (InternalAxiosRequestConfig & RequestConfig) | undefined;
+    if (config?.skipErrorHandler) {
       return;
     }
 
@@ -118,7 +123,7 @@ class ApiClient {
   /**
    * GET 请求
    */
-  async get<T = any>(url: string, config?: RequestConfig): Promise<T> {
+  async get<T = unknown>(url: string, config?: RequestConfig): Promise<T> {
     const response = await this.client.get<ApiResponse<T>>(url, config);
     return response.data.data;
   }
@@ -126,7 +131,7 @@ class ApiClient {
   /**
    * POST 请求
    */
-  async post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
+  async post<T = unknown>(url: string, data?: unknown, config?: RequestConfig): Promise<T> {
     const response = await this.client.post<ApiResponse<T>>(url, data, config);
     return response.data.data;
   }
@@ -134,7 +139,7 @@ class ApiClient {
   /**
    * PUT 请求
    */
-  async put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
+  async put<T = unknown>(url: string, data?: unknown, config?: RequestConfig): Promise<T> {
     const response = await this.client.put<ApiResponse<T>>(url, data, config);
     return response.data.data;
   }
@@ -142,7 +147,7 @@ class ApiClient {
   /**
    * DELETE 请求
    */
-  async delete<T = any>(url: string, config?: RequestConfig): Promise<T> {
+  async delete<T = unknown>(url: string, config?: RequestConfig): Promise<T> {
     const response = await this.client.delete<ApiResponse<T>>(url, config);
     return response.data.data;
   }
@@ -150,7 +155,7 @@ class ApiClient {
   /**
    * PATCH 请求
    */
-  async patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
+  async patch<T = unknown>(url: string, data?: unknown, config?: RequestConfig): Promise<T> {
     const response = await this.client.patch<ApiResponse<T>>(url, data, config);
     return response.data.data;
   }
@@ -158,7 +163,7 @@ class ApiClient {
   /**
    * 上传文件
    */
-  async upload<T = any>(
+  async upload<T = unknown>(
     url: string,
     file: File,
     onProgress?: (progress: number) => void,
@@ -188,7 +193,7 @@ class ApiClient {
    * 下载文件
    */
   async download(url: string, filename: string, config?: RequestConfig): Promise<void> {
-    const response = await this.client.get(url, {
+    const response = await this.client.get<Blob>(url, {
       ...config,
       responseType: 'blob'
     });

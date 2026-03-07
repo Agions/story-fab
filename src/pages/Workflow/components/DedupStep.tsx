@@ -28,6 +28,12 @@ const DedupStep: React.FC<DedupStepProps> = ({ data }) => {
     return styles.scoreLow;
   };
 
+  const getDuplicateTypeText = (type: string): string => {
+    if (type === 'exact') return '完全重复';
+    if (type === 'similar') return '相似内容';
+    return '模板套话';
+  };
+
   return (
     <Card title="原创性检测" className={styles.stepCard}>
       <div className={styles.dedupResult}>
@@ -58,16 +64,10 @@ const DedupStep: React.FC<DedupStepProps> = ({ data }) => {
         {originalityReport.duplicates.length > 0 && (
           <div className={styles.duplicateList}>
             <Title level={5}>重复内容</Title>
-            {originalityReport.duplicates.map((dup: any, index: number) => (
+            {originalityReport.duplicates.map((dup, index: number) => (
               <Alert
                 key={dup.id}
-                message={`重复 #${index + 1} - ${
-                  dup.type === 'exact'
-                    ? '完全重复'
-                    : dup.type === 'similar'
-                    ? '相似内容'
-                    : '模板套话'
-                }`}
+                message={`重复 #${index + 1} - ${getDuplicateTypeText(dup.type)}`}
                 description={
                   <div>
                     <Paragraph ellipsis={{ rows: 2 }}>
@@ -77,13 +77,7 @@ const DedupStep: React.FC<DedupStepProps> = ({ data }) => {
                     <Text type="warning">{dup.suggestion}</Text>
                   </div>
                 }
-                type={
-                  dup.type === 'exact'
-                    ? 'error'
-                    : dup.type === 'similar'
-                    ? 'warning'
-                    : 'info'
-                }
+                type={dup.type === 'exact' ? 'error' : dup.type === 'similar' ? 'warning' : 'info'}
                 showIcon
                 className={styles.duplicateAlert}
               />

@@ -1,4 +1,4 @@
-import type { Timeline, VideoClip, VideoTrack } from '@/core/types';
+import type { AudioClip, TextItem, Timeline, VideoClip } from './types';
 
 export function createEmptyTimeline(): Timeline {
   return {
@@ -178,7 +178,7 @@ export function addEffect(
   timeline: Timeline,
   clipId: string,
   effect: string,
-  params: Record<string, any>
+  params: Record<string, unknown>
 ): Timeline {
   return {
     ...timeline,
@@ -197,7 +197,7 @@ export function addEffect(
 export function addText(
   timeline: Timeline,
   trackId: string,
-  text: any,
+  text: TextItem,
   position: number
 ): Timeline {
   const track = timeline.textTracks.find((t) => t.id === trackId);
@@ -227,7 +227,7 @@ export function addText(
 export function addAudio(
   timeline: Timeline,
   trackId: string,
-  audio: any,
+  audio: AudioClip,
   position: number
 ): Timeline {
   const track = timeline.audioTracks.find((t) => t.id === trackId);

@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { Modal } from 'antd';
-import styles from './ScriptEditor.module.less';
+import styles from '../ScriptEditor.module.less';
 
 interface PreviewModalProps {
   visible: boolean;

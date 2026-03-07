@@ -3,7 +3,8 @@
  */
 import { useState, useCallback } from 'react';
 import { useEditorStore } from '@/store';
-import type { VideoAsset, Script, Voice, EditorPanel } from '../types';
+import type { EditorPanel as StoreEditorPanel } from '@/store/types';
+import type { VideoAsset, Script, Voice } from '../types';
 
 export function useEditor() {
   const {
@@ -58,7 +59,7 @@ export function useEditor() {
     setCurrentTime(time);
   }, [setCurrentTime]);
 
-  const switchPanel = useCallback((panel: EditorPanel) => {
+  const switchPanel = useCallback((panel: StoreEditorPanel) => {
     setActivePanel(panel);
   }, [setActivePanel]);
 

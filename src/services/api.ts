@@ -52,7 +52,7 @@ export const analysisApi = {
 export const scriptApi = {
   getScript: (projectId: string, scriptId: string): Promise<Script> => 
     api.get(`/projects/${projectId}/scripts/${scriptId}`),
-  generateScript: (projectId: string, data: { modelType: string; options?: any }): Promise<Script> => 
+  generateScript: (projectId: string, data: { modelType: string; options?: Record<string, unknown> }): Promise<Script> => 
     api.post(`/projects/${projectId}/scripts`, data),
   updateScript: (projectId: string, scriptId: string, data: Partial<Script>): Promise<Script> =>
     api.put(`/projects/${projectId}/scripts/${scriptId}`, data),

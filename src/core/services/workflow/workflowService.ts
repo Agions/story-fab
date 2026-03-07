@@ -10,6 +10,8 @@ import {
   executeTimelineStep,
   executeExportStep,
 } from './steps';
+import { WORKFLOW_MODE_DEFINITIONS } from '@/core/workflow/featureBlueprint';
+import { sceneCommentaryAlignmentService } from '../scene-commentary-alignment.service';
 import type {
   WorkflowState,
   WorkflowData,
@@ -17,13 +19,18 @@ import type {
   WorkflowCallbacks,
   WorkflowStep,
   TimelineData,
-  STEP_PROGRESS,
 } from './types';
+import type { ScriptData, VideoAnalysis, ScriptTemplate, AIModel, ExportSettings } from '@/core/types';
 
 export class WorkflowService {
   private state: WorkflowState;
   private callbacks: WorkflowCallbacks = {};
   private abortController: AbortController | null = null;
+  private currentConfig: WorkflowConfig | null = null;
+  private static readonly ALIGNMENT_GATE = {
+    minConfidence: 0.8,
+    maxDriftSeconds: 0.8,
+  } as const;
 
   constructor() {
     this.state = this.getInitialState();
@@ -75,6 +82,7 @@ export class WorkflowService {
     videoFile: File,
     config: WorkflowConfig
   ): Promise<void> {
+    this.currentConfig = config;
     this.abortController = new AbortController();
     this.updateState({ status: 'running', progress: 0 });
 
@@ -170,9 +178,22 @@ export class WorkflowService {
         this.state.data.videoInfo!,
         this.state.data.videoAnalysis!,
         this.state.data.editedScript || this.state.data.uniqueScript!,
-        true
+        true,
+        {
+          mode: config.mode,
+          autoOriginalOverlay: config.autoOriginalOverlay !== false,
+          overlayMixMode: config.overlayMixMode,
+          overlayOpacity: config.overlayOpacity,
+          syncStrategy:
+            config.commentarySyncStrategy ||
+            (config.mode ? WORKFLOW_MODE_DEFINITIONS[config.mode].syncTarget : 'balanced'),
+        }
       );
-      this.updateData({ timeline });
+      this.updateData({
+        timeline,
+        alignmentReport: timeline.alignment,
+        originalOverlayPlan: timeline.originalOverlayPlan,
+      });
       this.updateState({ step: 'timeline-edit', progress: 85 });
 
       // Step 10: 预览
@@ -188,7 +209,7 @@ export class WorkflowService {
     }
   }
 
-  private async rewriteScript(script: any): Promise<any> {
+  private async rewriteScript(script: ScriptData): Promise<ScriptData> {
     const randomSeed = Math.random().toString(36).substring(7);
     return {
       ...script,
@@ -197,12 +218,101 @@ export class WorkflowService {
     };
   }
 
-  async stepEditScript(editedScript: any): Promise<any> {
+  async stepAnalyze(): Promise<VideoAnalysis> {
+    if (!this.state.data.videoInfo || !this.state.data.projectId) {
+      throw new Error('缺少视频信息，无法执行分析');
+    }
+    const result = await executeAnalyzeStep(this.state.data.videoInfo, this.state.data.projectId);
+    this.updateData({ videoAnalysis: result.analysis });
+    this.updateState({ step: 'analyze', progress: 20 });
+    return result.analysis;
+  }
+
+  async stepTemplateSelect(templateId?: string): Promise<ScriptTemplate> {
+    if (!this.state.data.videoAnalysis) {
+      throw new Error('缺少视频分析结果，无法选择模板');
+    }
+    const result = await executeTemplateStep(this.state.data.videoAnalysis, templateId);
+    this.updateData({ selectedTemplate: result.template });
+    this.updateState({ step: 'template-select', progress: 35 });
+    return result.template;
+  }
+
+  async stepGenerateScript(
+    model: AIModel,
+    params: WorkflowConfig['scriptParams']
+  ): Promise<ScriptData> {
+    if (!this.state.data.videoInfo || !this.state.data.videoAnalysis || !this.state.data.selectedTemplate || !this.state.data.projectId) {
+      throw new Error('缺少生成脚本所需数据');
+    }
+    const result = await executeScriptGenerateStep(
+      this.state.data.videoInfo,
+      this.state.data.videoAnalysis,
+      this.state.data.selectedTemplate,
+      model,
+      params,
+      this.state.data.projectId
+    );
+    this.updateData({ generatedScript: result.script });
+    this.updateState({ step: 'script-generate', progress: 45 });
+    return result.script;
+  }
+
+  async stepDedupScript(
+    config?: WorkflowConfig['dedupConfig']
+  ): Promise<{ script: ScriptData; report: WorkflowData['originalityReport'] }> {
+    const baseScript = this.state.data.generatedScript;
+    if (!baseScript) {
+      throw new Error('缺少待去重脚本');
+    }
+    const result = await executeDedupStep(baseScript, config);
+    this.updateData({ dedupedScript: result.script, originalityReport: result.report });
+    this.updateState({ step: 'script-dedup', progress: 55 });
+    return {
+      script: result.script,
+      report: result.report,
+    };
+  }
+
+  async stepEnsureUniqueness(
+    config?: WorkflowConfig['uniquenessConfig']
+  ): Promise<{ script: ScriptData; isUnique: boolean; attempts: number }> {
+    const baseScript = this.state.data.dedupedScript || this.state.data.generatedScript;
+    if (!baseScript) {
+      throw new Error('缺少待唯一性处理脚本');
+    }
+    const result = await executeUniquenessStep(baseScript, async (script) => this.rewriteScript(script), config);
+    this.updateData({ uniqueScript: result.script, uniquenessReport: result.report });
+    this.updateState({ step: 'script-dedup', progress: 60 });
+    return { script: result.script, isUnique: result.isUnique, attempts: result.attempts };
+  }
+
+  async stepTimelineEdit(autoMatch: boolean = true): Promise<TimelineData> {
+    if (!this.state.data.videoInfo || !this.state.data.videoAnalysis || !(this.state.data.editedScript || this.state.data.uniqueScript || this.state.data.generatedScript)) {
+      throw new Error('缺少时间轴编辑所需数据');
+    }
+    const timeline = await executeTimelineStep(
+      this.state.data.videoInfo,
+      this.state.data.videoAnalysis,
+      this.state.data.editedScript || this.state.data.uniqueScript || this.state.data.generatedScript!,
+      autoMatch
+    );
+    this.updateData({ timeline });
+    this.updateState({ step: 'timeline-edit', progress: 70 });
+    return timeline;
+  }
+
+  async stepPreview(): Promise<string> {
+    this.updateState({ step: 'preview', progress: 90 });
+    return 'preview-ready';
+  }
+
+  async stepEditScript(editedScript: ScriptData): Promise<ScriptData> {
     this.updateState({ step: 'script-edit', progress: 60 });
 
-    const project = storageService.projects.get(this.state.data.projectId!);
+    const project = storageService.projects.getById(this.state.data.projectId!);
     if (project) {
-      const index = project.scripts.findIndex((s: any) => s.id === editedScript.id);
+      const index = project.scripts.findIndex((s) => s.id === editedScript.id);
       if (index >= 0) {
         project.scripts[index] = {
           ...editedScript,
@@ -219,19 +329,249 @@ export class WorkflowService {
     return editedScript;
   }
 
-  async stepExport(settings: any): Promise<string> {
+  async stepExport(settings: WorkflowData['exportSettings']): Promise<string> {
     this.updateState({ step: 'export', progress: 95 });
+
+    const exportSettings: ExportSettings = settings || {
+      format: 'mp4',
+      quality: 'high',
+      resolution: '1080p',
+      frameRate: 30,
+      includeSubtitles: true,
+      burnSubtitles: true,
+    };
+
+    const activeScript =
+      this.state.data.editedScript || this.state.data.uniqueScript || this.state.data.generatedScript;
+    if (!activeScript) {
+      throw new Error('缺少脚本，无法执行导出前对齐校验');
+    }
+
+    const alignmentGateResult = this.enforceAlignmentGate(this.state.data.timeline!, activeScript);
+    if (!alignmentGateResult.report.passed) {
+      throw new Error('导出已阻断：解说与画面对齐未达标，请检查时间轴后重试。');
+    }
+    this.updateData({
+      timeline: alignmentGateResult.timeline,
+      editedScript: alignmentGateResult.script,
+      alignmentReport: alignmentGateResult.timeline.alignment,
+      alignmentGateReport: alignmentGateResult.report,
+    });
 
     const exportedPath = await executeExportStep(
       this.state.data.projectId!,
       this.state.data.videoInfo!,
-      this.state.data.timeline!,
-      this.state.data.editedScript,
-      settings
+      alignmentGateResult.timeline,
+      alignmentGateResult.script,
+      exportSettings,
+      {
+        overlayMixMode: this.currentConfig?.overlayMixMode || 'pip',
+        overlayOpacity: this.currentConfig?.overlayOpacity ?? 0.72,
+      }
     );
 
     this.updateState({ progress: 100, status: 'completed' });
     return exportedPath;
+  }
+
+  private enforceAlignmentGate(
+    timeline: TimelineData,
+    script: ScriptData
+  ): {
+    timeline: TimelineData;
+    script: ScriptData;
+    report: NonNullable<WorkflowData['alignmentGateReport']>;
+  } {
+    const videoTrack = timeline.tracks.find((track) => track.type === 'video');
+    const subtitleTrack = timeline.tracks.find((track) => track.type === 'subtitle');
+    if (!videoTrack || !subtitleTrack) {
+      throw new Error('缺少视频轨或字幕轨，无法执行导出对齐门禁');
+    }
+
+    const buildAlignment = (currentTimeline: TimelineData, currentScript: ScriptData) => {
+      const scenes = videoTrack.clips.map((clip, index) => ({
+        id: `gate-scene-${index}`,
+        startTime: clip.startTime,
+        endTime: clip.endTime,
+        thumbnail: '',
+        tags: [],
+      }));
+      const currentSubtitleTrack =
+        currentTimeline.tracks.find((track) => track.type === 'subtitle') || subtitleTrack;
+      const segmentById = new Map(currentScript.segments.map((segment) => [segment.id, segment]));
+      const timedSegments = currentSubtitleTrack.clips
+        .map((clip) => {
+          const segmentId = clip.scriptSegmentId;
+          if (!segmentId) return null;
+          const segment = segmentById.get(segmentId);
+          if (!segment) return null;
+          return {
+            ...segment,
+            startTime: clip.startTime,
+            endTime: clip.endTime,
+          };
+        })
+        .filter(Boolean) as ScriptData['segments'];
+
+      const items = sceneCommentaryAlignmentService.align(scenes, timedSegments);
+      const averageConfidence =
+        items.reduce((sum, item) => sum + item.confidence, 0) / Math.max(items.length, 1);
+      const maxDriftSeconds = items.reduce((max, item) => Math.max(max, item.driftSeconds), 0);
+      const lowConfidenceCount = items.filter(
+        (item) => item.confidence < WorkflowService.ALIGNMENT_GATE.minConfidence
+      ).length;
+      const highDriftCount = items.filter(
+        (item) => item.driftSeconds > WorkflowService.ALIGNMENT_GATE.maxDriftSeconds
+      ).length;
+      return { items, averageConfidence, maxDriftSeconds, lowConfidenceCount, highDriftCount };
+    };
+
+    const before = buildAlignment(timeline, script);
+
+    const lowItems = before.items.filter(
+      (item) =>
+        item.confidence < WorkflowService.ALIGNMENT_GATE.minConfidence ||
+        item.driftSeconds > WorkflowService.ALIGNMENT_GATE.maxDriftSeconds
+    );
+
+    if (lowItems.length === 0) {
+      const readyTimeline: TimelineData = {
+        ...timeline,
+        alignment: {
+          averageConfidence: before.averageConfidence,
+          maxDriftSeconds: before.maxDriftSeconds,
+          items: before.items.map((item) => ({
+            sceneId: item.sceneId,
+            segmentId: item.segmentId,
+            driftSeconds: item.driftSeconds,
+            confidence: item.confidence,
+          })),
+        },
+      };
+      return {
+        timeline: readyTimeline,
+        script,
+        report: {
+          threshold: { ...WorkflowService.ALIGNMENT_GATE },
+          before: {
+            averageConfidence: before.averageConfidence,
+            maxDriftSeconds: before.maxDriftSeconds,
+            lowConfidenceCount: before.lowConfidenceCount,
+            highDriftCount: before.highDriftCount,
+          },
+          after: {
+            averageConfidence: before.averageConfidence,
+            maxDriftSeconds: before.maxDriftSeconds,
+            lowConfidenceCount: before.lowConfidenceCount,
+            highDriftCount: before.highDriftCount,
+          },
+          autoFixedSegments: 0,
+          failedSegmentsBefore: [],
+          failedSegmentsAfter: [],
+          passed: true,
+        },
+      };
+    }
+
+    const fixedTimeline: TimelineData = {
+      ...timeline,
+      tracks: timeline.tracks.map((track) =>
+        track.type === 'subtitle'
+          ? {
+              ...track,
+              clips: track.clips.map((clip) => ({ ...clip })),
+            }
+          : track
+      ),
+    };
+    const fixedScript: ScriptData = {
+      ...script,
+      segments: script.segments.map((segment) => ({ ...segment })),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const fixedVideoTrack = fixedTimeline.tracks.find((track) => track.type === 'video');
+    const fixedSubtitleTrack = fixedTimeline.tracks.find((track) => track.type === 'subtitle');
+    if (!fixedVideoTrack || !fixedSubtitleTrack) {
+      throw new Error('对齐门禁修正失败：无法获取时间轴轨道');
+    }
+
+    const videoBySegmentId = new Map<string, (typeof fixedVideoTrack.clips)[number]>();
+    for (const clip of fixedVideoTrack.clips) {
+      if (clip.scriptSegmentId && !videoBySegmentId.has(clip.scriptSegmentId)) {
+        videoBySegmentId.set(clip.scriptSegmentId, clip);
+      }
+    }
+
+    let autoFixedSegments = 0;
+    for (const item of lowItems) {
+      const targetVideoClip = videoBySegmentId.get(item.segmentId);
+      if (!targetVideoClip) continue;
+      const subtitleClip = fixedSubtitleTrack.clips.find((clip) => clip.scriptSegmentId === item.segmentId);
+      if (subtitleClip) {
+        subtitleClip.startTime = targetVideoClip.startTime;
+        subtitleClip.endTime = targetVideoClip.endTime;
+      }
+      const scriptSegment = fixedScript.segments.find((segment) => segment.id === item.segmentId);
+      if (scriptSegment) {
+        scriptSegment.startTime = targetVideoClip.startTime;
+        scriptSegment.endTime = targetVideoClip.endTime;
+      }
+      autoFixedSegments += 1;
+    }
+
+    const after = buildAlignment(fixedTimeline, fixedScript);
+    const passed = after.lowConfidenceCount === 0 && after.highDriftCount === 0;
+    const failedSegmentsAfter = after.items
+      .filter(
+        (item) =>
+          item.confidence < WorkflowService.ALIGNMENT_GATE.minConfidence ||
+          item.driftSeconds > WorkflowService.ALIGNMENT_GATE.maxDriftSeconds
+      )
+      .map((item) => ({
+        segmentId: item.segmentId,
+        driftSeconds: item.driftSeconds,
+        confidence: item.confidence,
+      }));
+
+    fixedTimeline.alignment = {
+      averageConfidence: after.averageConfidence,
+      maxDriftSeconds: after.maxDriftSeconds,
+      items: after.items.map((item) => ({
+        sceneId: item.sceneId,
+        segmentId: item.segmentId,
+        driftSeconds: item.driftSeconds,
+        confidence: item.confidence,
+      })),
+    };
+
+    return {
+      timeline: fixedTimeline,
+      script: fixedScript,
+      report: {
+        threshold: { ...WorkflowService.ALIGNMENT_GATE },
+        before: {
+          averageConfidence: before.averageConfidence,
+          maxDriftSeconds: before.maxDriftSeconds,
+          lowConfidenceCount: before.lowConfidenceCount,
+          highDriftCount: before.highDriftCount,
+        },
+        after: {
+          averageConfidence: after.averageConfidence,
+          maxDriftSeconds: after.maxDriftSeconds,
+          lowConfidenceCount: after.lowConfidenceCount,
+          highDriftCount: after.highDriftCount,
+        },
+        autoFixedSegments,
+        failedSegmentsBefore: lowItems.map((item) => ({
+          segmentId: item.segmentId,
+          driftSeconds: item.driftSeconds,
+          confidence: item.confidence,
+        })),
+        failedSegmentsAfter,
+        passed,
+      },
+    };
   }
 
   pause(): void {
@@ -249,6 +589,7 @@ export class WorkflowService {
 
   reset(): void {
     this.state = this.getInitialState();
+    this.currentConfig = null;
   }
 
   jumpToStep(step: WorkflowStep): void {
@@ -259,6 +600,7 @@ export class WorkflowService {
       'script-generate': 40,
       'script-dedup': 50,
       'script-edit': 60,
+      'ai-clip': 65,
       'timeline-edit': 70,
       preview: 90,
       export: 95,

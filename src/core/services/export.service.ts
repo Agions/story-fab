@@ -730,7 +730,10 @@ export class ExportService {
    * 批量导出多个格式
    */
   async batchExport(
-    timeline: any,
+    timeline: {
+      segments?: Array<{ start: number; end: number; sourceFile?: string }>;
+      outputPath?: string;
+    },
     formats: ExportFormat[]
   ): Promise<ExportResult[]> {
     const results: ExportResult[] = [];

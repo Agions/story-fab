@@ -8,18 +8,18 @@ import { message } from 'antd';
  * 生成唯一 ID
  */
 export function generateId(prefix = ''): string {
-  return `${prefix}${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${prefix}${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
 /**
  * 防抖函数
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
-  return function(...args: Parameters<T>) {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function(this: unknown, ...args: Parameters<T>) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
@@ -28,16 +28,18 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * 节流函数
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
-  let inThrottle: boolean;
-  return function(...args: Parameters<T>) {
+  let inThrottle = false;
+  return function(this: unknown, ...args: Parameters<T>) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => {
+        inThrottle = false;
+      }, limit);
     }
   };
 }
@@ -59,7 +61,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 /**
  * 下载文件
  */
-export function downloadFile(content: string, filename: string, type = 'text/plain') {
+export function downloadFile(content: string, filename: string, type = 'text/plain'): void {
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -81,10 +83,10 @@ export function deepClone<T>(obj: T): T {
 /**
  * 判断对象是否为空
  */
-export function isEmpty(obj: any): boolean {
+export function isEmpty(obj: unknown): boolean {
   if (obj == null) return true;
   if (Array.isArray(obj) || typeof obj === 'string') return obj.length === 0;
-  if (obj instanceof Object) return Object.keys(obj).length === 0;
+  if (typeof obj === 'object') return Object.keys(obj).length === 0;
   return false;
 }
 
@@ -246,29 +248,30 @@ export function getRelativeTime(date: Date | string): string {
 /**
  * 安全获取对象属性
  */
-export function get<T>(obj: any, path: string, defaultValue?: T): T | undefined {
+export function get<T>(obj: unknown, path: string, defaultValue?: T): T | undefined {
   const keys = path.split('.');
-  let result = obj;
+  let result: unknown = obj;
   for (const key of keys) {
     if (result == null) return defaultValue;
-    result = result[key];
+    if (typeof result !== 'object') return defaultValue;
+    result = (result as Record<string, unknown>)[key];
   }
-  return result ?? defaultValue;
+  return (result as T | undefined) ?? defaultValue;
 }
 
 /**
  * 创建防抖函数（支持 cancel）
  */
-export function debounceWithCancel<T extends (...args: any[]) => any>(
+export function debounceWithCancel<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
-): (...args: Parameters<T>) => void & { cancel: () => void } {
-  let timeout: NodeJS.Timeout | null = null;
+): ((...args: Parameters<T>) => void) & { cancel: () => void } {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
   
-  const debounced = function(...args: Parameters<T>) {
+  const debounced = function(this: unknown, ...args: Parameters<T>) {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
-  };
+  } as ((...args: Parameters<T>) => void) & { cancel: () => void };
   
   debounced.cancel = () => {
     if (timeout) clearTimeout(timeout);
@@ -280,15 +283,15 @@ export function debounceWithCancel<T extends (...args: any[]) => any>(
 /**
  * 创建节流函数（支持 cancel 和 flush）
  */
-export function throttleWithCancel<T extends (...args: any[]) => any>(
+export function throttleWithCancel<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
-): (...args: Parameters<T>) => void & { cancel: () => void; flush: () => void } {
+): ((...args: Parameters<T>) => void) & { cancel: () => void; flush: () => void } {
   let lastRun = 0;
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: ReturnType<typeof setTimeout> | null = null;
   let lastArgs: Parameters<T> | null = null;
   
-  const throttled = function(...args: Parameters<T>) {
+  const throttled = function(this: unknown, ...args: Parameters<T>) {
     const now = Date.now();
     const remaining = limit - (now - lastRun);
     
@@ -305,7 +308,7 @@ export function throttleWithCancel<T extends (...args: any[]) => any>(
         if (lastArgs) func.apply(this, lastArgs);
       }, remaining);
     }
-  };
+  } as ((...args: Parameters<T>) => void) & { cancel: () => void; flush: () => void };
   
   throttled.cancel = () => {
     if (timeout) clearTimeout(timeout);
@@ -315,7 +318,7 @@ export function throttleWithCancel<T extends (...args: any[]) => any>(
     if (lastRun > 0 && lastArgs) {
       if (timeout) clearTimeout(timeout);
       lastRun = Date.now();
-      func.apply(this, lastArgs);
+      func(...lastArgs);
     }
   };
   

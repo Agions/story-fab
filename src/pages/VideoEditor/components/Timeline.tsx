@@ -1,6 +1,6 @@
 import React, { useRef, memo } from 'react';
 import { VideoSegment } from '@/services/videoService';
-import styles from '../VideoEditor.module.less';
+import styles from '../index.module.less';
 
 interface TimelineProps {
   segments: VideoSegment[];

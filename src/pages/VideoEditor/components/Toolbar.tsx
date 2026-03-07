@@ -9,7 +9,7 @@ import {
   SaveOutlined,
   DownloadOutlined,
 } from '@ant-design/icons';
-import styles from '../VideoEditor.module.less';
+import styles from '../index.module.less';
 
 interface ToolbarProps {
   loading: boolean;

@@ -14,14 +14,21 @@ import {
   InfoCircleOutlined,
   LockOutlined,
 } from '@ant-design/icons';
-import ThemeContext from '../context/ThemeContext';
-import useTranslation from '../utils/i18n';
-import useLocalStorage from '../hooks/useLocalStorage';
-import ApiKeysPanel from '../components/Settings/ApiKeysPanel';
-import ModelSettingsPanel from '../components/Settings/ModelSettingsPanel';
-import GeneralSettingsPanel from '../components/Settings/GeneralSettingsPanel';
-import { ModelProvider } from '../constants/models';
-import styles from './Settings.module.less';
+import ThemeContext from '@/context/ThemeContext';
+import useTranslation from '@/utils/i18n';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import ApiKeysPanel from '@/components/Settings/ApiKeysPanel';
+import ModelSettingsPanel from '@/components/Settings/ModelSettingsPanel';
+import GeneralSettingsPanel from '@/components/Settings/GeneralSettingsPanel';
+import { ModelProvider } from '@/constants/models';
+import { AI_MODELS as CORE_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
+import {
+  getAvailableModelsFromApiKeys,
+  resolveDefaultModelId,
+} from '@/core/utils/model-availability';
+import { useStore } from '@/store';
+import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';
+import styles from './index.module.less';
 
 const { Title, Paragraph } = Typography;
 
@@ -33,22 +40,43 @@ interface ApiKeyConfig {
 const Settings: React.FC = () => {
   const themeContext = useContext(ThemeContext);
   const isDarkMode = themeContext?.isDarkMode || false;
-  const { t, language, changeLanguage } = useTranslation();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState('models');
   const [isLoading, setIsLoading] = useState(true);
+  const updateAIModelSettings = useStore(state => state.updateAIModelSettings);
 
   // 设置状态
-  const [defaultModel, setDefaultModel] = useLocalStorage<string>('default_model', 'gpt-4o');
-  const [apiKeys, setApiKeys] = useLocalStorage<Partial<Record<ModelProvider, ApiKeyConfig>>>('api_keys', {});
+  const [defaultModel, setDefaultModel] = useLocalStorage<string>(
+    'default_model',
+    DEFAULT_MODEL_ID
+  );
+  const [apiKeys, setApiKeys] = useLocalStorage<Partial<Record<ModelProvider, ApiKeyConfig>>>(
+    'api_keys',
+    {}
+  );
   const [autoSave, setAutoSave] = useLocalStorage<boolean>('auto_save', true);
   const [compactMode, setCompactMode] = useLocalStorage<boolean>('compact_mode', false);
   const [theme, setTheme] = useLocalStorage<string>('theme', 'auto');
+  const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(
+    PROJECT_SAVE_BEHAVIOR_KEY,
+    'stay'
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const availableModels = getAvailableModelsFromApiKeys(apiKeys, CORE_MODELS);
+    const nextDefaultModel = resolveDefaultModelId(defaultModel, availableModels);
+    if (nextDefaultModel !== defaultModel) {
+      setDefaultModel(nextDefaultModel);
+    }
+  }, [apiKeys, defaultModel, setDefaultModel]);
+
+  const availableModels = getAvailableModelsFromApiKeys(apiKeys, CORE_MODELS);
 
   // API 密钥管理
   const handleUpdateApiKey = (provider: ModelProvider, key: string) => {
@@ -56,6 +84,10 @@ const Settings: React.FC = () => {
       ...prev,
       [provider]: { key, isValid: undefined },
     }));
+    updateAIModelSettings(provider, {
+      enabled: Boolean(key.trim()),
+      apiKey: key.trim() || undefined,
+    });
   };
 
   const handleDeleteApiKey = (provider: ModelProvider) => {
@@ -63,6 +95,10 @@ const Settings: React.FC = () => {
       const next = { ...prev };
       delete next[provider];
       return next;
+    });
+    updateAIModelSettings(provider, {
+      enabled: false,
+      apiKey: undefined,
     });
     message.success('API 密钥已删除');
   };
@@ -78,7 +114,7 @@ const Settings: React.FC = () => {
     setAutoSave(true);
     setCompactMode(false);
     setTheme('auto');
-    changeLanguage('zh');
+    setProjectSaveBehavior('stay');
   };
 
   const handleThemeChange = (newTheme: string) => {
@@ -90,10 +126,6 @@ const Settings: React.FC = () => {
         themeContext.toggleTheme();
       }
     }
-  };
-
-  const handleLanguageChange = (lang: string) => {
-    changeLanguage(lang as 'zh' | 'en');
   };
 
   if (isLoading) {
@@ -108,23 +140,37 @@ const Settings: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <Title level={2}>{t('settings.title')}</Title>
-        <Paragraph type="secondary">{t('settings.description')}</Paragraph>
+        <Paragraph type="secondary">{t('settings.subtitle')}</Paragraph>
       </div>
 
       <Card className={`${styles.settingsCard} ${isDarkMode ? styles.darkCard : ''}`}>
-        <Tabs activeKey={activeTab} onChange={setActiveTab} tabPosition="left" className={styles.tabs}>
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          tabPosition="left"
+          className={styles.tabs}
+        >
           <Tabs.TabPane
-            tab={<span><RobotOutlined /> {t('settings.models')}</span>}
+            tab={
+              <span>
+                <RobotOutlined /> {t('settings.models')}
+              </span>
+            }
             key="models"
           >
             <ModelSettingsPanel
               defaultModel={defaultModel}
+              availableModels={availableModels}
               onModelChange={handleModelChange}
             />
           </Tabs.TabPane>
 
           <Tabs.TabPane
-            tab={<span><KeyOutlined /> API 密钥</span>}
+            tab={
+              <span>
+                <KeyOutlined /> API 密钥
+              </span>
+            }
             key="api"
           >
             <ApiKeysPanel
@@ -135,43 +181,55 @@ const Settings: React.FC = () => {
           </Tabs.TabPane>
 
           <Tabs.TabPane
-            tab={<span><SettingOutlined /> {t('settings.general')}</span>}
+            tab={
+              <span>
+                <SettingOutlined /> {t('settings.general')}
+              </span>
+            }
             key="general"
           >
             <GeneralSettingsPanel
               autoSave={autoSave}
               compactMode={compactMode}
-              language={language}
               theme={theme}
+              projectSaveBehavior={projectSaveBehavior}
               onAutoSaveChange={setAutoSave}
               onCompactModeChange={setCompactMode}
-              onLanguageChange={handleLanguageChange}
               onThemeChange={handleThemeChange}
+              onProjectSaveBehaviorChange={setProjectSaveBehavior}
               onReset={handleReset}
             />
           </Tabs.TabPane>
 
           <Tabs.TabPane
-            tab={<span><InfoCircleOutlined /> {t('settings.about')}</span>}
+            tab={
+              <span>
+                <InfoCircleOutlined /> {t('settings.about')}
+              </span>
+            }
             key="about"
           >
             <Card title={t('app.name')}>
               <Paragraph>
-                {t('app.name')} 是一款专业的短视频剪辑工具，集成了AI技术，帮助创作者更高效地创建优质内容。
+                {t('app.name')}{' '}
+                是一款专业的短视频剪辑工具，集成了AI技术，帮助创作者更高效地创建优质内容。
               </Paragraph>
-              <Paragraph>
-                版本: 2.0.0 | 作者: Agions
-              </Paragraph>
+              <Paragraph>版本: 1.0.0 | 作者: Agions</Paragraph>
             </Card>
           </Tabs.TabPane>
 
           <Tabs.TabPane
-            tab={<span><LockOutlined /> 隐私</span>}
+            tab={
+              <span>
+                <LockOutlined /> 隐私
+              </span>
+            }
             key="privacy"
           >
             <Card title="隐私与数据">
               <Paragraph>
-                ClipFlow 高度重视您的隐私。所有API密钥和个人设置仅存储在您的本地设备上，没有任何数据会传输到我们的服务器。
+                ClipFlow
+                高度重视您的隐私。所有API密钥和个人设置仅存储在您的本地设备上，没有任何数据会传输到我们的服务器。
               </Paragraph>
             </Card>
           </Tabs.TabPane>

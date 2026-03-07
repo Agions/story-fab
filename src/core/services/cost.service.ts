@@ -3,8 +3,6 @@
  * 监控和优化 LLM/视频生成成本
  */
 
-import { LLM_MODELS } from '@/core/constants';
-
 // 成本记录
 export interface CostRecord {
   id: string;
@@ -16,7 +14,7 @@ export interface CostRecord {
   cost: number; // USD
   duration?: number; // ms
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // 成本统计
@@ -45,28 +43,31 @@ export interface CostBudget {
 // 模型成本配置 (USD per 1K tokens) - 2026年3月最新
 const MODEL_COSTS: Record<string, { input: number; output: number }> = {
   // OpenAI
-  'gpt-5.3': { input: 0.007, output: 0.021 },
+  'gpt-5.3-codex': { input: 0.007, output: 0.021 },
 
   // Anthropic
-  'claude-4.6': { input: 0.018, output: 0.09 },
+  'claude-sonnet-4-6': { input: 0.018, output: 0.09 },
 
   // Google
-  'gemini-3.1-pro': { input: 0.0035, output: 0.0105 },
+  'gemini-3.1-pro-preview': { input: 0.0035, output: 0.0105 },
+  'gemini-3.1-flash-lite-preview': { input: 0.0015, output: 0.0045 },
 
   // 阿里
-  'qwen-3.5': { input: 0.004, output: 0.012 },
+  'qwen-max-latest': { input: 0.004, output: 0.012 },
 
   // 智谱
   'glm-5': { input: 0.001, output: 0.003 },
 
   // 讯飞
-  'spark-x1': { input: 0.003, output: 0.009 },
+  'spark-custom': { input: 0.003, output: 0.009 },
 
   // DeepSeek
-  'deepseek-r1': { input: 0.002, output: 0.006 },
+  'deepseek-chat': { input: 0.002, output: 0.006 },
+  'deepseek-reasoner': { input: 0.0025, output: 0.0075 },
 
-  // 月之暗面
-  'kimi-k2.5': { input: 0.003, output: 0.009 },
+  // 月之暗面 Kimi
+  'kimi-k2-0905-preview': { input: 0.003, output: 0.009 },
+  'kimi-k2-turbo-preview': { input: 0.002, output: 0.006 },
 };
 
 // 视频生成成本 (USD per minute)
@@ -99,7 +100,7 @@ export class CostService {
     model: string,
     inputTokens: number,
     outputTokens: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): CostRecord {
     const costConfig = MODEL_COSTS[model] || { input: 0.001, output: 0.003 };
     const cost =
@@ -131,7 +132,7 @@ export class CostService {
     provider: string,
     duration: number, // seconds
     resolution: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): CostRecord {
     const costPerMinute = VIDEO_COSTS[provider] || 0.5;
     const cost = (duration / 60) * costPerMinute;
@@ -242,24 +243,24 @@ export class CostService {
   ): { model: string; provider: string; estimatedCost: number } {
     const suggestions: Record<string, Array<{ model: string; provider: string; cost: number }>> = {
       simple: [
-        { model: 'qwen3.5-turbo', provider: 'alibaba', cost: 0.0003 },
-        { model: 'ernie-speed', provider: 'baidu', cost: 0.0001 },
-        { model: 'kimi-k2.5', provider: 'moonshot', cost: 0.001 },
+        { model: 'deepseek-chat', provider: 'deepseek', cost: 0.001 },
+        { model: 'qwen-max-latest', provider: 'alibaba', cost: 0.0012 },
+        { model: 'kimi-k2-0905-preview', provider: 'moonshot', cost: 0.0015 },
       ],
       standard: [
-        { model: 'qwen3.5-plus', provider: 'alibaba', cost: 0.0008 },
-        { model: 'kimi-k2.5', provider: 'moonshot', cost: 0.001 },
-        { model: 'glm-5', provider: 'zhipu', cost: 0.001 },
+        { model: 'qwen-max-latest', provider: 'alibaba', cost: 0.0012 },
+        { model: 'deepseek-chat', provider: 'deepseek', cost: 0.001 },
+        { model: 'glm-5', provider: 'zhipu', cost: 0.0015 },
       ],
       complex: [
-        { model: 'qwen3.5-max', provider: 'alibaba', cost: 0.002 },
-        { model: 'gpt-5.3', provider: 'openai', cost: 0.007 },
-        { model: 'claude-4.6', provider: 'anthropic', cost: 0.018 },
+        { model: 'qwen-max-latest', provider: 'alibaba', cost: 0.002 },
+        { model: 'gpt-5.3-codex', provider: 'openai', cost: 0.007 },
+        { model: 'claude-sonnet-4-6', provider: 'anthropic', cost: 0.018 },
       ],
       creative: [
-        { model: 'kimi-k2.5', provider: 'moonshot', cost: 0.001 },
-        { model: 'claude-4.6', provider: 'anthropic', cost: 0.018 },
-        { model: 'gpt-5.3', provider: 'openai', cost: 0.007 },
+        { model: 'kimi-k2-0905-preview', provider: 'moonshot', cost: 0.0015 },
+        { model: 'claude-sonnet-4-6', provider: 'anthropic', cost: 0.018 },
+        { model: 'gpt-5.3-codex', provider: 'openai', cost: 0.007 },
       ],
     };
 
@@ -315,7 +316,7 @@ export class CostService {
     }
 
     // 检查高成本模型使用
-    const highCostModels = ['gpt-5', 'claude-4-opus', 'qwen3.5-max'];
+    const highCostModels = ['gpt-5.3-codex', 'claude-sonnet-4-6', 'gemini-3.1-pro-preview'];
     for (const model of highCostModels) {
       if (stats.byModel[model] && stats.byModel[model] > totalCost * 0.3) {
         suggestions.push(`💡 ${model} 使用成本较高，建议评估是否可以降级到 Plus 或 Turbo 模型`);

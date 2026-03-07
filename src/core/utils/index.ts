@@ -16,4 +16,4 @@ export {
   formatDate,
   truncateText,
   capitalize
-} from '@/shared/utils';
+} from '@/shared/utils/format';

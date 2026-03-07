@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ProjectData, ScriptData, VideoInfo, ExportRecord } from '@/core/types';
-import { storageService } from '@/core/services';
+import { storageService } from '@/core/services/storage.service';
 
 export interface ProjectState {
   // 项目列表

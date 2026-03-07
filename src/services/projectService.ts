@@ -29,7 +29,7 @@ export const saveProjectFile = async (projectId: string, content: string): Promi
  * 加载项目文件
  * @param projectId 项目ID
  */
-export const loadProjectFile = async (projectId: string): Promise<any> => {
+export const loadProjectFile = async <T = Record<string, unknown>>(projectId: string): Promise<T> => {
   try {
     if (!projectId) {
       throw new Error('项目ID不能为空');
@@ -39,7 +39,7 @@ export const loadProjectFile = async (projectId: string): Promise<any> => {
       projectId 
     });
     
-    return JSON.parse(content);
+    return JSON.parse(content) as T;
   } catch (error) {
     console.error('加载项目失败:', error);
     message.error('加载项目失败，请重试');
@@ -72,19 +72,19 @@ export const deleteProjectFile = async (projectId: string): Promise<boolean> => 
 /**
  * 获取项目列表
  */
-export const getProjectList = async (): Promise<any[]> => {
+export const getProjectList = async <T = Record<string, unknown>>(): Promise<T[]> => {
   try {
     const files = await invoke<string[]>('list_app_data_files', { 
       directory: 'ClipFlow' 
     });
     
-    const projects = [];
+    const projects: T[] = [];
     
     for (const file of files) {
       if (file.endsWith('.json')) {
         try {
           const projectId = file.replace('.json', '');
-          const project = await loadProjectFile(projectId);
+          const project = await loadProjectFile<T>(projectId);
           projects.push(project);
         } catch (e) {
           console.error('加载项目失败:', e);

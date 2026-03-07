@@ -1,4 +1,6 @@
 import { dedupService } from '../../../templates/dedup.templates';
+import type { DedupStrategy } from '../../../templates/dedup';
+import type { OriginalityReport } from '../../../templates/dedup';
 import type { ScriptData } from '@/core/types';
 
 export interface DedupConfig {
@@ -11,11 +13,7 @@ export interface DedupConfig {
 
 export interface DedupResult {
   script: ScriptData;
-  report: {
-    score: number;
-    duplicates: any[];
-    suggestions: string[];
-  };
+  report: OriginalityReport;
 }
 
 export async function executeDedupStep(
@@ -26,7 +24,7 @@ export async function executeDedupStep(
   // 配置去重服务
   const config = {
     enabled: true,
-    strategies: ['exact', 'semantic', 'template'] as const,
+    strategies: ['exact', 'semantic', 'template'] as DedupStrategy[],
     threshold: 0.7,
     autoFix: true,
     preserveMeaning: true,

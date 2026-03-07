@@ -1,9 +1,21 @@
 import { saveFile } from './tauriService';
 import { message } from 'antd';
-import { Script } from './aiService';
+import type { Script } from './aiService';
 import { formatTime, formatDate } from '@/utils/format';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+
+type AutoTableDoc = InstanceType<typeof jsPDF> & {
+  autoTable: (options: {
+    startY: number;
+    head: string[][];
+    body: string[][];
+    headStyles: { fillColor: [number, number, number]; textColor: number };
+    columnStyles: Record<number, { cellWidth: number | 'auto' }>;
+    styles: { overflow: 'linebreak'; fontSize: number };
+    margin: { top: number };
+  }) => void;
+};
 
 /**
  * 脚本导出格式
@@ -140,13 +152,13 @@ const exportAsPdf = async (script: Script, filename: string): Promise<boolean> =
     doc.text(`最后更新: ${formatDate(script.updatedAt)}`, 14, 38);
     
     // 创建表格数据
-    const tableData = segments.map(segment => [
+    const tableData = segments.map((segment) => [
       `${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}`,
       segment.content
     ]);
     
     // 添加表格
-    (doc as any).autoTable({
+    (doc as AutoTableDoc).autoTable({
       startY: 45,
       head: [['时间', '脚本内容']],
       body: tableData,
@@ -182,7 +194,7 @@ const exportAsPdf = async (script: Script, filename: string): Promise<boolean> =
       message.error('PDF文件导出失败');
       return false;
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('导出PDF失败:', error);
     message.error('导出PDF失败，请稍后重试');
     return false;

@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { videoService } from '../video.service';
 import { visionService } from '../vision.service';
-import type { VideoInfo, Scene } from '@/core/types';
+import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
+import { DEFAULT_CLIP_CONFIG } from './types';
 import type {
   AIClipConfig,
   CutPoint,
@@ -9,7 +10,6 @@ import type {
   ClipSuggestion,
   ClipAnalysisResult,
   Keyframe,
-  DEFAULT_CLIP_CONFIG,
 } from './types';
 
 export async function analyzeVideo(
@@ -100,11 +100,12 @@ async function detectKeyframes(
 }
 
 function calculateKeyframeImportance(
-  keyframe: any,
+  _keyframe: SourceKeyframe,
   index: number,
   total: number
 ): number {
-  const position = index / total;
+  const safeTotal = Math.max(total, 1);
+  const position = index / safeTotal;
   const positionWeight = Math.sin(position * Math.PI);
   const distributionWeight = 1 - Math.abs(0.5 - position) * 0.5;
   return Math.min(1, (positionWeight + distributionWeight) / 2);
@@ -140,8 +141,8 @@ function generateCutPoints(
   videoInfo: VideoInfo,
   scenes: Scene[],
   keyframes: Keyframe[],
-  silenceSegments: Array<{ start: number; end: number }>,
-  emotions: any[],
+  silenceSegments: Array<{ start: number; end: number; duration: number }>,
+  emotions: EmotionAnalysis[],
   config: AIClipConfig
 ): CutPoint[] {
   const cutPoints: CutPoint[] = [];

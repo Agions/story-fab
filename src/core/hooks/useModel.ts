@@ -5,10 +5,12 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useStore } from '@/store';
-import { AI_MODELS, MODEL_PROVIDERS, getModelById, getModelsByProvider, getRecommendedModels } from '@/core/config/models.config';
+import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS, getModelById, getModelsByProvider, getRecommendedModels } from '@/core/config/models.config';
 import type { AIModel, ModelProvider, ModelCategory, AIModelSettings } from '@/core/types';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { resolveDefaultModelId } from '@/core/utils/model-availability';
 
-interface UseModelReturn {
+export interface UseModelReturn {
   // 模型列表
   allModels: AIModel[];
   availableModels: AIModel[];
@@ -42,29 +44,37 @@ export function useModel(): UseModelReturn {
   const store = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // 从 store 获取当前选择的模型
-  const selectedModelId = store.selectedAIModel;
-  const modelSettings = store.aiModelsSettings[selectedModelId] || { enabled: false };
-  
-  // 获取当前选中的模型详情
-  const selectedModel = useMemo(() => {
-    return getModelById(selectedModelId);
-  }, [selectedModelId]);
-  
-  // 获取当前选中的提供商
-  const selectedProvider = selectedModel?.provider;
-  
-  // 检查是否已配置
-  const isConfigured = useMemo(() => {
-    if (!selectedModel) return false;
-    const settings = store.aiModelsSettings[selectedModel.provider];
-    return settings?.enabled && !!settings?.apiKey;
-  }, [selectedModel, store.aiModelsSettings]);
-  
+  const [apiKeys] = useLocalStorage<Partial<Record<ModelProvider, { key: string; isValid?: boolean }>>>('api_keys', {});
+  const [defaultModelId, setDefaultModelId] = useLocalStorage<string>('default_model', DEFAULT_MODEL_ID);
+
+  useEffect(() => {
+    (Object.keys(MODEL_PROVIDERS) as ModelProvider[]).forEach((provider) => {
+      const configuredKey = apiKeys[provider]?.key?.trim() || '';
+      const currentSettings = store.aiModelsSettings[provider];
+      const shouldEnable = configuredKey.length > 0;
+      const currentKey = currentSettings?.apiKey || '';
+
+      if (currentSettings?.enabled !== shouldEnable || currentKey !== configuredKey) {
+        store.updateAIModelSettings(provider, {
+          enabled: shouldEnable,
+          apiKey: configuredKey || undefined,
+        });
+      }
+    });
+  }, [apiKeys, store]);
+
   // 按提供商分组的模型
   const modelsByProvider = useMemo(() => {
-    const providers: ModelProvider[] = ['openai', 'anthropic', 'google', 'baidu', 'alibaba', 'zhipu', 'iflytek', 'tencent'];
+    const providers: ModelProvider[] = [
+      'openai',
+      'anthropic',
+      'google',
+      'alibaba',
+      'zhipu',
+      'iflytek',
+      'deepseek',
+      'moonshot',
+    ];
     return Object.fromEntries(
       providers.map(p => [p, getModelsByProvider(p)])
     ) as Record<ModelProvider, AIModel[]>;
@@ -74,9 +84,46 @@ export function useModel(): UseModelReturn {
   const availableModels = useMemo(() => {
     return AI_MODELS.filter(model => {
       const settings = store.aiModelsSettings[model.provider];
-      return settings?.enabled && settings?.apiKey;
+      return model.isAvailable !== false && settings?.enabled && settings?.apiKey;
     });
   }, [store.aiModelsSettings]);
+
+  const selectedModel = useMemo(() => {
+    const modelFromDefault = getModelById(defaultModelId);
+    if (modelFromDefault && modelFromDefault.isAvailable !== false) {
+      return modelFromDefault;
+    }
+
+    const providerFallbackModel = getModelsByProvider(store.selectedAIModel as ModelProvider).find(
+      (model) => model.isAvailable !== false
+    );
+    if (providerFallbackModel) {
+      return providerFallbackModel;
+    }
+
+    return AI_MODELS.find((model) => model.isAvailable !== false);
+  }, [defaultModelId, store.selectedAIModel]);
+
+  const selectedProvider = selectedModel?.provider ?? (store.selectedAIModel as ModelProvider);
+  const modelSettings = store.aiModelsSettings[selectedProvider] || { enabled: false };
+
+  // 检查是否已配置
+  const isConfigured = useMemo(() => {
+    if (!selectedProvider) return false;
+    const settings = store.aiModelsSettings[selectedProvider];
+    return settings?.enabled && !!settings?.apiKey;
+  }, [selectedProvider, store.aiModelsSettings]);
+
+  useEffect(() => {
+    const fallbackCatalog = AI_MODELS.filter((model) => model.isAvailable !== false);
+    const nextDefaultModelId = resolveDefaultModelId(
+      defaultModelId,
+      availableModels.length > 0 ? availableModels : fallbackCatalog
+    );
+    if (nextDefaultModelId !== defaultModelId) {
+      setDefaultModelId(nextDefaultModelId);
+    }
+  }, [availableModels, defaultModelId, setDefaultModelId]);
   
   // 推荐模型
   const recommendedModels = useMemo(() => ({
@@ -90,10 +137,11 @@ export function useModel(): UseModelReturn {
   const selectModel = useCallback((modelId: string) => {
     const model = getModelById(modelId);
     if (model) {
-      store.setSelectedAIModel(modelId);
+      setDefaultModelId(model.id);
+      store.setSelectedAIModel(model.provider);
       setError(null);
     }
-  }, [store]);
+  }, [setDefaultModelId, store]);
   
   // 更新设置
   const updateSettings = useCallback((settings: Partial<AIModelSettings>) => {
@@ -124,9 +172,7 @@ export function useModel(): UseModelReturn {
       // 更新 store
       store.updateAIModelSettings(provider, {
         enabled: true,
-        apiKey,
-        apiSecret,
-        model: getModelsByProvider(provider)[0]?.id
+        apiKey
       });
       
       return true;
@@ -241,4 +287,11 @@ export function useModelCost() {
     formatCost,
     pricing: selectedModel?.pricing
   };
+}
+
+export interface UseModelCostReturn {
+  estimateCost: (inputTokens: number, outputTokens: number) => number;
+  estimateScriptCost: (wordCount: number) => number;
+  formatCost: (cost: number) => string;
+  pricing: AIModel['pricing'] | undefined;
 }

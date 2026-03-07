@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AIModelSettings, UserPreferences } from '@/core/types';
-import { storageService } from '@/core/services';
+import { storageService } from '@/core/services/storage.service';
 
 export interface UserState {
   // 用户信息

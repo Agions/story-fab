@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Row, Col, Select, Slider, InputNumber, Switch, Button, Tooltip, Space, Collapse, Tag, message, Progress, Popconfirm } from 'antd';
-import { PlusOutlined, DeleteOutlined, PlayCircleOutlined, ScissorOutlined, SaveOutlined, SoundOutlined, TransactionOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, PlayCircleOutlined, ScissorOutlined, SoundOutlined, SettingOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api/core';
 import styles from './VideoProcessingController.module.less';
 
@@ -76,11 +76,33 @@ interface VideoProcessingControllerProps {
   videoPath: string;
   segments: VideoSegment[];
   onProcessingComplete?: (outputPath: string) => void;
-  defaultQuality?: string;
-  defaultFormat?: string;
-  defaultTransition?: string;
-  defaultAudioProcess?: string;
+  defaultQuality?: (typeof QUALITY_OPTIONS)[number]['value'];
+  defaultFormat?: (typeof FORMAT_OPTIONS)[number]['value'];
+  defaultTransition?: (typeof TRANSITION_OPTIONS)[number]['value'];
+  defaultAudioProcess?: (typeof AUDIO_PROCESS_OPTIONS)[number]['value'];
 }
+
+interface BatchItem {
+  id: string;
+  segments: VideoSegment[];
+  name: string;
+  completed: boolean;
+}
+
+interface CustomQualitySettings {
+  resolution: string;
+  bitrate: number;
+  framerate: number;
+  useHardwareAcceleration: boolean;
+}
+
+type SaveFilePicker = (options?: {
+  suggestedName?: string;
+  types?: Array<{
+    description?: string;
+    accept: Record<string, string[]>;
+  }>;
+}) => Promise<{ name: string }>;
 
 // 计算片段总时长
 const calculateTotalDuration = (segments: VideoSegment[]): number => {
@@ -111,11 +133,10 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
   const [processingBatch, setProcessingBatch] = useState(false);
   const [currentBatchItem, setCurrentBatchItem] = useState(0);
   const [batchProgress, setBatchProgress] = useState(0);
-  const [batchItems, setBatchItems] = useState<{id: string, segments: VideoSegment[], name: string, completed: boolean}[]>([]);
-  const [outputPaths, setOutputPaths] = useState<string[]>([]);
+  const [batchItems, setBatchItems] = useState<BatchItem[]>([]);
   
   // 自定义质量设置
-  const [customSettings, setCustomSettings] = useState({
+  const [customSettings, setCustomSettings] = useState<CustomQualitySettings>({
     resolution: '1920x1080',
     bitrate: 4000,
     framerate: 30,
@@ -139,27 +160,24 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       return;
     }
     
-    const newBatchItem = {
+    const newBatchItem: BatchItem = {
       id: Date.now().toString(),
       segments: [...segments],
       name: `批处理 ${batchItems.length + 1}`,
       completed: false
     };
     
-    setBatchItems([...batchItems, newBatchItem]);
+    setBatchItems(prev => [...prev, newBatchItem]);
   }, [segments, batchItems.length]);
 
   // 移除批处理项目
   const removeBatchItem = useCallback((id: string) => {
-    setBatchItems(batchItems.filter(item => item.id !== id));
-  }, [batchItems]);
+    setBatchItems(prev => prev.filter(item => item.id !== id));
+  }, []);
 
-  // 重命名批处理项目
-  const renameBatchItem = useCallback((id: string, newName: string) => {
-    setBatchItems(batchItems.map(item => 
-      item.id === id ? { ...item, name: newName } : item
-    ));
-  }, [batchItems]);
+  const updateCustomSettings = useCallback((patch: Partial<CustomQualitySettings>) => {
+    setCustomSettings(prev => ({ ...prev, ...patch }));
+  }, []);
 
   // 处理单个视频
   const processVideo = useCallback(async (segmentsToProcess: VideoSegment[], itemName?: string): Promise<string> => {
@@ -169,18 +187,23 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         `${itemName.replace(/[^\w\s-]/gi, '')}_${new Date().toISOString().split('T')[0]}` : 
         `剪辑_${new Date().toISOString().split('T')[0]}`;
       
-      const savePath = await window.showSaveFilePicker({
+      const showSaveFilePicker = (window as Window & {
+        showSaveFilePicker?: SaveFilePicker;
+      }).showSaveFilePicker;
+      if (typeof showSaveFilePicker !== 'function') {
+        throw new Error('当前环境不支持文件选择器');
+      }
+      const saveHandle = await showSaveFilePicker({
         suggestedName: `${fileName}.${exportFormat}`,
         types: [{
           description: '视频文件',
           accept: { 'video/*': [`.${exportFormat}`] }
         }]
       });
-      
-      const outputPath = savePath.name;
+      const outputPath = saveHandle.name;
       
       // 构建编码参数
-      let qualityParams = {};
+      let qualityParams: Record<string, unknown> = {};
       if (videoQuality === 'custom') {
         qualityParams = {
           resolution: customSettings.resolution,
@@ -214,9 +237,10 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       }
       
       return outputPath;
-    } catch {
+    } catch (error) {
       console.error('视频处理失败:', error);
-      message.error('视频处理失败: ' + error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      message.error(`视频处理失败: ${errorMessage}`);
       throw error;
     }
   }, [exportFormat, videoQuality, customSettings, audioVolume, audioProcess, transitionType, transitionDuration, useSubtitles, videoPath, onProcessingComplete]);
@@ -232,7 +256,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     setCurrentBatchItem(0);
     setBatchProgress(0);
     
-    const newOutputPaths = [];
+    const newOutputPaths: string[] = [];
     
     for (let i = 0; i < batchItems.length; i++) {
       setCurrentBatchItem(i);
@@ -250,7 +274,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         
         // 更新总体进度
         setBatchProgress(((i + 1) / batchItems.length) * 100);
-      } catch {
+      } catch (error) {
         console.error(`处理批次项 ${i+1} 失败:`, error);
         message.error(`处理 "${item.name}" 失败`);
         
@@ -259,7 +283,6 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       }
     }
     
-    setOutputPaths(newOutputPaths);
     setProcessingBatch(false);
     message.success(`完成批量处理，共 ${newOutputPaths.length} 个文件`);
   }, [batchItems, processVideo]);
@@ -272,7 +295,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     }
     
     try {
-      const outputPath = await processVideo(segments);
+      await processVideo(segments);
       message.success('视频处理完成');
     } catch {
       // 错误已在processVideo内部处理
@@ -348,7 +371,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                       <div className={styles.formLabel}>分辨率</div>
                       <Select
                         value={customSettings.resolution}
-                        onChange={val => setCustomSettings({...customSettings, resolution: val})}
+                        onChange={resolution => updateCustomSettings({ resolution })}
                         style={{ width: '100%' }}
                       >
                         <Option value="1280x720">720p (1280x720)</Option>
@@ -369,7 +392,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                             max={20000}
                             step={500}
                             value={customSettings.bitrate}
-                            onChange={val => setCustomSettings({...customSettings, bitrate: val})}
+                            onChange={bitrate => updateCustomSettings({ bitrate })}
                           />
                         </Col>
                         <Col span={6}>
@@ -378,7 +401,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                             max={20000}
                             step={500}
                             value={customSettings.bitrate}
-                            onChange={val => setCustomSettings({...customSettings, bitrate: val as number})}
+                            onChange={bitrate => updateCustomSettings({ bitrate: bitrate ?? customSettings.bitrate })}
                             style={{ marginLeft: 8 }}
                           />
                         </Col>
@@ -391,7 +414,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                       <div className={styles.formLabel}>帧率 (FPS)</div>
                       <Select
                         value={customSettings.framerate}
-                        onChange={val => setCustomSettings({...customSettings, framerate: val})}
+                        onChange={framerate => updateCustomSettings({ framerate })}
                         style={{ width: '100%' }}
                       >
                         <Option value={24}>24 FPS (电影)</Option>
@@ -408,7 +431,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                       <div className={styles.formLabel}>启用硬件加速</div>
                       <Switch
                         checked={customSettings.useHardwareAcceleration}
-                        onChange={val => setCustomSettings({...customSettings, useHardwareAcceleration: val})}
+                        onChange={useHardwareAcceleration => updateCustomSettings({ useHardwareAcceleration })}
                       />
                       <span className={styles.switchDescription}>
                         启用可加快处理速度，但可能影响兼容性

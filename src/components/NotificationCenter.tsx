@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer, List, Typography, Button, Empty } from 'antd';
 import { BellOutlined } from '@ant-design/icons';
-import { useAppStore } from '@/store/app';
+import { useAppStore } from '@/store';
 import styles from './NotificationCenter.module.less';
 
 interface NotificationCenterProps {
@@ -13,7 +13,12 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ open, onClose }
   const { notifications, clearNotifications } = useAppStore();
 
   // 通知数据 (从store获取)
-  const notificationList = [];
+  const notificationList = Array.from({ length: notifications }, (_, idx) => ({
+    key: `notification-${idx + 1}`,
+    title: `系统通知 ${idx + 1}`,
+    time: '刚刚',
+    content: '你有一条新的系统通知。'
+  }));
 
   return (
     <Drawer
@@ -23,7 +28,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ open, onClose }
       open={open}
       width={320}
       extra={
-        <Button type="link" onClick={clearNotifications} disabled={!notifications}>
+        <Button type="link" onClick={clearNotifications} disabled={notifications <= 0}>
           清除全部
         </Button>
       }

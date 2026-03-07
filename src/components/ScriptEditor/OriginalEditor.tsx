@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
-import { Card, Button, Space, Dropdown, Menu, Modal, message, Form } from 'antd';
+import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import { Card, Button, Space, Dropdown, Modal, message, Form, type MenuProps } from 'antd';
 import {
   EditOutlined,
   SaveOutlined,
@@ -13,13 +13,20 @@ import SegmentTable from './SegmentTable';
 import SegmentEditForm from './SegmentEditForm';
 import PreviewModal from './PreviewModal';
 import AIModal from './AIModal';
-import styles from './ScriptEditor.module.less';
+import styles from '../ScriptEditor.module.less';
 
 interface OriginalEditorProps {
   videoPath: string;
   initialSegments?: VideoSegment[];
   onSave: (segments: VideoSegment[]) => void;
   onExport?: (format: string) => void;
+}
+
+interface SegmentFormValues {
+  start: number;
+  end: number;
+  type: string;
+  content: string;
 }
 
 const OriginalEditor: React.FC<OriginalEditorProps> = ({
@@ -30,7 +37,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
 }) => {
   const [segments, setSegments] = useState<VideoSegment[]>(initialSegments);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editForm] = Form.useForm();
+  const [editForm] = Form.useForm<SegmentFormValues>();
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewSrc, setPreviewSrc] = useState('');
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -76,8 +83,8 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
   // 保存编辑片段
   const handleSaveSegment = useCallback(() => {
     editForm.validateFields().then(values => {
-      const start = parseFloat(values.start);
-      const end = parseFloat(values.end);
+      const start = Number(values.start);
+      const end = Number(values.end);
 
       const newSegments = [...segments];
       const segment: VideoSegment = {
@@ -128,7 +135,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
       const previewPath = await previewSegment(videoPath, segment);
       setPreviewSrc(convertFileSrc(previewPath));
       setPreviewVisible(true);
-    } catch {
+    } catch (error) {
       console.error('生成预览失败:', error);
       message.error('生成预览失败');
     } finally {
@@ -150,11 +157,22 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
       setTimeout(() => {
         message.success('脚本优化完成');
       }, 2000);
-    } catch {
+    } catch (error) {
       console.error('AI 优化脚本失败:', error);
       message.error('AI 优化脚本失败');
     }
   }, []);
+
+  const exportMenuItems = useMemo<MenuProps['items']>(() => ([
+    { key: 'txt', label: '文本文件 (.txt)' },
+    { key: 'srt', label: '字幕文件 (.srt)' },
+    { key: 'doc', label: 'Word文档 (.docx)' },
+  ]), []);
+
+  const handleExportClick = useCallback<NonNullable<MenuProps['onClick']>>(({ key }) => {
+    onExport?.(String(key));
+    setExportMenuVisible(false);
+  }, [onExport]);
 
   return (
     <div className={styles.scriptEditor}>
@@ -171,13 +189,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
             </Button>
             {onExport && (
               <Dropdown
-                overlay={
-                  <Menu onClick={({ key }) => onExport(key as string)}>
-                    <Menu.Item key="txt">文本文件 (.txt)</Menu.Item>
-                    <Menu.Item key="srt">字幕文件 (.srt)</Menu.Item>
-                    <Menu.Item key="doc">Word文档 (.docx)</Menu.Item>
-                  </Menu>
-                }
+                menu={{ items: exportMenuItems, onClick: handleExportClick }}
                 open={exportMenuVisible}
                 onOpenChange={setExportMenuVisible}
               >

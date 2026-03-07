@@ -3,7 +3,7 @@
  * 用于可视化编辑视频和音频时间轴
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Card,
   Button,
@@ -15,28 +15,24 @@ import {
   Divider,
   Row,
   Col,
-  InputNumber,
   message
 } from 'antd';
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
-  ScissorOutlined,
   DeleteOutlined,
   PlusOutlined,
   SaveOutlined,
-  UndoOutlined,
-  RedoOutlined,
   ZoomInOutlined,
   ZoomOutOutlined
 } from '@ant-design/icons';
 import type { VideoInfo, ScriptData } from '@/core/types';
 import styles from './index.module.less';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 // 时间轴轨道类型
-interface TimelineTrack {
+export interface TimelineTrack {
   id: string;
   type: 'video' | 'audio' | 'script';
   name: string;
@@ -46,8 +42,9 @@ interface TimelineTrack {
 }
 
 // 时间轴片段
-interface TimelineClip {
+export interface TimelineClip {
   id: string;
+  scriptSegmentId?: string;
   trackId: string;
   startTime: number;
   endTime: number;
@@ -58,7 +55,7 @@ interface TimelineClip {
 }
 
 // 时间轴数据
-interface TimelineData {
+export interface TimelineData {
   tracks: TimelineTrack[];
   duration: number;
   currentTime: number;
@@ -68,13 +65,15 @@ interface VideoTimelineProps {
   timeline?: TimelineData;
   videoInfo?: VideoInfo;
   script?: ScriptData;
+  focusedSegmentId?: string;
   onSave?: (timeline: TimelineData) => void;
 }
 
 export const VideoTimeline: React.FC<VideoTimelineProps> = ({
   timeline: initialTimeline,
   videoInfo,
-  script,
+  script: _script,
+  focusedSegmentId,
   onSave
 }) => {
   const [timeline, setTimeline] = useState<TimelineData>(
@@ -115,6 +114,22 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
   const [selectedClip, setSelectedClip] = useState<string | null>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (initialTimeline) {
+      setTimeline(initialTimeline);
+    }
+  }, [initialTimeline]);
+
+  useEffect(() => {
+    if (!focusedSegmentId) return;
+    const subtitleTrack = timeline.tracks.find((track) => track.type === 'script');
+    const targetClip = subtitleTrack?.clips.find((clip) => clip.scriptSegmentId === focusedSegmentId);
+    if (!targetClip) return;
+
+    setTimeline((prev) => ({ ...prev, currentTime: targetClip.startTime }));
+    setSelectedClip(targetClip.id);
+  }, [focusedSegmentId, timeline.tracks]);
+
   // 格式化时间显示
   const formatTime = (seconds: number): string => {
     const hrs = Math.floor(seconds / 3600);
@@ -134,8 +149,9 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
   };
 
   // 处理时间变化
-  const handleTimeChange = (value: number) => {
-    setTimeline(prev => ({ ...prev, currentTime: value }));
+  const handleTimeChange = (value: number | number[]) => {
+    const nextTime = Array.isArray(value) ? value[0] : value;
+    setTimeline(prev => ({ ...prev, currentTime: nextTime }));
   };
 
   // 添加片段
@@ -188,8 +204,8 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
       <Space direction="vertical" size={0}>
         <Text strong>{track.name}</Text>
         <Space size="small">
-          {track.isMuted && <Tag size="small">静音</Tag>}
-          {track.isLocked && <Tag size="small">锁定</Tag>}
+          {track.isMuted && <Tag>静音</Tag>}
+          {track.isLocked && <Tag>锁定</Tag>}
         </Space>
       </Space>
     </div>
@@ -203,8 +219,8 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
           key={clip.id}
           className={`${styles.clip} ${selectedClip === clip.id ? styles.selected : ''}`}
           style={{
-            left: `${(clip.startTime / timeline.duration) * 100}%`,
-            width: `${((clip.endTime - clip.startTime) / timeline.duration) * 100}%`
+            left: `${(clip.startTime / (timeline.duration || 1)) * 100}%`,
+            width: `${((clip.endTime - clip.startTime) / (timeline.duration || 1)) * 100}%`
           }}
           onClick={() => setSelectedClip(clip.id)}
         >

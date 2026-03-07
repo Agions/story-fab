@@ -150,8 +150,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
               <Select defaultValue="zh-CN" style={{ width: 120 }}>
                 <Option value="zh-CN">中文</Option>
                 <Option value="en-US">英文</Option>
-                <Option value="ja-JP">日文</Option>
-              </Select>
+                              </Select>
             </div>
             <div className={styles.propItem}>
               <Text>语速</Text>

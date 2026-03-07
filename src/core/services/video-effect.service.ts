@@ -45,12 +45,16 @@ export interface ColorCorrection {
   tint: number;
 }
 
+type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
+};
+
 // 预设特效
 export interface EffectPreset {
   id: string;
   name: string;
   category: 'filter' | 'transition' | 'color' | 'animation';
-  config: Partial<EffectConfig>;
+  config: DeepPartial<EffectConfig>;
 }
 
 // 内置预设
@@ -80,7 +84,12 @@ export class VideoEffectService {
   applyPreset(presetId: string): void {
     const preset = EFFECT_PRESETS.find(p => p.id === presetId);
     if (preset) {
-      this.config = { ...this.config, ...preset.config };
+      this.config = {
+        filter: { ...this.config.filter, ...(preset.config.filter || {}) },
+        transition: { ...this.config.transition, ...(preset.config.transition || {}) },
+        animation: { ...this.config.animation, ...(preset.config.animation || {}) },
+        colorCorrection: { ...this.config.colorCorrection, ...(preset.config.colorCorrection || {}) },
+      };
     }
   }
 
@@ -113,7 +122,12 @@ export class VideoEffectService {
   }
 
   updateConfig(config: Partial<EffectConfig>): void {
-    this.config = { ...this.config, ...config };
+    this.config = {
+      filter: { ...this.config.filter, ...(config.filter || {}) },
+      transition: { ...this.config.transition, ...(config.transition || {}) },
+      animation: { ...this.config.animation, ...(config.animation || {}) },
+      colorCorrection: { ...this.config.colorCorrection, ...(config.colorCorrection || {}) },
+    };
   }
 
   reset(): void {

@@ -106,7 +106,7 @@ export abstract class BaseService {
       message.error('认证失败，请检查API密钥设置');
     } else if (serviceError.statusCode === 429) {
       message.error('请求过于频繁，请稍后重试');
-    } else if (serviceError.statusCode >= 500) {
+    } else if (typeof serviceError.statusCode === 'number' && serviceError.statusCode >= 500) {
       message.error('服务器错误，请稍后重试');
     } else {
       message.error(serviceError.message);

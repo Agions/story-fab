@@ -5,11 +5,5 @@
 )]
 
 fn main() {
-    tauri::Builder::default()
-        .setup(|_app| {
-            println!("启动 ClipFlow 应用");
-            Ok(())
-        })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+    clipflow_lib::run();
 }

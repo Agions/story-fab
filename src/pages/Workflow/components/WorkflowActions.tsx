@@ -6,12 +6,12 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import type { WorkflowStep } from '@/core/types';
-import { WORKFLOW_STEPS } from '../constants';
 import styles from '../index.module.less';
 
 interface WorkflowActionsProps {
   currentStep: WorkflowStep | 'ai-clip';
   currentStepIndex: number;
+  stepKeys: Array<WorkflowStep | 'ai-clip'>;
   isRunning: boolean;
   isPaused: boolean;
   isCompleted: boolean;
@@ -26,6 +26,7 @@ interface WorkflowActionsProps {
 
 const WorkflowActions: React.FC<WorkflowActionsProps> = ({
   currentStepIndex,
+  stepKeys,
   isRunning,
   isPaused,
   isCompleted,
@@ -38,7 +39,7 @@ const WorkflowActions: React.FC<WorkflowActionsProps> = ({
   onJumpToStep,
 }) => {
   const isFirstStep = currentStepIndex === 0;
-  const isLastStep = currentStepIndex === WORKFLOW_STEPS.length - 1;
+  const isLastStep = currentStepIndex === stepKeys.length - 1;
   const isMiddleStep = !isFirstStep && !isLastStep && !isRunning;
 
   return (
@@ -46,7 +47,7 @@ const WorkflowActions: React.FC<WorkflowActionsProps> = ({
       <Space>
         {isFirstStep && (
           <Button type="primary" size="large" onClick={onStart} disabled={!canStart}>
-            开始创作
+            启动 AI 自主创作
           </Button>
         )}
 
@@ -66,7 +67,7 @@ const WorkflowActions: React.FC<WorkflowActionsProps> = ({
 
         {isCompleted && (
           <Button type="primary" icon={<ReloadOutlined />} onClick={onReset}>
-            开始新项目
+            启动下一个 AI 项目
           </Button>
         )}
 
@@ -74,7 +75,7 @@ const WorkflowActions: React.FC<WorkflowActionsProps> = ({
           <>
             <Button
               onClick={() =>
-                onJumpToStep(WORKFLOW_STEPS[currentStepIndex - 1].key as WorkflowStep)
+                onJumpToStep(stepKeys[currentStepIndex - 1] as WorkflowStep)
               }
             >
               上一步
@@ -82,7 +83,7 @@ const WorkflowActions: React.FC<WorkflowActionsProps> = ({
             <Button
               type="primary"
               onClick={() =>
-                onJumpToStep(WORKFLOW_STEPS[currentStepIndex + 1].key as WorkflowStep)
+                onJumpToStep(stepKeys[currentStepIndex + 1] as WorkflowStep)
               }
             >
               下一步

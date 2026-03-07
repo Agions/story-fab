@@ -2,26 +2,22 @@
  * AI 视频编辑器页面
  * 采用标签页分离布局：AI第一人称解说 / AI解说 / AI混剪
  */
-import React, { useState } from 'react';
-import { Tabs, Card } from 'antd';
+import React, { useState, lazy, Suspense } from 'react';
 import {
-  ScissorOutlined,
   AudioOutlined,
-  VideoCameraOutlined,
   UserOutlined,
-  DashboardOutlined,
+  ScissorOutlined,
 } from '@ant-design/icons';
-import { useClipFlow } from '@/components/AIPanel/AIEditorContext';
-import {
-  ClipFlow as ClipFlowComponent,
-  ProjectCreate,
-  VideoUpload,
-  AIAnalyze,
-  ScriptGenerate,
-  VideoSynthesize,
-  VideoExport,
-} from '@/components/AIPanel/ClipFlow';
-import styles from './AIVideoEditor.module.less';
+import { ClipFlowProvider, useClipFlow } from '@/components/AIPanel/AIEditorContext';
+import styles from './index.module.less';
+
+const ClipFlowComponent = lazy(() => import('@/components/AIPanel/ClipFlow/ClipFlow'));
+const ProjectCreate = lazy(() => import('@/components/AIPanel/ClipFlow/ProjectCreate'));
+const VideoUpload = lazy(() => import('@/components/AIPanel/ClipFlow/VideoUpload'));
+const AIAnalyze = lazy(() => import('@/components/AIPanel/ClipFlow/AIAnalyze'));
+const ScriptGenerate = lazy(() => import('@/components/AIPanel/ClipFlow/ScriptGenerate'));
+const VideoSynthesize = lazy(() => import('@/components/AIPanel/ClipFlow/VideoSynthesize'));
+const VideoExport = lazy(() => import('@/components/AIPanel/ClipFlow/VideoExport'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
@@ -63,7 +59,7 @@ const AI_FUNCTIONS = [
   },
 ];
 
-const AIVideoEditor: React.FC = () => {
+const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState('commentary-first');
   const { state, goToNextStep } = useClipFlow();
 
@@ -86,9 +82,6 @@ const AIVideoEditor: React.FC = () => {
         return <ProjectCreate onNext={goToNextStep} />;
     }
   };
-
-  // 获取当前标签页的配置
-  const currentFunction = AI_FUNCTIONS.find(f => f.key === activeTab);
 
   return (
     <div className={styles.editorContainer}>
@@ -116,11 +109,27 @@ const AIVideoEditor: React.FC = () => {
 
       {/* 主要工作区 */}
       <div className={styles.workspace}>
-        <ClipFlowComponent showSteps={true} showNavigation={true}>
-          {renderStepContent()}
-        </ClipFlowComponent>
+        <Suspense
+          fallback={
+            <div style={{ padding: 24, textAlign: 'center' }}>
+              正在加载 AI 工作流模块...
+            </div>
+          }
+        >
+          <ClipFlowComponent showSteps={true} showNavigation={true}>
+            {renderStepContent()}
+          </ClipFlowComponent>
+        </Suspense>
       </div>
     </div>
+  );
+};
+
+const AIVideoEditor: React.FC = () => {
+  return (
+    <ClipFlowProvider>
+      <AIVideoEditorContent />
+    </ClipFlowProvider>
   );
 };
 

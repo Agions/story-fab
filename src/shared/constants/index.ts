@@ -17,8 +17,8 @@ export const ROUTES = {
   HOME: '/',
   DASHBOARD: '/dashboard',
   PROJECTS: '/projects',
-  PROJECT_DETAIL: '/projects/:id',
-  PROJECT_EDIT: '/projects/:id/edit',
+  PROJECT_DETAIL: '/project/:projectId',
+  PROJECT_EDIT: '/project/edit/:projectId',
   EDITOR: '/editor',
   SETTINGS: '/settings',
   VIDEO_STUDIO: '/video-studio'

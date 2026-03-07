@@ -5,6 +5,51 @@ import { message } from 'antd';
 import { appConfigDir } from '@tauri-apps/api/path';
 import { open as openExternal } from '@tauri-apps/plugin-shell';
 
+type ProjectFileData = {
+  aiModel?: {
+    apiKey?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
+type ExportScriptSegment = {
+  startTime: number;
+  endTime: number;
+  content: string;
+};
+
+type ExportScriptData = {
+  projectName: string;
+  createdAt: string;
+  segments: ExportScriptSegment[];
+};
+
+const normalizeProjectId = (projectId: string): string =>
+  projectId.trim().replace(/\.json$/i, '');
+
+const buildProjectIdCandidates = (projectId: string): string[] => {
+  const raw = projectId || '';
+  const basename = raw.split('/').pop() || raw;
+  const decoded = (() => {
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
+  })();
+  const decodedBasename = decoded.split('/').pop() || decoded;
+
+  return Array.from(
+    new Set([
+      normalizeProjectId(raw),
+      normalizeProjectId(basename),
+      normalizeProjectId(decoded),
+      normalizeProjectId(decodedBasename),
+    ].filter(Boolean))
+  );
+};
+
 // 确保应用数据目录
 export const ensureAppDataDir = async (): Promise<void> => {
   try {
@@ -22,7 +67,7 @@ export const ensureAppDataDir = async (): Promise<void> => {
     // 前端备用检查
     let dirExists = false;
     try {
-      dirExists = await exists(appDir, { dir: BaseDirectory.AppData });
+      dirExists = await exists(appDir, { baseDir: BaseDirectory.AppData });
     } catch (existsError) {
       console.error('检查目录是否存在时出错:', existsError);
       throw new Error(`检查目录出错: ${existsError instanceof Error ? existsError.message : '未知错误'}`);
@@ -31,7 +76,7 @@ export const ensureAppDataDir = async (): Promise<void> => {
     if (!dirExists) {
       console.log('应用数据目录不存在，创建目录:', appDir);
       try {
-        await mkdir(appDir, { dir: BaseDirectory.AppData, recursive: true });
+        await mkdir(appDir, { baseDir: BaseDirectory.AppData, recursive: true });
       } catch (createError) {
         console.error('创建目录失败:', createError);
         throw new Error(`创建目录失败: ${createError instanceof Error ? createError.message : '未知错误'}`);
@@ -39,7 +84,7 @@ export const ensureAppDataDir = async (): Promise<void> => {
       
       // 验证目录是否创建成功
       try {
-        const checkExists = await exists(appDir, { dir: BaseDirectory.AppData });
+        const checkExists = await exists(appDir, { baseDir: BaseDirectory.AppData });
         if (!checkExists) {
           throw new Error('无法创建应用数据目录，请检查权限');
         }
@@ -59,8 +104,10 @@ export const ensureAppDataDir = async (): Promise<void> => {
 };
 
 // 保存项目数据到文件
-export const saveProjectToFile = async (projectId: string, project: any): Promise<void> => {
-  if (!project || !projectId) {
+export const saveProjectToFile = async (projectId: string, project: object): Promise<void> => {
+  const normalizedProjectId = normalizeProjectId(projectId || '');
+
+  if (!project || !normalizedProjectId) {
     console.error('保存项目文件失败: 项目数据无效');
     throw new Error('无效的项目数据');
   }
@@ -72,14 +119,14 @@ export const saveProjectToFile = async (projectId: string, project: any): Promis
       throw new Error(`应用数据目录错误: ${err.message || '未知错误'}`);
     });
     
-    const projectPath = `ClipFlow/${projectId}.json`;
+    const projectPath = `ClipFlow/${normalizedProjectId}.json`;
     console.log('正在保存项目文件:', projectPath);
     
     // 准备项目数据
     let projectData: string;
     try {
       // 移除可能导致循环引用的字段
-      const cleanProject = { ...project };
+      const cleanProject = { ...(project as ProjectFileData) };
       if (cleanProject.aiModel && cleanProject.aiModel.apiKey) {
         // 创建新对象避免修改原始对象
         cleanProject.aiModel = { 
@@ -100,18 +147,18 @@ export const saveProjectToFile = async (projectId: string, project: any): Promis
     // 使用Rust函数直接写入文件，提供更好的错误处理
     try {
       await invoke('save_project_file', {
-        projectId: projectId,
+        projectId: normalizedProjectId,
         content: projectData
       });
       console.log('文件写入成功 (通过Rust函数)');
       return;
-    } catch (rustErr: any) {
+    } catch (rustErr) {
       console.warn('通过Rust保存文件失败，尝试使用JS API保存:', rustErr);
       // 继续使用JS API作为备选方案
     }
     
     // 检查文件是否已存在
-    const fileExists = await exists(projectPath, { dir: BaseDirectory.AppData })
+    const fileExists = await exists(projectPath, { baseDir: BaseDirectory.AppData })
       .catch(err => {
         console.error('检查文件是否存在时出错:', err);
         return false;
@@ -124,35 +171,37 @@ export const saveProjectToFile = async (projectId: string, project: any): Promis
       await writeTextFile(
         projectPath,
         projectData,
-        { dir: BaseDirectory.AppData }
+        { baseDir: BaseDirectory.AppData }
       );
       console.log('文件写入完成');
-    } catch (writeErr: any) {
+    } catch (writeErr) {
       console.error('文件写入失败:', writeErr);
       
       // 尝试备用方法保存
       try {
         const configDir = await getConfigDir();
-        const backupPath = `${configDir}${projectId}.json`;
+        const backupPath = `${configDir}${normalizedProjectId}.json`;
         await writeTextFile(backupPath, projectData);
         console.log('使用备用路径保存成功:', backupPath);
         return;
       } catch (backupErr) {
         console.error('备用保存也失败:', backupErr);
-        throw new Error(`文件写入失败: ${writeErr?.message || '未知错误'}`);
+        const writeErrMessage = writeErr instanceof Error ? writeErr.message : '未知错误';
+        throw new Error(`文件写入失败: ${writeErrMessage}`);
       }
     }
     
     // 验证文件是否写入成功
     try {
-      const verifyExists = await exists(projectPath, { dir: BaseDirectory.AppData });
+      const verifyExists = await exists(projectPath, { baseDir: BaseDirectory.AppData });
       if (!verifyExists) {
         throw new Error('文件似乎已写入但无法验证其存在');
       }
       console.log('验证文件存在: 成功');
-    } catch (verifyErr: any) {
+    } catch (verifyErr) {
       console.error('验证文件存在时出错:', verifyErr);
-      throw new Error(`无法验证文件是否保存成功: ${verifyErr?.message || '未知错误'}`);
+      const verifyErrMessage = verifyErr instanceof Error ? verifyErr.message : '未知错误';
+      throw new Error(`无法验证文件是否保存成功: ${verifyErrMessage}`);
     }
     
     console.log('项目文件保存成功:', projectPath);
@@ -169,25 +218,69 @@ export const saveProjectToFile = async (projectId: string, project: any): Promis
 };
 
 // 读取项目数据
-export const loadProjectFromFile = async (projectId: string): Promise<any> => {
-  try {
-    const projectPath = `ClipFlow/${projectId}.json`;
-    const existsFile = await exists(projectPath, { dir: BaseDirectory.AppData });
-    
-    if (!existsFile) {
-      throw new Error('项目文件不存在');
-    }
-    
-    const content = await readTextFile(projectPath, { dir: BaseDirectory.AppData });
-    return JSON.parse(content);
-  } catch (error) {
-    console.error('读取项目文件失败:', error);
-    throw error;
+export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string): Promise<T> => {
+  const candidates = buildProjectIdCandidates(projectId);
+  if (!candidates.length) {
+    throw new Error('项目ID不能为空');
   }
+
+  let lastError: unknown = null;
+
+  for (const candidateId of candidates) {
+    try {
+      // 优先使用 Rust 命令读取，避免前端 fs 插件权限/路径配置差异导致失败
+      try {
+        const content = await invoke<string>('load_project_file', { projectId: candidateId });
+        return JSON.parse(content) as T;
+      } catch (rustError) {
+        lastError = rustError;
+        console.warn(`通过 Rust 加载项目失败(${candidateId})，尝试使用 JS API 兜底:`, rustError);
+      }
+
+      const projectPath = `ClipFlow/${candidateId}.json`;
+      const existsFile = await exists(projectPath, { baseDir: BaseDirectory.AppData });
+      if (!existsFile) {
+        lastError = new Error(`项目文件不存在: ${candidateId}.json`);
+        continue;
+      }
+
+      const content = await readTextFile(projectPath, { baseDir: BaseDirectory.AppData });
+      return JSON.parse(content) as T;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  // 兼容历史版本：尝试从旧配置目录加载（曾作为备份路径写入）
+  try {
+    const configDir = await getConfigDir();
+    for (const candidateId of candidates) {
+      const legacyPaths = [
+        `${configDir}${candidateId}.json`,
+        `${configDir}ClipFlow/${candidateId}.json`,
+      ];
+
+      for (const legacyPath of legacyPaths) {
+        try {
+          const found = await exists(legacyPath);
+          if (!found) continue;
+          const content = await readTextFile(legacyPath);
+          return JSON.parse(content) as T;
+        } catch (legacyError) {
+          lastError = legacyError;
+        }
+      }
+    }
+  } catch (legacyRootError) {
+    lastError = legacyRootError;
+  }
+
+  console.error('读取项目文件失败:', lastError);
+  throw (lastError || new Error(`读取项目失败: ${projectId}`));
 };
 
 // 导出脚本到文本文件
-export const exportScriptToFile = async (script: any, filename: string): Promise<void> => {
+export const exportScriptToFile = async (script: ExportScriptData, filename: string): Promise<void> => {
   try {
     const savePath = await save({
       defaultPath: filename,
@@ -206,7 +299,7 @@ export const exportScriptToFile = async (script: any, filename: string): Promise
     content += `创建时间: ${new Date(script.createdAt).toLocaleString()}\n\n`;
     
     // 添加脚本内容
-    script.segments.forEach((segment: any) => {
+    script.segments.forEach((segment) => {
       content += `[${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}]\n`;
       content += `${segment.content}\n\n`;
     });
@@ -446,13 +539,13 @@ export const openExternalUrl = async (url: string): Promise<boolean> => {
 };
 
 // 列出所有项目
-export const listProjects = async (): Promise<any[]> => {
+export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
   try {
     // 尝试使用 Rust 函数列出项目
     try {
       const projects = await invoke('list_project_files');
       console.log('通过 Rust 函数获取项目列表成功:', projects);
-      return projects as any[];
+      return projects as T[];
     } catch (rustError) {
       console.warn('通过 Rust 获取项目列表失败，使用 JS API 替代:', rustError);
     }
@@ -487,7 +580,7 @@ export const listProjects = async (): Promise<any[]> => {
     const projects = await Promise.all(projectsPromises);
     
     // 过滤出成功加载的项目
-    return projects.filter(project => project !== null) as any[];
+    return projects.filter((project): project is ProjectFileData => project !== null) as unknown as T[];
   } catch (error) {
     console.error('列出项目失败:', error);
     throw error;
@@ -497,24 +590,30 @@ export const listProjects = async (): Promise<any[]> => {
 // 删除项目
 export const deleteProject = async (projectId: string): Promise<boolean> => {
   try {
-    const projectsDir = await ensureAppDataDir();
-    const projectPath = `${projectsDir}/${projectId}.json`;
-    
-    await invoke('delete_file', { path: projectPath });
-    
-    // 验证文件是否已删除
-    try {
-      await invoke('read_text_file', { path: projectPath });
-      console.error('项目文件删除失败:', projectPath);
-      return false;
-    } catch (error) {
-      // 如果文件无法读取，说明已成功删除
-      console.log('项目删除成功:', projectId);
-      return true;
-    }
+    const normalizedProjectId = normalizeProjectId(projectId || '');
+    if (!normalizedProjectId) return false;
+    await invoke('delete_project_file', { projectId: normalizedProjectId });
+    console.log('项目删除成功:', projectId);
+    return true;
   } catch (error) {
     console.error('删除项目出错:', error);
-    throw error;
+    return false;
+  }
+};
+
+/**
+ * 获取文件字节大小
+ */
+export const getFileSizeBytes = async (path: string): Promise<number> => {
+  if (!path?.trim()) {
+    return 0;
+  }
+  try {
+    const bytes = await invoke<number>('get_file_size', { path });
+    return Number.isFinite(bytes) ? bytes : 0;
+  } catch (error) {
+    console.warn('获取文件大小失败:', path, error);
+    return 0;
   }
 };
 

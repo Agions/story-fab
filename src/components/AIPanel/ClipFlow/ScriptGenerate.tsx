@@ -6,9 +6,9 @@
  * 2. AI 第一人称解说 - 以第一人称视角讲述
  * 3. AI 混剪 - 自动识别精彩片段并添加旁白
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
-  Card, Button, Space, Typography, Input, Alert, Divider, Select, message, Empty, Badge, Tabs, Tooltip, Progress, Tag, Row, Col
+  Card, Button, Space, Typography, Input, Alert, Select, message, Empty, Badge, Tooltip, Progress, Tag, Row, Col
 } from 'antd';
 import {
   FileTextOutlined,
@@ -23,17 +23,18 @@ import {
   StarOutlined,
   SettingOutlined,
   FullscreenOutlined,
-  SaveOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
-import { aiService } from '@/core/services';
-import type { ScriptData, ScriptSegment, ScriptMetadata, AIModel, AIModelSettings } from '@/core/types';
+import { aiService } from '@/core/services/ai.service';
+import type { ScriptData, ScriptSegment, ScriptMetadata, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
+import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
 import styles from './ClipFlow.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
-const { TabPane } = Tabs;
 
 // 核心功能类型
 export type AIFunctionType = 'video-narration' | 'first-person' | 'remix';
@@ -200,7 +201,8 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
   const [generating, setGenerating] = useState(false);
   const [generatingType, setGeneratingType] = useState<AIFunctionType | null>(null);
   const [progress, setProgress] = useState(0);
-  const [activeTab, setActiveTab] = useState('config');
+  const [defaultModel] = useLocalStorage<string>('default_model', DEFAULT_MODEL_ID);
+  const [apiKeys] = useLocalStorage<Partial<Record<ModelProvider, { key: string; isValid?: boolean }>>>('api_keys', {});
   
   // 文案配置
   const [config, setConfig] = useState({
@@ -221,20 +223,17 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
     try {
       const topic = state.analysis?.summary || '视频内容解说';
       
-      const model: AIModel = {
-        id: 'gpt-4',
-        name: 'GPT-4',
-        provider: 'openai',
-        category: ['text'],
-        description: 'OpenAI GPT-4',
-        features: [],
-        tokenLimit: 128000,
-        contextWindow: 128000,
-      };
+      const availableModels = getAvailableModelsFromApiKeys(apiKeys, CORE_AI_MODELS);
+      const resolvedModelId = resolveDefaultModelId(defaultModel, availableModels);
+      const model = (
+        availableModels.find((item) => item.id === resolvedModelId) ||
+        CORE_AI_MODELS.find((item) => item.id === DEFAULT_MODEL_ID) ||
+        CORE_AI_MODELS[0]
+      ) as AIModel;
       
       const settings: AIModelSettings = {
         enabled: true,
-        apiKey: '',
+        apiKey: apiKeys[model.provider]?.key || '',
         temperature: 0.7,
         maxTokens: 2000,
       };
@@ -260,7 +259,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
             length: config.length,
             audience: '通用',
             language: 'zh-CN',
-            keywords: state.analysis?.scenes?.map(s => s.type).filter(Boolean) || [],
+            keywords: state.analysis?.scenes?.map(s => s.type).filter((type): type is string => Boolean(type)) || [],
             videoDuration: state.currentVideo?.duration,
           }
         );
@@ -291,7 +290,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
         setProgress(100);
         message.success('文案生成成功（智能模板）');
       }
-    } catch {
+    } catch (error) {
       console.error('文案生成失败:', error);
       message.error('文案生成失败，请重试');
     } finally {
@@ -304,7 +303,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
   }, [config.style, config.length, state.analysis, state.subtitleData.asr, state.currentVideo, setNarrationScript, setRemixScript]);
 
   // 处理编辑文案
-  const handleEditScript = (newContent: string) => {
+  const handleEditScript = (newContent: string): void => {
     const script = config.functionType === 'remix' ? state.scriptData.remix : state.scriptData.narration;
     
     if (script) {
@@ -380,8 +379,9 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
                 {/* 三大核心功能选择 */}
                 {(Object.entries(FUNCTION_CONFIG) as [AIFunctionType, typeof FUNCTION_CONFIG[AIFunctionType]][]).map(([key, func]) => {
                   const isActive = config.functionType === key;
-                  const hasContent = key === 'video-narration' ? !!state.scriptData.narration : 
-                                    key === 'first-person' ? false : !!state.scriptData.remix;
+                  const hasContent = key === 'remix'
+                    ? !!state.scriptData.remix
+                    : !!state.scriptData.narration;
                   
                   return (
                     <div
@@ -424,7 +424,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
                   <Text strong style={{ display: 'block', marginBottom: 8 }}>语气风格</Text>
                   <Select
                     value={config.style}
-                    onChange={(v) => setConfig({ ...config, style: v })}
+                    onChange={(style) => setConfig({ ...config, style })}
                     style={{ width: '100%' }}
                   >
                     {scriptStyles.map(s => (
@@ -438,7 +438,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
                   <Text strong style={{ display: 'block', marginBottom: 8 }}>文案长度</Text>
                   <Select
                     value={config.length}
-                    onChange={(v) => setConfig({ ...config, length: v })}
+                    onChange={(length) => setConfig({ ...config, length })}
                     style={{ width: '100%' }}
                   >
                     {scriptLengths.map(l => (
@@ -579,8 +579,9 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
             >
               <Row gutter={8}>
                 {(Object.entries(FUNCTION_CONFIG) as [AIFunctionType, typeof FUNCTION_CONFIG[AIFunctionType]][]).map(([key, func]) => {
-                  const hasContent = key === 'video-narration' ? !!state.scriptData.narration : 
-                                    key === 'first-person' ? false : !!state.scriptData.remix;
+                  const hasContent = key === 'remix'
+                    ? !!state.scriptData.remix
+                    : !!state.scriptData.narration;
                   return (
                     <Col span={8} key={key}>
                       <div style={{ 

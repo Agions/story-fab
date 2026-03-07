@@ -6,8 +6,14 @@
 
 // 条件导入 Tauri API - 仅在 Tauri 环境中可用
 let invoke: ((cmd: string, args?: Record<string, unknown>) => Promise<unknown>) | null = null;
-let openDialog: ((options: unknown) => Promise<unknown>) | null = null;
-let saveDialog: ((options: unknown) => Promise<unknown>) | null = null;
+type DialogFilter = { name: string; extensions: string[] };
+type OpenDialogOptions = { multiple?: boolean; filters?: DialogFilter[]; defaultPath?: string };
+type SaveDialogOptions = { filters?: DialogFilter[]; defaultPath?: string };
+type OpenDialogResult = string | string[] | null;
+type SaveDialogResult = string | null;
+
+let openDialog: ((options?: OpenDialogOptions) => Promise<OpenDialogResult>) | null = null;
+let saveDialog: ((options?: SaveDialogOptions) => Promise<SaveDialogResult>) | null = null;
 
 // 动态导入 Tauri API
 const loadTauriApi = async () => {
@@ -115,10 +121,10 @@ export class FileStorageService {
       // 尝试调用 Tauri 命令加载文件
       if (invoke) {
         try {
-          const content = await invoke<string>('load_project_file', {
+          const content = await invoke('load_project_file', {
             projectId: id,
           });
-          const project = JSON.parse(content) as ProjectData;
+          const project = JSON.parse(content as string) as ProjectData;
           // 更新本地缓存
           this.updateLocalCache(project);
           console.log('项目加载成功:', id);
@@ -192,9 +198,9 @@ export class FileStorageService {
       // 尝试调用 Tauri 命令列出文件
       if (invoke) {
         try {
-          const files = await invoke<string[]>('list_app_data_files', {
+          const files = (await invoke('list_app_data_files', {
             directory: PROJECT_DIRECTORY,
-          });
+          })) as string[];
 
           if (!files || !Array.isArray(files)) {
             return [];
@@ -383,11 +389,11 @@ export class FileStorageService {
       // 调用 Tauri 命令导入文件
       if (invoke) {
         try {
-          const content = await invoke<string>('import_project_file', {
+          const content = await invoke('import_project_file', {
             importPath,
             projectId: newProjectId,
           });
-          project = JSON.parse(content) as ProjectData;
+          project = JSON.parse(content as string) as ProjectData;
         } catch {
           console.warn('Tauri API import failed');
         }
@@ -429,7 +435,7 @@ export class FileStorageService {
       // 尝试使用 Tauri API
       if (invoke) {
         try {
-          await invoke<string>('load_project_file', {
+          await invoke('load_project_file', {
             projectId: id,
           });
           return true;
@@ -458,7 +464,7 @@ export class FileStorageService {
       // 尝试使用 Tauri API
       if (invoke) {
         try {
-          const appDataDir = await invoke<string>('check_app_data_directory');
+          const appDataDir = (await invoke('check_app_data_directory')) as string;
           return `${appDataDir}/${PROJECT_DIRECTORY}/${id}.json`;
         } catch {
           console.warn('Tauri API unavailable');
@@ -477,22 +483,29 @@ export class FileStorageService {
    * 清理项目数据，移除敏感信息
    */
   private sanitizeProject(project: ProjectData): ProjectData {
-    const clean = { ...project };
+    type SensitiveProject = ProjectData & {
+      apiKey?: string;
+      aiModel?: {
+        apiKey?: string;
+        [key: string]: unknown;
+      } | null;
+    };
+    const clean: SensitiveProject = { ...(project as SensitiveProject) };
 
     // 移除可能的敏感字段（如果存在）
     if ('apiKey' in clean) {
-      delete (clean as any).apiKey;
+      delete clean.apiKey;
     }
 
     if ('aiModel' in clean && clean.aiModel) {
-      const aiModel = { ...clean.aiModel } as any;
+      const aiModel = { ...clean.aiModel };
       if (aiModel.apiKey) {
         aiModel.apiKey = undefined;
       }
       clean.aiModel = aiModel;
     }
 
-    return clean;
+    return clean as ProjectData;
   }
 
   /**

@@ -7,14 +7,11 @@
  */
 import React, { useState, useCallback, useRef } from 'react';
 import { 
-  Upload, Button, Card, Space, Typography, Progress, 
-  List, message, Alert, Divider, Tooltip, Badge 
+  Upload, Button, Card, Space, Typography,
+  message, Alert, Divider, Tooltip
 } from 'antd';
 import {
-  VideoCameraOutlined,
-  InboxOutlined,
   DeleteOutlined,
-  CheckCircleOutlined,
   PlayCircleOutlined,
   FileOutlined,
   CloudUploadOutlined,
@@ -63,7 +60,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
   const [dragOver, setDragOver] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'paused' | 'completed'>('idle');
   const [currentFile, setCurrentFile] = useState<File | null>(null);
-  const uploadControllerRef = useRef<AbortController | null>(null);
+  const uploadStatusRef = useRef<string>('idle');
 
   // 验证文件
   const validateFile = (file: File): { valid: boolean; error?: string } => {
@@ -88,6 +85,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
     setUploading(true);
     setUploadProgress(0);
     setUploadStatus('uploading');
+    uploadStatusRef.current = 'uploading';
     setCurrentFile(file);
     
     // 生成唯一上传ID（用于断点续传）
@@ -101,11 +99,11 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
       
       // 模拟上传进度
       for (let i = 0; i < totalChunks; i++) {
-        if (uploadStatus === 'paused') {
+        if (uploadStatusRef.current === 'paused') {
           // 暂停处理
           await new Promise<void>((resolve) => {
             const checkResume = setInterval(() => {
-              if (uploadStatus === 'uploading') {
+              if (uploadStatusRef.current === 'uploading') {
                 clearInterval(checkResume);
                 resolve();
               }
@@ -169,21 +167,23 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
       } else {
         setTimeout(() => goToNextStep(), 500);
       }
-    } catch {
+    } catch (error) {
       message.error('视频处理失败，请重试');
       console.error(error);
     } finally {
       setUploading(false);
     }
-  }, [setVideo, goToNextStep, onNext, uploadStatus]);
+  }, [setVideo, goToNextStep, onNext]);
 
   // 处理暂停/继续上传
   const handlePauseResume = () => {
     if (uploadStatus === 'uploading') {
       setUploadStatus('paused');
+      uploadStatusRef.current = 'paused';
       message.info('上传已暂停');
     } else if (uploadStatus === 'paused') {
       setUploadStatus('uploading');
+      uploadStatusRef.current = 'uploading';
       message.info('继续上传中...');
     }
   };
@@ -193,6 +193,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
     setVideo(null);
     setUploadProgress(0);
     setUploadStatus('idle');
+    uploadStatusRef.current = 'idle';
     setCurrentFile(null);
     chunkStore.clear('current');
   };

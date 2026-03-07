@@ -1,5 +1,6 @@
 import { uniquenessService } from '../../uniqueness.service';
 import type { ScriptData } from '@/core/types';
+import type { ContentFingerprint, UniquenessCheckResult } from '../../uniqueness.service';
 
 export interface UniquenessConfig {
   enabled: boolean;
@@ -12,7 +13,14 @@ export interface UniquenessResult {
   script: ScriptData;
   isUnique: boolean;
   attempts: number;
-  report: any;
+  report: {
+    fingerprint: ContentFingerprint;
+    check: UniquenessCheckResult;
+    history: {
+      totalScripts: number;
+      recentScripts: number;
+    };
+  };
 }
 
 export async function executeUniquenessStep(

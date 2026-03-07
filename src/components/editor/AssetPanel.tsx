@@ -3,33 +3,33 @@ import {
   Tabs, 
   Button, 
   Upload, 
-  Card, 
-  List, 
   Input, 
   Empty, 
   Tooltip, 
   Space,
   Dropdown,
-  Typography,
   Tag
 } from 'antd';
+import type { UploadProps, MenuProps } from 'antd';
 import { 
   UploadOutlined, 
   VideoCameraOutlined, 
   AudioOutlined, 
   FileImageOutlined,
   FileTextOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  FilterOutlined,
   MoreOutlined
 } from '@ant-design/icons';
 import { formatDuration, formatFileSize } from '@/shared';
 import styles from './AssetPanel.module.less';
 
-const { TabPane } = Tabs;
+const TABS = [
+  { key: 'all', label: '全部' },
+  { key: 'video', label: '视频' },
+  { key: 'audio', label: '音频' },
+  { key: 'image', label: '图片' },
+  { key: 'text', label: '文本' },
+] as const;
 const { Search } = Input;
-const { Text } = Typography;
 
 interface Asset {
   id: string;
@@ -41,6 +41,8 @@ interface Asset {
   size: number;
   tags: string[];
 }
+
+type AssetTab = (typeof TABS)[number]['key'];
 
 // 模拟素材数据
 const mockAssets: Asset[] = [
@@ -92,10 +94,8 @@ const mockAssets: Asset[] = [
   }
 ];
 
-interface AssetPanelProps {}
-
-const AssetPanel: React.FC<AssetPanelProps> = () => {
-  const [activeTab, setActiveTab] = useState('all');
+const AssetPanel: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<AssetTab>('all');
   const [assets, setAssets] = useState<Asset[]>(mockAssets);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -116,7 +116,7 @@ const AssetPanel: React.FC<AssetPanelProps> = () => {
   
   // 删除素材
   const handleDelete = (id: string) => {
-    setAssets(assets.filter(asset => asset.id !== id));
+    setAssets(prev => prev.filter(asset => asset.id !== id));
   };
   
   // 添加到时间轴
@@ -162,13 +162,14 @@ const AssetPanel: React.FC<AssetPanelProps> = () => {
   };
   
   // 上传素材
-  const handleUpload = (info: any) => {
-    console.log('上传文件', info);
+  const handleUpload: UploadProps['customRequest'] = (options) => {
+    console.log('上传文件', options);
+    options.onSuccess?.({}, new XMLHttpRequest());
     // 实际项目中会处理文件上传和转码
   };
   
   // 素材项操作菜单
-  const assetMenu = (id: string) => ({
+  const assetMenu = (id: string): { items: MenuProps['items'] } => ({
     items: [
       {
         key: '1',
@@ -186,7 +187,7 @@ const AssetPanel: React.FC<AssetPanelProps> = () => {
         onClick: () => console.log('复制', id)
       },
       {
-        type: 'divider',
+        type: 'divider' as const,
       },
       {
         key: '4',
@@ -207,17 +208,12 @@ const AssetPanel: React.FC<AssetPanelProps> = () => {
         />
       </div>
       
-      <Tabs 
+      <Tabs
         activeKey={activeTab} 
-        onChange={setActiveTab}
+        onChange={(key) => setActiveTab(key as AssetTab)}
         className={styles.assetTabs}
-      >
-        <TabPane tab="全部" key="all" />
-        <TabPane tab="视频" key="video" />
-        <TabPane tab="音频" key="audio" />
-        <TabPane tab="图片" key="image" />
-        <TabPane tab="文本" key="text" />
-      </Tabs>
+        items={TABS.map((tab) => ({ key: tab.key, label: tab.label }))}
+      />
       
       <div className={styles.uploadContainer}>
         <Upload

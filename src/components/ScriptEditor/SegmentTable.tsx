@@ -1,9 +1,11 @@
-import React, { useMemo, useCallback, memo } from 'react';
-import { Table, Space, Button, Tooltip } from 'antd';
+import React, { memo } from 'react';
+import { List, Space, Button, Tooltip, Typography, Tag } from 'antd';
 import { EditOutlined, PlayCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { VideoSegment, formatDuration } from '@/services/videoService';
 import { getTypeLabel } from './types';
-import styles from './ScriptEditor.module.less';
+import styles from '../ScriptEditor.module.less';
+
+const { Text } = Typography;
 
 interface SegmentTableProps {
   segments: VideoSegment[];
@@ -20,82 +22,42 @@ const SegmentTable: React.FC<SegmentTableProps> = ({
   onDelete,
   onAdd,
 }) => {
-  const columns = useMemo(() => [
-    {
-      title: '时间',
-      key: 'time',
-      width: 180,
-      render: (_: any, record: VideoSegment) => (
-        <span>
-          {formatDuration(record.start)} - {formatDuration(record.end)}
-        </span>
-      ),
-    },
-    {
-      title: '时长',
-      key: 'duration',
-      width: 80,
-      render: (_: any, record: VideoSegment) => (
-        <span>{formatDuration(record.end - record.start)}</span>
-      ),
-    },
-    {
-      title: '类型',
-      dataIndex: 'type',
-      key: 'type',
-      width: 100,
-      render: (type: string) => <span>{getTypeLabel(type)}</span>,
-    },
-    {
-      title: '内容',
-      dataIndex: 'content',
-      key: 'content',
-      render: (content: string) => (
-        <div className={styles.contentCell}>
-          {content || <span className={styles.emptyContent}>（无内容）</span>}
-        </div>
-      ),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      width: 180,
-      render: (_: any, record: VideoSegment, index: number) => (
-        <Space size="small">
-          <Tooltip title="编辑">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(index)}
-            />
-          </Tooltip>
-          <Tooltip title="预览">
-            <Button
-              type="text"
-              icon={<PlayCircleOutlined />}
-              onClick={() => onPreview(index)}
-            />
-          </Tooltip>
-          <Tooltip title="删除">
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => onDelete(index)}
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ], [onEdit, onPreview, onDelete]);
-
   return (
-    <Table
-      rowKey={(_, index) => String(index)}
-      dataSource={segments}
-      columns={columns}
-      pagination={false}
+    <List
       className={styles.segmentsTable}
+      dataSource={segments}
+      locale={{ emptyText: '暂无片段，请先添加' }}
+      renderItem={(record: VideoSegment, index: number) => (
+        <List.Item
+          key={`${record.start}-${record.end}-${index}`}
+          actions={[
+            <Tooltip key="edit" title="编辑">
+              <Button type="text" icon={<EditOutlined />} onClick={() => onEdit(index)} />
+            </Tooltip>,
+            <Tooltip key="preview" title="预览">
+              <Button type="text" icon={<PlayCircleOutlined />} onClick={() => onPreview(index)} />
+            </Tooltip>,
+            <Tooltip key="delete" title="删除">
+              <Button type="text" danger icon={<DeleteOutlined />} onClick={() => onDelete(index)} />
+            </Tooltip>,
+          ]}
+        >
+          <List.Item.Meta
+            title={
+              <Space size={10} wrap>
+                <Tag>{getTypeLabel(record.type || '')}</Tag>
+                <Text>{formatDuration(record.start)} - {formatDuration(record.end)}</Text>
+                <Text type="secondary">时长 {formatDuration(record.end - record.start)}</Text>
+              </Space>
+            }
+            description={
+              <div className={styles.contentCell}>
+                {record.content || <span className={styles.emptyContent}>（无内容）</span>}
+              </div>
+            }
+          />
+        </List.Item>
+      )}
     />
   );
 };

@@ -3,31 +3,32 @@
  */
 import React from 'react';
 import { Card, Form, Switch, Select, Button, Space, Divider, message } from 'antd';
-import { SettingOutlined, GlobalOutlined, SaveOutlined, UndoOutlined } from '@ant-design/icons';
+import { SettingOutlined, UndoOutlined } from '@ant-design/icons';
+import type { ProjectSaveBehavior } from '@/shared/constants/settings';
 
 const { Option } = Select;
 
 interface GeneralSettingsPanelProps {
   autoSave: boolean;
   compactMode: boolean;
-  language: string;
   theme: string;
+  projectSaveBehavior: ProjectSaveBehavior;
   onAutoSaveChange: (v: boolean) => void;
   onCompactModeChange: (v: boolean) => void;
-  onLanguageChange: (v: string) => void;
   onThemeChange: (v: string) => void;
+  onProjectSaveBehaviorChange: (v: ProjectSaveBehavior) => void;
   onReset: () => void;
 }
 
 const GeneralSettingsPanel: React.FC<GeneralSettingsPanelProps> = ({
   autoSave,
   compactMode,
-  language,
   theme,
+  projectSaveBehavior,
   onAutoSaveChange,
   onCompactModeChange,
-  onLanguageChange,
   onThemeChange,
+  onProjectSaveBehaviorChange,
   onReset,
 }) => {
   const handleReset = () => {
@@ -56,19 +57,22 @@ const GeneralSettingsPanel: React.FC<GeneralSettingsPanelProps> = ({
           />
         </Form.Item>
 
-        <Form.Item label={<><GlobalOutlined /> 语言</>}>
-          <Select value={language} onChange={onLanguageChange} style={{ width: 200 }}>
-            <Option value="zh-CN">简体中文</Option>
-            <Option value="en-US">English</Option>
-            <Option value="ja-JP">日本語</Option>
-          </Select>
-        </Form.Item>
-
         <Form.Item label="主题">
           <Select value={theme} onChange={onThemeChange} style={{ width: 200 }}>
             <Option value="light">浅色</Option>
             <Option value="dark">深色</Option>
             <Option value="auto">跟随系统</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item label="项目保存后跳转">
+          <Select<ProjectSaveBehavior>
+            value={projectSaveBehavior}
+            onChange={onProjectSaveBehaviorChange}
+            style={{ width: 220 }}
+          >
+            <Option value="stay">留在编辑页</Option>
+            <Option value="detail">跳转项目详情</Option>
           </Select>
         </Form.Item>
 

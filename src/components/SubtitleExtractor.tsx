@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Typography, Button, Space, message, Select, Progress, List, Input, Empty, Switch } from 'antd';
 import { AudioOutlined, FileTextOutlined, EditOutlined, DownloadOutlined, SyncOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
+import { motion } from '@/components/common/motion-shim';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -109,8 +109,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
                 <Option value="auto">自动识别 (Auto)</Option>
                 <Option value="zh">中文 (Chinese)</Option>
                 <Option value="en">英文 (English)</Option>
-                <Option value="ja">日文 (Japanese)</Option>
-              </Select>
+                              </Select>
             </div>
             <div>
               <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>导出格式</Text>

@@ -3,8 +3,8 @@ import { Card, Button, Progress, message, Alert, Typography, Spin } from 'antd';
 import { VideoCameraOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api/core';
 import { v4 as uuidv4 } from 'uuid';
-import VideoUploader from './VideoUploader';
 import type { VideoAnalysis, KeyMoment, Emotion } from '../types';
+import VideoSelector from './VideoSelector';
 import styles from './VideoAnalyzer.module.less';
 
 const { Title, Paragraph } = Typography;
@@ -13,6 +13,14 @@ interface VideoAnalyzerProps {
   projectId: string;
   videoUrl?: string;
   onAnalysisComplete: (analysis: VideoAnalysis) => void;
+}
+
+interface AnalyzeVideoResult {
+  title?: string;
+  duration: number;
+  width: number;
+  height: number;
+  fps: number;
 }
 
 const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
@@ -39,7 +47,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       setProgress(10);
       
       // 调用Tauri后端分析视频
-      const videoMetadata = await invoke<any>('analyze_video', { 
+      const videoMetadata = await invoke<AnalyzeVideoResult>('analyze_video', { 
         path: selectedVideoUrl 
       }).catch(err => {
         console.error('视频分析失败:', err);
@@ -104,15 +112,15 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
         duration: videoMetadata.duration,
         keyMoments,
         emotions,
-        summary: `视频时长: ${Math.round(videoMetadata.duration)}秒，分辨率: ${videoMetadata.width}x${videoMetadata.height}，帧率: ${videoMetadata.fps}帧/秒。`
+        summary: `视频时长: ${Math.round(videoMetadata.duration)}秒，分辨率: ${videoMetadata.width}x${videoMetadata.height}，帧率: ${videoMetadata.fps}帧/秒。关键帧数量: ${keyFrames.length}。${thumbnail ? '已生成缩略图。' : ''}`
       };
       
       setProgress(100);
       
       message.success('视频分析完成');
       onAnalysisComplete(analysis);
-    } catch (error: any) {
-      setError(error.message || '视频分析失败');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : '视频分析失败');
       message.error('视频分析失败，请稍后重试');
     } finally {
       setLoading(false);
@@ -143,9 +151,9 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
             <span className={styles.url}>{selectedVideoUrl}</span>
           </div>
         ) : (
-          <VideoUploader 
-            initialValue={selectedVideoUrl} 
-            onUploadSuccess={(url) => setSelectedVideoUrl(url)}
+          <VideoSelector
+            initialVideoPath={selectedVideoUrl}
+            onVideoSelect={(filePath) => setSelectedVideoUrl(filePath)}
           />
         )}
       </div>

@@ -4,18 +4,22 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { workflowService } from '@/core/services';
+import { workflowService } from '@/core/services/workflow/workflowService';
 import type {
+  AIModel,
+  ScriptData,
+  ExportSettings,
+  VideoAnalysis,
+  ScriptTemplate,
+} from '@/core/types';
+import type {
+  TimelineData,
   WorkflowState,
   WorkflowData,
   WorkflowConfig,
   WorkflowCallbacks,
   WorkflowStep,
-  ScriptData,
-  ExportSettings,
-  VideoAnalysis,
-  ScriptTemplate
-} from '@/core/types';
+} from '@/core/services/workflow/types';
 
 export interface UseWorkflowReturn {
   // 状态
@@ -45,11 +49,15 @@ export interface UseWorkflowReturn {
   start: (projectId: string, videoFile: File, config: WorkflowConfig) => Promise<void>;
   analyze: () => Promise<VideoAnalysis>;
   selectTemplate: (templateId?: string) => Promise<ScriptTemplate>;
-  generateScript: (model: any, params: any) => Promise<ScriptData>;
-  dedupScript: (config?: any) => Promise<{ script: ScriptData; report: any }>;
-  ensureUniqueness: (config?: any) => Promise<{ script: ScriptData; isUnique: boolean; attempts: number }>;
+  generateScript: (model: AIModel, params: WorkflowConfig['scriptParams']) => Promise<ScriptData>;
+  dedupScript: (
+    config?: WorkflowConfig['dedupConfig']
+  ) => Promise<{ script: ScriptData; report: WorkflowData['originalityReport'] }>;
+  ensureUniqueness: (
+    config?: WorkflowConfig['uniquenessConfig']
+  ) => Promise<{ script: ScriptData; isUnique: boolean; attempts: number }>;
   editScript: (script: ScriptData) => Promise<ScriptData>;
-  editTimeline: (autoMatch?: boolean) => Promise<any>;
+  editTimeline: (autoMatch?: boolean) => Promise<TimelineData>;
   preview: () => Promise<string>;
   export: (settings: ExportSettings) => Promise<string>;
   pause: () => void;
@@ -126,19 +134,19 @@ export function useWorkflow(callbacks?: WorkflowCallbacks): UseWorkflowReturn {
     return result;
   }, []);
 
-  const generateScript = useCallback(async (model: any, params: any) => {
+  const generateScript = useCallback(async (model: AIModel, params: WorkflowConfig['scriptParams']) => {
     const result = await workflowService.stepGenerateScript(model, params);
     setState(workflowService.getState());
     return result;
   }, []);
 
-  const dedupScript = useCallback(async (config?: any) => {
+  const dedupScript = useCallback(async (config?: WorkflowConfig['dedupConfig']) => {
     const result = await workflowService.stepDedupScript(config);
     setState(workflowService.getState());
     return result;
   }, []);
 
-  const ensureUniqueness = useCallback(async (config?: any) => {
+  const ensureUniqueness = useCallback(async (config?: WorkflowConfig['uniquenessConfig']) => {
     const result = await workflowService.stepEnsureUniqueness(config);
     setState(workflowService.getState());
     return result;

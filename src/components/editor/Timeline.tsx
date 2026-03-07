@@ -30,7 +30,6 @@ import {
   SoundOutlined,
   FontSizeOutlined,
   ThunderboltOutlined,
-  DragHandleOutlined,
   ShrinkOutlined,
   ArrowsAltOutlined,
   LockOutlined,
@@ -600,7 +599,7 @@ const Timeline: React.FC<TimelineProps> = ({
       endTime: currentTime + copiedClip.duration
     };
 
-    const track = tracks.find(t => t.type === copiedClip.type);
+    const track = tracks.find(t => t.id === copiedClip.trackId);
     if (!track) {
       message.warning('没有对应的轨道类型');
       return;
@@ -1238,7 +1237,7 @@ const Timeline: React.FC<TimelineProps> = ({
           <Tooltip title={snapEnabled ? '关闭吸附' : '开启吸附'}>
             <Button
               type="text"
-              icon={snapEnabled ? <DragHandleOutlined /> : <DragHandleOutlined style={{ opacity: 0.5 }} />}
+              icon={snapEnabled ? <DragOutlined /> : <DragOutlined style={{ opacity: 0.5 }} />}
               onClick={() => setSnapEnabled(!snapEnabled)}
               className={snapEnabled ? styles.activeAction : ''}
             >
@@ -1361,6 +1360,3 @@ const Timeline: React.FC<TimelineProps> = ({
 };
 
 export default Timeline;
-
-// Export types for external use
-export type { Track, Clip, Keyframe, Transition, ClipProperties };

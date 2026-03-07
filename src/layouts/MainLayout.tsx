@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Button, Drawer, Tooltip, Badge, Avatar, Dropdown, Space, Typography } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import type { ItemType } from 'antd/es/menu/interface';
 import {
   HomeOutlined,
   VideoCameraOutlined,
@@ -25,7 +26,7 @@ import {
   FireOutlined
 } from '@ant-design/icons';
 import { useTheme } from '@/context/ThemeContext';
-import { useAppStore } from '@/store/app';
+import { useAppStore } from '@/store';
 import NotificationCenter from '@/components/NotificationCenter';
 import styles from './MainLayout.module.less';
 
@@ -33,7 +34,7 @@ const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 
 // 页脚组件
-const Footer = () => (
+const Footer: React.FC = () => (
   <div className={styles.footer}>
     <div className={styles.footerContent}>
       <div className={styles.footerLinks}>
@@ -63,12 +64,11 @@ const MainLayout: React.FC = () => {
 
   useEffect(() => {
     // 检查Tauri功能是否可用
-    const checkTauriSupport = async () => {
+    const checkTauriSupport = async (): Promise<void> => {
       try {
-        // 简单地检查是否可以导入Tauri API
-        await import('@tauri-apps/api/tauri');
-        setTauriSupported(true);
-      } catch {
+        const tauriAvailable = typeof window !== 'undefined' && '__TAURI__' in window;
+        setTauriSupported(tauriAvailable);
+      } catch (error) {
         console.warn('Tauri功能不可用:', error);
         setTauriSupported(false);
       }
@@ -89,7 +89,7 @@ const MainLayout: React.FC = () => {
   }, [mobileDrawerOpen]);
 
   // 用户菜单选项
-  const userMenuItems = [
+  const userMenuItems: ItemType[] = [
     {
       key: 'profile',
       icon: <UserOutlined />,
@@ -117,7 +117,7 @@ const MainLayout: React.FC = () => {
   ];
 
   // 导航菜单项
-  const menuItems = [
+  const menuItems: ItemType[] = [
     {
       key: '/',
       icon: <HomeOutlined />,

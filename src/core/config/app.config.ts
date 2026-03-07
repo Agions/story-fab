@@ -6,7 +6,7 @@
 // 应用信息
 export const APP_CONFIG = {
   name: 'ClipFlow',
-  version: '2.0.0',
+  version: '1.0.0',
   description: 'AI驱动的专业视频内容创作平台',
   repository: 'https://github.com/Agions/clipflow',
   license: 'MIT'
@@ -28,46 +28,6 @@ export const API_CONFIG = {
   timeout: 30000,
   retryCount: 3,
   retryDelay: 1000
-} as const;
-
-// 支持的 AI 模型
-export const AI_MODELS = {
-  qwen: {
-    id: 'qwen',
-    name: '通义千问',
-    provider: '阿里云',
-    description: '阿里云通义千问大模型',
-    apiKeyFormat: 'API_KEY',
-    defaultModel: 'qwen3.5-plus',
-    baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1'
-  },
-  baidu: {
-    id: 'baidu',
-    name: '文心一言',
-    provider: '百度',
-    description: '百度文心大模型',
-    apiKeyFormat: 'API_KEY:SECRET_KEY',
-    defaultModel: 'ernie-5.0',
-    baseUrl: 'https://qianfan.baidubce.com/v2'
-  },
-  glm5: {
-    id: 'glm5',
-    name: '智谱 GLM-5',
-    provider: '智谱AI',
-    description: '智谱最新 GLM-5 大模型',
-    apiKeyFormat: 'API_KEY',
-    defaultModel: 'glm-5',
-    baseUrl: 'https://open.bigmodel.cn/api/paas/v4'
-  },
-  minimax: {
-    id: 'minimax',
-    name: 'MiniMax',
-    provider: 'MiniMax',
-    description: 'MiniMax M2.5 大模型',
-    apiKeyFormat: 'API_KEY',
-    defaultModel: 'minimax-m2.5',
-    baseUrl: 'https://api.minimax.chat/v1'
-  }
 } as const;
 
 // 视频处理配置

@@ -1,4 +1,4 @@
-import type { Timeline } from '@/core/types';
+import type { Timeline } from './types';
 
 const STORAGE_KEY = 'reelforge_timeline';
 

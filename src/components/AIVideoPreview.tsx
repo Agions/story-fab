@@ -2,8 +2,8 @@
  * 视频预览区 + 时间轴
  * 简化的 AI 剪辑专用时间轴
  */
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Layout, Button, Slider, Typography, Space, Upload, Progress, message } from 'antd';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { Button, Slider, Typography, Space, Upload, message, type UploadProps } from 'antd';
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
@@ -18,8 +18,26 @@ import { useAIEditor } from './AIPanel/AIEditorContext';
 import type { VideoInfo } from '@/core/types';
 import styles from './AIVideoPreview.module.less';
 
-const { Content } = Layout;
 const { Text } = Typography;
+
+interface ClipSuggestionCompat {
+  id: string;
+  description: string;
+  confidence: number;
+}
+
+interface CutPointCompat {
+  id: string;
+  timestamp: number;
+  type: 'scene' | 'silence' | 'highlight';
+  description: string;
+}
+
+interface ClipResultCompat {
+  suggestions: ClipSuggestionCompat[];
+  cutPoints: CutPointCompat[];
+  segments: Array<{ id: string }>;
+}
 
 // 格式化时间
 const formatTime = (seconds: number): string => {
@@ -31,10 +49,28 @@ const formatTime = (seconds: number): string => {
 const AIVideoPreview: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { state, setVideo, setPlaying, setCurrentTime, dispatch } = useAIEditor();
-  const { isPlaying, currentTime, duration, currentVideo, clipResult } = state;
+  const { isPlaying, currentTime, duration, currentVideo, analysis } = state;
   
   const [isDragging, setIsDragging] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  const clipResult = useMemo<ClipResultCompat>(() => {
+    const scenes = analysis?.scenes || [];
+    return {
+      segments: scenes.map(scene => ({ id: scene.id })),
+      cutPoints: scenes.map((scene, index) => ({
+        id: scene.id || `scene-${index}`,
+        timestamp: scene.startTime,
+        type: 'scene',
+        description: scene.description || `场景 ${index + 1}`
+      })),
+      suggestions: scenes.slice(0, 5).map((scene, index) => ({
+        id: scene.id || `suggestion-${index}`,
+        description: scene.description || `建议保留 ${formatTime(scene.startTime)} 的关键片段`,
+        confidence: Number(scene.confidence ?? 0.8)
+      }))
+    };
+  }, [analysis]);
 
   // 视频加载完成
   const handleLoadedMetadata = () => {
@@ -79,12 +115,12 @@ const AIVideoPreview: React.FC = () => {
   };
 
   // 进度条拖动
-  const handleProgressChange = (value: number) => {
-    seekTo(value);
+  const handleProgressChange = (value: number | number[]) => {
+    seekTo(Array.isArray(value) ? value[0] : value);
   };
 
   // 文件上传
-  const handleUpload = (file: File) => {
+  const handleUploadFile = (file: File) => {
     // 验证文件类型
     if (!file.type.startsWith('video/')) {
       message.error('请上传视频文件');
@@ -110,7 +146,7 @@ const AIVideoPreview: React.FC = () => {
       width: 0,
       height: 0,
       fps: 30,
-      format: file.type.split('/')[1],
+      format: file.type.split('/')[1] || 'mp4',
       size: file.size,
       createdAt: new Date().toISOString(),
     };
@@ -119,6 +155,10 @@ const AIVideoPreview: React.FC = () => {
     message.success(`已加载视频: ${file.name}`);
 
     return false; // 阻止默认上传
+  };
+
+  const handleUpload: UploadProps['beforeUpload'] = (file) => {
+    return handleUploadFile(file);
   };
 
   // 视频元数据加载
@@ -135,7 +175,7 @@ const AIVideoPreview: React.FC = () => {
   };
 
   // 清除视频
-  const handleClearVideo = () => {
+  const handleClearVideo = useCallback(() => {
     if (videoUrl) {
       URL.revokeObjectURL(videoUrl);
     }
@@ -143,7 +183,15 @@ const AIVideoPreview: React.FC = () => {
     setVideo(null);
     setCurrentTime(0);
     setPlaying(false);
-  };
+  }, [videoUrl, setVideo, setCurrentTime, setPlaying]);
+
+  useEffect(() => {
+    return () => {
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+      }
+    };
+  }, [videoUrl]);
 
   // 键盘快捷键
   useEffect(() => {
@@ -186,7 +234,7 @@ const AIVideoPreview: React.FC = () => {
       );
     }
 
-    if (clipResult && clipResult.suggestions.length > 0) {
+    if (clipResult.suggestions.length > 0) {
       return (
         <div className={styles.suggestionsList}>
           {clipResult.suggestions.slice(0, 5).map((suggestion, index) => (
@@ -240,7 +288,9 @@ const AIVideoPreview: React.FC = () => {
                 e.preventDefault();
                 setIsDragging(false);
                 const file = e.dataTransfer.files[0];
-                if (file) handleUpload(file);
+                if (file) {
+                  void handleUploadFile(file);
+                }
               }}
             >
               <UploadOutlined className={styles.uploadIcon} />
@@ -328,7 +378,7 @@ const AIVideoPreview: React.FC = () => {
           <Text strong style={{ color: '#ccc' }}>时间轴</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
             {currentVideo 
-              ? `已加载 ${clipResult?.segments?.length || 0} 个片段`
+              ? `已加载 ${clipResult.segments.length} 个片段`
               : '已加载 0 个片段'}
           </Text>
         </div>
@@ -350,7 +400,7 @@ const AIVideoPreview: React.FC = () => {
               </div>
               
               {/* AI 剪辑点轨道 */}
-              {clipResult && clipResult.cutPoints.length > 0 && (
+              {clipResult.cutPoints.length > 0 && (
                 <div className={styles.track}>
                   <Text type="secondary" style={{ fontSize: 11 }}>AI 剪辑点</Text>
                   <div className={styles.trackBar}>
@@ -359,7 +409,7 @@ const AIVideoPreview: React.FC = () => {
                         key={point.id}
                         className={styles.cutPoint}
                         style={{ 
-                          left: `${(point.timestamp / duration) * 100}%`,
+                          left: `${(point.timestamp / (duration || 1)) * 100}%`,
                           backgroundColor: point.type === 'scene' ? '#1890ff' : 
                             point.type === 'silence' ? '#ff4d4f' : '#52c41a'
                         }}

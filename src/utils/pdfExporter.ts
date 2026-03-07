@@ -5,7 +5,14 @@ import 'jspdf-autotable';
 // 声明扩展模块，解决TypeScript类型问题
 declare module 'jspdf' {
   interface jsPDF {
-    autoTable: (options: any) => jsPDF;
+    autoTable: (options: {
+      startY?: number;
+      head: string[][];
+      body: string[][];
+      headStyles?: { fillColor?: [number, number, number] };
+      styles?: { overflow?: 'linebreak' | 'ellipsize' | 'hidden' | 'visible'; cellWidth?: 'auto' | 'wrap' | number };
+      columnStyles?: Record<number, { cellWidth?: 'auto' | 'wrap' | number }>;
+    }) => jsPDF;
   }
 }
 
@@ -74,7 +81,7 @@ export const exportScriptToPDF = (script: Script, projectName: string) => {
   });
   
   // 添加页脚
-  const pageCount = (doc as any).internal.pages.length - 1;
+  const pageCount = ((doc as jsPDF & { internal: { pages: unknown[] } }).internal.pages?.length || 1) - 1;
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);

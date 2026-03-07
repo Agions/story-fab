@@ -7,6 +7,8 @@ import { useState, useCallback, useMemo } from 'react';
 import { costService } from '@/core/services/cost.service';
 import { OPTIMIZATION_CONFIG } from '@/core/config/optimization.config';
 import { aiService } from '@/core/services/ai.service';
+import { getModelById } from '@/core/config/models.config';
+import type { AIModelSettings } from '@/core/types';
 
 // 任务类型
 export type TaskType = 'simple' | 'standard' | 'complex' | 'creative';
@@ -122,6 +124,15 @@ export function useSmartModel() {
       // 获取模型建议
       const suggestion = costService.getModelSuggestion(taskType, budgetLevel);
       const { model, provider } = suggestion;
+      const modelMeta = getModelById(model);
+      if (!modelMeta) {
+        throw new Error(`模型不存在: ${model}`);
+      }
+      const settings: AIModelSettings = {
+        enabled: true,
+        apiKey: '',
+        model
+      };
 
       // 调用 AI 服务
       let lastError: Error | null = null;
@@ -132,11 +143,20 @@ export function useSmartModel() {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-          result = await aiService.generate(prompt, {
-            model,
-            provider,
-            signal: controller.signal
-          });
+          const generated = await aiService.generateScript(
+            modelMeta,
+            settings,
+            {
+              topic: prompt.slice(0, 50) || 'AI 生成内容',
+              style: 'casual',
+              tone: 'neutral',
+              length: 'medium',
+              audience: 'general',
+              language: 'zh-CN',
+              requirements: `taskType=${taskType}; budgetLevel=${budgetLevel}; provider=${provider}`,
+            }
+          );
+          result = generated.content;
 
           clearTimeout(timeoutId);
           break;

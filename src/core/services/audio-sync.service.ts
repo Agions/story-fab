@@ -50,6 +50,8 @@ export interface SyncTimeline {
   issues: SyncIssue[];
 }
 
+type TimelineSegment = SyncTimeline['videoSegments'][number];
+
 // 默认配置
 const DEFAULT_CONFIG: SyncConfig = {
   silenceThreshold: -40,
@@ -195,7 +197,7 @@ export class AudioVideoSyncService {
   /**
    * 导出同步后的时间轴
    */
-  exportTimeline(segments: any[]): SyncTimeline {
+  exportTimeline(segments: TimelineSegment[]): SyncTimeline {
     const offsetSeconds = this.config.audioOffset / 1000;
     
     return {

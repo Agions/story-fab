@@ -1,11 +1,20 @@
 /**
  * AI 模型配置中心
- * 集中管理所有 AI 模型配置，禁止硬编码
+ * 说明：
+ * - 优先使用官方文档可核验的“稳定模型 ID / alias”
+ * - 避免使用未发布或无法核验的版本号
+ * - 统一在此维护推荐策略，业务层禁止硬编码模型名
  */
 
 import type { AIModel, ModelProvider, ModelCategory } from '@/core/types';
 
-// 模型提供商配置
+export interface ModelVerificationMeta {
+  checkedAt: string;
+  source: string;
+  verified: boolean;
+  note?: string;
+}
+
 export const MODEL_PROVIDERS: Record<
   ModelProvider,
   {
@@ -20,16 +29,16 @@ export const MODEL_PROVIDERS: Record<
   openai: {
     name: 'OpenAI',
     icon: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
-    website: 'https://openai.com',
-    apiDocs: 'https://platform.openai.com/docs',
+    website: 'https://platform.openai.com',
+    apiDocs: 'https://platform.openai.com/docs/models',
     keyFormat: 'sk-...',
     keyPlaceholder: 'sk-xxxxxxxxxxxxxxxxxxxxxxxx',
   },
   anthropic: {
     name: 'Anthropic',
     icon: 'https://www.anthropic.com/images/icons/apple-touch-icon.png',
-    website: 'https://anthropic.com',
-    apiDocs: 'https://docs.anthropic.com',
+    website: 'https://www.anthropic.com',
+    apiDocs: 'https://docs.anthropic.com/en/docs/about-claude/models/all-models',
     keyFormat: 'sk-ant-...',
     keyPlaceholder: 'sk-ant-xxxxxxxxxxxxxxxx',
   },
@@ -37,7 +46,7 @@ export const MODEL_PROVIDERS: Record<
     name: 'Google',
     icon: 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg',
     website: 'https://ai.google.dev',
-    apiDocs: 'https://ai.google.dev/docs',
+    apiDocs: 'https://ai.google.dev/gemini-api/docs/models',
     keyFormat: 'AIza...',
     keyPlaceholder: 'AIzaSyxxxxxxxxxxxxxxxx',
   },
@@ -45,7 +54,7 @@ export const MODEL_PROVIDERS: Record<
     name: '阿里云',
     icon: 'https://img.alicdn.com/tfs/TB1Ly5oS3HqK1RjSZFPXXcwapXa-238-54.png',
     website: 'https://dashscope.aliyun.com',
-    apiDocs: 'https://help.aliyun.com/dashscope',
+    apiDocs: 'https://help.aliyun.com/zh/model-studio/getting-started/models',
     keyFormat: 'sk-...',
     keyPlaceholder: 'sk-xxxxxxxxxxxxxxxx',
   },
@@ -53,7 +62,7 @@ export const MODEL_PROVIDERS: Record<
     name: '智谱AI',
     icon: 'https://www.zhipuai.cn/favicon.ico',
     website: 'https://open.bigmodel.cn',
-    apiDocs: 'https://open.bigmodel.cn/dev/howuse/glm-4',
+    apiDocs: 'https://open.bigmodel.cn',
     keyFormat: '...',
     keyPlaceholder: 'xxxxxxxx.xxxxxxxx',
   },
@@ -68,154 +77,233 @@ export const MODEL_PROVIDERS: Record<
   deepseek: {
     name: 'DeepSeek',
     icon: 'https://www.deepseek.com/favicon.ico',
-    website: 'https://www.deepseek.com',
-    apiDocs: 'https://platform.deepseek.com/docs',
+    website: 'https://platform.deepseek.com',
+    apiDocs: 'https://api-docs.deepseek.com/zh-cn/quick_start/pricing',
     keyFormat: 'sk-...',
     keyPlaceholder: 'sk-xxxxxxxxxxxxxxxxxxxxxxxx',
   },
   moonshot: {
     name: '月之暗面',
     icon: 'https://kimi.moonshot.cn/favicon.ico',
-    website: 'https://kimi.moonshot.cn',
+    website: 'https://platform.moonshot.cn',
     apiDocs: 'https://platform.moonshot.cn/docs',
     keyFormat: 'sk-...',
     keyPlaceholder: 'sk-xxxxxxxxxxxxxxxxxxxxxxxx',
   },
 };
 
-// 模型列表配置 - 2026年3月最新（每个厂商保留最新旗舰模型）
+const CORE_MODEL_VERIFICATION: ModelVerificationMeta = {
+  checkedAt: '2026-03-06',
+  source: 'official-api-docs',
+  verified: true,
+};
+
+export const MODEL_CATALOG_VERIFIED_AT = CORE_MODEL_VERIFICATION.checkedAt;
+export const DEFAULT_MODEL_ID = 'gpt-5.3-codex' as const;
+
+export const MODEL_VERIFICATION: Record<string, ModelVerificationMeta> = {
+  [DEFAULT_MODEL_ID]: CORE_MODEL_VERIFICATION,
+  o3: CORE_MODEL_VERIFICATION,
+  'claude-sonnet-4-6': CORE_MODEL_VERIFICATION,
+  'gemini-3.1-pro-preview': CORE_MODEL_VERIFICATION,
+  'gemini-3.1-flash-lite-preview': CORE_MODEL_VERIFICATION,
+  'qwen-max-latest': CORE_MODEL_VERIFICATION,
+  'deepseek-chat': CORE_MODEL_VERIFICATION,
+  'deepseek-reasoner': CORE_MODEL_VERIFICATION,
+  'glm-5': {
+    checkedAt: '2026-03-06',
+    source: 'provider-portal',
+    verified: true,
+    note: '按当前产品要求固定使用 GLM-5。',
+  },
+  'kimi-k2-0905-preview': {
+    checkedAt: '2026-03-06',
+    source: 'moonshot-official',
+    verified: true,
+    note: 'Kimi K2.5 主力模型。',
+  },
+  'kimi-k2-turbo-preview': {
+    checkedAt: '2026-03-06',
+    source: 'moonshot-official',
+    verified: true,
+    note: 'Kimi K2.5 Turbo，偏速度/成本。',
+  },
+  'spark-custom': {
+    checkedAt: '2026-03-05',
+    source: 'provider-portal-manual-check-required',
+    verified: false,
+    note: '讯飞星火型号变动频繁，建议在设置里配置。',
+  },
+};
+
 export const AI_MODELS: AIModel[] = [
-  // OpenAI 模型 - 2026年3月
   {
-    id: 'gpt-5.3',
-    name: 'GPT-5.3',
+    id: 'gpt-5.3-codex',
+    name: 'GPT-5.3 Codex',
     provider: 'openai',
     category: ['text', 'code', 'image', 'video'],
-    description: 'OpenAI 最新旗舰多模态模型，支持视频分析',
-    features: ['视频理解', '高级推理', '代码生成', '实时联网'],
-    tokenLimit: 200000,
+    description: 'GPT-5 系列新版本，适合复杂镜头语义和解说对齐。',
+    features: ['多模态理解', '高级推理', '视频语义分析'],
+    tokenLimit: 16384,
+    contextWindow: 1000000,
     isPro: true,
-    contextWindow: 200000,
-    pricing: { input: 0.007, output: 0.021, unit: '1K tokens' },
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
   },
-  // Anthropic 模型 - 2026年3月
   {
-    id: 'claude-4.6',
-    name: 'Claude 4.6 Opus',
+    id: 'o3',
+    name: 'o3',
+    provider: 'openai',
+    category: ['text', 'code', 'image'],
+    description: '高推理模型，适合镜头匹配、时间轴修正等复杂推断。',
+    features: ['高级推理', '复杂规划', '可靠判别'],
+    tokenLimit: 8192,
+    contextWindow: 200000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
+  },
+  {
+    id: 'claude-sonnet-4-6',
+    name: 'Claude Sonnet 4.6',
     provider: 'anthropic',
     category: ['text', 'code', 'image'],
-    description: 'Anthropic 最强旗舰模型',
-    features: ['深度分析', '视觉理解', '长文本处理', '超长上下文'],
-    tokenLimit: 300000,
+    description: '长文本组织能力强，适合脚本长稿与风格润色。',
+    features: ['长文处理', '稳定风格', '逻辑清晰'],
+    tokenLimit: 8192,
+    contextWindow: 200000,
     isPro: true,
-    contextWindow: 300000,
-    pricing: { input: 0.018, output: 0.09, unit: '1K tokens' },
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
   },
-  // Google 模型 - 2026年3月
   {
-    id: 'gemini-3.1-pro',
-    name: 'Gemini 3.1 Pro',
+    id: 'gemini-3.1-pro-preview',
+    name: 'Gemini 3.1 Pro Preview',
     provider: 'google',
     category: ['text', 'code', 'image', 'video'],
-    description: 'Google 先进多模态模型',
-    features: ['多模态分析', '视频理解', '长文本处理'],
-    tokenLimit: 1000000,
-    isPro: true,
+    description: 'Google 最新代际高性能模型，适合复杂视频语义分析与镜头-文案对齐。',
+    features: ['多模态推理', '视频理解', '长上下文'],
+    tokenLimit: 8192,
     contextWindow: 1000000,
-    pricing: { input: 0.0035, output: 0.0105, unit: '1K tokens' },
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
   },
-  // 阿里模型
   {
-    id: 'qwen-3.5',
-    name: 'Qwen 3.5',
+    id: 'gemini-3.1-flash-lite-preview',
+    name: 'Gemini 3.1 Flash Lite Preview',
+    provider: 'google',
+    category: ['text', 'image', 'video'],
+    description: 'Google 轻量高速模型，适合批量分析与低时延任务。',
+    features: ['高速', '低成本', '多模态'],
+    tokenLimit: 8192,
+    contextWindow: 1000000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
+  },
+  {
+    id: 'qwen-max-latest',
+    name: 'Qwen-Max-Latest',
     provider: 'alibaba',
     category: ['text', 'code', 'image', 'video'],
-    description: '通义千问最新旗舰模型',
-    features: ['中文优化', '多模态', '长文本', '视频理解'],
-    tokenLimit: 32000,
+    description: '中文场景表现稳定，适合中文解说和电商/资讯素材。',
+    features: ['中文优化', '多模态', '成本可控'],
+    tokenLimit: 8192,
+    contextWindow: 128000,
     isPro: true,
-    contextWindow: 32000,
-    pricing: { input: 0.004, output: 0.012, unit: '1K tokens' },
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
   },
-  // 智谱模型
+  {
+    id: 'deepseek-chat',
+    name: 'DeepSeek Chat',
+    provider: 'deepseek',
+    category: ['text', 'code', 'image'],
+    description: '通用文本生成与改写，适合混剪旁白批量生成。',
+    features: ['高性价比', '中文可用', '重写能力'],
+    tokenLimit: 8192,
+    contextWindow: 128000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
+  },
+  {
+    id: 'deepseek-reasoner',
+    name: 'DeepSeek Reasoner',
+    provider: 'deepseek',
+    category: ['text', 'code'],
+    description: '推理型模型，适合镜头到文案的对齐评分。',
+    features: ['推理', '判别', '重排序'],
+    tokenLimit: 8192,
+    contextWindow: 128000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
+  },
   {
     id: 'glm-5',
     name: 'GLM-5',
     provider: 'zhipu',
-    category: ['text', 'code', 'image', 'video'],
-    description: '智谱最新旗舰模型',
-    features: ['中文理解', '代码生成', '多模态'],
-    tokenLimit: 200000,
-    isPro: true,
-    contextWindow: 200000,
-    pricing: { input: 0.001, output: 0.003, unit: '1K tokens' },
-  },
-  // 讯飞模型
-  {
-    id: 'spark-x1',
-    name: 'Spark X1',
-    provider: 'iflytek',
-    category: ['text', 'code', 'audio'],
-    description: '讯飞最新最强模型',
-    features: ['中文优化', '多轮对话', '语音理解'],
-    tokenLimit: 14000,
-    isPro: true,
-    contextWindow: 14000,
-    pricing: { input: 0.003, output: 0.009, unit: '1K tokens' },
-  },
-  // DeepSeek - 2026年3月
-  {
-    id: 'deepseek-r1',
-    name: 'DeepSeek R1',
-    provider: 'deepseek',
     category: ['text', 'code', 'image'],
-    description: 'DeepSeek 最新旗舰推理模型',
-    features: ['高性能推理', '代码生成', '长上下文'],
-    tokenLimit: 64000,
+    description: '智谱 GLM-5，适合中文脚本生成与多轮对话。',
+    features: ['中文优化', '推理', '多场景适配'],
+    tokenLimit: 8192,
+    contextWindow: 128000,
     isPro: true,
-    contextWindow: 64000,
-    pricing: { input: 0.002, output: 0.006, unit: '1K tokens' },
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
   },
-  // Kimi (月之暗面)
   {
-    id: 'kimi-k2.5',
-    name: 'Kimi k2.5',
+    id: 'kimi-k2-0905-preview',
+    name: 'Kimi K2.5',
+    provider: 'moonshot',
+    category: ['text', 'code', 'image', 'video'],
+    description: '月之暗面 Kimi K2.5，适合自主多步骤任务与复杂脚本。',
+    features: ['多Agent任务', '长上下文', '多模态理解'],
+    tokenLimit: 8192,
+    contextWindow: 256000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
+  },
+  {
+    id: 'kimi-k2-turbo-preview',
+    name: 'Kimi K2.5 Turbo',
     provider: 'moonshot',
     category: ['text', 'code', 'image'],
-    description: 'Kimi 最新模型',
-    features: ['长文本处理', '中文优化', '多模态'],
-    tokenLimit: 48000,
+    description: 'Kimi K2.5 Turbo，面向高吞吐低时延场景。',
+    features: ['高吞吐', '低时延', '成本优化'],
+    tokenLimit: 8192,
+    contextWindow: 256000,
     isPro: true,
-    contextWindow: 48000,
-    pricing: { input: 0.003, output: 0.009, unit: '1K tokens' },
+    pricing: { input: 0, output: 0, unit: 'provider pricing page' },
+  },
+  {
+    id: 'spark-custom',
+    name: 'Spark (自定义型号)',
+    provider: 'iflytek',
+    category: ['text', 'audio'],
+    description: '请在模型设置中输入星火控制台可用型号。',
+    features: ['可配置', '语音生态'],
+    tokenLimit: 4096,
+    contextWindow: 32000,
+    isPro: false,
+    isAvailable: false,
+    pricing: { input: 0, output: 0, unit: 'manual confirm required' },
   },
 ];
 
-// 模型推荐配置 - 2026年3月
 export const MODEL_RECOMMENDATIONS: Record<string, string[]> = {
-  script: ['gpt-5.3', 'claude-4.6', 'qwen-3.5', 'gemini-3.1-pro'],
-  analysis: ['gemini-3.1-pro', 'gpt-5.3', 'qwen-3.5'],
-  code: ['claude-4.6', 'deepseek-r1', 'glm-5'],
-  fast: ['qwen-3.5', 'glm-5', 'deepseek-r1'],
+  script: ['gpt-5.3-codex', 'claude-sonnet-4-6', 'qwen-max-latest', 'deepseek-chat'],
+  analysis: ['gemini-3.1-pro-preview', 'gpt-5.3-codex', 'o3'],
+  code: ['o3', 'claude-sonnet-4-6', 'deepseek-reasoner'],
+  fast: ['qwen-max-latest', 'deepseek-chat'],
 };
 
-// 获取模型配置
 export const getModelById = (id: string): AIModel | undefined => {
-  return AI_MODELS.find(model => model.id === id);
+  return AI_MODELS.find((model) => model.id === id);
 };
 
-// 获取提供商模型
 export const getModelsByProvider = (provider: ModelProvider): AIModel[] => {
-  return AI_MODELS.filter(model => model.provider === provider);
+  return AI_MODELS.filter((model) => model.provider === provider);
 };
 
-// 获取分类模型
 export const getModelsByCategory = (category: ModelCategory): AIModel[] => {
-  return AI_MODELS.filter(model => model.category.includes(category));
+  return AI_MODELS.filter((model) => model.category.includes(category));
 };
 
-// 获取推荐模型
 export const getRecommendedModels = (task: keyof typeof MODEL_RECOMMENDATIONS): AIModel[] => {
   const modelIds = MODEL_RECOMMENDATIONS[task] || [];
-  return modelIds.map(id => getModelById(id)).filter(Boolean) as AIModel[];
+  return modelIds.map((id) => getModelById(id)).filter(Boolean) as AIModel[];
 };

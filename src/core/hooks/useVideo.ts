@@ -7,7 +7,7 @@ import { useState, useCallback, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoInfo, VideoAnalysis, TaskStatus } from '@/core/types';
 
-interface UseVideoReturn {
+export interface UseVideoReturn {
   // 视频信息
   video: VideoInfo | null;
   analysis: VideoAnalysis | null;
@@ -216,11 +216,6 @@ export function useVideo(): UseVideoReturn {
         videoId,
         scenes: generateMockScenes(video.duration),
         keyframes: generateMockKeyframes(video.duration),
-        audioTranscript: {
-          segments: [],
-          fullText: '',
-          language: 'zh'
-        },
         objects: [],
         emotions: [],
         summary: `视频时长 ${formatDuration(video.duration)}，分辨率 ${video.width}x${video.height}，包含 ${Math.floor(video.duration / 30)} 个场景。`,

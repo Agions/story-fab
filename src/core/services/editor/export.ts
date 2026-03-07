@@ -1,19 +1,18 @@
-import type { Timeline, ExportSettings } from '@/core/types';
-import type { EditorConfig } from './types';
+import type { EditorExportSettings, Timeline } from './types';
 
 export async function exportTimeline(
   timeline: Timeline,
-  settings?: Partial<ExportSettings>,
-  defaultSettings?: ExportSettings
+  settings?: Partial<EditorExportSettings>,
+  defaultSettings?: EditorExportSettings
 ): Promise<Blob> {
-  const exportSettings = { ...defaultSettings, ...settings };
+  const _exportSettings = { ...defaultSettings, ...settings };
   // 这里应该调用 FFmpeg 或其他导出服务
   return new Blob(['export data'], { type: 'video/mp4' });
 }
 
 export function getExportPreview(
   timeline: Timeline,
-  defaultSettings: ExportSettings
+  defaultSettings: EditorExportSettings
 ): {
   duration: number;
   resolution: string;

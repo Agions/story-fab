@@ -5,7 +5,7 @@
 // 应用信息
 export const APP = {
   name: 'ClipFlow',
-  version: '2.0.0',
+  version: '1.0.0',
   description: 'AI 驱动的专业视频内容创作平台',
   author: 'Agions',
   website: 'https://github.com/Agions/ClipFlow',
@@ -26,8 +26,8 @@ export const AUDIO_FORMATS = ['mp3', 'wav', 'ogg', 'm4a', 'aac'];
 // 文件大小限制 (MB)
 export const FILE_LIMITS = {
   video: 2048, // 2GB
-  image: 10,    // 10MB
-  audio: 50,    // 50MB
+  image: 10, // 10MB
+  audio: 50, // 50MB
 };
 
 // 视频参数
@@ -140,17 +140,17 @@ export const API_ENDPOINTS = {
   // 项目
   projects: '/api/projects',
   project: (id: string) => `/api/projects/${id}`,
-  
+
   // 视频
   videos: '/api/videos',
   video: (id: string) => `/api/videos/${id}`,
   videoUpload: '/api/videos/upload',
-  
+
   // AI
   aiAnalyze: '/api/ai/analyze',
   aiGenerate: '/api/ai/generate',
   aiVoice: '/api/ai/voice',
-  
+
   // 导出
   export: '/api/export',
   exportStatus: (id: string) => `/api/export/${id}`,

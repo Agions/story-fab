@@ -3,20 +3,15 @@
  */
 import React, { useState } from 'react';
 import { 
-  Card, Button, Space, Typography, Select, Slider, 
-  Switch, Alert, Divider, Progress, message, Result, List, Tag, Row, Col, Radio, Tooltip, Badge
+  Card, Button, Space, Typography,
+  Switch, Alert, Divider, Progress, message, Result, Tag, Row, Col, Radio, Badge
 } from 'antd';
 import {
   ExportOutlined,
   DownloadOutlined,
   CheckCircleOutlined,
-  SettingOutlined,
   PlayCircleOutlined,
-  FileOutlined,
   VideoCameraOutlined,
-  AudioOutlined,
-  ThunderboltOutlined,
-  CheckSquareOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import type { ExportSettings } from '@/core/types';
@@ -29,8 +24,8 @@ const FORMAT_OPTIONS = [
   { value: 'mp4', label: 'MP4', desc: '通用格式，兼容性最好', icon: '🎬' },
   { value: 'mov', label: 'MOV', desc: 'Apple 格式，画质优秀', icon: '🍎' },
   { value: 'webm', label: 'WEBM', desc: 'Web 格式，适合在线播放', icon: '🌐' },
-  { value: 'avi', label: 'AVI', desc: '老旧格式，体积较大', icon: '📼' },
-];
+  { value: 'mkv', label: 'MKV', desc: '封装灵活，适合归档', icon: '📦' },
+] as const;
 
 // 质量选项
 const QUALITY_OPTIONS = [
@@ -38,23 +33,22 @@ const QUALITY_OPTIONS = [
   { value: 'medium', label: '标清', desc: '平衡画质和大小', bitrate: '3-5Mbps', size: '~30MB/min' },
   { value: 'high', label: '高清', desc: '清晰画质', bitrate: '8-12Mbps', size: '~60MB/min' },
   { value: 'ultra', label: '超清', desc: '4K 超高清', bitrate: '25-35Mbps', size: '~200MB/min' },
-];
+] as const;
 
 // 分辨率选项
 const RESOLUTION_OPTIONS = [
-  { value: '480p', label: '480p', desc: '854x480', ratio: '16:9' },
   { value: '720p', label: '720p HD', desc: '1280x720', ratio: '16:9' },
   { value: '1080p', label: '1080p Full HD', desc: '1920x1080', ratio: '16:9' },
-  { value: '1440p', label: '2K QHD', desc: '2560x1440', ratio: '16:9' },
-  { value: '2160p', label: '4K UHD', desc: '3840x2160', ratio: '16:9' },
-];
+  { value: '2k', label: '2K QHD', desc: '2560x1440', ratio: '16:9' },
+  { value: '4k', label: '4K UHD', desc: '3840x2160', ratio: '16:9' },
+] as const;
 
 // 帧率选项
 const FPS_OPTIONS = [
   { value: 24, label: '24 fps', desc: '电影感', icon: '🎬' },
   { value: 30, label: '30 fps', desc: '标准', icon: '📺' },
   { value: 60, label: '60 fps', desc: '流畅', icon: '⚡' },
-];
+] as const;
 
 interface VideoExportProps {
   onComplete?: () => void;
@@ -65,8 +59,6 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exported, setExported] = useState(false);
-  const [activeTab, setActiveTab] = useState('basic');
-
   // 导出配置
   const [config, setConfig] = useState<ExportSettings>({
     format: state.exportSettings?.format || 'mp4',
@@ -110,7 +102,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
       setExported(true);
       message.success('视频导出成功！');
 
-    } catch {
+    } catch (error) {
       console.error('导出失败:', error);
       message.error('导出失败，请重试');
     } finally {
@@ -206,7 +198,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
           <Card title="🎬 输出格式" size="small" style={{ marginBottom: 16 }}>
             <Radio.Group 
               value={config.format}
-              onChange={(e) => setConfig({ ...config, format: e.target.value })}
+              onChange={(e) => setConfig({ ...config, format: e.target.value as ExportSettings['format'] })}
               style={{ width: '100%' }}
             >
               <Space direction="vertical" style={{ width: '100%' }}>
@@ -233,7 +225,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
                 <Text strong style={{ marginBottom: 8, display: 'block' }}>📐 分辨率</Text>
                 <Radio.Group 
                   value={config.resolution}
-                  onChange={(e) => setConfig({ ...config, resolution: e.target.value })}
+                  onChange={(e) => setConfig({ ...config, resolution: e.target.value as ExportSettings['resolution'] })}
                 >
                   <Space wrap>
                     {RESOLUTION_OPTIONS.map(res => (
@@ -250,7 +242,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
                 <Text strong style={{ marginBottom: 8, display: 'block' }}>⚡ 帧率</Text>
                 <Radio.Group 
                   value={config.frameRate}
-                  onChange={(e) => setConfig({ ...config, frameRate: e.target.value })}
+                  onChange={(e) => setConfig({ ...config, frameRate: e.target.value as ExportSettings['frameRate'] })}
                 >
                   <Space>
                     {FPS_OPTIONS.map(fps => (
@@ -267,7 +259,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
                 <Text strong style={{ marginBottom: 8, display: 'block' }}>🎯 质量</Text>
                 <Radio.Group 
                   value={config.quality}
-                  onChange={(e) => setConfig({ ...config, quality: e.target.value })}
+                  onChange={(e) => setConfig({ ...config, quality: e.target.value as ExportSettings['quality'] })}
                   style={{ width: '100%' }}
                 >
                   <Row gutter={[8, 8]}>
@@ -281,7 +273,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
                             background: config.quality === q.value ? '#e6f7ff' : '#fff',
                             cursor: 'pointer'
                           }}
-                          onClick={() => setConfig({ ...config, quality: q.value })}
+                          onClick={() => setConfig({ ...config, quality: q.value as ExportSettings['quality'] })}
                         >
                           <Text strong>{q.label}</Text>
                           <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>{q.desc}</Text>

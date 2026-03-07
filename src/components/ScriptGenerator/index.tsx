@@ -12,7 +12,6 @@ import {
   Button,
   Space,
   Typography,
-  Slider,
   Radio,
   Tag,
   Progress,
@@ -20,8 +19,6 @@ import {
   Divider,
   Tooltip,
   Badge,
-  Empty,
-  Spin,
   message
 } from 'antd';
 import {
@@ -31,19 +28,16 @@ import {
   FileTextOutlined,
   UserOutlined,
   GlobalOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
   CheckCircleOutlined,
   LoadingOutlined,
   SettingOutlined,
   DollarOutlined,
-  InfoCircleOutlined
 } from '@ant-design/icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/components/common/motion-shim';
 import { useModel, useModelCost } from '@/core/hooks/useModel';
 import { useProject } from '@/core/hooks/useProject';
 import ModelSelector from '@/components/ModelSelector';
-import type { ScriptData, ScriptMetadata } from '@/core/types';
+import type { ScriptData, ScriptSegment } from '@/core/types';
 import styles from './index.module.less';
 
 const { Title, Text, Paragraph } = Typography;
@@ -93,17 +87,28 @@ interface ScriptGeneratorProps {
   onSave?: (script: ScriptData) => void;
 }
 
+interface ScriptFormValues {
+  topic: string;
+  keywords?: string[];
+  style: string;
+  tone: string;
+  length: 'short' | 'medium' | 'long';
+  audience: string;
+  language: 'zh' | 'en';
+  requirements?: string;
+}
+
 export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
   projectId,
   videoDuration,
   onGenerate,
   onSave
 }) => {
-  const { project, updateScript } = useProject(projectId);
+  const { updateScript } = useProject(projectId);
   const { selectedModel, isConfigured } = useModel();
   const { estimateScriptCost, formatCost } = useModelCost();
 
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<ScriptFormValues>();
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [generatedScript, setGeneratedScript] = useState<ScriptData | null>(null);
@@ -118,7 +123,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
   }, [form, estimateScriptCost, formatCost]);
 
   // 生成脚本
-  const handleGenerate = useCallback(async (values: any) => {
+  const handleGenerate = useCallback(async (values: ScriptFormValues) => {
     if (!selectedModel) {
       message.warning('请先选择 AI 模型');
       setShowModelSelector(true);
@@ -173,7 +178,8 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       setGeneratedScript(script);
       onGenerate?.(script);
       message.success('脚本生成成功');
-    } catch {
+    } catch (error) {
+      console.error('脚本生成失败:', error);
       message.error('脚本生成失败');
     } finally {
       setIsGenerating(false);
@@ -211,9 +217,9 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
                 text={
                   <Space>
                     <Text>{selectedModel.name}</Text>
-                    <Tag size="small" color={isConfigured ? 'success' : 'warning'}>
-                      {isConfigured ? '已配置' : '未配置'}
-                    </Tag>
+                        <Tag color={isConfigured ? 'success' : 'warning'}>
+                          {isConfigured ? '已配置' : '未配置'}
+                        </Tag>
                   </Space>
                 }
               />
@@ -452,7 +458,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
 };
 
 // 辅助函数
-function generateMockScript(values: any): string {
+function generateMockScript(values: ScriptFormValues): string {
   return `欢迎来到${values.topic}！
 
 今天我们将一起探索这个精彩的主题。
@@ -468,7 +474,7 @@ function generateMockScript(values: any): string {
 希望通过这个视频，能够帮助大家更好地理解${values.topic}。让我们开始吧！`;
 }
 
-function generateMockSegments(values: any) {
+function generateMockSegments(_values: ScriptFormValues): ScriptSegment[] {
   return [
     { id: '1', startTime: 0, endTime: 10, content: '开场介绍', type: 'narration' },
     { id: '2', startTime: 10, endTime: 60, content: '核心概念讲解', type: 'narration' },

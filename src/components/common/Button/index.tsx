@@ -8,7 +8,9 @@ import { Button as AntButton, ButtonProps as AntButtonProps } from 'antd';
 import classNames from 'classnames';
 import styles from './index.module.less';
 
-interface ButtonProps extends AntButtonProps {
+type BaseButtonProps = Omit<AntButtonProps, 'size' | 'type' | 'danger' | 'onClick' | 'variant'>;
+
+interface ButtonProps extends BaseButtonProps {
   /** 变体 */
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   /** 尺寸 */
@@ -22,7 +24,7 @@ interface ButtonProps extends AntButtonProps {
   /** 图标 */
   icon?: React.ReactNode;
   /** 点击事件 */
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLElement>;
   /** 子元素 */
   children?: React.ReactNode;
 }

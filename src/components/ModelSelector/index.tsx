@@ -10,7 +10,6 @@ import {
   useModelCost,
   useRecommendedModel
 } from '@/core/hooks/useModel';
-import { AI_MODELS } from '@/core/config/models.config';
 import type { AIModel, ModelProvider } from '@/core/types';
 import { useModelFilter } from './hooks/useModelFilter';
 import { useModelSelection } from './hooks/useModelSelection';
@@ -59,7 +58,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     setProvider,
     setSearchQuery,
     filteredModels
-  } = useModelFilter({ models: AI_MODELS });
+  } = useModelFilter({ models: availableModels });
 
   const {
     isTesting,

@@ -3,7 +3,7 @@
  * 确保每次生成的视频解说都是原创唯一的
  */
 
-import type { ScriptData, ScriptSegment } from '@/core/types';
+import type { ScriptData } from '@/core/types';
 import { storageService } from './storage.service';
 
 // 内容指纹
@@ -45,6 +45,8 @@ interface UniquenessConfig {
   addRandomness: boolean;
 }
 
+type FingerprintStore = Record<string, ContentFingerprint>;
+
 class UniquenessService {
   private config: UniquenessConfig;
   private fingerprints: Map<string, ContentFingerprint> = new Map();
@@ -67,11 +69,10 @@ class UniquenessService {
    * 加载历史指纹
    */
   private loadFingerprints(): void {
-    const stored = storageService.get('script_fingerprints');
+    const stored = storageService.get<FingerprintStore>('script_fingerprints');
     if (stored) {
       try {
-        const data = JSON.parse(stored);
-        this.fingerprints = new Map(Object.entries(data));
+        this.fingerprints = new Map<string, ContentFingerprint>(Object.entries(stored));
       } catch {
         this.fingerprints = new Map();
       }
@@ -82,8 +83,8 @@ class UniquenessService {
    * 保存指纹
    */
   private saveFingerprints(): void {
-    const data = Object.fromEntries(this.fingerprints);
-    storageService.set('script_fingerprints', JSON.stringify(data));
+    const data = Object.fromEntries(this.fingerprints) as FingerprintStore;
+    storageService.set('script_fingerprints', data);
   }
 
   /**
@@ -246,6 +247,10 @@ class UniquenessService {
     const intersection = new Set([...set1].filter(x => set2.has(x)));
     const union = new Set([...set1, ...set2]);
 
+    if (union.size === 0) {
+      return 0;
+    }
+
     return intersection.size / union.size;
   }
 
@@ -391,7 +396,8 @@ class UniquenessService {
     for (const group of variations) {
       const original = group[0];
       const alternatives = group.slice(1);
-      const replacement = alternatives[Math.floor(Math.random() * alternatives.length)];
+      const replacement =
+        alternatives[Math.floor(Math.random() * alternatives.length)] ?? original;
       content = content.replace(new RegExp(original, 'g'), replacement);
     }
 

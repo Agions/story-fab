@@ -8,7 +8,9 @@ import { Card as AntCard, CardProps as AntCardProps } from 'antd';
 import classNames from 'classnames';
 import styles from './index.module.less';
 
-interface CardProps extends AntCardProps {
+type BaseCardProps = Omit<AntCardProps, 'size' | 'variant'>;
+
+interface CardProps extends BaseCardProps {
   /** 是否可悬停 */
   hoverable?: boolean;
   /** 是否选中 */

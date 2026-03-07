@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Card, Row, Col, Typography, Tag, Avatar, Radio, Space, Tooltip, Button, Input, Segmented, Spin } from 'antd';
 import { CheckCircleFilled, RobotOutlined, QuestionCircleOutlined, CodeOutlined, VideoCameraOutlined, EditOutlined, FireOutlined, StarOutlined, ThunderboltOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
+import { motion } from '@/components/common/motion-shim';
+import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS } from '@/core/config/models.config';
+import type { AIModel as CoreAIModel, ModelProvider } from '@/core/types';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
 import styles from './AIModelSelector.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 
 // 模型类型定义
 export type ModelCategory = 'text' | 'code' | 'image' | 'video' | 'all';
-export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'baidu' | 'iflytek' | 'alibaba' | 'tencent' | 'zhipu';
 
 export interface AIModel {
   id: string;
@@ -32,117 +35,54 @@ interface AIModelSelectorProps {
   category?: ModelCategory;
   compact?: boolean;
   className?: string;
+  respectApiKeyConfig?: boolean;
 }
 
-const models: AIModel[] = [
-  {
-    id: 'gpt-5',
-    name: 'GPT-5',
-    provider: 'openai',
-    category: ['text', 'code', 'image'],
-    description: '最强大的多模态大模型，支持文本、代码和图像分析',
-    features: ['视觉理解', '高级推理', '代码生成'],
-    tokenLimit: 128000,
-    isPro: true,
-    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/2048px-ChatGPT_logo.svg.png'
-  },
-  {
-    id: 'gpt-3.5-turbo',
-    name: 'GPT-3.5',
-    provider: 'openai',
-    category: ['text', 'code'],
-    description: '性能均衡的大型语言模型，适合日常文本和代码任务',
-    features: ['文本生成', '代码辅助', '快速响应'],
-    tokenLimit: 16000,
-    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/2048px-ChatGPT_logo.svg.png'
-  },
-  {
-    id: 'claude-opus-4-6',
-    name: 'Claude Opus 4.6',
-    provider: 'anthropic',
-    category: ['text', 'code', 'image'],
-    description: 'Anthropic最强大的多模态模型，具有卓越理解力',
-    features: ['深度分析', '视觉理解', '长文本处理'],
-    tokenLimit: 200000,
-    isPro: true,
-    avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF4BPGvrUHBwGbFiLZNlIRU3mp09a4KTMYoQD-MCc4XDwbPGUu'
-  },
-  {
-    id: 'claude-sonnet-4-6',
-    name: 'Claude Sonnet 4.6',
-    provider: 'anthropic',
-    category: ['text', 'code', 'image'],
-    description: '平衡性能与速度的Claude模型，多任务处理能力强',
-    features: ['创意写作', '精确回答', '图像分析'],
-    tokenLimit: 180000,
-    avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF4BPGvrUHBwGbFiLZNlIRU3mp09a4KTMYoQD-MCc4XDwbPGUu'
-  },
-  {
-    id: 'gemini-3-pro',
-    name: 'Gemini 3 Pro',
-    provider: 'google',
-    category: ['text', 'code', 'image', 'video'],
-    description: 'Google最先进的多模态模型，支持视频分析',
-    features: ['多模态分析', '视频理解', '长文本处理'],
-    tokenLimit: 100000,
-    isPro: true,
-    avatar: 'https://storage.googleapis.com/gweb-uniblog-publish-prod/images/gemini-advanced_1.max-1000x1000.png'
-  },
-  {
-    id: 'ernie-4',
-    name: 'ERNIE 5.5',
-    provider: 'baidu',
-    category: ['text', 'code'],
-    description: '百度最新自然语言理解模型，擅长中文处理',
-    features: ['中文优化', '知识图谱', '对话能力'],
-    tokenLimit: 30000,
-    avatar: 'https://img2.baidu.com/it/u=3016903464,1904337711&fm=253&fmt=auto&app=138&f=PNG?w=500&h=500'
-  },
-  {
-    id: 'spark-3.5',
-    name: '讯飞星火3.5',
-    provider: 'iflytek',
-    category: ['text', 'code'],
-    description: '科大讯飞强大的认知大模型，偏重中文应用场景',
-    features: ['中文理解', '语音转文本', '知识问答'],
-    tokenLimit: 32000,
-    avatar: 'https://sf3-cn.feishucdn.com/obj/eden-cn/uphco_h47iazuq/iflytek-spark-prd-website/static/favicon.ico'
-  },
-  {
-    id: 'qwen3.5-max',
-    name: '通义千问',
-    provider: 'alibaba',
-    category: ['text', 'code', 'image'],
-    description: '阿里云推出的创新大模型，拥有强大的文本处理能力',
-    features: ['多语言支持', '代码生成', '图像理解'],
-    tokenLimit: 30000,
-    avatar: 'https://img.alicdn.com/imgextra/i2/O1CN01YQzmiJ1QTmFpub1Gk_!!6000000001976-2-tps-200-200.png'
-  },
-  {
-    id: 'chatglm4',
-    name: 'GLM-5',
-    provider: 'zhipu',
-    category: ['text', 'code', 'image'],
-    description: '清华&智谱AI推出的开源双语对话模型，优化中英文处理',
-    features: ['双语优化', '代码能力', '学术研究'],
-    tokenLimit: 32000,
-    avatar: 'https://www.zhipuai.cn/static/media/glm-large.6d351772.png'
-  }
-];
+const toDisplayModel = (model: CoreAIModel): AIModel => ({
+  id: model.id,
+  name: model.name,
+  provider: model.provider,
+  category: model.category.filter((item): item is Exclude<ModelCategory, 'all'> => item !== 'audio'),
+  description: model.description,
+  features: model.features,
+  tokenLimit: model.tokenLimit,
+  isPro: model.isPro,
+  isAvailable: model.isAvailable !== false,
+  avatar: MODEL_PROVIDERS[model.provider]?.icon,
+});
 
 const AIModelSelector: React.FC<AIModelSelectorProps> = ({
-  selectedModel = 'gpt-3.5-turbo',
+  selectedModel = DEFAULT_MODEL_ID,
   onChange,
   onConfigureAPI,
   category = 'all',
   compact = false,
-  className = ''
+  className = '',
+  respectApiKeyConfig = true,
 }) => {
+  const [apiKeys] = useLocalStorage<Partial<Record<ModelProvider, { key: string; isValid?: boolean }>>>('api_keys', {});
   const [selectedModelId, setSelectedModelId] = useState<string>(selectedModel);
   const [activeCategory, setActiveCategory] = useState<ModelCategory>(category);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'card' | 'list'>(compact ? 'list' : 'card');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  const allModels = useMemo(() => CORE_AI_MODELS.map(toDisplayModel), []);
+
+  const candidateModels = useMemo(() => {
+    if (!respectApiKeyConfig) {
+      return allModels.filter((model) => model.isAvailable !== false);
+    }
+    return getAvailableModelsFromApiKeys(apiKeys, allModels);
+  }, [allModels, apiKeys, respectApiKeyConfig]);
+
+  useEffect(() => {
+    const nextSelectedModelId = resolveDefaultModelId(selectedModel, candidateModels);
+    if (nextSelectedModelId !== selectedModelId) {
+      setSelectedModelId(nextSelectedModelId);
+      onChange?.(nextSelectedModelId);
+    }
+  }, [candidateModels, onChange, selectedModel, selectedModelId]);
 
   // 响应式布局处理
   useEffect(() => {
@@ -160,17 +100,7 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
 
   // 获取提供商显示名称
   const getProviderName = useCallback((provider: ModelProvider): string => {
-    const providerMap: Record<ModelProvider, string> = {
-      'openai': 'OpenAI',
-      'anthropic': 'Anthropic',
-      'google': 'Google',
-      'baidu': '百度',
-      'iflytek': '科大讯飞',
-      'alibaba': '阿里云',
-      'tencent': '腾讯',
-      'zhipu': '智谱AI'
-    };
-    return providerMap[provider] || provider;
+    return MODEL_PROVIDERS[provider]?.name || provider;
   }, []);
 
   // 获取类别图标
@@ -196,7 +126,7 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
 
   // 过滤模型
   const filteredModels = useMemo(() => {
-    return models.filter(model => {
+    return candidateModels.filter(model => {
       // 类别过滤
       if (activeCategory !== 'all' && !model.category.includes(activeCategory)) {
         return false;
@@ -215,7 +145,7 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
       
       return true;
     });
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, candidateModels, searchQuery]);
 
   // 处理模型选择
   const handleModelSelect = useCallback((modelId: string) => {
@@ -491,9 +421,9 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
         >
-          <Button 
+            <Button 
             type="link" 
-            onClick={() => onConfigureAPI(models.find(m => m.id === selectedModelId)?.provider || 'openai')}
+            onClick={() => onConfigureAPI(allModels.find(m => m.id === selectedModelId)?.provider || 'openai')}
             icon={<ThunderboltOutlined />}
           >
             配置API密钥

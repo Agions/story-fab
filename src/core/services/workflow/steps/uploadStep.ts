@@ -1,28 +1,33 @@
 import { videoService } from '../../video.service';
 import { storageService } from '../../storage.service';
-import type { WorkflowState, WorkflowData } from '../types';
+import type { VideoInfo } from '@/core/types';
 
 export interface UploadStepResult {
-  videoInfo: any;
+  videoInfo: VideoInfo;
   projectId: string;
 }
 
 export async function executeUploadStep(
   projectId: string,
   videoFile: File,
-  updateProgress: (progress: number) => void
+  updateProgress: (progress: number) => void = () => {}
 ): Promise<UploadStepResult> {
-  // 上传视频
-  const videoInfo = await videoService.uploadVideo(videoFile, (progress) => {
-    updateProgress(5 + progress * 0.1);
-  });
+  updateProgress(6);
+  const videoInfo = await videoService.getVideoInfo(videoFile);
+  const thumbnail = await videoService.generateThumbnail(videoInfo.path).catch(() => '');
+  updateProgress(12);
+
+  const enrichedVideoInfo: VideoInfo = {
+    ...videoInfo,
+    thumbnail: thumbnail || undefined,
+  };
 
   // 保存到项目
-  const project = storageService.projects.get(projectId);
+  const project = storageService.projects.getById(projectId);
   if (project) {
-    project.videos.push(videoInfo);
+    project.videos.push(enrichedVideoInfo);
     storageService.projects.save(project);
   }
 
-  return { videoInfo, projectId };
+  return { videoInfo: enrichedVideoInfo, projectId };
 }

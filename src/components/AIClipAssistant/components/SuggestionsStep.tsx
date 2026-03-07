@@ -102,7 +102,7 @@ const SuggestionsStep: React.FC<SuggestionsStepProps> = ({
                 <Space>
                   <Text strong>{suggestion.description}</Text>
                   {suggestion.autoApplicable && (
-                    <Tag color="green" size="small">
+                    <Tag color="green">
                       可自动应用
                     </Tag>
                   )}

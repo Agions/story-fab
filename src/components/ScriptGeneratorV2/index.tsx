@@ -28,10 +28,9 @@ import {
   GlobalOutlined,
   CheckCircleOutlined,
   LoadingOutlined,
-  SettingOutlined,
-  DollarOutlined
+  SettingOutlined
 } from '@ant-design/icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/components/common/motion-shim';
 import { useModel, useModelCost } from '@/core/hooks';
 import ModelSelector from '@/components/ModelSelector';
 import {
@@ -41,9 +40,9 @@ import {
   TARGET_AUDIENCES,
   LANGUAGE_OPTIONS
 } from '@/core/constants';
-import { aiService } from '@/core/services';
+import { aiService } from '@/core/services/ai.service';
 import { formatDuration } from '@/core/utils';
-import type { ScriptData } from '@/core/types';
+import type { ScriptData, AIModelSettings } from '@/core/types';
 import styles from './index.module.less';
 
 const { Title, Text, Paragraph } = Typography;
@@ -55,6 +54,17 @@ interface ScriptGeneratorProps {
   videoDuration?: number;
   onGenerate?: (script: ScriptData) => void;
   onSave?: (script: ScriptData) => void;
+}
+
+interface ScriptFormValues {
+  topic: string;
+  keywords?: string[];
+  style: string;
+  tone: string;
+  length: string;
+  audience: string;
+  language: string;
+  requirements?: string;
 }
 
 // 表单字段配置
@@ -79,15 +89,15 @@ const DEFAULT_FORM_VALUES = {
 };
 
 export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
-  projectId,
+  projectId: _projectId,
   videoDuration,
   onGenerate,
   onSave
 }) => {
-  const { selectedModel, isConfigured } = useModel();
+  const { selectedModel, isConfigured, modelSettings } = useModel();
   const { formatCost, estimateScriptCost } = useModelCost();
 
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<ScriptFormValues>();
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [generatedScript, setGeneratedScript] = useState<ScriptData | null>(null);
@@ -113,7 +123,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
   ], []);
 
   // 生成脚本
-  const handleGenerate = useCallback(async (values: any) => {
+  const handleGenerate = useCallback(async (values: ScriptFormValues) => {
     if (!selectedModel) {
       setShowModelSelector(true);
       return;
@@ -136,19 +146,19 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       // 调用 AI 服务
       const script = await aiService.generateScript(
         selectedModel,
-        { apiKey: 'mock-key' }, // 实际应从配置获取
+        modelSettings as AIModelSettings,
         { ...values, videoDuration }
       );
 
       setProgress(100);
       setGeneratedScript(script);
       onGenerate?.(script);
-    } catch {
+    } catch (error) {
       console.error('生成失败:', error);
     } finally {
       setIsGenerating(false);
     }
-  }, [selectedModel, isConfigured, videoDuration, progressSteps, onGenerate]);
+  }, [selectedModel, isConfigured, modelSettings, videoDuration, progressSteps, onGenerate]);
 
   // 渲染模型选择卡片
   const renderModelCard = () => (

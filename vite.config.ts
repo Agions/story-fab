@@ -9,12 +9,12 @@ export default defineConfig({
   ],
   clearScreen: false,
   server: {
-    port: 1420,
+    port: 1430,
     strictPort: true,
     host: true,
   },
   preview: {
-    port: 1420,
+    port: 1430,
     strictPort: true,
   },
   css: {
@@ -47,13 +47,20 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
             return 'react-vendor'
           }
-          // 动画库
-          if (id.includes('node_modules/framer-motion')) {
-            return 'motion-vendor'
+          // 路由与状态管理
+          if (id.includes('node_modules/react-router') || id.includes('node_modules/zustand')) {
+            return 'app-framework'
           }
           // Tauri
           if (id.includes('node_modules/@tauri-apps')) {
             return 'tauri-vendor'
+          }
+          // 业务重模块分包
+          if (id.includes('/src/pages/Workflow/') || id.includes('/src/core/workflow/')) {
+            return 'workflow-feature'
+          }
+          if (id.includes('/src/pages/Editor/') || id.includes('/src/components/editor/')) {
+            return 'editor-feature'
           }
         },
       },

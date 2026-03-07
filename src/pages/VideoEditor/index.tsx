@@ -4,6 +4,8 @@ import { Layout, Tabs, Row, Col, message } from 'antd';
 import { RobotOutlined } from '@ant-design/icons';
 
 import { saveProjectFile } from '@/services/projectService';
+import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
+import { logger } from '@/utils/logger';
 import { useVideoEditor } from './hooks/useVideoEditor';
 
 import Toolbar from './components/Toolbar';
@@ -14,13 +16,14 @@ import KeyframePanel from './components/KeyframePanel';
 import AIClipPanel from './components/AIClipPanel';
 import ExportSettingsPanel from './components/ExportSettingsPanel';
 
-import styles from './VideoEditor.module.less';
+import styles from './index.module.less';
 
 const { Content } = Layout;
 const { TabPane } = Tabs;
 
 const VideoEditorPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
+  const [activeTab, setActiveTab] = useState<string>('trim');
 
   const {
     // 状态
@@ -74,8 +77,8 @@ const VideoEditorPage: React.FC = () => {
 
       await saveProjectFile(projectId || 'new', JSON.stringify(projectToSave));
       message.success('项目保存成功');
-    } catch {
-      console.error('保存失败:', error);
+    } catch (error) {
+      logger.error('保存失败:', error);
       message.error('保存失败，请重试');
     } finally {
       setIsSaving(false);
@@ -88,8 +91,8 @@ const VideoEditorPage: React.FC = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       message.success('视频导出成功');
-    } catch {
-      console.error('导出失败:', error);
+    } catch (error) {
+      logger.error('导出失败:', error);
       message.error('导出失败，请重试');
     } finally {
       setIsExporting(false);
@@ -97,8 +100,8 @@ const VideoEditorPage: React.FC = () => {
   }, [setIsExporting]);
 
   // AI 分析完成
-  const handleAnalysisComplete = useCallback((result: any) => {
-    console.log('AI 剪辑分析完成:', result);
+  const handleAnalysisComplete = useCallback((result: ClipAnalysisResult) => {
+    logger.info('AI 剪辑分析完成:', result);
     message.success(`检测到 ${result.cutPoints.length} 个剪辑点`);
   }, []);
 
@@ -149,6 +152,7 @@ const VideoEditorPage: React.FC = () => {
           <Col span={8}>
             <Tabs
               defaultActiveKey="trim"
+              activeKey={activeTab}
               onChange={setActiveTab}
               className={styles.editorTabs}
             >

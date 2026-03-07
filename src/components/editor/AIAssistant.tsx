@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { 
   Tabs, 
   Button, 
@@ -32,6 +32,10 @@ import {
   QuestionCircleOutlined,
   CloseCircleOutlined
 } from '@ant-design/icons';
+import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
+import type { ModelProvider } from '@/core/types';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
 import styles from './AIAssistant.module.less';
 
 const { TabPane } = Tabs;
@@ -42,12 +46,20 @@ const { Panel } = Collapse;
 
 interface AIAssistantProps {}
 
+interface AssistantMessage {
+  role: 'ai' | 'user';
+  content: string;
+  time: Date;
+}
+
 const AIAssistant: React.FC<AIAssistantProps> = () => {
+  const [apiKeys] = useLocalStorage<Partial<Record<ModelProvider, { key: string; isValid?: boolean }>>>('api_keys', {});
   const [activeTab, setActiveTab] = useState('chat');
   const [prompt, setPrompt] = useState('');
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [messages, setMessages] = useState<any[]>([
+  const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_MODEL_ID);
+  const [messages, setMessages] = useState<AssistantMessage[]>([
     {
       role: 'ai',
       content: '您好！我是您的AI视频助手。我可以帮助您生成字幕、智能剪辑片段、提供内容建议以及增强视频效果。请告诉我您需要什么帮助？',
@@ -56,19 +68,30 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   ]);
   
   // AI模型选项
-  const models = [
-    { id: 'gpt-5.2', name: 'GPT-5.2 (通用)', provider: 'openai' },
-    { id: 'claude-4.6-opus', name: 'Claude 4.6 Opus (高精度)', provider: 'anthropic' },
-    { id: 'gemini-3.1-pro', name: 'Gemini 3.1 Pro (多模态)', provider: 'google' },
-    { id: 'ernie-4.0', name: '文心一言 (中文优化)', provider: 'baidu' }
-  ];
+  const models = useMemo(() => {
+    const configuredModels = getAvailableModelsFromApiKeys(apiKeys, CORE_AI_MODELS);
+    return configuredModels.map((model) => ({
+      id: model.id,
+      name: model.name,
+      provider: model.provider,
+    }));
+  }, [apiKeys]);
+
+  const resolvedModelId = resolveDefaultModelId(selectedModelId, models);
+
+  // AI模型选项
+  const allModels = CORE_AI_MODELS.filter((model) => model.isAvailable !== false).map((model) => ({
+    id: model.id,
+    name: model.name,
+    provider: model.provider,
+  }));
+  const selectableModels = models.length > 0 ? models : allModels;
   
   // 字幕语言选项
   const languages = [
     { code: 'zh', name: '中文' },
     { code: 'en', name: '英语' },
-    { code: 'ja', name: '日语' },
-    { code: 'ko', name: '韩语' },
+        { code: 'ko', name: '韩语' },
     { code: 'fr', name: '法语' },
     { code: 'de', name: '德语' },
     { code: 'es', name: '西班牙语' },
@@ -80,7 +103,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     if (!prompt.trim()) return;
     
     // 添加用户消息
-    const userMessage = {
+    const userMessage: AssistantMessage = {
       role: 'user',
       content: prompt,
       time: new Date()
@@ -92,7 +115,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     setProcessing(true);
     setTimeout(() => {
       // 添加AI回复
-      const aiResponse = {
+      const aiResponse: AssistantMessage = {
         role: 'ai',
         content: `我将帮您完成"${prompt.substring(0, 30)}${prompt.length > 30 ? '...' : ''}"。正在处理您的请求...`,
         time: new Date()
@@ -125,7 +148,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
         setProcessing(false);
         
         // 添加结果消息
-        const resultMessage = {
+        const resultMessage: AssistantMessage = {
           role: 'ai',
           content: '已成功生成字幕！字幕已经添加到时间轴上，您可以在编辑器中查看和修改。',
           time: new Date()
@@ -150,7 +173,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
         setProcessing(false);
         
         // 添加结果消息
-        const resultMessage = {
+        const resultMessage: AssistantMessage = {
           role: 'ai',
           content: '智能剪辑完成！已为您移除了沉默部分并优化了节奏。可以在时间轴上查看剪辑结果。',
           time: new Date()
@@ -223,11 +246,12 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
             <div className={styles.chatInput}>
               <div className={styles.modelSelector}>
                 <Select
-                  defaultValue="gpt-5.2"
+                  value={resolveDefaultModelId(resolvedModelId, selectableModels)}
                   style={{ width: '100%' }}
                   size="small"
+                  onChange={setSelectedModelId}
                 >
-                  {models.map(model => (
+                  {selectableModels.map(model => (
                     <Option key={model.id} value={model.id}>
                       {model.name}
                     </Option>

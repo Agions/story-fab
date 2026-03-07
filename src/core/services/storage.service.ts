@@ -3,7 +3,9 @@
  * 统一的本地存储管理
  */
 
-import type { ProjectData, AppState, UserPreferences } from '@/core/types';
+import type { ProjectData, UserPreferences } from '@/core/types';
+
+type StoredAppState = Record<string, unknown>;
 
 // 存储键名
 const STORAGE_KEYS = {
@@ -86,12 +88,12 @@ export class StorageService {
    * 应用状态
    */
   appState = {
-    get: (): Partial<AppState> => {
+    get: (): Partial<StoredAppState> => {
       const data = localStorage.getItem(STORAGE_KEYS.APP_STATE);
       return data ? JSON.parse(data) : {};
     },
 
-    set: (state: Partial<AppState>): void => {
+    set: (state: Partial<StoredAppState>): void => {
       const current = this.appState.get();
       localStorage.setItem(STORAGE_KEYS.APP_STATE, JSON.stringify({ ...current, ...state }));
     },
@@ -159,12 +161,12 @@ export class StorageService {
    * 模型设置
    */
   modelSettings = {
-    get: (provider: string): any => {
+    get: <T = unknown>(provider: string): T | null => {
       const data = localStorage.getItem(`${STORAGE_KEYS.MODEL_SETTINGS}_${provider}`);
-      return data ? JSON.parse(data) : null;
+      return data ? (JSON.parse(data) as T) : null;
     },
 
-    set: (provider: string, settings: any): void => {
+    set: (provider: string, settings: unknown): void => {
       localStorage.setItem(`${STORAGE_KEYS.MODEL_SETTINGS}_${provider}`, JSON.stringify(settings));
     },
 
@@ -172,13 +174,13 @@ export class StorageService {
       localStorage.removeItem(`${STORAGE_KEYS.MODEL_SETTINGS}_${provider}`);
     },
 
-    getAll: (): Record<string, any> => {
-      const settings: Record<string, any> = {};
+    getAll: <T = unknown>(): Record<string, T | null> => {
+      const settings: Record<string, T | null> = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key?.startsWith(STORAGE_KEYS.MODEL_SETTINGS)) {
           const provider = key.replace(`${STORAGE_KEYS.MODEL_SETTINGS}_`, '');
-          settings[provider] = this.modelSettings.get(provider);
+          settings[provider] = this.modelSettings.get<T>(provider);
         }
       }
       return settings;
@@ -189,14 +191,18 @@ export class StorageService {
    * 导出历史
    */
   exportHistory = {
-    get: (): any[] => {
+    get: <T = unknown>(): T[] => {
       const data = localStorage.getItem(STORAGE_KEYS.EXPORT_HISTORY);
-      return data ? JSON.parse(data) : [];
+      return data ? (JSON.parse(data) as T[]) : [];
     },
 
-    add: (record: any): void => {
-      const history = this.exportHistory.get();
-      history.unshift({ ...record, timestamp: new Date().toISOString() });
+    add: (record: unknown): void => {
+      const history = this.exportHistory.get<unknown>();
+      const normalizedRecord =
+        typeof record === 'object' && record !== null
+          ? (record as Record<string, unknown>)
+          : { value: record };
+      history.unshift({ ...normalizedRecord, timestamp: new Date().toISOString() });
       localStorage.setItem(STORAGE_KEYS.EXPORT_HISTORY, JSON.stringify(history.slice(0, 100)));
     },
 
@@ -244,7 +250,7 @@ export class StorageService {
    * 导出所有数据
    */
   exportAll(): string {
-    const data: Record<string, any> = {};
+    const data: Record<string, unknown> = {};
 
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -262,7 +268,7 @@ export class StorageService {
    */
   importAll(json: string): boolean {
     try {
-      const data = JSON.parse(json);
+      const data = JSON.parse(json) as Record<string, unknown>;
       Object.entries(data).forEach(([key, value]) => {
         localStorage.setItem(key, JSON.stringify(value));
       });

@@ -21,6 +21,16 @@ export interface ScriptGenerateResult {
   script: ScriptData;
 }
 
+interface TemplateSection {
+  id: string;
+  name: string;
+  type: string;
+  duration: number;
+  targetWordCount: number;
+  content: string;
+  tips?: string[];
+}
+
 export async function executeScriptGenerateStep(
   videoInfo: VideoInfo,
   videoAnalysis: VideoAnalysis,
@@ -28,7 +38,7 @@ export async function executeScriptGenerateStep(
   model: AIModel,
   params: ScriptGenerateConfig,
   projectId: string,
-  updateProgress: (progress: number) => void
+  updateProgress: (progress: number) => void = () => {}
 ): Promise<ScriptGenerateResult> {
   // 应用模板生成脚本结构
   const templateResult = scriptTemplateService.applyTemplate(selectedTemplate.id, {
@@ -41,7 +51,7 @@ export async function executeScriptGenerateStep(
 
   // 为每个段落生成内容
   const segments = await Promise.all(
-    templateResult.structure.map(async (section, index) => {
+    templateResult.structure.map(async (section: TemplateSection, index: number) => {
       const prompt = buildSegmentPrompt(section, videoInfo, videoAnalysis, params);
       const content = await aiService.generateText(model, prompt);
 
@@ -82,7 +92,7 @@ export async function executeScriptGenerateStep(
   };
 
   // 保存脚本
-  const project = storageService.projects.get(projectId);
+  const project = storageService.projects.getById(projectId);
   if (project) {
     project.scripts.push(script);
     storageService.projects.save(project);
@@ -91,7 +101,7 @@ export async function executeScriptGenerateStep(
   return { script };
 }
 
-function getSegmentType(type: string): string {
+function getSegmentType(type: string): ScriptData['segments'][number]['type'] {
   switch (type) {
     case 'hook':
     case 'intro':
@@ -107,7 +117,7 @@ function getSegmentType(type: string): string {
 }
 
 function buildSegmentPrompt(
-  section: any,
+  section: TemplateSection,
   videoInfo: VideoInfo,
   analysis: VideoAnalysis,
   params: ScriptGenerateConfig

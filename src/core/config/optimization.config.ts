@@ -9,29 +9,29 @@ export const COST_OPTIMIZATION = {
   llm: {
     // 简单任务 (< 100 tokens 输入)
     simple: {
-      primary: 'qwen3.5-turbo',
-      fallback: 'kimi-k2.5',
+      primary: 'deepseek-chat',
+      fallback: 'qwen-max-latest',
       maxTokens: 500,
       temperature: 0.3,
     },
     // 标准任务 (100-1000 tokens)
     standard: {
-      primary: 'qwen3.5-plus',
-      fallback: 'kimi-k2.5',
+      primary: 'qwen-max-latest',
+      fallback: 'deepseek-chat',
       maxTokens: 2000,
       temperature: 0.5,
     },
     // 复杂任务 (> 1000 tokens)
     complex: {
-      primary: 'qwen3.5-max',
-      fallback: 'gpt-5',
+      primary: 'gpt-5.3-codex',
+      fallback: 'o3',
       maxTokens: 4000,
       temperature: 0.7,
     },
     // 创意任务
     creative: {
-      primary: 'kimi-k2.5',
-      fallback: 'claude-4.6',
+      primary: 'claude-sonnet-4-6',
+      fallback: 'gpt-5.3-codex',
       maxTokens: 3000,
       temperature: 0.8,
     },
@@ -102,7 +102,7 @@ export const CODE_OPTIMIZATION = {
     // 组件级分割
     components: true,
     // 库级分割
-    vendors: ['antd', 'framer-motion', 'lodash-es'],
+    vendors: ['antd', 'lodash-es'],
   },
 };
 
@@ -124,7 +124,7 @@ export const QUALITY_OPTIMIZATION = {
   // 多模型投票
   ensemble: {
     enabled: false, // 默认关闭（成本高）
-    models: ['qwen3.5-max', 'kimi-k2.5', 'glm-5'],
+    models: ['gpt-5.3-codex', 'claude-sonnet-4-6', 'qwen-max-latest'],
     // 投票策略
     strategy: 'quality', // 'quality' | 'speed' | 'cost'
     // 超时时间

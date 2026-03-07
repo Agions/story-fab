@@ -5,13 +5,17 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
+type AudioContextWindow = Window & {
+  webkitAudioContext?: typeof AudioContext;
+};
+
 // 语音配置
 export interface VoiceConfig {
   // 语音类型
   voice: 'male' | 'female' | 'neutral';
   
   // 语言
-  language: 'zh-CN' | 'en-US' | 'ja-JP' | 'ko-KR';
+  language: 'zh-CN' | 'en-US' | 'ko-KR';
   
   // 声音参数
   rate: number;     // 语速 0.1 - 10
@@ -45,9 +49,7 @@ const AVAILABLE_VOICES: VoiceItem[] = [
   { id: 'zh-CN-female-1', name: '晓晓 (中文女声)', lang: 'zh-CN', gender: 'female' },
   { id: 'zh-CN-male-1', name: '云飞 (中文男声)', lang: 'zh-CN', gender: 'male' },
   { id: 'en-US-female-1', name: 'Samantha (English)', lang: 'en-US', gender: 'female' },
-  { id: 'en-US-male-1', name: 'Daniel (English)', lang: 'en-US', gender: 'male' },
-  { id: 'ja-JP-female-1', name: '日本語女性', lang: 'ja-JP', gender: 'female' },
-  { id: 'ko-KR-male-1', name: '한국어 남자', lang: 'ko-KR', gender: 'male' },
+  { id: 'en-US-male-1', name: 'Daniel (English)', lang: 'en-US', gender: 'male' },  { id: 'ko-KR-male-1', name: '한국어 남자', lang: 'ko-KR', gender: 'male' },
 ];
 
 // 默认配置
@@ -76,7 +78,9 @@ export class VoiceSynthesisService {
    */
   private initAudioContext(): void {
     try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioWindow = window as AudioContextWindow;
+      const AudioContextCtor = window.AudioContext || audioWindow.webkitAudioContext;
+      this.audioContext = AudioContextCtor ? new AudioContextCtor() : null;
     } catch (error) {
       console.warn('AudioContext 不可用:', error);
     }

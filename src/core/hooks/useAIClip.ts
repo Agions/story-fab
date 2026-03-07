@@ -131,7 +131,7 @@ export function useAIClip(): UseAIClipReturn {
         projectId,
         videos,
         config,
-        (updatedTask) => {
+        (updatedTask: BatchClipTask) => {
           setBatchTask(updatedTask);
           setProgress(updatedTask.progress);
         }

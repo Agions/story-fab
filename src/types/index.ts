@@ -1,3 +1,10 @@
+import {
+  AI_MODELS as CORE_AI_MODELS,
+  MODEL_PROVIDERS,
+  getModelsByProvider,
+} from '@/core/config/models.config';
+import type { ModelProvider } from '@/core/types';
+
 export interface VideoAnalysis {
   id: string;
   title: string;
@@ -77,111 +84,47 @@ export interface AIModelSettings {
 }
 
 // AI 模型类型 - 2026年3月最新
-export type AIModelType = 'openai' | 'anthropic' | 'google' | 'alibaba' | 'zhipu' | 'iflytek' | 'deepseek' | 'moonshot';
+export type AIModelType = ModelProvider;
+
+const ALL_MODEL_PROVIDERS = Object.keys(MODEL_PROVIDERS) as AIModelType[];
 
 // 用于 Project.aiModel 的 AI_MODEL_INFO
-export const AI_MODEL_INFO: Record<AIModelType, AIModelConfig> = {
-  openai: {
-    key: 'openai',
-    name: 'OpenAI',
-    provider: 'OpenAI'
+export const AI_MODEL_INFO: Record<AIModelType, AIModelConfig> = ALL_MODEL_PROVIDERS.reduce(
+  (acc, provider) => {
+    acc[provider] = {
+      key: provider,
+      name: MODEL_PROVIDERS[provider].name,
+      provider: MODEL_PROVIDERS[provider].name,
+    };
+    return acc;
   },
-  anthropic: {
-    key: 'anthropic',
-    name: 'Anthropic',
-    provider: 'Anthropic'
-  },
-  google: {
-    key: 'google',
-    name: 'Google',
-    provider: 'Google'
-  },
-  alibaba: {
-    key: 'alibaba',
-    name: '通义千问',
-    provider: '阿里云'
-  },
-  zhipu: {
-    key: 'zhipu',
-    name: '智谱GLM',
-    provider: '智谱AI'
-  },
-  iflytek: {
-    key: 'iflytek',
-    name: '讯飞星火',
-    provider: '科大讯飞'
-  },
-  deepseek: {
-    key: 'deepseek',
-    name: 'DeepSeek',
-    provider: 'DeepSeek'
-  },
-  moonshot: {
-    key: 'moonshot',
-    name: 'Kimi',
-    provider: '月之暗面'
-  }
+  {} as Record<AIModelType, AIModelConfig>
+);
+
+const providerDefaultModelName = (provider: AIModelType): string => {
+  const model = getModelsByProvider(provider).find((item) => item.isAvailable !== false) || CORE_AI_MODELS.find((item) => item.provider === provider);
+  return model?.name || MODEL_PROVIDERS[provider].name;
+};
+
+const providerDescription = (provider: AIModelType): string => {
+  if (provider === 'iflytek') return '讯飞星火模型请以控制台可用型号为准';
+  return `默认模型：${providerDefaultModelName(provider)}`;
 };
 
 // 用于 UI 展示的 AI_MODEL_INFO（包含更多字段）
-export const AI_MODEL_INFO_UI: Record<AIModelType, AIModelInfo> = {
-  openai: {
-    name: 'OpenAI',
-    provider: 'OpenAI',
-    description: 'OpenAI 最新旗舰多模态模型 GPT-5.3，支持视频分析',
-    icon: 'OpenAIIcon',
-    apiKeyFormat: 'sk-...'
+export const AI_MODEL_INFO_UI: Record<AIModelType, AIModelInfo> = ALL_MODEL_PROVIDERS.reduce(
+  (acc, provider) => {
+    acc[provider] = {
+      name: MODEL_PROVIDERS[provider].name,
+      provider: MODEL_PROVIDERS[provider].name,
+      description: providerDescription(provider),
+      icon: MODEL_PROVIDERS[provider].icon,
+      apiKeyFormat: MODEL_PROVIDERS[provider].keyFormat,
+    };
+    return acc;
   },
-  anthropic: {
-    name: 'Claude',
-    provider: 'Anthropic',
-    description: 'Anthropic 最强旗舰模型 Claude 4.6 Opus，支持长文本处理',
-    icon: 'ClaudeIcon',
-    apiKeyFormat: 'sk-ant-...'
-  },
-  google: {
-    name: 'Gemini',
-    provider: 'Google',
-    description: 'Google 最强多模态模型 Gemini 3 Ultra，支持音视频理解',
-    icon: 'GeminiIcon',
-    apiKeyFormat: 'AIza...'
-  },
-  alibaba: {
-    name: '通义千问',
-    provider: '阿里云',
-    description: '阿里云最新旗舰模型 Qwen 3.5，支持中文优化和多模态',
-    icon: 'QwenIcon',
-    apiKeyFormat: 'sk-...'
-  },
-  zhipu: {
-    name: '智谱GLM',
-    provider: '智谱AI',
-    description: '智谱最新旗舰模型 GLM-5，支持长文本和多模态',
-    icon: 'GLMIcon',
-    apiKeyFormat: '...'
-  },
-  iflytek: {
-    name: '讯飞星火',
-    provider: '科大讯飞',
-    description: '讯飞最新最强模型 Spark X1，支持中文优化',
-    icon: 'SparkIcon',
-    apiKeyFormat: 'APPID:API_KEY:API_SECRET'
-  },
-  deepseek: {
-    name: 'DeepSeek',
-    provider: 'DeepSeek',
-    description: 'DeepSeek 最新旗舰推理模型 R1，支持高性能推理',
-    icon: 'DeepSeekIcon',
-    apiKeyFormat: 'sk-...'
-  },
-  moonshot: {
-    name: 'Kimi',
-    provider: '月之暗面',
-    description: '月之暗面最新模型 Kimi k2.5，支持长文本处理',
-    icon: 'KimiIcon',
-    apiKeyFormat: '...'
-  }
-};
+  {} as Record<AIModelType, AIModelInfo>
+);
 
 /**
  * 脚本生成选项
@@ -209,6 +152,8 @@ export interface AppSettings {
 export interface ProjectData {
   id: string;
   name: string;
+  templateId?: string;
+  templateName?: string;
   description: string;
   videoPath: string;
   createdAt: string;

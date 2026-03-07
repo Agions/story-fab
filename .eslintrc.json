@@ -18,7 +18,7 @@
       "jsx": true
     }
   },
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": ["@typescript-eslint", "react", "react-hooks"],
   "rules": {
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-explicit-any": "off",
@@ -30,7 +30,9 @@
     "no-console": "off",
     "no-case-declarations": "off",
     "prefer-const": "off",
-    "no-useless-escape": "off"
+    "no-useless-escape": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "off"
   },
   "settings": {
     "react": {
