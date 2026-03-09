@@ -30,7 +30,7 @@ export { exportService, ExportService } from './export.service';
 export { pipelineService, PipelineService } from './pipeline.service';
 
 // 新增服务
-export { smartCutService, SmartCutService } from './smartCut.service';
+export { smartCutService, SmartCutService } from './smart-cut.service';
 export { videoEnhanceService, VideoEnhanceService } from './videoEnhance.service';
 export { performanceService, PerformanceService } from './performance.service';
 

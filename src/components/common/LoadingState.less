@@ -1,0 +1,57 @@
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  
+  &.active {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+  
+  &.disabled {
+    animation: none;
+  }
+}
+
+@keyframes skeleton-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .spinner-circle {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f0f0f0;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-progress {
+  height: 4px;
+  background: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+  
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #87d068);
+    animation: progress 2s ease-in-out infinite;
+  }
+}
+
+@keyframes progress {
+  0% { width: 0; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}

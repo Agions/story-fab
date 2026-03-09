@@ -1,0 +1,30 @@
+.optimized-input-wrapper {
+  .required {
+    label::after {
+      content: ' *';
+      color: #ff4d4f;
+    }
+  }
+  
+  input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  }
+  
+  input[aria-invalid="true"] {
+    border-color: #ff4d4f;
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1);
+    }
+  }
+}
+
+.inline-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #ff4d4f;
+  margin-top: 4px;
+}
