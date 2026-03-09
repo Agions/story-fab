@@ -83,3 +83,6 @@ export type {
 
 export { unifiedWorkflowService, UnifiedWorkflowService } from './unified-workflow.service';
 export type { WorkflowMode, WorkflowState, WorkflowStep, WorkflowResult, VideoClip, SceneInfo, AudioPeak, ScriptData, ScriptSegment, SubtitleData, SubtitleEntry } from './unified-workflow.service';
+
+export { enhancedCommentaryService, EnhancedCommentaryService } from './enhanced-commentary.service';
+export type { EnhancedCommentaryConfig, VideoAnalysisResult, SceneInfo, EmotionSegment, AudioPeakInfo, KeyFrameInfo, CommentarySegment, EnhancedCommentaryResult, ClipSegment, MusicSegment, SubtitleEntry } from './enhanced-commentary.service';
