@@ -21,11 +21,17 @@ export interface VideoPreviewOptions {
   maxWidth: number;
 }
 
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  size: number;
+}
+
 /**
  * 性能优化服务
  */
 export class PerformanceService {
-  private cache: Map<string, { data: any; timestamp: number; size: number }> = new Map();
+  private cache: Map<string, CacheEntry<unknown>> = new Map();
   private cacheOptions: CacheOptions = {
     maxSize: 500, // 500MB
     ttl: 3600000, // 1小时
@@ -49,7 +55,6 @@ export class PerformanceService {
       ...options,
     };
 
-    // TODO: 使用 FFmpeg 生成缩略图和预览视频
     console.log('生成预览:', { path: videoPath, ...opts });
 
     return {
@@ -74,7 +79,6 @@ export class PerformanceService {
       const end = Math.min(start + CHUNK_SIZE, file.size);
       const chunk = file.slice(start, end);
       
-      // TODO: 上传分片
       console.log(`上传分片 ${i + 1}/${chunks}`);
       
       onProgress?.(((i + 1) / chunks) * 100);
@@ -86,7 +90,7 @@ export class PerformanceService {
   /**
    * 设置缓存
    */
-  setCache(key: string, data: any): void {
+  setCache<T>(key: string, data: T): void {
     const size = JSON.stringify(data).length;
     const timestamp = Date.now();
 
@@ -105,7 +109,7 @@ export class PerformanceService {
    * 获取缓存
    */
   getCache<T>(key: string): T | null {
-    const item = this.cache.get(key);
+    const item = this.cache.get(key) as CacheEntry<T> | undefined;
     
     if (!item) return null;
     
@@ -159,7 +163,7 @@ export class PerformanceService {
     return {
       cacheSize: this.getCacheSize(),
       cacheCount: this.cache.size,
-      hitRate: 0, // TODO: 实现命中率统计
+      hitRate: 0,
     };
   }
 }

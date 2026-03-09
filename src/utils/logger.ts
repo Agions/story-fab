@@ -1,3 +1,8 @@
+/**
+ * 日志工具
+ * 统一的日志记录
+ */
+
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 const isDev = import.meta.env.DEV;
@@ -7,19 +12,53 @@ const shouldLog = (level: LogLevel): boolean => {
   return level === 'warn' || level === 'error';
 };
 
-const write = (level: LogLevel, ...args: unknown[]) => {
+interface LogEntry {
+  level: LogLevel;
+  message: string;
+  timestamp: string;
+  context?: Record<string, unknown>;
+}
+
+const logs: LogEntry[] = [];
+const MAX_LOGS = 1000;
+
+const write = (level: LogLevel, message: string, context?: Record<string, unknown>) => {
   if (!shouldLog(level)) return;
-  if (level === 'debug') {
-    console.log(...args);
-    return;
+
+  const entry: LogEntry = {
+    level,
+    message,
+    timestamp: new Date().toISOString(),
+    context,
+  };
+
+  // 存储日志
+  logs.push(entry);
+  if (logs.length > MAX_LOGS) logs.shift();
+
+  // 输出
+  const prefix = `[${level.toUpperCase()}]`;
+  if (context) {
+    console[level](prefix, message, context);
+  } else {
+    console[level](prefix, message);
   }
-  console[level](...args);
 };
 
 export const logger = {
-  debug: (...args: unknown[]) => write('debug', ...args),
-  info: (...args: unknown[]) => write('info', ...args),
-  warn: (...args: unknown[]) => write('warn', ...args),
-  error: (...args: unknown[]) => write('error', ...args),
+  debug: (message: string, context?: Record<string, unknown>) => write('debug', message, context),
+  info: (message: string, context?: Record<string, unknown>) => write('info', message, context),
+  warn: (message: string, context?: Record<string, unknown>) => write('warn', message, context),
+  error: (message: string, context?: Record<string, unknown>) => write('error', message, context),
+  
+  // 获取日志历史
+  getLogs: (level?: LogLevel): LogEntry[] => {
+    if (level) return logs.filter(l => l.level === level);
+    return [...logs];
+  },
+  
+  // 清空日志
+  clear: () => { logs.length = 0; },
 };
 
+export default logger;
