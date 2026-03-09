@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Typography, Divider, Button, Tag, message, Tooltip, Space } from 'antd';
+import { Card, Typography, Divider, Button, Tag, Tooltip, Space } from 'antd';
 import { 
   FilePdfOutlined, 
   CopyOutlined, 
@@ -9,6 +9,7 @@ import {
   CalendarOutlined
 } from '@ant-design/icons';
 import type { Script, ScriptSegment } from '@/types';
+import { notify } from '@/shared';
 import styles from './ScriptPreview.module.less';
 
 const { Title, Paragraph, Text } = Typography;
@@ -41,12 +42,12 @@ const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport 
 
     navigator.clipboard.writeText(text).then(
       () => {
-        message.success('脚本已复制到剪贴板');
+        notify.success('脚本已复制到剪贴板');
         setCopying(false);
       },
       (err) => {
         console.error('复制失败:', err);
-        message.error('复制失败，请重试');
+        notify.error(err, '复制失败，请重试');
         setCopying(false);
       }
     );

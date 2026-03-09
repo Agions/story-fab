@@ -1,5 +1,4 @@
 import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
-import { message } from 'antd';
 import { getConfigDir } from './fileOperations';
 
 /**
@@ -51,11 +50,9 @@ export const saveApiKey = async (service: string, apiKey: string): Promise<boole
     config[service] = apiKey;
 
     await writeTextFile(configPath, JSON.stringify(config, null, 2));
-    message.success(`${service}的API密钥已保存`);
     return true;
   } catch (error) {
     console.error(`保存${service}的API密钥失败:`, error);
-    message.error(`保存API密钥失败: ${error}`);
     return false;
   }
 };
@@ -100,7 +97,6 @@ export const saveAppData = async <T>(key: string, data: T): Promise<boolean> => 
     return true;
   } catch (error) {
     console.error(`保存应用数据(${key})失败:`, error);
-    message.error(`保存数据失败: ${error}`);
     return false;
   }
 };

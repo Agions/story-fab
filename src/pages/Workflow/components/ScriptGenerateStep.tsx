@@ -81,18 +81,6 @@ const ScriptGenerateStep: React.FC<ScriptGenerateStepProps> = ({
                 </Radio.Group>
               </div>
             </Col>
-            <Col span={12}>
-              <div className={styles.paramItem}>
-                <Text>语言</Text>
-                <Radio.Group
-                  value={scriptParams.language}
-                  onChange={(e) => onParamsChange({ language: e.target.value })}
-                >
-                  <Radio.Button value="zh">中文</Radio.Button>
-                  <Radio.Button value="en">English</Radio.Button>
-                </Radio.Group>
-              </div>
-            </Col>
           </Row>
         </Card>
 

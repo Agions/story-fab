@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { 
   Card, Button, Space, Typography,
-  Switch, Alert, Divider, Progress, message, Result, Tag, Row, Col, Radio, Badge
+  Switch, Alert, Divider, Progress, Result, Tag, Row, Col, Radio, Badge
 } from 'antd';
 import {
   ExportOutlined,
@@ -14,6 +14,7 @@ import {
   VideoCameraOutlined,
 } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
+import { notify } from '@/shared';
 import type { ExportSettings } from '@/core/types';
 import styles from './ClipFlow.module.less';
 
@@ -81,7 +82,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
   // 处理导出
   const handleExport = async () => {
     if (!state.synthesisData?.finalVideoUrl) {
-      message.warning('请先完成视频合成');
+      notify.warning('请先完成视频合成');
       return;
     }
 
@@ -100,11 +101,11 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
       // 保存设置
       setExportSettings(config);
       setExported(true);
-      message.success('视频导出成功！');
+      notify.success('视频导出成功！');
 
     } catch (error) {
       console.error('导出失败:', error);
-      message.error('导出失败，请重试');
+      notify.error(error, '导出失败，请重试');
     } finally {
       setExporting(false);
     }

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { message } from 'antd';
 import { aiClipService, type AIClipConfig, type ClipAnalysisResult, type ClipSegment } from '@/core/services/aiClip.service';
 import type { VideoInfo } from '@/core/types';
+import { notify } from '@/shared';
 
 export const useAIClipAssistant = (
   videoInfo: VideoInfo,
@@ -68,11 +68,11 @@ export const useAIClipAssistant = (
       setSelectedSuggestions(autoSelected);
 
       onAnalysisComplete?.(result);
-      message.success('视频分析完成！');
+      notify.success('视频分析完成！');
       setCurrentStep(2);
     } catch (err) {
       setError(err instanceof Error ? err.message : '分析失败');
-      message.error('视频分析失败');
+      notify.error(err, '视频分析失败');
     } finally {
       setAnalyzing(false);
     }
@@ -93,11 +93,11 @@ export const useAIClipAssistant = (
       setPreviewSegments(result.segments);
       onAnalysisComplete?.(result);
 
-      message.success('智能剪辑完成！');
+      notify.success('智能剪辑完成！');
       setCurrentStep(3);
     } catch (err) {
       setError(err instanceof Error ? err.message : '剪辑失败');
-      message.error('智能剪辑失败');
+      notify.error(err, '智能剪辑失败');
     } finally {
       setAnalyzing(false);
     }
@@ -116,7 +116,7 @@ export const useAIClipAssistant = (
     setPreviewSegments(segments);
     onApplySuggestions?.(segments);
 
-    message.success(`已应用 ${selectedIds.length} 条建议`);
+    notify.success(`已应用 ${selectedIds.length} 条建议`);
     setCurrentStep(3);
   }, [analysisResult, selectedSuggestions, videoInfo, onApplySuggestions]);
 

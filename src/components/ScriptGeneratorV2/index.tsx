@@ -37,8 +37,7 @@ import {
   SCRIPT_STYLES,
   TONE_OPTIONS,
   SCRIPT_LENGTHS,
-  TARGET_AUDIENCES,
-  LANGUAGE_OPTIONS
+  TARGET_AUDIENCES
 } from '@/core/constants';
 import { aiService } from '@/core/services/ai.service';
 import { formatDuration } from '@/core/utils';
@@ -63,7 +62,6 @@ interface ScriptFormValues {
   tone: string;
   length: string;
   audience: string;
-  language: string;
   requirements?: string;
 }
 
@@ -75,7 +73,6 @@ const FORM_FIELDS = {
   tone: { label: '语气语调' },
   length: { label: '脚本长度' },
   audience: { label: '目标受众' },
-  language: { label: '语言' },
   requirements: { label: '特殊要求（可选）', placeholder: '例如：需要包含产品介绍、使用步骤、注意事项等' }
 };
 
@@ -85,7 +82,6 @@ const DEFAULT_FORM_VALUES = {
   tone: 'friendly',
   length: 'medium',
   audience: 'general',
-  language: 'zh'
 };
 
 export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
@@ -147,7 +143,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       const script = await aiService.generateScript(
         selectedModel,
         modelSettings as AIModelSettings,
-        { ...values, videoDuration }
+        { ...values, language: 'zh', videoDuration }
       );
 
       setProgress(100);
@@ -249,14 +245,6 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
         </Select>
       </Form.Item>
 
-      <Form.Item name="language" label={FORM_FIELDS.language.label}>
-        <Radio.Group>
-          {LANGUAGE_OPTIONS.map(opt => (
-            <Radio key={opt.value} value={opt.value}>{opt.label}</Radio>
-          ))}
-        </Radio.Group>
-      </Form.Item>
-
       <Form.Item name="requirements" label={FORM_FIELDS.requirements.label}>
         <TextArea rows={3} placeholder={FORM_FIELDS.requirements.placeholder} />
       </Form.Item>
@@ -321,7 +309,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
                 {TARGET_AUDIENCES.find(a => a.value === generatedScript.metadata.targetAudience)?.label}
               </Tag>
               <Tag icon={<GlobalOutlined />}>
-                {LANGUAGE_OPTIONS.find(l => l.value === generatedScript.metadata.language)?.label}
+                中文
               </Tag>
             </Space>
           </div>

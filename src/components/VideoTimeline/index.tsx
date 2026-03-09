@@ -15,7 +15,6 @@ import {
   Divider,
   Row,
   Col,
-  message
 } from 'antd';
 import {
   PlayCircleOutlined,
@@ -27,6 +26,7 @@ import {
   ZoomOutOutlined
 } from '@ant-design/icons';
 import type { VideoInfo, ScriptData } from '@/core/types';
+import { notify } from '@/shared';
 import styles from './index.module.less';
 
 const { Text } = Typography;
@@ -175,7 +175,7 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
       )
     }));
 
-    message.success('已添加片段');
+    notify.success('已添加片段');
   };
 
   // 删除片段
@@ -189,13 +189,13 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
     }));
 
     setSelectedClip(null);
-    message.success('已删除片段');
+    notify.success('已删除片段');
   };
 
   // 保存时间轴
   const handleSave = () => {
     onSave?.(timeline);
-    message.success('时间轴已保存');
+    notify.success('时间轴已保存');
   };
 
   // 渲染轨道头部

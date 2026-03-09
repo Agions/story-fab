@@ -8,7 +8,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { 
   Upload, Button, Card, Space, Typography,
-  message, Alert, Divider, Tooltip
+  Alert, Divider, Tooltip
 } from 'antd';
 import {
   DeleteOutlined,
@@ -23,7 +23,7 @@ import {
 import { useClipFlow } from '../AIEditorContext';
 import { ProcessingProgress } from '@/components/common';
 import type { VideoInfo } from '@/core/types';
-import { formatDuration, formatFileSize } from '@/shared';
+import { formatDuration, formatFileSize, notify } from '@/shared';
 import styles from './ClipFlow.module.less';
 
 const { Title, Text, Paragraph } = Typography;
@@ -78,7 +78,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
   const handleUpload = useCallback(async (file: File) => {
     const validation = validateFile(file);
     if (!validation.valid) {
-      message.error(validation.error);
+      notify.error(null, validation.error || '文件校验失败');
       return;
     }
 
@@ -159,7 +159,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
 
       // 保存视频信息到状态
       setVideo(videoInfo);
-      message.success('视频上传成功');
+      notify.success('视频上传成功');
 
       // 跳转到下一步
       if (onNext) {
@@ -168,7 +168,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
         setTimeout(() => goToNextStep(), 500);
       }
     } catch (error) {
-      message.error('视频处理失败，请重试');
+      notify.error(error, '视频处理失败，请重试');
       console.error(error);
     } finally {
       setUploading(false);
@@ -180,11 +180,11 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
     if (uploadStatus === 'uploading') {
       setUploadStatus('paused');
       uploadStatusRef.current = 'paused';
-      message.info('上传已暂停');
+      notify.info('上传已暂停');
     } else if (uploadStatus === 'paused') {
       setUploadStatus('uploading');
       uploadStatusRef.current = 'uploading';
-      message.info('继续上传中...');
+      notify.info('继续上传中...');
     }
   };
 

@@ -23,6 +23,9 @@ const KeyframePanel: React.FC<KeyframePanelProps> = ({ keyframes }) => {
                 src={frame}
                 alt={`关键帧 ${index + 1}`}
                 className={styles.keyframeImage}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
               />
             </div>
           ))}

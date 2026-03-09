@@ -47,6 +47,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onLoadVideo,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const lastSyncedTimeRef = useRef(0);
 
   const togglePlayPause = useCallback(() => {
     if (!videoRef.current) return;
@@ -62,7 +63,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   const handleTimeUpdate = useCallback(() => {
     if (!videoRef.current) return;
-    onTimeUpdate(videoRef.current.currentTime);
+    const nextTime = videoRef.current.currentTime;
+    // 控制时间轴更新频率，降低播放期间的高频重渲染压力
+    if (Math.abs(nextTime - lastSyncedTimeRef.current) < 0.08) return;
+    lastSyncedTimeRef.current = nextTime;
+    onTimeUpdate(nextTime);
   }, [onTimeUpdate]);
 
   const handleLoadedMetadata = useCallback(() => {

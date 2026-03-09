@@ -12,7 +12,6 @@ import {
   Space,
   Typography,
   Tag,
-  message,
   Alert
 } from 'antd';
 import {
@@ -27,7 +26,7 @@ import {
 import { motion, AnimatePresence } from '@/components/common/motion-shim';
 import { useVideo } from '@/core/hooks/useVideo';
 import type { VideoInfo } from '@/core/types';
-import { formatDuration, formatFileSize } from '@/shared';
+import { formatDuration, formatFileSize, notify } from '@/shared';
 import styles from './index.module.less';
 
 const { Title, Text, Paragraph } = Typography;
@@ -95,7 +94,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     const videoInfo = await uploadVideo(file);
     if (videoInfo) {
       onUpload?.(videoInfo);
-      message.success('视频上传成功');
+      notify.success('视频上传成功');
     }
     return false; // 阻止默认上传行为
   }, [uploadVideo, onUpload]);
@@ -111,13 +110,13 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
       // 验证文件类型
       const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
       if (!SUPPORTED_FORMATS.includes(fileExt)) {
-        message.error(`不支持的文件格式，仅支持 ${SUPPORTED_FORMATS.join(', ')}`);
+        notify.error(null, `不支持的文件格式，仅支持 ${SUPPORTED_FORMATS.join(', ')}`);
         setDragFile(null);
         return;
       }
       // 验证文件大小
       if (file.size > MAX_FILE_SIZE) {
-        message.error(`文件过大，最大支持 ${formatFileSize(MAX_FILE_SIZE)}`);
+        notify.error(null, `文件过大，最大支持 ${formatFileSize(MAX_FILE_SIZE)}`);
         setDragFile(null);
         return;
       }
@@ -130,7 +129,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
   // 处理删除
   const handleRemove = useCallback(() => {
     onRemove?.();
-    message.info('视频已移除');
+    notify.info('视频已移除');
   }, [onRemove]);
 
   // 当前显示的视频

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Row, 
   Col, 
@@ -15,7 +15,6 @@ import {
   Tooltip,
   Input,
   Segmented,
-  message,
   Modal
 } from 'antd';
 import { 
@@ -37,10 +36,17 @@ import {
   SearchOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { listProjects, deleteProject as deleteProjectFile, getFileSizeBytes } from '@/services/tauriService';
+import { listProjects, deleteProject as deleteProjectFile, getFileSizeBytes, PROJECTS_CHANGED_EVENT } from '@/services/tauriService';
+import {
+  preloadAIVideoEditorPage,
+  preloadProjectEditPage,
+  preloadProjectsPage,
+  preloadSettingsPage,
+} from '@/core/utils/route-preload';
 import { useSettings } from '@/context/SettingsContext';
 import {
   extractProjectMediaMetrics,
+  notify,
   pickPreferredSizeMb,
   resolveProjectVideoPath,
   type RawProjectRecord,
@@ -95,7 +101,7 @@ const Dashboard: React.FC = () => {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects);
   const [loading, setLoading] = useState(false);
   
-  const loadProjects = async () => {
+  const loadProjects = useCallback(async () => {
     try {
       setLoading(true);
       const rawProjects = await listProjects<RawProjectRecord>();
@@ -121,11 +127,11 @@ const Dashboard: React.FC = () => {
       setProjects(mapped);
     } catch (error) {
       console.error('加载项目失败:', error);
-      message.error('加载项目失败，请稍后重试');
+      notify.error(error, '加载项目失败，请稍后重试');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // 统计数据
   const totalProjects = projects.length;
@@ -135,7 +141,14 @@ const Dashboard: React.FC = () => {
   // 搜索和过滤项目
   useEffect(() => {
     void loadProjects();
-  }, []);
+    const handleProjectsChanged = () => {
+      void loadProjects();
+    };
+    window.addEventListener(PROJECTS_CHANGED_EVENT, handleProjectsChanged);
+    return () => {
+      window.removeEventListener(PROJECTS_CHANGED_EVENT, handleProjectsChanged);
+    };
+  }, [loadProjects]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -170,14 +183,14 @@ const Dashboard: React.FC = () => {
         try {
           const ok = await deleteProjectFile(id);
           if (ok) {
-            message.success('项目已删除');
+            notify.success('项目已删除');
             await loadProjects();
           } else {
-            message.error('删除项目失败');
+            notify.error(null, '删除项目失败');
           }
         } catch (error) {
           console.error('删除项目失败:', error);
-          message.error('删除项目失败，请稍后重试');
+          notify.error(error, '删除项目失败，请稍后重试');
         }
       },
     });
@@ -207,7 +220,7 @@ const Dashboard: React.FC = () => {
         key: '2',
         label: '复制项目',
         icon: <CopyOutlined />,
-        onClick: () => message.info('复制项目功能即将上线')
+        onClick: () => notify.info('复制项目功能即将上线')
       },
       {
         key: '3',
@@ -224,12 +237,16 @@ const Dashboard: React.FC = () => {
     <Col xs={24} sm={12} md={8} lg={6} key={project.id}>
       <Card 
         className={styles.projectCard}
+        onMouseEnter={() => { void preloadProjectEditPage(); }}
         cover={
           <div className={styles.thumbnailContainer}>
             <img 
               alt={project.title} 
               src={project.thumbnail} 
               className={styles.thumbnail}
+              loading="lazy"
+              decoding="async"
+              draggable={false}
               onClick={() => openProject(project.id)}
             />
             <div className={styles.duration}>
@@ -303,6 +320,7 @@ const Dashboard: React.FC = () => {
         <Button
           type="text"
           icon={<EditOutlined />}
+          onMouseEnter={() => { void preloadProjectEditPage(); }}
           onClick={() => openProject(project.id)}
         />,
         <Button
@@ -322,13 +340,16 @@ const Dashboard: React.FC = () => {
               alt={project.title} 
               src={project.thumbnail} 
               className={styles.listThumbnail}
+              loading="lazy"
+              decoding="async"
+              draggable={false}
             />
             <div className={styles.listDuration}>
               {formatDuration(project.duration)}
             </div>
           </div>
         }
-        title={<a onClick={() => openProject(project.id)}>{project.title}</a>}
+        title={<a onMouseEnter={() => { void preloadProjectEditPage(); }} onClick={() => openProject(project.id)}>{project.title}</a>}
         description={
           <Space direction="vertical" size={2} style={{ width: '100%' }}>
             <div className={styles.projectInfo}>
@@ -358,6 +379,7 @@ const Dashboard: React.FC = () => {
           size="large"
           icon={<PlusOutlined />}
           onClick={createNewProject}
+          onMouseEnter={() => { void preloadProjectEditPage(); }}
           className={styles.newProjectButton}
         >
           新建项目
@@ -451,7 +473,7 @@ const Dashboard: React.FC = () => {
           }
           className={styles.emptyState}
         >
-          <Button type="primary" icon={<PlusOutlined />} onClick={createNewProject}>
+          <Button type="primary" icon={<PlusOutlined />} onMouseEnter={() => { void preloadProjectEditPage(); }} onClick={createNewProject}>
             创建第一个项目
           </Button>
         </Empty>
@@ -461,28 +483,28 @@ const Dashboard: React.FC = () => {
       <Card title="快速工具" className={styles.quickTools}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={8} md={6}>
-            <Card className={styles.toolCard} onClick={() => navigate('/templates')}>
+            <Card className={styles.toolCard} onMouseEnter={() => { void preloadAIVideoEditorPage(); }} onClick={() => navigate('/workflow')}>
               <VideoCameraOutlined className={styles.toolIcon} />
               <div className={styles.toolTitle}>模板库</div>
               <div className={styles.toolDesc}>使用专业模板快速创建</div>
             </Card>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <Card className={styles.toolCard} onClick={() => navigate('/assets')}>
+            <Card className={styles.toolCard} onMouseEnter={() => { void preloadProjectsPage(); }} onClick={() => navigate('/projects')}>
               <FolderOutlined className={styles.toolIcon} />
               <div className={styles.toolTitle}>素材库</div>
               <div className={styles.toolDesc}>管理您的视频素材</div>
             </Card>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <Card className={styles.toolCard} onClick={() => navigate('/ai-tools')}>
+            <Card className={styles.toolCard} onMouseEnter={() => { void preloadAIVideoEditorPage(); }} onClick={() => navigate('/ai-editor')}>
               <FireOutlined className={styles.toolIcon} />
               <div className={styles.toolTitle}>AI 助手</div>
               <div className={styles.toolDesc}>智能生成内容与剪辑</div>
             </Card>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <Card className={styles.toolCard} onClick={() => navigate('/settings')}>
+            <Card className={styles.toolCard} onMouseEnter={() => { void preloadSettingsPage(); }} onClick={() => navigate('/settings')}>
               <BarChartOutlined className={styles.toolIcon} />
               <div className={styles.toolTitle}>数据分析</div>
               <div className={styles.toolDesc}>查看您的创作数据</div>

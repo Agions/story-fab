@@ -5,7 +5,6 @@ import {
   Form,
   Input,
   Button,
-  message,
   Steps,
   Typography,
   Space,
@@ -20,15 +19,21 @@ import VideoSelector from '@/components/VideoSelector';
 import ScriptEditor from '@/components/ScriptEditor';
 import { VideoMetadata, VideoSegment, analyzeVideo, extractKeyFrames } from '@/services/videoService';
 import { generateScriptWithAI, analyzeKeyFramesWithAI } from '@/services/aiService';
-import { loadProjectFromFile, saveProjectToFile } from '@/services/tauriService';
+import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauriService';
 import { normalizeProjectFile } from '@/core/utils/project-file';
 import type { ProjectFileLike } from '@/core/utils/project-file';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';
+import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
 import { v4 as uuid } from 'uuid';
 import styles from './index.module.less';
 
 const { Title, Paragraph } = Typography;
+const STEP_ITEMS = [
+  { title: '选择视频', icon: <VideoCameraOutlined />, description: '上传视频文件' },
+  { title: '分析内容', icon: <EditOutlined />, description: '分析视频生成脚本' },
+  { title: '编辑脚本', icon: <CheckCircleOutlined />, description: '编辑和优化脚本' },
+];
 
 interface ProjectData extends ProjectFileLike<unknown, { path?: string }> {
   id: string;
@@ -41,6 +46,76 @@ interface ProjectData extends ProjectFileLike<unknown, { path?: string }> {
   keyFrames?: string[];
   script?: VideoSegment[];
 }
+
+interface ProjectEditHeaderProps {
+  isNewProject: boolean;
+  loading: boolean;
+  initialLoading: boolean;
+  saving: boolean;
+  saveBehavior: ProjectSaveBehavior;
+  autoSaveEnabled: boolean;
+  onBack: () => void;
+  onSave: () => void;
+  onSaveBehaviorChange: (value: ProjectSaveBehavior) => void;
+  onAutoSaveToggle: (checked: boolean) => void;
+}
+
+const ProjectEditHeader = React.memo((props: ProjectEditHeaderProps) => {
+  const {
+    isNewProject,
+    loading,
+    initialLoading,
+    saving,
+    saveBehavior,
+    autoSaveEnabled,
+    onBack,
+    onSave,
+    onSaveBehaviorChange,
+    onAutoSaveToggle,
+  } = props;
+
+  return (
+    <div className={styles.header}>
+      <Button type="text" icon={<ArrowLeftOutlined />} onClick={onBack}>返回</Button>
+      <Title level={3}>{isNewProject ? '创建新项目' : '编辑项目'}</Title>
+      <Space size="middle">
+        <div className={styles.saveBehaviorControl}>
+          <span className={styles.saveBehaviorLabel}>保存后：</span>
+          <Select<ProjectSaveBehavior>
+            size="small"
+            value={saveBehavior}
+            onChange={onSaveBehaviorChange}
+            options={[
+              { value: 'stay', label: '留在编辑页' },
+              { value: 'detail', label: '跳转项目详情' },
+            ]}
+          />
+        </div>
+        <div className={styles.saveBehaviorControl}>
+          <span className={styles.saveBehaviorLabel}>自动保存：</span>
+          <Switch size="small" checked={autoSaveEnabled} onChange={onAutoSaveToggle} />
+        </div>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={onSave}
+          loading={saving}
+          disabled={loading || initialLoading}
+        >
+          保存项目
+        </Button>
+      </Space>
+    </div>
+  );
+});
+
+ProjectEditHeader.displayName = 'ProjectEditHeader';
+
+const AutoSaveStatus = React.memo(({ content }: { content: React.ReactNode }) => (
+  <div className={styles.autoSaveStatus}>{content}</div>
+));
+
+AutoSaveStatus.displayName = 'AutoSaveStatus';
 
 const normalizeProjectData = (project: ProjectData): ProjectData => {
   const normalized = normalizeProjectFile(project);
@@ -122,9 +197,24 @@ const ProjectEdit: React.FC = () => {
   });
 
   const draftTimerRef = useRef<number | null>(null);
+  const autoSaveRequestSeqRef = useRef(0);
   const lastDraftFingerprintRef = useRef('');
   const recentProjectTrackedRef = useRef('');
   const draftProjectIdRef = useRef<string>(projectId || '');
+  const persistLockRef = useRef(false);
+  const analyzingLockRef = useRef(false);
+  const loadRequestSeqRef = useRef(0);
+  const mountedRef = useRef(true);
+  const [reloadToken, setReloadToken] = useState(0);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      if (draftTimerRef.current) {
+        window.clearTimeout(draftTimerRef.current);
+      }
+    };
+  }, []);
 
   const canAccessStep = useCallback((step: number) => {
     if (step <= 0) return true;
@@ -140,12 +230,12 @@ const ProjectEdit: React.FC = () => {
     }
 
     if (targetStep > 0 && !videoPath) {
-      message.warning('请先选择视频后再继续。');
+      notify.warning('请先选择视频后再继续。');
       return;
     }
 
     if (targetStep > 1) {
-      message.warning('请先完成视频分析后再进入脚本编辑。');
+      notify.warning('请先完成视频分析后再进入脚本编辑。');
     }
   }, [canAccessStep, videoPath]);
 
@@ -223,42 +313,128 @@ const ProjectEdit: React.FC = () => {
     const { silent = false, requireVideo = true, requireValidName = true } = options || {};
 
     if (requireVideo && !videoPath) {
-      if (!silent) message.error('请先选择视频文件');
+      if (!silent) notify.error(null, '请先选择视频文件');
       return null;
     }
 
     const nameInput = normalizeText(form.getFieldValue('name'));
     if (requireValidName && nameInput && nameInput.length < 2) {
-      if (!silent) message.error('项目名称至少2个字符');
+      if (!silent) notify.error(null, '项目名称至少2个字符');
       return null;
     }
 
-    const data = buildProjectData();
-    await saveProjectToFile(data.id, data);
-    const shouldSyncProjectState = !silent || !project || project.id !== data.id;
-    if (shouldSyncProjectState) {
-      setProject(data);
-    }
-    if (recentProjectTrackedRef.current !== data.id) {
-      addRecentProject(data.id);
-      recentProjectTrackedRef.current = data.id;
+    if (persistLockRef.current) {
+      if (!silent) notify.info('正在保存，请稍候');
+      return null;
     }
 
-    if (!silent) message.success('项目保存成功');
-    return data;
+    persistLockRef.current = true;
+    const data = buildProjectData();
+    try {
+      await saveProjectToFile(data.id, data);
+      const shouldSyncProjectState = !silent || !project || project.id !== data.id;
+      if (shouldSyncProjectState) {
+        setProject(data);
+      }
+      if (recentProjectTrackedRef.current !== data.id) {
+        addRecentProject(data.id);
+        recentProjectTrackedRef.current = data.id;
+      }
+
+      if (!silent) notify.success('项目保存成功');
+      return data;
+    } finally {
+      persistLockRef.current = false;
+    }
   }, [addRecentProject, buildProjectData, form, videoPath]);
 
+  const getCurrentDraftFingerprint = useCallback(() => buildDraftFingerprint({
+    id: project?.id || projectId || '',
+    name: form.getFieldValue('name'),
+    description: form.getFieldValue('description'),
+    videoPath,
+    keyFrameCount: keyFrames.length,
+    scriptCount: scriptSegments.length,
+    hasMetadata: Boolean(videoMetadata),
+  }), [
+    form,
+    keyFrames.length,
+    project?.id,
+    projectId,
+    scriptSegments.length,
+    videoMetadata,
+    videoPath,
+  ]);
+
+  const scheduleAutoSave = useCallback(() => {
+    if (!autoSaveEnabled || initialLoading || loading || saving || !videoPath) return;
+    const currentFingerprint = getCurrentDraftFingerprint();
+    if (lastDraftFingerprintRef.current === currentFingerprint) {
+      return;
+    }
+
+    if (draftTimerRef.current) window.clearTimeout(draftTimerRef.current);
+    const requestId = ++autoSaveRequestSeqRef.current;
+    const isStale = () => !mountedRef.current || requestId !== autoSaveRequestSeqRef.current;
+
+    draftTimerRef.current = window.setTimeout(async () => {
+      try {
+        if (isStale()) return;
+        setAutoSaveState('saving');
+        const draftData = await persistProject({
+          silent: true,
+          requireVideo: true,
+          requireValidName: false,
+        });
+
+        if (isStale()) return;
+        if (!draftData) {
+          setAutoSaveState('idle');
+          return;
+        }
+        lastDraftFingerprintRef.current = currentFingerprint;
+        setLastAutoSaveAt(new Date().toLocaleTimeString('zh-CN', { hour12: false }));
+        setAutoSaveState('saved');
+      } catch (draftError) {
+        if (isStale()) return;
+        console.error('自动保存草稿失败:', draftError);
+        setAutoSaveState('error');
+      }
+    }, 900);
+  }, [autoSaveEnabled, getCurrentDraftFingerprint, initialLoading, loading, persistProject, saving, videoPath]);
+
   useEffect(() => {
+    const requestId = ++loadRequestSeqRef.current;
+    const isStale = () => !mountedRef.current || requestId !== loadRequestSeqRef.current;
+
     if (!projectId) {
+      if (isStale()) return;
+      setIsNewProject(true);
+      setProject(null);
+      setError(null);
+      setInitialLoading(false);
+      setCurrentStep(0);
+      setVideoSelected(false);
+      setVideoPath('');
+      setVideoMetadata(null);
+      setKeyFrames([]);
+      setScriptSegments([]);
+      setAutoSaveState('idle');
+      setLastAutoSaveAt('');
+      draftProjectIdRef.current = '';
+      lastDraftFingerprintRef.current = '';
       form.setFieldsValue({ name: defaultProjectName, description: '' });
       return;
     }
 
+    if (isStale()) return;
     setInitialLoading(true);
     setIsNewProject(false);
+    setError(null);
 
-    loadProjectFromFile<ProjectData>(projectId)
+    loadProjectWithRetry<ProjectData>(projectId, { retries: 2, retryDelayMs: 260 })
       .then((projectData) => {
+        if (isStale()) return;
         const normalizedProject = normalizeProjectData(projectData);
         draftProjectIdRef.current = normalizedProject.id;
         setProject(normalizedProject);
@@ -295,75 +471,29 @@ const ProjectEdit: React.FC = () => {
         setError(null);
       })
       .catch((err: unknown) => {
+        if (isStale()) return;
         console.error('加载项目失败:', err);
         const detail = err instanceof Error ? err.message : String(err);
         setError(`加载项目失败：${detail}`);
-        message.error(`加载项目失败：${detail}`);
+        notify.error(err, '加载项目失败，请返回项目列表后重试');
       })
       .finally(() => {
+        if (isStale()) return;
         setInitialLoading(false);
       });
-  }, [defaultProjectName, form, projectId]);
+  }, [defaultProjectName, form, projectId, reloadToken]);
 
   useEffect(() => {
-    if (!autoSaveEnabled || initialLoading || loading || saving || !videoPath) return;
-
-    const currentFingerprint = buildDraftFingerprint({
-      id: project?.id || projectId || '',
-      name: '',
-      description: '',
-      videoPath,
-      keyFrameCount: keyFrames.length,
-      scriptCount: scriptSegments.length,
-      hasMetadata: Boolean(videoMetadata),
-    });
-
-    if (lastDraftFingerprintRef.current === currentFingerprint) {
-      return;
-    }
-
-    if (draftTimerRef.current) window.clearTimeout(draftTimerRef.current);
-
-    draftTimerRef.current = window.setTimeout(async () => {
-      try {
-        setAutoSaveState('saving');
-        const draftData = await persistProject({
-          silent: true,
-          requireVideo: true,
-          requireValidName: false,
-        });
-
-        if (!draftData) {
-          setAutoSaveState('idle');
-          return;
-        }
-        lastDraftFingerprintRef.current = currentFingerprint;
-        setLastAutoSaveAt(new Date().toLocaleTimeString('zh-CN', { hour12: false }));
-        setAutoSaveState('saved');
-      } catch (draftError) {
-        console.error('自动保存草稿失败:', draftError);
-        setAutoSaveState('error');
-      }
-    }, 900);
-
-    return () => {
-      if (draftTimerRef.current) window.clearTimeout(draftTimerRef.current);
-    };
-  }, [
-    initialLoading,
-    keyFrames,
-    loading,
-    persistProject,
-    saving,
-    scriptSegments,
-    videoMetadata,
-    videoPath,
-    autoSaveEnabled,
-    project?.id,
-    projectId,
-  ]);
+    scheduleAutoSave();
+  }, [scheduleAutoSave]);
 
   const handleVideoSelect = (filePath: string, metadata?: VideoMetadata) => {
+    if (filePath === videoPath && videoSelected) {
+      if (metadata && metadata !== videoMetadata) {
+        setVideoMetadata(metadata);
+      }
+      return;
+    }
     setVideoPath(filePath);
     setVideoSelected(true);
     if (metadata) setVideoMetadata(metadata);
@@ -382,12 +512,13 @@ const ProjectEdit: React.FC = () => {
   };
 
   const handleAnalyzeVideo = async () => {
-    if (loading) return;
+    if (loading || analyzingLockRef.current) return;
     if (!videoPath) {
-      message.error('请先选择视频');
+      notify.error(null, '请先选择视频');
       return;
     }
 
+    analyzingLockRef.current = true;
     let stage: 'metadata' | 'keyframes' | 'frames-ai' | 'script' = 'metadata';
 
     try {
@@ -396,13 +527,13 @@ const ProjectEdit: React.FC = () => {
       let metadata = videoMetadata;
       if (!metadata) {
         stage = 'metadata';
-        message.info('正在分析视频元数据...');
+        notify.info('正在分析视频元数据...');
         metadata = await analyzeVideo(videoPath);
         setVideoMetadata(metadata);
       }
 
       stage = 'keyframes';
-      message.info('正在提取关键帧...');
+      notify.info('正在提取关键帧...');
       const frames = await extractKeyFrames(videoPath);
       const framePaths = frames.map((frame) => frame.path);
       if (framePaths.length === 0) {
@@ -411,11 +542,11 @@ const ProjectEdit: React.FC = () => {
       setKeyFrames(framePaths);
 
       stage = 'frames-ai';
-      message.info('正在分析关键帧内容...');
+      notify.info('正在分析关键帧内容...');
       const frameDescriptions = await analyzeKeyFramesWithAI(framePaths);
 
       stage = 'script';
-      message.info('正在根据视频内容生成脚本...');
+      notify.info('正在根据视频内容生成脚本...');
       const scriptText = await generateScriptWithAI(metadata, frameDescriptions, {
         style: '自然流畅',
         tone: '专业',
@@ -434,7 +565,7 @@ const ProjectEdit: React.FC = () => {
       }
 
       setScriptSegments(script);
-      message.success('视频分析完成');
+      notify.success('视频分析完成');
       goToStep(2);
     } catch (analyzeError) {
       console.error('视频分析失败:', analyzeError);
@@ -446,9 +577,10 @@ const ProjectEdit: React.FC = () => {
         script: '脚本生成',
       }[stage];
       const errorMessage = detail.includes('失败') ? detail : `${stageLabel}失败：${detail}`;
-      message.error(errorMessage);
+      notify.error(analyzeError, errorMessage);
     } finally {
       setLoading(false);
+      analyzingLockRef.current = false;
     }
   };
 
@@ -466,12 +598,25 @@ const ProjectEdit: React.FC = () => {
       });
 
       if (!projectData) return;
+      lastDraftFingerprintRef.current = buildDraftFingerprint({
+        id: projectData.id,
+        name: projectData.name,
+        description: projectData.description,
+        videoPath: projectData.videoPath,
+        keyFrameCount: projectData.keyFrames?.length || 0,
+        scriptCount: projectData.script?.length || 0,
+        hasMetadata: Boolean(projectData.metadata),
+      });
+      setAutoSaveState('saved');
+      setLastAutoSaveAt(new Date().toLocaleTimeString('zh-CN', { hour12: false }));
 
-      const targetRoute = saveBehavior === 'detail'
+      const shouldOpenDetail = saveBehavior === 'detail';
+      const shouldBindNewIdToEditRoute = Boolean(!projectId && isNewProject);
+      const targetRoute = shouldOpenDetail
         ? `/project/${projectData.id}`
         : `/project/edit/${projectData.id}`;
 
-      if (isNewProject || saveBehavior === 'detail' || !projectId) {
+      if (shouldBindNewIdToEditRoute || shouldOpenDetail) {
         setIsNewProject(false);
         if (location.pathname !== targetRoute) {
           navigate(targetRoute, { replace: true });
@@ -479,14 +624,18 @@ const ProjectEdit: React.FC = () => {
       }
     } catch (saveError) {
       console.error('保存项目失败:', saveError);
-      message.error(saveError instanceof Error ? saveError.message : '保存项目失败，请稍后再试');
+      notify.error(saveError, '保存项目失败，请稍后再试');
     } finally {
       setSaving(false);
     }
   };
 
   const handleBack = () => {
-    navigate(-1);
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate('/projects');
   };
 
   const handleSaveBehaviorChange = (value: ProjectSaveBehavior) => {
@@ -501,6 +650,10 @@ const ProjectEdit: React.FC = () => {
   const handleAutoSaveToggle = (checked: boolean) => {
     setAutoSaveEnabled(checked);
     if (!checked) {
+      if (draftTimerRef.current) {
+        window.clearTimeout(draftTimerRef.current);
+      }
+      autoSaveRequestSeqRef.current += 1;
       setAutoSaveState('idle');
       setLastAutoSaveAt('');
     }
@@ -511,20 +664,28 @@ const ProjectEdit: React.FC = () => {
     }
   };
 
-  const getAutoSaveTag = () => {
+  const autoSaveTag = React.useMemo(() => {
     if (!autoSaveEnabled) return <Tag color="default">自动保存已关闭</Tag>;
     if (!videoPath) return <Tag color="default">未开始自动保存</Tag>;
     if (autoSaveState === 'saving') return <Tag color="processing">草稿自动保存中...</Tag>;
     if (autoSaveState === 'saved') return <Tag color="success">{lastAutoSaveAt ? `草稿已保存 ${lastAutoSaveAt}` : '草稿已保存'}</Tag>;
     if (autoSaveState === 'error') return <Tag color="error">草稿保存失败</Tag>;
     return <Tag color="default">自动保存待触发</Tag>;
-  };
+  }, [autoSaveEnabled, autoSaveState, lastAutoSaveAt, videoPath]);
 
   const handleExportScript = (format: string) => {
-    message.info(`导出脚本为 ${format.toUpperCase()} 格式`);
+    notify.info(`导出脚本为 ${format.toUpperCase()} 格式`);
   };
 
-  const renderStepContent = () => {
+  const handleFormValuesChange = (changedValues: Partial<Pick<ProjectData, 'name' | 'description'>>) => {
+    if (!Object.prototype.hasOwnProperty.call(changedValues, 'name')
+      && !Object.prototype.hasOwnProperty.call(changedValues, 'description')) {
+      return;
+    }
+    scheduleAutoSave();
+  };
+
+  const stepContent = React.useMemo(() => {
     switch (currentStep) {
       case 0:
         return (
@@ -570,6 +731,9 @@ const ProjectEdit: React.FC = () => {
                           src={frame}
                           alt={`关键帧 ${index + 1}`}
                           className={styles.keyFrameImage}
+                          loading="lazy"
+                          decoding="async"
+                          draggable={false}
                         />
                       ))}
                     </div>
@@ -616,15 +780,35 @@ const ProjectEdit: React.FC = () => {
       default:
         return null;
     }
-  };
+  }, [
+    currentStep,
+    goToStep,
+    videoPath,
+    handleVideoSelect,
+    handleVideoRemove,
+    loading,
+    videoSelected,
+    keyFrames,
+    scriptSegments,
+    handleAnalyzeVideo,
+    handleSaveProject,
+    saving,
+    handleExportScript,
+  ]);
 
   if (error) {
+    const actions = [<Button key="back" onClick={handleBack}>返回</Button>];
+    if (projectId) {
+      actions.unshift(
+        <Button key="retry" type="primary" onClick={() => setReloadToken((v) => v + 1)}>重试</Button>
+      );
+    }
     return (
       <Result
         status="error"
         title="加载失败"
         subTitle={error}
-        extra={[<Button key="back" onClick={handleBack}>返回</Button>]}
+        extra={actions}
       />
     );
   }
@@ -632,47 +816,27 @@ const ProjectEdit: React.FC = () => {
   return (
     <div className={styles.container}>
       <Spin spinning={initialLoading} tip="加载项目中...">
-        <div className={styles.header}>
-          <Button type="text" icon={<ArrowLeftOutlined />} onClick={handleBack}>返回</Button>
-          <Title level={3}>{isNewProject ? '创建新项目' : '编辑项目'}</Title>
-          <Space size="middle">
-            <div className={styles.saveBehaviorControl}>
-              <span className={styles.saveBehaviorLabel}>保存后：</span>
-              <Select<ProjectSaveBehavior>
-                size="small"
-                value={saveBehavior}
-                onChange={handleSaveBehaviorChange}
-                options={[
-                  { value: 'stay', label: '留在编辑页' },
-                  { value: 'detail', label: '跳转项目详情' },
-                ]}
-              />
-            </div>
-            <div className={styles.saveBehaviorControl}>
-              <span className={styles.saveBehaviorLabel}>自动保存：</span>
-              <Switch size="small" checked={autoSaveEnabled} onChange={handleAutoSaveToggle} />
-            </div>
-            <Button
-              type="primary"
-              icon={<SaveOutlined />}
-              onClick={handleSaveProject}
-              loading={saving}
-              disabled={loading || initialLoading}
-            >
-              保存项目
-            </Button>
-          </Space>
-        </div>
+        <ProjectEditHeader
+          isNewProject={isNewProject}
+          loading={loading}
+          initialLoading={initialLoading}
+          saving={saving}
+          saveBehavior={saveBehavior}
+          autoSaveEnabled={autoSaveEnabled}
+          onBack={handleBack}
+          onSave={handleSaveProject}
+          onSaveBehaviorChange={handleSaveBehaviorChange}
+          onAutoSaveToggle={handleAutoSaveToggle}
+        />
 
-        <div className={styles.autoSaveStatus}>
-          {getAutoSaveTag()}
-        </div>
+        <AutoSaveStatus content={autoSaveTag} />
 
         <Card className={styles.card}>
           <Form
             form={form}
             layout="vertical"
             initialValues={{ name: defaultProjectName, description: '' }}
+            onValuesChange={handleFormValuesChange}
           >
             <Form.Item
               name="name"
@@ -702,16 +866,12 @@ const ProjectEdit: React.FC = () => {
           <Steps
             current={currentStep}
             onChange={goToStep}
-            items={[
-              { title: '选择视频', icon: <VideoCameraOutlined />, description: '上传视频文件' },
-              { title: '分析内容', icon: <EditOutlined />, description: '分析视频生成脚本' },
-              { title: '编辑脚本', icon: <CheckCircleOutlined />, description: '编辑和优化脚本' },
-            ]}
+            items={STEP_ITEMS}
           />
         </div>
 
         <div className={styles.stepsContent}>
-          {renderStepContent()}
+          {stepContent}
         </div>
       </Spin>
     </div>

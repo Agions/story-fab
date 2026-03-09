@@ -5,11 +5,12 @@
  * 流转到: VideoUpload
  */
 import React, { useMemo, useState } from 'react';
-import { Form, Input, Select, Button, Card, Typography, message, Divider, Tag } from 'antd';
+import { Form, Input, Select, Button, Card, Typography, Divider, Tag } from 'antd';
 import { PlusOutlined, ArrowRightOutlined, CheckCircleOutlined, VideoCameraOutlined, BookOutlined, CustomerServiceOutlined, FileTextOutlined, SettingOutlined } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import type { ProjectData } from '@/core/types';
 import { saveProjectToFile } from '@/services/tauriService';
+import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
 import styles from './ClipFlow.module.less';
 
@@ -187,7 +188,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
       addRecentProject(newProject.id);
       setProject(newProject);
       form.setFieldValue('name', normalizedName);
-      message.success('项目创建成功');
+      notify.success('项目创建成功');
       
       // 跳转到下一步
       if (onNext) {
@@ -197,7 +198,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
       }
     } catch (error) {
       console.error('项目创建失败:', error);
-      message.error(error instanceof Error ? error.message : '项目创建失败');
+      notify.error(error, '项目创建失败');
     } finally {
       setLoading(false);
     }

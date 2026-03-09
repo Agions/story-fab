@@ -3,9 +3,7 @@ import { ThemeProvider } from '../context/ThemeContext';
 import { SettingsProvider } from '../context/SettingsContext';
 import { ConfigProvider, theme } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
-import enUS from 'antd/locale/en_US';
 import { useTheme } from '../context/ThemeContext';
-import useTranslation from '../utils/i18n';
 
 // App Provider Props
 interface AppProviderProps {
@@ -109,10 +107,6 @@ const getLightThemeTokens = () => ({
  */
 const ThemeConfigurator: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { isDarkMode } = useTheme();
-  const { language } = useTranslation();
-
-  // 根据语言选择Ant Design的语言包
-  const antdLocale = language === 'zh' ? zhCN : enUS;
 
   // 获取主题 tokens
   const themeTokens = isDarkMode ? getDarkThemeTokens() : getLightThemeTokens();
@@ -203,7 +197,7 @@ const ThemeConfigurator: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   return (
     <ConfigProvider
-      locale={antdLocale}
+      locale={zhCN}
       theme={{
         token: themeTokens,
         components: sharedComponentStyles as any,

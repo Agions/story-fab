@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { invoke } from '@tauri-apps/api/core';
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
 import { ensureFFmpegInstalled } from '@/services/videoService';
-import { message } from 'antd';
 
 // 导出格式
 export type ExportFormat = 'mp4' | 'webm' | 'mov' | 'mkv';
@@ -164,6 +163,9 @@ const DEFAULT_CONFIG: ExportConfig = {
 // Tauri 事件监听器集合
 type ProgressListener = (progress: ExportProgress) => void;
 
+const isMissingFFmpegError = (errorMessage: string): boolean =>
+  errorMessage.includes('未安装FFmpeg') || errorMessage.includes('未安装 FFmpeg');
+
 export class ExportService {
   private config: ExportConfig;
   private isExporting: boolean = false;
@@ -242,23 +244,20 @@ export class ExportService {
         createdAt: new Date().toISOString(),
       };
 
-      message.success('视频转码完成');
       return result;
     } catch (error) {
       result.success = false;
       const errorMessage = error instanceof Error ? error.message : '未知错误';
-      result.error = errorMessage;
       onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
 
       // 友好的错误提示
       let userMessage = '视频转码失败';
-      if (errorMessage.includes('未安装FFmpeg')) {
+      if (isMissingFFmpegError(errorMessage)) {
         userMessage = '转码失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
       } else if (errorMessage.includes('转码失败')) {
         userMessage = '视频转码失败，请检查输入文件是否有效。';
       }
-
-      message.error(userMessage);
+      result.error = userMessage;
       return result;
     } finally {
       this.isExporting = false;
@@ -368,25 +367,22 @@ export class ExportService {
         createdAt: new Date().toISOString(),
       };
 
-      message.success('视频剪辑完成');
       return result;
     } catch (error) {
       result.success = false;
       const errorMessage = error instanceof Error ? error.message : '未知错误';
-      result.error = errorMessage;
       onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
 
       // 友好的错误提示
       let userMessage = '视频剪辑失败';
-      if (errorMessage.includes('未安装FFmpeg')) {
+      if (isMissingFFmpegError(errorMessage)) {
         userMessage = '剪辑失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
       } else if (errorMessage.includes('没有提供有效的片段信息')) {
         userMessage = '剪辑失败：请提供有效的视频片段信息。';
       } else if (errorMessage.includes('无效的片段时间范围')) {
         userMessage = '剪辑失败：片段时间范围无效。';
       }
-
-      message.error(userMessage);
+      result.error = userMessage;
       return result;
     } finally {
       // 清理监听器
@@ -464,23 +460,20 @@ export class ExportService {
         createdAt: new Date().toISOString(),
       };
 
-      message.success('视频合并完成');
       return result;
     } catch (error) {
       result.success = false;
       const errorMessage = error instanceof Error ? error.message : '未知错误';
-      result.error = errorMessage;
       onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
 
       // 友好的错误提示
       let userMessage = '视频合并失败';
-      if (errorMessage.includes('未安装FFmpeg')) {
+      if (isMissingFFmpegError(errorMessage)) {
         userMessage = '合并失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
       } else if (errorMessage.includes('输入路径列表不能为空')) {
         userMessage = '合并失败：请提供有效的视频文件列表。';
       }
-
-      message.error(userMessage);
+      result.error = userMessage;
       return result;
     } finally {
       this.isExporting = false;
@@ -689,23 +682,20 @@ export class ExportService {
         createdAt: new Date().toISOString(),
       };
 
-      message.success('视频导出完成');
       return result;
     } catch (error) {
       result.success = false;
       const errorMessage = error instanceof Error ? error.message : '未知错误';
-      result.error = errorMessage;
       onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
 
       // 友好的错误提示
       let userMessage = '视频导出失败';
-      if (errorMessage.includes('未安装FFmpeg')) {
+      if (isMissingFFmpegError(errorMessage)) {
         userMessage = '导出失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
       } else if (errorMessage.includes('导出失败')) {
         userMessage = '视频导出失败，请检查输入文件是否有效。';
       }
-
-      message.error(userMessage);
+      result.error = userMessage;
       return result;
     } finally {
       // 清理监听器
@@ -958,25 +948,22 @@ export class ExportService {
         createdAt: new Date().toISOString(),
       };
 
-      message.success('视频导出完成');
       return result;
     } catch (error) {
       result.success = false;
       const errorMessage = error instanceof Error ? error.message : '未知错误';
-      result.error = errorMessage;
       onProgress?.({ stage: 'error', progress: 0, estimatedTimeRemaining: 0 });
 
       // 友好的错误提示
       let userMessage = '视频导出失败';
-      if (errorMessage.includes('未安装FFmpeg')) {
+      if (isMissingFFmpegError(errorMessage)) {
         userMessage = '导出失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
       } else if (errorMessage.includes('导出已取消')) {
         userMessage = '导出已取消';
       } else if (errorMessage.includes('合并失败')) {
         userMessage = '视频合并失败，请检查片段文件是否有效。';
       }
-
-      message.error(userMessage);
+      result.error = userMessage;
       return result;
     } finally {
       // 清理监听器

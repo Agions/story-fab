@@ -10,7 +10,7 @@ export interface AppState {
   // UI 状态
   sidebarCollapsed: boolean;
   theme: 'light' | 'dark' | 'auto';
-  language: 'zh' | 'en';
+  language: 'zh';
   
   // 当前选中
   currentProjectId: string | null;
@@ -31,7 +31,7 @@ export interface AppState {
   // Actions
   toggleSidebar: () => void;
   setTheme: (theme: 'light' | 'dark' | 'auto') => void;
-  setLanguage: (language: 'zh' | 'en') => void;
+  setLanguage: (language: 'zh') => void;
   setCurrentProject: (projectId: string | null) => void;
   setCurrentModel: (model: AIModel | null) => void;
   setLoading: (isLoading: boolean, message?: string) => void;

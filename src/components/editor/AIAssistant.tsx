@@ -87,17 +87,6 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   }));
   const selectableModels = models.length > 0 ? models : allModels;
   
-  // 字幕语言选项
-  const languages = [
-    { code: 'zh', name: '中文' },
-    { code: 'en', name: '英语' },
-        { code: 'ko', name: '韩语' },
-    { code: 'fr', name: '法语' },
-    { code: 'de', name: '德语' },
-    { code: 'es', name: '西班牙语' },
-    { code: 'ru', name: '俄语' }
-  ];
-  
   // 发送消息
   const sendMessage = () => {
     if (!prompt.trim()) return;
@@ -288,16 +277,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
               <div className={styles.toolOptions}>
                 <div className={styles.optionItem}>
                   <Text>识别语言</Text>
-                  <Select
-                    defaultValue="zh"
-                    style={{ width: '100%' }}
-                  >
-                    {languages.map(lang => (
-                      <Option key={lang.code} value={lang.code}>
-                        {lang.name}
-                      </Option>
-                    ))}
-                  </Select>
+                  <Input value="中文（固定）" disabled />
                 </div>
                 
                 <div className={styles.optionItem}>
@@ -378,15 +358,11 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
                   <div className={styles.optionItem}>
                     <Text>翻译字幕</Text>
                     <Select
-                      placeholder="选择目标语言（可选）"
+                      placeholder="当前版本固定中文"
                       style={{ width: '100%' }}
-                      allowClear
+                      disabled
                     >
-                      {languages.filter(lang => lang.code !== 'zh').map(lang => (
-                        <Option key={lang.code} value={lang.code}>
-                          {lang.name}
-                        </Option>
-                      ))}
+                      <Option value="zh-CN">简体中文</Option>
                     </Select>
                   </div>
                 </div>

@@ -38,7 +38,7 @@ type SpeechRecognitionWindow = Window & {
 // 字幕配置
 export interface SubtitleConfig {
   // 语言
-  language: 'zh' | 'en' | 'ko' | 'auto';
+  language: 'zh';
   
   // 输出格式
   format: 'srt' | 'vtt' | 'ass' | 'txt';
@@ -49,7 +49,7 @@ export interface SubtitleConfig {
   profanityFilter: boolean;// 脏话过滤
   
   // 翻译
-  translateTo?: 'zh' | 'en';
+  translateTo?: 'zh';
 }
 
 // 字幕条目
@@ -81,7 +81,7 @@ export interface SpeechRecognitionResult {
 
 // 默认配置
 const DEFAULT_CONFIG: SubtitleConfig = {
-  language: 'auto',
+  language: 'zh',
   format: 'srt',
   continuous: true,
   interimResults: true,
@@ -120,8 +120,6 @@ export class SubtitleService {
   private getLanguageCode(lang: string): string {
     const langMap: Record<string, string> = {
       'zh': 'zh-CN',
-      'en': 'en-US',      'ko': 'ko-KR',
-      'auto': 'zh-CN',
     };
     return langMap[lang] || 'zh-CN';
   }
@@ -190,12 +188,12 @@ export class SubtitleService {
     const entries: SubtitleEntry[] = [
       { id: uuidv4(), index: 1, startTime: 0, endTime: 3, text: '欢迎使用 ClipFlow', confidence: 0.95 },
       { id: uuidv4(), index: 2, startTime: 3, endTime: 6, text: '智能字幕生成功能', confidence: 0.93 },
-      { id: uuidv4(), index: 3, startTime: 6, endTime: 10, text: '支持多种语言识别', confidence: 0.91 },
+      { id: uuidv4(), index: 3, startTime: 6, endTime: 10, text: '支持高精度中文识别', confidence: 0.91 },
     ];
 
     return {
       id: uuidv4(),
-      language: this.config.language === 'auto' ? 'zh' : this.config.language,
+      language: this.config.language,
       entries,
       duration: 10,
       createdAt: new Date().toISOString(),

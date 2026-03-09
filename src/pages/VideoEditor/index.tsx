@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, lazy, Suspense, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Layout, Tabs, Row, Col, message } from 'antd';
+import { Layout, Tabs, Row, Col, Spin } from 'antd';
 import { RobotOutlined } from '@ant-design/icons';
 
-import { saveProjectFile } from '@/services/projectService';
+import { saveProjectToFile } from '@/services/tauriService';
+import { notify } from '@/shared';
 import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
 import { logger } from '@/utils/logger';
 import { useVideoEditor } from './hooks/useVideoEditor';
@@ -12,18 +13,43 @@ import Toolbar from './components/Toolbar';
 import VideoPlayer from './components/VideoPlayer';
 import Timeline from './components/Timeline';
 import SegmentList from './components/SegmentList';
-import KeyframePanel from './components/KeyframePanel';
-import AIClipPanel from './components/AIClipPanel';
-import ExportSettingsPanel from './components/ExportSettingsPanel';
 
 import styles from './index.module.less';
 
 const { Content } = Layout;
 const { TabPane } = Tabs;
+const loadKeyframePanel = () => import('./components/KeyframePanel');
+const loadAIClipPanel = () => import('./components/AIClipPanel');
+const loadExportSettingsPanel = () => import('./components/ExportSettingsPanel');
+const KeyframePanel = lazy(loadKeyframePanel);
+const AIClipPanel = lazy(loadAIClipPanel);
+const ExportSettingsPanel = lazy(loadExportSettingsPanel);
+
+const PanelLoading: React.FC = () => (
+  <div style={{ padding: '20px 0', textAlign: 'center' }}>
+    <Spin size="small" />
+  </div>
+);
 
 const VideoEditorPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const [activeTab, setActiveTab] = useState<string>('trim');
+  const aliveRef = useRef(true);
+
+  useEffect(() => () => {
+    aliveRef.current = false;
+  }, []);
+
+  useEffect(() => {
+    const warmup = () => {
+      void loadKeyframePanel();
+      void loadAIClipPanel();
+      void loadExportSettingsPanel();
+    };
+
+    const timer = window.setTimeout(warmup, 360);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const {
     // 状态
@@ -65,44 +91,54 @@ const VideoEditorPage: React.FC = () => {
 
   // 保存项目
   const handleSaveProject = useCallback(async () => {
+    if (isSaving) return;
     setIsSaving(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
       const projectToSave = {
         id: projectId || 'new',
         segments,
         updatedAt: new Date().toISOString(),
       };
 
-      await saveProjectFile(projectId || 'new', JSON.stringify(projectToSave));
-      message.success('项目保存成功');
+      await saveProjectToFile(projectId || 'new', projectToSave);
+      if (aliveRef.current) {
+        notify.success('项目保存成功');
+      }
     } catch (error) {
       logger.error('保存失败:', error);
-      message.error('保存失败，请重试');
+      if (aliveRef.current) {
+        notify.error(error, '保存失败，请重试');
+      }
     } finally {
-      setIsSaving(false);
+      if (aliveRef.current) {
+        setIsSaving(false);
+      }
     }
-  }, [projectId, segments, setIsSaving]);
+  }, [isSaving, projectId, segments, setIsSaving]);
 
   // 导出视频
   const handleExportVideo = useCallback(async () => {
+    if (isExporting) return;
     setIsExporting(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      message.success('视频导出成功');
+      // 预留导出任务接入点，避免固定延时造成阻塞感。
+      notify.info('导出功能开发中，敬请期待');
     } catch (error) {
       logger.error('导出失败:', error);
-      message.error('导出失败，请重试');
+      if (aliveRef.current) {
+        notify.error(error, '导出失败，请重试');
+      }
     } finally {
-      setIsExporting(false);
+      if (aliveRef.current) {
+        setIsExporting(false);
+      }
     }
-  }, [setIsExporting]);
+  }, [isExporting, setIsExporting]);
 
   // AI 分析完成
   const handleAnalysisComplete = useCallback((result: ClipAnalysisResult) => {
     logger.info('AI 剪辑分析完成:', result);
-    message.success(`检测到 ${result.cutPoints.length} 个剪辑点`);
+    notify.success(`检测到 ${result.cutPoints.length} 个剪辑点`);
   }, []);
 
   return (
@@ -154,6 +190,8 @@ const VideoEditorPage: React.FC = () => {
               defaultActiveKey="trim"
               activeKey={activeTab}
               onChange={setActiveTab}
+              destroyInactiveTabPane
+              animated={false}
               className={styles.editorTabs}
             >
               <TabPane tab="片段" key="trim">
@@ -167,18 +205,22 @@ const VideoEditorPage: React.FC = () => {
                 />
               </TabPane>
 
-              <TabPane tab="关键帧" key="keyframes">
-                <KeyframePanel keyframes={keyframes} />
+              <TabPane tab={<span onMouseEnter={() => { void loadKeyframePanel(); }}>关键帧</span>} key="keyframes">
+                <Suspense fallback={<PanelLoading />}>
+                  <KeyframePanel keyframes={keyframes} />
+                </Suspense>
               </TabPane>
 
-              <TabPane tab={<span><RobotOutlined /> AI 剪辑</span>} key="ai-clip">
-                <AIClipPanel
-                  projectId={projectId}
-                  videoSrc={videoSrc}
-                  duration={duration}
-                  onAnalysisComplete={handleAnalysisComplete}
-                  onApplySuggestions={handleApplyAISuggestions}
-                />
+              <TabPane tab={<span onMouseEnter={() => { void loadAIClipPanel(); }}><RobotOutlined /> AI 剪辑</span>} key="ai-clip">
+                <Suspense fallback={<PanelLoading />}>
+                  <AIClipPanel
+                    projectId={projectId}
+                    videoSrc={videoSrc}
+                    duration={duration}
+                    onAnalysisComplete={handleAnalysisComplete}
+                    onApplySuggestions={handleApplyAISuggestions}
+                  />
+                </Suspense>
               </TabPane>
 
               <TabPane tab="效果" key="effects">
@@ -187,13 +229,15 @@ const VideoEditorPage: React.FC = () => {
                 </div>
               </TabPane>
 
-              <TabPane tab="设置" key="settings">
-                <ExportSettingsPanel
-                  outputFormat={outputFormat}
-                  videoQuality={videoQuality}
-                  onFormatChange={setOutputFormat}
-                  onQualityChange={setVideoQuality}
-                />
+              <TabPane tab={<span onMouseEnter={() => { void loadExportSettingsPanel(); }}>设置</span>} key="settings">
+                <Suspense fallback={<PanelLoading />}>
+                  <ExportSettingsPanel
+                    outputFormat={outputFormat}
+                    videoQuality={videoQuality}
+                    onFormatChange={setOutputFormat}
+                    onQualityChange={setVideoQuality}
+                  />
+                </Suspense>
               </TabPane>
             </Tabs>
           </Col>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Card, Typography, Button, Space, message, Select, Progress, List, Input, Empty, Switch } from 'antd';
+import { Card, Typography, Button, Space, Select, Progress, List, Input, Empty, Switch } from 'antd';
 import { AudioOutlined, FileTextOutlined, EditOutlined, DownloadOutlined, SyncOutlined } from '@ant-design/icons';
 import { motion } from '@/components/common/motion-shim';
+import { notify } from '@/shared';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -20,7 +21,6 @@ interface SubtitleExtractorProps {
 }
 
 const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoUrl, onExtracted }) => {
-  const [language, setLanguage] = useState('auto');
   const [format, setFormat] = useState('srt');
   const [translate, setTranslate] = useState(false);
   
@@ -33,7 +33,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
 
   const handleExtract = () => {
     if (!videoUrl) {
-      message.error('未检测到视频源');
+      notify.error(null, '未检测到视频源');
       return;
     }
     
@@ -54,7 +54,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
             { id: '4', start: '00:00:12,500', end: '00:00:18,000', text: '让我们通过一个实际的代码案例来看看它是如何工作的。' },
           ];
           setExtractedSubtitles(fakeSubtitles);
-          message.success('字幕提取成功！');
+          notify.success('字幕提取成功！');
           if (onExtracted) {
             onExtracted(fakeSubtitles);
           }
@@ -68,12 +68,12 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
   const handleSaveEdit = (id: string) => {
     setExtractedSubtitles(prev => prev.map(s => s.id === id ? { ...s, text: editingText } : s));
     setEditingId(null);
-    message.success('字幕修改已保存');
+    notify.success('字幕修改已保存');
   };
 
   const exportSubtitle = () => {
     if (extractedSubtitles.length === 0) {
-      message.warning('无字幕可导出');
+      notify.warning('无字幕可导出');
       return;
     }
     
@@ -95,7 +95,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    message.success(`已导出为 ${format.toUpperCase()} 格式`);
+    notify.success(`已导出为 ${format.toUpperCase()} 格式`);
   };
 
   return (
@@ -105,11 +105,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
           <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
             <div>
               <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>识别语言</Text>
-              <Select value={language} onChange={setLanguage} style={{ width: 180 }}>
-                <Option value="auto">自动识别 (Auto)</Option>
-                <Option value="zh">中文 (Chinese)</Option>
-                <Option value="en">英文 (English)</Option>
-                              </Select>
+              <Input value="中文（固定）" disabled style={{ width: 180 }} />
             </div>
             <div>
               <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>导出格式</Text>

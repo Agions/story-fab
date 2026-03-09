@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Row, Col, Select, Slider, InputNumber, Switch, Button, Tooltip, Space, Collapse, Tag, message, Progress, Popconfirm } from 'antd';
+import { Card, Row, Col, Select, Slider, InputNumber, Switch, Button, Tooltip, Space, Collapse, Tag, Progress, Popconfirm } from 'antd';
 import { PlusOutlined, DeleteOutlined, PlayCircleOutlined, ScissorOutlined, SoundOutlined, SettingOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api/core';
+import { notify } from '@/shared';
 import styles from './VideoProcessingController.module.less';
 
 const { Option } = Select;
@@ -156,7 +157,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
   // 添加批处理项目
   const addBatchItem = useCallback(() => {
     if (!segments || segments.length === 0) {
-      message.warning('没有可用的脚本片段');
+      notify.warning('没有可用的脚本片段');
       return;
     }
     
@@ -239,8 +240,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       return outputPath;
     } catch (error) {
       console.error('视频处理失败:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      message.error(`视频处理失败: ${errorMessage}`);
+      notify.error(error, '视频处理失败');
       throw error;
     }
   }, [exportFormat, videoQuality, customSettings, audioVolume, audioProcess, transitionType, transitionDuration, useSubtitles, videoPath, onProcessingComplete]);
@@ -248,7 +248,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
   // 开始批量处理
   const startBatchProcessing = useCallback(async () => {
     if (batchItems.length === 0) {
-      message.warning('请先添加批处理项目');
+      notify.warning('请先添加批处理项目');
       return;
     }
     
@@ -276,7 +276,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         setBatchProgress(((i + 1) / batchItems.length) * 100);
       } catch (error) {
         console.error(`处理批次项 ${i+1} 失败:`, error);
-        message.error(`处理 "${item.name}" 失败`);
+        notify.error(error, `处理 "${item.name}" 失败`);
         
         // 继续处理下一个
         continue;
@@ -284,19 +284,19 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     }
     
     setProcessingBatch(false);
-    message.success(`完成批量处理，共 ${newOutputPaths.length} 个文件`);
+    notify.success(`完成批量处理，共 ${newOutputPaths.length} 个文件`);
   }, [batchItems, processVideo]);
 
   // 处理当前加载的视频
   const handleProcessCurrentVideo = useCallback(async () => {
     if (!segments || segments.length === 0) {
-      message.warning('没有可用的脚本片段');
+      notify.warning('没有可用的脚本片段');
       return;
     }
     
     try {
       await processVideo(segments);
-      message.success('视频处理完成');
+      notify.success('视频处理完成');
     } catch {
       // 错误已在processVideo内部处理
     }

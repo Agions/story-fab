@@ -16,7 +16,6 @@ import {
   Tabs,
   Slider,
   Select,
-  message,
   Modal,
   Progress,
 } from 'antd';
@@ -40,6 +39,7 @@ import {
 } from '@ant-design/icons';
 import { motion } from '@/components/common/motion-shim';
 import { useEditor } from '@/core/hooks';
+import { notify } from '@/shared';
 import type {
   AudioTrack,
   EditorExportSettings as ExportSettings,
@@ -134,10 +134,10 @@ export const EditorPage: React.FC = () => {
       a.download = `export_${Date.now()}.mp4`;
       a.click();
       URL.revokeObjectURL(url);
-      message.success('导出成功！');
+      notify.success('导出成功！');
       setShowExportModal(false);
-    } catch {
-      message.error('导出失败');
+    } catch (error) {
+      notify.error(error, '导出失败');
     }
   };
 
@@ -145,9 +145,9 @@ export const EditorPage: React.FC = () => {
   const handleSplit = () => {
     if (state.selectedClipId) {
       operations.splitClip(state.selectedClipId, state.currentTime);
-      message.success('已分割片段');
+      notify.success('已分割片段');
     } else {
-      message.warning('请先选择一个片段');
+      notify.warning('请先选择一个片段');
     }
   };
 
@@ -155,9 +155,9 @@ export const EditorPage: React.FC = () => {
   const handleDelete = () => {
     if (state.selectedClipId && state.selectedTrackId) {
       operations.removeClip(state.selectedTrackId, state.selectedClipId);
-      message.success('已删除片段');
+      notify.success('已删除片段');
     } else {
-      message.warning('请先选择一个片段');
+      notify.warning('请先选择一个片段');
     }
   };
 
@@ -401,7 +401,7 @@ export const EditorPage: React.FC = () => {
                   onClick={() => {
                     if (state.selectedClipId) {
                       // 添加效果
-                      message.info(`添加效果: ${effect.label}`);
+                      notify.info(`添加效果: ${effect.label}`);
                     }
                   }}
                 >

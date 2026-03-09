@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
-import { message } from 'antd';
+import { useState, useCallback, useRef } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { VideoSegment, extractKeyFrames, analyzeVideo } from '@/services/videoService';
 import { clipWorkflowService } from '@/core/services/clip-workflow.service';
 import type { VideoInfo } from '@/core/types';
 import type { ClipSegment } from '@/core/services/aiClip.service';
+import { notify } from '@/shared';
 import { logger } from '@/utils/logger';
 
 export const useVideoEditor = (projectId: string | undefined) => {
@@ -24,6 +24,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
   // 历史记录
   const [editHistory, setEditHistory] = useState<VideoSegment[][]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const historyIndexRef = useRef(-1);
 
   // 导出设置
   const [outputFormat, setOutputFormat] = useState<string>('mp4');
@@ -32,18 +33,26 @@ export const useVideoEditor = (projectId: string | undefined) => {
   // 操作状态
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const loadVideoLockRef = useRef(false);
+  const smartClipLockRef = useRef(false);
 
   // 添加到历史记录
   const addToHistory = useCallback((newSegments: VideoSegment[]) => {
-    setEditHistory(prev => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      return [...newHistory, newSegments];
+    setEditHistory((prev) => {
+      const cursor = historyIndexRef.current;
+      const newHistory = prev.slice(0, cursor + 1);
+      const nextHistory = [...newHistory, newSegments];
+      const nextIndex = nextHistory.length - 1;
+      historyIndexRef.current = nextIndex;
+      setHistoryIndex(nextIndex);
+      return nextHistory;
     });
-    setHistoryIndex(prev => prev + 1);
-  }, [historyIndex]);
+  }, []);
 
   // 加载视频
   const handleLoadVideo = useCallback(async () => {
+    if (loading || analyzing || loadVideoLockRef.current) return;
+    loadVideoLockRef.current = true;
     try {
       const selected = await open({
         multiple: false,
@@ -83,42 +92,47 @@ export const useVideoEditor = (projectId: string | undefined) => {
 
         setKeyframes(frames.map(frame => frame.path));
 
-        message.success('视频加载成功');
+        notify.success('视频加载成功');
       } catch (error) {
         logger.error('视频分析失败:', error);
-        message.error('视频分析失败，请检查文件格式');
+        notify.error(error, '视频分析失败，请检查文件格式');
       } finally {
         setAnalyzing(false);
         setLoading(false);
       }
     } catch (err) {
       logger.error('选择文件失败:', err);
+    } finally {
+      loadVideoLockRef.current = false;
     }
-  }, [addToHistory]);
+  }, [addToHistory, analyzing, loading]);
 
   // 撤销
   const handleUndo = useCallback(() => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      setSegments(editHistory[newIndex]);
-    }
+    if (historyIndex <= 0) return;
+    const newIndex = historyIndex - 1;
+    historyIndexRef.current = newIndex;
+    setHistoryIndex(newIndex);
+    setSegments(editHistory[newIndex]);
   }, [historyIndex, editHistory]);
 
   // 重做
   const handleRedo = useCallback(() => {
-    if (historyIndex < editHistory.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      setSegments(editHistory[newIndex]);
-    }
+    if (historyIndex >= editHistory.length - 1) return;
+    const newIndex = historyIndex + 1;
+    historyIndexRef.current = newIndex;
+    setHistoryIndex(newIndex);
+    setSegments(editHistory[newIndex]);
   }, [historyIndex, editHistory]);
 
   // 添加片段
   const handleAddSegment = useCallback(() => {
+    if (duration <= 0) return;
+    const baseStart = Math.max(0, Math.min(currentTime, Math.max(duration - 5, 0)));
+    const baseEnd = Math.max(baseStart, Math.min(baseStart + 5, duration));
     const newSegment: VideoSegment = {
-      start: Math.min(currentTime, duration - 5),
-      end: Math.min(currentTime + 5, duration),
+      start: baseStart,
+      end: baseEnd,
       type: 'video',
       content: `片段 ${segments.length + 1}`,
     };
@@ -127,29 +141,37 @@ export const useVideoEditor = (projectId: string | undefined) => {
     setSegments(newSegments);
     addToHistory(newSegments);
     setSelectedSegmentIndex(newSegments.length - 1);
-    message.success('已添加新片段');
+    notify.success('已添加新片段');
   }, [currentTime, duration, segments, addToHistory]);
 
   // 删除片段
   const handleDeleteSegment = useCallback((index: number) => {
+    if (index < 0 || index >= segments.length) return;
     const newSegments = segments.filter((_, i) => i !== index);
     setSegments(newSegments);
     addToHistory(newSegments);
-    setSelectedSegmentIndex(-1);
-    message.success('已删除片段');
+    setSelectedSegmentIndex((prev) => {
+      if (prev === index) return -1;
+      if (prev > index) return prev - 1;
+      return prev;
+    });
+    notify.success('已删除片段');
   }, [segments, addToHistory]);
 
   // 选择片段
   const handleSelectSegment = useCallback((index: number) => {
+    if (index === selectedSegmentIndex) return;
+    if (index < -1 || index >= segments.length) return;
     setSelectedSegmentIndex(index);
     if (index >= 0 && segments[index]) {
       setCurrentTime(segments[index].start);
     }
-  }, [segments]);
+  }, [segments, selectedSegmentIndex]);
 
   // 智能剪辑
   const handleSmartClip = useCallback(async () => {
-    if (!videoSrc) return;
+    if (!videoSrc || analyzing || smartClipLockRef.current) return;
+    smartClipLockRef.current = true;
 
     setAnalyzing(true);
     try {
@@ -178,16 +200,18 @@ export const useVideoEditor = (projectId: string | undefined) => {
       setSegments(newSegments);
       addToHistory(newSegments);
 
-      message.success(`智能剪辑完成: ${result.segments.length} 个片段`);
-    } catch {
-      message.error('智能剪辑失败');
+      notify.success(`智能剪辑完成: ${result.segments.length} 个片段`);
+    } catch (error) {
+      notify.error(error, '智能剪辑失败');
     } finally {
       setAnalyzing(false);
+      smartClipLockRef.current = false;
     }
-  }, [projectId, videoSrc, duration, outputFormat, segments, addToHistory]);
+  }, [projectId, videoSrc, duration, outputFormat, segments, addToHistory, analyzing]);
 
   // 应用 AI 建议
   const handleApplyAISuggestions = useCallback((aiSegments: ClipSegment[]) => {
+    if (!Array.isArray(aiSegments) || aiSegments.length === 0) return;
     const newSegments = aiSegments.map(s => ({
       start: s.startTime,
       end: s.endTime,
@@ -196,7 +220,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
     }));
     setSegments(newSegments);
     addToHistory(newSegments);
-    message.success('已应用 AI 剪辑建议');
+    notify.success('已应用 AI 剪辑建议');
   }, [addToHistory]);
 
   return {

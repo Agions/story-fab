@@ -1,11 +1,13 @@
-import React, { useState, useEffect, lazy, Suspense, useMemo } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Typography, Button, Card, Row, Col, Input, Select,
-  Tag, Space, Modal, message, Empty, Dropdown, Progress, Tooltip, Spin
+  Tag, Space, Modal, Empty, Dropdown, Progress, Tooltip, Spin
 } from 'antd';
 import { useSettings } from '@/context/SettingsContext';
-import { listProjects, deleteProject as deleteProjectFile } from '@/services/tauriService';
+import { notify } from '@/shared';
+import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '@/services/tauriService';
+import { preloadProjectDetailPage, preloadProjectEditPage, preloadVideoEditorPage } from '@/core/utils/route-preload';
 import type { ProjectUIStatus, ProjectUIStats, ProjectView } from './types';
 import {
   PlusOutlined,
@@ -48,7 +50,7 @@ const ProjectManager: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<ProjectStatusFilter>('all');
   const [loading, setLoading] = useState(true);
 
-  const loadProjectData = async () => {
+  const loadProjectData = useCallback(async () => {
     try {
       setLoading(true);
       const data = await listProjects<Record<string, unknown>>();
@@ -58,16 +60,23 @@ const ProjectManager: React.FC = () => {
       setProjects(mapped);
     } catch (error) {
       console.error('加载项目列表失败:', error);
-      message.error('加载项目列表失败，请稍后重试');
+      notify.error(error, '加载项目列表失败，请稍后重试');
       setProjects([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void loadProjectData();
-  }, []);
+    const handleProjectsChanged = () => {
+      void loadProjectData();
+    };
+    window.addEventListener(PROJECTS_CHANGED_EVENT, handleProjectsChanged);
+    return () => {
+      window.removeEventListener(PROJECTS_CHANGED_EVENT, handleProjectsChanged);
+    };
+  }, [loadProjectData]);
 
   const statusConfig: Record<ProjectUIStatus, { color: string; text: string }> = {
     draft: { color: 'default', text: '草稿' },
@@ -135,14 +144,14 @@ const ProjectManager: React.FC = () => {
         try {
           const ok = await deleteProjectFile(id);
           if (!ok) {
-            message.error('删除项目失败');
+            notify.error(null, '删除项目失败');
             return;
           }
-          message.success('项目已删除');
+          notify.success('项目已删除');
           await loadProjectData();
         } catch (error) {
           console.error('删除项目失败:', error);
-          message.error('删除项目失败，请稍后重试');
+          notify.error(error, '删除项目失败，请稍后重试');
         }
       }
     });
@@ -176,6 +185,7 @@ const ProjectManager: React.FC = () => {
         <Card
           hoverable
           onClick={() => navigate('/project/new')}
+          onMouseEnter={() => { void preloadProjectEditPage(); }}
           style={{ 
             borderRadius: 10, height: 220, 
             border: '2px dashed rgba(102, 126, 234, 0.3)',
@@ -202,6 +212,7 @@ const ProjectManager: React.FC = () => {
             <Card
               hoverable
               onClick={() => navigate(`/project/${project.id}`)}
+              onMouseEnter={() => { void preloadProjectDetailPage(); }}
               style={{ borderRadius: 10, height: 220, overflow: 'hidden' }}
               styles={{ body: { padding: 16, height: '100%', display: 'flex', flexDirection: 'column' } }}
             >
@@ -211,7 +222,7 @@ const ProjectManager: React.FC = () => {
                   {statusConfig[uiStatus.status]?.text || '草稿'}
                 </Tag>
                 <Dropdown menu={projectActions(project)} trigger={['click']}>
-                  <Button type="text" icon={<EllipsisOutlined />} size="small" onClick={e => e.stopPropagation()} />
+                  <Button type="text" icon={<EllipsisOutlined />} size="small" onMouseEnter={() => { void preloadProjectEditPage(); void preloadVideoEditorPage(); }} onClick={e => e.stopPropagation()} />
                 </Dropdown>
               </div>
 
@@ -265,6 +276,8 @@ const ProjectManager: React.FC = () => {
           addRecentProject(projectId);
           navigate(`/editor/${projectId}`);
         }}
+        onPreloadProject={() => { void preloadProjectDetailPage(); }}
+        onPreloadEditor={() => { void preloadVideoEditorPage(); }}
         projectActions={projectActions}
       />
     </Suspense>
@@ -323,6 +336,7 @@ const ProjectManager: React.FC = () => {
               type="primary" 
               icon={<PlusOutlined />} 
               onClick={() => navigate('/project/new')}
+              onMouseEnter={() => { void preloadProjectEditPage(); }}
               style={{ 
                 background: 'linear-gradient(135deg, #667eea, #764ba2)',
                 border: 'none', borderRadius: 6,

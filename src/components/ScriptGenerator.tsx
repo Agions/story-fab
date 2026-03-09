@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Card, Button, Radio, Form, Select, Input, message, Typography, Alert, Spin, Space, Tooltip } from 'antd';
+import { Card, Button, Radio, Form, Select, Input, Typography, Alert, Spin, Space, Tooltip } from 'antd';
 import { FileTextOutlined, RobotOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { aiService } from '@/services/aiService';
@@ -10,6 +10,7 @@ import type { ModelProvider } from '@/core/types';
 import { MODEL_PROVIDERS } from '@/core/config/models.config';
 import { PROVIDER_NAMES } from '@/constants/models';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { notify } from '@/shared';
 import styles from './ScriptGenerator.module.less';
 
 const { Title, Paragraph } = Typography;
@@ -109,11 +110,11 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
         modelUsed: PROVIDER_NAMES[selectedModel]
       };
       
-      message.success('脚本生成成功');
+      notify.success('脚本生成成功');
       onScriptGenerated(script);
     } catch (error) {
       setError(error instanceof Error ? error.message : '脚本生成失败');
-      message.error('脚本生成失败，请稍后重试');
+      notify.error(error, '脚本生成失败，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -126,7 +127,7 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
     // 检查是否有API密钥
     const modelSettings = aiModelsSettings[value];
     if (!modelSettings?.enabled) {
-      message.warning(`您尚未配置${PROVIDER_NAMES[value]}的API密钥，请前往"设置"页面进行配置`);
+      notify.warning(`您尚未配置${PROVIDER_NAMES[value]}的API密钥，请前往"设置"页面进行配置`);
     }
   };
 

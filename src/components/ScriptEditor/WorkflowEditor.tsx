@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Card, Tabs, List, Button, Space, Input, Tag, Typography, Modal, message, type TabsProps } from 'antd';
+import { Card, Tabs, List, Button, Space, Input, Tag, Typography, Modal, type TabsProps } from 'antd';
 import {
   EditOutlined,
   SaveOutlined,
@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
 import { formatDuration } from '@/services/videoService';
+import { notify } from '@/shared';
 import styles from '../ScriptEditor.module.less';
 
 const { Text, Paragraph, Title } = Typography;
@@ -55,19 +56,19 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
     };
     onSave(updatedScript);
     onScriptUpdate?.(updatedScript);
-    message.success('脚本已保存');
+    notify.success('脚本已保存');
   }, [script, editedTitle, editedContent, onSave, onScriptUpdate]);
 
   const handleAIImprove = useCallback(async () => {
     try {
-      message.info('正在使用 AI 优化脚本...');
+      notify.info('正在使用 AI 优化脚本...');
       setAiModalVisible(false);
       setTimeout(() => {
-        message.success('脚本优化完成');
+        notify.success('脚本优化完成');
       }, 2000);
     } catch (error) {
       console.error('AI 优化脚本失败:', error);
-      message.error('AI 优化脚本失败');
+      notify.error(error, 'AI 优化脚本失败');
     }
   }, []);
 

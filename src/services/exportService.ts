@@ -1,5 +1,4 @@
 import { saveFile } from './tauriService';
-import { message } from 'antd';
 import type { Script } from './aiService';
 import { formatTime, formatDate } from '@/utils/format';
 import jsPDF from 'jspdf';
@@ -59,7 +58,6 @@ export const exportScript = async (
         filters = [{ name: 'HTML文件', extensions: ['html'] }];
         break;
       default:
-        message.error(`不支持的导出格式: ${format}`);
         return false;
     }
     
@@ -70,7 +68,6 @@ export const exportScript = async (
     );
   } catch (error) {
     console.error('导出脚本失败:', error);
-    message.error('导出失败，请稍后重试');
     return false;
   }
 };
@@ -188,15 +185,11 @@ const exportAsPdf = async (script: Script, filename: string): Promise<boolean> =
     );
     
     if (saved) {
-      message.success('PDF文件已导出成功');
       return true;
-    } else {
-      message.error('PDF文件导出失败');
-      return false;
     }
+    return false;
   } catch (error: unknown) {
     console.error('导出PDF失败:', error);
-    message.error('导出PDF失败，请稍后重试');
     return false;
   }
 };

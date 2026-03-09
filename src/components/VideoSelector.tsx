@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Button, message, Space, Card, Spin } from 'antd';
+import { Button, Space, Card, Spin } from 'antd';
 import { UploadOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { open } from '@tauri-apps/plugin-dialog';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { analyzeVideo, VideoMetadata, formatDuration, formatResolution } from '@/services/videoService';
+import { notify } from '@/shared';
 import styles from './VideoSelector.module.less';
 
 interface VideoSelectorProps {
@@ -88,7 +89,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
       }
     } catch (error) {
       console.error('选择视频失败:', error);
-      message.error('选择视频失败，请重试');
+      notify.error(error, '选择视频失败，请重试');
     }
   };
 
@@ -102,7 +103,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
     // 验证文件类型
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!VIDEO_EXTENSIONS.includes(ext)) {
-      message.error(`不支持的视频格式: ${ext}，请选择 ${VIDEO_EXTENSIONS.join(', ')} 格式`);
+      notify.error(null, `不支持的视频格式: ${ext}，请选择 ${VIDEO_EXTENSIONS.join(', ')} 格式`);
       return;
     }
 
@@ -133,7 +134,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
 
     video.onerror = () => {
       URL.revokeObjectURL(video.src);
-      message.error('无法读取视频文件');
+      notify.error(null, '无法读取视频文件');
       setIsAnalyzing(false);
     };
 
@@ -174,7 +175,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
       await invoke('open_file', { path: videoPath });
     } catch (error) {
       console.error('打开视频失败:', error);
-      message.error('无法打开视频，请确保系统有关联的视频播放器');
+      notify.error(error, '无法打开视频，请确保系统有关联的视频播放器');
     }
   };
 

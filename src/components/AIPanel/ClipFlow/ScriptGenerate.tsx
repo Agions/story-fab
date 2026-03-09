@@ -6,9 +6,9 @@
  * 2. AI 第一人称解说 - 以第一人称视角讲述
  * 3. AI 混剪 - 自动识别精彩片段并添加旁白
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { 
-  Card, Button, Space, Typography, Input, Alert, Select, message, Empty, Badge, Tooltip, Progress, Tag, Row, Col
+  Card, Button, Space, Typography, Input, Alert, Select, Empty, Badge, Tooltip, Progress, Tag, Row, Col
 } from 'antd';
 import {
   FileTextOutlined,
@@ -30,14 +30,20 @@ import { aiService } from '@/core/services/ai.service';
 import type { ScriptData, ScriptSegment, ScriptMetadata, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { notify } from '@/shared';
 import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
+import { orchestrateCommentaryAgents } from '@/core/services/workflow/agents';
+import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '@/core/workflow/alignmentGate';
+import {
+  FEATURE_TO_FUNCTION,
+  FUNCTION_TO_FEATURE,
+  FUNCTION_TO_MODE,
+  type AIFunctionType,
+} from './functionModeMap';
 import styles from './ClipFlow.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
-
-// 核心功能类型
-export type AIFunctionType = 'video-narration' | 'first-person' | 'remix';
 
 // 功能配置 - 优化版
 const FUNCTION_CONFIG: Record<AIFunctionType, {
@@ -194,6 +200,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
     state, 
     setNarrationScript, 
     setRemixScript,
+    setFeature,
     goToNextStep,
     dispatch,
   } = useClipFlow();
@@ -210,15 +217,57 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
     style: 'casual',
     length: 'medium',
   });
+  const [alignmentGate, setAlignmentGate] = useState<{
+    averageConfidence: number;
+    maxDriftSeconds: number;
+    passed: boolean;
+  } | null>(null);
 
   // 获取当前功能配置
   const currentFunction = FUNCTION_CONFIG[config.functionType];
+  const currentMode = FUNCTION_TO_MODE[config.functionType];
+
+  useEffect(() => {
+    if (state.selectedFeature === 'none') return;
+    const mapped = FEATURE_TO_FUNCTION[state.selectedFeature as 'smartClip' | 'voiceover' | 'subtitle'];
+    if (!mapped || mapped === config.functionType) return;
+    setConfig((prev) => ({ ...prev, functionType: mapped }));
+  }, [config.functionType, state.selectedFeature]);
+
+  const applyCommentaryOrchestration = useCallback((scriptData: ScriptData): ScriptData => {
+    if (!state.analysis?.scenes?.length || !scriptData.segments?.length) {
+      setAlignmentGate(null);
+      return scriptData;
+    }
+
+    const orchestration = orchestrateCommentaryAgents({
+      mode: currentMode,
+      analysis: state.analysis,
+      segments: scriptData.segments,
+    });
+
+    const passed = isAlignmentGatePassed(orchestration.alignmentSummary);
+
+    setAlignmentGate({
+      averageConfidence: orchestration.alignmentSummary.averageConfidence,
+      maxDriftSeconds: orchestration.alignmentSummary.maxDriftSeconds,
+      passed,
+    });
+
+    return {
+      ...scriptData,
+      segments: orchestration.alignedSegments,
+      content: orchestration.alignedSegments.map((segment) => segment.content).join('\n\n'),
+      updatedAt: new Date().toISOString(),
+    };
+  }, [currentMode, state.analysis]);
 
   // 处理生成文案
   const handleGenerate = useCallback(async (functionType: AIFunctionType) => {
     setGenerating(true);
     setGeneratingType(functionType);
     setProgress(0);
+    setFeature(FUNCTION_TO_FEATURE[functionType]);
 
     try {
       const topic = state.analysis?.summary || '视频内容解说';
@@ -265,34 +314,36 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
         );
         
         setProgress(80);
+        const alignedScript = applyCommentaryOrchestration(scriptData);
         if (functionType === 'video-narration' || functionType === 'first-person') {
-          setNarrationScript(scriptData);
+          setNarrationScript(alignedScript);
         } else {
-          setRemixScript(scriptData);
+          setRemixScript(alignedScript);
         }
         
         setProgress(100);
-        message.success(`${FUNCTION_CONFIG[functionType].title}生成成功！`);
+        notify.success(`${FUNCTION_CONFIG[functionType].title}生成成功！`);
       } catch (apiError) {
         console.error('AI API 调用失败:', apiError);
         setProgress(50);
-        message.warning('AI 服务暂不可用，使用智能模板生成');
+        notify.warning('AI 服务暂不可用，使用智能模板生成');
         
         const mockScript = generateMockScript(functionType, config.style, config.length);
         setProgress(80);
+        const alignedMockScript = applyCommentaryOrchestration(mockScript);
         
         if (functionType === 'video-narration' || functionType === 'first-person') {
-          setNarrationScript(mockScript);
+          setNarrationScript(alignedMockScript);
         } else {
-          setRemixScript(mockScript);
+          setRemixScript(alignedMockScript);
         }
         
         setProgress(100);
-        message.success('文案生成成功（智能模板）');
+        notify.success('文案生成成功（智能模板）');
       }
     } catch (error) {
       console.error('文案生成失败:', error);
-      message.error('文案生成失败，请重试');
+      notify.error(error, '文案生成失败，请重试');
     } finally {
       setTimeout(() => {
         setGenerating(false);
@@ -300,7 +351,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
         setProgress(0);
       }, 500);
     }
-  }, [config.style, config.length, state.analysis, state.subtitleData.asr, state.currentVideo, setNarrationScript, setRemixScript]);
+  }, [config.style, config.length, state.analysis, state.currentVideo, setNarrationScript, setRemixScript, setFeature, applyCommentaryOrchestration]);
 
   // 处理编辑文案
   const handleEditScript = (newContent: string): void => {
@@ -318,7 +369,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
       } else {
         setNarrationScript(updatedScript);
       }
-      message.success('文案已保存');
+      notify.success('文案已保存');
     }
   };
 
@@ -332,12 +383,18 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
 
   const currentScript = getCurrentScript();
   const canProceed = state.stepStatus['ai-analyze'];
+  const gateStatusTag = useMemo(() => {
+    if (!alignmentGate) return null;
+    return alignmentGate.passed
+      ? <Tag color="success">对齐通过</Tag>
+      : <Tag color="warning">对齐待优化</Tag>;
+  }, [alignmentGate]);
 
   // 复制文案
   const handleCopy = () => {
     if (currentScript?.content) {
       navigator.clipboard.writeText(currentScript.content);
-      message.success('文案已复制到剪贴板');
+      notify.success('文案已复制到剪贴板');
     }
   };
 
@@ -386,7 +443,10 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
                   return (
                     <div
                       key={key}
-                      onClick={() => setConfig({ ...config, functionType: key })}
+                      onClick={() => {
+                        setConfig({ ...config, functionType: key });
+                        setFeature(FUNCTION_TO_FEATURE[key]);
+                      }}
                       style={{
                         padding: '14px 16px',
                         border: `2px solid ${isActive ? func.color : '#e8e8e8'}`,
@@ -557,7 +617,18 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
                   <Text type="secondary">
                     <StarOutlined /> 风格: {currentScript.metadata?.style || config.style}
                   </Text>
+                  {gateStatusTag}
                 </div>
+              )}
+
+              {alignmentGate && (
+                <Alert
+                  type={alignmentGate.passed ? 'success' : 'warning'}
+                  showIcon
+                  style={{ marginTop: 12 }}
+                  message={alignmentGate.passed ? '音画对齐质量通过' : '音画对齐建议优化'}
+                  description={`平均置信度 ${alignmentGate.averageConfidence.toFixed(2)}（阈值 ${ALIGNMENT_GATE_THRESHOLD.minConfidence}），最大漂移 ${alignmentGate.maxDriftSeconds.toFixed(2)}s（阈值 ${ALIGNMENT_GATE_THRESHOLD.maxDriftSeconds}s）。`}
+                />
               )}
 
               {/* 空状态 */}

@@ -2,8 +2,9 @@
  * 通用设置面板
  */
 import React from 'react';
-import { Card, Form, Switch, Select, Button, Space, Divider, message } from 'antd';
+import { Card, Form, Switch, Select, Button, Space, Divider } from 'antd';
 import { SettingOutlined, UndoOutlined } from '@ant-design/icons';
+import { notify } from '@/shared';
 import type { ProjectSaveBehavior } from '@/shared/constants/settings';
 
 const { Option } = Select;
@@ -33,7 +34,7 @@ const GeneralSettingsPanel: React.FC<GeneralSettingsPanelProps> = ({
 }) => {
   const handleReset = () => {
     onReset();
-    message.success('设置已重置');
+    notify.success('设置已重置');
   };
 
   return (

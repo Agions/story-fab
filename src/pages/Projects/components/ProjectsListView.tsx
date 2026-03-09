@@ -14,6 +14,8 @@ interface ProjectsListViewProps {
   formatDate: (value: string) => string;
   onOpenProject: (projectId: string) => void;
   onOpenEditor: (projectId: string) => void;
+  onPreloadProject: () => void;
+  onPreloadEditor: () => void;
   projectActions: (project: ProjectView) => MenuProps;
 }
 
@@ -25,6 +27,8 @@ const ProjectsListView: React.FC<ProjectsListViewProps> = ({
   formatDate,
   onOpenProject,
   onOpenEditor,
+  onPreloadProject,
+  onPreloadEditor,
   projectActions,
 }) => {
   return (
@@ -42,6 +46,7 @@ const ProjectsListView: React.FC<ProjectsListViewProps> = ({
               hoverable
               style={{ width: '100%' }}
               onClick={() => onOpenProject(project.id)}
+              onMouseEnter={onPreloadProject}
               bodyStyle={{ padding: '14px 16px' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
@@ -71,6 +76,7 @@ const ProjectsListView: React.FC<ProjectsListViewProps> = ({
                     <Button
                       type="text"
                       icon={<PlayCircleOutlined />}
+                      onMouseEnter={onPreloadEditor}
                       onClick={(e) => {
                         e.stopPropagation();
                         onOpenEditor(project.id);

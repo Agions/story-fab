@@ -1,7 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, exists, mkdir } from '@tauri-apps/plugin-fs';
-import { message } from 'antd';
 import { appConfigDir } from '@tauri-apps/api/path';
 
 /**
@@ -24,7 +23,6 @@ export const selectFile = async (
     return Array.isArray(selected) ? selected[0] : selected;
   } catch (error) {
     console.error('选择文件失败:', error);
-    message.error('选择文件失败');
     return null;
   }
 };
@@ -51,11 +49,9 @@ export const saveFile = async (
     }
 
     await writeTextFile(savePath, content);
-    message.success('文件保存成功');
     return true;
   } catch (error) {
     console.error('保存文件失败:', error);
-    message.error('保存文件失败');
     return false;
   }
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Card, Button, Space, Dropdown, Modal, message, Form, type MenuProps } from 'antd';
+import { Card, Button, Space, Dropdown, Modal, Form, type MenuProps } from 'antd';
 import {
   EditOutlined,
   SaveOutlined,
@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import { VideoSegment, formatDuration, previewSegment } from '@/services/videoService';
 import { convertFileSrc } from '@tauri-apps/api/core';
+import { notify } from '@/shared';
 import SegmentTable from './SegmentTable';
 import SegmentEditForm from './SegmentEditForm';
 import PreviewModal from './PreviewModal';
@@ -137,7 +138,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
       setPreviewVisible(true);
     } catch (error) {
       console.error('生成预览失败:', error);
-      message.error('生成预览失败');
+      notify.error(error, '生成预览失败');
     } finally {
       setPreviewLoading(false);
     }
@@ -146,20 +147,20 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
   // 保存脚本
   const handleSave = useCallback(() => {
     onSave(segments);
-    message.success('脚本已保存');
+    notify.success('脚本已保存');
   }, [onSave, segments]);
 
   // AI 优化
   const handleAIImprove = useCallback(async () => {
     try {
-      message.info('正在使用 AI 优化脚本...');
+      notify.info('正在使用 AI 优化脚本...');
       setAiModalVisible(false);
       setTimeout(() => {
-        message.success('脚本优化完成');
+        notify.success('脚本优化完成');
       }, 2000);
     } catch (error) {
       console.error('AI 优化脚本失败:', error);
-      message.error('AI 优化脚本失败');
+      notify.error(error, 'AI 优化脚本失败');
     }
   }, []);
 

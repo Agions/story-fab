@@ -10,7 +10,6 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig
 } from 'axios';
-import { message } from 'antd';
 
 // 请求配置
 interface RequestConfig extends AxiosRequestConfig {
@@ -117,7 +116,7 @@ class ApiClient {
       errorMessage = error.message;
     }
 
-    message.error(errorMessage);
+    console.error('[api] request failed:', errorMessage);
   }
 
   /**

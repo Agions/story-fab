@@ -1,4 +1,4 @@
-import React, { useRef, memo } from 'react';
+import React, { useRef, memo, useMemo } from 'react';
 import { VideoSegment } from '@/services/videoService';
 import styles from '../index.module.less';
 
@@ -18,31 +18,35 @@ const Timeline: React.FC<TimelineProps> = ({
   onSelectSegment,
 }) => {
   const timelineRef = useRef<HTMLDivElement>(null);
+  const safeDuration = Math.max(duration, 1);
+  const renderedSegments = useMemo(() => (
+    segments.map((segment, index) => (
+      <div
+        key={index}
+        className={`${styles.timelineSegment} ${selectedIndex === index ? styles.selected : ''}`}
+        style={{
+          left: `${(segment.start / safeDuration) * 100}%`,
+          width: `${((segment.end - segment.start) / safeDuration) * 100}%`,
+        }}
+        onClick={() => onSelectSegment(index)}
+      >
+        <div className={styles.segmentHandle} />
+        <div className={styles.segmentLabel}>{index + 1}</div>
+        <div className={styles.segmentHandle} />
+      </div>
+    ))
+  ), [onSelectSegment, safeDuration, segments, selectedIndex]);
 
   return (
     <div className={styles.timelineContainer}>
       <div className={styles.timeline} ref={timelineRef}>
-        {segments.map((segment, index) => (
-          <div
-            key={index}
-            className={`${styles.timelineSegment} ${selectedIndex === index ? styles.selected : ''}`}
-            style={{
-              left: `${(segment.start / Math.max(duration, 1)) * 100}%`,
-              width: `${((segment.end - segment.start) / Math.max(duration, 1)) * 100}%`,
-            }}
-            onClick={() => onSelectSegment(index)}
-          >
-            <div className={styles.segmentHandle} />
-            <div className={styles.segmentLabel}>{index + 1}</div>
-            <div className={styles.segmentHandle} />
-          </div>
-        ))}
+        {renderedSegments}
 
         {/* 播放头 */}
         <div
           className={styles.playhead}
           style={{
-            left: `${(currentTime / Math.max(duration, 1)) * 100}%`,
+            left: `${(currentTime / safeDuration) * 100}%`,
           }}
         />
       </div>

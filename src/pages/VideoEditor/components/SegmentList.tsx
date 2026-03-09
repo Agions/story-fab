@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, useMemo, memo } from 'react';
 import { Card, Button, Typography, Space, Tag, Empty } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { VideoSegment } from '@/services/videoService';
@@ -13,6 +13,14 @@ interface SegmentListProps {
   onSelectSegment: (index: number) => void;
   onDeleteSegment: (index: number) => void;
   onAddSegment: () => void;
+}
+
+interface SegmentItemProps {
+  index: number;
+  segment: VideoSegment;
+  selected: boolean;
+  onSelectSegment: (index: number) => void;
+  onDeleteSegment: (index: number) => void;
 }
 
 // 格式化时间
@@ -30,6 +38,61 @@ const formatTime = (seconds: number): string => {
   return parts.join(':');
 };
 
+const getSegmentKey = (segment: VideoSegment, index: number): string =>
+  `${index}-${segment.start}-${segment.end}-${segment.type}-${segment.content || ''}`;
+
+const SegmentItem: React.FC<SegmentItemProps> = memo(({
+  index,
+  segment,
+  selected,
+  onSelectSegment,
+  onDeleteSegment,
+}) => {
+  const handleDelete = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDeleteSegment(index);
+  }, [index, onDeleteSegment]);
+
+  const handleSelect = useCallback(() => {
+    onSelectSegment(index);
+  }, [index, onSelectSegment]);
+
+  return (
+    <Card
+      className={`${styles.segmentCard} ${selected ? styles.selected : ''}`}
+      onClick={handleSelect}
+    >
+      <div className={styles.segmentHeader}>
+        <Text strong>片段 {index + 1}</Text>
+        <Space>
+          <Button
+            type="text"
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={handleDelete}
+          />
+        </Space>
+      </div>
+
+      <div className={styles.segmentTime}>
+        <Tag color="blue">
+          {formatTime(segment.start)} - {formatTime(segment.end)}
+        </Tag>
+        <Text type="secondary">
+          时长: {formatTime(segment.end - segment.start)}
+        </Text>
+      </div>
+
+      {segment.content && (
+        <div className={styles.segmentContent}>
+          <Text ellipsis>{segment.content}</Text>
+        </div>
+      )}
+    </Card>
+  );
+});
+
 const SegmentList: React.FC<SegmentListProps> = ({
   segments,
   selectedIndex,
@@ -38,10 +101,18 @@ const SegmentList: React.FC<SegmentListProps> = ({
   onDeleteSegment,
   onAddSegment,
 }) => {
-  const handleDelete = useCallback((e: React.MouseEvent, index: number) => {
-    e.stopPropagation();
-    onDeleteSegment(index);
-  }, [onDeleteSegment]);
+  const renderedItems = useMemo(() => (
+    segments.map((segment, index) => (
+      <SegmentItem
+        key={getSegmentKey(segment, index)}
+        index={index}
+        segment={segment}
+        selected={selectedIndex === index}
+        onSelectSegment={onSelectSegment}
+        onDeleteSegment={onDeleteSegment}
+      />
+    ))
+  ), [onDeleteSegment, onSelectSegment, segments, selectedIndex]);
 
   if (segments.length === 0) {
     return (
@@ -65,42 +136,7 @@ const SegmentList: React.FC<SegmentListProps> = ({
   return (
     <div className={styles.segmentList}>
       <Title level={5} className={styles.sectionTitle}>片段列表</Title>
-
-      {segments.map((segment, index) => (
-        <Card
-          key={index}
-          className={`${styles.segmentCard} ${selectedIndex === index ? styles.selected : ''}`}
-          onClick={() => onSelectSegment(index)}
-        >
-          <div className={styles.segmentHeader}>
-            <Text strong>片段 {index + 1}</Text>
-            <Space>
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={(e) => handleDelete(e, index)}
-              />
-            </Space>
-          </div>
-
-          <div className={styles.segmentTime}>
-            <Tag color="blue">
-              {formatTime(segment.start)} - {formatTime(segment.end)}
-            </Tag>
-            <Text type="secondary">
-              时长: {formatTime(segment.end - segment.start)}
-            </Text>
-          </div>
-
-          {segment.content && (
-            <div className={styles.segmentContent}>
-              <Text ellipsis>{segment.content}</Text>
-            </div>
-          )}
-        </Card>
-      ))}
+      {renderedItems}
 
       <Button
         type="dashed"

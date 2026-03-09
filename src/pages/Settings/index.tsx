@@ -6,7 +6,7 @@
  * @version 2.0
  */
 import React, { useState, useEffect, useContext } from 'react';
-import { Tabs, Card, Skeleton, Typography, message } from 'antd';
+import { Tabs, Card, Skeleton, Typography } from 'antd';
 import {
   KeyOutlined,
   RobotOutlined,
@@ -27,6 +27,7 @@ import {
   resolveDefaultModelId,
 } from '@/core/utils/model-availability';
 import { useStore } from '@/store';
+import { notify } from '@/shared';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';
 import styles from './index.module.less';
 
@@ -100,13 +101,13 @@ const Settings: React.FC = () => {
       enabled: false,
       apiKey: undefined,
     });
-    message.success('API 密钥已删除');
+    notify.success('API 密钥已删除');
   };
 
   // 模型设置
   const handleModelChange = (model: string) => {
     setDefaultModel(model);
-    message.success('默认模型已更新');
+    notify.success('默认模型已更新');
   };
 
   // 通用设置

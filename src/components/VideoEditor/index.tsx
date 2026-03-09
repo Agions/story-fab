@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect, memo } from 'react';
-import { Card, Typography, message } from 'antd';
+import { Card, Typography } from 'antd';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { save } from '@tauri-apps/plugin-dialog';
 import { ScriptSegment } from '@/types';
+import { notify } from '@/shared';
 
 import VideoPlayer from './VideoPlayer';
 import Timeline from './Timeline';
@@ -126,7 +127,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       setPreviewUrl(fileUrl);
     } catch (error) {
       console.error('生成预览失败:', error);
-      message.error(`生成预览失败: ${error instanceof Error ? error.message : String(error)}`);
+      notify.error(error, '生成预览失败');
     } finally {
       setPreviewLoading(false);
     }
@@ -154,7 +155,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     setShowSettingsModal(false);
 
     if (!editedSegments || editedSegments.length === 0) {
-      message.warning('没有可用的脚本片段来剪辑视频');
+      notify.warning('没有可用的脚本片段来剪辑视频');
       return;
     }
 
@@ -199,10 +200,10 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
         onEditComplete(savePath);
       }
 
-      message.success('视频剪辑完成');
+      notify.success('视频剪辑完成');
     } catch (error) {
       console.error('导出视频失败:', error);
-      message.error(`导出视频失败: ${error instanceof Error ? error.message : String(error)}`);
+      notify.error(error, '导出视频失败');
     } finally {
       setProcessing(false);
     }
@@ -213,7 +214,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     if (onEditComplete) {
       onEditComplete(editedSegments);
     }
-    message.success('片段时间已更新');
+    notify.success('片段时间已更新');
   }, [editedSegments, onEditComplete]);
 
   // 计算时间位置

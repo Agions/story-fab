@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { message } from 'antd';
 import { useWorkflow, useModel } from '@/core/hooks';
+import { notify } from '@/shared';
 import { scriptTemplateService } from '@/core/templates/script.templates';
 import type { ScriptTemplate, AIModel } from '@/core/types';
 import { DEFAULT_WORKFLOW_MODE, type WorkflowMode } from '@/core/workflow/featureBlueprint';
@@ -21,7 +21,7 @@ export interface ScriptParams {
   tone: string;
   length: 'short' | 'medium' | 'long';
   targetAudience: string;
-  language: 'zh' | 'en';
+  language: 'zh';
 }
 
 export const useWorkflowPage = () => {
@@ -71,13 +71,13 @@ export const useWorkflowPage = () => {
   } = useWorkflow({
     onStepChange: (step) => {
       const stepInfo = getWorkflowSteps(workflowMode).find((s) => s.key === step);
-      message.info(`进入步骤: ${stepInfo?.title}`);
+      notify.info(`进入步骤: ${stepInfo?.title}`);
     },
     onError: (err) => {
-      message.error(err);
+      notify.error(err, '工作流执行失败');
     },
     onComplete: () => {
-      message.success('工作流完成！');
+      notify.success('工作流完成！');
     },
   });
 
@@ -90,7 +90,7 @@ export const useWorkflowPage = () => {
   // 开始工作流
   const handleStart = useCallback(async () => {
     if (!selectedFile || !selectedModel) {
-      message.error('请选择视频文件和 AI 模型');
+      notify.error(null, '请选择视频文件和 AI 模型');
       return;
     }
 

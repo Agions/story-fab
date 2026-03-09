@@ -1,6 +1,7 @@
 import { scriptTemplateService } from '../../../templates/script.templates';
 import { aiService } from '../../ai.service';
 import { storageService } from '../../storage.service';
+import { orchestrateCommentaryAgents } from '../agents';
 import type {
   VideoInfo,
   VideoAnalysis,
@@ -8,6 +9,7 @@ import type {
   ScriptData,
   AIModel,
 } from '@/core/types';
+import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
 
 export interface ScriptGenerateConfig {
   style: string;
@@ -38,6 +40,7 @@ export async function executeScriptGenerateStep(
   model: AIModel,
   params: ScriptGenerateConfig,
   projectId: string,
+  mode: WorkflowMode = 'ai-commentary',
   updateProgress: (progress: number) => void = () => {}
 ): Promise<ScriptGenerateResult> {
   // 应用模板生成脚本结构
@@ -52,7 +55,7 @@ export async function executeScriptGenerateStep(
   // 为每个段落生成内容
   const segments = await Promise.all(
     templateResult.structure.map(async (section: TemplateSection, index: number) => {
-      const prompt = buildSegmentPrompt(section, videoInfo, videoAnalysis, params);
+      const prompt = buildSegmentPrompt(section, videoInfo, videoAnalysis, params, mode);
       const content = await aiService.generateText(model, prompt);
 
       updateProgress(45 + ((index + 1) / templateResult.structure.length) * 10);
@@ -69,11 +72,17 @@ export async function executeScriptGenerateStep(
   );
 
   // 创建脚本数据
+  const orchestrated = orchestrateCommentaryAgents({
+    mode,
+    analysis: videoAnalysis,
+    segments,
+  });
+
   const script: ScriptData = {
     id: `script_${Date.now()}`,
     title: `${videoInfo.name} 解说脚本`,
-    content: segments.map((s) => s.content).join('\n\n'),
-    segments,
+    content: orchestrated.alignedSegments.map((s) => s.content).join('\n\n'),
+    segments: orchestrated.alignedSegments,
     metadata: {
       style: params.style,
       tone: params.tone,
@@ -120,9 +129,16 @@ function buildSegmentPrompt(
   section: TemplateSection,
   videoInfo: VideoInfo,
   analysis: VideoAnalysis,
-  params: ScriptGenerateConfig
+  params: ScriptGenerateConfig,
+  mode: WorkflowMode = 'ai-commentary'
 ): string {
   const sceneInfo = analysis.scenes[Math.floor(Math.random() * analysis.scenes.length)];
+
+  const modeGuidance: Record<WorkflowMode, string> = {
+    'ai-commentary': '按专业解说风格写作，重点解释画面信息，避免空洞套话。',
+    'ai-first-person': '必须使用第一人称视角叙述（我/我们），并保持主观体验连贯。',
+    'ai-mixclip': '按混剪旁白风格写作，多用短句和节奏词，强化转场冲击力。',
+  };
 
   return `你是一位专业的视频解说文案创作者。请为以下视频段落生成解说词。
 
@@ -145,7 +161,8 @@ function buildSegmentPrompt(
 - 风格: ${params.style}
 - 语气: ${params.tone}
 - 目标受众: ${params.targetAudience}
-- 语言: ${params.language === 'zh' ? '中文' : 'English'}
+- 语言: 中文
+- 模式约束: ${modeGuidance[mode]}
 
 【段落说明】
 ${section.content}

@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { 
   Modal, Tabs, Card, Typography, Space, Button, 
-  List, Tag, Divider, Empty, Spin, message 
+  List, Tag, Divider, Empty, Spin
 } from 'antd';
 import {
   FileTextOutlined,
@@ -18,7 +18,7 @@ import {
   CloseOutlined,
   DownloadOutlined,
 } from '@ant-design/icons';
-import { formatDuration } from '@/shared';
+import { formatDuration, notify } from '@/shared';
 import styles from './PreviewModal.module.less';
 
 const { Text, Title, Paragraph } = Typography;
@@ -90,10 +90,10 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
       try {
         await navigator.clipboard.writeText(scriptPreview.content);
         setCopied(true);
-        message.success('已复制到剪贴板');
+        notify.success('已复制到剪贴板');
         setTimeout(() => setCopied(false), 2000);
-      } catch {
-        message.error('复制失败');
+      } catch (error) {
+        notify.error(error, '复制失败');
       }
     }
   };

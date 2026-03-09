@@ -479,9 +479,27 @@ fn list_project_files(app: tauri::AppHandle) -> Result<Vec<serde_json::Value>, S
         if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
             continue;
         }
+        let file_stem = path
+            .file_stem()
+            .and_then(|name| name.to_str())
+            .map(|value| value.to_string())
+            .unwrap_or_default();
         match fs::read_to_string(&path) {
             Ok(content) => match serde_json::from_str::<serde_json::Value>(&content) {
-                Ok(json) => result.push(json),
+                Ok(mut json) => {
+                    // 兼容历史项目：如果 id 缺失则使用文件名补齐，避免前端列表因脏数据被整体过滤。
+                    if let Some(object) = json.as_object_mut() {
+                        let has_id = object
+                            .get("id")
+                            .and_then(|value| value.as_str())
+                            .map(|value| !value.trim().is_empty())
+                            .unwrap_or(false);
+                        if !has_id && !file_stem.is_empty() {
+                            object.insert("id".to_string(), serde_json::Value::String(file_stem.clone()));
+                        }
+                    }
+                    result.push(json)
+                }
                 Err(_) => continue,
             },
             Err(_) => continue,

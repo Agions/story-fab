@@ -2,9 +2,10 @@
  * API 密钥设置面板
  */
 import React, { useState, useCallback } from 'react';
-import { Card, Form, Input, Button, Space, Tag, message, Spin, Typography, Alert, Divider } from 'antd';
+import { Card, Form, Input, Button, Space, Tag, Spin, Typography, Alert, Divider } from 'antd';
 import { KeyOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { validateApiKey } from '@/services/apiKeyService';
+import { notify } from '@/shared';
 import { ModelProvider, PROVIDER_NAMES } from '@/constants/models';
 import { MODEL_PROVIDERS } from '@/core/config/models.config';
 
@@ -27,7 +28,7 @@ const ApiKeysPanel: React.FC<ApiKeysPanelProps> = ({ apiKeys, onUpdateKey, onDel
 
   const handleTest = useCallback(async (provider: ModelProvider, key: string) => {
     if (!key) {
-      message.warning('请先输入 API 密钥');
+      notify.warning('请先输入 API 密钥');
       return;
     }
 
@@ -35,12 +36,12 @@ const ApiKeysPanel: React.FC<ApiKeysPanelProps> = ({ apiKeys, onUpdateKey, onDel
     try {
       const result = await validateApiKey(provider, key);
       if (result.isValid) {
-        message.success(`${PROVIDER_NAMES[provider]} API 密钥验证成功`);
+        notify.success(`${PROVIDER_NAMES[provider]} API 密钥验证成功`);
       } else {
-        message.error(result.error || '验证失败');
+        notify.error(null, result.error || '验证失败');
       }
-    } catch {
-      message.error('验证出错');
+    } catch (error) {
+      notify.error(error, '验证出错');
     } finally {
       setTestingProvider(null);
     }

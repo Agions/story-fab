@@ -114,8 +114,7 @@ export const TARGET_AUDIENCES = [
 
 // 语言选项
 export const LANGUAGE_OPTIONS = [
-  { value: 'zh', label: '中文' },
-  { value: 'en', label: 'English' }
+  { value: 'zh', label: '中文' }
 ] as const;
 
 // 主题模式

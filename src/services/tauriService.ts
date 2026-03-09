@@ -1,9 +1,9 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, BaseDirectory, mkdir, exists } from '@tauri-apps/plugin-fs';
-import { message } from 'antd';
 import { appConfigDir } from '@tauri-apps/api/path';
 import { open as openExternal } from '@tauri-apps/plugin-shell';
+import { normalizeProjectId, buildProjectIdCandidates } from '@/core/utils/project-id';
 
 type ProjectFileData = {
   aiModel?: {
@@ -25,29 +25,40 @@ type ExportScriptData = {
   segments: ExportScriptSegment[];
 };
 
-const normalizeProjectId = (projectId: string): string =>
-  projectId.trim().replace(/\.json$/i, '');
+export const PROJECTS_CHANGED_EVENT = 'clipflow:projects:changed';
 
-const buildProjectIdCandidates = (projectId: string): string[] => {
-  const raw = projectId || '';
-  const basename = raw.split('/').pop() || raw;
-  const decoded = (() => {
-    try {
-      return decodeURIComponent(raw);
-    } catch {
-      return raw;
-    }
-  })();
-  const decodedBasename = decoded.split('/').pop() || decoded;
+const emitProjectsChanged = (): void => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(PROJECTS_CHANGED_EVENT));
+  }
+};
 
-  return Array.from(
-    new Set([
-      normalizeProjectId(raw),
-      normalizeProjectId(basename),
-      normalizeProjectId(decoded),
-      normalizeProjectId(decodedBasename),
-    ].filter(Boolean))
-  );
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const normalizeListedProject = (value: unknown): ProjectFileData | null => {
+  if (!isRecord(value)) return null;
+
+  const rawId = typeof value.id === 'string' ? value.id : '';
+  const fallbackId = typeof value.projectId === 'string' ? value.projectId : '';
+  const normalizedId = normalizeProjectId(rawId || fallbackId);
+  if (!normalizedId) return null;
+
+  const merged: ProjectFileData = {
+    ...value,
+    id: normalizedId,
+  };
+
+  if (typeof merged.name !== 'string' || !merged.name.trim()) {
+    merged.name = `项目 ${normalizedId.slice(0, 8)}`;
+  }
+  if (typeof merged.updatedAt !== 'string') {
+    merged.updatedAt = typeof merged.createdAt === 'string'
+      ? merged.createdAt
+      : new Date().toISOString();
+  }
+
+  return merged;
 };
 
 // 确保应用数据目录
@@ -98,7 +109,6 @@ export const ensureAppDataDir = async (): Promise<void> => {
     return;
   } catch (error) {
     console.error('创建应用数据目录失败:', error);
-    message.error('创建应用数据目录失败，请检查权限设置');
     throw error;
   }
 };
@@ -150,6 +160,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
         projectId: normalizedProjectId,
         content: projectData
       });
+      emitProjectsChanged();
       console.log('文件写入成功 (通过Rust函数)');
       return;
     } catch (rustErr) {
@@ -182,6 +193,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
         const configDir = await getConfigDir();
         const backupPath = `${configDir}${normalizedProjectId}.json`;
         await writeTextFile(backupPath, projectData);
+        emitProjectsChanged();
         console.log('使用备用路径保存成功:', backupPath);
         return;
       } catch (backupErr) {
@@ -204,15 +216,11 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
       throw new Error(`无法验证文件是否保存成功: ${verifyErrMessage}`);
     }
     
+    emitProjectsChanged();
     console.log('项目文件保存成功:', projectPath);
     return;
   } catch (error) {
     console.error('保存项目文件失败:', error);
-    // 传递更明确的错误信息
-    const errorMessage = error instanceof Error 
-      ? error.message
-      : '未知错误';
-    message.error(`保存项目文件失败: ${errorMessage}`);
     throw error;
   }
 };
@@ -279,6 +287,30 @@ export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string
   throw (lastError || new Error(`读取项目失败: ${projectId}`));
 };
 
+/**
+ * 带轻量重试的项目读取，缓解插件初始化/瞬时 IO 波动导致的偶发失败。
+ */
+export const loadProjectWithRetry = async <T = ProjectFileData>(
+  projectId: string,
+  options?: { retries?: number; retryDelayMs?: number }
+): Promise<T> => {
+  const retries = Math.max(0, options?.retries ?? 2);
+  const retryDelayMs = Math.max(100, options?.retryDelayMs ?? 220);
+
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      return await loadProjectFromFile<T>(projectId);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= retries) break;
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs * (attempt + 1)));
+    }
+  }
+
+  throw (lastError || new Error(`读取项目失败: ${projectId}`));
+};
+
 // 导出脚本到文本文件
 export const exportScriptToFile = async (script: ExportScriptData, filename: string): Promise<void> => {
   try {
@@ -305,10 +337,8 @@ export const exportScriptToFile = async (script: ExportScriptData, filename: str
     });
     
     await writeTextFile(savePath, content);
-    message.success('脚本已导出');
   } catch (error) {
     console.error('导出脚本失败:', error);
-    message.error('导出脚本失败');
     throw error;
   }
 };
@@ -387,11 +417,9 @@ export const saveApiKey = async (service: string, apiKey: string): Promise<boole
     config[service] = apiKey;
     
     await writeTextFile(configPath, JSON.stringify(config, null, 2));
-    message.success(`${service}的API密钥已保存`);
     return true;
   } catch (error) {
     console.error(`保存${service}的API密钥失败:`, error);
-    message.error(`保存API密钥失败: ${error}`);
     return false;
   }
 };
@@ -417,7 +445,6 @@ export const selectFile = async (filters?: { name: string, extensions: string[] 
     return Array.isArray(selected) ? selected[0] : selected;
   } catch (error) {
     console.error('选择文件失败:', error);
-    message.error('选择文件失败');
     return null;
   }
 };
@@ -445,11 +472,9 @@ export const saveFile = async (
     }
     
     await writeTextFile(savePath, content);
-    message.success('文件保存成功');
     return true;
   } catch (error) {
     console.error('保存文件失败:', error);
-    message.error('保存文件失败');
     return false;
   }
 };
@@ -494,7 +519,6 @@ export const saveAppData = async <T>(key: string, data: T): Promise<boolean> => 
     return true;
   } catch (error) {
     console.error(`保存应用数据(${key})失败:`, error);
-    message.error(`保存数据失败: ${error}`);
     return false;
   }
 };
@@ -532,7 +556,6 @@ export const openExternalUrl = async (url: string): Promise<boolean> => {
       return true;
     } catch (windowError) {
       console.error('无法打开链接:', windowError);
-      message.error('无法打开链接，请手动复制并访问: ' + url);
       return false;
     }
   }
@@ -543,9 +566,15 @@ export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
   try {
     // 尝试使用 Rust 函数列出项目
     try {
-      const projects = await invoke('list_project_files');
-      console.log('通过 Rust 函数获取项目列表成功:', projects);
-      return projects as T[];
+      const projects = await invoke<unknown[]>('list_project_files');
+      const normalized = (Array.isArray(projects) ? projects : [])
+        .map(normalizeListedProject)
+        .filter((item): item is ProjectFileData => item !== null);
+      if (normalized.length > 0) {
+        console.log('通过 Rust 函数获取项目列表成功:', normalized.length);
+        return normalized as T[];
+      }
+      console.warn('Rust 项目列表为空或数据异常，切换到文件扫描兜底');
     } catch (rustError) {
       console.warn('通过 Rust 获取项目列表失败，使用 JS API 替代:', rustError);
     }
@@ -578,9 +607,11 @@ export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
       });
     
     const projects = await Promise.all(projectsPromises);
+    const normalized = projects
+      .map(normalizeListedProject)
+      .filter((project): project is ProjectFileData => project !== null);
     
-    // 过滤出成功加载的项目
-    return projects.filter((project): project is ProjectFileData => project !== null) as unknown as T[];
+    return normalized as unknown as T[];
   } catch (error) {
     console.error('列出项目失败:', error);
     throw error;
@@ -593,6 +624,7 @@ export const deleteProject = async (projectId: string): Promise<boolean> => {
     const normalizedProjectId = normalizeProjectId(projectId || '');
     if (!normalizedProjectId) return false;
     await invoke('delete_project_file', { projectId: normalizedProjectId });
+    emitProjectsChanged();
     console.log('项目删除成功:', projectId);
     return true;
   } catch (error) {

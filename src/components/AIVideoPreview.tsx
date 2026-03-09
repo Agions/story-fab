@@ -3,7 +3,7 @@
  * 简化的 AI 剪辑专用时间轴
  */
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Button, Slider, Typography, Space, Upload, message, type UploadProps } from 'antd';
+import { Button, Slider, Typography, Space, Upload, type UploadProps } from 'antd';
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
@@ -16,6 +16,7 @@ import {
 } from '@ant-design/icons';
 import { useAIEditor } from './AIPanel/AIEditorContext';
 import type { VideoInfo } from '@/core/types';
+import { notify } from '@/shared';
 import styles from './AIVideoPreview.module.less';
 
 const { Text } = Typography;
@@ -123,13 +124,13 @@ const AIVideoPreview: React.FC = () => {
   const handleUploadFile = (file: File) => {
     // 验证文件类型
     if (!file.type.startsWith('video/')) {
-      message.error('请上传视频文件');
+      notify.error(null, '请上传视频文件');
       return false;
     }
 
     // 验证文件大小 (最大 500MB)
     if (file.size > 500 * 1024 * 1024) {
-      message.error('视频文件不能超过 500MB');
+      notify.error(null, '视频文件不能超过 500MB');
       return false;
     }
 
@@ -152,7 +153,7 @@ const AIVideoPreview: React.FC = () => {
     };
 
     setVideo(videoInfo);
-    message.success(`已加载视频: ${file.name}`);
+    notify.success(`已加载视频: ${file.name}`);
 
     return false; // 阻止默认上传
   };

@@ -238,7 +238,7 @@ export interface EventEmitter {
 /** 应用配置 */
 export interface AppConfig {
   theme: 'light' | 'dark' | 'auto';
-  language: 'zh' | 'en';
+  language: 'zh';
   autoSave: boolean;
   autoSaveInterval: number;
   defaultQuality: 'low' | 'medium' | 'high' | 'ultra';

@@ -2,7 +2,7 @@
  * 通用工具函数
  * 包含: 防抖节流、剪贴板、文件下载、深拷贝、类型判断等
  */
-import { message } from 'antd';
+import { notify } from '@/shared';
 
 /**
  * 生成唯一 ID
@@ -50,10 +50,10 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
-    message.success('已复制到剪贴板');
+    notify.success('已复制到剪贴板');
     return true;
   } catch {
-    message.error('复制失败');
+    notify.error(null, '复制失败');
     return false;
   }
 }

@@ -3,7 +3,6 @@
  * 支持：通义千问、讯飞星火、智谱清言、DeepSeek、Moonshot Kimi
  */
 import axios from 'axios';
-import { message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import { getApiKey } from './tauriService';
 import { VideoMetadata } from './videoService';
@@ -433,8 +432,7 @@ export const generateScriptWithAI = async (
   try {
     const apiKey = await getApiKey('openai');
     if (!apiKey) {
-      message.error('未配置 OpenAI API 密钥，请先在设置中配置');
-      throw new Error('未配置API密钥');
+      throw new Error('未配置 OpenAI API 密钥，请先在设置中配置');
     }
 
     const normalizeStyle = (style: string | undefined): ScriptGenerationSettings['style'] => {
@@ -476,8 +474,7 @@ export const generateScriptWithAI = async (
     });
   } catch (error) {
     console.error('脚本生成失败:', error);
-    message.error(error instanceof Error ? error.message : '脚本生成失败');
-    throw error;
+    throw new Error(error instanceof Error ? error.message : '脚本生成失败');
   }
 };
 
@@ -491,8 +488,7 @@ export const improveScriptWithAI = async (
 ): Promise<string> => {
   const apiKey = await getApiKey('openai');
   if (!apiKey) {
-    message.error('未配置 OpenAI API 密钥');
-    throw new Error('未配置API密钥');
+    throw new Error('未配置 OpenAI API 密钥，请先在设置中配置');
   }
 
   const prompt = `请根据以下指示优化视频脚本:\n\n原始脚本:\n${originalScript}\n\n优化指示:\n${instructions}`;

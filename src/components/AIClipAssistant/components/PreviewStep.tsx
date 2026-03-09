@@ -90,6 +90,9 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
                 src={segment.thumbnail}
                 alt={`片段 ${index + 1}`}
                 className={styles.segmentThumbnail}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
               />
             )}
           </Card>

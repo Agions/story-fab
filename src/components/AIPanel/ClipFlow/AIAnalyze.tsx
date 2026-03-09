@@ -10,7 +10,7 @@
 import React, { useState } from 'react';
 import { 
   Card, Button, Space, Typography, List, 
-  Tag, Alert, Divider, Checkbox, message, Row, Col, Badge
+  Tag, Alert, Divider, Checkbox, Row, Col, Badge
 } from 'antd';
 import {
   CloudSyncOutlined,
@@ -28,6 +28,7 @@ import {
 import { useClipFlow } from '../AIEditorContext';
 import { visionService } from '@/core/services/vision.service';
 import { ProcessingProgress } from '@/components/common';
+import { notify } from '@/shared';
 import type { Scene } from '@/core/types';
 import styles from './ClipFlow.module.less';
 
@@ -124,7 +125,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
   // 执行 AI 分析
   const runAnalysis = async () => {
     if (!state.currentVideo) {
-      message.warning('请先上传视频');
+      notify.warning('请先上传视频');
       return;
     }
 
@@ -148,7 +149,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
           );
           setAnalysis({ id: `analysis_${Date.now()}`, videoId: state.currentVideo.id, scenes, keyframes: [], objects, emotions, summary: `检测到 ${scenes.length} 个场景`, stats: { sceneCount: scenes.length, objectCount: objects?.length || 0, avgSceneDuration: state.currentVideo.duration / scenes.length, sceneTypes: {}, objectCategories: {}, dominantEmotions: {} }, createdAt: new Date().toISOString() });
         } catch {
-          message.warning('场景检测使用默认数据');
+          notify.warning('场景检测使用默认数据');
           const mockScenes = generateMockScenes(state.currentVideo.duration);
           setAnalysis({ id: `analysis_${Date.now()}`, videoId: state.currentVideo.id, scenes: mockScenes, keyframes: [], objects: [], emotions: [], summary: `检测到 ${mockScenes.length} 个场景`, stats: { sceneCount: mockScenes.length, objectCount: 0, avgSceneDuration: state.currentVideo.duration / mockScenes.length, sceneTypes: {}, objectCategories: {}, dominantEmotions: {} }, createdAt: new Date().toISOString() });
         }
@@ -200,7 +201,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
       setProgress(100);
       
       dispatch({ type: 'SET_STEP_COMPLETE', payload: { step: 'ai-analyze', complete: true } });
-      message.success('AI 分析完成！');
+      notify.success('AI 分析完成！');
       
       setTimeout(() => {
         if (onNext) onNext();
@@ -209,7 +210,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
 
     } catch (error) {
       console.error('分析失败:', error);
-      message.error('分析过程出错，请重试');
+      notify.error(error, '分析过程出错，请重试');
     } finally {
       setAnalyzing(false);
     }

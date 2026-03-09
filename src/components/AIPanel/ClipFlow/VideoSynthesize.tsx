@@ -4,10 +4,10 @@
  * 数据输入: video, script, voice
  * 数据输出: synthesis (最终合成视频)
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { 
   Card, Button, Space, Typography, Tag,
-  Switch, Slider, Alert, Progress, message, Tabs, Row, Col, Badge, Radio
+  Switch, Slider, Alert, Progress, Tabs, Row, Col, Badge, Radio
 } from 'antd';
 import {
   PlayCircleOutlined,
@@ -22,6 +22,10 @@ import { voiceSynthesisService } from '@/core/services/voice-synthesis.service';
 import { videoEffectService } from '@/core/services/video-effect.service';
 import { audioVideoSyncService } from '@/core/services/audio-sync.service';
 import { subtitleService } from '@/core/services/subtitle.service';
+import { orchestrateCommentaryAgents } from '@/core/services/workflow/agents';
+import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '@/core/workflow/alignmentGate';
+import { FEATURE_TO_FUNCTION, FUNCTION_TO_MODE } from './functionModeMap';
+import { notify } from '@/shared';
 import styles from './ClipFlow.module.less';
 
 const { Title, Text, Paragraph } = Typography;
@@ -31,8 +35,6 @@ const { TabPane } = Tabs;
 const VOICE_OPTIONS = [
   { value: 'female_zh', label: '🎤 女声 (中文)', desc: '温柔甜美', style: 'warm' },
   { value: 'male_zh', label: '🎤 男声 (中文)', desc: '成熟稳重', style: 'deep' },
-  { value: 'female_en', label: '🎤 女声 (英文)', desc: '活泼自然', style: 'energetic' },
-  { value: 'male_en', label: '🎤 男声 (英文)', desc: '专业正式', style: 'formal' },
   { value: 'neutral', label: '🎤 中性声音', desc: '通用场景', style: 'neutral' },
 ];
 
@@ -101,11 +103,37 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
     return state.scriptData.narration?.content || state.scriptData.remix?.content || '';
   };
 
+  const alignmentQuality = useMemo(() => {
+    if (!state.analysis?.scenes?.length) return null;
+    const activeFunction = state.selectedFeature !== 'none'
+      ? FEATURE_TO_FUNCTION[state.selectedFeature as 'smartClip' | 'voiceover' | 'subtitle']
+      : undefined;
+    const script =
+      activeFunction === 'remix'
+        ? state.scriptData.remix
+        : state.scriptData.narration || state.scriptData.remix;
+    if (!script?.segments?.length) return null;
+
+    const mode = activeFunction ? FUNCTION_TO_MODE[activeFunction] : 'ai-commentary';
+    const orchestration = orchestrateCommentaryAgents({
+      mode,
+      analysis: state.analysis,
+      segments: script.segments,
+    });
+    const passed = isAlignmentGatePassed(orchestration.alignmentSummary);
+    return {
+      passed,
+      averageConfidence: orchestration.alignmentSummary.averageConfidence,
+      maxDriftSeconds: orchestration.alignmentSummary.maxDriftSeconds,
+      overlayCount: orchestration.overlayPlan.length,
+    };
+  }, [state.analysis, state.scriptData.narration, state.scriptData.remix, state.selectedFeature]);
+
   // 生成配音
   const handleGenerateVoice = useCallback(async () => {
     const scriptContent = getCurrentScriptContent();
     if (!scriptContent) {
-      message.warning('请先生成文案');
+      notify.warning('请先生成文案');
       return;
     }
 
@@ -126,10 +154,10 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
       });
       
       setProgress(100);
-      message.success('配音生成成功！');
+      notify.success('配音生成成功！');
     } catch (error) {
       console.error('配音生成失败:', error);
-      message.error('配音生成失败');
+      notify.error(error, '配音生成失败');
     } finally {
       setSynthesizing(false);
     }
@@ -138,13 +166,13 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
   // 开始合成
   const handleSynthesize = async () => {
     if (!state.currentVideo) {
-      message.warning('请先上传视频');
+      notify.warning('请先上传视频');
       return;
     }
 
     const scriptContent = getCurrentScriptContent();
     if (!scriptContent && config.enableVoice) {
-      message.warning('请先生成文案');
+      notify.warning('请先生成文案');
       return;
     }
 
@@ -189,7 +217,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
         addWatermark: false
       });
 
-      message.success('视频合成完成！');
+      notify.success('视频合成完成！');
 
       setTimeout(() => {
         if (onNext) onNext();
@@ -198,7 +226,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
 
     } catch (error) {
       console.error('合成失败:', error);
-      message.error('视频合成失败');
+      notify.error(error, '视频合成失败');
     } finally {
       setSynthesizing(false);
     }
@@ -302,6 +330,16 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
           <Title level={4} style={{ margin: 0 }}>⚙️ 视频合成配置</Title>
         </Space>
       </div>
+
+      {alignmentQuality && (
+        <Alert
+          type={alignmentQuality.passed ? 'success' : 'warning'}
+          showIcon
+          style={{ marginBottom: 16 }}
+          message={alignmentQuality.passed ? '音画对齐质量通过' : '音画对齐建议优化'}
+          description={`平均置信度 ${alignmentQuality.averageConfidence.toFixed(2)}（阈值 ${ALIGNMENT_GATE_THRESHOLD.minConfidence}），最大漂移 ${alignmentQuality.maxDriftSeconds.toFixed(2)}s（阈值 ${ALIGNMENT_GATE_THRESHOLD.maxDriftSeconds}s），原画覆盖建议 ${alignmentQuality.overlayCount} 段。`}
+        />
+      )}
 
       <Tabs activeKey={activeTab} onChange={setActiveTab}>
         {/* 配音设置 */}

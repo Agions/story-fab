@@ -1,9 +1,10 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Typography, Space, Spin, message, Divider, Modal, Tag } from 'antd';
+import { Card, Button, Typography, Space, Spin, Divider, Modal, Tag, Result } from 'antd';
 import { ArrowLeftOutlined, SaveOutlined, DeleteOutlined, ExportOutlined, RobotOutlined } from '@ant-design/icons';
 import { useSettings } from '@/context/SettingsContext';
-import { exportScriptToFile, saveProjectToFile, loadProjectFromFile, listProjects } from '@/services/tauriService';
+import { notify } from '@/shared';
+import { exportScriptToFile, saveProjectToFile, loadProjectWithRetry, listProjects } from '@/services/tauriService';
 import { findProjectByScriptId, normalizeProjectFile } from '@/core/utils/project-file';
 import type { ProjectFileLike } from '@/core/utils/project-file';
 import type { Script } from '@/services/aiService';
@@ -52,28 +53,53 @@ const ScriptDetail: React.FC = () => {
   const [project, setProject] = useState<ProjectWithScripts | null>(null);
   const [script, setScript] = useState<Script | null>(null);
   const [segments, setSegments] = useState<VideoSegment[]>([]);
+  const [loadError, setLoadError] = useState<string>('');
+  const [reloadToken, setReloadToken] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const loadRequestSeqRef = useRef(0);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const requestId = ++loadRequestSeqRef.current;
+    const isStale = () => !mountedRef.current || requestId !== loadRequestSeqRef.current;
+
     if (!scriptId) {
-      message.error('参数错误');
-      navigate('/projects');
+      if (isStale()) return;
+      setProject(null);
+      setScript(null);
+      setSegments([]);
+      setLoadError('参数错误：缺少脚本ID');
+      setLoading(false);
       return;
     }
 
     const loadData = async () => {
       try {
+        if (isStale()) return;
+        setProject(null);
+        setScript(null);
+        setSegments([]);
         setLoading(true);
+        setLoadError('');
         let currentProject: ProjectWithScripts | undefined;
         if (projectId) {
-          currentProject = await loadProjectFromFile<ProjectWithScripts>(projectId);
+          currentProject = await loadProjectWithRetry<ProjectWithScripts>(projectId, { retries: 2, retryDelayMs: 260 });
         } else {
           const allProjects = await listProjects<ProjectWithScripts>();
           currentProject = findProjectByScriptId(allProjects, scriptId);
         }
 
         if (!currentProject) {
-          message.error('找不到项目');
-          navigate('/projects');
+          if (isStale()) return;
+          setLoadError('找不到所属项目');
           return;
         }
 
@@ -81,26 +107,30 @@ const ScriptDetail: React.FC = () => {
 
         const currentScript = normalizedProject.scripts?.find((s) => s.id === scriptId);
         if (!currentScript) {
-          message.error('找不到脚本');
-          navigate(`/project/${normalizedProject.id}`);
+          if (isStale()) return;
+          setLoadError('找不到脚本，请确认脚本是否已被删除');
           return;
         }
 
+        if (isStale()) return;
         setProject(normalizedProject);
         setScript(currentScript);
         setSegments(toVideoSegments(currentScript));
         addRecentProject(normalizedProject.id);
       } catch (error) {
+        if (isStale()) return;
         console.error('加载脚本详情失败:', error);
-        message.error('加载脚本失败');
-        navigate('/projects');
+        const detail = error instanceof Error ? error.message : '未知错误';
+        setLoadError(detail);
+        notify.error(error, '加载脚本失败，请重试');
       } finally {
+        if (isStale()) return;
         setLoading(false);
       }
     };
 
     void loadData();
-  }, [addRecentProject, projectId, scriptId, navigate]);
+  }, [addRecentProject, projectId, scriptId, reloadToken]);
 
   useEffect(() => {
     if (!loading && project && script) {
@@ -114,10 +144,10 @@ const ScriptDetail: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!project || !script) return;
+    if (!project || !script || isSaving || isDeleting) return;
 
     try {
-      setLoading(true);
+      setIsSaving(true);
 
       // 更新脚本
       const updatedScript = {
@@ -146,19 +176,20 @@ const ScriptDetail: React.FC = () => {
       // 保存到文件
       await saveProjectToFile(updatedProject.id, updatedProject);
       
-      message.success('保存成功');
+      notify.success('保存成功');
     } catch (error) {
       console.error('保存失败:', error);
-      message.error('保存失败');
+      notify.error(error, '保存失败');
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
   const handleExport = async () => {
-    if (!project || !script) return;
+    if (!project || !script || isExporting || isDeleting) return;
 
     try {
+      setIsExporting(true);
       await exportScriptToFile(
         {
           projectName: project.name,
@@ -167,23 +198,28 @@ const ScriptDetail: React.FC = () => {
         },
         `${project.name}_脚本_${new Date().toISOString().slice(0, 10)}.txt`
       );
+      notify.success('导出成功');
     } catch (error) {
       console.error('导出脚本失败:', error);
-      message.error('导出失败');
+      notify.error(error, '导出失败');
+    } finally {
+      setIsExporting(false);
     }
   };
 
   const handleDelete = () => {
-    if (!project || !script) return;
+    if (!project || !script || isDeleting || isSaving || isExporting) return;
 
     Modal.confirm({
       title: '确认删除',
       content: '确定要删除这个脚本吗？此操作不可撤销。',
       okText: '删除',
       okType: 'danger',
+      okButtonProps: { loading: isDeleting },
       cancelText: '取消',
       onOk: async () => {
         try {
+          setIsDeleting(true);
           // 过滤掉要删除的脚本
           const updatedScripts = (project.scripts ?? []).filter((s) => s.id !== script.id);
           
@@ -197,11 +233,13 @@ const ScriptDetail: React.FC = () => {
           // 保存到文件
           await saveProjectToFile(updatedProject.id, updatedProject);
           
-          message.success('删除成功');
+          notify.success('删除成功');
           navigate(`/project/${project.id}`);
         } catch (error) {
           console.error('删除脚本失败:', error);
-          message.error('删除失败');
+          notify.error(error, '删除失败');
+        } finally {
+          setIsDeleting(false);
         }
       }
     });
@@ -209,6 +247,20 @@ const ScriptDetail: React.FC = () => {
 
   if (loading) {
     return <Spin size="large" tip="加载中..." />;
+  }
+  if (loadError) {
+    return (
+      <Result
+        status="error"
+        title="加载脚本失败"
+        subTitle={loadError}
+        extra={[
+          <Button key="retry" type="primary" onClick={() => setReloadToken((v) => v + 1)}>重试</Button>,
+          projectId ? <Button key="project" onClick={() => navigate(`/project/${projectId}`)}>返回项目</Button> : null,
+          <Button key="back" onClick={() => navigate('/projects')}>返回项目列表</Button>,
+        ]}
+      />
+    );
   }
 
   if (!project || !script) {
@@ -230,6 +282,8 @@ const ScriptDetail: React.FC = () => {
             type="primary"
             icon={<SaveOutlined />}
             onClick={handleSave}
+            loading={isSaving}
+            disabled={isDeleting}
           >
             保存
           </Button>
@@ -237,7 +291,8 @@ const ScriptDetail: React.FC = () => {
           <Button
             icon={<ExportOutlined />}
             onClick={handleExport}
-            disabled={segments.length === 0}
+            loading={isExporting}
+            disabled={segments.length === 0 || isSaving || isDeleting}
           >
             导出
           </Button>
@@ -246,6 +301,8 @@ const ScriptDetail: React.FC = () => {
             danger
             icon={<DeleteOutlined />}
             onClick={handleDelete}
+            loading={isDeleting}
+            disabled={isSaving || isExporting}
           >
             删除
           </Button>

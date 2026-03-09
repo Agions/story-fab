@@ -10,7 +10,6 @@ export type { RequestConfig as BaseRequestConfig } from './base.service';
 export { aiService } from './ai.service';
 export { videoService } from './video.service';
 export { storageService } from './storage.service';
-export { fileStorageService, FileStorageService } from './fileStorage.service';
 export { visionService } from './vision.service';
 export { workflowService } from './workflow.service';
 export { scriptTemplateService } from '../templates/script.templates';

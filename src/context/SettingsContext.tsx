@@ -72,10 +72,10 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     };
   }, [settings.theme]);
   
-  // 应用语言设置
+  // 统一固定中文
   useEffect(() => {
-    document.documentElement.setAttribute('lang', settings.language);
-  }, [settings.language]);
+    document.documentElement.setAttribute('lang', 'zh-CN');
+  }, []);
 
   return (
     <SettingsContext.Provider value={{ settings, updateSettings, resetSettings, addRecentProject }}>

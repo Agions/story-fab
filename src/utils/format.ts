@@ -55,6 +55,9 @@ export const formatDuration = (seconds: number): string => {
   if (isNaN(seconds) || seconds < 0) {
     return '00:00:00';
   }
+  if (seconds === 0) {
+    return '00:00:00';
+  }
   
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -92,8 +95,12 @@ export const truncateText = (text: string, maxLength: number): string => {
   if (!text || text.length <= maxLength) {
     return text;
   }
-  
-  return text.substring(0, maxLength) + '...';
+
+  if (maxLength <= 3) {
+    return '.'.repeat(Math.max(0, maxLength));
+  }
+
+  return text.substring(0, maxLength - 3) + '...';
 };
 
 /**
@@ -116,7 +123,7 @@ export const formatFriendlyDuration = (seconds: number): string => {
     result += `${hours}小时`;
   }
   
-  if (minutes > 0 || hours > 0) {
+  if (minutes > 0) {
     result += `${minutes}分钟`;
   }
   

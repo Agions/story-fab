@@ -622,7 +622,7 @@ ${script}
 语气：${params.tone}
 长度：${length.time}（约${length.words}）
 目标受众：${params.audience}
-语言：${params.language === 'zh' ? '中文' : 'English'}
+语言：中文
 ${params.keywords?.length ? `关键词：${params.keywords.join('、')}` : ''}
 ${params.requirements ? `特殊要求：${params.requirements}` : ''}
 ${params.videoDuration ? `视频时长：${Math.round(params.videoDuration / 60)}分钟` : ''}

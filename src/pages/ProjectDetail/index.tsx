@@ -1,6 +1,6 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, message, Modal, Spin, Typography, Menu, Space, Drawer, Tooltip } from 'antd';
+import { Button, Modal, Spin, Typography, Menu, Space, Drawer, Tooltip, Result } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   ArrowLeftOutlined, 
@@ -14,8 +14,9 @@ import {
 } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/store';
-import { saveProjectToFile, getApiKey, loadProjectFromFile, deleteProject } from '@/services/tauriService';
+import { saveProjectToFile, getApiKey, loadProjectWithRetry, deleteProject } from '@/services/tauriService';
 import { useSettings } from '@/context/SettingsContext';
+import { notify } from '@/shared';
 import { generateScriptWithModel, parseGeneratedScript } from '@/services/aiService';
 import { resolveLegacyModel } from '@/services/aiModelAdapter';
 import { normalizeProjectFile } from '@/core/utils/project-file';
@@ -77,6 +78,22 @@ const StepFallback: React.FC = () => (
   </div>
 );
 
+const persistUpdatedProject = async (updatedProject: ProjectData) => {
+  try {
+    await saveProjectToFile(updatedProject.id, updatedProject);
+  } catch (error) {
+    notify.error(error, '项目保存失败，请重试');
+  }
+};
+
+const MENU_ITEMS: MenuProps['items'] = [
+  { key: 'analyze', icon: <EyeOutlined />, label: '画面识别' },
+  { key: 'subtitle', icon: <FormOutlined />, label: '字幕提取' },
+  { key: 'script', icon: <DashboardOutlined />, label: '脚本生成' },
+  { key: 'sync', icon: <AudioOutlined />, label: '音画同步' },
+  { key: 'edit', icon: <ScissorOutlined />, label: '视频混剪' },
+];
+
 const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
@@ -88,6 +105,31 @@ const ProjectDetail: React.FC = () => {
   const [activeScript, setActiveScript] = useState<Script | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [loadError, setLoadError] = useState<string>('');
+  const [reloadToken, setReloadToken] = useState(0);
+  const loadRequestSeqRef = useRef(0);
+  const mountedRef = useRef(true);
+  const scriptPersistTimerRef = useRef<number | null>(null);
+  const createScriptLockRef = useRef(false);
+  const generateScriptLockRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      if (scriptPersistTimerRef.current) {
+        window.clearTimeout(scriptPersistTimerRef.current);
+      }
+    };
+  }, []);
+
+  const schedulePersistUpdatedProject = useCallback((updatedProject: ProjectData, delayMs = 280) => {
+    if (scriptPersistTimerRef.current) {
+      window.clearTimeout(scriptPersistTimerRef.current);
+    }
+    scriptPersistTimerRef.current = window.setTimeout(() => {
+      void persistUpdatedProject(updatedProject);
+    }, delayMs);
+  }, []);
 
   useEffect(() => {
     // 预加载当前步骤常见的下一步组件，降低切换等待时间
@@ -117,10 +159,17 @@ const ProjectDetail: React.FC = () => {
   }, [activeScript]);
 
   useEffect(() => {
-    if (!projectId) return;
+    const requestId = ++loadRequestSeqRef.current;
+    const isStale = () => !mountedRef.current || requestId !== loadRequestSeqRef.current;
+
+    if (!projectId || isStale()) return;
+    setProject(null);
+    setActiveScript(null);
     setLoading(true);
-    loadProjectFromFile<ProjectData>(projectId)
+    setLoadError('');
+    loadProjectWithRetry<ProjectData>(projectId, { retries: 2, retryDelayMs: 260 })
       .then((currentProject) => {
+        if (isStale()) return;
         const normalizedProject = normalizeProjectFile(currentProject);
         setProject(normalizedProject);
         addRecentProject(normalizedProject.id);
@@ -129,16 +178,19 @@ const ProjectDetail: React.FC = () => {
         }
       })
       .catch((error) => {
+        if (isStale()) return;
         console.error('加载项目失败:', error);
-        message.error('找不到项目信息');
-        navigate('/projects');
+        const detail = error instanceof Error ? error.message : '未知错误';
+        setLoadError(detail);
+        notify.error(error, '加载项目失败，请重试');
       })
       .finally(() => {
+        if (isStale()) return;
         setLoading(false);
       });
-  }, [addRecentProject, projectId, navigate]);
+  }, [addRecentProject, projectId, reloadToken]);
 
-  const handleDeleteProject = () => {
+  const handleDeleteProject = useCallback(() => {
     Modal.confirm({
       title: '确认删除',
       content: '确定要删除此项目吗？此操作不可撤销。',
@@ -149,17 +201,18 @@ const ProjectDetail: React.FC = () => {
         if (!projectId) return;
         try {
           await deleteProject(projectId);
-          message.success('项目已删除');
+          notify.success('项目已删除');
           navigate('/projects');
         } catch {
-          message.error('删除项目失败');
+          notify.error(null, '删除项目失败');
         }
       }
     });
-  };
+  }, [navigate, projectId]);
 
-  const handleCreateScript = (): void => {
-    if (!project) return;
+  const handleCreateScript = useCallback((): void => {
+    if (!project || createScriptLockRef.current) return;
+    createScriptLockRef.current = true;
     try {
       const newScript: Script = {
         id: uuidv4(),
@@ -179,38 +232,43 @@ const ProjectDetail: React.FC = () => {
       setProject(updatedProject);
       setActiveScript(newScript);
       
-      message.loading({ content: '正在保存...', key: 'save' });
+      notify.loading('正在保存...', 'save');
       saveProjectToFile(updatedProject.id, updatedProject).then(() => {
-        message.success({ content: '脚本创建成功', key: 'save' });
+        notify.success('脚本创建成功', 'save');
       }).catch(() => {
-        message.error({ content: '保存失败', key: 'save' });
+        notify.error(null, '保存失败', 'save');
+      }).finally(() => {
+        createScriptLockRef.current = false;
       });
     } catch {
-      message.error('创建失败');
+      createScriptLockRef.current = false;
+      notify.error(null, '创建失败');
     }
-  };
+  }, [project]);
 
-  const handleGenerateScript = async () => {
+  const handleGenerateScript = useCallback(async () => {
+    if (generateScriptLockRef.current) return;
     if (!project || !project.analysis) {
-      message.warning('项目缺少分析数据，请先完成【画面识别】步骤');
+      notify.warning('项目缺少分析数据，请先完成【画面识别】步骤');
       return;
     }
     
     try {
+      generateScriptLockRef.current = true;
       setAiLoading(true);
       const modelSettings = aiModelsSettings[selectedAIModel];
       if (!modelSettings?.enabled) {
-        message.warning(`请在设置中启用 ${selectedAIModel} 模型`);
+        notify.warning(`请在设置中启用 ${selectedAIModel} 模型`);
         return;
       }
       
       const apiKey = await getApiKey(selectedAIModel);
       if (!apiKey) {
-        message.warning(`缺少 ${selectedAIModel} 的API密钥`);
+        notify.warning(`缺少 ${selectedAIModel} 的API密钥`);
         return;
       }
       
-      message.loading({ content: 'AI正在创作脚本...', key: 'ai' });
+      notify.loading('AI正在创作脚本...', 'ai');
       const compatibleModel = resolveLegacyModel(selectedAIModel);
       const scriptText = await generateScriptWithModel(
         compatibleModel,
@@ -235,29 +293,67 @@ const ProjectDetail: React.FC = () => {
       setActiveScript(scriptWithModelInfo);
       
       await saveProjectToFile(updatedProject.id, updatedProject);
-      message.success({ content: 'AI脚本生成完毕✨', key: 'ai' });
+      notify.success('AI脚本生成完毕✨', 'ai');
     } catch (error) {
-      message.error({
-        content: `生成失败: ${error instanceof Error ? error.message : '未知错误'}`,
-        key: 'ai'
-      });
+      notify.error(error, '生成失败：未知错误', 'ai');
     } finally {
       setAiLoading(false);
+      generateScriptLockRef.current = false;
     }
-  };
-
-  const menuItems: MenuProps['items'] = [
-    { key: 'analyze', icon: <EyeOutlined />, label: '画面识别 (Frame Analysis)' },
-    { key: 'subtitle', icon: <FormOutlined />, label: '字幕提取 (Subtitle Ext)' },
-    { key: 'script', icon: <DashboardOutlined />, label: '脚本生成 (AI Script)' },
-    { key: 'sync', icon: <AudioOutlined />, label: '音画同步 (A/V Sync)' },
-    { key: 'edit', icon: <ScissorOutlined />, label: '视频混剪 (Video Output)' },
-  ];
+  }, [aiModelsSettings, project, selectedAIModel]);
 
   if (loading) return <div className={styles.spinner}><Spin size="large" /></div>;
+  if (loadError) {
+    return (
+      <Result
+        status="error"
+        title="加载项目失败"
+        subTitle={loadError}
+        extra={[
+          <Button key="retry" type="primary" onClick={() => setReloadToken((v) => v + 1)}>重试</Button>,
+          <Button key="back" onClick={() => navigate('/projects')}>返回项目列表</Button>,
+        ]}
+      />
+    );
+  }
   if (!project) return null;
 
-  const renderContent = (): React.ReactNode => {
+  const handleAnalysisComplete = useCallback((analysis: VideoAnalysis) => {
+    if (!project) return;
+    const updated = { ...project, analysis };
+    setProject(updated);
+    void persistUpdatedProject(updated);
+    notify.success('画面识别已完成并保存');
+  }, [project]);
+
+  const handleSubtitleExtracted = useCallback((subtitles: unknown) => {
+    if (!project) return;
+    const updated = { ...project, extractedSubtitles: subtitles };
+    setProject(updated);
+    void persistUpdatedProject(updated);
+  }, [project]);
+
+  const handleScriptSave = useCallback((updatedSegments: Parameters<ScriptEditorOriginalProps['onSave']>[0]) => {
+    if (!project || !activeScript) return;
+    const updatedScript: Script = {
+      ...activeScript,
+      content: toScriptSegments(updatedSegments),
+      fullText: updatedSegments.map((segment) => segment.content ?? '').join('\n\n'),
+      updatedAt: new Date().toISOString()
+    };
+    const updatedProject = {
+      ...project,
+      scripts: (project.scripts ?? []).map((script) =>
+        script.id === activeScript.id ? updatedScript : script
+      ),
+      updatedAt: new Date().toISOString()
+    };
+    setActiveScript(updatedScript);
+    setProject(updatedProject);
+    schedulePersistUpdatedProject(updatedProject);
+  }, [activeScript, project, schedulePersistUpdatedProject]);
+
+  const contentNode = useMemo((): React.ReactNode => {
     switch (activeStep) {
       case 'analyze':
         return (
@@ -266,12 +362,7 @@ const ProjectDetail: React.FC = () => {
               <VideoAnalyzer
                 projectId={project.id}
                 videoUrl={project.videoUrl}
-                onAnalysisComplete={(analysis) => {
-                  const updated = { ...project, analysis };
-                  setProject(updated);
-                  saveProjectToFile(updated.id, updated);
-                  message.success('画面识别已完成并保存');
-                }}
+                onAnalysisComplete={handleAnalysisComplete}
               />
             </Suspense>
           </div>
@@ -283,11 +374,7 @@ const ProjectDetail: React.FC = () => {
               <SubtitleExtractor
                 projectId={project.id}
                 videoUrl={project.videoUrl}
-                onExtracted={(subtitles) => {
-                  const updated = { ...project, extractedSubtitles: subtitles };
-                  setProject(updated);
-                  saveProjectToFile(updated.id, updated);
-                }}
+                onExtracted={handleSubtitleExtracted}
               />
             </Suspense>
           </div>
@@ -307,23 +394,7 @@ const ProjectDetail: React.FC = () => {
                 <ScriptEditor
                   videoPath={project.videoUrl ?? ''}
                   initialSegments={toVideoSegments(activeScript)}
-                  onSave={(updatedSegments: Parameters<ScriptEditorOriginalProps['onSave']>[0]) => {
-                    const updatedScript: Script = {
-                      ...activeScript,
-                      content: toScriptSegments(updatedSegments),
-                      fullText: updatedSegments.map((segment) => segment.content ?? '').join('\n\n'),
-                      updatedAt: new Date().toISOString()
-                    };
-                    const updatedProject = {
-                      ...project,
-                      scripts: (project.scripts ?? []).map((script) =>
-                        script.id === activeScript.id ? updatedScript : script
-                      )
-                    };
-                    setActiveScript(updatedScript);
-                    setProject(updatedProject);
-                    saveProjectToFile(updatedProject.id, updatedProject);
-                  }}
+                  onSave={handleScriptSave}
                 />
               </Suspense>
             ) : (
@@ -336,10 +407,10 @@ const ProjectDetail: React.FC = () => {
       case 'sync':
         return (
           <div className={styles.placeholderSection}>
-             <div className={styles.iconWrapper}><AudioOutlined /></div>
-             <Title level={3}>全自动音画同步引擎</Title>
-             <Text>结合TTS合成声音与画面关键帧自动对齐，提供影院级配音体验。</Text>
-             <Button type="primary" size="large" className={styles.premiumBtn} onClick={() => message.info('功能开发中，敬请期待！')}>即将推出</Button>
+            <div className={styles.iconWrapper}><AudioOutlined /></div>
+            <Title level={3}>全自动音画同步引擎</Title>
+            <Text>结合TTS合成声音与画面关键帧自动对齐，提供影院级配音体验。</Text>
+            <Button type="primary" size="large" className={styles.premiumBtn} onClick={() => notify.info('功能开发中，敬请期待！')}>即将推出</Button>
           </div>
         );
       case 'edit':
@@ -356,7 +427,18 @@ const ProjectDetail: React.FC = () => {
       default:
         return null;
     }
-  };
+  }, [
+    activeStep,
+    activeScript,
+    aiLoading,
+    handleAnalysisComplete,
+    handleCreateScript,
+    handleGenerateScript,
+    handleScriptSave,
+    handleSubtitleExtracted,
+    project.id,
+    project.videoUrl,
+  ]);
 
   return (
     <div className={styles.container}>
@@ -388,7 +470,7 @@ const ProjectDetail: React.FC = () => {
               mode="vertical"
               selectedKeys={[activeStep]}
               className={styles.stepMenu}
-              items={menuItems}
+              items={MENU_ITEMS}
               onSelect={({ key }) => setActiveStep(String(key))}
             />
           </div>
@@ -396,7 +478,7 @@ const ProjectDetail: React.FC = () => {
 
         <div className={styles.contentArea}>
           <div className={styles.activeContent}>
-            {renderContent()}
+            {contentNode}
           </div>
         </div>
       </div>

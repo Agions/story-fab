@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Card, Button, Progress, message, Alert, Typography, Spin } from 'antd';
+import { Card, Button, Progress, Alert, Typography, Spin } from 'antd';
 import { VideoCameraOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoAnalysis, KeyMoment, Emotion } from '../types';
 import VideoSelector from './VideoSelector';
+import { notify } from '@/shared';
 import styles from './VideoAnalyzer.module.less';
 
 const { Title, Paragraph } = Typography;
@@ -35,7 +36,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
   const handleAnalyze = async () => {
     if (!selectedVideoUrl) {
-      message.error('请先上传视频或输入视频链接');
+      notify.error(null, '请先上传视频或输入视频链接');
       return;
     }
 
@@ -117,11 +118,11 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       
       setProgress(100);
       
-      message.success('视频分析完成');
+      notify.success('视频分析完成');
       onAnalysisComplete(analysis);
     } catch (error) {
       setError(error instanceof Error ? error.message : '视频分析失败');
-      message.error('视频分析失败，请稍后重试');
+      notify.error(error, '视频分析失败，请稍后重试');
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button } from 'antd';
 import type { Project } from '@/types';
+import { notify } from '@/shared';
 import styles from './ProjectForm.module.less';
 
 interface ProjectFormProps {
@@ -19,9 +20,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const handleSubmit = async (values: Partial<Project>) => {
     try {
       await onSubmit(values);
-      message.success('保存成功');
-    } catch {
-      message.error('保存失败');
+      notify.success('保存成功');
+    } catch (error) {
+      notify.error(error, '保存失败');
     }
   };
 

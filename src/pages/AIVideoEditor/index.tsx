@@ -2,13 +2,14 @@
  * AI 视频编辑器页面
  * 采用标签页分离布局：AI第一人称解说 / AI解说 / AI混剪
  */
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, lazy, Suspense, useEffect } from 'react';
 import {
   AudioOutlined,
   UserOutlined,
   ScissorOutlined,
 } from '@ant-design/icons';
 import { ClipFlowProvider, useClipFlow } from '@/components/AIPanel/AIEditorContext';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/AIPanel/ClipFlow/functionModeMap';
 import styles from './index.module.less';
 
 const ClipFlowComponent = lazy(() => import('@/components/AIPanel/ClipFlow/ClipFlow'));
@@ -60,8 +61,16 @@ const AI_FUNCTIONS = [
 ];
 
 const AIVideoEditorContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('commentary-first');
-  const { state, goToNextStep } = useClipFlow();
+  const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
+  const { state, goToNextStep, setFeature } = useClipFlow();
+
+  useEffect(() => {
+    const targetFeature = TAB_TO_FEATURE[activeTab];
+    if (state.selectedFeature === targetFeature) {
+      return;
+    }
+    setFeature(targetFeature);
+  }, [activeTab, setFeature, state.selectedFeature]);
 
   // 根据当前步骤渲染内容
   const renderStepContent = () => {
@@ -92,7 +101,7 @@ const AIVideoEditorContent: React.FC = () => {
             <div
               key={func.key}
               className={`${styles.functionCard} ${activeTab === func.key ? styles.active : ''}`}
-              onClick={() => setActiveTab(func.key)}
+              onClick={() => setActiveTab(func.key as AIFunctionTabKey)}
               style={{
                 '--func-color': func.color,
               } as React.CSSProperties}

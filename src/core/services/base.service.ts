@@ -3,8 +3,6 @@
  * 提供统一的错误处理、请求拦截和日志记录
  */
 
-import { message } from 'antd';
-
 /**
  * 服务错误类型
  */
@@ -100,18 +98,6 @@ export abstract class BaseService {
     const serviceError = this.normalizeError(error);
     
     console.error(`[${this.name}] ${context || '操作失败'}:`, serviceError);
-    
-    // 显示用户友好的错误消息
-    if (serviceError.statusCode === 401) {
-      message.error('认证失败，请检查API密钥设置');
-    } else if (serviceError.statusCode === 429) {
-      message.error('请求过于频繁，请稍后重试');
-    } else if (typeof serviceError.statusCode === 'number' && serviceError.statusCode >= 500) {
-      message.error('服务器错误，请稍后重试');
-    } else {
-      message.error(serviceError.message);
-    }
-    
     throw serviceError;
   }
 

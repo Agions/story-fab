@@ -97,7 +97,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           icon={<SaveOutlined />}
           onClick={onSave}
           loading={isSaving}
-          disabled={!hasVideo}
+          disabled={!hasVideo || loading || analyzing || isSaving || isExporting}
         >
           保存
         </Button>
@@ -107,7 +107,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           icon={<DownloadOutlined />}
           onClick={onExport}
           loading={isExporting}
-          disabled={!hasVideo}
+          disabled={!hasVideo || loading || analyzing || isSaving || isExporting}
         >
           导出
         </Button>

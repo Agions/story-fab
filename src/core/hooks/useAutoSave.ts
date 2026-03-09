@@ -4,7 +4,6 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { message } from 'antd';
 
 // 自动保存配置
 export interface AutoSaveConfig {

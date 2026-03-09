@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Card, Radio, Button, Input, Space, message, Tooltip } from 'antd';
+import { Card, Radio, Button, Input, Space, Tooltip } from 'antd';
 import type { RadioChangeEvent } from 'antd/es/radio';
 import { ExportOutlined, FileTextOutlined, FilePdfOutlined, GlobalOutlined } from '@ant-design/icons';
 import { ExportFormat, exportScript } from '@/services/exportService';
 import { Script } from '@/services/aiService';
+import { notify } from '@/shared';
 import { logger } from '@/utils/logger';
 import styles from './ExportPanel.module.less';
 
@@ -35,7 +36,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
   // 执行导出
   const handleExport = async () => {
     if (!filename.trim()) {
-      message.error('请输入有效的文件名');
+      notify.error(null, '请输入有效的文件名');
       return;
     }
     
@@ -48,11 +49,10 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
           filename: filename,
         };
         await onExport(settings);
-        message.success('导出成功');
+        notify.success('导出成功');
       } catch (error) {
         logger.error('导出失败:', error);
-        const detail = error instanceof Error ? error.message : '导出失败，请稍后重试';
-        message.error(detail);
+        notify.error(error, '导出失败，请稍后重试');
       } finally {
         setExporting(false);
       }
@@ -61,7 +61,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
     
     // 否则使用默认的导出逻辑
     if (!script) {
-      message.error('没有可导出的脚本');
+      notify.error(null, '没有可导出的脚本');
       return;
     }
     
@@ -69,12 +69,13 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
     try {
       const success = await exportScript(script, exportFormat, filename);
       if (success) {
-        message.success(`脚本已成功导出为${exportFormat.toUpperCase()}格式`);
+        notify.success(`脚本已成功导出为${exportFormat.toUpperCase()}格式`);
+      } else {
+        notify.error(null, '导出失败，请稍后重试');
       }
     } catch (error) {
       logger.error('导出失败:', error);
-      const detail = error instanceof Error ? error.message : '导出失败，请稍后重试';
-      message.error(detail);
+      notify.error(error, '导出失败，请稍后重试');
     } finally {
       setExporting(false);
     }

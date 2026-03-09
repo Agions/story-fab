@@ -19,7 +19,6 @@ import {
   Divider,
   Tooltip,
   Badge,
-  message
 } from 'antd';
 import {
   EditOutlined,
@@ -37,6 +36,7 @@ import { motion, AnimatePresence } from '@/components/common/motion-shim';
 import { useModel, useModelCost } from '@/core/hooks/useModel';
 import { useProject } from '@/core/hooks/useProject';
 import ModelSelector from '@/components/ModelSelector';
+import { notify } from '@/shared';
 import type { ScriptData, ScriptSegment } from '@/core/types';
 import styles from './index.module.less';
 
@@ -94,7 +94,6 @@ interface ScriptFormValues {
   tone: string;
   length: 'short' | 'medium' | 'long';
   audience: string;
-  language: 'zh' | 'en';
   requirements?: string;
 }
 
@@ -125,13 +124,13 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
   // 生成脚本
   const handleGenerate = useCallback(async (values: ScriptFormValues) => {
     if (!selectedModel) {
-      message.warning('请先选择 AI 模型');
+      notify.warning('请先选择 AI 模型');
       setShowModelSelector(true);
       return;
     }
 
     if (!isConfigured) {
-      message.warning('请先配置 API 密钥');
+      notify.warning('请先配置 API 密钥');
       return;
     }
 
@@ -164,7 +163,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
           tone: values.tone,
           length: values.length,
           targetAudience: values.audience,
-          language: values.language || 'zh',
+          language: 'zh',
           wordCount: estimateWordCount(values.length),
           estimatedDuration: estimateDuration(values.length),
           generatedBy: selectedModel.id,
@@ -177,10 +176,10 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       setProgress(100);
       setGeneratedScript(script);
       onGenerate?.(script);
-      message.success('脚本生成成功');
+      notify.success('脚本生成成功');
     } catch (error) {
       console.error('脚本生成失败:', error);
-      message.error('脚本生成失败');
+      notify.error(error, '脚本生成失败');
     } finally {
       setIsGenerating(false);
     }
@@ -191,7 +190,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
     if (generatedScript) {
       updateScript(generatedScript);
       onSave?.(generatedScript);
-      message.success('脚本已保存');
+      notify.success('脚本已保存');
     }
   }, [generatedScript, updateScript, onSave]);
 
@@ -346,16 +345,6 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
           </Form.Item>
 
           <Form.Item
-            name="language"
-            label="语言"
-          >
-            <Radio.Group>
-              <Radio value="zh">中文</Radio>
-              <Radio value="en">English</Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          <Form.Item
             name="requirements"
             label="特殊要求（可选）"
           >
@@ -445,7 +434,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
                     {AUDIENCE_OPTIONS.find(a => a.value === generatedScript.metadata.targetAudience)?.label}
                   </Tag>
                   <Tag icon={<GlobalOutlined />}>
-                    {generatedScript.metadata.language === 'zh' ? '中文' : 'English'}
+                    中文
                   </Tag>
                 </Space>
               </div>

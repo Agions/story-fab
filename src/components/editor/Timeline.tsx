@@ -10,8 +10,7 @@ import {
   Popover,
   Switch,
   Select,
-  InputNumber,
-  message
+  InputNumber
 } from 'antd';
 import {
   PlusOutlined,
@@ -40,6 +39,7 @@ import {
   CompressOutlined
 } from '@ant-design/icons';
 import styles from './Timeline.module.less';
+import { notify } from '@/shared';
 
 // ==============================================
 // Types - 类型定义
@@ -553,7 +553,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
     const splitTime = currentTime;
     if (splitTime <= selectedClip.startTime || splitTime >= selectedClip.endTime) {
-      message.warning('播放头不在片段范围内');
+      notify.warning('播放头不在片段范围内');
       return;
     }
 
@@ -577,14 +577,14 @@ const Timeline: React.FC<TimelineProps> = ({
       ).concat(track.id === selectedClip.trackId ? [newClip] : [])
     })));
 
-    message.success('片段已拆分');
+    notify.success('片段已拆分');
   }, [selectedClipId, selectedClip, currentTime]);
 
   // Copy clip
   const copyClip = useCallback(() => {
     if (!selectedClip) return;
     setCopiedClip({ ...selectedClip });
-    message.success('片段已复制');
+    notify.success('片段已复制');
   }, [selectedClip]);
 
   // Paste clip
@@ -601,7 +601,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
     const track = tracks.find(t => t.id === copiedClip.trackId);
     if (!track) {
-      message.warning('没有对应的轨道类型');
+      notify.warning('没有对应的轨道类型');
       return;
     }
 
@@ -610,7 +610,7 @@ const Timeline: React.FC<TimelineProps> = ({
     ));
 
     setSelectedClipId(newClip.id);
-    message.success('片段已粘贴');
+    notify.success('片段已粘贴');
   }, [copiedClip, currentTime, tracks]);
 
   // Delete selected clip
@@ -624,7 +624,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
     setSelectedClipId(null);
     onClipSelect?.(null);
-    message.success('片段已删除');
+    notify.success('片段已删除');
   }, [selectedClipId, onClipSelect]);
 
   // Add keyframe to selected clip
@@ -637,7 +637,7 @@ const Timeline: React.FC<TimelineProps> = ({
     );
 
     if (existingKeyframe) {
-      message.warning('此处已有关键帧');
+      notify.warning('此处已有关键帧');
       return;
     }
 
@@ -657,7 +657,7 @@ const Timeline: React.FC<TimelineProps> = ({
     })));
 
     setSelectedKeyframe(newKeyframe);
-    message.success('关键帧已添加');
+    notify.success('关键帧已添加');
   }, [selectedClipId, selectedClip, currentTime]);
 
   // Update keyframe properties

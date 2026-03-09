@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Typography, Button, Card, Row, Col,
@@ -23,7 +23,8 @@ import {
 } from '@ant-design/icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useSettings } from '@/context/SettingsContext';
-import { getFileSizeBytes, listProjects } from '@/services/tauriService';
+import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '@/services/tauriService';
+import { preloadProjectEditPage, preloadProjectsPage } from '@/core/utils/route-preload';
 import {
   extractProjectMediaMetrics,
   pickPreferredSizeMb,
@@ -64,51 +65,59 @@ const Home = () => {
   const [projects, setProjects] = useState<HomeProjectItem[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
 
-  useEffect(() => {
-    let active = true;
-    const loadProjects = async () => {
-      setProjectsLoading(true);
-      try {
-        const rawProjects = await listProjects<RawProjectRecord>();
-        if (!active) {
-          return;
-        }
-        const enriched = await Promise.all((Array.isArray(rawProjects) ? rawProjects : [])
-          .filter((project) => typeof project.id === 'string')
-          .map(async (project) => {
-            const metrics = extractProjectMediaMetrics(project);
-            const videoPath = resolveProjectVideoPath(project);
-            const exactSizeMb = videoPath ? (await getFileSizeBytes(videoPath)) / 1024 / 1024 : 0;
-            const sizeMb = pickPreferredSizeMb(exactSizeMb, metrics.explicitSizeMb, metrics.estimatedSizeMb);
-            return {
-              id: String(project.id),
-              name: typeof project.name === 'string' ? project.name : '未命名项目',
-              description: typeof project.description === 'string' ? project.description : '',
-              createdAt: typeof project.createdAt === 'string' ? project.createdAt : new Date().toISOString(),
-              updatedAt: typeof project.updatedAt === 'string'
-                ? project.updatedAt
-                : (typeof project.createdAt === 'string' ? project.createdAt : new Date().toISOString()),
-              status: project.status === 'completed' || project.status === 'processing' || project.status === 'archived'
-                ? project.status
-                : 'draft',
-              durationSec: metrics.durationSec,
-              sizeMb,
-            } satisfies HomeProjectItem;
-          }));
-        setProjects(enriched);
-      } catch (error) {
-        console.error('加载首页项目列表失败:', error);
-      } finally {
-        if (active) {
-          setProjectsLoading(false);
-        }
+  const loadProjects = useCallback(async (activeRef?: { current: boolean }) => {
+    setProjectsLoading(true);
+    try {
+      const rawProjects = await listProjects<RawProjectRecord>();
+      if (activeRef && !activeRef.current) {
+        return;
       }
-    };
-    void loadProjects();
-    return () => {
-      active = false;
-    };
+      const enriched = await Promise.all((Array.isArray(rawProjects) ? rawProjects : [])
+        .filter((project) => typeof project.id === 'string')
+        .map(async (project) => {
+          const metrics = extractProjectMediaMetrics(project);
+          const videoPath = resolveProjectVideoPath(project);
+          const exactSizeMb = videoPath ? (await getFileSizeBytes(videoPath)) / 1024 / 1024 : 0;
+          const sizeMb = pickPreferredSizeMb(exactSizeMb, metrics.explicitSizeMb, metrics.estimatedSizeMb);
+          return {
+            id: String(project.id),
+            name: typeof project.name === 'string' ? project.name : '未命名项目',
+            description: typeof project.description === 'string' ? project.description : '',
+            createdAt: typeof project.createdAt === 'string' ? project.createdAt : new Date().toISOString(),
+            updatedAt: typeof project.updatedAt === 'string'
+              ? project.updatedAt
+              : (typeof project.createdAt === 'string' ? project.createdAt : new Date().toISOString()),
+            status: project.status === 'completed' || project.status === 'processing' || project.status === 'archived'
+              ? project.status
+              : 'draft',
+            durationSec: metrics.durationSec,
+            sizeMb,
+          } satisfies HomeProjectItem;
+        }));
+      if (!activeRef || activeRef.current) {
+        setProjects(enriched);
+      }
+    } catch (error) {
+      console.error('加载首页项目列表失败:', error);
+    } finally {
+      if (!activeRef || activeRef.current) {
+        setProjectsLoading(false);
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    const activeRef = { current: true };
+    void loadProjects(activeRef);
+    const handleProjectsChanged = () => {
+      void loadProjects(activeRef);
+    };
+    window.addEventListener(PROJECTS_CHANGED_EVENT, handleProjectsChanged);
+    return () => {
+      activeRef.current = false;
+      window.removeEventListener(PROJECTS_CHANGED_EVENT, handleProjectsChanged);
+    };
+  }, [loadProjects]);
 
   const recentProjects = useMemo(() => {
     const projectMap = new Map(projects.map((project) => [project.id, project]));
@@ -269,6 +278,7 @@ const Home = () => {
                 size="large"
                 icon={<PlusOutlined />}
                 onClick={() => navigate('/project/new')}
+                onMouseEnter={() => { void preloadProjectEditPage(); }}
                 style={{
                   background: '#fff',
                   color: '#667eea',
@@ -285,6 +295,7 @@ const Home = () => {
                 size="large"
                 icon={<ProjectOutlined />}
                 onClick={() => navigate('/projects')}
+                onMouseEnter={() => { void preloadProjectsPage(); }}
                 style={{
                   background: 'rgba(255,255,255,0.2)',
                   color: '#fff',
@@ -391,7 +402,7 @@ const Home = () => {
           </Space>
         }
         extra={
-          <Button type="link" onClick={() => navigate('/projects')}>
+          <Button type="link" onMouseEnter={() => { void preloadProjectsPage(); }} onClick={() => navigate('/projects')}>
             查看全部
           </Button>
         }
@@ -404,7 +415,7 @@ const Home = () => {
           <div style={{ textAlign: 'center', padding: '8px 0' }}>
             <Text type="secondary">暂无项目，先创建一个项目开始创作。</Text>
             <div style={{ marginTop: 10 }}>
-              <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/project/new')}>
+              <Button type="primary" icon={<PlusOutlined />} onMouseEnter={() => { void preloadProjectEditPage(); }} onClick={() => navigate('/project/new')}>
                 创建项目
               </Button>
             </div>
@@ -421,6 +432,7 @@ const Home = () => {
                   }}
                   styles={{ body: { padding: 14 } }}
                   onClick={() => navigate(`/project/edit/${project.id}`)}
+                  onMouseEnter={() => { void preloadProjectEditPage(); }}
                 >
                   <Text strong ellipsis style={{ display: 'block' }}>
                     {project.name || '未命名项目'}
@@ -539,6 +551,7 @@ const Home = () => {
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => navigate('/project/new')}
+                onMouseEnter={() => { void preloadProjectEditPage(); }}
                 style={{
                   background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
                   border: 'none',

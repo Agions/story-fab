@@ -1,5 +1,4 @@
 import { invoke } from '@tauri-apps/api/core';
-import { message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -24,7 +23,6 @@ export const ensureFFmpegInstalled = async (): Promise<boolean> => {
   const { installed, version } = await checkFFmpegInstallation();
   
   if (!installed) {
-    message.error('操作失败：未检测到FFmpeg，请先安装FFmpeg后再试');
     return false;
   }
   
@@ -92,7 +90,6 @@ export const analyzeVideo = async (videoPath: string): Promise<VideoMetadata> =>
       userMessage = '错误：视频路径无效。';
     }
 
-    message.error(userMessage);
     throw new Error(userMessage);
   }
 };
@@ -144,8 +141,7 @@ export const extractKeyFrames = async (
       userMessage = '提取关键帧失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
     }
     
-    message.error(userMessage);
-    throw error;
+    throw new Error(userMessage);
   }
 };
 
@@ -185,8 +181,7 @@ export const generateThumbnail = async (
       userMessage = '生成缩略图失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
     }
     
-    message.error(userMessage);
-    throw error;
+    throw new Error(userMessage);
   }
 };
 
@@ -244,7 +239,6 @@ export const cutVideo = async (
     });
     
     console.log('视频剪辑完成');
-    message.success('视频剪辑完成');
     return true;
   } catch (error) {
     console.error('视频剪辑失败:', error);
@@ -258,7 +252,6 @@ export const cutVideo = async (
       friendlyMessage = '剪辑失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
     }
     
-    message.error(friendlyMessage);
     throw new Error(friendlyMessage);
   }
 };
@@ -311,7 +304,6 @@ export const previewSegment = async (
       friendlyMessage = '预览失败：未检测到 FFmpeg，请确保已正确安装并配置到系统 PATH。';
     }
     
-    message.error(friendlyMessage);
     throw new Error(friendlyMessage);
   }
 };

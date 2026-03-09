@@ -10,7 +10,6 @@ import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/co
 export interface AppSettings {
   autoSave: boolean;
   compactMode: boolean;
-  language: string;
   theme: string;
   defaultModel: string;
   projectSaveBehavior: ProjectSaveBehavior;
@@ -50,7 +49,6 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
 export function useSettingsStore() {
   const [autoSave, setAutoSave] = useLocalStorage('clipflow-autosave', true);
   const [compactMode, setCompactMode] = useLocalStorage('clipflow-compact', false);
-  const [language, setLanguage] = useLocalStorage('clipflow-language', 'zh-CN');
   const [theme, setTheme] = useLocalStorage('clipflow-theme', 'light');
   const [defaultModel, setDefaultModel] = useLocalStorage('clipflow-default-model', 'deepseek-chat');
   const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
@@ -60,7 +58,6 @@ export function useSettingsStore() {
   const settings: AppSettings = {
     autoSave,
     compactMode,
-    language,
     theme,
     defaultModel,
     projectSaveBehavior,
@@ -71,24 +68,22 @@ export function useSettingsStore() {
   const updateSettings = useCallback((newSettings: Partial<AppSettings>) => {
     if (newSettings.autoSave !== undefined) setAutoSave(newSettings.autoSave);
     if (newSettings.compactMode !== undefined) setCompactMode(newSettings.compactMode);
-    if (newSettings.language !== undefined) setLanguage(newSettings.language);
     if (newSettings.theme !== undefined) setTheme(newSettings.theme);
     if (newSettings.defaultModel !== undefined) setDefaultModel(newSettings.defaultModel);
     if (newSettings.projectSaveBehavior !== undefined) setProjectSaveBehavior(newSettings.projectSaveBehavior);
     if (newSettings.outputPath !== undefined) setOutputPath(newSettings.outputPath);
     if (newSettings.recentProjects !== undefined) setRecentProjects(newSettings.recentProjects);
-  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath, setRecentProjects]);
+  }, [setAutoSave, setCompactMode, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath, setRecentProjects]);
 
   const resetSettings = useCallback(() => {
     setAutoSave(true);
     setCompactMode(false);
-    setLanguage('zh-CN');
     setTheme('light');
     setDefaultModel('deepseek-chat');
     setProjectSaveBehavior('stay');
     setOutputPath('');
     setRecentProjects([]);
-  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath, setRecentProjects]);
+  }, [setAutoSave, setCompactMode, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath, setRecentProjects]);
 
   const addRecentProject = useCallback((projectId: string) => {
     setRecentProjects(prev => {
@@ -142,7 +137,6 @@ export function useApiKeyState(initialValue: string = '') {
 export function useAppSettings() {
   const [autoSave, setAutoSave] = useLocalStorage('clipflow-autosave', true);
   const [compactMode, setCompactMode] = useLocalStorage('clipflow-compact', false);
-  const [language, setLanguage] = useLocalStorage('clipflow-language', 'zh-CN');
   const [theme, setTheme] = useLocalStorage('clipflow-theme', 'light');
   const [defaultModel, setDefaultModel] = useLocalStorage('clipflow-default-model', 'deepseek-chat');
   const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
@@ -151,17 +145,17 @@ export function useAppSettings() {
   const resetAll = useCallback(() => {
     setAutoSave(true);
     setCompactMode(false);
-    setLanguage('zh-CN');
     setTheme('light');
     setDefaultModel('deepseek-chat');
     setProjectSaveBehavior('stay');
     setOutputPath('');
-  }, [setAutoSave, setCompactMode, setLanguage, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath]);
+  }, [setAutoSave, setCompactMode, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath]);
 
   return {
     autoSave, setAutoSave,
     compactMode, setCompactMode,
-    language, setLanguage,
+    language: 'zh-CN',
+    setLanguage: (_value: string) => {},
     theme, setTheme,
     defaultModel, setDefaultModel,
     projectSaveBehavior, setProjectSaveBehavior,

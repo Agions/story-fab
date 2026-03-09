@@ -11,6 +11,7 @@ import {
   executeExportStep,
 } from './steps';
 import { WORKFLOW_MODE_DEFINITIONS } from '@/core/workflow/featureBlueprint';
+import { ALIGNMENT_GATE_THRESHOLD } from '@/core/workflow/alignmentGate';
 import { sceneCommentaryAlignmentService } from '../scene-commentary-alignment.service';
 import type {
   WorkflowState,
@@ -27,10 +28,6 @@ export class WorkflowService {
   private callbacks: WorkflowCallbacks = {};
   private abortController: AbortController | null = null;
   private currentConfig: WorkflowConfig | null = null;
-  private static readonly ALIGNMENT_GATE = {
-    minConfidence: 0.8,
-    maxDriftSeconds: 0.8,
-  } as const;
 
   constructor() {
     this.state = this.getInitialState();
@@ -126,6 +123,7 @@ export class WorkflowService {
           config.model,
           config.scriptParams,
           projectId,
+          config.mode || 'ai-commentary',
           (progress) => this.updateState({ progress })
         );
         this.updateData({ generatedScript: scriptResult.script });
@@ -251,7 +249,8 @@ export class WorkflowService {
       this.state.data.selectedTemplate,
       model,
       params,
-      this.state.data.projectId
+      this.state.data.projectId,
+      this.currentConfig?.mode || 'ai-commentary'
     );
     this.updateData({ generatedScript: result.script });
     this.updateState({ step: 'script-generate', progress: 45 });
@@ -295,9 +294,24 @@ export class WorkflowService {
       this.state.data.videoInfo,
       this.state.data.videoAnalysis,
       this.state.data.editedScript || this.state.data.uniqueScript || this.state.data.generatedScript!,
-      autoMatch
+      autoMatch,
+      {
+        mode: this.currentConfig?.mode,
+        autoOriginalOverlay: this.currentConfig?.autoOriginalOverlay !== false,
+        overlayMixMode: this.currentConfig?.overlayMixMode,
+        overlayOpacity: this.currentConfig?.overlayOpacity,
+        syncStrategy:
+          this.currentConfig?.commentarySyncStrategy ||
+          (this.currentConfig?.mode
+            ? WORKFLOW_MODE_DEFINITIONS[this.currentConfig.mode].syncTarget
+            : 'balanced'),
+      }
     );
-    this.updateData({ timeline });
+    this.updateData({
+      timeline,
+      alignmentReport: timeline.alignment,
+      originalOverlayPlan: timeline.originalOverlayPlan,
+    });
     this.updateState({ step: 'timeline-edit', progress: 70 });
     return timeline;
   }
@@ -418,10 +432,10 @@ export class WorkflowService {
         items.reduce((sum, item) => sum + item.confidence, 0) / Math.max(items.length, 1);
       const maxDriftSeconds = items.reduce((max, item) => Math.max(max, item.driftSeconds), 0);
       const lowConfidenceCount = items.filter(
-        (item) => item.confidence < WorkflowService.ALIGNMENT_GATE.minConfidence
+        (item) => item.confidence < ALIGNMENT_GATE_THRESHOLD.minConfidence
       ).length;
       const highDriftCount = items.filter(
-        (item) => item.driftSeconds > WorkflowService.ALIGNMENT_GATE.maxDriftSeconds
+        (item) => item.driftSeconds > ALIGNMENT_GATE_THRESHOLD.maxDriftSeconds
       ).length;
       return { items, averageConfidence, maxDriftSeconds, lowConfidenceCount, highDriftCount };
     };
@@ -430,8 +444,8 @@ export class WorkflowService {
 
     const lowItems = before.items.filter(
       (item) =>
-        item.confidence < WorkflowService.ALIGNMENT_GATE.minConfidence ||
-        item.driftSeconds > WorkflowService.ALIGNMENT_GATE.maxDriftSeconds
+        item.confidence < ALIGNMENT_GATE_THRESHOLD.minConfidence ||
+        item.driftSeconds > ALIGNMENT_GATE_THRESHOLD.maxDriftSeconds
     );
 
     if (lowItems.length === 0) {
@@ -452,7 +466,7 @@ export class WorkflowService {
         timeline: readyTimeline,
         script,
         report: {
-          threshold: { ...WorkflowService.ALIGNMENT_GATE },
+          threshold: { ...ALIGNMENT_GATE_THRESHOLD },
           before: {
             averageConfidence: before.averageConfidence,
             maxDriftSeconds: before.maxDriftSeconds,
@@ -525,8 +539,8 @@ export class WorkflowService {
     const failedSegmentsAfter = after.items
       .filter(
         (item) =>
-          item.confidence < WorkflowService.ALIGNMENT_GATE.minConfidence ||
-          item.driftSeconds > WorkflowService.ALIGNMENT_GATE.maxDriftSeconds
+          item.confidence < ALIGNMENT_GATE_THRESHOLD.minConfidence ||
+          item.driftSeconds > ALIGNMENT_GATE_THRESHOLD.maxDriftSeconds
       )
       .map((item) => ({
         segmentId: item.segmentId,
@@ -549,7 +563,7 @@ export class WorkflowService {
       timeline: fixedTimeline,
       script: fixedScript,
       report: {
-        threshold: { ...WorkflowService.ALIGNMENT_GATE },
+        threshold: { ...ALIGNMENT_GATE_THRESHOLD },
         before: {
           averageConfidence: before.averageConfidence,
           maxDriftSeconds: before.maxDriftSeconds,

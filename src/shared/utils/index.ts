@@ -2,7 +2,8 @@
  * 通用工具函数
  */
 
-import { message } from 'antd';
+import { notify } from './notify';
+export * from './notify';
 
 /**
  * 防抖函数
@@ -238,28 +239,28 @@ export async function readFromClipboard(): Promise<string> {
  * 显示成功消息
  */
 export function showSuccess(msg: string): void {
-  message.success(msg);
+  notify.success(msg);
 }
 
 /**
  * 显示错误消息
  */
 export function showError(msg: string): void {
-  message.error(msg);
+  notify.error(null, msg);
 }
 
 /**
  * 显示警告消息
  */
 export function showWarning(msg: string): void {
-  message.warning(msg);
+  notify.warning(msg);
 }
 
 /**
  * 显示信息消息
  */
 export function showInfo(msg: string): void {
-  message.info(msg);
+  notify.info(msg);
 }
 
 export type RawProjectRecord = Record<string, unknown>;

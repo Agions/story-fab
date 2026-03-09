@@ -4,7 +4,7 @@
  * 三大核心功能：视频解说 | 第一人称 | AI混剪
  */
 import React from 'react';
-import { Layout, Button, Tooltip, Space, Typography, Divider, Select, Slider, message } from 'antd';
+import { Layout, Button, Tooltip, Space, Typography, Divider, Select, Slider } from 'antd';
 import {
   ScissorOutlined,
   AudioOutlined,
@@ -22,6 +22,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAIEditor, AIFeatureType } from './AIPanel/AIEditorContext';
+import { notify } from '@/shared';
 import styles from './AILayout.module.less';
 
 const { Header, Sider, Content } = Layout;
@@ -72,7 +73,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
 
   // 处理核心功能切换
   const handleFunctionClick = (functionKey: string) => {
-    message.info(`已切换到 ${functionKey} 模式`);
+    notify.info(`已切换到 ${functionKey} 模式`);
   };
 
   // 处理功能切换
@@ -83,10 +84,10 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
   // 处理导出
   const handleExport = () => {
     if (!currentVideo) {
-      message.warning('请先上传视频');
+      notify.warning('请先上传视频');
       return;
     }
-    message.info('导出功能开发中...');
+    notify.info('导出功能开发中...');
   };
 
   // 渲染属性设置面板
@@ -147,10 +148,9 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
             </div>
             <div className={styles.propItem}>
               <Text>语言</Text>
-              <Select defaultValue="zh-CN" style={{ width: 120 }}>
+              <Select value="zh-CN" style={{ width: 120 }}>
                 <Option value="zh-CN">中文</Option>
-                <Option value="en-US">英文</Option>
-                              </Select>
+              </Select>
             </div>
             <div className={styles.propItem}>
               <Text>语速</Text>
@@ -185,7 +185,6 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
               <Text>字幕语言</Text>
               <Select defaultValue="zh" style={{ width: 120 }}>
                 <Option value="zh">中文</Option>
-                <Option value="en">英文</Option>
                 <Option value="auto">自动识别</Option>
               </Select>
             </div>
@@ -393,7 +392,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
               block 
               className={styles.applyBtn}
               onClick={() => {
-                message.success(`已切换到 ${aiFeatures.find(f => f.key === selectedFeature)?.label} 功能`);
+                notify.success(`已切换到 ${aiFeatures.find(f => f.key === selectedFeature)?.label} 功能`);
               }}
             >
               应用设置
