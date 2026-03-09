@@ -4,6 +4,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/utils/logger';
 
 export interface SceneChange {
   id: string;
@@ -88,7 +89,7 @@ export class SmartCutService {
   async detectSceneChanges(videoBuffer: ArrayBuffer): Promise<SceneChange[]> {
     // TODO: 实现场景切换检测
     // 使用 OpenCV 或 FFmpeg 进行场景检测
-    console.log('检测场景切换...');
+    logger.info('检测场景切换...');
     
     // 模拟返回
     return [];
@@ -100,7 +101,7 @@ export class SmartCutService {
   async detectAudioPeaks(videoBuffer: ArrayBuffer): Promise<AudioPeak[]> {
     // TODO: 实现音频峰值检测
     // 使用 Web Audio API 分析音频
-    console.log('检测音频峰值...');
+    logger.info('检测音频峰值...');
     
     return [];
   }
@@ -111,7 +112,7 @@ export class SmartCutService {
   async analyzeMotion(videoBuffer: ArrayBuffer): Promise<MotionSegment[]> {
     // TODO: 实现运动分析
     // 使用光流法分析运动
-    console.log('分析运动强度...');
+    logger.info('分析运动强度...');
     
     return [];
   }

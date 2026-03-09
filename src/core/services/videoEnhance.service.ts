@@ -2,6 +2,7 @@
  * AI 视频增强服务
  * 超分、补帧、去噪
  */
+import { logger } from '@/utils/logger';
 
 export type EnhanceType = 'super-resolution' | 'frame-interpolation' | 'denoise' | 'color-restore';
 
@@ -53,7 +54,7 @@ export class VideoEnhanceService {
     scale: ScaleFactor = 2,
     options?: Partial<EnhanceOptions>
   ): Promise<EnhanceResult> {
-    console.log(`超分辨率处理: ${inputPath}, scale=${scale}x`);
+    logger.info(`超分辨率处理: ${inputPath}, scale=${scale}x`);
     
     // TODO: 使用 Real-ESRGAN 或其他超分模型
     // 1. 加载视频帧
@@ -80,7 +81,7 @@ export class VideoEnhanceService {
     targetFps: FrameRate = 60,
     options?: Partial<EnhanceOptions>
   ): Promise<EnhanceResult> {
-    console.log(`补帧处理: ${inputPath}, targetFps=${targetFps}`);
+    logger.info(`补帧处理: ${inputPath}, targetFps=${targetFps}`);
     
     // TODO: 使用 RIFE 或其他补帧模型
     // 1. 分析原始帧
@@ -106,7 +107,7 @@ export class VideoEnhanceService {
     level: DenoiseLevel = 'medium',
     options?: Partial<EnhanceOptions>
   ): Promise<EnhanceResult> {
-    console.log(`去噪处理: ${inputPath}, level=${level}`);
+    logger.info(`去噪处理: ${inputPath}, level=${level}`);
     
     // TODO: 使用 FFmpeg 或 AI 模型进行去噪
     // 1. 分析噪声类型
@@ -128,7 +129,7 @@ export class VideoEnhanceService {
     outputPath: string,
     options?: Partial<EnhanceOptions>
   ): Promise<EnhanceResult> {
-    console.log(`色彩修复: ${inputPath}`);
+    logger.info(`色彩修复: ${inputPath}`);
     
     // TODO: 使用 DeOldify 或其他模型进行色彩修复
     return {
