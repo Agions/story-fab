@@ -1,5 +1,6 @@
 /**
  * 智能字幕服务
+import { logger } from '@/utils/logger';
  * 语音转字幕、翻译、导入导出
  */
 
@@ -48,7 +49,7 @@ export class SubtitleService {
   ): Promise<SubtitleData> {
     // TODO: 实现 ASR
     // 使用 Whisper 或其他 ASR 服务
-    console.log('语音识别中...', options);
+    logger.info('语音识别中...', options);
     
     return {
       entries: [],
@@ -67,7 +68,7 @@ export class SubtitleService {
   ): Promise<SubtitleData> {
     // TODO: 实现翻译
     // 使用 LLM 进行翻译
-    console.log('翻译字幕到', targetLanguage);
+    logger.info('翻译字幕到', targetLanguage);
     
     return {
       ...subtitles,

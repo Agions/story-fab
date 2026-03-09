@@ -1,5 +1,6 @@
 /**
  * 性能优化服务
+import { logger } from '@/utils/logger';
  * 视频预览、缓存、大文件处理
  */
 
@@ -55,7 +56,7 @@ export class PerformanceService {
       ...options,
     };
 
-    console.log('生成预览:', { path: videoPath, ...opts });
+    logger.info('生成预览:', { path: videoPath, ...opts });
 
     return {
       thumbnails: [],
@@ -79,7 +80,7 @@ export class PerformanceService {
       const end = Math.min(start + CHUNK_SIZE, file.size);
       const chunk = file.slice(start, end);
       
-      console.log(`上传分片 ${i + 1}/${chunks}`);
+      logger.info(`上传分片 ${i + 1}/${chunks}`);
       
       onProgress?.(((i + 1) / chunks) * 100);
     }
