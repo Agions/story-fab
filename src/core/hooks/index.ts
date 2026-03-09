@@ -11,9 +11,7 @@ export { useSmartModel } from './useSmartModel';
 export { useAIClip } from './useAIClip';
 
 export { useAutoSave, useAutoSaveRegister } from './useAutoSave';
-export { useWorkflowAutoSave } from './useWorkflowAutoSave';
 export type { AutoSaveConfig, AutoSaveState } from './useAutoSave';
-export type { UseAutoSaveOptions, UseAutoSaveReturn } from './useWorkflowAutoSave';
 export type { UseModelReturn, UseModelCostReturn } from './useModel';
 export type { UseProjectReturn } from './useProject';
 export type { UseVideoReturn } from './useVideo';
