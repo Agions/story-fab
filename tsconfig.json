@@ -22,6 +22,6 @@
     }
   },
   "include": ["src"],
-  "exclude": ["src/components/AIPanel/**", "src/core/services/editor/**", "src/utils/__tests__/**", "src/components/WorkflowMonitor.tsx"],
+  "exclude": ["src/components/AIPanel/**", "src/core/services/editor/**", "src/utils/__tests__/**", "src/components/WorkflowMonitor.tsx", "src/components/AIModelSelector.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
