@@ -1,5 +1,4 @@
 import React, { useCallback, memo } from 'react';
-import { formatTime } from \'@/shared/utils/format\';
 import { Card, Row, Col, Button, Typography } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import { ScriptSegment } from '@/types';

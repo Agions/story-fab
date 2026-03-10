@@ -4,7 +4,6 @@
  */
 
 import React, { useEffect, useState, useRef } from 'react';
-import { formatTime } from \'@/shared/utils/format\';
 import {
   Card,
   Button,

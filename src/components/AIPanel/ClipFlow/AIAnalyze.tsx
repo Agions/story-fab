@@ -8,7 +8,6 @@
  *   - subtitle.asr (ASR 字幕)
  */
 import React, { useState } from 'react';
-import { formatTime } from \'@/shared/utils/format\';
 import { 
   Card, Button, Space, Typography, List, 
   Tag, Alert, Divider, Checkbox, Row, Col, Badge

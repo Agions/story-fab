@@ -1,5 +1,4 @@
 import React, { useEffect, memo } from 'react';
-import { formatTime } from \'@/shared/utils/format\';
 import { Modal, Button, Spin, Typography } from 'antd';
 import { ScriptSegment } from '@/types';
 import styles from './VideoEditor.module.less';

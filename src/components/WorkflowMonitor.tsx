@@ -4,7 +4,6 @@
  */
 
 import React, { useMemo } from 'react';
-import { formatTime } from \'@/shared/utils/format\';
 import { Card, Progress, Timeline, Tag, Space, Typography, Statistic, Row, Col, Tooltip } from 'antd';
 import {
   CheckCircleOutlined,

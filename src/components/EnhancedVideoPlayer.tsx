@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { formatTime } from \'@/shared/utils/format\';
 import { Button, Tooltip, Slider, Space, Row, Col, Radio, InputNumber, Statistic, Card } from 'antd';
 import { 
   PlayCircleOutlined, 
