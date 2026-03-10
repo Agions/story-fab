@@ -1,6 +1,6 @@
 import { saveFile } from './tauriService';
 import type { Script } from './aiService';
-import { formatTime, formatDate } from '@/utils/format';
+import { formatTime, formatDate } from '@/shared/utils/format';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
