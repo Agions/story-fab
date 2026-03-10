@@ -4,6 +4,7 @@ import { readTextFile, writeTextFile, BaseDirectory, mkdir, exists } from '@taur
 import { appConfigDir } from '@tauri-apps/api/path';
 import { open as openExternal } from '@tauri-apps/plugin-shell';
 import { normalizeProjectId, buildProjectIdCandidates } from '@/core/utils/project-id';
+import { logger } from '@/utils/logger';
 
 type ProjectFileData = {
   aiModel?: {
@@ -69,10 +70,10 @@ export const ensureAppDataDir = async (): Promise<void> => {
     // 先尝试使用Rust函数检查目录
     try {
       const dirPath = await invoke('check_app_data_directory');
-      console.log('Rust目录检查成功:', dirPath);
+      logger.info('Rust目录检查成功:', dirPath);
       return;
     } catch (rustError) {
-      console.warn('Rust目录检查失败，回退到前端检查:', rustError);
+      logger.warn('Rust目录检查失败，回退到前端检查:', rustError);
     }
     
     // 前端备用检查
@@ -80,16 +81,16 @@ export const ensureAppDataDir = async (): Promise<void> => {
     try {
       dirExists = await exists(appDir, { baseDir: BaseDirectory.AppData });
     } catch (existsError) {
-      console.error('检查目录是否存在时出错:', existsError);
+      logger.error('检查目录是否存在时出错:', existsError);
       throw new Error(`检查目录出错: ${existsError instanceof Error ? existsError.message : '未知错误'}`);
     }
     
     if (!dirExists) {
-      console.log('应用数据目录不存在，创建目录:', appDir);
+      logger.info('应用数据目录不存在，创建目录:', appDir);
       try {
         await mkdir(appDir, { baseDir: BaseDirectory.AppData, recursive: true });
       } catch (createError) {
-        console.error('创建目录失败:', createError);
+        logger.error('创建目录失败:', createError);
         throw new Error(`创建目录失败: ${createError instanceof Error ? createError.message : '未知错误'}`);
       }
       
@@ -100,15 +101,15 @@ export const ensureAppDataDir = async (): Promise<void> => {
           throw new Error('无法创建应用数据目录，请检查权限');
         }
       } catch (verifyError) {
-        console.error('验证目录是否创建成功时出错:', verifyError);
+        logger.error('验证目录是否创建成功时出错:', verifyError);
         throw new Error(`验证目录出错: ${verifyError instanceof Error ? verifyError.message : '未知错误'}`);
       }
-      console.log('应用数据目录创建成功');
+      logger.info('应用数据目录创建成功');
     }
     
     return;
   } catch (error) {
-    console.error('创建应用数据目录失败:', error);
+    logger.error('创建应用数据目录失败:', error);
     throw error;
   }
 };
@@ -118,19 +119,19 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
   const normalizedProjectId = normalizeProjectId(projectId || '');
 
   if (!project || !normalizedProjectId) {
-    console.error('保存项目文件失败: 项目数据无效');
+    logger.error('保存项目文件失败: 项目数据无效');
     throw new Error('无效的项目数据');
   }
 
   try {
     // 确保目录存在
     await ensureAppDataDir().catch(err => {
-      console.error('确保应用数据目录存在时出错:', err);
+      logger.error('确保应用数据目录存在时出错:', err);
       throw new Error(`应用数据目录错误: ${err.message || '未知错误'}`);
     });
     
     const projectPath = `ClipFlow/${normalizedProjectId}.json`;
-    console.log('正在保存项目文件:', projectPath);
+    logger.info('正在保存项目文件:', projectPath);
     
     // 准备项目数据
     let projectData: string;
@@ -150,7 +151,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
         throw new Error('项目数据序列化为空');
       }
     } catch (err) {
-      console.error('序列化项目数据失败:', err);
+      logger.error('序列化项目数据失败:', err);
       throw new Error('无法序列化项目数据');
     }
     
@@ -161,21 +162,21 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
         content: projectData
       });
       emitProjectsChanged();
-      console.log('文件写入成功 (通过Rust函数)');
+      logger.info('文件写入成功 (通过Rust函数)');
       return;
     } catch (rustErr) {
-      console.warn('通过Rust保存文件失败，尝试使用JS API保存:', rustErr);
+      logger.warn('通过Rust保存文件失败，尝试使用JS API保存:', rustErr);
       // 继续使用JS API作为备选方案
     }
     
     // 检查文件是否已存在
     const fileExists = await exists(projectPath, { baseDir: BaseDirectory.AppData })
       .catch(err => {
-        console.error('检查文件是否存在时出错:', err);
+        logger.error('检查文件是否存在时出错:', err);
         return false;
       });
       
-    console.log(`项目文件${fileExists ? '已存在' : '不存在'}，准备${fileExists ? '更新' : '新建'}`);
+    logger.info(`项目文件${fileExists ? '已存在' : '不存在'}，准备${fileExists ? '更新' : '新建'}`);
     
     // 执行写入
     try {
@@ -184,9 +185,9 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
         projectData,
         { baseDir: BaseDirectory.AppData }
       );
-      console.log('文件写入完成');
+      logger.info('文件写入完成');
     } catch (writeErr) {
-      console.error('文件写入失败:', writeErr);
+      logger.error('文件写入失败:', writeErr);
       
       // 尝试备用方法保存
       try {
@@ -194,10 +195,10 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
         const backupPath = `${configDir}${normalizedProjectId}.json`;
         await writeTextFile(backupPath, projectData);
         emitProjectsChanged();
-        console.log('使用备用路径保存成功:', backupPath);
+        logger.info('使用备用路径保存成功:', backupPath);
         return;
       } catch (backupErr) {
-        console.error('备用保存也失败:', backupErr);
+        logger.error('备用保存也失败:', backupErr);
         const writeErrMessage = writeErr instanceof Error ? writeErr.message : '未知错误';
         throw new Error(`文件写入失败: ${writeErrMessage}`);
       }
@@ -209,18 +210,18 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
       if (!verifyExists) {
         throw new Error('文件似乎已写入但无法验证其存在');
       }
-      console.log('验证文件存在: 成功');
+      logger.info('验证文件存在: 成功');
     } catch (verifyErr) {
-      console.error('验证文件存在时出错:', verifyErr);
+      logger.error('验证文件存在时出错:', verifyErr);
       const verifyErrMessage = verifyErr instanceof Error ? verifyErr.message : '未知错误';
       throw new Error(`无法验证文件是否保存成功: ${verifyErrMessage}`);
     }
     
     emitProjectsChanged();
-    console.log('项目文件保存成功:', projectPath);
+    logger.info('项目文件保存成功:', projectPath);
     return;
   } catch (error) {
-    console.error('保存项目文件失败:', error);
+    logger.error('保存项目文件失败:', error);
     throw error;
   }
 };
@@ -242,7 +243,7 @@ export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string
         return JSON.parse(content) as T;
       } catch (rustError) {
         lastError = rustError;
-        console.warn(`通过 Rust 加载项目失败(${candidateId})，尝试使用 JS API 兜底:`, rustError);
+        logger.warn(`通过 Rust 加载项目失败(${candidateId})，尝试使用 JS API 兜底:`, rustError);
       }
 
       const projectPath = `ClipFlow/${candidateId}.json`;
@@ -283,7 +284,7 @@ export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string
     lastError = legacyRootError;
   }
 
-  console.error('读取项目文件失败:', lastError);
+  logger.error('读取项目文件失败:', lastError);
   throw (lastError || new Error(`读取项目失败: ${projectId}`));
 };
 
@@ -338,7 +339,7 @@ export const exportScriptToFile = async (script: ExportScriptData, filename: str
     
     await writeTextFile(savePath, content);
   } catch (error) {
-    console.error('导出脚本失败:', error);
+    logger.error('导出脚本失败:', error);
     throw error;
   }
 };
@@ -363,7 +364,7 @@ export const getConfigDir = async (): Promise<string> => {
     }
     return configDir;
   } catch (error) {
-    console.error('获取配置目录失败:', error);
+    logger.error('获取配置目录失败:', error);
     return '';
   }
 };
@@ -390,7 +391,7 @@ export const getApiKey = async (service: string): Promise<string> => {
     
     return config[service] || '';
   } catch (error) {
-    console.error(`获取${service}的API密钥失败:`, error);
+    logger.error(`获取${service}的API密钥失败:`, error);
     return '';
   }
 };
@@ -419,7 +420,7 @@ export const saveApiKey = async (service: string, apiKey: string): Promise<boole
     await writeTextFile(configPath, JSON.stringify(config, null, 2));
     return true;
   } catch (error) {
-    console.error(`保存${service}的API密钥失败:`, error);
+    logger.error(`保存${service}的API密钥失败:`, error);
     return false;
   }
 };
@@ -444,7 +445,7 @@ export const selectFile = async (filters?: { name: string, extensions: string[] 
     // Tauri的open函数在选择单个文件时可能返回字符串或数组
     return Array.isArray(selected) ? selected[0] : selected;
   } catch (error) {
-    console.error('选择文件失败:', error);
+    logger.error('选择文件失败:', error);
     return null;
   }
 };
@@ -474,7 +475,7 @@ export const saveFile = async (
     await writeTextFile(savePath, content);
     return true;
   } catch (error) {
-    console.error('保存文件失败:', error);
+    logger.error('保存文件失败:', error);
     return false;
   }
 };
@@ -498,7 +499,7 @@ export const getAppData = async <T>(key: string): Promise<T | null> => {
     const dataContent = await readTextFile(dataPath);
     return JSON.parse(dataContent) as T;
   } catch (error) {
-    console.error(`获取应用数据(${key})失败:`, error);
+    logger.error(`获取应用数据(${key})失败:`, error);
     return null;
   }
 };
@@ -518,7 +519,7 @@ export const saveAppData = async <T>(key: string, data: T): Promise<boolean> => 
     
     return true;
   } catch (error) {
-    console.error(`保存应用数据(${key})失败:`, error);
+    logger.error(`保存应用数据(${key})失败:`, error);
     return false;
   }
 };
@@ -538,11 +539,11 @@ export const openExternalUrl = async (url: string): Promise<boolean> => {
       validUrl = 'https://' + validUrl;
     }
     
-    console.log(`正在打开外部链接: ${validUrl}`);
+    logger.info(`正在打开外部链接: ${validUrl}`);
     await openExternal(validUrl);
     return true;
   } catch (error) {
-    console.error('打开外部链接失败:', error);
+    logger.error('打开外部链接失败:', error);
     
     // 降级处理：尝试使用window.open
     try {
@@ -552,10 +553,10 @@ export const openExternalUrl = async (url: string): Promise<boolean> => {
       }
       
       window.open(validUrl, '_blank', 'noopener,noreferrer');
-      console.log('通过window.open打开链接');
+      logger.info('通过window.open打开链接');
       return true;
     } catch (windowError) {
-      console.error('无法打开链接:', windowError);
+      logger.error('无法打开链接:', windowError);
       return false;
     }
   }
@@ -571,12 +572,12 @@ export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
         .map(normalizeListedProject)
         .filter((item): item is ProjectFileData => item !== null);
       if (normalized.length > 0) {
-        console.log('通过 Rust 函数获取项目列表成功:', normalized.length);
+        logger.info('通过 Rust 函数获取项目列表成功:', normalized.length);
         return normalized as T[];
       }
-      console.warn('Rust 项目列表为空或数据异常，切换到文件扫描兜底');
+      logger.warn('Rust 项目列表为空或数据异常，切换到文件扫描兜底');
     } catch (rustError) {
-      console.warn('通过 Rust 获取项目列表失败，使用 JS API 替代:', rustError);
+      logger.warn('通过 Rust 获取项目列表失败，使用 JS API 替代:', rustError);
     }
     
     // 确保应用数据目录存在
@@ -601,7 +602,7 @@ export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
           const projectId = file.replace('.json', '');
           return await loadProjectFromFile(projectId);
         } catch (error) {
-          console.error(`加载项目 ${file} 失败:`, error);
+          logger.error(`加载项目 ${file} 失败:`, error);
           return null;
         }
       });
@@ -613,7 +614,7 @@ export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
     
     return normalized as unknown as T[];
   } catch (error) {
-    console.error('列出项目失败:', error);
+    logger.error('列出项目失败:', error);
     throw error;
   }
 };
@@ -625,10 +626,10 @@ export const deleteProject = async (projectId: string): Promise<boolean> => {
     if (!normalizedProjectId) return false;
     await invoke('delete_project_file', { projectId: normalizedProjectId });
     emitProjectsChanged();
-    console.log('项目删除成功:', projectId);
+    logger.info('项目删除成功:', projectId);
     return true;
   } catch (error) {
-    console.error('删除项目出错:', error);
+    logger.error('删除项目出错:', error);
     return false;
   }
 };
@@ -644,7 +645,7 @@ export const getFileSizeBytes = async (path: string): Promise<number> => {
     const bytes = await invoke<number>('get_file_size', { path });
     return Number.isFinite(bytes) ? bytes : 0;
   } catch (error) {
-    console.warn('获取文件大小失败:', path, error);
+    logger.warn('获取文件大小失败:', path, error);
     return 0;
   }
 };
@@ -658,7 +659,7 @@ export async function checkFFmpeg(): Promise<{installed: boolean, version?: stri
     const result = await invoke<{installed: boolean, version?: string}>('check_ffmpeg');
     return result;
   } catch (error) {
-    console.error('检查FFmpeg失败:', error);
+    logger.error('检查FFmpeg失败:', error);
     return { installed: false };
   }
 } 

@@ -289,7 +289,7 @@ const Dashboard: React.FC = () => {
             <Button 
               type="text" 
               icon={<CloudUploadOutlined />} 
-              onClick={() => console.log('导出', project.id)}
+              onClick={() => logger.info('导出', project.id)}
               aria-label="导出视频"
             />
           </Tooltip>,
@@ -347,7 +347,7 @@ const Dashboard: React.FC = () => {
         <Button
           type="text"
           icon={<CloudUploadOutlined />}
-          onClick={() => console.log('导出', project.id)}
+          onClick={() => logger.info('导出', project.id)}
           aria-label="导出视频"
         />,
         <Dropdown menu={projectMenu(project.id)} placement="bottomRight" trigger={['click']}>
