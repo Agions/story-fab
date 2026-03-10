@@ -372,6 +372,38 @@
   }
 }
 
+.loadingContainer {
+  margin-bottom: 32px;
+}
+
+.skeletonTitle {
+  height: 20px;
+  width: 80%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeletonDesc {
+  height: 14px;
+  width: 60%;
+  margin-top: 8px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .quickTools {
   margin-bottom: 32px;
 
@@ -503,6 +535,12 @@
 // 科技暗黑模式适配
 // ==============================================
 :global(.dark) {
+  .skeletonTitle,
+  .skeletonDesc {
+    background: linear-gradient(90deg, @bg-tertiary 25%, @bg-hover 50%, @bg-tertiary 75%);
+    background-size: 200% 100%;
+  }
+
   .dashboardContainer {
     background: linear-gradient(180deg, @bg-primary 0%, @bg-secondary 100%);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);

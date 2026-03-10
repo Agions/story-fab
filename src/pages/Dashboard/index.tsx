@@ -471,8 +471,19 @@ const Dashboard: React.FC = () => {
       
       {/* 项目列表 */}
       {loading ? (
-        <div className={styles.emptyState}>
-          <Empty description="正在加载项目..." />
+        <div className={styles.loadingContainer}>
+          <Row gutter={[16, 16]} className={styles.projectGrid}>
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <Col xs={24} sm={12} md={8} lg={6} key={i}>
+                <Card className={styles.projectCard} loading>
+                  <Card.Meta
+                    title={<div className={styles.skeletonTitle} />}
+                    description={<div className={styles.skeletonDesc} />}
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
         </div>
       ) : filteredProjects.length > 0 ? (
         viewMode === 'grid' ? (
