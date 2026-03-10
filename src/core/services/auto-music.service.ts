@@ -1,6 +1,6 @@
 /**
  * 自动配乐服务
- * 根据视频内容智能推荐和匹配背景音乐
+ * 支持本地上传 + AI音乐API推荐
  */
 import { logger } from '@/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,33 +15,28 @@ export interface MusicTrack {
   genre: MusicGenre;
   mood: MusicMood[];
   duration: number; // 秒
-  url?: string;
-  localPath?: string;
+  url?: string;          // 在线URL
+  localPath?: string;    // 本地文件路径
   bpm?: number;
   tags: string[];
+  source: 'preset' | 'upload' | 'ai';
 }
 
 export interface MusicMatchResult {
   track: MusicTrack;
   score: number; // 0-1 匹配度
-  startTime: number; // 建议开始时间
-  fadeIn: number; // 淡入时间(秒)
-  fadeOut: number; // 淡出时间(秒)
-  volume: number; // 0-1
+  startTime: number;
+  fadeIn: number;
+  fadeOut: number;
+  volume: number;
 }
 
 export interface AutoMusicConfig {
-  /** 视频总时长 */
   videoDuration: number;
-  /** 目标音乐风格 */
   preferredGenre?: MusicGenre;
-  /** 目标音乐情绪 */
   preferredMood?: MusicMood;
-  /** 是否循环播放 */
   loopEnabled?: boolean;
-  /** 是否自动淡入淡出 */
   autoFade?: boolean;
-  /** 音乐音量 */
   volume?: number;
 }
 
@@ -51,81 +46,85 @@ export interface AutoMusicResult {
   recommendations: MusicTrack[];
 }
 
+export interface MusicUploadOptions {
+  file: File;
+  name?: string;
+  genre?: MusicGenre;
+  mood?: MusicMood[];
+  tags?: string[];
+}
+
+export interface AIMusicRecommendOptions {
+  videoDescription?: string;
+  videoTags?: string[];
+  genre?: MusicGenre;
+  mood?: MusicMood;
+  duration?: number;
+}
+
 /**
  * 预置背景音乐库
  */
 const PRESET_MUSIC_LIBRARY: MusicTrack[] = [
   {
-    id: 'music-1',
+    id: 'preset-1',
     name: 'Inspiring Corporate',
     genre: 'cinematic',
     mood: ['upbeat', 'energetic'],
     duration: 180,
     bpm: 120,
     tags: ['企业', '励志', '积极', '片头'],
+    source: 'preset',
   },
   {
-    id: 'music-2',
+    id: 'preset-2',
     name: 'Peaceful Ambient',
     genre: 'ambient',
     mood: ['calm', 'neutral'],
     duration: 240,
     bpm: 70,
     tags: ['氛围', '放松', '冥想', '背景'],
+    source: 'preset',
   },
   {
-    id: 'music-3',
+    id: 'preset-3',
     name: 'Electronic Pulse',
     genre: 'electronic',
     mood: ['energetic', 'upbeat'],
     duration: 150,
     bpm: 128,
     tags: ['电子', '科技', '未来感', '节奏'],
+    source: 'preset',
   },
   {
-    id: 'music-4',
+    id: 'preset-4',
     name: 'Emotional Piano',
     genre: 'classical',
     mood: ['emotional', 'sad'],
     duration: 200,
     bpm: 60,
     tags: ['钢琴', '情感', '感人', '叙事'],
+    source: 'preset',
   },
   {
-    id: 'music-5',
+    id: 'preset-5',
     name: 'Happy Ukulele',
     genre: 'folk',
     mood: ['happy', 'upbeat'],
     duration: 120,
     bpm: 110,
     tags: ['尤克里里', '轻快', '阳光', '生活'],
+    source: 'preset',
   },
   {
-    id: 'music-6',
+    id: 'preset-6',
     name: 'Cinematic Epic',
     genre: 'cinematic',
     mood: ['tense', 'energetic'],
     duration: 300,
     bpm: 90,
     tags: ['史诗', '大气', '电影', '高潮'],
-  },
-  {
-    id: 'music-7',
-    name: 'Chill Lounge',
-    genre: 'electronic',
-    mood: ['calm', 'neutral'],
-    duration: 220,
-    bpm: 85,
-    tags: ['沙发音乐', '放松', '酒吧', '休息'],
-  },
-  {
-    id: 'music-8',
-    name: 'Rock Energy',
-    genre: 'rock',
-    mood: ['energetic', 'upbeat'],
-    duration: 180,
-    bpm: 140,
-    tags: ['摇滚', '力量', '运动', '激情'],
+    source: 'preset',
   },
 ];
 
@@ -133,11 +132,15 @@ const PRESET_MUSIC_LIBRARY: MusicTrack[] = [
  * 自动配乐服务
  */
 export class AutoMusicService {
-  private musicLibrary: MusicTrack[];
+  private presetLibrary: MusicTrack[];
+  private userLibrary: MusicTrack[];
   private config: AutoMusicConfig;
+  private aiApiKey?: string;
+  private aiApiEndpoint?: string;
 
   constructor(config?: Partial<AutoMusicConfig>) {
-    this.musicLibrary = PRESET_MUSIC_LIBRARY;
+    this.presetLibrary = PRESET_MUSIC_LIBRARY;
+    this.userLibrary = [];
     this.config = {
       videoDuration: 60,
       loopEnabled: true,
@@ -148,6 +151,14 @@ export class AutoMusicService {
   }
 
   /**
+   * 配置AI音乐API
+   */
+  configureAIApi(apiKey: string, endpoint?: string): void {
+    this.aiApiKey = apiKey;
+    this.aiApiEndpoint = endpoint;
+  }
+
+  /**
    * 更新配置
    */
   updateConfig(config: Partial<AutoMusicConfig>): void {
@@ -155,14 +166,128 @@ export class AutoMusicService {
   }
 
   /**
-   * 根据视频分析推荐音乐
+   * 获取完整音乐库（预置 + 用户上传）
+   */
+  getMusicLibrary(): MusicTrack[] {
+    return [...this.presetLibrary, ...this.userLibrary];
+  }
+
+  /**
+   * 获取预置音乐
+   */
+  getPresetLibrary(): MusicTrack[] {
+    return [...this.presetLibrary];
+  }
+
+  /**
+   * 获取用户上传的音乐
+   */
+  getUserLibrary(): MusicTrack[] {
+    return [...this.userLibrary];
+  }
+
+  /**
+   * 本地上传音乐
+   */
+  async uploadMusic(options: MusicUploadOptions): Promise<MusicTrack> {
+    const { file, name, genre = 'electronic', mood = ['neutral'], tags = [] } = options;
+
+    // 获取音频时长
+    const duration = await this.getAudioDuration(file);
+    
+    const track: MusicTrack = {
+      id: `upload-${uuidv4()}`,
+      name: name || file.name.replace(/\.[^/.]+$/, ''),
+      genre,
+      mood,
+      duration: Math.round(duration),
+      localPath: URL.createObjectURL(file),
+      tags: ['用户上传', ...tags],
+      source: 'upload',
+    };
+
+    this.userLibrary.push(track);
+    logger.info('音乐上传成功:', track.name);
+    
+    return track;
+  }
+
+  /**
+   * 从URL添加在线音乐
+   */
+  async addMusicFromUrl(url: string, metadata: Partial<MusicTrack>): Promise<MusicTrack> {
+    const track: MusicTrack = {
+      id: `url-${uuidv4()}`,
+      name: metadata.name || '在线音乐',
+      genre: metadata.genre || 'electronic',
+      mood: metadata.mood || ['neutral'],
+      duration: metadata.duration || 180,
+      url,
+      tags: metadata.tags || ['在线'],
+      source: 'preset',
+    };
+
+    this.presetLibrary.push(track);
+    return track;
+  }
+
+  /**
+   * 删除用户上传的音乐
+   */
+  removeMusic(musicId: string): boolean {
+    const index = this.userLibrary.findIndex(m => m.id === musicId);
+    if (index > -1) {
+      const track = this.userLibrary[index];
+      // 释放URL对象
+      if (track.localPath && track.source === 'upload') {
+        URL.revokeObjectURL(track.localPath);
+      }
+      this.userLibrary.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * AI音乐推荐（需要API）
+   */
+  async recommendAIMusic(options: AIMusicRecommendOptions): Promise<MusicTrack[]> {
+    // 如果没有配置API，返回空
+    if (!this.aiApiKey) {
+      logger.warn('未配置AI音乐API，请先配置或使用本地上传');
+      return [];
+    }
+
+    // TODO: 实现AI音乐API调用
+    // 可接入的服务：
+    // - Suno AI (https://suno.ai/)
+    // - Udio (https://udio.ai/)
+    // - ElevenLabs (音频增强)
+    
+    logger.info('AI音乐推荐:', options);
+    
+    // 模拟API调用
+    try {
+      // 这里应该调用实际的AI音乐生成API
+      // const response = await fetch(this.aiApiEndpoint || 'https://api.suno.ai/generate', {...});
+      
+      // 暂时返回空，等待实际API接入
+      return [];
+    } catch (error) {
+      logger.error('AI音乐推荐失败:', error);
+      return [];
+    }
+  }
+
+  /**
+   * 根据视频分析推荐音乐（使用本地库）
    */
   async recommendMusic(options?: Partial<AutoMusicConfig>): Promise<AutoMusicResult> {
     const config = { ...this.config, ...options };
-    logger.info('自动配乐分析中...', config);
+    logger.info('音乐推荐分析中...', config);
 
-    // 根据偏好过滤音乐
-    let filtered = this.musicLibrary;
+    const library = this.getMusicLibrary();
+    let filtered = library;
     
     if (config.preferredGenre) {
       filtered = filtered.filter(m => m.genre === config.preferredGenre);
@@ -172,12 +297,11 @@ export class AutoMusicService {
       filtered = filtered.filter(m => m.mood.includes(config.preferredMood!));
     }
 
-    // 如果没有匹配的音乐，返回空建议
     if (filtered.length === 0) {
-      filtered = this.musicLibrary;
+      filtered = library;
     }
 
-    // 计算匹配度并排序
+    // 计算匹配度
     const scored = filtered.map(track => ({
       track,
       score: this.calculateMatchScore(track, config),
@@ -185,8 +309,7 @@ export class AutoMusicService {
 
     scored.sort((a, b) => b.score - a.score);
 
-    // 生成配乐建议
-    const recommendations = scored.slice(0, 3).map(s => s.track);
+    const recommendations = scored.slice(0, 5).map(s => s.track);
     const tracks: MusicMatchResult[] = [];
 
     if (recommendations.length > 0) {
@@ -214,51 +337,52 @@ export class AutoMusicService {
   }
 
   /**
-   * 计算音乐匹配度
+   * 计算匹配度
    */
   private calculateMatchScore(track: MusicTrack, config: AutoMusicConfig): number {
-    let score = 0.5; // 基础分
+    let score = 0.5;
 
-    // 风格匹配
     if (config.preferredGenre && track.genre === config.preferredGenre) {
       score += 0.3;
     }
 
-    // 情绪匹配
     if (config.preferredMood && track.mood.includes(config.preferredMood)) {
       score += 0.2;
     }
 
-    // 时长适配 (越接近视频时长越好)
     const durationDiff = Math.abs(track.duration - config.videoDuration);
-    if (durationDiff < 30) {
-      score += 0.1;
-    } else if (durationDiff < 60) {
-      score += 0.05;
-    }
+    if (durationDiff < 30) score += 0.1;
+    else if (durationDiff < 60) score += 0.05;
 
     return Math.min(score, 1);
   }
 
   /**
-   * 获取音乐库列表
+   * 获取音频文件时长
    */
-  getMusicLibrary(): MusicTrack[] {
-    return this.musicLibrary;
+  private getAudioDuration(file: File): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const audio = new Audio();
+      audio.onloadedmetadata = () => resolve(audio.duration);
+      audio.onerror = () => reject(new Error('无法读取音频文件'));
+      audio.src = URL.createObjectURL(file);
+    });
   }
 
   /**
-   * 按风格筛选音乐
+   * 筛选音乐
    */
-  filterByGenre(genre: MusicGenre): MusicTrack[] {
-    return this.musicLibrary.filter(m => m.genre === genre);
-  }
-
-  /**
-   * 按情绪筛选音乐
-   */
-  filterByMood(mood: MusicMood): MusicTrack[] {
-    return this.musicLibrary.filter(m => m.mood.includes(mood));
+  filterMusic(genre?: MusicGenre, mood?: MusicMood): MusicTrack[] {
+    let library = this.getMusicLibrary();
+    
+    if (genre) {
+      library = library.filter(m => m.genre === genre);
+    }
+    if (mood) {
+      library = library.filter(m => m.mood.includes(mood));
+    }
+    
+    return library;
   }
 
   /**
@@ -266,7 +390,7 @@ export class AutoMusicService {
    */
   searchMusic(keyword: string): MusicTrack[] {
     const lower = keyword.toLowerCase();
-    return this.musicLibrary.filter(m => 
+    return this.getMusicLibrary().filter(m => 
       m.name.toLowerCase().includes(lower) ||
       m.tags.some(t => t.toLowerCase().includes(lower)) ||
       m.genre.toLowerCase().includes(lower)
@@ -274,6 +398,5 @@ export class AutoMusicService {
   }
 }
 
-// 导出单例
 export const autoMusicService = new AutoMusicService();
 export default autoMusicService;
