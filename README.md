@@ -182,8 +182,8 @@ git push origin feature/your-feature
 
 ## 💬 交流社区
 
-- [GitHub Issues](https://github.com/agions/clipflow/issues) - 问题反馈
-- [Discussions](https://github.com/agions/clipflow/discussions) - 讨论交流
+- [GitHub Issues](https://github.com/agions/clipflow/issues) - 报告 Bug
+- [GitHub Discussions](https://github.com/agions/clipflow/discussions) - 交流讨论
 
 ---
 
