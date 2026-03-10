@@ -1,6 +1,7 @@
 /**
  * 音乐处理步骤
  * 自动配乐工作流步骤
+ * 支持用户自主上传音乐
  */
 import { logger } from '@/utils/logger';
 import { autoMusicService, type MusicTrack, type MusicMatchResult } from '../auto-music.service';
@@ -9,61 +10,135 @@ export interface MusicStepInput {
   videoDuration: number;
   preferredGenre?: string;
   preferredMood?: string;
-  customTracks?: MusicTrack[];
+  /** 用户上传的音乐文件 */
+  userUploadedTracks?: MusicTrack[];
+  /** 是否跳过配乐 */
+  skipMusic?: boolean;
 }
 
 export interface MusicStepOutput {
   tracks: MusicMatchResult[];
   totalDuration: number;
   recommendations: MusicTrack[];
-  usedSource: 'preset' | 'upload' | 'ai';
+  usedSource: 'preset' | 'upload' | 'ai' | 'none';
+  /** 是否需要用户交互 */
+  requiresUserAction: boolean;
 }
 
 /**
  * 音乐处理步骤
+ * 返回是否需要用户上传音乐
  */
 export async function musicStep(input: MusicStepInput): Promise<MusicStepOutput> {
   logger.info('[MusicStep] 开始处理配乐', input);
 
+  // 如果用户选择跳过配乐
+  if (input.skipMusic) {
+    return {
+      tracks: [],
+      totalDuration: 0,
+      recommendations: [],
+      usedSource: 'none',
+      requiresUserAction: false,
+    };
+  }
+
   try {
-    // 如果有自定义音乐，先上传
-    if (input.customTracks && input.customTracks.length > 0) {
-      for (const track of input.customTracks) {
-        if (track.localPath) {
-          // 添加到音乐库
-          await autoMusicService.addMusicFromUrl(track.localPath, {
-            name: track.name,
-            genre: track.genre,
-            mood: track.mood,
-            duration: track.duration,
-            tags: track.tags,
-          });
-        }
-      }
+    // 优先使用用户上传的音乐
+    if (input.userUploadedTracks && input.userUploadedTracks.length > 0) {
+      logger.info('[MusicStep] 使用用户上传的音乐', {
+        count: input.userUploadedTracks.length,
+      });
+
+      const tracks: MusicMatchResult[] = input.userUploadedTracks.map((track, index) => ({
+        track,
+        score: 1.0,
+        startTime: index * track.duration,
+        fadeIn: 2,
+        fadeOut: index === input.userUploadedTracks!.length - 1 ? 3 : 0,
+        volume: 0.5,
+      }));
+
+      return {
+        tracks,
+        totalDuration: tracks.reduce((sum, t) => sum + t.track.duration, 0),
+        recommendations: input.userUploadedTracks,
+        usedSource: 'upload',
+        requiresUserAction: false,
+      };
     }
 
-    // 推荐音乐
+    // 尝试从预设库推荐
     const result = await autoMusicService.recommendMusic({
       videoDuration: input.videoDuration,
       preferredGenre: input.preferredGenre as any,
       preferredMood: input.preferredMood as any,
     });
 
-    logger.info('[MusicStep] 配乐推荐完成', {
-      trackCount: result.recommendations.length,
-      totalDuration: result.totalDuration,
-    });
+    // 如果有推荐结果，直接使用
+    if (result.recommendations.length > 0) {
+      logger.info('[MusicStep] 配乐推荐完成', {
+        trackCount: result.recommendations.length,
+        totalDuration: result.totalDuration,
+      });
 
+      return {
+        tracks: result.tracks,
+        totalDuration: result.totalDuration,
+        recommendations: result.recommendations,
+        usedSource: 'preset',
+        requiresUserAction: false,
+      };
+    }
+
+    // 没有可用音乐，需要用户上传
+    logger.warn('[MusicStep] 没有可用音乐，需要用户上传');
     return {
-      tracks: result.tracks,
-      totalDuration: result.totalDuration,
-      recommendations: result.recommendations,
-      usedSource: 'preset',
+      tracks: [],
+      totalDuration: 0,
+      recommendations: [],
+      usedSource: 'none',
+      requiresUserAction: true,
     };
   } catch (error) {
     logger.error('[MusicStep] 配乐处理失败', error);
-    throw error;
+    // 出错时也需要用户介入
+    return {
+      tracks: [],
+      totalDuration: 0,
+      recommendations: [],
+      usedSource: 'none',
+      requiresUserAction: true,
+    };
   }
+}
+
+/**
+ * 获取可用的音乐库（用于UI展示）
+ */
+export function getMusicLibrary() {
+  return {
+    presets: autoMusicService.getPresetLibrary(),
+    userUploaded: autoMusicService.getUserLibrary(),
+  };
+}
+
+/**
+ * 上传用户音乐
+ */
+export async function uploadUserMusic(file: File, metadata: {
+  name?: string;
+  genre?: string;
+  mood?: string[];
+  tags?: string[];
+}): Promise<MusicTrack> {
+  return autoMusicService.uploadMusic({
+    file,
+    name: metadata.name,
+    genre: metadata.genre as any,
+    mood: metadata.mood as any,
+    tags: metadata.tags,
+  });
 }
 
 export default musicStep;

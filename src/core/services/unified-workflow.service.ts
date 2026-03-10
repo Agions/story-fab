@@ -221,15 +221,34 @@ export class UnifiedWorkflowService {
       // 步骤6: 自动配乐
       await this.runStep(workflow, '自动配乐', async () => {
         const videoDuration = this.calculateVideoDuration(workflow.result?.clips || []);
+        
+        // 获取用户上传的音乐
+        const userTracks = options?.userMusic as any[] || [];
+        
         const musicResult = await musicStep({
           videoDuration,
           preferredGenre: (options?.musicGenre as string) || 'cinematic',
           preferredMood: (options?.musicMood as string) || 'upbeat',
+          userUploadedTracks: userTracks.length > 0 ? userTracks : undefined,
+          skipMusic: options?.skipMusic as boolean,
         } as MusicStepInput);
+        
         logger.info('步骤6: 自动配乐完成', {
           trackCount: musicResult.tracks.length,
           totalDuration: musicResult.totalDuration,
+          usedSource: musicResult.usedSource,
+          requiresUserAction: musicResult.requiresUserAction,
         });
+        
+        // 保存配乐结果到workflow
+        workflow.result = {
+          ...workflow.result!,
+          music: {
+            tracks: musicResult.tracks.map(t => t.track),
+            totalDuration: musicResult.totalDuration,
+          },
+        } as WorkflowResult;
+        
         return musicResult;
       });
 
