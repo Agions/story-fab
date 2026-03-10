@@ -1,5 +1,4 @@
 import React from 'react';
-import { formatTime } from \'@/shared/utils/format\';
 import { Card, Row, Col, Button, Space, Typography, Tag, Divider, Empty } from 'antd';
 import { ReloadOutlined, DownloadOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import type { ClipSegment } from '@/core/services/aiClip.service';
