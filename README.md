@@ -4,8 +4,6 @@
   <img src="./public/logo.svg" alt="ClipFlow" width="128" />
 </p>
 
-> 📺 演示视频：[B站](https://bilibili.com) / [YouTube](https://youtube.com) （施工中）
-
 <h3 align="center">AI 驱动的智能视频剪辑桌面应用</h3>
 
 <p align="center">
