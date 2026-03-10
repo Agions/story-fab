@@ -132,3 +132,58 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* 平滑滚动 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 选中文本颜色 */
+::selection {
+  background-color: var(--brand-purple);
+  color: white;
+}
+
+/* 滚动条优化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-dim);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* 暗色模式滚动条 */
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--bg-hover);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--border-active);
+}
+
+/* 优化按钮点击效果 */
+.ant-btn:active {
+  transform: scale(0.98);
+}
+
+/* 优化卡片悬停效果 */
+.ant-card {
+  transition: all 0.2s ease;
+}
+
+/* 优化输入框过渡 */
+.ant-input,
+.ant-select-selector {
+  transition: all 0.2s ease !important;
+}

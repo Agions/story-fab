@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import { useTheme } from '@/context/ThemeContext';
 
 export const toErrorMessage = (error: unknown, fallback: string): string => {
   if (error instanceof Error) {
@@ -12,12 +13,56 @@ export const toErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
-export const notify = {
-  success: (content: string, key?: string) => message.success(key ? { content, key } : content),
-  error: (error: unknown, fallback: string, key?: string) =>
-    message.error(key ? { content: toErrorMessage(error, fallback), key } : toErrorMessage(error, fallback)),
-  warning: (content: string, key?: string) => message.warning(key ? { content, key } : content),
-  info: (content: string, key?: string) => message.info(key ? { content, key } : content),
-  loading: (content: string, key: string) => message.loading({ content, key }),
-};
+// 消息持续时间
+const MESSAGE_DURATION = 3; // 3秒
 
+export const notify = {
+  success: (content: string, key?: string) => {
+    const options = { 
+      content, 
+      key,
+      duration: MESSAGE_DURATION,
+    };
+    message.success(options);
+  },
+  
+  error: (error: unknown, fallback: string, key?: string) => {
+    const options = { 
+      content: toErrorMessage(error, fallback), 
+      key,
+      duration: MESSAGE_DURATION * 2, // 错误消息显示更久
+    };
+    message.error(options);
+  },
+  
+  warning: (content: string, key?: string) => {
+    const options = { 
+      content, 
+      key,
+      duration: MESSAGE_DURATION,
+    };
+    message.warning(options);
+  },
+  
+  info: (content: string, key?: string) => {
+    const options = { 
+      content, 
+      key,
+      duration: MESSAGE_DURATION,
+    };
+    message.info(options);
+  },
+  
+  loading: (content: string, key: string) => {
+    message.loading({ content, key, duration: 0 });
+  },
+  
+  // 销毁指定消息
+  destroy: (key?: string) => {
+    if (key) {
+      message.destroy(key);
+    } else {
+      message.destroy();
+    }
+  },
+};
