@@ -1,16 +1,10 @@
 /**
  * 智能字幕服务
+import { logger } from '@/utils/logger';
  * 语音转字幕、翻译、导入导出
- * 
- * 实现说明：
- * - ASR: 使用 Web Speech API 或 Whisper API
- * - 翻译: 使用 LLM API
- * - 导出: 支持 SRT/ASS/VTT/LRC 格式
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { logger } from '@/utils/logger';
-import { aiService } from './ai.service';
 
 export interface SubtitleEntry {
   id: string;
@@ -18,7 +12,6 @@ export interface SubtitleEntry {
   endTime: number;
   text: string;
   language?: string;
-  confidence?: number; // 识别置信度
 }
 
 export interface SubtitleFormat {
@@ -43,166 +36,24 @@ export interface ASROptions {
   timestamp?: boolean;
 }
 
-export interface SubtitleStyle {
-  fontFamily?: string;
-  fontSize?: number;
-  color?: string;
-  backgroundColor?: string;
-  position?: 'top' | 'bottom';
-}
-
 /**
  * 智能字幕服务
  */
 export class SubtitleService {
-  private apiKey?: string;
-
-  /**
-   * 配置 API 密钥
-   */
-  configure(apiKey: string): void {
-    this.apiKey = apiKey;
-  }
-
   /**
    * 语音转字幕 (ASR)
-   * 优先使用 Web Speech API，回退到模拟实现
    */
   async recognizeSpeech(
     audioBuffer: ArrayBuffer,
     options?: ASROptions
   ): Promise<SubtitleData> {
-    const language = options?.language || 'zh-CN';
-    logger.info('[Subtitle] 开始语音识别...', { language, model: options?.model });
-
-    try {
-      // 方法1: 尝试使用 Web Speech API
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        return await this.recognizeWithWebSpeech(audioBuffer, language);
-      }
-
-      // 方法2: 尝试使用 Whisper API
-      if (this.apiKey) {
-        return await this.recognizeWithWhisper(audioBuffer, options);
-      }
-
-      // 方法3: 返回示例数据（开发调试用）
-      logger.warn('[Subtitle] 无可用 ASR 引擎，返回示例数据');
-      return this.getSampleSubtitles(language);
-    } catch (error) {
-      logger.error('[Subtitle] 语音识别失败', error);
-      throw error;
-    }
-  }
-
-  /**
-   * 使用 Web Speech API
-   */
-  private async recognizeWithWebSpeech(
-    _audioBuffer: ArrayBuffer,
-    language: string
-  ): Promise<SubtitleData> {
-    return new Promise((resolve, reject) => {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-      
-      if (!SpeechRecognition) {
-        reject(new Error('Speech API 不可用'));
-        return;
-      }
-
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = language;
-
-      const entries: SubtitleEntry[] = [];
-      let currentId = 0;
-      let lastEndTime = 0;
-
-      recognition.onresult = (event: any) => {
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i];
-          if (result.isFinal) {
-            const text = result[0].transcript.trim();
-            if (text) {
-              const startTime = lastEndTime;
-              const duration = text.length * 100; // 估算
-              lastEndTime = startTime + duration;
-
-              entries.push({
-                id: uuidv4(),
-                startTime,
-                endTime: lastEndTime,
-                text,
-                language,
-                confidence: result[0].confidence,
-              });
-            }
-          }
-        }
-      };
-
-      recognition.onerror = (error: any) => {
-        logger.error('[Subtitle] Web Speech 识别错误', error);
-        reject(error);
-      };
-
-      recognition.onend = () => {
-        resolve({
-          entries,
-          language,
-          format: { type: 'srt' },
-        });
-      };
-
-      recognition.start();
-      
-      // 5秒后自动停止
-      setTimeout(() => recognition.stop(), 5000);
-    });
-  }
-
-  /**
-   * 使用 Whisper API
-   */
-  private async recognizeWithWhisper(
-    audioBuffer: ArrayBuffer,
-    options?: ASROptions
-  ): Promise<SubtitleData> {
-    const formData = new FormData();
-    const blob = new Blob([audioBuffer], { type: 'audio/webm' });
-    formData.append('file', blob, 'audio.webm');
-    formData.append('model', options?.model || 'whisper-1');
-    formData.append('language', options?.language?.split('-')[0] || 'zh');
-    formData.append('response_format', 'verbose_json');
-    formData.append('timestamp_granularities', 'segment');
-
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Whisper API 错误: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    // TODO: 实现 ASR
+    // 使用 Whisper 或其他 ASR 服务
+    logger.info('语音识别中...', options);
     
-    const entries: SubtitleEntry[] = data.segments?.map((seg: any) => ({
-      id: uuidv4(),
-      startTime: seg.start * 1000,
-      endTime: seg.end * 1000,
-      text: seg.text.trim(),
-      language: options?.language || 'zh-CN',
-      confidence: seg.avg_log_prob ? Math.exp(seg.avg_log_prob) : undefined,
-    })) || [];
-
     return {
-      entries,
-      language: options?.language || 'zh-CN',
+      entries: [],
+      language: options?.language || 'zh',
       format: { type: 'srt' },
     };
   }
@@ -215,80 +66,18 @@ export class SubtitleService {
     targetLanguage: string,
     sourceLanguage?: string
   ): Promise<SubtitleData> {
-    logger.info('[Subtitle] 翻译字幕', { 
-      from: sourceLanguage || subtitles.language, 
-      to: targetLanguage,
-      count: subtitles.entries.length,
-    });
-
-    try {
-      // 使用 LLM 进行翻译
-      const translatedEntries = await Promise.all(
-        subtitles.entries.map(async (entry) => {
-          try {
-            const translated = await this.translateText(entry.text, targetLanguage, sourceLanguage);
-            return {
-              ...entry,
-              text: translated,
-            };
-          } catch (error) {
-            logger.warn('[Subtitle] 翻译失败，使用原文', error);
-            return entry;
-          }
-        })
-      );
-
-      return {
-        ...subtitles,
-        entries: translatedEntries,
-        language: targetLanguage,
-      };
-    } catch (error) {
-      logger.error('[Subtitle] 字幕翻译失败', error);
-      throw error;
-    }
-  }
-
-  /**
-   * 翻译单条文本
-   */
-  private async translateText(
-    text: string,
-    targetLanguage: string,
-    sourceLanguage?: string
-  ): Promise<string> {
-    if (!this.apiKey) {
-      // 无 API 时返回原文
-      return `[${targetLanguage}] ${text}`;
-    }
-
-    const prompt = `将以下${sourceLanguage || '中文'}文本翻译成${targetLanguage}，只返回翻译结果，不需要其他解释：\n\n${text}`;
-
-    try {
-      const response = await aiService.generateText(prompt, {
-        model: 'gpt-3.5-turbo',
-        maxTokens: 500,
-      });
-      
-      return response.text?.trim() || text;
-    } catch (error) {
-      logger.error('[Subtitle] 翻译请求失败', error);
-      return text;
-    }
-  }
-
-  /**
-   * 生成字幕样式
-   */
-  generateStyle(style: SubtitleStyle): string {
-    const styles: string[] = [];
+    // TODO: 实现翻译
+    // 使用 LLM 进行翻译
+    logger.info('翻译字幕到', targetLanguage);
     
-    if (style.fontFamily) styles.push(`font-family: ${style.fontFamily}`);
-    if (style.fontSize) styles.push(`font-size: ${style.fontSize}px`);
-    if (style.color) styles.push(`color: ${style.color}`);
-    if (style.backgroundColor) styles.push(`background-color: ${style.backgroundColor}`);
-    
-    return styles.join('; ');
+    return {
+      ...subtitles,
+      language: targetLanguage,
+      entries: subtitles.entries.map(entry => ({
+        ...entry,
+        text: `[${targetLanguage}] ${entry.text}`,
+      })),
+    };
   }
 
   /**
@@ -305,7 +94,7 @@ export class SubtitleService {
   /**
    * 导出 ASS 格式
    */
-  exportToASS(subtitles: SubtitleData, style?: SubtitleStyle): string {
+  exportToASS(subtitles: SubtitleData): string {
     const header = `[Script Info]
 Title: ClipFlow Subtitles
 ScriptType: v4.00+
@@ -314,7 +103,7 @@ PlayDepth: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,${style?.fontFamily || 'Arial'},${style?.fontSize || 20},${style?.color || '&H00FFFFFF'},&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,${style?.position === 'top' ? '8' : '2'},10,10,10,1
+Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -350,19 +139,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
       const time = this.formatLRCTime(entry.startTime);
       return `[${time}]${entry.text}`;
     }).join('\n');
-  }
-
-  /**
-   * 导出指定格式
-   */
-  export(subtitles: SubtitleData, format: SubtitleFormat['type']): string {
-    switch (format) {
-      case 'srt': return this.exportToSRT(subtitles);
-      case 'ass': return this.exportToASS(subtitles);
-      case 'vtt': return this.exportToVTT(subtitles);
-      case 'lrc': return this.exportToLRC(subtitles);
-      default: return this.exportToSRT(subtitles);
-    }
   }
 
   /**
@@ -413,44 +189,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
   }
 
   /**
-   * 导入文件（自动检测格式）
+   * 格式化时间 (SRT)
    */
-  async importFromFile(file: File): Promise<SubtitleData> {
-    const content = await file.text();
-    const ext = file.name.split('.').pop()?.toLowerCase();
-    
-    switch (ext) {
-      case 'srt': return this.importFromSRT(content);
-      // 可扩展其他格式
-      default: throw new Error(`不支持的格式: ${ext}`);
-    }
-  }
-
-  /**
-   * 示例字幕数据
-   */
-  private getSampleSubtitles(language: string): SubtitleData {
-    return {
-      entries: [
-        { id: uuidv4(), startTime: 0, endTime: 3000, text: '欢迎使用 ClipFlow', language },
-        { id: uuidv4(), startTime: 3500, endTime: 7000, text: 'AI 驱动的智能视频剪辑工具', language },
-        { id: uuidv4(), startTime: 7500, endTime: 12000, text: '让创作变得更简单', language },
-      ],
-      language,
-      format: { type: 'srt' },
-    };
-  }
-
-  // ==================== 时间格式化 ====================
-
   private formatSRTTime(ms: number): string {
     const hours = Math.floor(ms / 3600000);
     const minutes = Math.floor((ms % 3600000) / 60000);
-    const seconds = Math.floor((ms %  1000);
-60000) /    const milliseconds = ms % 1000;
+    const seconds = Math.floor((ms % 60000) / 1000);
+    const milliseconds = ms % 1000;
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')},${milliseconds.toString().padStart(3, '0')}`;
   }
 
+  /**
+   * 格式化时间 (ASS)
+   */
   private formatASSTime(ms: number): string {
     const hours = Math.floor(ms / 3600000);
     const minutes = Math.floor((ms % 3600000) / 60000);
@@ -459,6 +210,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
   }
 
+  /**
+   * 格式化时间 (VTT)
+   */
   private formatVTTTime(ms: number): string {
     const hours = Math.floor(ms / 3600000);
     const minutes = Math.floor((ms % 3600000) / 60000);
@@ -467,6 +221,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
   }
 
+  /**
+   * 格式化时间 (LRC)
+   */
   private formatLRCTime(ms: number): string {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);

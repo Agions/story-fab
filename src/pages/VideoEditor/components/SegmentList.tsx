@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, memo } from 'react';
 import { Card, Button, Typography, Space, Tag, Empty } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { VideoSegment } from '@/services/videoService';
-import { formatTime } from '@/shared/utils/format';
 import styles from '../index.module.less';
 
 const { Text, Title } = Typography;
@@ -24,7 +23,16 @@ interface SegmentItemProps {
   onDeleteSegment: (index: number) => void;
 }
 
-// formatTime 已从 @/shared/utils/format 导入
+// 格式化时间
+const formatTime = (seconds: number): string => {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  const parts = [
+    hrs > 0 ? String(hrs).padStart(2, '0') : null,
+    String(mins).padStart(2, '0'),
+    String(secs).padStart(2, '0'),
   ].filter(Boolean);
 
   return parts.join(':');
