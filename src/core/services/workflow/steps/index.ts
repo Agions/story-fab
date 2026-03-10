@@ -7,3 +7,4 @@ export * from './uniquenessStep';
 export * from './aiClipStep';
 export * from './timelineStep';
 export * from './exportStep';
+export * from './musicStep';

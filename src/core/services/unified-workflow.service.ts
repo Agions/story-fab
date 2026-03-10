@@ -9,6 +9,8 @@ import { visionService } from './vision.service';
 import { aiService } from './ai.service';
 import { smartCutService } from './smart-cut.service';
 import { subtitleService } from './subtitle.service';
+import { autoMusicService, type MusicTrack } from './auto-music.service';
+import { musicStep, type MusicStepInput } from './workflow/steps/musicStep';
 
 /**
  * 工作流模式
@@ -50,6 +52,10 @@ export interface WorkflowResult {
   clips: VideoClip[];
   script?: ScriptData;
   subtitles?: SubtitleData;
+  music?: {
+    tracks: MusicTrack[];
+    totalDuration: number;
+  };
 }
 
 /**
@@ -140,7 +146,8 @@ export class UnifiedWorkflowService {
       { id: '3', name: 'AI 智能剪辑', status: 'pending', progress: 0 },
       { id: '4', name: '生成解说', status: 'pending', progress: 0 },
       { id: '5', name: '字幕处理', status: 'pending', progress: 0 },
-      { id: '6', name: '导出成片', status: 'pending', progress: 0 },
+      { id: '6', name: '自动配乐', status: 'pending', progress: 0 },
+      { id: '7', name: '导出成片', status: 'pending', progress: 0 },
     ];
 
     const workflow: WorkflowState = {
@@ -211,10 +218,25 @@ export class UnifiedWorkflowService {
         return subtitles;
       });
 
-      // 步骤6: 导出
+      // 步骤6: 自动配乐
+      await this.runStep(workflow, '自动配乐', async () => {
+        const videoDuration = this.calculateVideoDuration(workflow.result?.clips || []);
+        const musicResult = await musicStep({
+          videoDuration,
+          preferredGenre: (options?.musicGenre as string) || 'cinematic',
+          preferredMood: (options?.musicMood as string) || 'upbeat',
+        } as MusicStepInput);
+        logger.info('步骤6: 自动配乐完成', {
+          trackCount: musicResult.tracks.length,
+          totalDuration: musicResult.totalDuration,
+        });
+        return musicResult;
+      });
+
+      // 步骤7: 导出
       await this.runStep(workflow, '导出成片', async () => {
         const result = await this.exportResult();
-        logger.info('步骤6: 导出完成');
+        logger.info('步骤7: 导出完成');
         return result;
       });
 
@@ -312,6 +334,13 @@ export class UnifiedWorkflowService {
       entries: [],
       language: 'zh-CN',
     };
+  }
+
+  /**
+   * 计算视频总时长
+   */
+  private calculateVideoDuration(clips: VideoClip[]): number {
+    return clips.reduce((total, clip) => total + clip.duration, 0);
   }
 
   /**
