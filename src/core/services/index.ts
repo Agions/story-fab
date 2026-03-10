@@ -87,3 +87,5 @@ export type { WorkflowMode, WorkflowState, WorkflowStep, WorkflowResult, VideoCl
 
 export { enhancedCommentaryService, EnhancedCommentaryService } from './enhanced-commentary.service';
 export type { EnhancedCommentaryConfig, VideoAnalysisResult, SceneInfo, EmotionSegment, AudioPeakInfo, KeyFrameInfo, CommentarySegment, EnhancedCommentaryResult, ClipSegment, MusicSegment, SubtitleEntry } from './enhanced-commentary.service';
+export { videoGenerateOptimizeService, VideoGenerateOptimizeService } from './video-generate-optimize.service';
+export { parallelProcessingService, ParallelProcessingService } from './parallel-processing.service';
