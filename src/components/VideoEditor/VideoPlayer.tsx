@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback, memo } from 'react';
+import { formatTime } from \'@/shared/utils/format\';
 import { Button, Slider, Typography } from 'antd';
 import { PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 import styles from './VideoEditor.module.less';

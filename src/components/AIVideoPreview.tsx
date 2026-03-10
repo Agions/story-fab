@@ -3,6 +3,7 @@
  * 简化的 AI 剪辑专用时间轴
  */
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { formatTime } from \'@/shared/utils/format\';
 import { Button, Slider, Typography, Space, Upload, type UploadProps } from 'antd';
 import {
   PlayCircleOutlined,

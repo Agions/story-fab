@@ -4,6 +4,25 @@
  */
 
 /**
+ * 格式化时间 (秒 -> mm:ss 或 hh:mm:ss)
+ * 用于视频播放器时间显示
+ */
+export function formatTime(seconds: number): string {
+  if (isNaN(seconds) || seconds < 0) {
+    return '00:00';
+  }
+
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
  * 格式化时长 (秒 -> mm:ss 或 hh:mm:ss)
  */
 export function formatDuration(seconds: number): string {

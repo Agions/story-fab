@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatTime } from \'@/shared/utils/format\';
 import { useState, useRef, useEffect } from 'react';
 import { Slider, Button } from 'antd';
 import {

@@ -6,6 +6,7 @@ import {
   FullscreenOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
+import { formatTime } from '@/shared/utils/format';
 import styles from '../index.module.less';
 
 const { Text } = Typography;
@@ -20,21 +21,6 @@ interface VideoPlayerProps {
   onPlayStateChange: (isPlaying: boolean) => void;
   onLoadVideo: () => void;
 }
-
-// 格式化时间
-const formatTime = (seconds: number): string => {
-  const hrs = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
-  const parts = [
-    hrs > 0 ? String(hrs).padStart(2, '0') : null,
-    String(mins).padStart(2, '0'),
-    String(secs).padStart(2, '0'),
-  ].filter(Boolean);
-
-  return parts.join(':');
-};
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
   videoSrc,

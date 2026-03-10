@@ -8,6 +8,7 @@
  *   - subtitle.asr (ASR 字幕)
  */
 import React, { useState } from 'react';
+import { formatTime } from \'@/shared/utils/format\';
 import { 
   Card, Button, Space, Typography, List, 
   Tag, Alert, Divider, Checkbox, Row, Col, Badge
@@ -34,65 +35,6 @@ import styles from './ClipFlow.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 
-// 格式化时间
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
-
-// 模拟数据
-const generateMockSubtitles = (duration: number) => {
-  const subtitles = [];
-  const interval = 3;
-  for (let t = 0; t < duration; t += interval) {
-    subtitles.push({
-      startTime: t,
-      endTime: Math.min(t + interval, duration),
-      text: `这是第 ${Math.floor(t / interval) + 1} 句演示文本...`,
-      speaker: Math.random() > 0.5 ? 'Speaker A' : 'Speaker B',
-    });
-  }
-  return subtitles;
-};
-
-const generateMockScenes = (duration: number): Scene[] => {
-  const scenes: Scene[] = [];
-  const sceneCount = Math.max(3, Math.floor(duration / 15));
-  const sceneTypes = ['对话', '动作', '风景', '特写', '远景'];
-  const sceneTags = ['室内', '室外', '白天', '夜晚', '人物', '物品'];
-  
-  for (let i = 0; i < sceneCount; i++) {
-    const startTime = (duration / sceneCount) * i;
-    const endTime = (duration / sceneCount) * (i + 1);
-    const typeIndex = Math.floor(Math.random() * sceneTypes.length);
-    
-    scenes.push({
-      id: `scene_${i}`,
-      startTime,
-      endTime,
-      thumbnail: '',
-      description: `场景 ${i + 1}: ${sceneTypes[typeIndex]}`,
-      tags: sceneTags.slice(0, Math.floor(Math.random() * 4) + 1),
-      type: sceneTypes[typeIndex],
-      confidence: 0.7 + Math.random() * 0.3,
-    });
-  }
-  return scenes;
-};
-
-// 分析任务配置
-const ANALYSIS_TASKS = [
-  { key: 'sceneDetection', label: '场景检测', icon: <TableOutlined />, desc: '智能识别视频中的不同场景', color: '#1890ff' },
-  { key: 'objectDetection', label: '物体识别', icon: <AimOutlined />, desc: '检测视频中的物体和人物', color: '#52c41a' },
-  { key: 'emotionAnalysis', label: '情感分析', icon: <SmileOutlined />, desc: '分析人物情感和情绪变化', color: '#fa8c16' },
-  { key: 'ocrEnabled', label: 'OCR 字幕', icon: <FileTextOutlined />, desc: '识别视频中的文字内容', color: '#722ed1' },
-  { key: 'asrEnabled', label: 'ASR 语音', icon: <AudioOutlined />, desc: '语音转文字生成字幕', color: '#13c2c2' },
-];
-
-interface AIAnalyzeProps {
-  onNext?: () => void;
-}
 
 const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
   const { 

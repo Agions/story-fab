@@ -1,4 +1,5 @@
 import React, { useCallback, memo } from 'react';
+import { formatTime } from \'@/shared/utils/format\';
 import { Tooltip } from 'antd';
 import { ScriptSegment } from '@/types';
 import styles from './VideoEditor.module.less';
