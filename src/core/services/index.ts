@@ -33,6 +33,7 @@ export { pipelineService, PipelineService } from './pipeline.service';
 export { smartCutService, SmartCutService } from './smart-cut.service';
 export { videoEnhanceService, VideoEnhanceService } from './videoEnhance.service';
 export { performanceService, PerformanceService } from './performance.service';
+export { autoMusicService, AutoMusicService } from './auto-music.service';
 
 // 重新导出类型
 export type { AIResponse, RequestConfig } from './ai.service';

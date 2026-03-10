@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, Typography, Button, Space, Select, Progress, List, Input, Empty, Switch } from 'antd';
 import { AudioOutlined, FileTextOutlined, EditOutlined, DownloadOutlined, SyncOutlined } from '@ant-design/icons';
 import { motion } from '@/components/common/motion-shim';
 import { notify } from '@/shared';
+import { subtitleService } from '@/core/services';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -31,7 +32,8 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
 
-  const handleExtract = () => {
+  // 提取字幕
+  const handleExtract = useCallback(async () => {
     if (!videoUrl) {
       notify.error(null, '未检测到视频源');
       return;
@@ -41,29 +43,39 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     setProgress(0);
     setExtractedSubtitles([]);
     
-    // 模拟提取过程
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsExtracting(false);
-          const fakeSubtitles = [
-            { id: '1', start: '00:00:01,000', end: '00:00:04,500', text: '大家好，欢迎来到本期视频。' },
-            { id: '2', start: '00:00:05,000', end: '00:00:08,200', text: '今天我们将介绍AI大模型最前沿的应用。' },
-            { id: '3', start: '00:00:08,500', end: '00:00:12,100', text: '包括最新的推理模型以及视觉识别模块。' },
-            { id: '4', start: '00:00:12,500', end: '00:00:18,000', text: '让我们通过一个实际的代码案例来看看它是如何工作的。' },
-          ];
-          setExtractedSubtitles(fakeSubtitles);
-          notify.success('字幕提取成功！');
-          if (onExtracted) {
-            onExtracted(fakeSubtitles);
-          }
-          return 100;
-        }
-        return prev + Math.floor(Math.random() * 15) + 5;
-      });
-    }, 500);
-  };
+    try {
+      // 模拟进度更新
+      const progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 90));
+      }, 300);
+
+      // 调用字幕服务（这里用模拟数据，实际会调用 subtitleService）
+      // 实际实现需要获取视频的音频轨道并传给 ASR
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      clearInterval(progressInterval);
+      setProgress(100);
+      
+      // 模拟字幕结果
+      const mockSubtitles = [
+        { id: '1', start: '00:00:01,000', end: '00:00:04,500', text: '大家好，欢迎来到本期视频。' },
+        { id: '2', start: '00:00:05,000', end: '00:00:08,200', text: '今天我们将介绍AI大模型最前沿的应用。' },
+        { id: '3', start: '00:00:08,500', end: '00:00:12,100', text: '包括最新的推理模型以及视觉识别模块。' },
+        { id: '4', start: '00:00:12,500', end: '00:00:18,000', text: '让我们通过一个实际的代码案例来看看它是如何工作的。' },
+      ];
+      
+      setExtractedSubtitles(mockSubtitles);
+      notify.success('字幕提取成功！');
+      
+      if (onExtracted) {
+        onExtracted(mockSubtitles);
+      }
+    } catch (error) {
+      notify.error(error, '字幕提取失败，请重试');
+    } finally {
+      setIsExtracting(false);
+    }
+  }, [videoUrl, onExtracted]);
 
   const handleSaveEdit = (id: string) => {
     setExtractedSubtitles(prev => prev.map(s => s.id === id ? { ...s, text: editingText } : s));
@@ -99,17 +111,17 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }} role="region" aria-label="字幕提取器">
       <Card title={<><AudioOutlined /> 智能语音识别设置</>} bordered={false} style={{ borderRadius: 10 }}>
-        <Space direction="vertical" style={{ width: '100%' }} size="large">
+        <Space direction="vertical" style={{ width: '100%' }} size="large" role="group" aria-label="字幕提取设置">
           <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
             <div>
               <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>识别语言</Text>
-              <Input value="中文（固定）" disabled style={{ width: 180 }} />
+              <Input value="中文（固定）" disabled style={{ width: 180 }} aria-label="识别语言" />
             </div>
             <div>
               <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>导出格式</Text>
-              <Select value={format} onChange={setFormat} style={{ width: 140 }}>
+              <Select value={format} onChange={setFormat} style={{ width: 140 }} aria-label="导出格式选择">
                 <Option value="srt">SRT</Option>
                 <Option value="vtt">VTT</Option>
                 <Option value="txt">纯文本</Option>
@@ -117,7 +129,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
             </div>
             <div>
               <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>同步翻译(实验性)</Text>
-              <Switch checked={translate} onChange={setTranslate} checkedChildren="开启" unCheckedChildren="关闭" />
+              <Switch checked={translate} onChange={setTranslate} checkedChildren="开启" unCheckedChildren="关闭" aria-label="同步翻译开关" />
             </div>
           </div>
           
@@ -135,6 +147,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
               onClick={handleExtract}
               size="large"
               style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)', border: 'none', borderRadius: 8 }}
+              aria-label="开始提取字幕"
             >
               开始提取字幕
             </Button>
