@@ -163,6 +163,37 @@ export type EditorPanel = 'video' | 'script' | 'subtitle' | 'voice' | 'effect';
 
 export type AIFeatureType = 'video-narration' | 'first-person' | 'remix' | 'smart-clip';
 
+// ==================== AI 相关类型 ====================
+
+export interface VideoInfo {
+  id: string;
+  name: string;
+  path: string;
+  duration: number;
+  width: number;
+  height: number;
+  size: number;
+  fps: number;
+  format: string;
+}
+
+export interface AIModel {
+  id: string;
+  name: string;
+  provider: ModelProvider;
+  model: string;
+  maxTokens?: number;
+  enabled: boolean;
+  category?: string;
+  description?: string;
+  features?: string[];
+  tokenLimit?: number;
+  isPro?: boolean;
+  isAvailable?: boolean;
+}
+
+export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'azure' | 'local' | 'custom';
+
 export interface AnalysisResult {
   scenes: Scene[];
   keyframes: Keyframe[];
