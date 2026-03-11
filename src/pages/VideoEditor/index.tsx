@@ -1,6 +1,6 @@
 import React, { useState, useCallback, lazy, Suspense, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Layout, Tabs, Row, Col, Spin } from 'antd';
+import { Layout, Tabs, Row, Col, Spin, message } from 'antd';
 import { RobotOutlined } from '@ant-design/icons';
 
 import { saveProjectToFile } from '@/services/tauriService';
@@ -8,6 +8,7 @@ import { notify } from '@/shared';
 import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
 import { logger } from '@/utils/logger';
 import { useVideoEditor } from './hooks/useVideoEditor';
+import { exportService, ExportConfig, ExportProgress } from '@/core/services/export.service';
 
 import Toolbar from './components/Toolbar';
 import VideoPlayer from './components/VideoPlayer';
@@ -119,21 +120,71 @@ const VideoEditorPage: React.FC = () => {
   // 导出视频
   const handleExportVideo = useCallback(async () => {
     if (isExporting) return;
+    if (!videoSrc || segments.length === 0) {
+      notify.warning('请先加载视频并添加剪辑片段');
+      return;
+    }
+
     setIsExporting(true);
     try {
-      // 预留导出任务接入点，避免固定延时造成阻塞感。
-      notify.info('导出功能开发中，敬请期待');
+      // 构建导出配置
+      const exportConfig: Partial<ExportConfig> = {
+        format: outputFormat as 'mp4' | 'webm' | 'mov' | 'mkv',
+        quality: videoQuality as 'low' | 'medium' | 'high' | 'ultra',
+        resolution: '1080p',
+        frameRate: 30,
+        aspectRatio: '16:9',
+        audioCodec: 'aac',
+        audioBitrate: '256k',
+        sampleRate: 48000,
+        channels: 2,
+      };
+
+      // 设置导出配置
+      exportService.setConfig(exportConfig);
+
+      // 准备时间轴数据
+      const timeline = {
+        segments: segments.map(s => ({
+          sourceFile: videoSrc,
+          start: s.startTime,
+          end: s.endTime,
+        })),
+        outputPath: `export/${Date.now()}.${outputFormat}`,
+      };
+
+      // 显示进度
+      let progressMsg: any = message.loading('正在导出视频...', 0);
+
+      // 执行导出
+      const result = await exportService.export(
+        timeline as any,
+        (progress: ExportProgress) => {
+          const percent = Math.round(progress.progress);
+          if (percent % 20 === 0) {
+            logger.info(`导出进度: ${percent}%`);
+          }
+        }
+      );
+
+      // 关闭 loading
+      progressMsg();
+
+      if (result.success) {
+        notify.success(`视频导出成功: ${result.filePath}`);
+        logger.info('导出成功:', result);
+      } else {
+        throw new Error(result.error || '导出失败');
+      }
     } catch (error) {
       logger.error('导出失败:', error);
-      if (aliveRef.current) {
-        notify.error(error, '导出失败，请重试');
-      }
+      notify.error(error, '导出失败，请重试');
     } finally {
       if (aliveRef.current) {
         setIsExporting(false);
       }
     }
-  }, [isExporting, setIsExporting]);
+  }, [isExporting, videoSrc, segments, outputFormat, videoQuality, setIsExporting]);
 
   // AI 分析完成
   const handleAnalysisComplete = useCallback((result: ClipAnalysisResult) => {
