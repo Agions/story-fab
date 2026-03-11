@@ -14,7 +14,7 @@ import SegmentTable from './SegmentTable';
 import SegmentEditForm from './SegmentEditForm';
 import PreviewModal from './PreviewModal';
 import AIModal from './AIModal';
-import styles from '../ScriptEditor.module.less';
+import styles from './ScriptEditor.module.less';
 
 interface OriginalEditorProps {
   videoPath: string;

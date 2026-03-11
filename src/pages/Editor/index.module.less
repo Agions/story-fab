@@ -1,720 +1,212 @@
-/**
- * 视频剪辑页面样式
- */
+/* ClipFlow X - Editor Page Cinema Director Styles */
+/* 电影导演工作室风格 - 基础编辑器 */
+
+@film-amber: #d4a574;
+@film-amber-light: #e8c9a8;
+@film-amber-glow: rgba(212, 165, 116, 0.35);
+
+@ink-black: #0d0d0f;
+@ink-deep: #141418;
+@ink-charcoal: #1c1c22;
+@ink-surface: #242430;
+
+@border-subtle: rgba(255, 255, 255, 0.06);
+@border-default: rgba(255, 255, 255, 0.1);
+
+@text-primary: #f8f8f2;
+@text-secondary: #a8a8b3;
+@text-muted: #6b6b7a;
+
+@bg-void: #08080a;
+@bg-elevated: #141418;
+@bg-surface: #1c1c22;
+@bg-card: rgba(28, 28, 34, 0.7);
+
+@radius-md: 8px;
+@radius-lg: 12px;
+
+@shadow-glow-amber: 0 0 30px var(--film-amber-glow);
 
 .editorPage {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #1a1a1a;
-  color: #fff;
+  background: @bg-void;
+  color: @text-primary;
+  animation: fadeIn 0.3s ease;
 }
 
-// 工具栏
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 工具栏 */
 .toolbar {
-  height: 48px;
-  padding: 0 16px;
+  height: 52px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #2a2a2a;
-  border-bottom: 1px solid #3a3a3a;
+  background: @bg-elevated;
+  border-bottom: 1px solid @border-subtle;
 
   :global {
     .ant-btn {
       background: transparent;
       border: none;
-      color: #ccc;
+      color: @text-secondary;
+      border-radius: @radius-md;
+      transition: all 0.2s ease;
 
       &:hover {
-        color: #fff;
-        background: #3a3a3a;
+        color: @film-amber;
+        background: rgba(212, 165, 116, 0.1);
       }
 
       &:disabled {
-        color: #666;
+        color: @text-muted;
       }
     }
 
     .ant-divider {
-      background: #3a3a3a;
+      background: @border-default;
     }
   }
 }
 
-.zoomText {
-  color: #999;
-  font-size: 12px;
-  min-width: 50px;
-  text-align: center;
-}
-
-// 主布局
-.mainLayout {
+/* 编辑器主体 */
+.editorMain {
   flex: 1;
+  display: flex;
   overflow: hidden;
 }
 
-// 侧边栏
-.sidebar {
-  background: #252525;
-  border-right: 1px solid #3a3a3a;
-
-  :global {
-    .ant-tabs {
-      height: 100%;
-
-      .ant-tabs-nav {
-        margin-bottom: 0;
-        background: #2a2a2a;
-        border-bottom: 1px solid #3a3a3a;
-
-        .ant-tabs-tab {
-          color: #999;
-          padding: 12px 16px;
-
-          &.ant-tabs-tab-active {
-            color: #1890ff;
-          }
-        }
-      }
-
-      .ant-tabs-content {
-        height: calc(100% - 44px);
-        overflow-y: auto;
-      }
-    }
-  }
+/* 左侧面板 */
+.leftPanel {
+  width: 280px;
+  background: @bg-elevated;
+  border-right: 1px solid @border-subtle;
+  overflow-y: auto;
 }
 
-.panelContent {
-  padding: 16px;
-  color: #ccc;
-}
-
-.effectGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.effectButton {
-  background: #3a3a3a;
-  border: 1px solid #4a4a4a;
-  color: #ccc;
-
-  &:hover {
-    background: #4a4a4a;
-    color: #fff;
-  }
-}
-
-// 主内容区
-.content {
+/* 中间预览区 */
+.previewArea {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  background: @bg-void;
 }
 
-// 预览区
+/* 右侧面板 */
+.rightPanel {
+  width: 300px;
+  background: @bg-elevated;
+  border-left: 1px solid @border-subtle;
+  overflow-y: auto;
+}
+
+/* 预览容器 */
 .previewContainer {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  padding: 16px;
-  background: #1a1a1a;
-}
-
-.previewVideo {
-  flex: 1;
-  display: flex;
   align-items: center;
   justify-content: center;
-  background: #0a0a0a;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.video {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.emptyPreview {
-  text-align: center;
-  color: #666;
-
-  .emptyIcon {
-    font-size: 48px;
-    margin-bottom: 16px;
-  }
-}
-
-// 播放控制
-.playbackControls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 16px 0;
-
-  :global {
-    .ant-btn {
-      background: #3a3a3a;
-      border: none;
-      color: #fff;
-
-      &:hover {
-        background: #4a4a4a;
-      }
-
-      &.ant-btn-primary {
-        background: #1890ff;
-
-        &:hover {
-          background: #40a9ff;
-        }
-      }
-    }
-  }
-}
-
-.timeDisplay {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: monospace;
-  font-size: 14px;
-}
-
-.currentTime {
-  color: #fff;
-}
-
-.timeSeparator {
-  color: #666;
-}
-
-.totalTime {
-  color: #999;
-}
-
-.playbackRate {
-  :global {
-    .ant-select {
-      .ant-select-selector {
-        background: #3a3a3a;
-        border-color: #4a4a4a;
-        color: #fff;
-      }
-    }
-  }
-}
-
-.progressSlider {
-  margin: 0;
-
-  :global {
-    .ant-slider-rail {
-      background: #3a3a3a;
-    }
-
-    .ant-slider-track {
-      background: #1890ff;
-    }
-
-    .ant-slider-handle {
-      border-color: #1890ff;
-      background: #1890ff;
-    }
-  }
-}
-
-// 时间轴
-.timelineContainer {
-  height: 240px;
-  background: #252525;
-  border-top: 1px solid #3a3a3a;
+  background: @ink-black;
   position: relative;
-  overflow: hidden;
-}
-
-.timelineHeader {
-  height: 32px;
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  background: #2a2a2a;
-  border-bottom: 1px solid #3a3a3a;
-
-  :global {
-    .ant-btn {
-      background: transparent;
-      border: none;
-      color: #999;
-      font-size: 12px;
-
-      &:hover {
-        color: #fff;
-        background: #3a3a3a;
-      }
-    }
-  }
-}
-
-.timelineTracks {
-  height: calc(100% - 32px);
-  overflow-y: auto;
-  padding: 8px 0;
-}
-
-.track {
-  display: flex;
-  height: 48px;
-  margin-bottom: 4px;
-}
-
-.trackHeader {
-  width: 80px;
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  background: #2a2a2a;
-  border-right: 1px solid #3a3a3a;
-  font-size: 12px;
-  color: #999;
-}
-
-.trackContent {
-  flex: 1;
-  position: relative;
-  background: #1a1a1a;
-}
-
-.clip {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  background: #1890ff;
-  border-radius: 4px;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #40a9ff;
-  }
-
-  &.selected {
-    box-shadow: 0 0 0 2px #fff;
-  }
-}
-
-.clipContent {
-  padding: 4px 8px;
-}
-
-.clipLabel {
-  font-size: 11px;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.textItem {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  background: #52c41a;
-  border-radius: 4px;
-  cursor: pointer;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-
-  &:hover {
-    background: #73d13d;
-  }
-}
-
-.textContent {
-  font-size: 11px;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-// 播放头
-.playhead {
-  position: absolute;
-  top: 32px;
-  bottom: 0;
-  width: 2px;
-  background: #ff4d4f;
-  pointer-events: none;
-  z-index: 100;
 
   &::before {
     content: '';
     position: absolute;
-    top: -6px;
-    left: -5px;
-    width: 12px;
-    height: 12px;
-    background: #ff4d4f;
-    border-radius: 50%;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(212, 165, 116, 0.03) 0%, @ink-black 70%);
   }
 }
 
-// 导出模态框
-.exportProgress {
-  text-align: center;
-  padding: 24px;
-
-  p {
-    margin-top: 16px;
-    color: #999;
-  }
-}
-
-.exportPreview {
-  margin-top: 16px;
+/* 时间轴 */
+.timeline {
+  height: 200px;
+  background: @bg-elevated;
+  border-top: 1px solid @border-subtle;
   padding: 12px;
-  background: #f5f5f5;
-  border-radius: 4px;
+}
 
-  p {
-    margin: 4px 0;
-    color: #666;
+/* 面板标题 */
+.panelTitle {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-weight: 600;
+  font-size: 14px;
+  color: @text-primary;
+  padding: 16px;
+  border-bottom: 1px solid @border-subtle;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .anticon {
+    color: @film-amber;
   }
 }
 
-// 响应式
-@media (max-width: 1200px) {
-  .sidebar {
-    width: 250px !important;
+/* 列表项 */
+.panelItem {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid @border-subtle;
+
+  &:hover {
+    background: rgba(212, 165, 116, 0.05);
+  }
+
+  &.active {
+    background: rgba(212, 165, 116, 0.1);
+    border-left: 3px solid @film-amber;
+  }
+
+  .itemTitle {
+    font-size: 13px;
+    color: @text-primary;
+    margin-bottom: 4px;
+  }
+
+  .itemDesc {
+    font-size: 11px;
+    color: @text-muted;
+  }
+}
+
+/* 按钮组 */
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid @border-subtle;
+
+  :global .ant-btn {
+    flex: 1;
+    height: 36px;
+    font-size: 13px;
+  }
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .leftPanel,
+  .rightPanel {
+    width: 240px;
   }
 }
 
 @media (max-width: 768px) {
-  .toolbar {
-    flex-wrap: wrap;
+  .editorMain {
+    flex-direction: column;
+  }
+
+  .leftPanel,
+  .rightPanel {
+    width: 100%;
     height: auto;
-    padding: 8px;
-
-    > * {
-      margin: 4px 0;
-    }
-  }
-
-  .sidebar {
-    display: none;
-  }
-
-  .timelineContainer {
-    height: 180px;
-  }
-}
-
-// 深色模式适配 - Tech Dark Theme with Neon Glow
-:global(.dark) {
-  .editorPage {
-    background: @bg-primary;
-    color: @text-primary;
-  }
-
-  .toolbar {
-    background: @bg-secondary;
-    border-bottom: 1px solid @border-primary;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 15px rgba(99, 102, 241, 0.08);
-
-    :global {
-      .ant-btn {
-        background: transparent;
-        border: none;
-        color: @text-secondary;
-        transition: all 0.3s ease;
-
-        &:hover {
-          color: @primary-color;
-          background: @bg-tertiary;
-          text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
-        }
-
-        &:disabled {
-          color: #666;
-        }
-      }
-
-      .ant-divider {
-        background: @border-primary;
-      }
-    }
-  }
-
-  .zoomText {
-    color: @text-secondary;
-  }
-
-  .sidebar {
-    background: @bg-secondary;
-    border-right: 1px solid @border-primary;
-    box-shadow: 2px 0 10px rgba(99, 102, 241, 0.05);
-
-    :global {
-      .ant-tabs {
-        .ant-tabs-nav {
-          background: @bg-tertiary;
-          border-bottom: 1px solid @border-primary;
-
-          .ant-tabs-tab {
-            color: @text-secondary;
-            transition: all 0.3s ease;
-
-            &:hover {
-              color: @primary-color;
-              text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
-            }
-
-            &.ant-tabs-tab-active {
-              color: @primary-color;
-              text-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .panelContent {
-    color: @text-secondary;
-  }
-
-  .effectButton {
-    background: @bg-tertiary;
-    border: 1px solid @border-primary;
-    color: @text-secondary;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: rgba(99, 102, 241, 0.15);
-      border-color: @primary-color;
-      color: @primary-color;
-      box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
-    }
-  }
-
-  .previewContainer {
-    background: @bg-primary;
-    box-shadow: inset 0 0 60px rgba(99, 102, 241, 0.05);
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background:
-        radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
-      pointer-events: none;
-    }
-  }
-
-  .previewVideo {
-    background: @bg-secondary;
-    box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
-  }
-
-  .emptyPreview {
-    color: @text-secondary;
-
-    .emptyIcon {
-      color: @primary-color;
-      text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-    }
-  }
-
-  .playbackControls {
-    :global {
-      .ant-btn {
-        background: @bg-tertiary;
-        border: 1px solid @border-primary;
-        color: @text-primary;
-        transition: all 0.3s ease;
-
-        &:hover {
-          background: rgba(99, 102, 241, 0.15);
-          border-color: @primary-color;
-          color: @primary-color;
-          box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
-        }
-
-        &.ant-btn-primary {
-          background: @primary-color;
-          border-color: @primary-color;
-          box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
-
-          &:hover {
-            background: lighten(@primary-color, 5%);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-          }
-        }
-      }
-    }
-  }
-
-  .timeDisplay {
-    font-size: 14px;
-  }
-
-  .currentTime {
-    color: @primary-color;
-    text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
-  }
-
-  .timeSeparator {
-    color: @text-secondary;
-  }
-
-  .totalTime {
-    color: @text-secondary;
-  }
-
-  .playbackRate {
-    :global {
-      .ant-select {
-        .ant-select-selector {
-          background: @bg-tertiary !important;
-          border-color: @border-primary !important;
-          color: @text-primary !important;
-          transition: all 0.3s ease;
-
-          &:hover {
-            border-color: @primary-color !important;
-            box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
-          }
-        }
-      }
-    }
-  }
-
-  .progressSlider {
-    :global {
-      .ant-slider-rail {
-        background: @bg-tertiary;
-      }
-
-      .ant-slider-track {
-        background: @primary-color;
-        box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
-      }
-
-      .ant-slider-handle {
-        border-color: @primary-color;
-        background: @primary-color;
-        box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
-
-        &:hover {
-          box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
-        }
-      }
-    }
-  }
-
-  .timelineContainer {
-    background: @bg-secondary;
-    border-top: 1px solid @border-primary;
-    box-shadow: 0 -4px 20px rgba(99, 102, 241, 0.08);
-  }
-
-  .timelineHeader {
-    background: @bg-tertiary;
-    border-bottom: 1px solid @border-primary;
-
-    :global {
-      .ant-btn {
-        background: transparent;
-        border: none;
-        color: @text-secondary;
-        font-size: 12px;
-        transition: all 0.3s ease;
-
-        &:hover {
-          color: @primary-color;
-          background: @bg-secondary;
-          text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
-        }
-      }
-    }
-  }
-
-  .trackHeader {
-    background: @bg-tertiary;
-    border-right: 1px solid @border-primary;
-    color: @text-secondary;
-  }
-
-  .trackContent {
-    background: @bg-primary;
-  }
-
-  .clip {
-    background: linear-gradient(135deg, @primary-color 0%, lighten(@primary-color, 10%) 100%);
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: linear-gradient(135deg, lighten(@primary-color, 5%) 0%, lighten(@primary-color, 15%) 100%);
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-    }
-
-    &.selected {
-      box-shadow: 0 0 0 2px @text-primary, 0 0 15px rgba(99, 102, 241, 0.6);
-    }
-  }
-
-  .clipLabel {
-    color: @text-primary;
-  }
-
-  .textItem {
-    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: linear-gradient(135deg, #34d399 0%, #6ee7b7 100%);
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
-    }
-  }
-
-  .textContent {
-    color: @text-primary;
-  }
-
-  .playhead {
-    background: #ef4444;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
-
-    &::before {
-      background: #ef4444;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
-    }
-  }
-
-  .exportPreview {
-    background: @bg-tertiary;
-    border: 1px solid @border-primary;
-
-    p {
-      color: @text-secondary;
-    }
+    max-height: 200px;
   }
 }

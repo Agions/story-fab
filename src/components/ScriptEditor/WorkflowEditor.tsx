@@ -10,7 +10,7 @@ import {
 import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
 import { formatDuration } from '@/services/videoService';
 import { notify } from '@/shared';
-import styles from '../ScriptEditor.module.less';
+import styles from './ScriptEditor.module.less';
 
 const { Text, Paragraph, Title } = Typography;
 const { TextArea } = Input;

@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Card, Form, Input, Select, Button, Space } from 'antd';
 import type { FormInstance } from 'antd';
 import { segmentTypeOptions } from './types';
-import styles from '../ScriptEditor.module.less';
+import styles from './ScriptEditor.module.less';
 
 const { TextArea } = Input;
 

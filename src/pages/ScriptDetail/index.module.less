@@ -1,151 +1,215 @@
-// Dark theme color variables
-@bg-primary: #0a0a0f;
-@bg-secondary: #12121a;
-@bg-tertiary: #1a1a24;
-@primary-color: #6366f1;
-@border-primary: #2a2a3a;
-@text-primary: #f1f5f9;
-@text-secondary: #94a3b8;
+/* ClipFlow X - Script Detail Page Cinema Director Styles */
+/* 电影导演工作室风格 - 脚本详情页 */
+
+@film-amber: #d4a574;
+@film-amber-light: #e8c9a8;
+@film-amber-glow: rgba(212, 165, 116, 0.35);
+
+@ink-black: #0d0d0f;
+@ink-deep: #141418;
+@ink-charcoal: #1c1c22;
+@ink-surface: #242430;
+
+@border-subtle: rgba(255, 255, 255, 0.06);
+@border-default: rgba(255, 255, 255, 0.1);
+
+@text-primary: #f8f8f2;
+@text-secondary: #a8a8b3;
+@text-muted: #6b6b7a;
+
+@bg-void: #08080a;
+@bg-elevated: #141418;
+@bg-surface: #1c1c22;
+@bg-card: rgba(28, 28, 34, 0.7);
+
+@radius-md: 8px;
+@radius-lg: 12px;
+@radius-xl: 16px;
+
+@shadow-glow-amber: 0 0 30px var(--film-amber-glow);
 
 .container {
-  padding: 20px;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 头部 */
 .header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
+
+  h1 {
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    font-weight: 700;
+    font-size: 28px;
+    color: @text-primary;
+    margin: 0;
+  }
+
+  :global {
+    .ant-btn-primary {
+      background: linear-gradient(135deg, @film-amber 0%, #c49464 100%) !important;
+      border: none !important;
+      color: @ink-black !important;
+      box-shadow: @shadow-glow-amber;
+    }
+  }
 }
 
+/* 信息卡片 */
 .infoCard {
+  background: @bg-card;
+  border-radius: @radius-lg;
+  border: 1px solid @border-subtle;
+  backdrop-filter: blur(20px);
+  padding: 20px;
   margin-bottom: 24px;
-}
 
-.stats {
-  margin-top: 12px;
-}
+  .infoRow {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
 
-.editorContainer {
-  margin-top: 24px;
-}
+    .infoItem {
+      .label {
+        font-size: 12px;
+        color: @text-muted;
+        margin-bottom: 4px;
+      }
 
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 24px;
-}
-
-.tabs {
-  background: #fff;
-  margin-bottom: 24px;
-}
-
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.scriptInfo {
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-  gap: 16px;
-}
-
-.modelTag {
-  font-size: 12px;
-  height: 22px;
-  line-height: 22px;
-}
-
-// Dark mode styles with neon glow effects
-:global(.dark) {
-  .container {
-    background: @bg-primary;
-    color: @text-primary;
-  }
-
-  .header {
-    background: @bg-secondary;
-    border-bottom: 1px solid @border-primary;
-  }
-
-  .infoCard {
-    background: @bg-secondary;
-    border: 1px solid @border-primary;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
-  }
-
-  .stats {
-    color: @text-secondary;
-  }
-
-  .editorContainer {
-    background: @bg-secondary;
-    border: 1px solid @border-primary;
-    border-radius: 8px;
-    box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
-  }
-
-  .title {
-    color: @text-primary;
-    text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
-  }
-
-  .tabs {
-    background: @bg-secondary;
-    border-bottom: 1px solid @border-primary;
-
-    :global(.ant-tabs-nav) {
-      &::before {
-        border-bottom-color: @border-primary;
+      .value {
+        font-size: 14px;
+        color: @text-primary;
+        font-weight: 500;
       }
     }
+  }
+}
 
-    :global(.ant-tabs-tab) {
-      color: @text-secondary;
+/* 统计 */
+.stats {
+  margin-top: 16px;
+  display: flex;
+  gap: 24px;
 
-      &:hover {
-        color: @primary-color;
-      }
+  .statItem {
+    .statLabel {
+      font-size: 12px;
+      color: @text-muted;
+    }
 
-      :global(.ant-tabs-tab-btn) {
-        &:focus {
-          color: @primary-color;
+    .statValue {
+      font-size: 20px;
+      font-weight: 700;
+      color: @film-amber;
+      font-family: var(--font-display, 'Outfit', sans-serif);
+    }
+  }
+}
+
+/* 标签页 */
+.tabs {
+  background: @bg-card;
+  border-radius: @radius-lg;
+  border: 1px solid @border-subtle;
+  backdrop-filter: blur(20px);
+  margin-bottom: 24px;
+  overflow: hidden;
+
+  :global {
+    .ant-tabs-nav {
+      padding: 0 16px;
+      margin-bottom: 0;
+
+      .ant-tabs-tab {
+        padding: 16px 20px;
+        color: @text-secondary;
+        font-family: var(--font-display, 'Outfit', sans-serif);
+
+        &:hover {
+          color: @text-primary;
+        }
+
+        &.ant-tabs-tab-active {
+          .ant-tabs-tab-btn {
+            color: @film-amber !important;
+          }
         }
       }
     }
 
-    :global(.ant-tabs-tab-active) {
-      :global(.ant-tabs-tab-btn) {
-        color: @primary-color;
-        text-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
-      }
+    .ant-tabs-ink-bar {
+      background: @film-amber;
+      box-shadow: @shadow-glow-amber;
     }
 
-    :global(.ant-tabs-ink-bar) {
-      background: @primary-color;
-      box-shadow: 0 0 10px @primary-color, 0 0 20px rgba(99, 102, 241, 0.5);
+    .ant-tabs-content-holder {
+      background: @bg-elevated;
+    }
+
+    .ant-tabs-content {
+      padding: 24px;
     }
   }
+}
 
-  .loading {
-    background: @bg-primary;
-    color: @text-secondary;
+/* 编辑器容器 */
+.editorContainer {
+  background: @bg-card;
+  border-radius: @radius-lg;
+  border: 1px solid @border-subtle;
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+/* 脚本内容 */
+.scriptContent {
+  background: @ink-black;
+  border-radius: @radius-md;
+  padding: 20px;
+  min-height: 300px;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+  font-size: 15px;
+  line-height: 1.8;
+  color: @text-secondary;
+  white-space: pre-wrap;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
   }
 
-  .scriptInfo {
-    color: @text-secondary;
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
   }
 
-  .modelTag {
-    background: rgba(99, 102, 241, 0.2);
-    color: @primary-color;
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+  .infoRow {
+    flex-direction: column;
+    gap: 12px !important;
+  }
+
+  .stats {
+    flex-wrap: wrap;
+    gap: 16px;
   }
 }

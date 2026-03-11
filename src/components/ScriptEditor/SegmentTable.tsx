@@ -3,7 +3,7 @@ import { List, Space, Button, Tooltip, Typography, Tag } from 'antd';
 import { EditOutlined, PlayCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { VideoSegment, formatDuration } from '@/services/videoService';
 import { getTypeLabel } from './types';
-import styles from '../ScriptEditor.module.less';
+import styles from './ScriptEditor.module.less';
 
 const { Text } = Typography;
 

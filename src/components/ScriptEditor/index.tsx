@@ -2,7 +2,7 @@ import React, { memo, lazy, Suspense } from 'react';
 import { Card, Empty, Typography, Spin } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { ScriptEditorProps, isWorkflowProps } from './types';
-import styles from '../ScriptEditor.module.less';
+import styles from './ScriptEditor.module.less';
 
 const { Text } = Typography;
 const WorkflowEditor = lazy(() => import('./WorkflowEditor'));
