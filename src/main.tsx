@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import 'antd/dist/reset.css';
 import './index.css';
-import './styles/cinema-theme.css';
+import './styles/vintage-film.css';
 import './styles/index.less';
 import './assets/theme.less';
 
