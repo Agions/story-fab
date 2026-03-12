@@ -29,10 +29,73 @@ import { useClipFlow } from '../AIEditorContext';
 import { visionService } from '@/core/services/vision.service';
 import { ProcessingProgress } from '@/components/common';
 import { notify } from '@/shared';
-import type { Scene } from '@/core/types';
+import type { Scene, AIAnalyzeProps } from '@/core/types';
 import styles from './ClipFlow.module.less';
 
 const { Title, Text, Paragraph } = Typography;
+
+// 格式化时间函数
+const formatTime = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
+// 生成模拟场景数据
+const generateMockScenes = (duration: number): Scene[] => {
+  const scenes: Scene[] = [];
+  const sceneCount = Math.max(3, Math.floor(duration / 10));
+  
+  for (let i = 0; i < sceneCount; i++) {
+    const startTime = (duration / sceneCount) * i;
+    const endTime = startTime + (duration / sceneCount);
+    scenes.push({
+      id: `scene-${i}`,
+      startTime,
+      endTime,
+      type: ['action', 'dialog', 'landscape', 'closeup'][i % 4] as Scene['type'],
+      score: 0.7 + Math.random() * 0.3,
+    });
+  }
+  
+  return scenes;
+};
+
+// 生成模拟字幕数据
+const generateMockSubtitles = (duration: number) => {
+  const subtitles = [];
+  const subtitleCount = Math.max(5, Math.floor(duration / 5));
+  
+  for (let i = 0; i < subtitleCount; i++) {
+    const startTime = (duration / subtitleCount) * i;
+    const endTime = startTime + (duration / subtitleCount);
+    subtitles.push({
+      id: `subtitle-${i}`,
+      startTime,
+      endTime,
+      text: `这是第 ${i + 1} 段字幕内容`,
+    });
+  }
+  
+  return subtitles;
+};
+
+// AI 分析任务列表
+interface AnalysisTask {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  color?: string;
+  desc?: string;
+}
+
+const ANALYSIS_TASKS: AnalysisTask[] = [
+  { key: 'scene', label: '场景识别', icon: <AimOutlined />, color: 'blue', desc: '自动识别视频中的不同场景' },
+  { key: 'ocr', label: 'OCR 文字识别', icon: <FileTextOutlined />, color: 'green', desc: '提取视频中的文字内容' },
+  { key: 'asr', label: '语音转写', icon: <AudioOutlined />, color: 'purple', desc: '将语音转换为文字' },
+  { key: 'emotion', label: '情感分析', icon: <SmileOutlined />, color: 'orange', desc: '分析视频的情感倾向' },
+  { key: 'summary', label: '内容摘要', icon: <TableOutlined />, color: 'cyan', desc: '生成视频内容摘要' },
+];
 
 
 const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {

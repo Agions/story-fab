@@ -27,6 +27,10 @@ export interface ProjectSettings {
   compactMode: boolean;
   theme: 'light' | 'dark' | 'auto';
   projectSaveBehavior: 'stay' | 'detail';
+  videoQuality?: 'low' | 'medium' | 'high' | 'ultra';
+  outputFormat?: 'mp4' | 'webm' | 'gif';
+  resolution?: '720p' | '1080p' | '4k';
+  frameRate?: 24 | 30 | 60;
 }
 
 // ==================== 视频相关类型 ====================
@@ -300,4 +304,75 @@ export interface ModalProps {
   cancelText?: string;
   width?: number | string;
   footer?: ReactNode;
+}
+
+// ==================== 项目数据相关类型 ====================
+
+export interface ProjectData {
+  id: string;
+  name: string;
+  description?: string;
+  templateId?: string;
+  templateName?: string;
+  scripts?: Script[];
+  videoAssets?: VideoAsset[];
+  timeline?: EditorTimeline;
+  settings?: ProjectSettings;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ScriptData {
+  id: string;
+  title: string;
+  content: string;
+  segments: ScriptSegment[];
+  metadata?: ScriptMetadata;
+}
+
+export interface ExportSettings {
+  format: 'mp4' | 'webm' | 'gif';
+  quality: 'low' | 'medium' | 'high' | 'ultra';
+  resolution: '720p' | '1080p' | '4k';
+  fps: 24 | 30 | 60;
+  includeSubtitles: boolean;
+  includeWatermark: boolean;
+}
+
+export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'alibaba' | 'iflytek' | 'custom';
+
+export interface AIModelSettings {
+  provider: ModelProvider;
+  model: string;
+  apiKey?: string;
+  baseUrl?: string;
+  temperature?: number;
+  maxTokens?: number;
+}
+
+// ==================== AI 分析相关类型 ====================
+
+export interface AIAnalysisResult {
+  scenes: Scene[];
+  subtitles: SubtitleEntry[];
+  summary: string;
+  tags: string[];
+  mood?: string;
+}
+
+export interface VideoAnalysis {
+  id: string;
+  videoId: string;
+  scenes?: Scene[];
+  ocrText?: string;
+  asrText?: string;
+  emotions?: string[];
+  summary?: string;
+  createdAt?: string;
+}
+
+export interface AIAnalyzeProps {
+  videoUrl?: string;
+  onAnalyzeComplete?: (result: AIAnalysisResult) => void;
+  onNext?: () => void;
 }
