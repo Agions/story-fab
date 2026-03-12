@@ -328,6 +328,17 @@ export interface ScriptData {
   content: string;
   segments: ScriptSegment[];
   metadata?: ScriptMetadata;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ScriptMetadata {
+  title?: string;
+  author?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  wordCount?: number;
+  style?: string;
 }
 
 export interface ExportSettings {
@@ -337,6 +348,8 @@ export interface ExportSettings {
   fps: 24 | 30 | 60;
   includeSubtitles: boolean;
   includeWatermark: boolean;
+  frameRate?: number;
+  burnSubtitles?: boolean;
 }
 
 export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'alibaba' | 'iflytek' | 'custom';
@@ -348,6 +361,7 @@ export interface AIModelSettings {
   baseUrl?: string;
   temperature?: number;
   maxTokens?: number;
+  enabled?: boolean;
 }
 
 // ==================== AI 分析相关类型 ====================
