@@ -29,7 +29,7 @@ export interface ProjectState {
 export const useProjectStore = create<ProjectState>()(
   persist(
     (set) => ({
-      projects: [],
+      projects: [] as Project[],
       currentProject: null,
       loading: false,
 

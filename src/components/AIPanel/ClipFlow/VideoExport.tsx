@@ -65,9 +65,11 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
     format: state.exportSettings?.format || 'mp4',
     quality: state.exportSettings?.quality || 'high',
     resolution: state.exportSettings?.resolution || '1080p',
+    fps: state.exportSettings?.fps || 30,
     frameRate: state.exportSettings?.frameRate || 30,
     includeSubtitles: state.exportSettings?.includeSubtitles ?? true,
     burnSubtitles: state.exportSettings?.burnSubtitles ?? true,
+    includeWatermark: state.exportSettings?.includeWatermark ?? false,
   });
 
   // 预估文件大小

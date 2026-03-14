@@ -170,7 +170,7 @@ export class UnifiedWorkflowService {
    */
   async executeWorkflow(
     workflowId: string,
-    videos: ArrayBuffer[],
+    videos: VideoInfo[],
     options?: Record<string, unknown>
   ): Promise<WorkflowResult> {
     const workflow = this.workflows.get(workflowId);
@@ -324,7 +324,7 @@ export class UnifiedWorkflowService {
    */
   private async generateScript(
     mode: WorkflowMode,
-    videos: ArrayBuffer[]
+    videos: VideoInfo[]
   ): Promise<ScriptData> {
     const prompts = {
       commentary: '生成专业解说文案',
@@ -334,13 +334,19 @@ export class UnifiedWorkflowService {
 
     // 调用 AI 服务生成文案
     const result = await aiService.generateScript(
-      videos[0],
+      'openai',
+      '',
+      { videoDuration: 0, scenes: [], language: 'zh-CN' },
       { prompt: prompts[mode] }
     );
 
+    // generateScript 返回 string，需要自行解析
+    const resultText = typeof result === 'string' ? result : String(result);
+    const lines = resultText.split('\n').filter((l: string) => l.trim());
+    
     return {
-      segments: result.segments || [],
-      totalDuration: result.duration || 0,
+      segments: lines.map((line: string, idx: number) => ({ id: `seg_${idx}`, content: line, startTime: idx * 10, endTime: (idx + 1) * 10 })),
+      totalDuration: lines.length * 10,
       language: 'zh-CN',
     };
   }

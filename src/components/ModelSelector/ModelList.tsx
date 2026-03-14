@@ -33,7 +33,7 @@ export const ModelList: React.FC<ModelListProps> = ({
 }) => {
   return (
     <Spin spinning={isLoading} tip="加载中...">
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="sync">
         {models.length > 0 ? (
           <div className={isCompact ? styles.compactGrid : styles.modelGrid}>
             {models.map(model => (

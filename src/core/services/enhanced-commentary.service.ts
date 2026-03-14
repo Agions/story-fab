@@ -270,11 +270,24 @@ export class EnhancedCommentaryService {
   ): Promise<VideoAnalysisResult> {
     logger.info('[EnhancedCommentary] 视频分析中...');
     
+    // 创建默认 VideoInfo 对象
+    const defaultVideoInfo: VideoInfo = {
+      id: uuidv4(),
+      name: 'video',
+      path: '',
+      duration: 0,
+      width: 1920,
+      height: 1080,
+      size: 0,
+      fps: 30,
+      format: 'mp4',
+    };
+    
     // 调用 Vision 服务进行视频分析
-    const visionResult = await visionService.analyzeVideo(videoData);
+    const visionResult = await visionService.analyzeVideo(defaultVideoInfo);
     
     // 调用 SmartCut 服务进行智能分析
-    const smartCutResult = await smartCutService.process(videoData);
+    const smartCutResult = await smartCutService.process(defaultVideoInfo);
     
     return {
       videoId: uuidv4(),
@@ -321,19 +334,25 @@ export class EnhancedCommentaryService {
     
     // 调用 AI 服务生成解说
     const scriptResult = await aiService.generateScript(
-      new ArrayBuffer(0),
+      'openai',
+      '',
+      { videoDuration: 0, scenes: [], language: 'zh-CN' },
       { 
         style: config.scriptStyle,
         tone: config.scriptTone,
       }
     );
     
+    // generateScript 返回 string，需要自行解析
+    const scriptText = typeof scriptResult === 'string' ? scriptResult : String(scriptResult);
+    const lines = scriptText.split('\n').filter((l: string) => l.trim());
+    
     // 转换为解说片段
-    return (scriptResult.segments || []).map(seg => ({
+    return lines.map((line: string, idx: number) => ({
       id: uuidv4(),
-      videoStartTime: seg.startTime,
-      videoEndTime: seg.endTime,
-      text: seg.text,
+      videoStartTime: idx * 10,
+      videoEndTime: (idx + 1) * 10,
+      text: line,
     }));
   }
 

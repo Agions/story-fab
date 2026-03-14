@@ -93,6 +93,8 @@ const SegmentItem: React.FC<SegmentItemProps> = memo(({
   );
 });
 
+SegmentItem.displayName = 'SegmentItem';
+
 const SegmentList: React.FC<SegmentListProps> = ({
   segments,
   selectedIndex,

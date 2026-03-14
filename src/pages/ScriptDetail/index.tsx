@@ -124,7 +124,6 @@ const ScriptDetail: React.FC = () => {
         setLoadError(detail);
         notify.error(error, '加载脚本失败，请重试');
       } finally {
-        if (isStale()) return;
         setLoading(false);
       }
     };

@@ -62,7 +62,7 @@ export const useProjectStore = create<ProjectState>()(
   persist(
     (set, get) => ({
       // 初始状态
-      projects: [],
+      projects: [] as Project[],
       currentProject: null,
       searchQuery: '',
       filterStatus: 'all',

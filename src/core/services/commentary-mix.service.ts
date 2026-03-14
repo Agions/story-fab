@@ -228,7 +228,7 @@ export class CommentaryMixService {
           duration,
           sceneType: scene.type || 'general',
           emotion: scene.dominantEmotion,
-          motionLevel: scene.features?.motionScore,
+          motionLevel: scene.motionScore,
         });
       }
     }

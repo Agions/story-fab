@@ -112,7 +112,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
         title: videoMetadata.title || `项目_${projectId}`,
         duration: videoMetadata.duration,
         keyMoments,
-        emotions,
+        emotions: emotions.map(e => e.type),
         summary: `视频时长: ${Math.round(videoMetadata.duration)}秒，分辨率: ${videoMetadata.width}x${videoMetadata.height}，帧率: ${videoMetadata.fps}帧/秒。关键帧数量: ${keyFrames.length}。${thumbnail ? '已生成缩略图。' : ''}`
       };
       

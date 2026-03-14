@@ -10,8 +10,8 @@ import {
   UserOutlined,
   AudioOutlined,
   CheckCircleOutlined,
-  SparklesOutlined,
-  LayersOutlined,
+  RocketOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import type { WorkflowStep } from '@/core/services/workflow';
 import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
@@ -52,7 +52,7 @@ const BASE_WORKFLOW_STEPS: Array<{
     key: 'script-generate',
     title: '生成脚本',
     description: 'AI 自动生成解说词',
-    icon: <SparklesOutlined />,
+    icon: <RocketOutlined />,
     skippable: false,
   },
   {
@@ -80,7 +80,7 @@ const BASE_WORKFLOW_STEPS: Array<{
     key: 'timeline-edit',
     title: '时间轴',
     description: '调整视频和音频',
-    icon: <LayersOutlined />,
+    icon: <AppstoreOutlined />,
     skippable: true,
   },
   {

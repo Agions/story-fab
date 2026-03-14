@@ -274,7 +274,7 @@ export class AutoMusicService {
       // 暂时返回空，等待实际API接入
       return [];
     } catch (error) {
-      logger.error('AI音乐推荐失败:', error);
+      logger.error('AI音乐推荐失败:', { error });
       return [];
     }
   }

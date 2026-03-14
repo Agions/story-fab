@@ -24,6 +24,8 @@ interface LoadingStateProps {
   active?: boolean;
   /** 自定义类名 */
   className?: string;
+  /** 自定义样式 */
+  style?: React.CSSProperties;
 }
 
 /**
@@ -38,6 +40,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   borderRadius = 4,
   active = true,
   className = '',
+  style,
 }) => {
   // 检查用户是否偏好减少动画
   const prefersReducedMotion = React.useMemo(() => {
@@ -49,6 +52,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
     width,
     height,
     borderRadius,
+    ...style,
   };
 
   // 骨架屏

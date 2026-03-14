@@ -86,11 +86,26 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
           }
         : undefined;
       
+      // 转换 VideoAnalysis 为 AnalysisInput
+      const analysisInput = {
+        keyMoments: analysis.keyMoments?.map(k => ({ timestamp: k.timestamp, description: k.description, importance: k.importance })),
+        emotions: typeof analysis.emotions === 'object' ? analysis.emotions.map((e: unknown) => {
+          if (typeof e === 'object' && e !== null) {
+            const emotion = e as Record<string, unknown>;
+            return { timestamp: emotion.timestamp as number, type: String(emotion.type || 'neutral'), intensity: Number(emotion.intensity) || 0.5 };
+          }
+          return { timestamp: 0, type: 'neutral', intensity: 0.5 };
+        }) : undefined,
+        summary: analysis.summary,
+        title: analysis.title,
+        duration: analysis.duration,
+      };
+      
       // 调用AI服务生成脚本内容
       const scriptContent = await aiService.generateScript(
         compatibleModel,
         resolvedApiKey,
-        analysis,
+        analysisInput,
         settings
       );
       

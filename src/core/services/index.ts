@@ -1,10 +1,10 @@
 /**
  * Services 统一导出
+ * 只导出服务实例，类型统一从 @/core/types 导入
  */
 
 // 导出基类和错误类型
 export { BaseService, ServiceError } from './base.service';
-export type { RequestConfig as BaseRequestConfig } from './base.service';
 
 // 导出各个服务
 export { aiService } from './ai.service';
@@ -35,57 +35,7 @@ export { videoEnhanceService, VideoEnhanceService } from './videoEnhance.service
 export { performanceService, PerformanceService } from './performance.service';
 export { autoMusicService, AutoMusicService } from './auto-music.service';
 
-// 重新导出类型
-export type { AIResponse, RequestConfig } from './ai.service';
-export type {
-  WorkflowState,
-  WorkflowData,
-  WorkflowConfig,
-  WorkflowCallbacks,
-  TimelineData,
-  WorkflowStep
-} from './workflow.service';
-export type {
-  EditorConfig,
-  EditorAction,
-  EditorHistory
-} from './editor.service';
-export type {
-  CostRecord,
-  CostStats,
-  CostBudget
-} from './cost.service';
-export type {
-  CutPoint,
-  CutPointType,
-  ClipSuggestion,
-  ClipSegment,
-  AIClipConfig,
-  ClipAnalysisResult,
-  BatchClipTask
-} from './aiClip.service';
-export type { ClipSegment as WorkflowClipSegment, ClipResult } from './clip-workflow.service';
-export type { MixResult } from './commentary-mix.service';
-export type { SyncConfig, SyncResult, SyncIssue, SyncTimeline } from './audio-sync.service';
-export type { SubtitleConfig, SubtitleEntry, SubtitleData, SpeechRecognitionResult } from './subtitle.service';
-export type { SceneCommentaryAlignment, OriginalOverlayPlanItem } from './scene-commentary-alignment.service';
-export type { AIDirectorPlanInput, AIDirectorPlanOutput, AutonomousRenderInput } from './ai-director.service';
-export type { OverlayWindow, SubtitleWindow, OverlayQualityReport } from './overlay-quality.service';
-export type { OverlayMarker, OverlayOptimizationInput, OverlayOptimizationResult } from './overlay-optimization.service';
-export type { VoiceConfig, VoiceItem, SynthesisResult } from './voice-synthesis.service';
-export type { EffectConfig, FilterEffect, TransitionEffect, AnimationEffect, ColorCorrection, EffectPreset } from './video-effect.service';
-export type { 
-  ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, 
-  ExportResult, ExportProgress 
-} from './export.service';
-export type {
-  PipelineConfig, PipelineState, WorkflowStep as PipelineWorkflowStep, WorkflowEventType, WorkflowEvent, WorkflowResult
-} from './pipeline.service';
-
 export { unifiedWorkflowService, UnifiedWorkflowService } from './unified-workflow.service';
-export type { WorkflowMode, WorkflowState, WorkflowStep, WorkflowResult, VideoClip, SceneInfo, AudioPeak, ScriptData, ScriptSegment, SubtitleData, SubtitleEntry } from './unified-workflow.service';
-
 export { enhancedCommentaryService, EnhancedCommentaryService } from './enhanced-commentary.service';
-export type { EnhancedCommentaryConfig, VideoAnalysisResult, SceneInfo, EmotionSegment, AudioPeakInfo, KeyFrameInfo, CommentarySegment, EnhancedCommentaryResult, ClipSegment, MusicSegment, SubtitleEntry } from './enhanced-commentary.service';
 export { videoGenerateOptimizeService, VideoGenerateOptimizeService } from './video-generate-optimize.service';
 export { parallelProcessingService, ParallelProcessingService } from './parallel-processing.service';

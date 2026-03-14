@@ -90,6 +90,30 @@ export const MODEL_PROVIDERS: Record<
     keyFormat: 'sk-...',
     keyPlaceholder: 'sk-xxxxxxxxxxxxxxxxxxxxxxxx',
   },
+  azure: {
+    name: 'Azure OpenAI',
+    icon: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Microsoft-Azure.svg',
+    website: 'https://azure.microsoft.com/services/cognitive-services/openai',
+    apiDocs: 'https://learn.microsoft.com/azure/cognitive-services/openai',
+    keyFormat: 'Azure API Key',
+    keyPlaceholder: 'Your Azure API Key',
+  },
+  local: {
+    name: '本地模型',
+    icon: 'https://localhost/favicon.ico',
+    website: 'https://github.com',
+    apiDocs: 'https://github.com',
+    keyFormat: 'Local Endpoint',
+    keyPlaceholder: 'http://localhost:11434',
+  },
+  custom: {
+    name: '自定义',
+    icon: 'https://localhost/favicon.ico',
+    website: 'https://github.com',
+    apiDocs: 'https://github.com',
+    keyFormat: 'API Key',
+    keyPlaceholder: 'Your Custom API Key',
+  },
 };
 
 const CORE_MODEL_VERIFICATION: ModelVerificationMeta = {

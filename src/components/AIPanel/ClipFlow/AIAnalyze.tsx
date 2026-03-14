@@ -151,7 +151,9 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
             state.currentVideo,
             { minSceneDuration: 3, threshold: 0.3, detectObjects: config.objectDetection, detectEmotions: config.emotionAnalysis }
           );
-          setAnalysis({ id: `analysis_${Date.now()}`, videoId: state.currentVideo.id, scenes, keyframes: [], objects, emotions, summary: `检测到 ${scenes.length} 个场景`, stats: { sceneCount: scenes.length, objectCount: objects?.length || 0, avgSceneDuration: state.currentVideo.duration / scenes.length, sceneTypes: {}, objectCategories: {}, dominantEmotions: {} }, createdAt: new Date().toISOString() });
+          // 将 EmotionAnalysis[] 转换为 string[] 用于 VideoAnalysis
+          const emotionStrings = emotions?.map(e => e.dominant || e.emotion || 'neutral') || [];
+          setAnalysis({ id: `analysis_${Date.now()}`, videoId: state.currentVideo.id, scenes, keyframes: [], objects, emotions: emotionStrings, summary: `检测到 ${scenes.length} 个场景`, stats: { sceneCount: scenes.length, objectCount: objects?.length || 0, avgSceneDuration: state.currentVideo.duration / scenes.length, sceneTypes: {}, objectCategories: {}, dominantEmotions: {} }, createdAt: new Date().toISOString() });
         } catch {
           notify.warning('场景检测使用默认数据');
           const mockScenes = generateMockScenes(state.currentVideo.duration);

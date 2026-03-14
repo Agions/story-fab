@@ -26,10 +26,8 @@ interface MotionProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-/**
- * 动画 Div 组件
- */
-export const motion: React.FC<MotionProps> = ({
+// 内部组件实现
+const MotionDivComponent: React.FC<MotionProps> = ({
   children,
   initial,
   animate,
@@ -96,6 +94,13 @@ export const motion: React.FC<MotionProps> = ({
     </div>
   );
 };
+
+// 导出 motion 对象，包含 div 属性
+export const motion: typeof MotionDivComponent & {
+  div: typeof MotionDivComponent;
+} = Object.assign(MotionDivComponent, {
+  div: MotionDivComponent,
+});
 
 // 常用动画变体
 export const variants = {

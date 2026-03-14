@@ -38,4 +38,7 @@ export const PROVIDER_ICONS: Record<ModelProvider, string> = {
   zhipu: '⚪',
   moonshot: '🌙',
   deepseek: '🔮',
+  azure: '☁️',
+  local: '💻',
+  custom: '⚙️',
 };

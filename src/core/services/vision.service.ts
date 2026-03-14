@@ -91,6 +91,26 @@ const EMOTION_DIMENSIONS = [
 
 export class VisionService {
   /**
+   * 视频分析入口
+   * 整合场景检测、对象识别、情感分析
+   */
+  async analyzeVideo(
+    videoInfo: VideoInfo,
+    options?: {
+      minSceneDuration?: number;
+      threshold?: number;
+      detectObjects?: boolean;
+      detectEmotions?: boolean;
+    }
+  ): Promise<{
+    scenes: Scene[];
+    objects: ObjectDetection[];
+    emotions: EmotionAnalysis[];
+  }> {
+    return this.detectScenesAdvanced(videoInfo, options);
+  }
+
+  /**
    * 高级场景检测
    * 使用多维度分析提高准确性
    */
@@ -528,7 +548,7 @@ export class VisionService {
         description: s.description
       })),
       objects,
-      emotions,
+      emotions: emotions?.map(e => e.dominant || e.emotion || 'neutral') || [],
       summary,
       stats: {
         sceneCount: scenes.length,

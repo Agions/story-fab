@@ -23,14 +23,28 @@ export interface Project {
 export type ProjectStatus = 'draft' | 'processing' | 'completed' | 'failed';
 
 export interface ProjectSettings {
-  autoSave: boolean;
-  compactMode: boolean;
-  theme: 'light' | 'dark' | 'auto';
-  projectSaveBehavior: 'stay' | 'detail';
+  autoSave?: boolean;
+  compactMode?: boolean;
+  theme?: 'light' | 'dark' | 'auto';
+  projectSaveBehavior?: 'stay' | 'detail';
   videoQuality?: 'low' | 'medium' | 'high' | 'ultra';
   outputFormat?: 'mp4' | 'webm' | 'gif';
   resolution?: '720p' | '1080p' | '4k';
   frameRate?: 24 | 30 | 60;
+  audioCodec?: string;
+  videoCodec?: string;
+  subtitleEnabled?: boolean;
+  subtitleStyle?: {
+    fontFamily: string;
+    fontSize: number;
+    color: string;
+    backgroundColor: string;
+    outline: boolean;
+    outlineColor: string;
+    position: string;
+    alignment: string;
+  };
+  includeWatermark?: boolean;
 }
 
 // ==================== 视频相关类型 ====================
@@ -63,6 +77,14 @@ export interface Scene {
   endTime: number;
   type: 'action' | 'dialog' | 'landscape' | 'closeup';
   score: number;
+  thumbnail?: string;
+  description?: string;
+  tags?: string[];
+  confidence?: number;
+  features?: string[];
+  motionScore?: number;
+  dominantEmotion?: string;
+  duration?: number;
 }
 
 export interface AudioPeak {
@@ -78,23 +100,46 @@ export interface AudioPeak {
 export interface Script {
   id: string;
   segments: ScriptSegment[];
-  totalDuration: number;
-  language: string;
+  totalDuration?: number;
+  language?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ScriptSegment {
   id: string;
   startTime: number;
   endTime: number;
-  text: string;
+  content?: string;
+  text?: string;
   voice?: string;
+  type?: string;
 }
 
 export interface ScriptMetadata {
   title?: string;
   author?: string;
+  tone?: string;
+  length?: string;
+  estimatedDuration?: number;
+  targetAudience?: string;
+  language?: string;
+  wordCount?: number;
+  generatedBy?: string;
+  generatedAt?: string;
+  template?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ScriptTemplate {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  content: string;
+  duration?: number;
+  wordCount?: number;
 }
 
 // ==================== 音频相关类型 ====================
@@ -115,12 +160,6 @@ export interface VoiceSettings {
 
 // ==================== 字幕相关类型 ====================
 
-export interface Subtitle {
-  id: string;
-  entries: SubtitleEntry[];
-  language: string;
-}
-
 export interface SubtitleEntry {
   id: string;
   startTime: number;
@@ -128,6 +167,12 @@ export interface SubtitleEntry {
   text: string;
   language?: string;
   confidence?: number;
+}
+
+export interface Subtitle {
+  id: string;
+  entries: SubtitleEntry[];
+  language?: string;
 }
 
 // ==================== 编辑器相关类型 ====================
@@ -179,24 +224,37 @@ export interface VideoInfo {
   size: number;
   fps: number;
   format: string;
+  thumbnail?: string;
+  createdAt?: string;
+  url?: string;
 }
 
 export interface AIModel {
   id: string;
   name: string;
-  provider: ModelProvider;
-  model: string;
+  provider?: ModelProvider;
+  model?: string;
   maxTokens?: number;
-  enabled: boolean;
-  category?: string;
+  contextWindow?: number;
+  enabled?: boolean;
+  category?: string | string[];
   description?: string;
   features?: string[];
   tokenLimit?: number;
   isPro?: boolean;
   isAvailable?: boolean;
+  pricing?: {
+    input: number;
+    output: number;
+    currency?: string;
+    unit?: string;
+  };
+  recommended?: boolean;
 }
 
-export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'azure' | 'local' | 'custom';
+export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'azure' | 'local' | 'custom' | 'alibaba' | 'iflytek' | 'zhipu' | 'moonshot' | 'deepseek';
+
+export type ModelCategory = 'video' | 'audio' | 'image' | 'text' | 'all';
 
 export interface AnalysisResult {
   scenes: Scene[];
@@ -214,7 +272,7 @@ export interface Keyframe {
 }
 
 export interface DetectedObject {
-  id: string;
+  id?: string;
   label: string;
   confidence: number;
   bbox: [number, number, number, number];
@@ -226,8 +284,23 @@ export interface EmotionData {
   intensity: number;
 }
 
+export interface Emotion {
+  timestamp: number;
+  type: string;
+  intensity: number;
+}
+
+export interface KeyMoment {
+  id: string;
+  timestamp: number;
+  time?: number;
+  type?: string;
+  description: string;
+  importance: number;
+}
+
 export interface AnalysisStats {
-  totalDuration: number;
+  totalDuration?: number;
   sceneCount: number;
   keyframeCount: number;
   objectCount: number;
@@ -246,13 +319,30 @@ export interface WorkflowState {
 
 export type WorkflowStatus = 'idle' | 'running' | 'completed' | 'error' | 'paused';
 
-export interface WorkflowStep {
+// 工作流步骤类型 (union type)
+export type WorkflowStepType = 
+  | 'upload'
+  | 'analyze'
+  | 'template-select'
+  | 'script-generate'
+  | 'script-dedup'
+  | 'script-edit'
+  | 'ai-clip'
+  | 'timeline-edit'
+  | 'preview'
+  | 'export';
+
+// 工作流步骤实例
+export interface WorkflowStepInstance {
   id: string;
   name: string;
   status: 'pending' | 'running' | 'completed' | 'failed';
   progress: number;
   duration?: number;
 }
+
+// 兼容旧名称
+export type WorkflowStep = WorkflowStepType;
 
 export interface WorkflowResult {
   videoId: string;
@@ -316,8 +406,10 @@ export interface ProjectData {
   templateName?: string;
   scripts?: Script[];
   videoAssets?: VideoAsset[];
+  videos?: VideoInfo[];
   timeline?: EditorTimeline;
   settings?: ProjectSettings;
+  status?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -326,6 +418,7 @@ export interface ScriptData {
   id: string;
   title: string;
   content: string;
+  duration?: number;
   segments: ScriptSegment[];
   metadata?: ScriptMetadata;
   createdAt?: string;
@@ -352,11 +445,9 @@ export interface ExportSettings {
   burnSubtitles?: boolean;
 }
 
-export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'alibaba' | 'iflytek' | 'custom';
-
 export interface AIModelSettings {
-  provider: ModelProvider;
-  model: string;
+  provider?: ModelProvider;
+  model?: string;
   apiKey?: string;
   baseUrl?: string;
   temperature?: number;
@@ -377,16 +468,79 @@ export interface AIAnalysisResult {
 export interface VideoAnalysis {
   id: string;
   videoId: string;
+  title?: string;
+  duration?: number;
+  transcript?: string;
   scenes?: Scene[];
+  keyframes?: Keyframe[];
+  objects?: DetectedObject[];
+  keyMoments?: KeyMoment[];
   ocrText?: string;
   asrText?: string;
-  emotions?: string[];
+  emotions?: string[] | Emotion[];
   summary?: string;
   createdAt?: string;
+  stats?: {
+    sceneCount: number;
+    objectCount: number;
+    avgSceneDuration: number;
+    sceneTypes: Record<string, number>;
+    objectCategories: Record<string, number>;
+    dominantEmotions: Record<string, number>;
+  };
 }
 
 export interface AIAnalyzeProps {
   videoUrl?: string;
   onAnalyzeComplete?: (result: AIAnalysisResult) => void;
   onNext?: () => void;
+}
+
+// 任务状态
+export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+// 用户偏好设置
+export interface UserPreferences {
+  theme?: 'light' | 'dark' | 'auto';
+  language?: string;
+  autoSave?: boolean;
+  notifications?: boolean;
+  [key: string]: unknown;
+}
+
+// 导出记录
+export interface ExportRecord {
+  id: string;
+  projectId: string;
+  format: string;
+  quality: string;
+  resolution: string;
+  fileSize?: number;
+  filePath?: string;
+  status: TaskStatus;
+  createdAt: string;
+  completedAt?: string;
+}
+
+// 情感分析结果
+export interface EmotionAnalysis {
+  id?: string;
+  timestamp: number;
+  emotion?: string;
+  confidence?: number;
+  emotions?: Array<{ id: string; name: string; score: number }>;
+  dominant?: string;
+  intensity?: number;
+  category?: string | string[];
+  sceneId?: string;
+}
+
+// 对象检测结果
+export interface ObjectDetection {
+  id?: string;
+  sceneId?: string;
+  label: string;
+  confidence: number;
+  bbox: [number, number, number, number];
+  category?: string | string[];
 }

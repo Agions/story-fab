@@ -64,7 +64,7 @@ export class SceneCommentaryAlignmentService {
     return scenes
       .filter((scene) => scene.endTime > scene.startTime)
       .map((scene, index) => {
-        const motionScore = scene.features?.motionScore ?? 0;
+        const motionScore = scene.motionScore ?? 0;
         const reason: OriginalOverlayPlanItem['reason'] =
           motionScore > 0.7 ? 'motion' : scene.dominantEmotion ? 'emotion' : index % 3 === 0 ? 'anchor' : 'transition';
 

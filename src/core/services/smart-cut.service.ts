@@ -134,7 +134,7 @@ export class SmartCutService {
       logger.info('[SmartCut] 场景切换检测完成', { count: scenes.length });
       return scenes;
     } catch (error) {
-      logger.error('[SmartCut] 场景切换检测失败', error);
+      logger.error('[SmartCut] 场景切换检测失败', { error });
       return [];
     }
   }
@@ -194,7 +194,7 @@ export class SmartCutService {
       logger.info('[SmartCut] 音频峰值检测完成', { count: peaks.length });
       return peaks;
     } catch (error) {
-      logger.error('[SmartCut] 音频峰值检测失败', error);
+      logger.error('[SmartCut] 音频峰值检测失败', { error });
       return [];
     }
   }
@@ -249,7 +249,7 @@ export class SmartCutService {
       logger.info('[SmartCut] 运动分析完成', { count: segments.length });
       return segments;
     } catch (error) {
-      logger.error('[SmartCut] 运动分析失败', error);
+      logger.error('[SmartCut] 运动分析失败', { error });
       return [];
     }
   }

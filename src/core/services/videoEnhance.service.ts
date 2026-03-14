@@ -37,7 +37,7 @@ export interface EnhanceOptions {
 export interface EnhanceResult {
   success: boolean;
   outputPath?: string;
-  duration: number;
+  duration?: number;
   metadata?: {
     width?: number;
     height?: number;
@@ -138,7 +138,7 @@ export class VideoEnhanceService {
         },
       };
     } catch (error) {
-      logger.error('[VideoEnhance] 超分辨率失败', error);
+      logger.error('[VideoEnhance] 超分辨率失败', { error });
       return {
         success: false,
         error: error instanceof Error ? error.message : '未知错误',
@@ -212,7 +212,7 @@ export class VideoEnhanceService {
         },
       };
     } catch (error) {
-      logger.error('[VideoEnhance] 补帧失败', error);
+      logger.error('[VideoEnhance] 补帧失败', { error });
       return {
         success: false,
         error: error instanceof Error ? error.message : '未知错误',
@@ -282,7 +282,7 @@ export class VideoEnhanceService {
         },
       };
     } catch (error) {
-      logger.error('[VideoEnhance] 去噪失败', error);
+      logger.error('[VideoEnhance] 去噪失败', { error });
       return {
         success: false,
         error: error instanceof Error ? error.message : '未知错误',
@@ -347,7 +347,7 @@ export class VideoEnhanceService {
         },
       };
     } catch (error) {
-      logger.error('[VideoEnhance] 色彩修复失败', error);
+      logger.error('[VideoEnhance] 色彩修复失败', { error });
       return {
         success: false,
         error: error instanceof Error ? error.message : '未知错误',
