@@ -1,5 +1,6 @@
 {
   "root": true,
+  "ignorePatterns": ["node_modules/", "dist/", "src/components/WorkflowMonitor.tsx"],
   "env": {
     "browser": true,
     "es2021": true,

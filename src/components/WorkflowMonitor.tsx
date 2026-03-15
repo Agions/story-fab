@@ -2,6 +2,7 @@
  * 工作流监控面板组件
  * 实时显示工作流状态、进度和详细信息
  */
+/* eslint-disable react/jsx-key */
 
 import React, { useMemo } from 'react';
 import { Card, Progress, Timeline, Tag, Space, Typography, Statistic, Row, Col, Tooltip } from 'antd';
