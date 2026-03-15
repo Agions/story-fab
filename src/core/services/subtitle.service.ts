@@ -1,39 +1,56 @@
 /**
  * 智能字幕服务
-import { logger } from '@/utils/logger';
  * 语音转字幕、翻译、导入导出
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/utils/logger';
 
+/**
+ * 字幕条目
+ */
 export interface SubtitleEntry {
   id: string;
   startTime: number; // 毫秒
   endTime: number;
   text: string;
   language?: string;
+  speaker?: string;
+  confidence?: number;
 }
 
-export interface SubtitleFormat {
-  type: 'srt' | 'ass' | 'vtt' | 'lrc';
-}
+/**
+ * 字幕格式
+ */
+export type SubtitleFormat = 'srt' | 'ass' | 'vtt' | 'lrc';
 
+/**
+ * 字幕数据
+ */
 export interface SubtitleData {
   entries: SubtitleEntry[];
   language: string;
   format: SubtitleFormat;
+  title?: string;
 }
 
+/**
+ * 翻译结果
+ */
 export interface TranslationResult {
   original: string;
   translated: string;
   language: string;
 }
 
+/**
+ * ASR 选项
+ */
 export interface ASROptions {
   language?: string;
   model?: 'base' | 'small' | 'medium' | 'large';
   timestamp?: boolean;
+  speaker?: boolean;
 }
 
 /**
@@ -47,15 +64,25 @@ export class SubtitleService {
     audioBuffer: ArrayBuffer,
     options?: ASROptions
   ): Promise<SubtitleData> {
-    // TODO: 实现 ASR
-    // 使用 Whisper 或其他 ASR 服务
     logger.info('语音识别中...', options);
     
+    // TODO: 实现真正的 ASR
     return {
       entries: [],
-      language: options?.language || 'zh',
-      format: { type: 'srt' },
+      language: options?.language || 'zh-CN',
+      format: 'srt',
     };
+  }
+
+  /**
+   * 从音频文件路径提取字幕
+   */
+  async extractFromAudio(
+    audioPath: string,
+    options?: ASROptions
+  ): Promise<SubtitleData> {
+    logger.info('从音频提取字幕', { audioPath, options });
+    return this.recognizeSpeech(new ArrayBuffer(0), options);
   }
 
   /**
@@ -66,8 +93,6 @@ export class SubtitleService {
     targetLanguage: string,
     sourceLanguage?: string
   ): Promise<SubtitleData> {
-    // TODO: 实现翻译
-    // 使用 LLM 进行翻译
     logger.info('翻译字幕到', targetLanguage);
     
     return {
@@ -122,23 +147,14 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
    * 导出 VTT 格式
    */
   exportToVTT(subtitles: SubtitleData): string {
-    let vtt = 'WEBVTT\n\n';
-    vtt += subtitles.entries.map(entry => {
+    const header = 'WEBVTT\n\n';
+    const entries = subtitles.entries.map(entry => {
       const startTime = this.formatVTTTime(entry.startTime);
       const endTime = this.formatVTTTime(entry.endTime);
       return `${startTime} --> ${endTime}\n${entry.text}\n`;
     }).join('\n');
-    return vtt;
-  }
-
-  /**
-   * 导出 LRC 格式
-   */
-  exportToLRC(subtitles: SubtitleData): string {
-    return subtitles.entries.map(entry => {
-      const time = this.formatLRCTime(entry.startTime);
-      return `[${time}]${entry.text}`;
-    }).join('\n');
+    
+    return header + entries;
   }
 
   /**
@@ -153,84 +169,70 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
       if (lines.length < 3) continue;
       
       const timeLine = lines[1];
-      const timeMatch = timeLine.match(
-        /(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})/
-      );
+      const timeMatch = timeLine.match(/(\d{2}):(\d{2}):(\d{2}),(\d{3}) --> (\d{2}):(\d{2}):(\d{2}),(\d{3})/);
       
-      if (!timeMatch) continue;
-      
-      const startTime = 
-        parseInt(timeMatch[1]) * 3600000 +
-        parseInt(timeMatch[2]) * 60000 +
-        parseInt(timeMatch[3]) * 1000 +
-        parseInt(timeMatch[4]);
+      if (timeMatch) {
+        const startTime = 
+          parseInt(timeMatch[1]) * 3600000 +
+          parseInt(timeMatch[2]) * 60000 +
+          parseInt(timeMatch[3]) * 1000 +
+          parseInt(timeMatch[4]);
         
-      const endTime = 
-        parseInt(timeMatch[5]) * 3600000 +
-        parseInt(timeMatch[6]) * 60000 +
-        parseInt(timeMatch[7]) * 1000 +
-        parseInt(timeMatch[8]);
+        const endTime = 
+          parseInt(timeMatch[5]) * 3600000 +
+          parseInt(timeMatch[6]) * 60000 +
+          parseInt(timeMatch[7]) * 1000 +
+          parseInt(timeMatch[8]);
         
-      const text = lines.slice(2).join('\n');
-      
-      entries.push({
-        id: uuidv4(),
-        startTime,
-        endTime,
-        text,
-      });
+        const text = lines.slice(2).join('\n');
+        
+        entries.push({
+          id: uuidv4(),
+          startTime,
+          endTime,
+          text,
+        });
+      }
     }
     
-    return {
-      entries,
-      language: 'unknown',
-      format: { type: 'srt' },
-    };
+    return { entries, language: 'zh-CN', format: 'srt' };
   }
 
   /**
-   * 格式化时间 (SRT)
+   * 格式化 SRT 时间
    */
   private formatSRTTime(ms: number): string {
     const hours = Math.floor(ms / 3600000);
     const minutes = Math.floor((ms % 3600000) / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     const milliseconds = ms % 1000;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')},${milliseconds.toString().padStart(3, '0')}`;
+    
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')},${String(milliseconds).padStart(3, '0')}`;
   }
 
   /**
-   * 格式化时间 (ASS)
+   * 格式化 ASS 时间
    */
   private formatASSTime(ms: number): string {
     const hours = Math.floor(ms / 3600000);
     const minutes = Math.floor((ms % 3600000) / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     const centiseconds = Math.floor((ms % 1000) / 10);
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+    
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
   }
 
   /**
-   * 格式化时间 (VTT)
+   * 格式化 VTT 时间
    */
   private formatVTTTime(ms: number): string {
     const hours = Math.floor(ms / 3600000);
     const minutes = Math.floor((ms % 3600000) / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     const milliseconds = ms % 1000;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
-  }
-
-  /**
-   * 格式化时间 (LRC)
-   */
-  private formatLRCTime(ms: number): string {
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    const centiseconds = Math.floor((ms % 1000) / 10);
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+    
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
   }
 }
 
 export const subtitleService = new SubtitleService();
-export default SubtitleService;
