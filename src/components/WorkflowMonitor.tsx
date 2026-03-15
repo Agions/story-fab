@@ -243,16 +243,18 @@ export const WorkflowMonitor: React.FC<WorkflowMonitorProps> = ({
               children: (
                 <Space direction="vertical" size={0}>
                   <Text strong={isCurrent}>{step.title}</Text>
-                  {showDetails && stepConfig && (
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {step.description}
-                      {stepConfig.skippable && (
+                  {showDetails && stepConfig ? (
+                    <>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {step.description}
+                      </Text>
+                      {stepConfig.skippable ? (
                         <Tag color="blue" style={{ marginLeft: 4 }}>
                           可跳过
                         </Tag>
-                      )}
-                    </Text>
-                  )}
+                      ) : null}
+                    </>
+                  ) : null}
                 </Space>
               );
             })}
