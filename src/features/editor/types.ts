@@ -1,6 +1,14 @@
 /**
  * Editor Types - 编辑器类型定义
  */
+import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
+
+// Re-export and extend ScriptSegment for editor
+export type ScriptSegment = CoreScriptSegment & {
+  /** 编辑器专用类型 */
+  editorType?: 'narration' | 'action' | 'dialogue';
+};
+
 export interface VideoAsset {
   id: string;
   url: string;
@@ -11,14 +19,6 @@ export interface VideoAsset {
   thumbnail?: string;
   size: number;
   format: string;
-}
-
-export interface ScriptSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
-  content: string;
-  type: 'narration' | 'action' | 'dialogue';
 }
 
 export interface Script {

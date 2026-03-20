@@ -19,10 +19,11 @@ export async function executeTimelineStep(
   videoAnalysis: VideoAnalysis,
   editedScript: ScriptData,
   autoMatch: boolean = true,
-  options: TimelineBuildOptions = {}
+  options: TimelineBuildOptions = {},
+  updateProgress: (progress: number) => void = () => {}
 ): Promise<TimelineData> {
   if (autoMatch) {
-    return autoMatchTimeline(videoInfo, videoAnalysis, editedScript, options);
+    return autoMatchTimeline(videoInfo, videoAnalysis, editedScript, options, updateProgress);
   }
 
   // 创建空时间轴
@@ -40,8 +41,11 @@ async function autoMatchTimeline(
   videoInfo: VideoInfo,
   analysis: VideoAnalysis,
   script: ScriptData,
-  options: TimelineBuildOptions
+  options: TimelineBuildOptions,
+  updateProgress: (progress: number) => void = () => {}
 ): Promise<TimelineData> {
+  updateProgress(10);
+  
   if (!script.segments.length) {
     return {
       tracks: [
@@ -53,6 +57,7 @@ async function autoMatchTimeline(
     };
   }
 
+  updateProgress(20);
   const directorPlan = await aiDirectorService.buildPlan({
     mode: options.mode || 'ai-commentary',
     targetDuration: videoInfo.duration,
@@ -69,12 +74,14 @@ async function autoMatchTimeline(
     })),
   });
 
+  updateProgress(40);
   const videoClips: TimelineData['tracks'][0]['clips'] = [];
   const subtitleClips: TimelineData['tracks'][0]['clips'] = [];
   const effectClips: TimelineData['tracks'][0]['clips'] = [];
   const matchedScenes = script.segments.map((segment, index) =>
     findBestMatchingScene(segment, analysis.scenes, index / script.segments.length)
   );
+  updateProgress(50);
   const averageDuration = Math.max(videoInfo.duration / script.segments.length, 0.001);
   const rawDurations = matchedScenes.map((scene) => {
     const duration = scene ? scene.endTime - scene.startTime : averageDuration;
@@ -119,6 +126,7 @@ async function autoMatchTimeline(
     currentTime = endTime;
   });
 
+  updateProgress(60);
   const alignmentItems = sceneCommentaryAlignmentService.align(
     videoClips.map((clip, index) => ({
       id: `scene-aligned-${index}`,
@@ -135,6 +143,7 @@ async function autoMatchTimeline(
     }))
   );
 
+  updateProgress(70);
   const averageConfidence =
     alignmentItems.reduce((sum, item) => sum + item.confidence, 0) / Math.max(alignmentItems.length, 1);
   const maxDriftSeconds = alignmentItems.reduce((max, item) => Math.max(max, item.driftSeconds), 0);
@@ -154,6 +163,7 @@ async function autoMatchTimeline(
       ? []
       : sceneCommentaryAlignmentService.buildOriginalOverlayPlan(timelineScenesForOverlay);
 
+  updateProgress(80);
   if (originalOverlayPlan.length) {
     effectClips.push(
       ...originalOverlayPlan.map((item, index) => ({
@@ -169,6 +179,7 @@ async function autoMatchTimeline(
     );
   }
 
+  updateProgress(90);
   const overlayQuality = overlayQualityService.evaluate(
     originalOverlayPlan.map((item) => ({ start: item.startTime, end: item.endTime, reason: item.reason })),
     subtitleClips.map((clip) => ({ start: clip.startTime, end: clip.endTime })),
@@ -187,6 +198,7 @@ async function autoMatchTimeline(
     duration: Math.max(currentTime, videoInfo.duration),
   });
 
+  updateProgress(100);
   return {
     tracks: [
       { id: 'video-track-1', type: 'video', clips: videoClips },

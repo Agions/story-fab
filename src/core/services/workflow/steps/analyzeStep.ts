@@ -11,25 +11,36 @@ export async function executeAnalyzeStep(
   projectId: string,
   updateProgress: (progress: number) => void = () => {}
 ): Promise<AnalyzeStepResult> {
-  // 使用视觉识别服务进行高级分析
-  const { scenes, objects, emotions } = await visionService.detectScenesAdvanced(
+  // 阶段1：场景检测 (0-30%)
+  updateProgress(5);
+  const { scenes } = await visionService.detectScenesAdvanced(
     videoInfo,
-    {
-      minSceneDuration: 3,
-      detectObjects: true,
-      detectEmotions: true,
-    }
+    { minSceneDuration: 3, detectObjects: false, detectEmotions: false }
   );
+  updateProgress(15);
 
+  // 阶段2：对象识别 (30-60%)
+  const { objects } = await visionService.detectScenesAdvanced(
+    videoInfo,
+    { minSceneDuration: 3, detectObjects: true, detectEmotions: false }
+  );
   updateProgress(30);
 
-  // 生成分析报告
+  // 阶段3：情绪分析 (60-80%)
+  const { emotions } = await visionService.detectScenesAdvanced(
+    videoInfo,
+    { minSceneDuration: 3, detectObjects: false, detectEmotions: true }
+  );
+  updateProgress(60);
+
+  // 阶段4：生成报告 (80-100%)
   const analysis = await visionService.generateAnalysisReport(
     videoInfo,
     scenes,
     objects,
     emotions
   );
+  updateProgress(100);
 
   // 保存分析结果
   const project = storageService.projects.getById(projectId);

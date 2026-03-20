@@ -10,8 +10,8 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
-  Steps, Card, Button, Space, Result, Spin, message, 
-  Alert, Progress, Typography, Divider, List, Tag, Tooltip, Badge 
+  Steps, Card, Button, Space, 
+  Alert, Progress, Typography, Tag, Tooltip, Badge 
 } from 'antd';
 import {
   PlusOutlined,
@@ -123,7 +123,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
   showSteps = true,
   showNavigation = true,
 }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // TODO: 启用导航功能
   const { projectId } = useParams();
   const { 
     state, 

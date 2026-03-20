@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, Row, Col, Button, Typography, Tooltip, Dropdown, Empty, Spin, Input, Modal, Form, Select, DatePicker } from 'antd';
 import { 
   PlusOutlined, 
@@ -11,7 +11,8 @@ import {
   EditOutlined,
   EyeOutlined,
   SearchOutlined,
-  SortAscendingOutlined
+  SortAscendingOutlined,
+  VideoCameraOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { formatDuration, formatDate } from '@/shared';
@@ -55,7 +56,8 @@ const Dashboard: React.FC = () => {
     setLoading(false);
   }, []);
 
-  const handleCreateProject = (values: CreateProjectFormValues) => {
+  // 使用 useCallback 缓存回调函数
+  const handleCreateProject = useCallback((values: CreateProjectFormValues) => {
     console.log('创建新项目:', values);
     // 这里应该实现实际的项目创建逻辑
     setShowCreateModal(false);
@@ -73,8 +75,8 @@ const Dashboard: React.FC = () => {
       starred: false
     };
     
-    setProjects([newProject, ...projects]);
-  };
+    setProjects(prev => [newProject, ...prev]);
+  }, [form]);
 
   const handleOpenProject = (projectId: string) => {
     navigate(`/editor/${projectId}`);
@@ -116,18 +118,21 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const filteredProjects = projects
-    .filter(project => project.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => {
-      const fieldA = sortBy === 'title' ? a[sortBy].toLowerCase() : new Date(a[sortBy]).getTime();
-      const fieldB = sortBy === 'title' ? b[sortBy].toLowerCase() : new Date(b[sortBy]).getTime();
-      
-      if (sortOrder === 'asc') {
-        return fieldA > fieldB ? 1 : -1;
-      } else {
-        return fieldA < fieldB ? 1 : -1;
-      }
-    });
+  // 使用 useMemo 缓存过滤和排序结果
+  const filteredProjects = useMemo(() => {
+    return projects
+      .filter(project => project.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort((a, b) => {
+        const fieldA = sortBy === 'title' ? a[sortBy].toLowerCase() : new Date(a[sortBy]).getTime();
+        const fieldB = sortBy === 'title' ? b[sortBy].toLowerCase() : new Date(b[sortBy]).getTime();
+        
+        if (sortOrder === 'asc') {
+          return fieldA > fieldB ? 1 : -1;
+        } else {
+          return fieldA < fieldB ? 1 : -1;
+        }
+      });
+  }, [projects, searchQuery, sortBy, sortOrder]);
 
   const sortOptions = [
     { label: '最近编辑', value: 'updatedAt' },
@@ -184,18 +189,29 @@ const Dashboard: React.FC = () => {
             <Spin size="large" />
           </div>
         ) : filteredProjects.length === 0 ? (
-          <Empty 
-            description="没有找到项目" 
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          >
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />}
-              onClick={() => setShowCreateModal(true)}
-            >
-              创建第一个项目
-            </Button>
-          </Empty>
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>
+              <VideoCameraOutlined />
+            </div>
+            <h3 className={styles.emptyTitle}>还没有项目</h3>
+            <p className={styles.emptyDescription}>
+              {searchQuery 
+                ? '没有找到匹配的项目，试试其他关键词'
+                : '创建你的第一个视频项目，开始 AI 剪辑之旅'
+              }
+            </p>
+            {!searchQuery && (
+              <Button 
+                type="primary" 
+                size="large"
+                icon={<PlusOutlined />}
+                onClick={() => setShowCreateModal(true)}
+                className={styles.emptyButton}
+              >
+                创建第一个项目
+              </Button>
+            )}
+          </div>
         ) : (
           <Row gutter={[24, 24]}>
             {filteredProjects.map(project => (

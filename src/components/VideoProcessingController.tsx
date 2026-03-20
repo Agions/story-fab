@@ -66,16 +66,9 @@ const AUDIO_PROCESS_OPTIONS = [
   { value: 'none', label: '无音频 (静音)' }
 ];
 
-interface VideoSegment {
-  start: number;
-  end: number;
-  type?: string;
-  content?: string;
-}
-
 interface VideoProcessingControllerProps {
   videoPath: string;
-  segments: VideoSegment[];
+  segments: Array<{ start: number; end: number; type?: string; content?: string }>;
   onProcessingComplete?: (outputPath: string) => void;
   defaultQuality?: (typeof QUALITY_OPTIONS)[number]['value'];
   defaultFormat?: (typeof FORMAT_OPTIONS)[number]['value'];

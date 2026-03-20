@@ -113,7 +113,8 @@ export interface ScriptSegment {
   content?: string;
   text?: string;
   voice?: string;
-  type?: string;
+  /** 脚本片段类型：narration-旁白, dialogue-对话, description-描述 */
+  type?: 'narration' | 'dialogue' | 'description' | string;
 }
 
 export interface ScriptMetadata {

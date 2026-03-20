@@ -64,7 +64,7 @@
     "babel-plugin-import": "^1.13.8",
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
-    "docsify-cli": "^4.4.4",
+    "docsify-cli": "^4.4.2",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -76,6 +76,6 @@
     "typedoc": "^0.28.1",
     "typescript": "^5.7.3",
     "vite": "^6.2.1",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.0"
   }
 }

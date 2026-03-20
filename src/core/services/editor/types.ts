@@ -1,3 +1,6 @@
+// Re-export canonical types from core/types
+export type { VideoSegment, ScriptSegment } from '@/core/types';
+
 export interface VideoClip {
   id: string;
   sourceId?: string;
@@ -84,19 +87,6 @@ export interface Timeline {
   markers: TimelineMarker[];
   createdAt: string;
   updatedAt: string;
-}
-
-export interface ScriptSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
-  content: string;
-}
-
-export interface VideoSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
 }
 
 export interface EditorExportSettings {

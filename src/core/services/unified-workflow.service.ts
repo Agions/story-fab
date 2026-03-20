@@ -11,6 +11,7 @@ import { smartCutService } from './smart-cut.service';
 import { subtitleService } from './subtitle.service';
 import { autoMusicService, type MusicTrack } from './auto-music.service';
 import { musicStep, type MusicStepInput } from './workflow/steps/musicStep';
+import type { ScriptSegment } from '@/core/types';
 
 /**
  * 工作流模式
@@ -97,17 +98,6 @@ export interface ScriptData {
   segments: ScriptSegment[];
   totalDuration: number;
   language: string;
-}
-
-/**
- * 脚本片段
- */
-export interface ScriptSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
-  text: string;
-  voice?: string;
 }
 
 /**

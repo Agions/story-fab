@@ -43,22 +43,24 @@ export async function executeScriptGenerateStep(
   mode: WorkflowMode = 'ai-commentary',
   updateProgress: (progress: number) => void = () => {}
 ): Promise<ScriptGenerateResult> {
-  // 应用模板生成脚本结构
+  // 阶段1：应用模板 (0-20%)
+  updateProgress(5);
   const templateResult = scriptTemplateService.applyTemplate(selectedTemplate.id, {
     topic: videoInfo.name,
     duration: videoInfo.duration,
     keywords: videoAnalysis.scenes.flatMap((s) => s.tags),
   });
+  updateProgress(20);
 
-  updateProgress(45);
-
-  // 为每个段落生成内容
+  // 阶段2：为每个段落生成内容 (20-80%)
   const segments = await Promise.all(
     templateResult.structure.map(async (section: TemplateSection, index: number) => {
       const prompt = buildSegmentPrompt(section, videoInfo, videoAnalysis, params, mode);
       const content = await aiService.generateText(model, prompt);
 
-      updateProgress(45 + ((index + 1) / templateResult.structure.length) * 10);
+      // 进度：20% + (index / total) * 60%
+      const segmentProgress = 20 + ((index + 1) / templateResult.structure.length) * 60;
+      updateProgress(Math.min(segmentProgress, 80));
 
       return {
         id: section.id,
@@ -71,13 +73,16 @@ export async function executeScriptGenerateStep(
     })
   );
 
-  // 创建脚本数据
+  // 阶段3：编排脚本 (80-95%)
+  updateProgress(85);
   const orchestrated = orchestrateCommentaryAgents({
     mode,
     analysis: videoAnalysis,
     segments,
   });
+  updateProgress(95);
 
+  // 创建脚本数据
   const script: ScriptData = {
     id: `script_${Date.now()}`,
     title: `${videoInfo.name} 解说脚本`,
@@ -100,12 +105,14 @@ export async function executeScriptGenerateStep(
     updatedAt: new Date().toISOString(),
   };
 
-  // 保存脚本
+  // 保存脚本 (95-100%)
+  updateProgress(98);
   const project = storageService.projects.getById(projectId);
   if (project) {
     project.scripts.push(script);
     storageService.projects.save(project);
   }
+  updateProgress(100);
 
   return { script };
 }

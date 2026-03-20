@@ -5,15 +5,17 @@
 import { createGlobalTheme } from '@vanilla-extract/css';
 
 export const vars = createGlobalTheme(':root', {
-  // 颜色
+  // 颜色 - 电影导演风格
   color: {
-    primary: '#1890ff',
-    primaryHover: '#40a9ff',
-    primaryActive: '#096dd9',
+    // 主色调：琥珀色（电影胶片感）
+    primary: '#d4a574',
+    primaryHover: '#e8c9a8',
+    primaryActive: '#c4956a',
+    // 功能色保持不变
     success: '#52c41a',
     warning: '#faad14',
     error: '#ff4d4f',
-    info: '#1890ff',
+    info: '#00f5d4',
     
     // 文本
     text: {

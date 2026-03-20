@@ -3,7 +3,11 @@ import {
   MODEL_PROVIDERS,
   getModelsByProvider,
 } from '@/core/config/models.config';
-import type { ModelProvider } from '@/core/types';
+import type { ModelProvider, VideoSegment as CoreVideoSegment, ScriptSegment as CoreScriptSegment } from '@/core/types';
+
+// Re-export canonical types from core/types
+export type VideoSegment = CoreVideoSegment;
+export type ScriptSegment = CoreScriptSegment;
 
 export interface VideoAnalysis {
   id: string;
@@ -33,14 +37,6 @@ export interface Script {
   createdAt: string;
   updatedAt: string;
   modelUsed?: string;
-}
-
-export interface ScriptSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
-  content: string;
-  type: 'narration' | 'dialogue' | 'description';
 }
 
 export interface Project {

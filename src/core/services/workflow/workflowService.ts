@@ -74,6 +74,11 @@ export class WorkflowService {
     this.state.data = { ...this.state.data, ...data };
   }
 
+  // 进度映射辅助函数：将步骤进度映射到整体进度
+  private mapStepProgress(stepStart: number, stepEnd: number, stepProgress: number): number {
+    return stepStart + (stepProgress / 100) * (stepEnd - stepStart);
+  }
+
   async start(
     projectId: string,
     videoFile: File,
@@ -84,21 +89,25 @@ export class WorkflowService {
     this.updateState({ status: 'running', progress: 0 });
 
     try {
-      // Step 1: 上传视频
+      // Step 1: 上传视频 (0-15%)
       const uploadResult = await executeUploadStep(
         projectId,
         videoFile,
-        (progress) => this.updateState({ progress })
+        (progress) => this.updateState({ 
+          progress: this.mapStepProgress(0, 15, progress) 
+        })
       );
       this.updateData(uploadResult);
       this.updateState({ progress: 15 });
 
-      // Step 2: 分析视频
+      // Step 2: 分析视频 (15-30%)
       if (config.autoAnalyze) {
         const analyzeResult = await executeAnalyzeStep(
           uploadResult.videoInfo,
           projectId,
-          (progress) => this.updateState({ progress })
+          (progress) => this.updateState({ 
+            progress: this.mapStepProgress(15, 30, progress) 
+          })
         );
         this.updateData({ videoAnalysis: analyzeResult.analysis });
       } else {
@@ -106,7 +115,7 @@ export class WorkflowService {
         return;
       }
 
-      // Step 3: 选择模板
+      // Step 3: 选择模板 (30-40%)
       const templateResult = await executeTemplateStep(
         this.state.data.videoAnalysis!,
         config.preferredTemplate
@@ -114,7 +123,7 @@ export class WorkflowService {
       this.updateData({ selectedTemplate: templateResult.template });
       this.updateState({ step: 'template-select', progress: 40 });
 
-      // Step 4: 生成脚本
+      // Step 4: 生成脚本 (40-60%)
       if (config.autoGenerateScript) {
         const scriptResult = await executeScriptGenerateStep(
           this.state.data.videoInfo!,
@@ -124,7 +133,9 @@ export class WorkflowService {
           config.scriptParams,
           projectId,
           config.mode || 'ai-commentary',
-          (progress) => this.updateState({ progress })
+          (progress) => this.updateState({ 
+            progress: this.mapStepProgress(40, 60, progress) 
+          })
         );
         this.updateData({ generatedScript: scriptResult.script });
       } else {
@@ -132,12 +143,14 @@ export class WorkflowService {
         return;
       }
 
-      // Step 5: 脚本去重
+      // Step 5: 脚本去重 (60-70%)
       if (config.autoDedup !== false && config.dedupConfig?.enabled !== false) {
         const dedupResult = await executeDedupStep(
           this.state.data.generatedScript!,
           config.dedupConfig,
-          (progress) => this.updateState({ progress })
+          (progress) => this.updateState({ 
+            progress: this.mapStepProgress(60, 70, progress) 
+          })
         );
         this.updateData({
           dedupedScript: dedupResult.script,
@@ -145,13 +158,15 @@ export class WorkflowService {
         });
       }
 
-      // Step 6: 唯一性保障
+      // Step 6: 唯一性保障 (70-75%)
       if (config.enforceUniqueness !== false) {
         const uniquenessResult = await executeUniquenessStep(
           this.state.data.dedupedScript || this.state.data.generatedScript!,
           async (script) => this.rewriteScript(script),
           config.uniquenessConfig,
-          (progress) => this.updateState({ progress })
+          (progress) => this.updateState({ 
+            progress: this.mapStepProgress(70, 75, progress) 
+          })
         );
         this.updateData({
           uniqueScript: uniquenessResult.script,
@@ -159,19 +174,21 @@ export class WorkflowService {
         });
       }
 
-      // Step 7: 编辑脚本
-      this.updateState({ step: 'script-edit', progress: 60 });
+      // Step 7: 编辑脚本 (75%)
+      this.updateState({ step: 'script-edit', progress: 75 });
 
-      // Step 8: AI 智能剪辑
+      // Step 8: AI 智能剪辑 (75-85%)
       if (config.aiClipConfig?.enabled) {
         await executeAIClipStep(
           this.state.data.videoInfo!,
           config.aiClipConfig,
-          (progress) => this.updateState({ progress })
+          (progress) => this.updateState({ 
+            progress: this.mapStepProgress(75, 85, progress) 
+          })
         );
       }
 
-      // Step 9: 时间轴编辑
+      // Step 9: 时间轴编辑 (85-95%)
       const timeline = await executeTimelineStep(
         this.state.data.videoInfo!,
         this.state.data.videoAnalysis!,
@@ -185,14 +202,17 @@ export class WorkflowService {
           syncStrategy:
             config.commentarySyncStrategy ||
             (config.mode ? WORKFLOW_MODE_DEFINITIONS[config.mode].syncTarget : 'balanced'),
-        }
+        },
+        (progress) => this.updateState({ 
+          progress: this.mapStepProgress(85, 95, progress) 
+        })
       );
       this.updateData({
         timeline,
         alignmentReport: timeline.alignment,
         originalOverlayPlan: timeline.originalOverlayPlan,
       });
-      this.updateState({ step: 'timeline-edit', progress: 85 });
+      this.updateState({ step: 'timeline-edit', progress: 95 });
 
       // Step 10: 预览
       this.updateState({ step: 'preview', progress: 90 });

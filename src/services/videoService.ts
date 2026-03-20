@@ -186,9 +186,10 @@ export const generateThumbnail = async (
 };
 
 /**
- * 视频片段接口
+ * 视频片段接口 - 用于剪辑操作
+ * 注意：这是服务级别的简化表示，核心类型请使用 @/core/types 的 VideoSegment
  */
-export interface VideoSegment {
+export interface VideoClipSegment {
   start: number;
   end: number;
   type?: string;
@@ -206,7 +207,7 @@ export interface VideoSegment {
 export const cutVideo = async (
   inputPath: string, 
   outputPath: string, 
-  segments: VideoSegment[],
+  segments: VideoClipSegment[],
   options?: {
     quality?: string,
     format?: string,
@@ -265,7 +266,7 @@ export const cutVideo = async (
  */
 export const previewSegment = async (
   inputPath: string,
-  segment: VideoSegment,
+  segment: VideoClipSegment,
   options?: {
     transition?: string,
     transitionDuration?: number,
