@@ -83,7 +83,7 @@ export interface EditorOperations {
 }
 
 // 剪辑 Hook
-export function useEditor(config?: Partial<EditorConfig>): {
+export function useEditor(_config?: Partial<EditorConfig>): {
   state: EditorState;
   operations: EditorOperations;
 } {

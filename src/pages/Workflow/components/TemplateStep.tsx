@@ -3,7 +3,7 @@ import { Card, Row, Col, Space, Typography } from 'antd';
 import type { ScriptTemplate } from '@/core/types';
 import styles from '../index.module.less';
 
-const { Paragraph, Text } = Typography;
+const { Paragraph } = Typography;
 
 interface TemplateStepProps {
   templates: ScriptTemplate[];

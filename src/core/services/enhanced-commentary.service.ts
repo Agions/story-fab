@@ -8,7 +8,7 @@ import { logger } from '@/utils/logger';
 import { visionService } from './vision.service';
 import { aiService } from './ai.service';
 import { smartCutService } from './smart-cut.service';
-import { subtitleService } from './subtitle.service';
+import { subtitleService as _subtitleService } from './subtitle.service';
 
 /**
  * 增强解说配置
@@ -134,7 +134,7 @@ export interface EnhancedCommentaryResult {
   
   // 元数据
   metadata: {
-    config: EnhancedCommentaryConfig;
+    _config: EnhancedCommentaryConfig;
     processedAt: string;
     processingTime: number;
   };
@@ -266,7 +266,7 @@ export class EnhancedCommentaryService {
    */
   private async analyzeVideo(
     videoData: ArrayBuffer,
-    config: EnhancedCommentaryConfig
+    _config: EnhancedCommentaryConfig
   ): Promise<VideoAnalysisResult> {
     logger.info('[EnhancedCommentary] 视频分析中...');
     
@@ -305,7 +305,7 @@ export class EnhancedCommentaryService {
    */
   private async generateClips(
     analysis: VideoAnalysisResult,
-    config: EnhancedCommentaryConfig
+    _config: EnhancedCommentaryConfig
   ): Promise<ClipSegment[]> {
     logger.info('[EnhancedCommentary] 生成剪辑片段...');
     
@@ -328,7 +328,7 @@ export class EnhancedCommentaryService {
    */
   private async generateCommentary(
     analysis: VideoAnalysisResult,
-    config: EnhancedCommentaryConfig
+    _config: EnhancedCommentaryConfig
   ): Promise<CommentarySegment[]> {
     logger.info('[EnhancedCommentary] 生成解说...');
     
@@ -361,7 +361,7 @@ export class EnhancedCommentaryService {
    */
   private async selectMusic(
     analysis: VideoAnalysisResult,
-    config: EnhancedCommentaryConfig
+    _config: EnhancedCommentaryConfig
   ): Promise<MusicSegment[]> {
     logger.info('[EnhancedCommentary] 选择配乐...');
     
@@ -382,7 +382,7 @@ export class EnhancedCommentaryService {
    */
   private generateSubtitles(
     commentary: CommentarySegment[],
-    config: EnhancedCommentaryConfig
+    _config: EnhancedCommentaryConfig
   ): SubtitleEntry[] {
     return commentary.map(c => ({
       id: uuidv4(),

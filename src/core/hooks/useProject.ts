@@ -148,7 +148,7 @@ export function useProject(projectId?: string): UseProjectReturn {
         setError('项目不存在');
         return false;
       }
-    } catch (err) {
+    } catch (_err) {
       setError('加载项目失败');
       return false;
     } finally {
@@ -176,7 +176,7 @@ export function useProject(projectId?: string): UseProjectReturn {
       setHasUnsavedChanges(false);
       
       return true;
-    } catch (err) {
+    } catch (_err) {
       setError('保存项目失败');
       return false;
     } finally {
@@ -203,7 +203,7 @@ export function useProject(projectId?: string): UseProjectReturn {
       }
       
       return true;
-    } catch (err) {
+    } catch (_err) {
       setError('删除项目失败');
       return false;
     }

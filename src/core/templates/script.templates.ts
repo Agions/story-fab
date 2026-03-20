@@ -599,7 +599,7 @@ class ScriptTemplateService {
   /**
    * 获取推荐模板
    */
-  getRecommendedTemplates(videoInfo?: any, preferences?: any): ScriptTemplate[] {
+  getRecommendedTemplates(_videoInfo?: any, preferences?: any): ScriptTemplate[] {
     // 基于视频信息和用户偏好推荐模板
     // 这里简化处理，返回前3个模板
     return TEMPLATES.slice(0, 3).map(t => ({

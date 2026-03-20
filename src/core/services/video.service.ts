@@ -223,7 +223,7 @@ class VideoService {
         const thumbnail = await this.generateThumbnail(videoPath, startTime + 0.5);
         scenes.push({
           id: uuidv4(),
-          startTime,
+          _startTime,
           endTime,
           thumbnail,
           description: `场景 ${scenes.length + 1}（${this.formatDuration(startTime)} - ${this.formatDuration(endTime)}）`,
@@ -232,7 +232,7 @@ class VideoService {
       } catch {
         scenes.push({
           id: uuidv4(),
-          startTime,
+          _startTime,
           endTime,
           thumbnail: '',
           description: `场景 ${scenes.length + 1}`,
@@ -251,7 +251,7 @@ class VideoService {
         const thumbnail = await this.generateThumbnail(videoPath, startTime).catch(() => '');
         scenes.push({
           id: uuidv4(),
-          startTime,
+          _startTime,
           endTime,
           thumbnail,
           description: `场景 ${i + 1}`,
@@ -325,7 +325,7 @@ class VideoService {
    */
   async generatePreview(
     videoPath: string,
-    startTime: number,
+    _startTime: number,
     endTime: number
   ): Promise<string> {
     // 这里应该使用 FFmpeg 生成预览片段
@@ -424,7 +424,7 @@ class VideoService {
   async clipVideo(
     inputPath: string,
     outputPath: string,
-    startTime: number,
+    _startTime: number,
     endTime: number
   ): Promise<string> {
     const builder = new FFmpegCommandBuilder();

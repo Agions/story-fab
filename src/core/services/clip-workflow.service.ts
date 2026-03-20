@@ -35,7 +35,7 @@ interface ClipConfig {
 // 剪辑片段
 export interface ClipSegment {
   id: string;
-  startTime: number;
+  _startTime: number;
   endTime: number;
   sourceStart: number;
   sourceEnd: number;
@@ -155,7 +155,7 @@ export class ClipWorkflowService {
   private async detectScenes(analysis: VideoAnalysis): Promise<Array<{ time: number; confidence: number }>> {
     const scenes = analysis.scenes || [];
     return scenes.map(scene => ({
-      time: scene.startTime,
+      time: scene._startTime,
       confidence: scene.confidence || 0.8,
     }));
   }

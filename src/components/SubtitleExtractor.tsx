@@ -3,7 +3,7 @@ import { Card, Typography, Button, Space, Select, Progress, List, Input, Empty, 
 import { AudioOutlined, FileTextOutlined, EditOutlined, DownloadOutlined, SyncOutlined } from '@ant-design/icons';
 import { motion } from '@/components/common/motion-shim';
 import { notify } from '@/shared';
-import { subtitleService } from '@/core/services';
+import { subtitleService as _subtitleService } from '@/core/services';
 
 const { Text } = Typography;
 const { Option } = Select;

@@ -50,7 +50,7 @@ export interface MixResult {
 interface VideoClipInfo {
   id: string;
   sourceId: string;
-  startTime: number;
+  _startTime: number;
   endTime: number;
   duration: number;
   sceneType?: string;
@@ -74,7 +74,7 @@ type TimelineClip =
   | {
       id: string;
       sourceId: string;
-      startTime: number;
+      _startTime: number;
       endTime: number;
       sourceStart: number;
       sourceEnd: number;
@@ -84,7 +84,7 @@ type TimelineClip =
   | {
       id: string;
       text: string;
-      startTime: number;
+      _startTime: number;
       endTime: number;
     };
 
@@ -223,7 +223,7 @@ export class CommentaryMixService {
         clips.push({
           id: uuidv4(),
           sourceId: analysis.videoId || '',
-          startTime: scene.startTime,
+          startTime: scene._startTime,
           endTime: scene.endTime,
           duration,
           sceneType: scene.type || 'general',
@@ -365,7 +365,7 @@ export class CommentaryMixService {
           sourceId: clip.sourceId,
           startTime: 0,
           endTime: clip.duration,
-          sourceStart: clip.startTime,
+          sourceStart: clip._startTime,
           sourceEnd: clip.endTime,
           transition: index > 0 ? this.config.transitionType : undefined,
           transitionDuration: this.config.transitionDuration,
@@ -377,7 +377,7 @@ export class CommentaryMixService {
         clips: (script.segments || []).map(seg => ({
           id: seg.id,
           text: seg.content,
-          startTime: seg.startTime,
+          startTime: seg._startTime,
           endTime: seg.endTime,
         })),
       },
@@ -405,7 +405,7 @@ export class CommentaryMixService {
   private buildFallbackScript(clips: VideoClipInfo[]): ScriptData {
     const segments: ScriptSegment[] = clips.map((clip) => ({
       id: uuidv4(),
-      startTime: clip.startTime,
+      startTime: clip._startTime,
       endTime: clip.endTime,
       content: '',
       type: 'narration',

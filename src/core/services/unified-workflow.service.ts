@@ -8,7 +8,7 @@ import { logger } from '@/utils/logger';
 import { visionService } from './vision.service';
 import { aiService } from './ai.service';
 import { smartCutService } from './smart-cut.service';
-import { subtitleService } from './subtitle.service';
+import { subtitleService as _subtitleService } from './subtitle.service';
 import { autoMusicService, type MusicTrack } from './auto-music.service';
 import { musicStep, type MusicStepInput } from './workflow/steps/musicStep';
 import type { ScriptSegment } from '@/core/types';
