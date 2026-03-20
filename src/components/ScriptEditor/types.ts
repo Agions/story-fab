@@ -1,5 +1,5 @@
 import { VideoSegment } from '@/services/videoService';
-import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
+import type { ScriptData, Scene } from '@/core/types';
 
 // 原始 Props 接口
 export interface ScriptEditorOriginalProps {

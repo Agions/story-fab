@@ -1,4 +1,4 @@
-import type { ScriptSegment, ScriptData } from '@/core/types';
+import type { ScriptData } from '@/core/types';
 
 export type DedupStrategy = 'exact' | 'semantic' | 'structural' | 'template';
 

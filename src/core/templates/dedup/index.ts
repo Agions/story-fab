@@ -2,7 +2,7 @@ export * from './types';
 export * from './detectors';
 export * from './rewriters';
 
-import type { ScriptData, ScriptSegment } from '@/core/types';
+import type { ScriptData } from '@/core/types';
 import type { DedupConfig, DuplicateResult, OriginalityReport, DedupStrategy } from './types';
 import {
   detectExactDuplicates,
