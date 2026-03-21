@@ -62,8 +62,12 @@ export default defineConfig({
           if (id.includes('node_modules/@tauri-apps')) {
             return 'tauri-vendor'
           }
-          // Ant Design 单独打包
-          if (id.includes('node_modules/antd') || id.includes('node_modules/@ant-design/icons')) {
+          // Ant Design icons 单独打包（图标库大但可缓存）
+          if (id.includes('node_modules/@ant-design/icons')) {
+            return 'icons-vendor'
+          }
+          // Ant Design 组件库（不含 icons）
+          if (id.includes('node_modules/antd')) {
             return 'antd-vendor'
           }
           // 业务重模块分包
@@ -82,7 +86,8 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'antd', '@ant-design/icons', 'axios', 'dayjs', 'zustand'],
+    include: ['react', 'react-dom', 'axios', 'dayjs', 'zustand'],
+    exclude: ['@ant-design/icons'],
   },
   define: {
     __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
