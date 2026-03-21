@@ -123,7 +123,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
   showSteps = true,
   showNavigation = true,
 }) => {
-  // const navigate = useNavigate(); // TODO: 启用导航功能
+  // const navigate = useNavigate(); // TODO: 启用导航功能 - 用于步骤完成后的页面跳转
   const { projectId } = useParams();
   const { 
     state, 

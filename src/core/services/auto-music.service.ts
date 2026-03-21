@@ -260,9 +260,9 @@ export class AutoMusicService {
 
     // TODO: 实现AI音乐API调用
     // 可接入的服务：
-    // - Suno AI (https://suno.ai/)
-    // - Udio (https://udio.ai/)
-    // - ElevenLabs (音频增强)
+    // - Suno AI (https://suno.ai/) - 主要推荐，支持情绪/风格生成
+    // - Udio (https://udio.ai/) - 备选方案
+    // - ElevenLabs (音频增强) - 用于音频后处理
     
     logger.info('AI音乐推荐:', options);
     

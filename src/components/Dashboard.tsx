@@ -51,7 +51,8 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     // 从API获取项目数据
     setLoading(true);
-    // TODO: 连接实际API获取项目数据
+    // TODO: 替换为真实API调用 - 需要对接后端项目列表接口
+    // 接口: GET /api/projects
     setProjects([]);
     setLoading(false);
   }, []);

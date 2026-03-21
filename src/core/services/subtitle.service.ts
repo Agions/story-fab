@@ -66,7 +66,7 @@ export class SubtitleService {
   ): Promise<SubtitleData> {
     logger.info('语音识别中...', options);
     
-    // TODO: 实现真正的 ASR
+    // TODO: 实现真正的 ASR - 需要集成 Whisper/讯飞/阿里 ASR 等服务
     return {
       entries: [],
       language: options?.language || 'zh-CN',

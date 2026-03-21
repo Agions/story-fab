@@ -39,7 +39,11 @@ export interface Script {
   modelUsed?: string;
 }
 
-export interface Project {
+/**
+ * 视频剪辑项目类型
+ * 与 core/types/Project（仪表盘项目）不同，此类型包含完整的视频处理相关数据
+ */
+export interface VideoProject {
   id: string;
   name: string;
   description: string;
@@ -53,6 +57,11 @@ export interface Project {
   updatedAt: string;
   aiModel?: AIModelConfig;
 }
+
+/**
+ * @deprecated 请使用 VideoProject，core/types/Project 是仪表盘项目类型
+ */
+export type Project = VideoProject;
 
 // 重命名以避免与 core/types 中的 AIModel 冲突
 export interface AIModelConfig {
@@ -84,7 +93,7 @@ export type AIModelType = ModelProvider;
 
 const ALL_MODEL_PROVIDERS = Object.keys(MODEL_PROVIDERS) as AIModelType[];
 
-// 用于 Project.aiModel 的 AI_MODEL_INFO
+// 用于 VideoProject.aiModel 的 AI_MODEL_INFO
 export const AI_MODEL_INFO: Record<AIModelType, AIModelConfig> = ALL_MODEL_PROVIDERS.reduce(
   (acc, provider) => {
     acc[provider] = {
