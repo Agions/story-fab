@@ -4,6 +4,36 @@
 
 ---
 
+## [1.0.0-beta] - 2026-03-21
+
+### 🔧 优化
+
+#### 代码质量
+- 类型统一：`VideoProject` 类型添加，原 `Project` 标记 `@deprecated`
+- 组件拆分：`VideoProcessingController/modules/` 模块化
+- 代码清理：TODO 注释增强描述信息
+
+#### 重构
+- **console.log → logger 重构**：33+ 文件统一使用 `@/utils/logger`
+- **工具函数去重**：`helpers.ts` 重导出 `array.ts`，消除 `unique`/`groupBy`/`sortBy`/`shuffle` 重复实现
+- **localStorage key 统一**：重命名 `'reelforge-store'` → `'clipflow-app-settings'`
+
+#### 清理
+- 移除未使用依赖：`styled-components` @types/styled-components
+- 删除死代码：`src/features/` 目录 (-511 行)
+
+### 🧪 测试
+- 新增 `format.test.ts` (33 tests)
+- 新增 `object.test.ts` (23 tests)
+- 测试结果：101 passed
+
+### ✅ 质量门禁
+- TypeScript: 0 errors
+- ESLint: 0 warnings
+- Build: ~17s
+
+---
+
 ## [1.0.0-beta] - 2026-03-03
 
 ### ✨ 新增
