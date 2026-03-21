@@ -1,5 +1,6 @@
 import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { getConfigDir } from './fileOperations';
+import { logger } from '@/utils/logger';
 
 /**
  * 获取API密钥
@@ -23,7 +24,7 @@ export const getApiKey = async (service: string): Promise<string> => {
 
     return config[service] || '';
   } catch (error) {
-    console.error(`获取${service}的API密钥失败:`, error);
+    logger.error(`获取${service}的API密钥失败:`, { error });
     return '';
   }
 };
@@ -52,7 +53,7 @@ export const saveApiKey = async (service: string, apiKey: string): Promise<boole
     await writeTextFile(configPath, JSON.stringify(config, null, 2));
     return true;
   } catch (error) {
-    console.error(`保存${service}的API密钥失败:`, error);
+    logger.error(`保存${service}的API密钥失败:`, { error });
     return false;
   }
 };
@@ -76,7 +77,7 @@ export const getAppData = async <T>(key: string): Promise<T | null> => {
     const dataContent = await readTextFile(dataPath);
     return JSON.parse(dataContent) as T;
   } catch (error) {
-    console.error(`获取应用数据(${key})失败:`, error);
+    logger.error(`获取应用数据(${key})失败:`, { error });
     return null;
   }
 };
@@ -96,7 +97,7 @@ export const saveAppData = async <T>(key: string, data: T): Promise<boolean> => 
 
     return true;
   } catch (error) {
-    console.error(`保存应用数据(${key})失败:`, error);
+    logger.error(`保存应用数据(${key})失败:`, { error });
     return false;
   }
 };

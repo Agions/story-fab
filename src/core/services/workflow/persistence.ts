@@ -5,6 +5,7 @@
 
 import { WorkflowData, WorkflowStep, WorkflowState, WorkflowConfig } from './types';
 import { workflowCacheManager, WorkflowCache } from './cacheManager';
+import { logger } from '@/utils/logger';
 
 const STORAGE_KEY_PREFIX = 'clipflow_workflow_';
 const MAX_STORED_WORKFLOWS = 5;
@@ -34,7 +35,7 @@ export class WorkflowPersistenceService {
       // 清理旧数据
       this.cleanup();
     } catch (error) {
-      console.error('Failed to save workflow state:', error);
+      logger.error('Failed to save workflow state:', { error });
     }
   }
 
@@ -59,7 +60,7 @@ export class WorkflowPersistenceService {
       
       return parsed.state;
     } catch (error) {
-      console.error('Failed to load workflow state:', error);
+      logger.error('Failed to load workflow state:', { error });
       return null;
     }
   }
@@ -72,7 +73,7 @@ export class WorkflowPersistenceService {
       const key = `${STORAGE_KEY_PREFIX}${projectId}_config`;
       localStorage.setItem(key, JSON.stringify(config));
     } catch (error) {
-      console.error('Failed to save workflow config:', error);
+      logger.error('Failed to save workflow config:', { error });
     }
   }
 
@@ -85,7 +86,7 @@ export class WorkflowPersistenceService {
       const data = localStorage.getItem(key);
       return data ? JSON.parse(data) : null;
     } catch (error) {
-      console.error('Failed to load workflow config:', error);
+      logger.error('Failed to load workflow config:', { error });
       return null;
     }
   }
@@ -104,7 +105,7 @@ export class WorkflowPersistenceService {
         savedAt: Date.now(),
       }));
     } catch (error) {
-      console.error('Failed to save step data:', error);
+      logger.error('Failed to save step data:', { error });
     }
   }
 
@@ -129,7 +130,7 @@ export class WorkflowPersistenceService {
       
       return parsed.data;
     } catch (error) {
-      console.error('Failed to load step data:', error);
+      logger.error('Failed to load step data:', { error });
       return null;
     }
   }
@@ -234,7 +235,7 @@ export class WorkflowPersistenceService {
       // 清除内存缓存
       workflowCacheManager.clearCache(projectId);
     } catch (error) {
-      console.error('Failed to remove workflow state:', error);
+      logger.error('Failed to remove workflow state:', { error });
     }
   }
 

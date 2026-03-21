@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, Row, Col, Button, Typography, Tooltip, Dropdown, Spin, Input, Modal, Form, Select, DatePicker } from 'antd';
+import { logger } from '@/utils/logger';
 import { 
   PlusOutlined, 
   MoreOutlined, 
@@ -59,7 +60,7 @@ const Dashboard: React.FC = () => {
 
   // 使用 useCallback 缓存回调函数
   const handleCreateProject = useCallback((values: CreateProjectFormValues) => {
-    console.log('创建新项目:', values);
+    logger.info('创建新项目:', { values });
     // 这里应该实现实际的项目创建逻辑
     setShowCreateModal(false);
     form.resetFields();

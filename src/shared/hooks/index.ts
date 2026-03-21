@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { debounce, throttle } from '../utils';
+import { logger } from '@/utils/logger';
 
 /**
  * 使用本地存储
@@ -15,7 +16,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error('useLocalStorage error:', error);
+      logger.error('useLocalStorage error:', { error });
       return initialValue;
     }
   });
@@ -26,7 +27,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error('useLocalStorage setValue error:', error);
+      logger.error('useLocalStorage setValue error:', { error });
     }
   }, [key, storedValue]);
 

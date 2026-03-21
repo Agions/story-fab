@@ -2,6 +2,7 @@
  * BaseService - 统一的服务层抽象基类
  * 提供统一的错误处理、请求拦截和日志记录
  */
+import { logger } from '@/utils/logger';
 
 /**
  * 服务错误类型
@@ -97,7 +98,7 @@ export abstract class BaseService {
   protected handleError(error: unknown, context?: string): never {
     const serviceError = this.normalizeError(error);
     
-    console.error(`[${this.name}] ${context || '操作失败'}:`, serviceError);
+    logger.error(`[${this.name}] ${context || '操作失败'}:`, { error: serviceError });
     throw serviceError;
   }
 
@@ -132,7 +133,7 @@ export abstract class BaseService {
     try {
       if (showLoading) {
         // 可以在这里添加全局 loading 状态
-        console.log(`[${this.name}] ${loadingMessage}`);
+        logger.debug(`[${this.name}] ${loadingMessage}`);
       }
       
       const result = await requestFn();
@@ -257,13 +258,13 @@ export abstract class BaseService {
     const prefix = `[${this.name}]`;
     switch (level) {
       case 'info':
-        console.log(prefix, message, ...args);
+        logger.info(prefix + ' ' + message, { args });
         break;
       case 'warn':
-        console.warn(prefix, message, ...args);
+        logger.warn(prefix + ' ' + message, { args });
         break;
       case 'error':
-        console.error(prefix, message, ...args);
+        logger.error(prefix + ' ' + message, { args });
         break;
     }
   }

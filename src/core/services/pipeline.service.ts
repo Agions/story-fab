@@ -4,6 +4,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/utils/logger';
 
 // 工作流步骤
 export type WorkflowStep = 
@@ -300,7 +301,7 @@ export class PipelineService {
     if (signal.aborted) throw new Error('已取消');
     
     // 实际实现需要上传到服务器
-    console.log('视频上传完成:', file.name);
+    logger.info('视频上传完成:', { fileName: file.name });
   }
 
   private async analyzeVideo(signal: AbortSignal): Promise<void> {
@@ -310,7 +311,7 @@ export class PipelineService {
     if (signal.aborted) throw new Error('已取消');
     
     // 调用 visionService
-    console.log('视频分析完成');
+    logger.info('视频分析完成');
   }
 
   private async smartClip(signal: AbortSignal): Promise<void> {
@@ -320,7 +321,7 @@ export class PipelineService {
     if (signal.aborted) throw new Error('已取消');
     
     // 调用 clipWorkflowService
-    console.log('智能剪辑完成');
+    logger.info('智能剪辑完成');
   }
 
   private async processEditing(signal: AbortSignal): Promise<void> {
@@ -329,7 +330,7 @@ export class PipelineService {
     
     if (signal.aborted) throw new Error('已取消');
     
-    console.log('编辑处理完成');
+    logger.info('编辑处理完成');
   }
 
   private async exportVideo(signal: AbortSignal): Promise<string> {
@@ -340,7 +341,7 @@ export class PipelineService {
     
     // 调用 exportService
     const outputPath = `export/${Date.now()}.${this.config.exportFormat}`;
-    console.log('视频导出完成:', outputPath);
+    logger.info('视频导出完成:', { outputPath });
     
     return outputPath;
   }

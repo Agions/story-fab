@@ -5,6 +5,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoInfo, VideoAnalysis, Scene, Keyframe } from '@/core/types';
+import { logger } from '@/utils/logger';
 
 // FFmpeg 命令构建器
 class FFmpegCommandBuilder {
@@ -145,7 +146,7 @@ class VideoService {
           description: `关键帧 ${i}`
         });
       } catch (error) {
-        console.error(`提取关键帧 ${i} 失败:`, error);
+        logger.error(`提取关键帧 ${i} 失败:`, { error });
       }
     }
 
@@ -345,8 +346,8 @@ class VideoService {
       return { success: true, output: result };
     } catch {
       // 非 Tauri 环境，记录命令并返回模拟结果
-      console.log('[FFmpeg Command]', command);
-      console.warn('[VideoService] FFmpeg 命令已生成但未执行（需要 Tauri 桌面端或 FFmpeg WASM）');
+      logger.debug('[FFmpeg Command]', { command });
+      logger.warn('[VideoService] FFmpeg 命令已生成但未执行（需要 Tauri 桌面端或 FFmpeg WASM）');
       return { success: false, output: 'Requires Tauri desktop or FFmpeg WASM runtime' };
     }
   }
@@ -412,7 +413,7 @@ class VideoService {
         options,
         createdAt: new Date().toISOString()
       };
-      console.log('[ExportConfig]', JSON.stringify(exportConfig));
+      logger.debug('[ExportConfig]', { exportConfig });
     }
 
     return outputPath;
@@ -455,7 +456,7 @@ class VideoService {
       .output(outputPath);
 
     const command = builder.build();
-    console.log('[MergeFileList]', fileList);
+    logger.debug('[MergeFileList]', { fileList });
     await this.executeFFmpeg(command);
     return outputPath;
   }

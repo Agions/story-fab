@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/utils/logger';
 import { 
   Tabs, 
   Button, 
@@ -121,7 +122,7 @@ const AssetPanel: React.FC = () => {
   
   // 添加到时间轴
   const addToTimeline = (asset: Asset) => {
-    console.log('添加到时间轴', asset);
+    logger.debug('添加到时间轴', { asset });
     // 这里将来会实现与Timeline组件的交互
   };
   
@@ -163,7 +164,7 @@ const AssetPanel: React.FC = () => {
   
   // 上传素材
   const handleUpload: UploadProps['customRequest'] = (options) => {
-    console.log('上传文件', options);
+    logger.debug('上传文件', { options });
     options.onSuccess?.({}, new XMLHttpRequest());
     // 实际项目中会处理文件上传和转码
   };
@@ -174,17 +175,17 @@ const AssetPanel: React.FC = () => {
       {
         key: '1',
         label: '重命名',
-        onClick: () => console.log('重命名', id)
+        onClick: () => logger.debug('重命名', { id })
       },
       {
         key: '2',
         label: '下载',
-        onClick: () => console.log('下载', id)
+        onClick: () => logger.debug('下载', { id })
       },
       {
         key: '3',
         label: '复制',
-        onClick: () => console.log('复制', id)
+        onClick: () => logger.debug('复制', { id })
       },
       {
         type: 'divider' as const,

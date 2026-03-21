@@ -1,4 +1,5 @@
 import type { Timeline } from './types';
+import { logger } from '@/utils/logger';
 
 const STORAGE_KEY = 'reelforge_timeline';
 
@@ -6,7 +7,7 @@ export function saveToStorage(timeline: Timeline): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(timeline));
   } catch (error) {
-    console.error('自动保存失败:', error);
+    logger.error('自动保存失败:', { error });
   }
 }
 
@@ -17,7 +18,7 @@ export function loadFromStorage(): Timeline | null {
       return JSON.parse(data);
     }
   } catch (error) {
-    console.error('加载失败:', error);
+    logger.error('加载失败:', { error });
   }
   return null;
 }

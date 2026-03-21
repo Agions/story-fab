@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { logger } from '@/utils/logger';
 import {
   editorService,
   saveToStorage,
@@ -193,7 +194,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
 
   const setPlaybackRate = useCallback((rate: number) => {
     // 实现播放速度调整
-    console.log('设置播放速度:', rate);
+    logger.debug('设置播放速度:', { rate });
   }, []);
 
   // 片段操作
@@ -290,7 +291,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
 
   const deleteTrack = useCallback((trackId: string) => {
     // 实现删除轨道
-    console.log('删除轨道:', trackId);
+    logger.debug('删除轨道:', { trackId });
   }, []);
 
   const toggleTrackVisibility = useCallback((trackId: string) => {

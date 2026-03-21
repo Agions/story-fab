@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, exists, mkdir } from '@tauri-apps/plugin-fs';
 import { appConfigDir } from '@tauri-apps/api/path';
+import { logger } from '@/utils/logger';
 
 /**
  * 选择文件
@@ -22,7 +23,7 @@ export const selectFile = async (
 
     return Array.isArray(selected) ? selected[0] : selected;
   } catch (error) {
-    console.error('选择文件失败:', error);
+    logger.error('选择文件失败:', { error });
     return null;
   }
 };
@@ -51,7 +52,7 @@ export const saveFile = async (
     await writeTextFile(savePath, content);
     return true;
   } catch (error) {
-    console.error('保存文件失败:', error);
+    logger.error('保存文件失败:', { error });
     return false;
   }
 };
@@ -68,7 +69,7 @@ export const getConfigDir = async (): Promise<string> => {
     }
     return configDir;
   } catch (error) {
-    console.error('获取配置目录失败:', error);
+    logger.error('获取配置目录失败:', { error });
     return '';
   }
 };

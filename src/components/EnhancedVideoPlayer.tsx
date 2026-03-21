@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Button, Tooltip, Slider, Space, Row, Col, Radio, InputNumber, Statistic, Card } from 'antd';
+import { logger } from '@/utils/logger';
 import { 
   PlayCircleOutlined, 
   PauseCircleOutlined, 
@@ -118,7 +119,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     // 自动播放（如果设置为true）
     if (autoPlay) {
       video.play().catch(_err => {
-        console.log('自动播放失败，可能是浏览器策略限制:', err);
+        logger.warn('自动播放失败，可能是浏览器策略限制');
       });
     }
     
@@ -148,7 +149,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       video.pause();
     } else {
       video.play().catch(_err => {
-        console.error('播放失败:', err);
+        logger.error('播放失败');
       });
     }
   }, [isPlaying]);
@@ -211,13 +212,13 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       if (container.requestFullscreen) {
         container.requestFullscreen()
           .then(() => setIsFullscreen(true))
-          .catch(_err => console.error('全屏失败:', err));
+          .catch(_err => logger.error('全屏失败'));
       }
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen()
           .then(() => setIsFullscreen(false))
-          .catch(_err => console.error('退出全屏失败:', err));
+          .catch(_err => logger.error('退出全屏失败'));
       }
     }
   }, [isFullscreen]);
@@ -305,7 +306,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       link.download = `frame_${Math.floor(video.currentTime)}.png`;
       link.click();
     } catch (e) {
-      console.error('截图失败:', e);
+      logger.error('截图失败');
     }
   }, []);
 

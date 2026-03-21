@@ -3,6 +3,7 @@
  */
 import { useState, useCallback } from 'react';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';
+import { logger } from '@/utils/logger';
 
 /**
  * 应用设置类型
@@ -36,7 +37,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error('LocalStorage save error:', error);
+      logger.error('LocalStorage save error:', { error });
     }
   }, [key, storedValue]);
 

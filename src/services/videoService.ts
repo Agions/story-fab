@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/utils/logger';
 
 /**
  * 检查FFmpeg是否已安装
@@ -10,7 +11,7 @@ export const checkFFmpegInstallation = async (): Promise<{installed: boolean; ve
     const result = await invoke('check_ffmpeg') as {installed: boolean; version?: string};
     return result;
   } catch (error) {
-    console.error('检查FFmpeg安装状态失败:', error);
+    logger.error('检查FFmpeg安装状态失败:', { error });
     return {installed: false};
   }
 };
@@ -26,7 +27,7 @@ export const ensureFFmpegInstalled = async (): Promise<boolean> => {
     return false;
   }
   
-  console.log('FFmpeg已安装:', version);
+  logger.info('FFmpeg已安装:', { version });
   return true;
 };
 
@@ -65,13 +66,13 @@ export const analyzeVideo = async (videoPath: string): Promise<VideoMetadata> =>
       throw new Error('未安装FFmpeg');
     }
 
-    console.log('分析视频:', videoPath);
+    logger.info('分析视频:', { videoPath });
     const metadata = await invoke('analyze_video', { path: videoPath });
-    console.log('视频分析结果:', metadata);
+    logger.debug('视频分析结果:', { metadata });
     
     return metadata as VideoMetadata;
   } catch (error) {
-    console.error('分析视频失败:', error);
+    logger.error('分析视频失败:', { error });
     let userMessage = '视频分析失败，请稍后再试';
 
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -115,7 +116,7 @@ export const extractKeyFrames = async (
     }
 
     const { interval = 10, maxFrames = 10 } = options;
-    console.log(`提取关键帧: ${videoPath}, 间隔: ${interval}秒, 最大帧数: ${maxFrames}`);
+    logger.info('提取关键帧:', { videoPath, interval, maxFrames });
 
     const framePaths = await invoke('extract_key_frames', { 
       path: videoPath,
@@ -130,10 +131,10 @@ export const extractKeyFrames = async (
       description: ''
     }));
 
-    console.log(`成功提取了 ${keyFrames.length} 个关键帧`);
+    logger.info('成功提取关键帧:', { count: keyFrames.length });
     return keyFrames;
   } catch (error) {
-    console.error('提取关键帧失败:', error);
+    logger.error('提取关键帧失败:', { error });
     let userMessage = '提取关键帧失败，请确保视频文件可访问且FFmpeg已安装';
     
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -165,15 +166,15 @@ export const generateThumbnail = async (
       throw new Error('未安装FFmpeg');
     }
 
-    console.log(`生成视频缩略图: ${videoPath}, 时间点: ${time}秒`);
+    logger.info('生成视频缩略图:', { videoPath, time });
     const thumbnailPath = await invoke('generate_thumbnail', { 
       path: videoPath
     }) as string;
 
-    console.log('缩略图生成成功:', thumbnailPath);
+    logger.debug('缩略图生成成功:', { thumbnailPath });
     return thumbnailPath;
   } catch (error) {
-    console.error('生成缩略图失败:', error);
+    logger.error('生成缩略图失败:', { error });
     let userMessage = '生成缩略图失败，请确保视频文件可访问且FFmpeg已安装';
     
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -223,9 +224,7 @@ export const cutVideo = async (
       throw new Error('未安装FFmpeg');
     }
     
-    console.log('开始剪辑视频:', inputPath, '输出:', outputPath);
-    console.log('片段:', segments);
-    console.log('选项:', options);
+    logger.info('开始剪辑视频:', { inputPath, outputPath, segments, options });
     
     await invoke('cut_video', {
       input_path: inputPath,
@@ -239,10 +238,10 @@ export const cutVideo = async (
       add_subtitles: options?.addSubtitles
     });
     
-    console.log('视频剪辑完成');
+    logger.info('视频剪辑完成');
     return true;
   } catch (error) {
-    console.error('视频剪辑失败:', error);
+    logger.error('视频剪辑失败:', { error });
     const errorMessage = error instanceof Error 
       ? error.message 
       : String(error);
@@ -280,7 +279,7 @@ export const previewSegment = async (
       throw new Error('未安装FFmpeg');
     }
     
-    console.log('预览片段:', segment);
+    logger.debug('预览片段:', { segment });
     
     // 修正函数名称，确保与Rust函数名匹配
     const previewPath = await invoke<string>('generate_preview', {
@@ -292,10 +291,10 @@ export const previewSegment = async (
       add_subtitles: options?.addSubtitles
     });
     
-    console.log('预览文件路径:', previewPath);
+    logger.debug('预览文件路径:', { previewPath });
     return previewPath;
   } catch (error) {
-    console.error('生成预览失败:', error);
+    logger.error('生成预览失败:', { error });
     const errorMessage = error instanceof Error 
       ? error.message 
       : String(error);

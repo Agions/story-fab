@@ -3,6 +3,7 @@
  * 提供性能监控和优化能力
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { logger } from '@/utils/logger';
 
 /**
  * 性能追踪 Hook
@@ -12,7 +13,7 @@ export function usePerformance(name: string) {
   
   useEffect(() => {
     const duration = performance.now() - startTime.current;
-    console.log(`[Performance] ${name}: ${duration.toFixed(2)}ms`);
+    logger.debug(`[Performance] ${name}:`, { duration: `${duration.toFixed(2)}ms` });
   }, [name]);
 }
 
@@ -189,7 +190,7 @@ export function useStorage<T>(key: string, initialValue: T, storage = 'local') {
       setStoredValue(valueToStore);
       storageEngine.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error('useStorage error:', error);
+      logger.error('useStorage error:', { error });
     }
   }, [key, storedValue, storageEngine]);
 
@@ -198,7 +199,7 @@ export function useStorage<T>(key: string, initialValue: T, storage = 'local') {
       storageEngine.removeItem(key);
       setStoredValue(initialValue);
     } catch (error) {
-      console.error('useStorage remove error:', error);
+      logger.error('useStorage remove error:', { error });
     }
   }, [key, initialValue, storageEngine]);
 

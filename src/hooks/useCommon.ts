@@ -2,6 +2,7 @@
  * 通用自定义 Hooks
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { logger } from '@/utils/logger';
 
 /**
  * 计数器 Hook
@@ -48,7 +49,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error('useLocalStorage error:', error);
+      logger.error('useLocalStorage error:', { error });
     }
   }, [key, storedValue]);
 

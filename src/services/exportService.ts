@@ -1,6 +1,7 @@
 import { saveFile } from './tauriService';
 import type { Script } from './aiService';
 import { formatTime, formatDate } from '@/shared/utils/format';
+import { logger } from '@/utils/logger';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -67,7 +68,7 @@ export const exportScript = async (
       filters
     );
   } catch (error) {
-    console.error('导出脚本失败:', error);
+    logger.error('导出脚本失败:', { error });
     return false;
   }
 };
@@ -189,7 +190,7 @@ const exportAsPdf = async (script: Script, filename: string): Promise<boolean> =
     }
     return false;
   } catch (error: unknown) {
-    console.error('导出PDF失败:', error);
+    logger.error('导出PDF失败:', { error });
     return false;
   }
 };

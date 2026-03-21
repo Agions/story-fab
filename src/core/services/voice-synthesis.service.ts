@@ -4,6 +4,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/utils/logger';
 
 type AudioContextWindow = Window & {
   webkitAudioContext?: typeof AudioContext;
@@ -185,7 +186,7 @@ export class VoiceSynthesisService {
     
     // 创建下载链接
     // 实际需要生成真实音频
-    console.log('合成完成:', result);
+    logger.info('语音合成完成');
     
     // 触发下载
     // const url = URL.createObjectURL(result.audioBlob);

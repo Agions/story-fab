@@ -6,6 +6,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { getApiKey } from './tauriService';
 import { VideoMetadata } from './videoService';
+import { logger } from '@/utils/logger';
 
 // ============================================
 // 类型定义
@@ -473,7 +474,7 @@ export const generateScriptWithAI = async (
       tone: normalizeTone(preferences.tone),
     });
   } catch (error) {
-    console.error('脚本生成失败:', error);
+    logger.error('脚本生成失败:', { error });
     throw new Error(error instanceof Error ? error.message : '脚本生成失败');
   }
 };
