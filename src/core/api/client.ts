@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * API 客户端
  * 统一的 HTTP 请求管理
@@ -116,7 +117,7 @@ class ApiClient {
       errorMessage = error.message;
     }
 
-    console.error('[api] request failed:', errorMessage);
+    logger.error('[api] request failed:', { errorMessage });
   }
 
   /**

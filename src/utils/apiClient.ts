@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * API 请求封装
  * 统一的请求/响应处理
@@ -45,19 +46,19 @@ apiClient.interceptors.response.use(
           window.location.href = '/login';
           break;
         case 403:
-          console.error('无权限访问');
+          logger.error('无权限访问');
           break;
         case 404:
-          console.error('请求资源不存在');
+          logger.error('请求资源不存在');
           break;
         case 500:
-          console.error('服务器错误');
+          logger.error('服务器错误');
           break;
         default:
-          console.error('请求失败');
+          logger.error('请求失败');
       }
     } else if (error.request) {
-      console.error('网络错误，请检查网络连接');
+      logger.error('网络错误，请检查网络连接');
     }
     
     return Promise.reject(error);
@@ -100,7 +101,7 @@ export async function request<T>(
   } catch (error) {
     const err = error as Error;
     if (showError) {
-      console.error(errorMsg || err.message);
+      logger.error(errorMsg || err.message);
     }
     return [null, err];
   }

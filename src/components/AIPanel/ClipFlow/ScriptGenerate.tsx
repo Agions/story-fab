@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 步骤4: 生成文案 - 优化版
  * 
@@ -324,7 +325,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
         setProgress(100);
         notify.success(`${FUNCTION_CONFIG[functionType].title}生成成功！`);
       } catch (apiError) {
-        console.error('AI API 调用失败:', apiError);
+        logger.error('AI API 调用失败:', { error: apiError });
         setProgress(50);
         notify.warning('AI 服务暂不可用，使用智能模板生成');
         
@@ -342,7 +343,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
         notify.success('文案生成成功（智能模板）');
       }
     } catch (error) {
-      console.error('文案生成失败:', error);
+      logger.error('文案生成失败:', { error });
       notify.error(error, '文案生成失败，请重试');
     } finally {
       setTimeout(() => {

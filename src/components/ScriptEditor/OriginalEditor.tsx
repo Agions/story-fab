@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { Card, Button, Space, Dropdown, Modal, Form, type MenuProps } from 'antd';
 import {
@@ -137,7 +138,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
       setPreviewSrc(convertFileSrc(previewPath));
       setPreviewVisible(true);
     } catch (error) {
-      console.error('生成预览失败:', error);
+      logger.error('生成预览失败:', { error });
       notify.error(error, '生成预览失败');
     } finally {
       setPreviewLoading(false);
@@ -159,7 +160,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
         notify.success('脚本优化完成');
       }, 2000);
     } catch (error) {
-      console.error('AI 优化脚本失败:', error);
+      logger.error('AI 优化脚本失败:', { error });
       notify.error(error, 'AI 优化脚本失败');
     }
   }, []);

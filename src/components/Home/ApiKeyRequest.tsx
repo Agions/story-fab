@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState } from 'react';
 import { Modal, Form, Input, Button, Select, Radio, Alert, Checkbox, Space, Typography } from 'antd';
 import { KeyOutlined, UserOutlined, MailOutlined, BankOutlined, EnvironmentOutlined } from '@ant-design/icons';
@@ -39,7 +40,7 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
         setSubmitted(true);
       }, 1000);
     } catch (error) {
-      console.error('表单验证失败:', error);
+      logger.error('表单验证失败:', { error });
     }
   };
   

@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 脚本生成器组件
  * 专业的 AI 脚本生成界面
@@ -178,7 +179,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       onGenerate?.(script);
       notify.success('脚本生成成功');
     } catch (error) {
-      console.error('脚本生成失败:', error);
+      logger.error('脚本生成失败:', { error });
       notify.error(error, '脚本生成失败');
     } finally {
       setIsGenerating(false);

@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 工作流错误处理服务
  * 提供统一的错误分类、恢复建议和错误处理
@@ -169,7 +170,7 @@ export class WorkflowErrorHandler {
     }
 
     // 打印错误日志
-    console.error('[WorkflowError]', error.code, error.message, error.details);
+    logger.error('[WorkflowError]', { code: error.code, message: error.message, details: error.details });
   }
 
   /**

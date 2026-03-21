@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import { aiClipService } from '../../aiClip.service';
 import type { VideoInfo } from '@/core/types';
 
@@ -45,7 +46,7 @@ export async function executeAIClipStep(
 
     updateProgress?.(68);
   } catch (error) {
-    console.error('AI 剪辑步骤失败:', error);
+    logger.error('AI 剪辑步骤失败:', { error });
     // AI 剪辑失败不中断整个工作流
   }
 }

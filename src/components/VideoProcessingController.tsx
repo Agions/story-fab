@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Row, Col, Select, Slider, InputNumber, Switch, Button, Tooltip, Space, Collapse, Tag, Progress, Popconfirm } from 'antd';
 import { PlusOutlined, DeleteOutlined, PlayCircleOutlined, ScissorOutlined, SoundOutlined, SettingOutlined } from '@ant-design/icons';
@@ -232,7 +233,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       
       return outputPath;
     } catch (error) {
-      console.error('视频处理失败:', error);
+      logger.error('视频处理失败:', { error });
       notify.error(error, '视频处理失败');
       throw error;
     }
@@ -268,7 +269,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         // 更新总体进度
         setBatchProgress(((i + 1) / batchItems.length) * 100);
       } catch (error) {
-        console.error(`处理批次项 ${i+1} 失败:`, error);
+        logger.error(`处理批次项 ${i+1} 失败:`, { error });
         notify.error(error, `处理 "${item.name}" 失败`);
         
         // 继续处理下一个

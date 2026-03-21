@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 步骤3: AI 分析 - 优化版
  * 
@@ -215,7 +216,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
       }, 800);
 
     } catch (error) {
-      console.error('分析失败:', error);
+      logger.error('分析失败:', { error });
       notify.error(error, '分析过程出错，请重试');
     } finally {
       setAnalyzing(false);

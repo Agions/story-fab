@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect, lazy, Suspense, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -59,7 +60,7 @@ const ProjectManager: React.FC = () => {
         .map(asProjectView);
       setProjects(mapped);
     } catch (error) {
-      console.error('加载项目列表失败:', error);
+      logger.error('加载项目列表失败:', { error });
       notify.error(error, '加载项目列表失败，请稍后重试');
       setProjects([]);
     } finally {
@@ -150,7 +151,7 @@ const ProjectManager: React.FC = () => {
           notify.success('项目已删除');
           await loadProjectData();
         } catch (error) {
-          console.error('删除项目失败:', error);
+          logger.error('删除项目失败:', { error });
           notify.error(error, '删除项目失败，请稍后重试');
         }
       }

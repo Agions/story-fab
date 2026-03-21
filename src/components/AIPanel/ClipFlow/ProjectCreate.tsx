@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 步骤1: 创建项目
  * 
@@ -197,7 +198,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
         goToNextStep();
       }
     } catch (error) {
-      console.error('项目创建失败:', error);
+      logger.error('项目创建失败:', { error });
       notify.error(error, '项目创建失败');
     } finally {
       setLoading(false);

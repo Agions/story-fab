@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * Error Boundary 组件
  * 捕获子组件错误，提供降级 UI
@@ -25,7 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    logger.error('ErrorBoundary caught an error:', { error, errorInfo });
   }
 
   handleReset = (): void => {

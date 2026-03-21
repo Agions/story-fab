@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * Tauri工具函数
  * 提供与Tauri API相关的工具函数
@@ -27,7 +28,7 @@ export const selectFile = async (options: {
 
     return selected as string || '';
   } catch (error) {
-    console.error('选择文件时出错:', error);
+    logger.error('选择文件时出错:', { error });
     return '';
   }
 };
@@ -41,7 +42,7 @@ export const readTextFileUtil = async (path: string): Promise<string> => {
   try {
     return await readTextFile(path);
   } catch (error) {
-    console.error('读取文件时出错:', error);
+    logger.error('读取文件时出错:', { error });
     throw error;
   }
 };
@@ -55,7 +56,7 @@ export const writeTextFileUtil = async (path: string, contents: string): Promise
   try {
     await writeTextFile(path, contents);
   } catch (error) {
-    console.error('写入文件时出错:', error);
+    logger.error('写入文件时出错:', { error });
     throw error;
   }
 };
@@ -69,7 +70,7 @@ export const fileExists = async (path: string): Promise<boolean> => {
   try {
     return await exists(path);
   } catch (error) {
-    console.error('检查文件是否存在时出错:', error);
+    logger.error('检查文件是否存在时出错:', { error });
     return false;
   }
 };

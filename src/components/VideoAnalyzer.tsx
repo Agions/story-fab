@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState } from 'react';
 import { Card, Button, Progress, Alert, Typography, Spin } from 'antd';
 import { VideoCameraOutlined } from '@ant-design/icons';
@@ -51,7 +52,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       const videoMetadata = await invoke<AnalyzeVideoResult>('analyze_video', { 
         path: selectedVideoUrl 
       }).catch(_err => {
-        console.error('视频分析失败:', err);
+        logger.error('视频分析失败:', { error: err });
         throw new Error(`视频分析失败: ${err}`);
       });
       
@@ -63,7 +64,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
         path: selectedVideoUrl,
         count: keyFrameCount
       }).catch(_err => {
-        console.error('提取关键帧失败:', err);
+        logger.error('提取关键帧失败:', { error: err });
         return [] as string[];
       });
       
@@ -73,7 +74,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       const thumbnail = await invoke<string>('generate_thumbnail', {
         path: selectedVideoUrl
       }).catch(_err => {
-        console.error('生成缩略图失败:', err);
+        logger.error('生成缩略图失败:', { error: err });
         return '';
       });
       

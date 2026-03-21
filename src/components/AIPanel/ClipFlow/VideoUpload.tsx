@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 步骤2: 上传视频
  * 
@@ -169,7 +170,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
       }
     } catch (error) {
       notify.error(error, '视频处理失败，请重试');
-      console.error(error);
+      logger.error('VideoUpload error:', { error });
     } finally {
       setUploading(false);
     }

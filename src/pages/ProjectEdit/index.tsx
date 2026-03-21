@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -274,7 +275,7 @@ const ProjectEdit: React.FC = () => {
 
       return resultSegments;
     } catch (parseError) {
-      console.error('解析脚本失败:', parseError);
+      logger.error('解析脚本失败:', { error: parseError });
       return [];
     }
   };
@@ -397,7 +398,7 @@ const ProjectEdit: React.FC = () => {
         setAutoSaveState('saved');
       } catch (draftError) {
         if (isStale()) return;
-        console.error('自动保存草稿失败:', draftError);
+        logger.error('自动保存草稿失败:', { error: draftError });
         setAutoSaveState('error');
       }
     }, 900);
@@ -472,7 +473,7 @@ const ProjectEdit: React.FC = () => {
       })
       .catch((err: unknown) => {
         if (isStale()) return;
-        console.error('加载项目失败:', err);
+        logger.error('加载项目失败:', { error: err });
         const detail = err instanceof Error ? err.message : String(err);
         setError(`加载项目失败：${detail}`);
         notify.error(err, '加载项目失败，请返回项目列表后重试');
@@ -568,7 +569,7 @@ const ProjectEdit: React.FC = () => {
       notify.success('视频分析完成');
       goToStep(2);
     } catch (analyzeError) {
-      console.error('视频分析失败:', analyzeError);
+      logger.error('视频分析失败:', { error: analyzeError });
       const detail = analyzeError instanceof Error ? analyzeError.message : '未知错误';
       const stageLabel = {
         metadata: '视频元数据分析',
@@ -623,7 +624,7 @@ const ProjectEdit: React.FC = () => {
         }
       }
     } catch (saveError) {
-      console.error('保存项目失败:', saveError);
+      logger.error('保存项目失败:', { error: saveError });
       notify.error(saveError, '保存项目失败，请稍后再试');
     } finally {
       setSaving(false);
@@ -643,7 +644,7 @@ const ProjectEdit: React.FC = () => {
     try {
       window.localStorage.setItem(PROJECT_SAVE_BEHAVIOR_KEY, value);
     } catch (storageError) {
-      console.error('保存项目跳转策略失败:', storageError);
+      logger.error('保存项目跳转策略失败:', { error: storageError });
     }
   };
 
@@ -660,7 +661,7 @@ const ProjectEdit: React.FC = () => {
     try {
       window.localStorage.setItem(PROJECT_AUTO_SAVE_KEY, checked ? '1' : '0');
     } catch (storageError) {
-      console.error('保存自动保存开关失败:', storageError);
+      logger.error('保存自动保存开关失败:', { error: storageError });
     }
   };
 

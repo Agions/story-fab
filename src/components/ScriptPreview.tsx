@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState } from 'react';
 import { Card, Typography, Divider, Button, Tag, Tooltip, Space } from 'antd';
 import { 
@@ -46,7 +47,7 @@ const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport 
         setCopying(false);
       },
       (err) => {
-        console.error('复制失败:', err);
+        logger.error('复制失败:', { error: err });
         notify.error(err, '复制失败，请重试');
         setCopying(false);
       }

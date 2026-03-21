@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useCallback, useEffect, memo } from 'react';
 import { Card, Typography } from 'antd';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
@@ -77,7 +78,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
   useEffect(() => {
     return () => {
       if (previewUrl && previewUrl.includes('temp')) {
-        invoke('clean_temp_file', { path: previewUrl }).catch(console.error);
+        invoke('clean_temp_file', { path: previewUrl }).catch((e) => logger.error('clean_temp_file error:', { error: e }));
       }
     };
   }, [previewUrl]);
@@ -126,7 +127,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       const fileUrl = convertFileSrc(tempPath);
       setPreviewUrl(fileUrl);
     } catch (error) {
-      console.error('生成预览失败:', error);
+      logger.error('生成预览失败:', { error });
       notify.error(error, '生成预览失败');
     } finally {
       setPreviewLoading(false);
@@ -202,7 +203,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
 
       notify.success('视频剪辑完成');
     } catch (error) {
-      console.error('导出视频失败:', error);
+      logger.error('导出视频失败:', { error });
       notify.error(error, '导出视频失败');
     } finally {
       setProcessing(false);

@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 步骤5: 视频合成 - 优化版
  * 
@@ -156,7 +157,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
       setProgress(100);
       notify.success('配音生成成功！');
     } catch (error) {
-      console.error('配音生成失败:', error);
+      logger.error('配音生成失败:', { error });
       notify.error(error, '配音生成失败');
     } finally {
       setSynthesizing(false);
@@ -225,7 +226,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
       }, 500);
 
     } catch (error) {
-      console.error('合成失败:', error);
+      logger.error('合成失败:', { error });
       notify.error(error, '视频合成失败');
     } finally {
       setSynthesizing(false);

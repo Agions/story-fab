@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { Card, Tabs, List, Button, Space, Input, Tag, Typography, Modal, type TabsProps } from 'antd';
 import {
@@ -67,7 +68,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
         notify.success('脚本优化完成');
       }, 2000);
     } catch (error) {
-      console.error('AI 优化脚本失败:', error);
+      logger.error('AI 优化脚本失败:', { error });
       notify.error(error, 'AI 优化脚本失败');
     }
   }, []);

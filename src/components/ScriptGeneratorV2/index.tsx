@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 脚本生成器组件 V2
  * 优化版本 - 使用常量、减少重复代码
@@ -150,7 +151,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
       setGeneratedScript(script);
       onGenerate?.(script);
     } catch (error) {
-      console.error('生成失败:', error);
+      logger.error('生成失败:', { error });
     } finally {
       setIsGenerating(false);
     }

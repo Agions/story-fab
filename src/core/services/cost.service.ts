@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 成本追踪服务
  * 监控和优化 LLM/视频生成成本
@@ -210,13 +211,13 @@ export class CostService {
     const monthlyPercent = (stats.thisMonth / this.budget.monthly) * 100;
 
     if (dailyPercent >= this.budget.alerts.daily) {
-      console.warn(`⚠️ 日预算告警: ${dailyPercent.toFixed(1)}%`);
+      logger.warn('日预算告警', { dailyPercent: dailyPercent.toFixed(1) + '%' });
     }
     if (weeklyPercent >= this.budget.alerts.weekly) {
-      console.warn(`⚠️ 周预算告警: ${weeklyPercent.toFixed(1)}%`);
+      logger.warn('周预算告警', { weeklyPercent: weeklyPercent.toFixed(1) + '%' });
     }
     if (monthlyPercent >= this.budget.alerts.monthly) {
-      console.warn(`⚠️ 月预算告警: ${monthlyPercent.toFixed(1)}%`);
+      logger.warn('月预算告警', { monthlyPercent: monthlyPercent.toFixed(1) + '%' });
     }
   }
 
@@ -405,7 +406,7 @@ ${suggestions.join('\n\n')}
       localStorage.setItem('reelforge_cost_records', JSON.stringify(this.records));
       localStorage.setItem('reelforge_cost_budget', JSON.stringify(this.budget));
     } catch (error) {
-      console.error('保存成本记录失败:', error);
+      logger.error('保存成本记录失败:', { error });
     }
   }
 
@@ -426,7 +427,7 @@ ${suggestions.join('\n\n')}
 
       return true;
     } catch (error) {
-      console.error('加载成本记录失败:', error);
+      logger.error('加载成本记录失败:', { error });
       return false;
     }
   }

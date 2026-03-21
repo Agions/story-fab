@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -98,7 +99,7 @@ const Home = () => {
         setProjects(enriched);
       }
     } catch (error) {
-      console.error('加载首页项目列表失败:', error);
+      logger.error('加载首页项目列表失败:', { error });
     } finally {
       if (!activeRef || activeRef.current) {
         setProjectsLoading(false);

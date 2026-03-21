@@ -81,7 +81,7 @@ export class VoiceSynthesisService {
       const AudioContextCtor = window.AudioContext || audioWindow.webkitAudioContext;
       this.audioContext = AudioContextCtor ? new AudioContextCtor() : null;
     } catch (error) {
-      console.warn('AudioContext 不可用:', error);
+      logger.warn('AudioContext 不可用:', { error });
     }
   }
 
@@ -147,7 +147,7 @@ export class VoiceSynthesisService {
     utterance.onstart = () => options?.onStart?.();
     utterance.onend = () => options?.onEnd?.();
     utterance.onerror = (event) => {
-      console.error('语音合成错误:', event);
+      logger.error('语音合成错误:', { event });
       options?.onError?.(new Error('语音合成失败'));
     };
 

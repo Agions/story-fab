@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useRef } from 'react';
 import { Button, Space, Card, Spin } from 'antd';
 import { UploadOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
@@ -81,14 +82,14 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
         setMetadata(videoMetadata);
         onVideoSelect(filePath, videoMetadata);
       } catch (error) {
-        console.error('分析视频失败:', error);
+        logger.error('分析视频失败:', { error });
         // 即使分析失败也允许选择视频
         onVideoSelect(filePath);
       } finally {
         setIsAnalyzing(false);
       }
     } catch (error) {
-      console.error('选择视频失败:', error);
+      logger.error('选择视频失败:', { error });
       notify.error(error, '选择视频失败，请重试');
     }
   };
@@ -174,7 +175,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
     try {
       await invoke('open_file', { path: videoPath });
     } catch (error) {
-      console.error('打开视频失败:', error);
+      logger.error('打开视频失败:', { error });
       notify.error(error, '无法打开视频，请确保系统有关联的视频播放器');
     }
   };

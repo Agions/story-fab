@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect, lazy, Suspense, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Modal, Spin, Typography, Menu, Space, Drawer, Tooltip, Result } from 'antd';
@@ -179,7 +180,7 @@ const ProjectDetail: React.FC = () => {
       })
       .catch((error) => {
         if (isStale()) return;
-        console.error('加载项目失败:', error);
+        logger.error('加载项目失败:', { error });
         const detail = error instanceof Error ? error.message : '未知错误';
         setLoadError(detail);
         notify.error(error, '加载项目失败，请重试');

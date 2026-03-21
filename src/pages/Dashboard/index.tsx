@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Row, 
@@ -126,7 +127,7 @@ const Dashboard: React.FC = () => {
         }));
       setProjects(mapped);
     } catch (error) {
-      console.error('加载项目失败:', error);
+      logger.error('加载项目失败:', { error });
       notify.error(error, '加载项目失败，请稍后重试');
     } finally {
       setLoading(false);
@@ -189,7 +190,7 @@ const Dashboard: React.FC = () => {
             notify.error(null, '删除项目失败');
           }
         } catch (error) {
-          console.error('删除项目失败:', error);
+          logger.error('删除项目失败:', { error });
           notify.error(error, '删除项目失败，请稍后重试');
         }
       },

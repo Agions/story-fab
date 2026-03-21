@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 步骤6: 导出视频 - 优化版
  */
@@ -106,7 +107,7 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
       notify.success('视频导出成功！');
 
     } catch (error) {
-      console.error('导出失败:', error);
+      logger.error('导出失败:', { error });
       notify.error(error, '导出失败，请重试');
     } finally {
       setExporting(false);

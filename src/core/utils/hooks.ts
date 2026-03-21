@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * 通用 Hooks
  * 可复用的 React Hooks
@@ -15,7 +16,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error('useLocalStorage error:', error);
+      logger.error('useLocalStorage error:', { error });
       return initialValue;
     }
   });
@@ -26,7 +27,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error('useLocalStorage setValue error:', error);
+      logger.error('useLocalStorage setValue error:', { error });
     }
   }, [key, storedValue]);
 

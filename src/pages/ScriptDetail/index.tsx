@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Typography, Space, Spin, Divider, Modal, Tag, Result } from 'antd';
@@ -119,7 +120,7 @@ const ScriptDetail: React.FC = () => {
         addRecentProject(normalizedProject.id);
       } catch (error) {
         if (isStale()) return;
-        console.error('加载脚本详情失败:', error);
+        logger.error('加载脚本详情失败:', { error });
         const detail = error instanceof Error ? error.message : '未知错误';
         setLoadError(detail);
         notify.error(error, '加载脚本失败，请重试');
@@ -177,7 +178,7 @@ const ScriptDetail: React.FC = () => {
       
       notify.success('保存成功');
     } catch (error) {
-      console.error('保存失败:', error);
+      logger.error('保存失败:', { error });
       notify.error(error, '保存失败');
     } finally {
       setIsSaving(false);
@@ -199,7 +200,7 @@ const ScriptDetail: React.FC = () => {
       );
       notify.success('导出成功');
     } catch (error) {
-      console.error('导出脚本失败:', error);
+      logger.error('导出脚本失败:', { error });
       notify.error(error, '导出失败');
     } finally {
       setIsExporting(false);
@@ -235,7 +236,7 @@ const ScriptDetail: React.FC = () => {
           notify.success('删除成功');
           navigate(`/project/${project.id}`);
         } catch (error) {
-          console.error('删除脚本失败:', error);
+          logger.error('删除脚本失败:', { error });
           notify.error(error, '删除失败');
         } finally {
           setIsDeleting(false);

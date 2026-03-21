@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * useAutoSave Hook - 自动保存功能
  * 实现每 30 秒自动保存编辑器内容
@@ -90,7 +91,7 @@ export function useAutoSave(config: AutoSaveConfig = {}): {
       if (onError && error instanceof Error) {
         onError(error);
       }
-      console.error('自动保存失败:', error);
+      logger.error('自动保存失败:', { error });
     }
   }, [state.isSaving, onSave, onError]);
 
