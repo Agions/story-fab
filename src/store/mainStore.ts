@@ -63,7 +63,7 @@ export const useStore = create<AppState>()(
       setIsDarkMode: (isDarkMode: boolean) => set({ isDarkMode })
     }),
     {
-      name: 'reelforge-store', // 存储在 localStorage 中的键名
+      name: 'clipflow-app-settings', // 存储在 localStorage 中的键名
       partialize: (state) => ({
         selectedAIModel: state.selectedAIModel,
         aiModelsSettings: state.aiModelsSettings,
