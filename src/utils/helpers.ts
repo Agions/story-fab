@@ -4,6 +4,9 @@
  */
 import { notify } from '@/shared';
 
+// 从 array.ts 重新导出数组工具函数（避免重复实现）
+export { unique, groupBy, sortBy, shuffle } from './array';
+
 /**
  * 生成唯一 ID
  */
@@ -144,40 +147,7 @@ export function isValidFileType(filename: string, allowedTypes: string[]): boole
   return allowedTypes.includes(ext);
 }
 
-// ========== 新增常用工具函数 ==========
-
-/**
- * 数组去重
- */
-export function unique<T>(arr: T[]): T[] {
-  return Array.from(new Set(arr));
-}
-
-/**
- * 数组分组
- */
-export function groupBy<T>(arr: T[], key: keyof T): Record<string, T[]> {
-  return arr.reduce((groups, item) => {
-    const groupKey = String(item[key]);
-    (groups[groupKey] = groups[groupKey] || []).push(item);
-    return groups;
-  }, {} as Record<string, T[]>);
-}
-
-/**
- * 排序数组（支持多字段排序）
- */
-export function sortBy<T>(arr: T[], ...keys: (keyof T)[]): T[] {
-  return [...arr].sort((a, b) => {
-    for (const key of keys) {
-      const aVal = a[key];
-      const bVal = b[key];
-      if (aVal < bVal) return -1;
-      if (aVal > bVal) return 1;
-    }
-    return 0;
-  });
-}
+// ========== 其他工具函数 ==========
 
 /**
  * 数字补零
@@ -198,18 +168,6 @@ export function clamp(value: number, min: number, max: number): number {
  */
 export function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * 随机打乱数组
- */
-export function shuffle<T>(arr: T[]): T[] {
-  const result = [...arr];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
 }
 
 /**
