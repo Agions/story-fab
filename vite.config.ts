@@ -2,10 +2,23 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
+// Ant Design 组件库按需导入配置
+const antdImportPlugin = () => ({
+  name: 'antd-import',
+  transform(code: string, id: string) {
+    if (!id.includes('node_modules/antd') && !id.includes('node_modules/@ant-design/icons')) {
+      return null
+    }
+    // antd v5 使用 CSS-in-JS,这里仅做标记以便手动优化
+    return null
+  }
+})
+
 export default defineConfig({
   base: './',
   plugins: [
     react(),
+    antdImportPlugin(),
   ],
   clearScreen: false,
   server: {
@@ -66,9 +79,36 @@ export default defineConfig({
           if (id.includes('node_modules/@ant-design/icons')) {
             return 'icons-vendor'
           }
-          // Ant Design 组件库（不含 icons）
+          // Ant Design 组件库按功能拆分
           if (id.includes('node_modules/antd')) {
-            return 'antd-vendor'
+            // 基础组件
+            if (id.includes('/ Button') || id.includes('/Input') || id.includes('/Select') || 
+                id.includes('/ Dropdown') || id.includes('/ Space') || id.includes('/ Badge')) {
+              return 'antd-basic'
+            }
+            // 布局组件
+            if (id.includes('/ Card') || id.includes('/ Row') || id.includes('/ Col') || 
+                id.includes('/ Layout') || id.includes('/ Tabs')) {
+              return 'antd-layout'
+            }
+            // 数据展示
+            if (id.includes('/ Table') || id.includes('/ List') || id.includes('/ Avatar') || 
+                id.includes('/ Tag') || id.includes('/ Progress')) {
+              return 'antd-data'
+            }
+            // 反馈与对话框
+            if (id.includes('/ Modal') || id.includes('/ Drawer') || id.includes('/ Message') || 
+                id.includes('/ Notification') || id.includes('/ Alert')) {
+              return 'antd-feedback'
+            }
+            // 表单组件（较大）
+            if (id.includes('/ Form') || id.includes('/ DatePicker') || id.includes('/ Upload') || 
+                id.includes('/ Switch') || id.includes('/ Slider') || id.includes('/ Radio') || 
+                id.includes('/ Checkbox') || id.includes('/ AutoComplete') || id.includes('/ Cascader')) {
+              return 'antd-form'
+            }
+            // 其他 antd 组件
+            return 'antd-misc'
           }
           // 业务重模块分包
           if (id.includes('/src/pages/Workflow/') || id.includes('/src/core/workflow/')) {
