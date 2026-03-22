@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { 
   Tabs, 
   Button, 
@@ -67,6 +67,24 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     }
   ]);
   
+  // Store interval IDs for cleanup
+  const progressIntervalRef = useRef<number | null>(null);
+  
+  // Cleanup intervals on unmount
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, []);
+    {
+      role: 'ai',
+      content: '您好！我是您的AI视频助手。我可以帮助您生成字幕、智能剪辑片段、提供内容建议以及增强视频效果。请告诉我您需要什么帮助？',
+      time: new Date()
+    }
+  ]);
+  
   // AI模型选项
   const models = useMemo(() => {
     const configuredModels = getAvailableModelsFromApiKeys(apiKeys, CORE_AI_MODELS);
@@ -126,14 +144,22 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   const generateSubtitles = () => {
     setProcessing(true);
     
+    // 清理之前的 interval
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    
     // 模拟进度条
     let currentProgress = 0;
-    const interval = setInterval(() => {
+    progressIntervalRef.current = window.setInterval(() => {
       currentProgress += 5;
       setProgress(currentProgress);
       
       if (currentProgress >= 100) {
-        clearInterval(interval);
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
         setProcessing(false);
         
         // 添加结果消息
@@ -151,14 +177,22 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   const smartCut = () => {
     setProcessing(true);
     
+    // 清理之前的 interval
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    
     // 模拟进度条
     let currentProgress = 0;
-    const interval = setInterval(() => {
+    progressIntervalRef.current = window.setInterval(() => {
       currentProgress += 3;
       setProgress(currentProgress);
       
       if (currentProgress >= 100) {
-        clearInterval(interval);
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
         setProcessing(false);
         
         // 添加结果消息

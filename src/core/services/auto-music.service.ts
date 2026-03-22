@@ -1,6 +1,6 @@
 /**
  * 自动配乐服务
- * 支持本地上传 + AI音乐API推荐
+ * 支持本地上传 + 预置音乐库
  */
 import { logger } from '@/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
@@ -19,7 +19,7 @@ export interface MusicTrack {
   localPath?: string;    // 本地文件路径
   bpm?: number;
   tags: string[];
-  source: 'preset' | 'upload' | 'ai';
+  source: 'preset' | 'upload';
 }
 
 export interface MusicMatchResult {
@@ -52,14 +52,6 @@ export interface MusicUploadOptions {
   genre?: MusicGenre;
   mood?: MusicMood[];
   tags?: string[];
-}
-
-export interface AIMusicRecommendOptions {
-  videoDescription?: string;
-  videoTags?: string[];
-  genre?: MusicGenre;
-  mood?: MusicMood;
-  duration?: number;
 }
 
 /**
@@ -135,8 +127,6 @@ export class AutoMusicService {
   private presetLibrary: MusicTrack[];
   private userLibrary: MusicTrack[];
   private config: AutoMusicConfig;
-  private aiApiKey?: string;
-  private aiApiEndpoint?: string;
 
   constructor(config?: Partial<AutoMusicConfig>) {
     this.presetLibrary = PRESET_MUSIC_LIBRARY;
@@ -148,14 +138,6 @@ export class AutoMusicService {
       volume: 0.5,
       ...config,
     };
-  }
-
-  /**
-   * 配置AI音乐API
-   */
-  configureAIApi(apiKey: string, endpoint?: string): void {
-    this.aiApiKey = apiKey;
-    this.aiApiEndpoint = endpoint;
   }
 
   /**
@@ -246,37 +228,6 @@ export class AutoMusicService {
       return true;
     }
     return false;
-  }
-
-  /**
-   * AI音乐推荐（需要API）
-   */
-  async recommendAIMusic(options: AIMusicRecommendOptions): Promise<MusicTrack[]> {
-    // 如果没有配置API，返回空
-    if (!this.aiApiKey) {
-      logger.warn('未配置AI音乐API，请先配置或使用本地上传');
-      return [];
-    }
-
-    // TODO: 实现AI音乐API调用
-    // 可接入的服务：
-    // - Suno AI (https://suno.ai/) - 主要推荐，支持情绪/风格生成
-    // - Udio (https://udio.ai/) - 备选方案
-    // - ElevenLabs (音频增强) - 用于音频后处理
-    
-    logger.info('AI音乐推荐:', options);
-    
-    // 模拟API调用
-    try {
-      // 这里应该调用实际的AI音乐生成API
-      // const response = await fetch(this.aiApiEndpoint || 'https://api.suno.ai/generate', {...});
-      
-      // 暂时返回空，等待实际API接入
-      return [];
-    } catch (error) {
-      logger.error('AI音乐推荐失败:', { error });
-      return [];
-    }
   }
 
   /**
