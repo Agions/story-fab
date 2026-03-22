@@ -39,3 +39,8 @@ export { unifiedWorkflowService, UnifiedWorkflowService } from './unified-workfl
 export { enhancedCommentaryService, EnhancedCommentaryService } from './enhanced-commentary.service';
 export { videoGenerateOptimizeService, VideoGenerateOptimizeService } from './video-generate-optimize.service';
 export { parallelProcessingService, ParallelProcessingService } from './parallel-processing.service';
+
+
+// ASR & OCR 服务
+export { asrService, ASRService } from './asr.service';
+export { ocrService, OCRService } from './ocr.service';
