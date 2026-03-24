@@ -2,7 +2,7 @@
  * Timeline 组件 - 模块化重构版
  * 
  * 重构自 src/components/editor/Timeline.tsx (1362 行)
- * 拆分为: types.ts, constants.ts, utils.ts
+ * 拆分为多个子组件以提高可维护性
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
@@ -11,53 +11,37 @@ import {
   Space,
   Tooltip,
   Dropdown,
-  Slider,
-  Divider,
-  Input,
-  Popover,
   Switch,
-  Select,
-  InputNumber
+  message,
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
-  DragOutlined,
-  ZoomInOutlined,
-  ZoomOutOutlined,
-  ColumnWidthOutlined,
-  SettingOutlined,
-  DoubleRightOutlined,
-  ScissorOutlined,
-  CopyOutlined,
-  SnippetsOutlined,
   PartitionOutlined,
-  AimOutlined,
-  SoundOutlined,
-  FontSizeOutlined,
-  ThunderboltOutlined,
-  ShrinkOutlined,
-  ArrowsAltOutlined,
-  LockOutlined,
-  UnlockOutlined,
-  EyeOutlined,
-  EyeInvisibleOutlined,
-  FullscreenOutlined,
-  CompressOutlined
+  CopyOutlined,
 } from '@ant-design/icons';
 import styles from './Timeline.module.less';
 import { notify } from '@/shared';
 
 // Types, Constants, Utils
-import type { TimelineProps, Track, Clip, TrackType, Keyframe } from './types';
+import type { TimelineProps, Track, Clip, TrackType, Keyframe, TimelineScale } from './types';
 import { TRACK_COLORS, TRANSITION_TYPES } from './constants';
 import { generateId, formatTime } from './utils';
+
+// 子组件
+import TimelineRuler from './TimelineRuler';
+import TimelineTrack from './TimelineTrack';
+import TimelineClip from './TimelineClip';
+import TimelineControls, { TimelineTool } from './TimelineControls';
+import TimelinePlayhead from './TimelinePlayhead';
+import KeyframePanel from './KeyframePanel';
 
 // ==============================================
 // Re-export types for external use
 // ==============================================
 export type { TrackType, Track, Clip, Keyframe } from './types';
 export type { TimelineProps } from './types';
+export type { TimelineTool } from './TimelineControls';
 
 // ==============================================
 // Main Component
@@ -74,28 +58,29 @@ const Timeline: React.FC<TimelineProps> = ({
 }) => {
   // State
   const [tracks, setTracks] = useState<Track[]>(initialTracks || []);
-  const [scale, setScale] = useState(100);
+  const [zoom, setZoom] = useState(100); // 缩放比例
   const [snapEnabled, setSnapEnabled] = useState(true);
   const [selectedClipId, setSelectedClipId] = useState<string | null>(null);
-  const [showWaveforms, setShowWaveforms] = useState(true);
-  const [showKeyframes, setShowKeyframes] = useState(true);
   const [copiedClip, setCopiedClip] = useState<Clip | null>(null);
-  const [draggingClip, setDraggingClip] = useState<{ clipId: string; startX: number; originalStart: number } | null>(null);
-  const [resizingClip, setResizingClip] = useState<{ clipId: string; edge: 'left' | 'right'; startX: number; originalStart: number; originalEnd: number } | null>(null);
   const [showKeyframePanel, setShowKeyframePanel] = useState(false);
-  const [selectedKeyframe, setSelectedKeyframe] = useState<Keyframe | null>(null);
+  const [currentTool, setCurrentTool] = useState<TimelineTool>('select');
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Refs
   const timelineRef = useRef<HTMLDivElement>(null);
-  const playheadRef = useRef<HTMLDivElement>(null);
   const tracksContainerRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef<boolean>(false);
+  const scrollLeftRef = useRef(0);
 
-  // Computed
-  const timelineWidth = Math.max(2000, duration * scale);
-  const playheadPosition = currentTime * scale;
+  // Computed scale
+  const scale: TimelineScale = useMemo(() => ({
+    pixelsPerSecond: zoom * 2, // 基准：100% = 200px/s
+    pixelsPerFrame: zoom * 2 / 30,
+  }), [zoom]);
 
-  // Normalize tracks to ensure all required properties exist
+  const timelineWidth = Math.max(2000, duration * scale.pixelsPerSecond);
+  const playheadPosition = currentTime * scale.pixelsPerSecond;
+
+  // Normalize tracks
   const normalizedTracks = useMemo(() => {
     return (tracks || []).map(track => ({
       id: track.id,
@@ -111,6 +96,7 @@ const Timeline: React.FC<TimelineProps> = ({
         sourceEnd: clip.sourceEnd || 0,
         duration: clip.duration || 0,
         color: clip.color || TRACK_COLORS[track.type as TrackType] || '#3b82f6',
+        thumbnail: clip.thumbnail,
         keyframes: clip.keyframes || [],
         transitions: clip.transitions || {},
         properties: clip.properties || {
@@ -118,13 +104,15 @@ const Timeline: React.FC<TimelineProps> = ({
           rotation: 0,
           opacity: 100,
           x: 0,
-          y: 0
-        }
+          y: 0,
+        },
       })),
-      isMuted: track.isMuted ?? false,
-      isLocked: track.isLocked ?? false,
-      isVisible: track.isVisible ?? true,
-      volume: track.volume ?? 100
+      height: 60,
+      muted: track.isMuted ?? false,
+      locked: track.isLocked ?? false,
+      visible: track.isVisible ?? true,
+      volume: track.volume ?? 100,
+      selected: false,
     }));
   }, [tracks]);
 
@@ -147,9 +135,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
   // Auto-scroll to keep playhead visible
   useEffect(() => {
-    if (playheadRef.current && tracksContainerRef.current) {
-      playheadRef.current.style.left = `${playheadPosition}px`;
-
+    if (tracksContainerRef.current) {
       const container = tracksContainerRef.current;
       const playheadX = playheadPosition;
       const scrollLeft = container.scrollLeft;
@@ -165,73 +151,78 @@ const Timeline: React.FC<TimelineProps> = ({
   // Event Handlers
   // ==============================================
 
-  // Define getSnapPoints first so it can be used by handleTimelineClick
-  const getSnapPoints = useCallback(() => {
-    const points: number[] = [0, duration];
-    tracks.forEach(track => {
-      track.clips.forEach(clip => {
-        points.push(clip.startTime, clip.endTime);
-      });
-    });
-    return [...new Set(points)];
-  }, [tracks, duration]);
+  const handleSeek = useCallback((time: number) => {
+    onTimeUpdate?.(time);
+  }, [onTimeUpdate]);
 
-  const handleTimelineClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (tracksContainerRef.current) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left + tracksContainerRef.current.scrollLeft;
-      let time = x / scale;
+  const handlePlay = useCallback(() => {
+    setIsPlaying(true);
+    // TODO: 实现播放逻辑
+  }, []);
 
-      if (snapEnabled) {
-        const snapPoints = getSnapPoints();
-        const nearestSnap = snapPoints.reduce((prev, curr) =>
-          Math.abs(curr - time) < Math.abs(prev - time) ? curr : prev
-        , time);
-        if (Math.abs(nearestSnap - time) < 0.1) {
-          time = nearestSnap;
-        }
-      }
+  const handlePause = useCallback(() => {
+    setIsPlaying(false);
+    // TODO: 实现暂停逻辑
+  }, []);
 
-      if (time >= 0 && time <= duration) {
-        onTimeUpdate(time);
+  const handleStop = useCallback(() => {
+    setIsPlaying(false);
+    onTimeUpdate?.(0);
+  }, [onTimeUpdate]);
+
+  const handleZoomChange = useCallback((newZoom: number) => {
+    setZoom(newZoom);
+  }, []);
+
+  const handleSnapToggle = useCallback((enabled: boolean) => {
+    setSnapEnabled(enabled);
+  }, []);
+
+  const handleToolChange = useCallback((tool: TimelineTool) => {
+    setCurrentTool(tool);
+  }, []);
+
+  const handleClipSelect = useCallback((clipId: string) => {
+    setSelectedClipId(clipId);
+    
+    // 查找 clip 并通知外部
+    for (const track of normalizedTracks) {
+      const clip = track.clips.find(c => c.id === clipId);
+      if (clip) {
+        onClipSelect?.({
+          ...clip,
+          trackId: track.id,
+        } as Clip);
+        break;
       }
     }
-  }, [scale, duration, snapEnabled, onTimeUpdate, getSnapPoints]);
+  }, [normalizedTracks, onClipSelect]);
 
-  const handlePlayheadMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    isDraggingRef.current = true;
+  const handleClipUpdate = useCallback((clipId: string, updates: Partial<Clip>) => {
+    const newTracks = tracks.map(track => ({
+      ...track,
+      clips: track.clips.map(clip => 
+        clip.id === clipId ? { ...clip, ...updates } : clip
+      ),
+    }));
+    setTracks(newTracks);
+    onTrackUpdate?.(newTracks);
+  }, [tracks, onTrackUpdate]);
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDraggingRef.current && tracksContainerRef.current && timelineRef.current) {
-        const rect = timelineRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left + tracksContainerRef.current.scrollLeft;
-        const time = Math.max(0, Math.min(duration, x / scale));
-        onTimeUpdate(time);
-      }
-    };
+  const handleTrackUpdate = useCallback((trackId: string, updates: Partial<Track>) => {
+    const newTracks = tracks.map(track =>
+      track.id === trackId ? { ...track, ...updates } : track
+    );
+    setTracks(newTracks);
+    onTrackUpdate?.(newTracks);
+  }, [tracks, onTrackUpdate]);
 
-    const handleMouseUp = () => {
-      isDraggingRef.current = false;
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [scale, duration, onTimeUpdate]);
-
-  const handleZoomIn = () => setScale(prev => Math.min(prev + 20, 300));
-  const handleZoomOut = () => setScale(prev => Math.max(prev - 20, 40));
-  const handleResetZoom = () => setScale(100);
-
-  const addTrack = useCallback((type: TrackType) => {
+  const handleAddTrack = useCallback((type: 'video' | 'audio' | 'subtitle') => {
     const typeCount = tracks.filter(t => t.type === type).length + 1;
-    const typeNames: Record<TrackType, string> = {
+    const typeNames: Record<string, string> = {
       video: '视频',
       audio: '音频',
       subtitle: '字幕',
-      effect: '特效'
     };
 
     const newTrack: Track = {
@@ -242,7 +233,7 @@ const Timeline: React.FC<TimelineProps> = ({
       isMuted: false,
       isLocked: false,
       isVisible: true,
-      volume: 100
+      volume: 100,
     };
 
     const newTracks = [...tracks, newTrack];
@@ -250,210 +241,306 @@ const Timeline: React.FC<TimelineProps> = ({
     onTrackUpdate?.(newTracks);
   }, [tracks, onTrackUpdate]);
 
+  const handleKeyframeAdd = useCallback((clipId: string, keyframe: Omit<Keyframe, 'id'>) => {
+    const newKeyframe: Keyframe = {
+      ...keyframe,
+      id: generateId(),
+    };
+    handleClipUpdate(clipId, {
+      keyframes: [...(selectedClip?.keyframes || []), newKeyframe],
+    } as Partial<Clip>);
+  }, [selectedClip, handleClipUpdate]);
+
+  const handleKeyframeUpdate = useCallback((clipId: string, keyframeId: string, updates: Partial<Keyframe>) => {
+    const clip = selectedClip;
+    if (!clip) return;
+
+    const newKeyframes = clip.keyframes.map(kf =>
+      kf.id === keyframeId ? { ...kf, ...updates } : kf
+    );
+    handleClipUpdate(clipId, { keyframes: newKeyframes } as Partial<Clip>);
+  }, [selectedClip, handleClipUpdate]);
+
+  const handleKeyframeDelete = useCallback((clipId: string, keyframeId: string) => {
+    const clip = selectedClip;
+    if (!clip) return;
+
+    const newKeyframes = clip.keyframes.filter(kf => kf.id !== keyframeId);
+    handleClipUpdate(clipId, { keyframes: newKeyframes } as Partial<Clip>);
+  }, [selectedClip, handleClipUpdate]);
+
   // ==============================================
-  // Render Helpers
+  // Clip Actions
   // ==============================================
 
-  const renderTimeRuler = () => {
-    const intervals = Math.ceil(duration / 10);
-    const marks = [];
-    
-    for (let i = 0; i <= intervals; i++) {
-      const time = i * 10;
-      if (time <= duration) {
-        marks.push(
-          <div
-            key={i}
-            className={styles.timeMark}
-            style={{ left: `${time * scale}px` }}
-          >
-            <span className={styles.timeLabel}>{formatTime(time)}</span>
-          </div>
-        );
-      }
+  const handleCopyClip = useCallback(() => {
+    if (selectedClip) {
+      setCopiedClip({ ...selectedClip });
+      message.success('已复制片段');
+    }
+  }, [selectedClip]);
+
+  const handlePasteClip = useCallback(() => {
+    if (!copiedClip) {
+      message.warning('请先复制片段');
+      return;
     }
 
-    return marks;
-  };
+    const newClip: Clip = {
+      ...copiedClip,
+      id: generateId(),
+      name: `${copiedClip.name} (副本)`,
+      startTime: currentTime,
+      endTime: currentTime + (copiedClip.endTime - copiedClip.startTime),
+    };
 
-  const renderTrack = (track: typeof normalizedTracks[0], index: number) => {
-    const trackColor = TRACK_COLORS[track.type];
+    // 找到对应的轨道并添加
+    const trackIndex = tracks.findIndex(t => t.type === copiedClip.type);
+    if (trackIndex >= 0) {
+      const newTracks = [...tracks];
+      newTracks[trackIndex] = {
+        ...newTracks[trackIndex],
+        clips: [...newTracks[trackIndex].clips, newClip],
+      };
+      setTracks(newTracks);
+      onTrackUpdate?.(newTracks);
+      setSelectedClipId(newClip.id);
+      message.success('已粘贴片段');
+    }
+  }, [copiedClip, currentTime, tracks, onTrackUpdate]);
 
-    return (
-      <div key={track.id} className={styles.track}>
-        <div className={styles.trackHeader}>
-          <div className={styles.trackInfo}>
-            <div 
-              className={styles.trackColorIndicator} 
-              style={{ backgroundColor: trackColor }}
-            />
-            <span className={styles.trackName}>{track.name}</span>
-          </div>
-          <div className={styles.trackActions}>
-            <Tooltip title={track.isMuted ? '取消静音' : '静音'}>
-              <Button
-                type="text"
-                size="small"
-                icon={track.isMuted ? <SoundOutlined /> : <SoundOutlined />}
-                onClick={() => {
-                  const newTracks = [...tracks];
-                  newTracks[index].isMuted = !newTracks[index].isMuted;
-                  setTracks(newTracks);
-                  onTrackUpdate?.(newTracks);
-                }}
-              />
-            </Tooltip>
-            <Tooltip title={track.isLocked ? '解锁' : '锁定'}>
-              <Button
-                type="text"
-                size="small"
-                icon={track.isLocked ? <LockOutlined /> : <UnlockOutlined />}
-                onClick={() => {
-                  const newTracks = [...tracks];
-                  newTracks[index].isLocked = !newTracks[index].isLocked;
-                  setTracks(newTracks);
-                  onTrackUpdate?.(newTracks);
-                }}
-              />
-            </Tooltip>
-            <Tooltip title={track.isVisible ? '隐藏' : '显示'}>
-              <Button
-                type="text"
-                size="small"
-                icon={track.isVisible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-                onClick={() => {
-                  const newTracks = [...tracks];
-                  newTracks[index].isVisible = !newTracks[index].isVisible;
-                  setTracks(newTracks);
-                  onTrackUpdate?.(newTracks);
-                }}
-              />
-            </Tooltip>
-            <Button
-              type="text"
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => {
-                const newTracks = tracks.filter(t => t.id !== track.id);
-                setTracks(newTracks);
-                onTrackUpdate?.(newTracks);
-              }}
-            />
-          </div>
-        </div>
-        <div className={styles.trackContent}>
-          {track.clips.map(clip => (
-            <div
-              key={clip.id}
-              className={styles.clip}
-              style={{
-                left: `${clip.startTime * scale}px`,
-                width: `${(clip.endTime - clip.startTime) * scale}px`,
-                backgroundColor: clip.color
-              }}
-              onClick={() => {
-                setSelectedClipId(clip.id);
-                onClipSelect?.(clip);
-              }}
-            >
-              <div className={styles.clipContent}>
-                <span className={styles.clipName}>{clip.name}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
+  const handleDeleteClip = useCallback(() => {
+    if (!selectedClipId) return;
+
+    const newTracks = tracks.map(track => ({
+      ...track,
+      clips: track.clips.filter(clip => clip.id !== selectedClipId),
+    }));
+    setTracks(newTracks);
+    onTrackUpdate?.(newTracks);
+    setSelectedClipId(null);
+    message.success('已删除片段');
+  }, [selectedClipId, tracks, onTrackUpdate]);
 
   // ==============================================
-  // Main Render
+  // Render
   // ==============================================
 
   return (
     <div className={styles.timelineContainer} ref={timelineRef}>
-      {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <Space>
-          <Button icon={<PlusOutlined />} onClick={() => addTrack('video')}>
-            添加视频轨道
-          </Button>
-          <Button icon={<PlusOutlined />} onClick={() => addTrack('audio')}>
-            添加音频轨道
-          </Button>
-          <Dropdown menu={{
-            items: TRANSITION_TYPES.map(t => ({
-              key: t.value,
-              label: t.label,
-              onClick: () => {
-                if (selectedClip) {
-                  const updatedClip = { ...selectedClip };
-                  updatedClip.transitions.out = { type: t.value as any, duration: 0.5 };
-                  onClipUpdate?.(updatedClip);
-                }
-              }
-            }))
-          }}>
-            <Button icon={<PartitionOutlined />}>添加转场</Button>
-          </Dropdown>
-        </Space>
+      {/* 控制栏 - 使用新的 TimelineControls 组件 */}
+      <TimelineControls
+        isPlaying={isPlaying}
+        currentTime={currentTime}
+        duration={duration}
+        zoom={zoom}
+        snapEnabled={snapEnabled}
+        currentTool={currentTool}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStop={handleStop}
+        onSeek={handleSeek}
+        onZoomChange={handleZoomChange}
+        onSnapToggle={handleSnapToggle}
+        onToolChange={handleToolChange}
+        onAddTrack={handleAddTrack}
+      />
 
-        <Space>
-          <Button icon={<AimOutlined />} onClick={handleResetZoom} title="重置缩放" />
-          <Button icon={<ZoomOutOutlined />} onClick={handleZoomOut} />
-          <span style={{ width: 100 }}>
-            <Slider 
-              value={scale} 
-              min={40} 
-              max={300} 
-              onChange={setScale}
-              tooltip={{ formatter: (v) => `${v}%` }}
-            />
-          </span>
-          <Button icon={<ZoomInOutlined />} onClick={handleZoomIn} />
-        </Space>
+      {/* 时间标尺 - 使用新的 TimelineRuler 组件 */}
+      <TimelineRuler
+        scale={scale}
+        duration={duration}
+        currentTime={currentTime}
+        scrollLeft={scrollLeftRef.current}
+        onSeek={handleSeek}
+      />
 
-        <Space>
-          <Switch 
-            checkedChildren="吸附" 
-            unCheckedChildren="吸附" 
-            checked={snapEnabled} 
-            onChange={setSnapEnabled}
-            size="small"
-          />
-        </Space>
-      </div>
-
-      {/* Time Ruler */}
-      <div className={styles.timeRuler}>
-        {renderTimeRuler()}
-      </div>
-
-      {/* Tracks Container */}
-      <div 
-        className={styles.tracksContainer} 
+      {/* 轨道容器 */}
+      <div
         ref={tracksContainerRef}
-        onClick={handleTimelineClick}
+        className={styles.tracksContainer}
+        onScroll={(e) => {
+          scrollLeftRef.current = e.currentTarget.scrollLeft;
+        }}
+        onClick={(e) => {
+          // 点击空白区域取消选中
+          if (e.target === e.currentTarget) {
+            setSelectedClipId(null);
+          }
+        }}
+        style={{
+          width: '100%',
+          flex: 1,
+          overflow: 'auto',
+          position: 'relative',
+        }}
       >
-        <div className={styles.tracksContent} style={{ width: `${timelineWidth}px` }}>
-          {/* Playhead */}
-          <div 
-            ref={playheadRef}
-            className={styles.playhead}
-            onMouseDown={handlePlayheadMouseDown}
+        <div
+          className={styles.tracksContent}
+          style={{ width: `${timelineWidth}px`, position: 'relative' }}
+        >
+          {/* 播放头 */}
+          <TimelinePlayhead
+            currentTime={currentTime}
+            scale={scale}
+            scrollLeft={scrollLeftRef.current}
+            containerHeight={400}
+            onSeek={handleSeek}
           />
 
-          {/* Tracks */}
-          {normalizedTracks.map((track, index) => renderTrack(track, index))}
+          {/* 轨道列表 */}
+          {normalizedTracks.map((track) => (
+            <TimelineTrack
+              key={track.id}
+              track={track}
+              clips={track.clips}
+              scale={scale}
+              selectedClipId={selectedClipId || undefined}
+              onClipSelect={handleClipSelect}
+              onClipUpdate={handleClipUpdate}
+              onTrackUpdate={handleTrackUpdate}
+            />
+          ))}
+
+          {/* 空白提示 */}
+          {normalizedTracks.length === 0 && (
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                textAlign: 'center',
+                color: 'var(--text-tertiary)',
+              }}
+            >
+              <p>暂无轨道</p>
+              <Space>
+                <Button icon={<PlusOutlined />} onClick={() => handleAddTrack('video')}>
+                  添加视频轨道
+                </Button>
+                <Button icon={<PlusOutlined />} onClick={() => handleAddTrack('audio')}>
+                  添加音频轨道
+                </Button>
+              </Space>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Current Time Display */}
-      <div className={styles.timeDisplay}>
-        <span className={styles.currentTime}>{formatTime(currentTime)}</span>
-        <span className={styles.separator}>/</span>
-        <span className={styles.totalTime}>{formatTime(duration)}</span>
+      {/* 选中 clip 的操作栏 */}
+      {selectedClip && (
+        <div
+          className={styles.clipActionsBar}
+          style={{
+            height: 48,
+            background: 'var(--bg-secondary)',
+            borderTop: '1px solid var(--border-color)',
+            padding: '0 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Space>
+            <span style={{ fontWeight: 500 }}>已选中:</span>
+            <span>{selectedClip.name}</span>
+            <span style={{ color: 'var(--text-tertiary)' }}>
+              {formatTime(selectedClip.startTime)} - {formatTime(selectedClip.endTime)}
+            </span>
+          </Space>
+
+          <Space>
+            <Button
+              size="small"
+              icon={<CopyOutlined />}
+              onClick={handleCopyClip}
+            >
+              复制
+            </Button>
+            <Button
+              size="small"
+              icon={<CopyOutlined />}
+              onClick={handlePasteClip}
+              disabled={!copiedClip}
+            >
+              粘贴
+            </Button>
+            <Dropdown
+              menu={{
+                items: TRANSITION_TYPES.map(t => ({
+                  key: t.value,
+                  label: t.label,
+                  onClick: () => {
+                    if (selectedClip) {
+                      handleClipUpdate(selectedClip.id, {
+                        transitions: {
+                          ...selectedClip.transitions,
+                          out: { type: t.value as any, duration: 0.5 },
+                        },
+                      } as Partial<Clip>);
+                    }
+                  },
+                })),
+              }}
+            >
+              <Button size="small" icon={<PartitionOutlined />}>
+                转场
+              </Button>
+            </Dropdown>
+            <Button
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={handleDeleteClip}
+            >
+              删除
+            </Button>
+            <Button
+              size="small"
+              onClick={() => setShowKeyframePanel(true)}
+            >
+              关键帧
+            </Button>
+          </Space>
+        </div>
+      )}
+
+      {/* 关键帧面板 */}
+      {showKeyframePanel && selectedClip && (
+        <KeyframePanel
+          clipId={selectedClip.id}
+          keyframes={selectedClip.keyframes || []}
+          onKeyframeAdd={handleKeyframeAdd}
+          onKeyframeUpdate={handleKeyframeUpdate}
+          onKeyframeDelete={handleKeyframeDelete}
+          onClose={() => setShowKeyframePanel(false)}
+        />
+      )}
+
+      {/* 时间显示 */}
+      <div
+        className={styles.timeDisplay}
+        style={{
+          height: 32,
+          background: 'var(--bg-secondary)',
+          borderTop: '1px solid var(--border-color)',
+          padding: '0 16px',
+          display: 'flex',
+          alignItems: 'center',
+          fontFamily: 'monospace',
+          fontSize: 12,
+        }}
+      >
+        <span style={{ color: 'var(--primary-color)' }}>
+          {formatTime(currentTime)}
+        </span>
+        <span style={{ color: 'var(--text-tertiary)', margin: '0 8px' }}>/</span>
+        <span>{formatTime(duration)}</span>
+        <div style={{ flex: 1 }} />
+        <span style={{ color: 'var(--text-tertiary)' }}>
+          {normalizedTracks.length} 轨道 | {normalizedTracks.reduce((sum, t) => sum + t.clips.length, 0)} 片段
+        </span>
       </div>
     </div>
   );

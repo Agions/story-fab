@@ -5,6 +5,23 @@ import { logger } from '@/utils/logger';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+/**
+ * HTML 转义函数，防止 XSS 攻击
+ */
+const escapeHtml = (text: string): string => {
+  const escapeMap: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;',
+  };
+  return text.replace(/[&<>"'`=/]/g, (char) => escapeMap[char] || char);
+};
+
 type AutoTableDoc = InstanceType<typeof jsPDF> & {
   autoTable: (options: {
     startY: number;
@@ -207,7 +224,7 @@ const formatAsHtml = (script: Script): string => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${script.id || '未命名脚本'}</title>
+  <title>${escapeHtml(script.id || '未命名脚本')}</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -264,7 +281,7 @@ const formatAsHtml = (script: Script): string => {
     content += `
     <div class="segment">
       <div class="time">[${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}]</div>
-      <div class="content">${segment.content}</div>
+      <div class="content">${escapeHtml(segment.content)}</div>
     </div>
 `;
   });

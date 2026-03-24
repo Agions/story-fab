@@ -5,15 +5,44 @@
 // Track types
 export type TrackType = 'video' | 'audio' | 'subtitle' | 'effect';
 
-export interface Track {
+// Timeline scale for pixel calculations
+export interface TimelineScale {
+  pixelsPerSecond: number;
+  pixelsPerFrame: number;
+}
+
+// Track interface
+export interface TimelineTrack {
   id: string;
   name: string;
   type: TrackType;
-  clips: Clip[];
-  isMuted: boolean;
-  isLocked: boolean;
-  isVisible: boolean;
+  clips: TimelineClip[];
+  height?: number;
+  muted?: boolean;
+  locked?: boolean;
+  visible?: boolean;
   volume?: number;
+  selected?: boolean;
+}
+
+// Clip interface (internal for timeline)
+export interface TimelineClip {
+  id: string;
+  trackId: string;
+  name: string;
+  startTime: number;
+  endTime: number;
+  sourceStart: number;
+  sourceEnd: number;
+  duration: number;
+  color: string;
+  thumbnail?: string;
+  keyframes: Keyframe[];
+  transitions: {
+    in?: Transition;
+    out?: Transition;
+  };
+  properties: ClipProperties;
 }
 
 // Clip types
@@ -33,6 +62,7 @@ export interface Clip {
     out?: Transition;
   };
   properties: ClipProperties;
+  thumbnail?: string;
 }
 
 export interface ClipProperties {
@@ -43,10 +73,16 @@ export interface ClipProperties {
   y: number;
 }
 
+// Keyframe interface
 export interface Keyframe {
   id: string;
   time: number;
-  properties: {
+  property: string;
+  value: number;
+  ease: KeyframeEase;
+  label?: string;
+  // Legacy support
+  properties?: {
     scale?: number;
     rotation?: number;
     opacity?: number;
@@ -54,6 +90,8 @@ export interface Keyframe {
     y?: number;
   };
 }
+
+export type KeyframeEase = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'bezier';
 
 export interface Transition {
   type: 'fade' | 'dissolve' | 'wipe' | 'slide';

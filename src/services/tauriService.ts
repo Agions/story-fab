@@ -171,8 +171,8 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
     
     // 检查文件是否已存在
     const fileExists = await exists(projectPath, { baseDir: BaseDirectory.AppData })
-      .catch(_err => {
-        logger.error('检查文件是否存在时出错:', err);
+      .catch(__err => {
+        logger.error('检查文件是否存在时出错:', __err);
         return false;
       });
       
