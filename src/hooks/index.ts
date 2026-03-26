@@ -1,5 +1,5 @@
 /**
- * 自定义 Hooks 统一导出
+ * Custom hooks barrel export
+ * Only include hooks that are actually imported elsewhere
  */
-export * from './usePerformance';
-export * from './useHistory';
+export { default as useLocalStorage } from './useLocalStorage';
