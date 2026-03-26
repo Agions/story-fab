@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { logger } from '@/utils/logger';
 import { visionService } from './vision.service';
 import { aiService } from './ai.service';
-import { smartCutService } from './smart-cut.service';
+import { smartCutService, type SceneChange, type AudioPeak } from './smart-cut.service';
 import { subtitleService as _subtitleService } from './subtitle.service';
 
 /**
@@ -395,7 +395,7 @@ export class EnhancedCommentaryService {
   /**
    * 转换场景
    */
-  private convertScenes(scenes: any[]): SceneInfo[] {
+  private convertScenes(scenes: SceneChange[]): SceneInfo[] {
     return scenes.map(s => ({
       startTime: s.startTime,
       endTime: s.endTime,
@@ -407,10 +407,10 @@ export class EnhancedCommentaryService {
   /**
    * 转换音频峰值
    */
-  private convertAudioPeaks(peaks: any[]): AudioPeakInfo[] {
+  private convertAudioPeaks(peaks: AudioPeak[]): AudioPeakInfo[] {
     return peaks.map(p => ({
       timestamp: p.timestamp,
-      type: p.type as any,
+      type: p.type as AudioPeakInfo["type"],
       volume: p.score,
     }));
   }

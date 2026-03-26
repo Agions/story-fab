@@ -6,6 +6,7 @@ import React from 'react';
 import { Button, Tooltip, Progress, Popconfirm, Tag } from 'antd';
 import { PlusOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import type { BatchItem } from '../types';
+import type { VideoSegment } from '@/core/types';
 
 interface BatchProcessingProps {
   batchItems: BatchItem[];
@@ -15,7 +16,7 @@ interface BatchProcessingProps {
   onAddBatchItem: () => void;
   onRemoveBatchItem: (id: string) => void;
   onStartBatchProcessing: () => void;
-  calculateTotalDuration: (segments: any[]) => number;
+  calculateTotalDuration: (segments: VideoSegment[]) => number;
 }
 
 export const BatchProcessing: React.FC<BatchProcessingProps> = ({

@@ -37,31 +37,34 @@ export interface OCRProviderConfig {
   apiSecret?: string;
 }
 
+// Tesseract.js Worker 类型
+interface TesseractWorker {
+  recognize: (image: string | Blob | File) => Promise<{
+    data: {
+      text: string;
+      confidence: number;
+      words: Array<{
+        text: string;
+        confidence: number;
+        bbox: { x0: number; y0: number; x1: number; y1: number };
+      }>;
+    };
+  }>;
+  terminate: () => Promise<void>;
+}
+
 // Tesseract.js 类型声明
 declare global {
   interface Window {
     Tesseract: {
-      createWorker: (lang: string, options?: object) => Promise<{
-        recognize: (image: string | Blob | File) => Promise<{
-          data: {
-            text: string;
-            confidence: number;
-            words: Array<{
-              text: string;
-              confidence: number;
-              bbox: { x0: number; y0: number; x1: number; y1: number };
-            }>;
-          };
-        }>;
-        terminate: () => Promise<void>;
-      }>;
+      createWorker: (lang: string, options?: object) => Promise<TesseractWorker>;
     };
   }
 }
 
 export class OCRService extends BaseService {
   private config: OCRProviderConfig | null = null;
-  private tesseractWorker: any = null;
+  private tesseractWorker: TesseractWorker | null = null;
   private isLoading = false;
 
   constructor() {

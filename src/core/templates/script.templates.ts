@@ -6,6 +6,14 @@
 import type { ScriptTemplate, ScriptMetadata } from '@/core/types';
 
 // 基础模板接口
+export interface TemplateSection {
+  type: 'intro' | 'hook' | 'body' | 'transition' | 'conclusion' | 'cta';
+  name: string;
+  duration: number;
+  content: string;
+  tips: string[];
+}
+
 interface TemplateConfig {
   id: string;
   name: string;
@@ -13,13 +21,7 @@ interface TemplateConfig {
   category: string;
   tags: string[];
   structure: {
-    sections: Array<{
-      type: 'intro' | 'hook' | 'body' | 'transition' | 'conclusion' | 'cta';
-      name: string;
-      duration: number; // 占比 (0-1)
-      content: string;
-      tips: string[];
-    }>;
+    sections: TemplateSection[];
   };
   style: {
     tone: string;
@@ -643,7 +645,7 @@ class ScriptTemplateService {
       topic: string;
       duration: number;
       keywords?: string[];
-      customSections?: any[];
+      customSections?: TemplateSection[];
     }
   ): {
     structure: any[];
@@ -687,7 +689,7 @@ class ScriptTemplateService {
    * 生成段落提示词
    */
   private generateSectionPrompt(
-    section: any,
+    section: TemplateSection,
     topic: string,
     keywords?: string[]
   ): string {
