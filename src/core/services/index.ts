@@ -31,14 +31,10 @@ export { pipelineService, PipelineService } from './pipeline.service';
 
 // 新增服务
 export { smartCutService, SmartCutService } from './smart-cut.service';
-export { videoEnhanceService, VideoEnhanceService } from './videoEnhance.service';
-export { performanceService, PerformanceService } from './performance.service';
 export { autoMusicService, AutoMusicService } from './auto-music.service';
 
-export { unifiedWorkflowService, UnifiedWorkflowService } from './unified-workflow.service';
 export { enhancedCommentaryService, EnhancedCommentaryService } from './enhanced-commentary.service';
-export { videoGenerateOptimizeService, VideoGenerateOptimizeService } from './video-generate-optimize.service';
-export { parallelProcessingService, ParallelProcessingService } from './parallel-processing.service';
+
 
 
 // ASR & OCR 服务
