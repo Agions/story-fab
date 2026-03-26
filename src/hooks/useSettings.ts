@@ -1,7 +1,7 @@
 /**
  * 设置页面专用 Hooks
  */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';
 import { logger } from '@/utils/logger';
 
@@ -56,7 +56,7 @@ export function useSettingsStore() {
   const [outputPath, setOutputPath] = useLocalStorage('clipflow-output-path', '');
   const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('clipflow-recent-projects', []);
 
-  const settings: AppSettings = {
+  const settings = useMemo<AppSettings>(() => ({
     autoSave,
     compactMode,
     theme,
@@ -64,7 +64,7 @@ export function useSettingsStore() {
     projectSaveBehavior,
     outputPath,
     recentProjects,
-  };
+  }), [autoSave, compactMode, theme, defaultModel, projectSaveBehavior, outputPath, recentProjects]);
 
   const updateSettings = useCallback((newSettings: Partial<AppSettings>) => {
     if (newSettings.autoSave !== undefined) setAutoSave(newSettings.autoSave);
