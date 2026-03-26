@@ -43,16 +43,6 @@ const formatTime = (seconds: number): string => {
 };
 
 // TODO: 这些函数应替换为实际的 AI 服务调用
-// 生成场景数据 - TODO: 使用 visionService.detectScenesAdvanced
-const _generateMockScenes = (duration: number): Scene[] => {
-  return [];
-};
-
-// 生成字幕数据 - TODO: 使用实际的 OCR/ASR 服务
-const _generateMockSubtitles = (duration: number) => {
-  return [];
-};
-
 // AI 分析任务列表
 interface AnalysisTask {
   key: string;
@@ -75,8 +65,6 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
   const { 
     state, 
     setAnalysis, 
-    setOcrSubtitle, 
-    setAsrSubtitle,
     goToNextStep,
     dispatch 
   } = useClipFlow();
@@ -85,7 +73,6 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
   const [progress, setProgress] = useState(0);
   const [currentTask, setCurrentTask] = useState('');
   const [taskList, setTaskList] = useState<string[]>([]);
-  const [previewModalVisible, setPreviewModalVisible] = useState(false);
   
   // 分析配置
   const [config, setConfig] = useState({
