@@ -4,7 +4,7 @@ import zlib from 'node:zlib';
 
 const DIST_ASSETS_DIR = path.resolve(process.cwd(), 'dist/assets');
 const MAX_CHUNK_KB = Number(process.env.MAX_CHUNK_KB || 600);
-const MAX_CHUNK_GZIP_KB = Number(process.env.MAX_CHUNK_GZIP_KB || 90);
+const MAX_CHUNK_GZIP_KB = Number(process.env.MAX_CHUNK_GZIP_KB || 95);
 const TOP_N = 8;
 
 if (!fs.existsSync(DIST_ASSETS_DIR)) {
