@@ -1,5 +1,5 @@
 import { logger } from '@/utils/logger';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Row, 
   Col, 
@@ -99,7 +99,7 @@ const Dashboard: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [viewMode, setViewMode] = useState<string | number>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects);
+  // filteredProjects computed via useMemo below
   const [loading, setLoading] = useState(false);
   
   const loadProjects = useCallback(async () => {
@@ -134,10 +134,10 @@ const Dashboard: React.FC = () => {
     }
   }, []);
 
-  // 统计数据
-  const totalProjects = projects.length;
-  const totalDuration = projects.reduce((sum, project) => sum + project.duration, 0);
-  const totalSize = projects.reduce((sum, project) => sum + project.size, 0);
+  // 统计数据 - memoized
+  const totalProjects = useMemo(() => projects.length, [projects]);
+  const totalDuration = useMemo(() => projects.reduce((sum, p) => sum + p.duration, 0), [projects]);
+  const totalSize = useMemo(() => projects.reduce((sum, p) => sum + p.size, 0), [projects]);
   
   // 搜索和过滤项目
   useEffect(() => {
@@ -151,16 +151,13 @@ const Dashboard: React.FC = () => {
     };
   }, [loadProjects]);
 
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredProjects(projects);
-    } else {
-      const filtered = projects.filter(project => 
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-      setFilteredProjects(filtered);
-    }
+  const filteredProjects = useMemo(() => {
+    if (searchQuery.trim() === '') return projects;
+    const q = searchQuery.toLowerCase();
+    return projects.filter(project =>
+      project.title.toLowerCase().includes(q) ||
+      project.tags.some(tag => tag.toLowerCase().includes(q))
+    );
   }, [searchQuery, projects]);
   
   // 切换收藏状态
