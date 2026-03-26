@@ -17,23 +17,19 @@ export { editorService, EditorService } from './editor.service';
 export { costService, CostService } from './cost.service';
 export { aiClipService, AIClipService } from './aiClip.service';
 export { clipWorkflowService, ClipWorkflowService } from './clip-workflow.service';
-export { commentaryMixService, CommentaryMixService } from './commentary-mix.service';
 export { audioVideoSyncService, AudioVideoSyncService } from './audio-sync.service';
 export { subtitleService, SubtitleService } from './subtitle.service';
 export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './scene-commentary-alignment.service';
 export { aiDirectorService, AIDirectorService } from './ai-director.service';
-export { overlayQualityService, OverlayQualityService } from './overlay-quality.service';
 export { optimizeOverlayIteratively } from './overlay-optimization.service';
 export { voiceSynthesisService, VoiceSynthesisService } from './voice-synthesis.service';
 export { videoEffectService, VideoEffectService } from './video-effect.service';
 export { exportService, ExportService } from './export.service';
-export { pipelineService, PipelineService } from './pipeline.service';
 
 // 新增服务
 export { smartCutService, SmartCutService } from './smart-cut.service';
 export { autoMusicService, AutoMusicService } from './auto-music.service';
 
-export { enhancedCommentaryService, EnhancedCommentaryService } from './enhanced-commentary.service';
 
 
 
