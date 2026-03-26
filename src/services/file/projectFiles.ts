@@ -5,7 +5,7 @@ import {
   listProjects as listProjectsFromTauri,
   deleteProject as deleteProjectFromTauri,
   exportScriptToFile as exportScriptToFileFromTauri,
-} from '@/services/tauriService';
+} from '@/services/tauri';
 
 type ProjectFileData = {
   aiModel?: {

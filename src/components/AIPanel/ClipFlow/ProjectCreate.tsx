@@ -10,7 +10,7 @@ import { Form, Input, Select, Button, Card, Typography, Divider, Tag } from 'ant
 import { PlusOutlined, ArrowRightOutlined, CheckCircleOutlined, VideoCameraOutlined, BookOutlined, CustomerServiceOutlined, FileTextOutlined, SettingOutlined } from '@ant-design/icons';
 import { useClipFlow } from '../AIEditorContext';
 import type { ProjectData } from '@/core/types';
-import { saveProjectToFile } from '@/services/tauriService';
+import { saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
 import styles from './ClipFlow.module.less';

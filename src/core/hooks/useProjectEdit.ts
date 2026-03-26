@@ -7,7 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import { notify } from '@/shared';
-import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauriService';
+import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { normalizeProjectFile, type ProjectFileLike } from '@/core/utils/project-file';
 
 export interface UseProjectEditOptions {

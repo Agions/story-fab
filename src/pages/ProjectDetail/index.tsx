@@ -15,7 +15,7 @@ import {
 } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/store';
-import { saveProjectToFile, getApiKey, loadProjectWithRetry, deleteProject } from '@/services/tauriService';
+import { saveProjectToFile, getApiKey, loadProjectWithRetry, deleteProject } from '@/services/tauri';
 import { useSettings } from '@/context/SettingsContext';
 import { notify } from '@/shared';
 import { generateScriptWithModel, parseGeneratedScript } from '@/services/aiService';
@@ -23,7 +23,7 @@ import { resolveLegacyModel } from '@/services/aiModelAdapter';
 import { normalizeProjectFile } from '@/core/utils/project-file';
 import type { ProjectFileLike } from '@/core/utils/project-file';
 import type { Script } from '@/services/aiService';
-import type { VideoSegment } from '@/services/videoService';
+import type { VideoSegment } from '@/services/video';
 import type { VideoAnalysis } from '@/types';
 import type { ScriptEditorOriginalProps } from '@/components/ScriptEditor/types';
 import styles from './index.module.less';

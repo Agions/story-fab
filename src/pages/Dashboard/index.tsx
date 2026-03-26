@@ -37,7 +37,7 @@ import {
   SearchOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { listProjects, deleteProject as deleteProjectFile, getFileSizeBytes, PROJECTS_CHANGED_EVENT } from '@/services/tauriService';
+import { listProjects, deleteProject as deleteProjectFile, getFileSizeBytes, PROJECTS_CHANGED_EVENT } from '@/services/tauri';
 import {
   preloadAIVideoEditorPage,
   preloadProjectEditPage,

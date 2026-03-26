@@ -24,7 +24,7 @@ import {
 } from '@ant-design/icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useSettings } from '@/context/SettingsContext';
-import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '@/services/tauriService';
+import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '@/services/tauri';
 import { preloadProjectEditPage, preloadProjectsPage } from '@/core/utils/route-preload';
 import {
   extractProjectMediaMetrics,

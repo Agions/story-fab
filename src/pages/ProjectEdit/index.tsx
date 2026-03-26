@@ -18,9 +18,9 @@ import {
 import { ArrowLeftOutlined, SaveOutlined, VideoCameraOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import VideoSelector from '@/components/VideoSelector';
 import ScriptEditor from '@/components/ScriptEditor';
-import { VideoMetadata, VideoSegment, analyzeVideo, extractKeyFrames } from '@/services/videoService';
+import { VideoMetadata, VideoSegment, analyzeVideo, extractKeyFrames } from '@/services/video';
 import { generateScriptWithAI, analyzeKeyFramesWithAI } from '@/services/aiService';
-import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauriService';
+import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { normalizeProjectFile } from '@/core/utils/project-file';
 import type { ProjectFileLike } from '@/core/utils/project-file';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';

@@ -7,7 +7,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { invoke } from '@tauri-apps/api/core';
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
-import { ensureFFmpegInstalled } from '@/services/videoService';
+import { ensureFFmpegInstalled } from '@/services/video';
 
 // 导出格式
 export type ExportFormat = 'mp4' | 'webm' | 'mov' | 'mkv';

@@ -7,7 +7,7 @@ import {
 } from 'antd';
 import { useSettings } from '@/context/SettingsContext';
 import { notify } from '@/shared';
-import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '@/services/tauriService';
+import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '@/services/tauri';
 import { preloadProjectDetailPage, preloadProjectEditPage, preloadVideoEditorPage } from '@/core/utils/route-preload';
 import type { ProjectUIStatus, ProjectUIStats, ProjectView } from './types';
 import {

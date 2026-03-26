@@ -5,11 +5,11 @@ import { Card, Button, Typography, Space, Spin, Divider, Modal, Tag, Result } fr
 import { ArrowLeftOutlined, SaveOutlined, DeleteOutlined, ExportOutlined, RobotOutlined } from '@ant-design/icons';
 import { useSettings } from '@/context/SettingsContext';
 import { notify } from '@/shared';
-import { exportScriptToFile, saveProjectToFile, loadProjectWithRetry, listProjects } from '@/services/tauriService';
+import { exportScriptToFile, saveProjectToFile, loadProjectWithRetry, listProjects } from '@/services/tauri';
 import { findProjectByScriptId, normalizeProjectFile } from '@/core/utils/project-file';
 import type { ProjectFileLike } from '@/core/utils/project-file';
 import type { Script } from '@/services/aiService';
-import type { VideoSegment } from '@/services/videoService';
+import type { VideoSegment } from '@/services/video';
 import styles from './index.module.less';
 
 const { Title, Text } = Typography;

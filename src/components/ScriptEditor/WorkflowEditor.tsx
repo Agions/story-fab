@@ -9,7 +9,7 @@ import {
   ClockCircleOutlined,
 } from '@ant-design/icons';
 import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
-import { formatDuration } from '@/services/videoService';
+import { formatDuration } from '@/services/video';
 import { notify } from '@/shared';
 import styles from './ScriptEditor.module.less';
 

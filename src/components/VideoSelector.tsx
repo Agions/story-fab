@@ -4,7 +4,7 @@ import { Button, Space, Card, Spin } from 'antd';
 import { UploadOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { open } from '@tauri-apps/plugin-dialog';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
-import { analyzeVideo, VideoMetadata, formatDuration, formatResolution } from '@/services/videoService';
+import { analyzeVideo, VideoMetadata, formatDuration, formatResolution } from '@/services/video';
 import { notify } from '@/shared';
 import styles from './VideoSelector.module.less';
 

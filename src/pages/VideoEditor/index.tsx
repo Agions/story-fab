@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Layout, Tabs, Row, Col, Spin, message } from 'antd';
 import { RobotOutlined } from '@ant-design/icons';
 
-import { saveProjectToFile } from '@/services/tauriService';
+import { saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
 import { logger } from '@/utils/logger';

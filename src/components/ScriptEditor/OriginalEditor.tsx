@@ -8,7 +8,7 @@ import {
   DownOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { VideoSegment, formatDuration, previewSegment } from '@/services/videoService';
+import { VideoSegment, formatDuration, previewSegment } from '@/services/video';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { notify } from '@/shared';
 import SegmentTable from './SegmentTable';

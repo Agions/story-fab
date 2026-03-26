@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, memo } from 'react';
 import { Card, Button, Typography, Space, Tag, Empty } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { VideoSegment } from '@/services/videoService';
+import { VideoSegment } from '@/services/video';
 import styles from '../index.module.less';
 
 const { Text, Title } = Typography;

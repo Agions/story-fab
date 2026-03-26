@@ -4,7 +4,7 @@
 import React, { useState, useCallback } from 'react';
 import { Card, Form, Input, Button, Space, Tag, Spin, Typography, Alert, Divider } from 'antd';
 import { KeyOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined, DeleteOutlined } from '@ant-design/icons';
-import { validateApiKey } from '@/services/apiKeyService';
+import { validateApiKey } from '@/services/apiKey';
 import { notify } from '@/shared';
 import { ModelProvider, PROVIDER_NAMES } from '@/constants/models';
 import { MODEL_PROVIDERS } from '@/core/config/models.config';

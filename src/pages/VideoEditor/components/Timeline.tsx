@@ -1,5 +1,5 @@
 import React, { useRef, memo, useMemo } from 'react';
-import { VideoSegment } from '@/services/videoService';
+import { VideoSegment } from '@/services/video';
 import styles from '../index.module.less';
 
 interface TimelineProps {

@@ -1,4 +1,4 @@
-import { VideoSegment } from '@/services/videoService';
+import { VideoSegment } from '@/services/video';
 import type { ScriptData, Scene } from '@/core/types';
 
 // 原始 Props 接口
