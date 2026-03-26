@@ -726,18 +726,18 @@ export class ExportService {
     },
     formats: ExportFormat[]
   ): Promise<ExportResult[]> {
-    const results: ExportResult[] = [];
-    
-    for (const format of formats) {
-      const originalFormat = this.config.format;
-      this.config.format = format;
-      
-      const result = await this.startExport(timeline);
-      results.push(result);
-      
-      this.config.format = originalFormat;
-    }
-    
+    // Parallel export for multiple formats
+    const results = await Promise.all(
+      formats.map(async (format) => {
+        const originalFormat = this.config.format;
+        this.config.format = format;
+        try {
+          return await this.startExport(timeline);
+        } finally {
+          this.config.format = originalFormat;
+        }
+      })
+    );
     return results;
   }
 
