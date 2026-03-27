@@ -4,8 +4,8 @@
  */
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { getApiKey } from './tauriService';
-import { VideoMetadata } from './videoService';
+import { getApiKey } from './tauri';
+import { VideoMetadata } from './video';
 import { logger } from '@/utils/logger';
 
 // ============================================
