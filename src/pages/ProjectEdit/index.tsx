@@ -138,7 +138,7 @@ const createDefaultProjectName = () => {
   return `未命名项目-${timestamp}`;
 };
 
-const PROJECT_AUTO_SAVE_KEY = 'clipflow-project-auto-save-enabled';
+const PROJECT_AUTO_SAVE_KEY = 'storyforge-project-auto-save-enabled';
 
 const buildDraftFingerprint = (payload: {
   id?: string;
