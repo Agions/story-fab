@@ -335,7 +335,7 @@ export class CostService {
     const suggestions = this.getOptimizationSuggestions();
 
     return `
-# ClipFlow 成本报告
+# StoryForge 成本报告
 
 生成时间: ${new Date().toLocaleString('zh-CN')}
 
@@ -370,7 +370,7 @@ ${Object.entries(stats.byModel)
 ${suggestions.join('\n\n')}
 
 ---
-*报告由 ClipFlow 成本追踪服务生成*
+*报告由 StoryForge 成本追踪服务生成*
     `.trim();
   }
 
@@ -403,8 +403,8 @@ ${suggestions.join('\n\n')}
    */
   saveToStorage(): void {
     try {
-      localStorage.setItem('reelforge_cost_records', JSON.stringify(this.records));
-      localStorage.setItem('reelforge_cost_budget', JSON.stringify(this.budget));
+      localStorage.setItem('storyforge_cost_records', JSON.stringify(this.records));
+      localStorage.setItem('storyforge_cost_budget', JSON.stringify(this.budget));
     } catch (error) {
       logger.error('保存成本记录失败:', { error });
     }
@@ -415,8 +415,8 @@ ${suggestions.join('\n\n')}
    */
   loadFromStorage(): boolean {
     try {
-      const records = localStorage.getItem('reelforge_cost_records');
-      const budget = localStorage.getItem('reelforge_cost_budget');
+      const records = localStorage.getItem('storyforge_cost_records');
+      const budget = localStorage.getItem('storyforge_cost_budget');
 
       if (records) {
         this.records = JSON.parse(records);
