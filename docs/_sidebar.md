@@ -9,19 +9,16 @@
 - 功能介绍
   - [功能总览](features.md)
   - [工作流程](workflow.md)
-  - [剧情分析模式 🎭NEW](guides/plot-analysis.md)
+  - [剧情分析模式 🎭](guides/plot-analysis.md)
 
 - 使用指南
-  - [项目管理](guides/project-management.md)
-  - [模型配置](guides/model-config.md)
-  - [AI 工作流](guides/ai-workflow.md)
+  - [常见问题](faq.md)
 
 - 开发参考
   - [开发规范](naming-convention.md)
   - [架构重构方案](struct-refactor-plan.md)
-  - [FAQ](reference/faq.md)
-  - [贡献指南](CONTRIBUTING.md)
+  - [贡献指南](../CONTRIBUTING.md)
 
 - 其他
-  - [CHANGELOG](CHANGELOG.md)
+  - [CHANGELOG](../CHANGELOG.md)
   - [GitHub](https://github.com/Agions/StoryForge)
