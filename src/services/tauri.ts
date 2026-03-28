@@ -26,7 +26,7 @@ type ExportScriptData = {
   segments: ExportScriptSegment[];
 };
 
-export const PROJECTS_CHANGED_EVENT = 'clipflow:projects:changed';
+export const PROJECTS_CHANGED_EVENT = 'storyforge:projects:changed';
 
 const emitProjectsChanged = (): void => {
   if (typeof window !== 'undefined') {
@@ -65,7 +65,7 @@ const normalizeListedProject = (value: unknown): ProjectFileData | null => {
 // 确保应用数据目录
 export const ensureAppDataDir = async (): Promise<void> => {
   try {
-    const appDir = 'ClipFlow';
+    const appDir = 'StoryForge';
     
     // 先尝试使用Rust函数检查目录
     try {
@@ -130,7 +130,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
       throw new Error(`应用数据目录错误: ${_err.message || '未知错误'}`);
     });
     
-    const projectPath = `ClipFlow/${normalizedProjectId}.json`;
+    const projectPath = `StoryForge/${normalizedProjectId}.json`;
     logger.info('正在保存项目文件:', projectPath);
     
     // 准备项目数据
@@ -246,7 +246,7 @@ export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string
         logger.warn(`通过 Rust 加载项目失败(${candidateId})，尝试使用 JS API 兜底:`, rustError);
       }
 
-      const projectPath = `ClipFlow/${candidateId}.json`;
+      const projectPath = `StoryForge/${candidateId}.json`;
       const existsFile = await exists(projectPath, { baseDir: BaseDirectory.AppData });
       if (!existsFile) {
         lastError = new Error(`项目文件不存在: ${candidateId}.json`);
@@ -266,7 +266,7 @@ export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string
     for (const candidateId of candidates) {
       const legacyPaths = [
         `${configDir}${candidateId}.json`,
-        `${configDir}ClipFlow/${candidateId}.json`,
+        `${configDir}StoryForge/${candidateId}.json`,
       ];
 
       for (const legacyPath of legacyPaths) {
@@ -584,7 +584,7 @@ export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
     await ensureAppDataDir();
     
     // 通过 Tauri API 获取所有 .json 文件
-    const appDir = 'ClipFlow';
+    const appDir = 'StoryForge';
     
     // 这里需要实现列出目录文件的逻辑，但 @tauri-apps/api/fs 没有直接的 readDir 函数
     // 使用 invoke 调用 Rust 端的自定义函数
