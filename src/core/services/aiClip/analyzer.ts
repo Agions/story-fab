@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { videoService } from '../video.service';
 import { visionService } from '../vision.service';
 import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
@@ -239,7 +238,7 @@ function generateSegments(
 ): ClipSegment[] {
   if (cutPoints.length === 0) {
     return [{
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       startTime: 0,
       endTime: videoInfo.duration,
       duration: videoInfo.duration,
@@ -266,7 +265,7 @@ function generateSegments(
       );
 
       segments.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         startTime: currentStart,
         endTime,
         duration: endTime - currentStart,
@@ -308,7 +307,7 @@ async function generateSuggestions(
   const silenceSegments = segments.filter((s) => s.type === 'silence');
   silenceSegments.forEach((segment) => {
     suggestions.push({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       type: 'trim',
       startTime: segment.startTime,
       endTime: segment.endTime,
@@ -326,7 +325,7 @@ async function generateSuggestions(
     const next = shortSegments[i + 1];
     if (next.startTime - current.endTime < 1) {
       suggestions.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         type: 'merge',
         startTime: current.startTime,
         endTime: next.endTime,
@@ -345,7 +344,7 @@ async function generateSuggestions(
   sceneChanges.forEach((segment, index) => {
     if (index < sceneChanges.length - 1) {
       suggestions.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         type: 'effect',
         startTime: segment.endTime,
         endTime: segment.endTime + 0.5,
@@ -364,7 +363,7 @@ async function generateSuggestions(
       .reduce((sum, s) => sum + s.duration, 0);
     if (currentDuration > config.targetDuration * 1.2) {
       suggestions.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         type: 'trim',
         startTime: 0,
         endTime: videoInfo.duration,
@@ -381,7 +380,7 @@ async function generateSuggestions(
     const slowSegments = segments.filter((s) => s.duration > 10);
     slowSegments.forEach((segment) => {
       suggestions.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         type: 'trim',
         startTime: segment.startTime,
         endTime: segment.endTime,
