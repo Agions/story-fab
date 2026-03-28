@@ -3,7 +3,6 @@
  * 支持：通义千问、讯飞星火、智谱清言、DeepSeek、Moonshot Kimi
  */
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 import { getApiKey } from './tauri';
 import { VideoMetadata } from './video';
 import { logger } from '@/utils/logger';
@@ -354,7 +353,7 @@ export const aiService = {
     const saveSegment = () => {
       if (hasCurrentSegment && currentContent.trim()) {
         segments.push({
-          id: uuidv4(),
+          id: crypto.randomUUID(),
           startTime: currentStartTime,
           endTime: currentEndTime,
           content: currentContent.trim(),
@@ -408,7 +407,7 @@ export const generateScriptWithModel = aiService.generateScript;
 export const parseGeneratedScript = (content: string, projectId: string): Script => {
   const segments = aiService.parseScriptContent(content);
   return {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     projectId,
     content: segments,
     fullText: segments.map(s => s.content).join('\n\n'),
