@@ -1,190 +1,299 @@
 /**
- * 常量定义
- * 集中管理所有常量
+ * AI 模型常量定义
+ * 更新至 2026 年 3 月最新模型名称
  */
-import { AI_MODELS as CORE_MODELS } from '@/core/config/models.config';
 
-// 脚本风格
-export const SCRIPT_STYLES = [
-  { value: 'professional', label: '专业正式', desc: '适合商业、教育类视频' },
-  { value: 'casual', label: '轻松随意', desc: '适合生活、娱乐类视频' },
-  { value: 'humorous', label: '幽默风趣', desc: '适合搞笑、娱乐类视频' },
-  { value: 'emotional', label: '情感共鸣', desc: '适合故事、情感类视频' },
-  { value: 'technical', label: '技术讲解', desc: '适合教程、科普类视频' },
-  { value: 'promotional', label: '营销推广', desc: '适合产品、广告类视频' }
-] as const;
+export const CORE_AI_MODELS = [
+  // ─── OpenAI ───────────────────────────────────────────────
+  {
+    id: 'gpt-4o',
+    name: 'GPT-4o',
+    provider: 'openai',
+    description: 'OpenAI 最新旗舰多模态模型，支持文本和视觉理解',
+    contextWindow: 128000,
+    inputCost: 2.5,      // $ / 1M tokens
+    outputCost: 10.0,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 16384,
+  },
+  {
+    id: 'gpt-4o-mini',
+    name: 'GPT-4o mini',
+    provider: 'openai',
+    description: '轻量级高速模型，性价比高',
+    contextWindow: 128000,
+    inputCost: 0.15,
+    outputCost: 0.6,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 16384,
+  },
+  {
+    id: 'gpt-4-turbo',
+    name: 'GPT-4 Turbo',
+    provider: 'openai',
+    description: 'GPT-4 高速版，支持视觉和函数调用',
+    contextWindow: 128000,
+    inputCost: 10.0,
+    outputCost: 30.0,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 4096,
+  },
+  {
+    id: 'o3-mini',
+    name: 'o3-mini',
+    provider: 'openai',
+    description: 'OpenAI 最新推理模型，专注复杂推理任务',
+    contextWindow: 128000,
+    inputCost: 0.55,
+    outputCost: 4.4,
+    supportsVision: false,
+    supportsFunctionCalling: false,
+    maxOutputTokens: 65536,
+  },
 
-// 语气选项
-export const TONE_OPTIONS = [
-  { value: 'friendly', label: '友好亲切' },
-  { value: 'authoritative', label: '权威专业' },
-  { value: 'enthusiastic', label: '热情激昂' },
-  { value: 'calm', label: '平静沉稳' },
-  { value: 'humorous', label: '幽默诙谐' }
-] as const;
+  // ─── Anthropic ──────────────────────────────────────────────
+  {
+    id: 'claude-sonnet-4-20250514',
+    name: 'Claude 4 Sonnet',
+    provider: 'anthropic',
+    description: 'Anthropic 中高端模型，速度与能力平衡',
+    contextWindow: 200000,
+    inputCost: 3.0,
+    outputCost: 15.0,
+    supportsVision: true,
+    supportsFunctionCalling: false,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'claude-3-5-sonnet-20241022',
+    name: 'Claude 3.5 Sonnet',
+    provider: 'anthropic',
+    description: 'Anthropic 旗舰级模型，长上下文处理能力强',
+    contextWindow: 200000,
+    inputCost: 3.0,
+    outputCost: 15.0,
+    supportsVision: true,
+    supportsFunctionCalling: false,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'claude-3-5-haiku-20241022',
+    name: 'Claude 3.5 Haiku',
+    provider: 'anthropic',
+    description: 'Anthropic 轻量快速模型',
+    contextWindow: 200000,
+    inputCost: 0.8,
+    outputCost: 4.0,
+    supportsVision: true,
+    supportsFunctionCalling: false,
+    maxOutputTokens: 8192,
+  },
 
-// 脚本长度
-export const SCRIPT_LENGTHS = [
-  { value: 'short', label: '简短', desc: '1-3分钟', words: '300-500字' },
-  { value: 'medium', label: '适中', desc: '3-5分钟', words: '500-800字' },
-  { value: 'long', label: '详细', desc: '5-10分钟', words: '800-1500字' }
-] as const;
+  // ─── Google Gemini ─────────────────────────────────────────
+  {
+    id: 'gemini-2.0-flash',
+    name: 'Gemini 2.0 Flash',
+    provider: 'google',
+    description: 'Google 最新高速模型，多模态能力强',
+    contextWindow: 1048576,
+    inputCost: 0.0,     // currently free within quota
+    outputCost: 0.0,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'gemini-1.5-pro',
+    name: 'Gemini 1.5 Pro',
+    provider: 'google',
+    description: 'Google 长上下文旗舰模型，1M token 上下文',
+    contextWindow: 2097152,
+    inputCost: 0.0,     // free tier
+    outputCost: 0.0,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'gemini-1.5-flash',
+    name: 'Gemini 1.5 Flash',
+    provider: 'google',
+    description: 'Google 轻量快速模型',
+    contextWindow: 1048576,
+    inputCost: 0.0,
+    outputCost: 0.0,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
 
-// 目标受众
-export const TARGET_AUDIENCES = [
-  { value: 'general', label: '普通大众' },
-  { value: 'professional', label: '专业人士' },
-  { value: 'student', label: '学生群体' },
-  { value: 'business', label: '商务人士' },
-  { value: 'tech', label: '技术爱好者' },
-  { value: 'elderly', label: '中老年群体' }
-] as const;
+  // ─── DeepSeek ──────────────────────────────────────────────
+  {
+    id: 'deepseek-chat',
+    name: 'DeepSeek Chat',
+    provider: 'deepseek',
+    description: 'DeepSeek 开源对话模型，中文能力强',
+    contextWindow: 64000,
+    inputCost: 0.07,
+    outputCost: 0.27,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'deepseek-reasoner',
+    name: 'DeepSeek R1',
+    provider: 'deepseek',
+    description: 'DeepSeek 最新推理模型，复杂推理任务优秀',
+    contextWindow: 64000,
+    inputCost: 0.55,
+    outputCost: 2.19,
+    supportsVision: false,
+    supportsFunctionCalling: false,
+    maxOutputTokens: 8192,
+  },
 
-// 语言选项
-export const LANGUAGE_OPTIONS = [
-  { value: 'zh', label: '中文' }
-] as const;
+  // ─── 通义千问 (Alibaba Qwen) ────────────────────────────────
+  {
+    id: 'qwen-plus',
+    name: '通义千问 Plus',
+    provider: 'dashscope',
+    description: '阿里 Qwen 高端模型，中文理解能力突出',
+    contextWindow: 131072,
+    inputCost: 0.6,
+    outputCost: 2.0,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'qwen-turbo',
+    name: '通义千问 Turbo',
+    provider: 'dashscope',
+    description: '阿里 Qwen 高速模型',
+    contextWindow: 131072,
+    inputCost: 0.3,
+    outputCost: 0.6,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'qwen-long',
+    name: '通义千问 Long',
+    provider: 'dashscope',
+    description: '阿里 Qwen 长文本模型，支持超长上下文',
+    contextWindow: 1048576,
+    inputCost: 0.5,
+    outputCost: 1.0,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
 
-// 存储键名
-export const STORAGE_KEYS = {
-  PROJECTS: 'reelforge_projects',
-  APP_STATE: 'reelforge_app_state',
-  USER_PREFERENCES: 'reelforge_preferences',
-  RECENT_FILES: 'reelforge_recent_files',
-  MODEL_SETTINGS: 'reelforge_model_settings',
-  EXPORT_HISTORY: 'reelforge_export_history'
-} as const;
+  // ─── 智谱 GLM (Zhipu) ─────────────────────────────────────
+  {
+    id: 'glm-4',
+    name: 'GLM-4',
+    provider: 'zhipuai',
+    description: '智谱 AI 旗舰模型，中文能力突出',
+    contextWindow: 128000,
+    inputCost: 1.0,
+    outputCost: 1.0,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 4096,
+  },
+  {
+    id: 'glm-4v',
+    name: 'GLM-4V',
+    provider: 'zhipuai',
+    description: '智谱 AI 视觉理解模型',
+    contextWindow: 128000,
+    inputCost: 1.0,
+    outputCost: 1.0,
+    supportsVision: true,
+    supportsFunctionCalling: false,
+    maxOutputTokens: 4096,
+  },
+  {
+    id: 'glm-4-alloy',
+    name: 'GLM-4 Alloy',
+    provider: 'zhipuai',
+    description: '智谱 AI 高速对话模型',
+    contextWindow: 128000,
+    inputCost: 0.55,
+    outputCost: 0.55,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 4096,
+  },
 
-// 路由路径
-export const ROUTES = {
-  HOME: '/',
-  DASHBOARD: '/dashboard',
-  PROJECTS: '/projects',
-  PROJECT_DETAIL: '/project/:projectId',
-  PROJECT_EDIT: '/project/edit/:projectId',
-  EDITOR: '/editor',
-  SETTINGS: '/settings',
-  VIDEO_STUDIO: '/video-studio'
-} as const;
+  // ─── Kimi (Moonshot AI) ───────────────────────────────────
+  {
+    id: 'moonshot-v1-128k',
+    name: 'Kimi 128K',
+    provider: 'moonshot',
+    description: 'Moonshot AI 超长上下文模型，128K 上下文',
+    contextWindow: 131072,
+    inputCost: 1.5,
+    outputCost: 1.5,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'moonshot-v1-32k',
+    name: 'Kimi 32K',
+    provider: 'moonshot',
+    description: 'Moonshot AI 标准上下文模型',
+    contextWindow: 32768,
+    inputCost: 0.6,
+    outputCost: 0.6,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 8192,
+  },
+  {
+    id: 'moonshot-v1-8k',
+    name: 'Kimi 8K',
+    provider: 'moonshot',
+    description: 'Moonshot AI 快速对话模型',
+    contextWindow: 8192,
+    inputCost: 0.2,
+    outputCost: 0.2,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    maxOutputTokens: 4096,
+  },
+];
 
-// 默认配置
-export const DEFAULTS = {
-  AUTO_SAVE_INTERVAL: 30, // 秒
-  MAX_FILE_SIZE: 2 * 1024 * 1024 * 1024, // 2GB
-  MAX_PROJECTS: 100,
-  MAX_RECENT_FILES: 20,
-  DEFAULT_VIDEO_QUALITY: 'high',
-  DEFAULT_OUTPUT_FORMAT: 'mp4',
-  DEFAULT_LANGUAGE: 'zh',
-  DEFAULT_SCRIPT_LENGTH: 'medium',
-  DEFAULT_STYLE: 'professional'
-} as const;
+/** 推荐的默认模型 */
+export const DEFAULT_MODEL_ID = 'gpt-4o';
 
-const MODEL_VERSION = '2026-03-06' as const;
-
-type CoreModelId =
-  | 'gpt-5.3-codex'
-  | 'o3'
-  | 'claude-sonnet-4-6'
-  | 'gemini-3.1-pro-preview'
-  | 'gemini-3.1-flash-lite-preview'
-  | 'qwen-max-latest'
-  | 'glm-5'
-  | 'spark-custom'
-  | 'deepseek-chat'
-  | 'deepseek-reasoner'
-  | 'kimi-k2-0905-preview'
-  | 'kimi-k2-turbo-preview';
-
-const MODEL_KEY_MAP: Record<string, CoreModelId> = {
-  OPENAI: 'gpt-5.3-codex',
-  OPENAI_REASONING: 'o3',
-  ANTHROPIC: 'claude-sonnet-4-6',
-  GOOGLE: 'gemini-3.1-pro-preview',
-  ALIBABA: 'qwen-max-latest',
-  ZHIPU: 'glm-5',
-  IFLYTEK: 'spark-custom',
-  DEEPSEEK: 'deepseek-chat',
-  DEEPSEEK_REASONER: 'deepseek-reasoner',
-  MOONSHOT: 'kimi-k2-0905-preview',
-};
-
-const asCapability = (category: string): string => {
-  if (category === 'image') return 'vision';
-  return category;
-};
-
-const buildLLMModel = (modelId: CoreModelId) => {
-  const model = CORE_MODELS.find((item) => item.id === modelId);
-  if (!model) {
-    throw new Error(`Model not found in core config: ${modelId}`);
-  }
-
-  const supportsFunctionCalling = model.provider !== 'iflytek';
-
-  return {
-    provider: model.provider,
-    name: model.name,
-    modelId: model.id,
-    version: MODEL_VERSION,
-    maxTokens: model.tokenLimit,
-    contextWindow: model.contextWindow,
-    supportsStreaming: true,
-    supportsFunctionCalling,
-    pricing: { input: 0, output: 0 },
-    capabilities: model.category.map(asCapability),
-    recommended: model.isPro !== false,
-  };
-};
-
-// LLM 模型配置（从 core/config/models.config.ts 派生）
-export const LLM_MODELS = {
-  OPENAI: buildLLMModel(MODEL_KEY_MAP.OPENAI),
-  OPENAI_REASONING: buildLLMModel(MODEL_KEY_MAP.OPENAI_REASONING),
-  ANTHROPIC: buildLLMModel(MODEL_KEY_MAP.ANTHROPIC),
-  GOOGLE: buildLLMModel(MODEL_KEY_MAP.GOOGLE),
-  ALIBABA: buildLLMModel(MODEL_KEY_MAP.ALIBABA),
-  ZHIPU: buildLLMModel(MODEL_KEY_MAP.ZHIPU),
-  IFLYTEK: buildLLMModel(MODEL_KEY_MAP.IFLYTEK),
-  DEEPSEEK: buildLLMModel(MODEL_KEY_MAP.DEEPSEEK),
-  DEEPSEEK_REASONER: buildLLMModel(MODEL_KEY_MAP.DEEPSEEK_REASONER),
-  MOONSHOT: buildLLMModel(MODEL_KEY_MAP.MOONSHOT),
-} as const;
-
-// 默认模型（国内推荐）
-export const DEFAULT_LLM_MODEL = LLM_MODELS.OPENAI;
-
-// 模型选择建议
+/** 模型推荐配置 */
 export const MODEL_RECOMMENDATIONS = {
-  // 脚本生成
-  scriptGeneration: [
-    LLM_MODELS.OPENAI,
-    LLM_MODELS.ANTHROPIC,
-    LLM_MODELS.ALIBABA,
-    LLM_MODELS.DEEPSEEK
-  ],
-  // 视频分析
-  videoAnalysis: [
-    LLM_MODELS.GOOGLE,
-    LLM_MODELS.OPENAI,
-    LLM_MODELS.ALIBABA
-  ],
-  // 长文本处理
-  longContext: [
-    LLM_MODELS.GOOGLE,
-    LLM_MODELS.ANTHROPIC,
-    LLM_MODELS.OPENAI
-  ],
-  // 成本敏感
-  costEffective: [
-    LLM_MODELS.DEEPSEEK,
-    LLM_MODELS.ALIBABA,
-    LLM_MODELS.GOOGLE
-  ],
-  // 高质量
-  highQuality: [
-    LLM_MODELS.OPENAI_REASONING,
-    LLM_MODELS.ANTHROPIC,
-    LLM_MODELS.GOOGLE
-  ]
-} as const;
+  video_analysis: 'gpt-4o',
+  subtitle_generation: 'claude-3-5-sonnet-20241022',
+  script_generation: 'gpt-4o',
+  speech_synthesis: 'openai',
+  general: 'gpt-4o',
+  code_generation: 'claude-3-5-sonnet-20241022',
+  long_video: 'gemini-1.5-pro',
+  chinese_content: 'qwen-plus',
+  low_cost: 'gpt-4o-mini',
+};
+
+/** 获取模型配置 */
+export function getModelConfig(modelId: string) {
+  return CORE_AI_MODELS.find(m => m.id === modelId);
+}
+
+/** 获取模型提供商 */
+export function getModelProvider(modelId: string) {
+  const model = getModelConfig(modelId);
+  return model?.provider;
+}
