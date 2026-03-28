@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { analyzeVideo } from './analyzer';
 import type { VideoInfo } from '@/core/types';
 import type { AIClipConfig, BatchClipTask, ClipAnalysisResult, ClipSegment, ClipSuggestion } from './types';
@@ -13,7 +12,7 @@ export async function batchProcess(
   onProgress?: (task: BatchClipTask) => void
 ): Promise<BatchClipTask> {
   const task: BatchClipTask = {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     projectId,
     videos,
     config,
@@ -79,7 +78,7 @@ export async function applySuggestions(
   for (const suggestion of selectedSuggestions) {
     if (suggestion.startTime > currentTime) {
       segments.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         startTime: currentTime,
         endTime: suggestion.startTime,
         duration: suggestion.startTime - currentTime,
@@ -98,7 +97,7 @@ export async function applySuggestions(
         break;
       case 'effect':
         segments.push({
-          id: uuidv4(),
+          id: crypto.randomUUID(),
           startTime: suggestion.startTime,
           endTime: suggestion.endTime,
           duration: suggestion.endTime - suggestion.startTime,
@@ -115,7 +114,7 @@ export async function applySuggestions(
 
   if (currentTime < videoInfo.duration) {
     segments.push({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       startTime: currentTime,
       endTime: videoInfo.duration,
       duration: videoInfo.duration - currentTime,
