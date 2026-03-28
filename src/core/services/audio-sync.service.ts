@@ -3,7 +3,6 @@
  * 提供专业的音视频同步功能
  */
 
-import { v4 as uuidv4 } from 'uuid';
 
 // 同步配置
 export interface SyncConfig {
