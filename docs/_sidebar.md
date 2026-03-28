@@ -17,9 +17,11 @@
   - [AI 工作流](guides/ai-workflow.md)
 
 - 开发参考
+  - [开发规范](naming-convention.md)
+  - [架构重构方案](struct-refactor-plan.md)
   - [FAQ](reference/faq.md)
   - [贡献指南](CONTRIBUTING.md)
 
 - 其他
   - [CHANGELOG](CHANGELOG.md)
-  - [GitHub](https://github.com/agions/storyforge)
+  - [GitHub](https://github.com/Agions/StoryForge)
