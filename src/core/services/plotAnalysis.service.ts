@@ -1,10 +1,9 @@
 /**
  * 剧情分析服务 - PlotAnalysis Service
- * 
+ *
  * 基于视频内容理解的智能剪辑模块
  * 核心功能：场景检测、对话转写、情感识别、剧情结构分析
  */
-import { v4 as uuidv4 } from 'uuid';
 import { logger } from '@/utils/logger';
 import { aiService } from './ai.service';
 import { visionService } from './vision.service';
@@ -16,7 +15,7 @@ import type { VideoInfo, Scene, Emotion, KeyMoment } from '@/core/types';
 // ============================================
 
 /** 剧情节点类型 */
-export type PlotNodeType = 
+export type PlotNodeType =
   | 'setup'           // 背景铺垫
   | 'rising_action'   // 上升情节
   | 'climax'          // 高潮
@@ -58,7 +57,7 @@ export interface PlotTimeline {
 }
 
 /** 剪辑版本类型 */
-export type EditVersion = 
+export type EditVersion =
   | 'full'        // 剧情完整版
   | 'highlights'; // 精华版
   | 'intense';    // 高能混剪版
@@ -84,7 +83,7 @@ export interface PlotAnalysisConfig {
   analyzeNarrativeArc: boolean;
   identifyThemes: boolean;
   minNodeDuration: number;   // 最小节点时长(秒)
-  maxNodes: number;          // 最大节点数
+  maxNodes: number;         // 最大节点数
 }
 
 /** 默认配置 */
@@ -114,13 +113,17 @@ class PlotAnalysisService {
 
     try {
       // 1. 并行执行基础分析
-      const [scenes, keyframes, transcript] = await Promise.all([
+      const [scenesResult, keyframesResult, asrResult] = await Promise.allSettled([
         this.detectScenes(videoInfo),
         this.extractKeyframes(videoInfo),
         this.transcribeAudio(videoInfo),
       ]);
 
-      // 2. 情感分析
+      const scenes = scenesResult.status === 'fulfilled' ? scenesResult.value : [];
+      const keyframes = keyframesResult.status === 'fulfilled' ? keyframesResult.value : [];
+      const transcript = asrResult.status === 'fulfilled' ? asrResult.value : '';
+
+      // 2. 情感分析（独立，不阻塞主流程）
       const emotions = await this.analyzeEmotions(videoInfo, scenes);
 
       // 3. 构建剧情节点
@@ -140,11 +143,8 @@ class PlotAnalysisService {
         videoInfo
       );
 
-      // 5. 生成剪辑建议
-      const suggestions = this.generateClipSuggestions(nodes, cfg);
-
       const timeline: PlotTimeline = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         videoId: videoInfo.id,
         nodes,
         summary,
@@ -155,10 +155,10 @@ class PlotAnalysisService {
         createdAt: new Date().toISOString(),
       };
 
-      logger.info('剧情分析完成:', { 
-        videoId: videoInfo.id, 
+      logger.info('剧情分析完成:', {
+        videoId: videoInfo.id,
         nodeCount: nodes.length,
-        themes 
+        themes
       });
 
       return timeline;
@@ -189,7 +189,6 @@ class PlotAnalysisService {
    */
   private async extractKeyframes(videoInfo: VideoInfo): Promise<string[]> {
     try {
-      // 使用 vision service 提取关键帧
       const frames = await visionService.extractKeyframes(videoInfo, { maxFrames: 30 });
       return frames.map(f => f.path || '');
     } catch (error) {
@@ -227,24 +226,22 @@ class PlotAnalysisService {
   /**
    * 构建剧情节点
    */
-  private async buildPlotNodes(
+  private buildPlotNodes(
     videoInfo: VideoInfo,
     scenes: Scene[],
     keyframes: string[],
     transcript: string,
     emotions: Emotion[],
     config: PlotAnalysisConfig
-  ): Promise<PlotNode[]> {
+  ): PlotNode[] {
     const nodes: PlotNode[] = [];
-    const duration = videoInfo.duration;
-    
-    // 基于场景构建节点
+
     for (const scene of scenes.slice(0, config.maxNodes)) {
       const nodeType = this.inferPlotNodeType(scene, emotions);
       const emotionalTone = this.getSceneEmotionalTone(scene.timestamp, emotions);
-      
+
       nodes.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         type: nodeType,
         timestamp: scene.startTime,
         duration: scene.endTime - scene.startTime,
@@ -259,7 +256,7 @@ class PlotAnalysisService {
 
     // 按时间排序
     nodes.sort((a, b) => a.timestamp - b.timestamp);
-    
+
     return nodes;
   }
 
@@ -267,32 +264,28 @@ class PlotAnalysisService {
    * 推断剧情节点类型
    */
   private inferPlotNodeType(scene: Scene, emotions: Emotion[]): PlotNodeType {
-    // 基于场景类型和情感推断
     const sceneEmotions = emotions.filter(
       e => e.timestamp >= scene.startTime && e.timestamp <= scene.endTime
     );
-    
+
     const dominantEmotion = sceneEmotions[0]?.emotion || 'neutral';
-    
-    // 动作场景
-    if (scene.type === 'action' || scene.motionScore && scene.motionScore > 0.7) {
+
+    if (scene.type === 'action' || (scene.motionScore && scene.motionScore > 0.7)) {
       return 'action';
     }
-    
-    // 对话场景
+
     if (scene.type === 'dialog' || (sceneEmotions.length > 0 && ['happy', 'sad', 'angry'].includes(dominantEmotion))) {
       return 'dialogue';
     }
-    
-    // 基于重要性推断
+
     if (scene.score && scene.score > 8) {
       return 'climax';
     }
-    
+
     if (scene.score && scene.score > 6) {
       return 'rising_action';
     }
-    
+
     return 'transition';
   }
 
@@ -303,16 +296,15 @@ class PlotAnalysisService {
     const nearbyEmotions = emotions.filter(
       e => Math.abs(e.timestamp - timestamp) < 5
     );
-    
+
     if (nearbyEmotions.length === 0) return 'neutral';
-    
-    // 简化为情感色调
+
     const emotionCounts: Record<string, number> = {};
     for (const e of nearbyEmotions) {
       const type = e.emotion || 'neutral';
       emotionCounts[type] = (emotionCounts[type] || 0) + 1;
     }
-    
+
     return Object.entries(emotionCounts)
       .sort((a, b) => b[1] - a[1])[0][0];
   }
@@ -333,7 +325,7 @@ class PlotAnalysisService {
       action: '动作场景',
       transition: '场景转换',
     };
-    
+
     const mins = Math.floor(scene.startTime / 60);
     const secs = Math.floor(scene.startTime % 60);
     return `${typeLabels[type] || '场景'} [${mins}:${secs.toString().padStart(2, '0')}]`;
@@ -344,22 +336,19 @@ class PlotAnalysisService {
    */
   private calculateImportance(scene: Scene, emotionalTone: string): number {
     let score = 5; // 基础分
-    
-    // 场景分数
+
     if (scene.score) {
       score += scene.score * 0.3;
     }
-    
-    // 情感强度
+
     const emotionIntensity = scene.dominantEmotion ? 1 : 0;
     score += emotionIntensity * 2;
-    
-    // 时长因素（适中最好）
+
     const duration = scene.endTime - scene.startTime;
     if (duration >= 10 && duration <= 60) {
       score += 1;
     }
-    
+
     return Math.min(10, Math.max(1, Math.round(score)));
   }
 
@@ -368,11 +357,11 @@ class PlotAnalysisService {
    */
   private generateNodeTags(scene: Scene, type: PlotNodeType): string[] {
     const tags = [type];
-    
+
     if (scene.features) {
       tags.push(...scene.features.slice(0, 2));
     }
-    
+
     return tags;
   }
 
@@ -387,13 +376,14 @@ class PlotAnalysisService {
     const nodesSummary = nodes
       .map(n => `[${n.timestamp.toFixed(0)}s] ${n.type}: ${n.title}`)
       .join('\n');
-    
+
     const prompt = `请分析以下视频的剧情结构：
 
 时间轴节点：
 ${nodesSummary}
 
 视频时长：${videoInfo.duration}秒
+${transcript ? `语音内容：\n${transcript.slice(0, 2000)}` : ''}
 
 请提取：
 1. 一句话剧情摘要
@@ -410,27 +400,26 @@ ${nodesSummary}
 }`;
 
     try {
-      // 使用 aiService 调用 LLM
-      const result = await aiService.generateText(prompt, {
-        model: 'gpt-4',
-        maxTokens: 1000,
-      });
-      
-      // 解析 JSON 响应
+      const result = await aiService.generateText(
+        { id: 'llm-understanding', provider: 'openai', model: 'gpt-4' } as any,
+        { enabled: true, apiKey: '', temperature: 0.3, maxTokens: 800 },
+        prompt
+      );
+
       const jsonMatch = result.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
         return {
           summary: parsed.summary || '视频内容',
           narrativeArc: parsed.narrativeArc || '线性叙事',
-          themes: parsed.themes || [],
-          characters: parsed.characters || [],
+          themes: Array.isArray(parsed.themes) ? parsed.themes : [],
+          characters: Array.isArray(parsed.characters) ? parsed.characters : [],
         };
       }
     } catch (error) {
       logger.warn('LLM剧情理解失败，使用默认:', { error });
     }
-    
+
     return {
       summary: `视频内容（${nodes.length}个场景）`,
       narrativeArc: '线性叙事',
@@ -450,8 +439,7 @@ ${nodesSummary}
 
     for (const node of nodes) {
       if (node.duration < config.minNodeDuration) continue;
-      
-      // 判断适合哪些版本
+
       const versions: EditVersion[] = ['full'];
       if (node.importance >= 7) {
         versions.push('highlights');
@@ -459,9 +447,9 @@ ${nodesSummary}
       if (node.type === 'climax' || node.type === 'action') {
         versions.push('intense');
       }
-      
+
       suggestions.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         startTime: node.timestamp,
         endTime: node.timestamp + node.duration,
         duration: node.duration,
@@ -493,7 +481,7 @@ ${nodesSummary}
       action: '激烈动作，视觉冲击',
       transition: '场景衔接',
     };
-    
+
     return reasons[node.type] || '重要场景';
   }
 
@@ -504,24 +492,21 @@ ${nodesSummary}
     timeline: PlotTimeline,
     version: EditVersion
   ): PlotClipSuggestion[] {
-    const { suggestions } = this;
-    
+    const suggestions = this.generateClipSuggestions(timeline.nodes, DEFAULT_PLOT_ANALYSIS_CONFIG);
+
     switch (version) {
       case 'full':
-        // 完整版：保留所有节点
         return suggestions.filter(s => s.version.includes('full'));
-      
+
       case 'highlights':
-        // 精华版：只保留重要性 >= 7 的
         return suggestions.filter(s => s.importance >= 7 && s.version.includes('highlights'));
-      
+
       case 'intense':
-        // 高能混剪：只保留高潮和动作
-        return suggestions.filter(s => 
+        return suggestions.filter(s =>
           (s.type === 'climax' || s.type === 'action' || s.type === 'turning_point')
           && s.version.includes('intense')
         );
-      
+
       default:
         return suggestions;
     }
