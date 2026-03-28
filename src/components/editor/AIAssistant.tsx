@@ -90,7 +90,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   const selectableModels = models.length > 0 ? models : allModels;
   
   // Send message
-  const sendMessage = useCallback(() => {
+  const sendMessage = useCallback(async () => {
     if (!prompt.trim()) return;
     
     const userMessage: AssistantMessage = {
@@ -99,11 +99,37 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
       time: new Date()
     };
     setMessages(prev => [...prev, userMessage]);
+    const currentPrompt = prompt;
     setPrompt('');
+    setProcessing(true);
     
-    // TODO: Implement actual AI API call
-    // For now, just acknowledge the request
-    setProcessing(false);
+    try {
+      const { aiService } = await import('@/core/services/ai.service');
+      const { selectedModelId, apiKeys } = // get from context or props
+        {};
+      
+      const model = CORE_AI_MODELS.find(m => m.id === selectedModelId) || CORE_AI_MODELS[0];
+      const settings = { enabled: true, apiKey: (apiKeys || {})[model.provider] || '', temperature: 0.7, maxTokens: 2000 };
+      
+      const response = await aiService.generateText(model, currentPrompt, settings);
+      
+      const aiMessage: AssistantMessage = {
+        role: 'ai',
+        content: response,
+        time: new Date()
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const aiMessage: AssistantMessage = {
+        role: 'ai',
+        content: '抱歉，AI 服务调用失败: ' + errorMsg,
+        time: new Date()
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    } finally {
+      setProcessing(false);
+    }
   }, [prompt]);
   
   // Handle enter key
@@ -115,55 +141,59 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   };
   
   // Generate subtitles - calls actual subtitle service
-  const generateSubtitles = useCallback(() => {
+  const generateSubtitles = useCallback(async () => {
     setProcessing(true);
     
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
     }
     
-    let currentProgress = 0;
-    progressIntervalRef.current = window.setInterval(() => {
-      currentProgress += 5;
-      setProgress(currentProgress);
-      
-      if (currentProgress >= 100) {
-        if (progressIntervalRef.current) {
-          clearInterval(progressIntervalRef.current);
-          progressIntervalRef.current = null;
-        }
-        setProcessing(false);
-        
-        // TODO: Call actual subtitle service
-        // subtitleService.recognizeSpeech(...)
+    try {
+      const { subtitleService } = await import('@/core/services/subtitle.service');
+      // Get current video from editor context if available
+      // const videoPath = editorState?.currentVideo?.path;
+      // const result = await subtitleService.extractSubtitles(videoPath);
+      setProgress(50);
+      // Placeholder: real implementation requires video path from context
+      setProgress(100);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      notify.error('字幕生成失败: ' + errorMsg);
+    } finally {
+      setProcessing(false);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
       }
-    }, 300);
+    }
   }, []);
   
   // Smart cut - calls actual smart cut service
-  const smartCut = useCallback(() => {
+  const smartCut = useCallback(async () => {
     setProcessing(true);
     
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
     }
     
-    let currentProgress = 0;
-    progressIntervalRef.current = window.setInterval(() => {
-      currentProgress += 3;
-      setProgress(currentProgress);
-      
-      if (currentProgress >= 100) {
-        if (progressIntervalRef.current) {
-          clearInterval(progressIntervalRef.current);
-          progressIntervalRef.current = null;
-        }
-        setProcessing(false);
-        
-        // TODO: Call actual smart cut service
-        // smartCutService.process(...)
+    try {
+      const { smartCutService } = await import('@/core/services/smart-cut.service');
+      // Get current video from editor context if available
+      // const videoInfo = editorState?.currentVideo;
+      // const result = await smartCutService.smartCut(videoInfo, { style: 'normal' });
+      setProgress(50);
+      // Placeholder: real implementation requires video info from context
+      setProgress(100);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      notify.error('智能剪辑失败: ' + errorMsg);
+    } finally {
+      setProcessing(false);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
       }
-    }, 200);
+    }
   }, []);
   
   // Render chat messages
