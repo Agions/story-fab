@@ -1,14 +1,15 @@
-# ClipFlow
+# StoryForge
 
 <p align="center">
-  <img src="./public/logo.svg" alt="ClipFlow" width="128" />
+  <img src="./public/logo.svg" alt="StoryForge" width="128" />
 </p>
 
-<h3 align="center">AI 驱动的智能视频剪辑桌面应用</h3>
+<h3 align="center">AI-Powered Video Storytelling Platform</h3>
+<h4 align="center">面向影视创作者和内容创作者的智能视频叙事平台</h4>
 
 <p align="center">
-  <a href="https://github.com/agions/clipflow/releases">
-    <img src="https://img.shields.io/github/v/release/agions/clipflow?include_prereleases&label=latest" alt="Release" />
+  <a href="https://github.com/agions/storyforge/releases">
+    <img src="https://img.shields.io/github/v/release/agions/storyforge?include_prereleases&label=latest" alt="Release" />
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" />
@@ -16,217 +17,279 @@
   <img src="https://img.shields.io/badge/React-18+-61DAFB?logo=react" alt="React" />
   <img src="https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Tauri-2.x-FFC107?logo=tauri" alt="Tauri" />
-  <img src="https://img.shields.io/github/stars/agions/clipflow" alt="Stars" />
+  <img src="https://img.shields.io/badge/AI-GPT%2BClaude-Gold?logo=openai" alt="AI Models" />
+  <img src="https://img.shields.io/github/stars/agions/storyforge" alt="Stars" />
+  <img src="https://img.shields.io/github/forks/agions/storyforge" alt="Forks" />
 </p>
 
 ---
 
-## ⭐ 为什么选择 ClipFlow？
+## 📖 Table of Contents
 
-| 特性 | 说明 |
-|------|------|
-| 🤖 **AI 智能剪辑** | 自动识别精彩片段，一键生成精彩集锦 |
-| 📝 **智能字幕** | 语音转文字 + 多语言翻译 + 风格化字幕 |
-| 🎵 **自动配乐** | 根据视频情绪智能匹配背景音乐 |
-| 🔒 **本地运行** | 所有数据本地处理，保护隐私安全 |
-| 💻 **桌面应用** | Tauri 构建，轻量流畅 |
+- [About](#about)
+- [✨ Features](#-features)
+- [🚀 Quick Start](#-quick-start)
+- [🎬 Editing Modes](#-editing-modes)
+- [🏗️ Architecture](#️-architecture)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ---
 
-## 🚀 快速开始
+## About
 
-### 环境要求
+**StoryForge** is a professional AI-powered video content creation platform designed for filmmakers and content creators. It provides intelligent script generation, video analysis, and smart editing capabilities — all powered by cutting-edge AI models.
 
-| 要求 | 版本 |
-|------|------|
-| Node.js | >= 18 |
-| npm | >= 9 |
-| Rust | 最新稳定版 (可选) |
+Unlike traditional video editors, StoryForge understands the **story** within your footage. It can analyze narrative structures, detect emotional beats, identify plot points, and automatically generate edits that preserve the integrity of your storytelling.
 
-### 安装
+---
+
+## ✨ Features
+
+### 🎭 Intelligent Editing Modes
+
+| Mode | Description |
+|------|-------------|
+| **🎬 AI Narration** | Auto-generate professional voice-over narration scripts |
+| **🔥 Smart Clip** | AI identifies best moments, generates highlight reels |
+| **📝 First-Person POV** | Transform videos into personal narrative experiences |
+| **🔄 Video Remix** | Intelligent video recombination with uniqueness checking |
+| **🎭 Plot Analysis** *(New!)* | Understand narrative structure, analyze plot points, generate story-driven edits |
+
+### 🤖 AI-Powered Core
+
+- **Scene Detection** — Automatic scene boundary identification
+- **Audio Peak Recognition** — Detect applause, laughter, music moments
+- **Motion Analysis** — Understand action intensity throughout footage
+- **Emotion Recognition** — Track emotional tone changes in scenes
+- **Speech-to-Text (ASR)** — Accurate transcription with timestamps
+- **OCR** — Extract visible text from footage
+
+### 🎵 Production Tools
+
+- **Smart Subtitles** — Auto-generate, translate, and style subtitles
+- **Auto Music** — AI-matched background music based on video mood
+- **Multi-Model Support** — OpenAI GPT, Claude, Gemini, Qwen, GLM, DeepSeek, Kimi
+
+### 💻 Desktop Native
+
+- **Local Processing** — All data stays on your machine
+- **Lightweight** — Built with Tauri (Rust + WebView)
+- **Cross-Platform** — Windows, macOS, Linux ready
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+| Requirement | Version |
+|------------|---------|
+| Node.js | ≥ 18 |
+| npm | ≥ 9 |
+| Rust | Latest stable (optional for dev) |
+| FFmpeg | Required for video processing |
+
+### Installation
 
 ```bash
-# 克隆项目
-git clone https://github.com/agions/clipflow.git
-cd clipflow
+# Clone the repository
+git clone https://github.com/agions/storyforge.git
+cd storyforge
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 启动开发
+# Start development
 npm run dev
 ```
 
-### 构建
+### Build
 
 ```bash
-# 开发模式
-npm run dev
-
-# 生产构建
+# Frontend only
 npm run build
 
-# Tauri 桌面应用
-npm run tauri dev    # 开发
-npm run tauri build  # 打包
+# Full Tauri desktop app
+npm run tauri dev    # Development mode
+npm run tauri build  # Production build
 ```
 
-### 常用命令
+### Common Commands
 
-| 命令 | 说明 |
-|------|------|
-| `npm run dev` | 前端开发模式 |
-| `npm run build` | 前端生产构建 |
-| `npm run tauri dev` | Tauri 开发模式 |
-| `npm run tauri build` | Tauri 打包 |
-| `npm run type-check` | TypeScript 类型检查 |
-| `npm run lint` | ESLint 检查 |
-| `npm run test` | 运行测试 |
-| `npm run docs:dev` | 文档开发服务器 |
-
----
-
-## 🎯 核心功能
-
-### 1. AI 智能剪辑
-
-- 场景切换检测
-- 音频峰值识别（笑声、掌声）
-- 运动强度分析
-- 自动生成精彩集锦
-
-### 2. 智能字幕
-
-- 语音转字幕 (ASR)
-- 多语言翻译
-- 字幕风格化
-- 导出 SRT/ASS/VTT
-
-### 3. 自动配乐
-
-- 情绪匹配音乐
-- 本地音乐库
-- 淡入淡出
-- 音量调节
-
-### 4. 多模型接入
-
-| 厂商 | 模型 |
-|------|------|
-| OpenAI | GPT-5.3 |
-| Anthropic | Claude 4.6 |
-| Google | Gemini 3 Ultra |
-| 阿里通义 | Qwen 3.5 |
-| 智谱 | GLM-5 |
-| DeepSeek | DeepSeek R1 |
-| 月之暗面 | Kimi k2.5 |
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Frontend development server |
+| `npm run build` | Production build |
+| `npm run tauri dev` | Tauri development mode |
+| `npm run tauri build` | Build desktop app |
+| `npm run type-check` | TypeScript type checking |
+| `npm run lint` | ESLint validation |
+| `npm run test` | Run test suite |
+| `npm run docs:dev` | Documentation server |
 
 ---
 
-## 🛠️ 技术栈
+## 🎬 Editing Modes
 
-| 类别 | 技术 |
-|------|------|
-| 前端框架 | React 18 + TypeScript 5 |
-| UI 组件 | Ant Design 5 |
-| 状态管理 | Zustand 5 |
-| 桌面客户端 | Tauri 2.x (Rust) |
-| 构建工具 | Vite 6 |
-| AI 服务 | OpenAI + Claude API |
-| 测试框架 | Vitest |
+### 🎭 Plot Analysis Mode (New)
 
----
-
-## 📂 项目结构
+The newest addition to StoryForge — a narrative-first editing approach:
 
 ```
-clipflow/
-├── src/                        # 前端源码
-│   ├── components/             # React 组件
-│   │   ├── editor/            # 编辑器组件
-│   │   ├── AIPanel/          # AI 功能面板
-│   │   └── common/            # 通用组件
-│   ├── core/                  # 核心逻辑
-│   │   ├── services/          # 业务服务
-│   │   │   └── workflow/     # 工作流服务
-│   │   └── types/             # 类型定义
-│   ├── pages/                 # 页面组件
-│   ├── hooks/                 # 自定义 Hooks
-│   ├── store/                 # Zustand 状态管理
-│   └── utils/                 # 工具函数
-├── src-tauri/                 # Tauri/Rust 后端
-├── docs/                      # 文档
-├── scripts/                   # 构建脚本
-└── tests/                     # 测试文件
+User uploads video
+       ↓
+AI analyzes content (scenes, dialogue, emotions)
+       ↓
+Generates "Plot Timeline" with tagged story beats
+       ↓
+User selects desired story elements:
+  • "Highlight Moments"
+  • "Emotional Turns"
+  • "Plot Climax"
+       ↓
+AI auto-generates story-driven edit
+       ↓
+Output versions:
+  📼 Full Narrative (complete story)
+  ✂️ Highlights Reel (best moments)
+  ⚡ Intense Mix (action-packed)
+```
+
+**Use cases:**
+- Documentary editing with narrative preservation
+- Event videos that need story structure
+- Interview compilations with coherent flow
+- Cinematic content requiring plot-aware cuts
+
+### 🎬 AI Narration Mode
+
+Upload footage → AI analyzes content → Generate professional narration script → Synthesize voice-over → Export
+
+### 🔥 Smart Clip Mode
+
+Upload footage → AI detects peaks (applause, laughter, action) → Auto-generate highlight reel → Manual fine-tune → Export
+
+### 📝 First-Person POV Mode
+
+Transform third-person footage into personal narrative experiences with AI-generated perspective shifts.
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        UI Layer                             │
+│   React 18 + TypeScript + Ant Design + Zustand (State)      │
+├─────────────────────────────────────────────────────────────┤
+│                     Service Layer                            │
+│  ┌──────────────┬──────────────┬──────────────┐            │
+│  │ PlotAnalysis │  AIClip      │  Vision      │            │
+│  │ Service      │  Service     │  Service     │            │
+│  └──────────────┴──────────────┴──────────────┘            │
+│  ┌──────────────┬──────────────┬──────────────┐            │
+│  │ ASR Service  │  Subtitle    │  Export      │            │
+│  │              │  Service     │  Service     │            │
+│  └──────────────┴──────────────┴──────────────┘            │
+├─────────────────────────────────────────────────────────────┤
+│                   AI Model Adapter Layer                      │
+│  ┌──────────────┬──────────────┬──────────────┐            │
+│  │ OpenAI       │ Anthropic    │ Google       │            │
+│  │ GPT-5        │ Claude 4     │ Gemini 3     │            │
+│  └──────────────┴──────────────┴──────────────┘            │
+│  ┌──────────────┬──────────────┬──────────────┐            │
+│  │ Qwen (Aliyun)│ GLM (Zhipu)  │ DeepSeek     │            │
+│  └──────────────┴──────────────┴──────────────┘            │
+├─────────────────────────────────────────────────────────────┤
+│                  Tauri Backend (Rust)                        │
+│  FFmpeg Integration │ File System │ Native Dialogs         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Module Structure
+
+```
+src/core/services/
+├── plotAnalysis.service.ts   # NEW: Narrative/story analysis
+├── aiClip.service.ts         # Smart clipping
+├── vision.service.ts        # Scene detection, keyframes
+├── asr.service.ts           # Speech recognition
+├── subtitle.service.ts      # Subtitle generation
+├── ai.service.ts            # AI model adapter (unified)
+└── ...
+
+src/components/
+├── AIPanel/                 # AI feature panels
+│   ├── ClipFlow/            # Clip mode UI
+│   └── ...
+├── editor/                  # Timeline/track editor
+└── common/                  # Shared components
+
+src/core/types/              # TypeScript domain models
 ```
 
 ---
 
-## 📊 代码质量
+## 🛠️ Tech Stack
 
-| 指标 | 状态 |
-|------|------|
-| TypeScript | 0 errors |
-| ESLint | 0 warnings |
-| 测试覆盖 | 180+ tests |
-| 构建时间 | ~15s |
+| Category | Technology |
+|----------|------------|
+| **Frontend Framework** | React 18 + TypeScript 5 |
+| **UI Library** | Ant Design 5 |
+| **State Management** | Zustand 5 |
+| **Desktop Runtime** | Tauri 2.x (Rust) |
+| **Build Tool** | Vite 6 |
+| **Testing** | Vitest |
+| **AI Services** | OpenAI, Anthropic, Google, Alibaba, Zhipu, DeepSeek, Moonshot |
 
 ---
 
-## 🤝 贡献指南
+## 🤝 Contributing
 
-欢迎贡献！
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) before submitting PRs.
 
 ```bash
-# 克隆项目
-git clone https://github.com/agions/clipflow.git
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/storyforge.git
 
-# 创建分支
+# Create feature branch
 git checkout -b feature/your-feature
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 开发
+# Develop
 npm run dev
 
-# 提交
-git commit -m 'feat: 添加新功能'
+# Run tests
+npm run test
 
-# 推送
+# Lint
+npm run lint
+
+# Submit PR
 git push origin feature/your-feature
 ```
 
 ---
 
-## 📖 文档
-
-- [📚 在线文档](https://agions.github.io/clipflow/)
-- [🔥 快速开始](docs/getting-started.md)
-- [⚙️ 模型配置](docs/guides/model-config.md)
-- [💡 AI 工作流](docs/guides/ai-workflow.md)
-
----
-
-## 📝 更新日志
-
-查看 [CHANGELOG.md](docs/CHANGELOG.md) 了解版本更新。
-
----
-
-## 💬 交流社区
-
-- [GitHub Issues](https://github.com/agions/clipflow/issues) - 报告 Bug
-- [Discussions](https://github.com/agions/clipflow/discussions) - 功能讨论
-
----
-
 ## 📄 License
 
-MIT License - 自由使用，商用欢迎！
+MIT License — free for personal and commercial use.
+
+---
+
+## 🙏 Acknowledgments
+
+- [Tauri](https://tauri.app/) — Lightweight desktop framework
+- [Ant Design](https://ant.design/) — UI component library
+- [FFmpeg](https://ffmpeg.org/) — Video processing engine
+- All contributing developers and beta testers
 
 ---
 
 <p align="center">
-  <strong>如果这个项目对你有帮助，欢迎点个 ⭐ Star！</strong>
+  <strong>If this project helps you, please give it a ⭐ Star!</strong>
 </p>
