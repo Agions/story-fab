@@ -95,7 +95,7 @@ export abstract class BaseService {
   /**
    * 统一的错误处理
    */
-  protected handleError(error: unknown, context?: string): never {
+  protected handleError(error: unknown, context?: string): ServiceError {
     const serviceError = this.normalizeError(error);
     
     logger.error(`[${this.name}] ${context || '操作失败'}:`, { error: serviceError });
@@ -139,7 +139,7 @@ export abstract class BaseService {
       const result = await requestFn();
       return result;
     } catch (error) {
-      return this.handleError(error, context);
+      throw this.handleError(error, context);
     }
   }
 
