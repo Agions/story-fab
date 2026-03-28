@@ -3,7 +3,6 @@
  * 支持本地上传 + 预置音乐库
  */
 import { logger } from '@/utils/logger';
-import { v4 as uuidv4 } from 'uuid';
 
 export type MusicGenre = 'pop' | 'electronic' | 'cinematic' | 'ambient' | 'rock' | 'jazz' | 'classical' | 'folk';
 export type MusicMood = 'upbeat' | 'calm' | 'energetic' | 'emotional' | 'neutral' | 'happy' | 'sad' | 'tense';
@@ -178,7 +177,7 @@ export class AutoMusicService {
     const duration = await this.getAudioDuration(file);
     
     const track: MusicTrack = {
-      id: `upload-${uuidv4()}`,
+      id: `upload-${crypto.randomUUID()}`,
       name: name || file.name.replace(/\.[^/.]+$/, ''),
       genre,
       mood,
@@ -199,7 +198,7 @@ export class AutoMusicService {
    */
   async addMusicFromUrl(url: string, metadata: Partial<MusicTrack>): Promise<MusicTrack> {
     const track: MusicTrack = {
-      id: `url-${uuidv4()}`,
+      id: `url-${crypto.randomUUID()}`,
       name: metadata.name || '在线音乐',
       genre: metadata.genre || 'electronic',
       mood: metadata.mood || ['neutral'],
