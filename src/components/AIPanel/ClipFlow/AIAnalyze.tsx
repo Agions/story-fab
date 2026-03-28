@@ -143,10 +143,19 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
       // 4. OCR 字幕
       if (config.ocrEnabled) {
         setCurrentTask('📝 正在识别文字 (OCR)...');
-        setTaskList(prev => [...prev, '✅ OCR 字幕识别完成']);
-        // TODO: 调用实际的 OCR 服务
-        // const ocrSubtitles = await ocrService.recognizeFromVideo(state.currentVideo);
-        // setOcrSubtitle(ocrSubtitles);
+        try {
+          const { visionService } = await import('@/core/services/vision.service');
+          const ocrResult = await visionService.extractTextFromVideo(state.currentVideo);
+          if (ocrResult && ocrResult.length > 0) {
+            setOcrSubtitle(ocrResult);
+            setTaskList(prev => [...prev, `✅ OCR 字幕识别完成 (${ocrResult.length} 条)`]);
+          } else {
+            setTaskList(prev => [...prev, '⚠️ OCR 未检测到文字']);
+          }
+        } catch (ocrError) {
+          notify.error('OCR 服务失败: ' + (ocrError instanceof Error ? ocrError.message : String(ocrError)));
+          setTaskList(prev => [...prev, '❌ OCR 识别失败']);
+        }
         completedTasks++;
         setProgress(Math.round((completedTasks / totalTasks) * 100));
       }
@@ -154,10 +163,19 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
       // 5. ASR 语音
       if (config.asrEnabled) {
         setCurrentTask('🎤 正在转换语音 (ASR)...');
-        setTaskList(prev => [...prev, '✅ ASR 语音转写完成']);
-        // TODO: 调用实际的 ASR 服务
-        // const asrSubtitles = await asrService.recognizeSpeech(state.currentVideo);
-        // setAsrSubtitle(asrSubtitles);
+        try {
+          const { asrService } = await import('@/core/services/asr.service');
+          const asrResult = await asrService.recognizeSpeech(state.currentVideo, { language: 'zh_cn' });
+          if (asrResult && asrResult.text) {
+            setAsrSubtitle(asrResult.segments);
+            setTaskList(prev => [...prev, `✅ ASR 语音转写完成 (${asrResult.segments.length} 段)`]);
+          } else {
+            setTaskList(prev => [...prev, '⚠️ ASR 未检测到语音']);
+          }
+        } catch (asrError) {
+          notify.error('ASR 服务失败: ' + (asrError instanceof Error ? asrError.message : String(asrError)));
+          setTaskList(prev => [...prev, '❌ ASR 转写失败']);
+        }
         completedTasks++;
         setProgress(Math.round((completedTasks / totalTasks) * 100));
       }
