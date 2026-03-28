@@ -3,7 +3,6 @@
  * 简化的完整剪辑流程
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import { visionService } from './vision.service';
 import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
 
@@ -155,7 +154,7 @@ export class ClipWorkflowService {
   private async detectScenes(analysis: VideoAnalysis): Promise<Array<{ time: number; confidence: number }>> {
     const scenes = analysis.scenes || [];
     return scenes.map(scene => ({
-      time: scene._startTime,
+      time: scene.startTime,
       confidence: scene.confidence || 0.8,
     }));
   }
@@ -199,7 +198,7 @@ export class ClipWorkflowService {
       
       // 创建片段
       const segment: ClipSegment = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         startTime: currentTime,
         endTime: currentTime + (end - start),
         sourceStart: start,
