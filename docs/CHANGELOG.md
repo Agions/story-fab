@@ -6,47 +6,36 @@
 
 ## [Unreleased] - 开发中
 
-### 🔧 优化
+暂无待发布内容。请查看 [主仓库 CHANGELOG](../../CHANGELOG.md)。
 
-#### 代码质量提升
+---
 
-| 优化项 | 说明 |
-|--------|------|
-| 类型统一 | `VideoProject` 类型添加，消除与 `core/types/Project` 命名冲突 |
-| 组件模块化 | `VideoProcessingController/modules/` 子组件拆分 |
-| 日志重构 | `console.*` → `logger` 统一日志管理 |
-| 工具函数去重 | `helpers.ts` 重导出 `array.ts`，消除重复实现 |
+## [1.1.0-beta] - 2026-03-28
 
-#### 构建优化
+### 🎭 新功能
 
-| 优化项 | 说明 |
-|--------|------|
-| Vite Chunking | icons 独立打包，提高缓存效率 |
-| Bundle 优化 | antd-vendor: 989KB → 922KB |
+#### 剧情分析模式 (Plot Analysis Mode) ✨NEW
 
-#### 依赖清理
+**核心功能**:
 
-- 移除未使用依赖：`styled-components`
-- 删除死代码：`src/features/` 目录 (-511 行)
+- **剧情图谱 (Plot Timeline)**: 自动分析视频中的剧情结构，生成可视化的故事节点图谱
+- **节点类型识别**:
+  - 背景铺垫 (Setup)
+  - 上升情节 (Rising Action)
+  - 高潮 (Climax)
+  - 情感转折 (Emotional Beat)
+  - 对话场景 (Dialogue)
+  - 动作场景 (Action)
+- **情感分析**: 识别视频中的情绪变化轨迹
+- **多版本输出**:
+  - 📼 剧情完整版 (Full Narrative)
+  - ✂️ 精华版 (Highlights Reel)
+  - ⚡ 高能混剪版 (Intense Mix)
 
-### 🧪 测试
+#### 项目重命名
 
-| 测试文件 | 测试数 |
-|----------|--------|
-| `format.test.ts` | 33 |
-| `object.test.ts` | 23 |
-| `validators.test.ts` | 24 |
-| `logger.test.ts` | 9 |
-| `route-preload.test.ts` | 7 |
-| `model-availability.test.ts` | 9 |
-| `shared/utils/common.test.ts` | 30 |
-| **总计** | **180+ tests** |
-
-### ✅ 质量门禁
-
-- TypeScript: 0 errors
-- ESLint: 0 warnings
-- Build: ~15s
+- **旧名称**: ClipFlow (126+ 同名项目，侵权风险)
+- **新名称**: StoryForge
 
 ---
 
@@ -79,10 +68,6 @@
 | 阿里云 | Qwen 3.5 |
 | 智谱 | GLM-5 |
 
-### 🗑️ 移除
-
-- 百度 ERNIE 模型
-
 ---
 
 ## 版本号规范
@@ -103,4 +88,4 @@
 
 ---
 
-<p align="center">感谢您使用 ClipFlow！</p>
+<p align="center">感谢您使用 StoryForge！</p>
