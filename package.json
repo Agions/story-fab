@@ -1,8 +1,8 @@
 {
-  "name": "clip-flow",
+  "name": "storyforge",
   "private": true,
-  "version": "1.0.0-beta",
-  "description": "ClipFlow (电影工坊) - AI-powered video content creation platform for filmmakers and content creators",
+  "version": "1.1.0-beta",
+  "description": "StoryForge - AI-Powered Video Storytelling Platform for Filmmakers and Content Creators",
   "author": "Agions <agions@qq.com>",
   "license": "MIT",
   "type": "module",
