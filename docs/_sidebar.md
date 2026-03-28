@@ -9,6 +9,7 @@
 - 功能介绍
   - [功能总览](features.md)
   - [工作流程](workflow.md)
+  - [剧情分析模式 🎭NEW](guides/plot-analysis.md)
 
 - 使用指南
   - [项目管理](guides/project-management.md)
@@ -21,4 +22,4 @@
 
 - 其他
   - [CHANGELOG](CHANGELOG.md)
-  - [GitHub](https://github.com/agions/clipflow)
+  - [GitHub](https://github.com/agions/storyforge)
