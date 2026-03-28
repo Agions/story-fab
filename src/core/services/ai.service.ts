@@ -6,6 +6,7 @@
 import { BaseService, ServiceError } from './base.service';
 import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis } from '@/core/types';
 import { LLM_MODELS, DEFAULT_LLM_MODEL, MODEL_RECOMMENDATIONS } from '@/core/constants';
+import { visionService } from './vision.service';
 
 // API 响应类型
 interface AIResponse {
@@ -105,6 +106,17 @@ export class AIService extends BaseService {
     prompt: string,
     settings: AIModelSettings = { enabled: true, apiKey: '', temperature: 0.7, maxTokens: 1200 }
   ): Promise<string> {
+    // 参数校验
+    if (settings.temperature !== undefined && (settings.temperature < 0 || settings.temperature > 2)) {
+      throw new ServiceError('temperature must be between 0 and 2', 'INVALID_PARAM');
+    }
+    if (settings.maxTokens !== undefined && settings.maxTokens <= 0) {
+      throw new ServiceError('maxTokens must be a positive integer', 'INVALID_PARAM');
+    }
+    if (typeof prompt !== 'string' || !prompt.trim()) {
+      throw new ServiceError('prompt must be a non-empty string', 'INVALID_PARAM');
+    }
+
     const response = await this.callAPI(model, settings, prompt);
     return response.content;
   }
@@ -175,10 +187,35 @@ export class AIService extends BaseService {
         const prompt = this.buildAnalysisPrompt(videoInfo);
         const response = await this.callAPI(model, settings, prompt);
         
+        // 并行调用视觉分析服务获取真实数据
+        const [scenesResult, keyframesResult] = await Promise.allSettled([
+          visionService.detectScenesAdvanced(videoInfo as any, { minSceneDuration: 3, threshold: 0.3 }),
+          visionService.extractKeyframes(videoInfo as any, { maxFrames: 20 }),
+        ]);
+
+        const scenes = scenesResult.status === 'fulfilled'
+          ? (scenesResult.value.scenes || []).map((s: any) => ({
+              id: s.id || crypto.randomUUID(),
+              startTime: s.startTime,
+              endTime: s.endTime,
+              thumbnail: s.thumbnail || '',
+              description: s.description || '',
+              tags: s.tags || [],
+            }))
+          : [];
+        const keyframes = keyframesResult.status === 'fulfilled'
+          ? (keyframesResult.value || []).map((k: any, idx: number) => ({
+              id: k.id || `kf_${idx}`,
+              timestamp: k.timestamp || 0,
+              thumbnail: k.thumbnail || '',
+              description: k.description || '',
+            }))
+          : [];
+
         return {
           summary: response.content,
-          scenes: this.generateMockScenes(videoInfo.duration),
-          keyframes: this.generateMockKeyframes(videoInfo.duration),
+          scenes,
+          keyframes,
           createdAt: new Date().toISOString()
         };
       },
@@ -710,68 +747,15 @@ ${script}
     return Math.ceil(wordCount / 150);
   }
 
-  /**
-   * 生成模拟场景
-   */
-  private generateMockScenes(duration: number): Array<{
-    id: string;
-    startTime: number;
-    endTime: number;
-    thumbnail: string;
-    description: string;
-    tags: string[];
-  }> {
-    const scenes: Array<{
-      id: string;
-      startTime: number;
-      endTime: number;
-      thumbnail: string;
-      description: string;
-      tags: string[];
-    }> = [];
-    const sceneCount = Math.min(Math.floor(duration / 30), 10);
-    
-    for (let i = 0; i < sceneCount; i++) {
-      scenes.push({
-        id: `scene_${i + 1}`,
-        startTime: i * 30,
-        endTime: Math.min((i + 1) * 30, duration),
-        thumbnail: '',
-        description: `场景 ${i + 1}`,
-        tags: [`场景${i + 1}`]
-      });
-    }
-    
-    return scenes;
+  // ⚠️ 以下 mock 方法已废弃，场景和关键帧现由 visionService 实时分析生成
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private generateMockScenes(duration: number): Array<any> {
+    return [];
   }
 
-  /**
-   * 生成模拟关键帧
-   */
-  private generateMockKeyframes(duration: number): Array<{
-    id: string;
-    timestamp: number;
-    thumbnail: string;
-    description: string;
-  }> {
-    const keyframes: Array<{
-      id: string;
-      timestamp: number;
-      thumbnail: string;
-      description: string;
-    }> = [];
-    const count = Math.min(Math.floor(duration / 5), 20);
-    
-    for (let i = 0; i < count; i++) {
-      keyframes.push({
-        id: `kf_${i + 1}`,
-        timestamp: i * 5,
-        thumbnail: '',
-        description: `关键帧 ${i + 1}`
-      });
-    }
-    
-    return keyframes;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private generateMockKeyframes(duration: number): Array<any> {
+    return [];
   }
 
   /**
