@@ -21,25 +21,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-
-      - name: Show Node version
-        run: node --version
-
-      - name: Show npm version
-        run: npm --version
-
-      - name: Show working directory
-        run: pwd && ls -la
-
-      - name: Show docs directory
-        run: ls -la docs/
 
       - name: Install dependencies
-        run: npm install --prefer-offline
+        run: npm install --no-audit --no-fund
 
       - name: Build VitePress
-        run: npx vitepress build docs
+        run: npm run docs:build
 
       - name: Show build output
         run: ls -la docs/.vitepress/dist/
