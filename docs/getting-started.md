@@ -4,11 +4,11 @@
 
 ## 环境要求
 
-| 要求 | 版本 |
-|------|------|
-| Node.js | ≥ 18.0.0 |
-| npm | ≥ 9.0.0 |
-| Git | ≥ 2.30.0 |
+| 要求 | 版本 | 说明 |
+|------|------|------|
+| Node.js | ≥ 18.0.0 | 推荐 LTS 版本 |
+| npm | ≥ 9.0.0 | 随 Node.js 一起安装 |
+| Git | ≥ 2.30.0 | 用于版本控制 |
 
 ## 安装步骤
 
@@ -27,22 +27,13 @@ npm install
 
 ### 3. 配置环境变量
 
-复制环境变量模板：
+复制环境变量模板并配置：
 
 ```bash
 cp .env.example .env
 ```
 
-编辑 `.env` 文件，添加你的 API Key：
-
-```env
-# AI 服务配置
-OPENAI_API_KEY=sk-xxxxx
-ANTHROPIC_API_KEY=sk-ant-xxxxx
-
-# 其他配置
-VITE_APP_TITLE=StoryForge
-```
+编辑 `.env` 文件，配置你的 AI API 密钥。详细配置请参考 [AI 模型配置](./ai-config.md)。
 
 ### 4. 启动开发服务器
 
@@ -50,53 +41,14 @@ VITE_APP_TITLE=StoryForge
 npm run dev
 ```
 
-访问 http://localhost:3000 查看应用。
+打开浏览器访问 <http://localhost:1430>
 
-## 构建生产版本
-
-```bash
-# 构建
-npm run build
-
-# 预览构建结果
-npm run preview
-```
-
-## 常用命令
-
-| 命令 | 说明 |
-|------|------|
-| `npm run dev` | 启动开发服务器 |
-| `npm run build` | 构建生产版本 |
-| `npm run lint` | 代码检查 |
-| `npm run test` | 运行测试 |
-| `npm run typecheck` | TypeScript 类型检查 |
-
-## 常见问题
-
-### 安装依赖失败
-
-```bash
-# 清除缓存后重试
-npm cache clean --force
-rm -rf node_modules
-npm install
-```
-
-### 端口被占用
-
-修改 `.env`：
-
-```env
-VITE_PORT=3001
-```
-
-### API Key 无效
-
-确保 API Key 有效且余额充足。可以在对应的 AI 服务平台上检查。
+::: tip 提示
+首次启动可能需要几分钟时间来安装依赖和构建项目。
+:::
 
 ## 下一步
 
-- [功能介绍](features) - 了解更多功能
-- [AI 模型配置](guides/ai-config) - 配置你的 AI 模型
-- [常见问题](faq) - 常见问题解答
+- [了解核心功能](./features.md)
+- [配置 AI 模型](./ai-config.md)
+- [查看安装详情](./installation.md)

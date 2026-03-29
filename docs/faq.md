@@ -1,87 +1,55 @@
 # 常见问题
 
-## 安装问题
+## 一般问题
 
-### Q: npm install 失败怎么办？
+### 如何开始使用 StoryForge？
 
-```bash
-# 清除缓存
-npm cache clean --force
+请参考[快速开始](./getting-started.md)指南，了解如何安装和启动项目。
 
-# 删除 node_modules
-rm -rf node_modules package-lock.json
+### StoryForge 支持哪些视频格式？
 
-# 重新安装
-npm install
-```
+StoryForge 支持 MP4、MOV、AVI、MKV 等常见视频格式。
 
-### Q: 端口被占用？
+### StoryForge 是免费的吗？
 
-修改 `.env`：
+StoryForge 本身是开源免费的，但使用 AI 服务（如 OpenAI、Azure 等）可能需要付费。
 
-```env
-VITE_PORT=3001
-```
+## AI 相关问题
 
-## AI 功能问题
+### 是否需要 AI API 密钥？
 
-### Q: AI 分析失败？
+是的，需要配置 AI 模型服务才能使用 AI 分析和生成功能。请参考 [AI 模型配置](./ai-config.md) 指南。
 
-1. 检查 API Key 是否有效
-2. 确认 API 余额充足
-3. 查看网络连接
+### 如何获取 AI API 密钥？
 
-### Q: 配音合成失败？
+你可以在以下平台申请 API 密钥：
 
-- Edge TTS 需要网络连接
-- 检查音频输出设备
-- 确认音频格式支持
+- [OpenAI Platform](https://platform.openai.com/api-keys)
+- [Azure Portal](https://portal.azure.com)
+- [智谱 AI 开放平台](https://open.bigmodel.cn/)
 
-## 视频处理问题
+### 支持哪些 AI 模型？
 
-### Q: 支持哪些视频格式？
+StoryForge 支持多种模型提供商：
 
-| 格式 | 状态 |
-|------|------|
-| MP4 (H.264) | ✅ 完全支持 |
-| MP4 (H.265) | ✅ 支持 |
-| MOV | ✅ 支持 |
-| AVI | ⚠️ 部分支持 |
-| MKV | ⚠️ 部分支持 |
-| WebM | ✅ 支持 |
+- OpenAI GPT 系列
+- Azure OpenAI
+- 智谱 GLM 系列
+- 百度文心一言
+- 阿里通义千问
 
-### Q: 视频太大处理慢？
+## 技术问题
 
-- 建议视频 ≤ 2GB
-- 分段处理大文件
-- 使用代理编辑
+### 启动开发服务器失败怎么办？
 
-## 导出问题
+1. 确保 Node.js 版本 ≥ 18.0.0
+2. 清除缓存：`npm cache clean --force`
+3. 删除 node_modules 后重新安装：`rm -rf node_modules && npm install`
 
-### Q: 导出失败？
+### 视频处理需要 GPU 吗？
 
-1. 检查磁盘空间
-2. 确认输出目录可写
-3. 尝试其他格式
+基础功能不需要 GPU。GPU 主要用于加速 AI 模型推理，推荐用于生产环境。
 
-### Q: 导出时间过长？
+### 如何报告问题或建议？
 
-- 降低输出分辨率
-- 使用硬件加速
-- 选择更快的编码格式
-
-## 其他问题
-
-### Q: 如何反馈问题？
-
-- GitHub Issues: https://github.com/Agions/StoryForge/issues
-- 提交问题时请附上错误日志
-
-### Q: 如何参与贡献？
-
-1. Fork 项目
-2. 创建特性分支
-3. 提交代码
-4. 创建 Pull Request
-
-详见 [贡献指南](../CONTRIBUTING.md)。
+请在 [GitHub Issues](https://github.com/Agions/StoryForge/issues) 中提交，我们会尽快处理。

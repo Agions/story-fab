@@ -3,10 +3,6 @@ name: Deploy Documentation
 on:
   push:
     branches: [main]
-    paths:
-      - 'docs/**'
-      - 'README.md'
-      - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
 permissions:
@@ -25,20 +21,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/configure-pages@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Copy Documentation Files
-        run: |
-          mkdir -p _site
-          # Copy docs to _site
-          cp -r docs/* _site/
-          # Copy README as index if exists
-          cp README.md _site/README.md 2>/dev/null || true
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Documentation
+        run: npm run docs:build
+
+      - uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: docs/.vitepress/dist
 
       - name: Deploy to GitHub Pages
         id: deployment

@@ -1,25 +1,41 @@
-# StoryForge
+---
+layout: home
 
-> AI 驱动的专业智能视频剪辑工具
+hero:
+  name: "StoryForge"
+  text: "AI 驱动的专业智能视频剪辑工具"
+  tagline: "支持智能混剪、剧情分析、字幕生成等全链路 AI 剪辑能力"
+  actions:
+    - theme: brand
+      text: 快速开始 →
+      link: /getting-started
+    - theme: alt
+      text: 功能介绍 →
+      link: /features
+    - theme: alt
+      text: GitHub
+      link: https://github.com/Agions/StoryForge
 
-## 功能特点
+features:
+  - icon: 🎬
+    title: 剧情分析
+    details: AI 深度理解视频叙事结构，自动识别高光时刻与情感曲线
+  - icon: ✂️
+    title: 智能剪辑
+    details: 基于 AI 分析结果，一键生成专业级剪辑方案
+  - icon: 🎙️
+    title: AI 配音
+    details: 多音色 AI 配音，支持中文、英文及多种方言
+  - icon: 🎵
+    title: 智能混剪
+    details: 自动识别节奏卡点，多素材智能拼接与转场
+  - icon: 📝
+    title: 字幕生成
+    details: 支持 ASR 自动字幕提取和 OCR 字幕识别
+  - icon: 🎨
+    title: 自动包装
+    details: 智能字幕样式、封面设计，片头片尾生成
+---
 
-- **智能剧情分析** - AI 深度理解视频叙事结构
-- **自动剪辑** - 一键生成专业级剪辑方案
-- **AI 配音** - 多音色配音支持
-- **智能混剪** - 自动识别节奏卡点
-
-## 快速开始
-
-1. 克隆项目
-2. 安装依赖
-3. 启动开发服务器
-
-详细指南请参考 [快速开始](getting-started) 页面。
-
-## 相关链接
-
-- [GitHub 仓库](https://github.com/Agions/StoryForge)
-- [功能介绍](features)
-- [工作流](workflow)
-- [常见问题](faq)
+<div class="vp-doc home">
+</div>
