@@ -36,10 +36,10 @@ jobs:
         run: ls -la docs/
 
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Build VitePress
-        run: npm run docs:build
+        run: npm run docs:build 2>&1
 
       - name: Show build output
         run: ls -la docs/.vitepress/dist/
