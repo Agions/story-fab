@@ -5,21 +5,21 @@
 
 // 应用信息
 export const APP_CONFIG = {
-  name: 'ClipFlow',
+  name: 'StoryForge',
   version: '1.0.0',
   description: 'AI驱动的专业视频内容创作平台',
-  repository: 'https://github.com/Agions/clipflow',
+  repository: 'https://github.com/Agions/storyforge',
   license: 'MIT'
 } as const;
 
 // 存储配置
 export const STORAGE_CONFIG = {
-  prefix: 'clipflow_',
+  prefix: 'storyforge_',
   keys: {
-    store: 'clipflow-store',
-    settings: 'clipflow-settings',
-    projects: 'clipflow-projects',
-    cache: 'clipflow-cache'
+    store: 'storyforge-store',
+    settings: 'storyforge-settings',
+    projects: 'storyforge-projects',
+    cache: 'storyforge-cache'
   }
 } as const;
 

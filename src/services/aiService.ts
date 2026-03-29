@@ -157,7 +157,7 @@ const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
     model: 'general',
     headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
     transformRequest: (prompt, options) => ({
-      header: { app_id: options?.appId || '', uid: 'ClipFlow_user' },
+      header: { app_id: options?.appId || '', uid: 'StoryForge_user' },
       parameter: { chat: { domain: 'general', temperature: 0.7, max_tokens: 4096 } },
       payload: { message: { text: [{ role: 'user', content: prompt }] } },
     }),

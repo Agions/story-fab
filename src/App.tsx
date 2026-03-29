@@ -39,7 +39,7 @@ const PageLoader = () => (
         border: '3px solid rgba(99, 102, 241, 0.25)',
         borderTopColor: '#6366f1',
         borderRadius: '50%',
-        animation: 'clipflow-spin 0.9s linear infinite',
+        animation: 'storyforge-spin 0.9s linear infinite',
       }}
     />
   </div>

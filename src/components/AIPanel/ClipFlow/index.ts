@@ -1,7 +1,7 @@
 /**
  * AI 剪辑流程组件导出
  */
-export { default as ClipFlow } from './ClipFlow';
+export { default as StoryForge } from './StoryForge';
 export { default as ProjectCreate } from './ProjectCreate';
 export { default as VideoUpload } from './VideoUpload';
 export { default as AIAnalyze } from './AIAnalyze';

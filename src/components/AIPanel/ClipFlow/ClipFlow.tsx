@@ -29,13 +29,13 @@ import {
   PlayCircleOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
-import { useClipFlow, ClipFlowStep, ClipFlowState } from '../AIEditorContext';
-import styles from './ClipFlow.module.less';
+import { useStoryForge, StoryForgeStep, StoryForgeState } from '../AIEditorContext';
+import styles from './StoryForge.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 
 // 流程步骤配置 - 体现三大核心功能
-const stepConfig: Record<ClipFlowStep, {
+const stepConfig: Record<StoryForgeStep, {
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -82,8 +82,8 @@ const stepConfig: Record<ClipFlowStep, {
 };
 
 // 获取步骤索引
-const getStepIndex = (step: ClipFlowStep): number => {
-  const steps: ClipFlowStep[] = [
+const getStepIndex = (step: StoryForgeStep): number => {
+  const steps: StoryForgeStep[] = [
     'project-create',
     'video-upload', 
     'ai-analyze',
@@ -95,7 +95,7 @@ const getStepIndex = (step: ClipFlowStep): number => {
 };
 
 // 检查是否可以进入下一步
-const canProceedToStep = (state: ClipFlowState, targetStep: ClipFlowStep): boolean => {
+const canProceedToStep = (state: StoryForgeState, targetStep: StoryForgeStep): boolean => {
   const currentIndex = getStepIndex(state.currentStep);
   const targetIndex = getStepIndex(targetStep);
   
@@ -112,13 +112,13 @@ const canProceedToStep = (state: ClipFlowState, targetStep: ClipFlowStep): boole
   return true;
 };
 
-interface ClipFlowProps {
+interface StoryForgeProps {
   children?: React.ReactNode;
   showSteps?: boolean;
   showNavigation?: boolean;
 }
 
-const ClipFlow: React.FC<ClipFlowProps> = ({
+const StoryForge: React.FC<StoryForgeProps> = ({
   children,
   showSteps = true,
   showNavigation = true,
@@ -133,7 +133,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
     canProceed,
     completedSteps,
     totalSteps,
-  } = useClipFlow();
+  } = useStoryForge();
 
   // 从 URL 同步项目 ID
   React.useEffect(() => {
@@ -143,7 +143,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
   }, [projectId]);
 
   // 步骤变化处理
-  const handleStepClick = (step: ClipFlowStep) => {
+  const handleStepClick = (step: StoryForgeStep) => {
     if (canProceedToStep(state, step)) {
       setStep(step);
     }
@@ -201,7 +201,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
 
   // 渲染步骤条 - 优化版
   const renderSteps = () => {
-    const steps: ClipFlowStep[] = [
+    const steps: StoryForgeStep[] = [
       'project-create',
       'video-upload',
       'ai-analyze', 
@@ -267,7 +267,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
 
   // 渲染导航按钮 - 优化版
   const renderNavigation = () => {
-    const steps: ClipFlowStep[] = [
+    const steps: StoryForgeStep[] = [
       'project-create',
       'video-upload',
       'ai-analyze',
@@ -414,7 +414,7 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
     return (
       <Card style={{ marginBottom: 16, textAlign: 'center' }}>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          <Title level={4}>🎬 欢迎使用 ClipFlow AI 剪辑</Title>
+          <Title level={4}>🎬 欢迎使用 StoryForge AI 剪辑</Title>
           <Paragraph>
             三大核心功能：AI 视频解说、AI 第一人称解说、AI 混剪
           </Paragraph>
@@ -446,4 +446,4 @@ const ClipFlow: React.FC<ClipFlowProps> = ({
   );
 };
 
-export default ClipFlow;
+export default StoryForge;

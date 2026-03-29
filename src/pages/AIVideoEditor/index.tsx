@@ -8,17 +8,17 @@ import {
   UserOutlined,
   ScissorOutlined,
 } from '@ant-design/icons';
-import { ClipFlowProvider, useClipFlow } from '@/components/AIPanel/AIEditorContext';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/AIPanel/ClipFlow/functionModeMap';
+import { StoryForgeProvider, useStoryForge } from '@/components/AIPanel/AIEditorContext';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/AIPanel/StoryForge/functionModeMap';
 import styles from './index.module.less';
 
-const ClipFlowComponent = lazy(() => import('@/components/AIPanel/ClipFlow/ClipFlow'));
-const ProjectCreate = lazy(() => import('@/components/AIPanel/ClipFlow/ProjectCreate'));
-const VideoUpload = lazy(() => import('@/components/AIPanel/ClipFlow/VideoUpload'));
-const AIAnalyze = lazy(() => import('@/components/AIPanel/ClipFlow/AIAnalyze'));
-const ScriptGenerate = lazy(() => import('@/components/AIPanel/ClipFlow/ScriptGenerate'));
-const VideoSynthesize = lazy(() => import('@/components/AIPanel/ClipFlow/VideoSynthesize'));
-const VideoExport = lazy(() => import('@/components/AIPanel/ClipFlow/VideoExport'));
+const StoryForgeComponent = lazy(() => import('@/components/AIPanel/StoryForge/StoryForge'));
+const ProjectCreate = lazy(() => import('@/components/AIPanel/StoryForge/ProjectCreate'));
+const VideoUpload = lazy(() => import('@/components/AIPanel/StoryForge/VideoUpload'));
+const AIAnalyze = lazy(() => import('@/components/AIPanel/StoryForge/AIAnalyze'));
+const ScriptGenerate = lazy(() => import('@/components/AIPanel/StoryForge/ScriptGenerate'));
+const VideoSynthesize = lazy(() => import('@/components/AIPanel/StoryForge/VideoSynthesize'));
+const VideoExport = lazy(() => import('@/components/AIPanel/StoryForge/VideoExport'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
@@ -62,7 +62,7 @@ const AI_FUNCTIONS = [
 
 const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
-  const { state, goToNextStep, setFeature } = useClipFlow();
+  const { state, goToNextStep, setFeature } = useStoryForge();
 
   useEffect(() => {
     const targetFeature = TAB_TO_FEATURE[activeTab];
@@ -125,9 +125,9 @@ const AIVideoEditorContent: React.FC = () => {
             </div>
           }
         >
-          <ClipFlowComponent showSteps={true} showNavigation={true}>
+          <StoryForgeComponent showSteps={true} showNavigation={true}>
             {renderStepContent()}
-          </ClipFlowComponent>
+          </StoryForgeComponent>
         </Suspense>
       </div>
     </div>
@@ -136,9 +136,9 @@ const AIVideoEditorContent: React.FC = () => {
 
 const AIVideoEditor: React.FC = () => {
   return (
-    <ClipFlowProvider>
+    <StoryForgeProvider>
       <AIVideoEditorContent />
-    </ClipFlowProvider>
+    </StoryForgeProvider>
   );
 };
 

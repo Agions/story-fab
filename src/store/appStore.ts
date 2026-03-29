@@ -87,7 +87,7 @@ export const useAppStore = create<AppState>()(
         })),
     }),
     {
-      name: 'clipflow-app',
+      name: 'storyforge-app',
       storage: createJSONStorage(() => localStorage),
       // 只持久化这些字段
       partialize: (state) => ({

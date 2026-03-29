@@ -21,11 +21,11 @@ import {
   InfoCircleOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { useClipFlow } from '../AIEditorContext';
+import { useStoryForge } from '../AIEditorContext';
 import { ProcessingProgress } from '@/components/common';
 import type { VideoInfo } from '@/core/types';
 import { formatDuration, formatFileSize, notify } from '@/shared';
-import styles from './ClipFlow.module.less';
+import styles from './StoryForge.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 const { Dragger } = Upload;
@@ -55,7 +55,7 @@ interface VideoUploadProps {
 }
 
 const VideoUpload: React.FC<VideoUploadProps> = ({ onNext }) => {
-  const { state, setVideo, goToNextStep } = useClipFlow();
+  const { state, setVideo, goToNextStep } = useStoryForge();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);

@@ -1,6 +1,6 @@
 # AI 工作流
 
-> ClipFlow 的核心 AI 处理流程
+> StoryForge 的核心 AI 处理流程
 
 ## 工作流概览
 
@@ -111,16 +111,16 @@
 
 ```bash
 # 导入项目
-clipflow import --video input.mp4
+storyforge import --video input.mp4
 
 # 执行 AI 分析
-clipflow analyze --project <id>
+storyforge analyze --project <id>
 
 # 生成剪辑
-clipflow clip --project <id> --mode auto
+storyforge clip --project <id> --mode auto
 
 # 导出视频
-clipflow export --project <id> --format mp4 --quality 1080p
+storyforge export --project <id> --format mp4 --quality 1080p
 ```
 
 ---

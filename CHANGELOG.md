@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 项目重命名
 
-- **旧名称**: ClipFlow (126+ 同名项目，侵权风险)
+- **旧名称**: StoryForge (126+ 同名项目，侵权风险)
 - **新名称**: StoryForge
 - 体现"AI视频创作 + 故事叙事"的核心价值
 

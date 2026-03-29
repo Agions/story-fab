@@ -198,7 +198,7 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
       
       <div className={styles.contact}>
         <Text type="secondary">
-          如有任何问题，请发送邮件至 <Link href="mailto:support@ClipFlow.com">support@ClipFlow.com</Link> 获取帮助
+          如有任何问题，请发送邮件至 <Link href="mailto:support@StoryForge.com">support@StoryForge.com</Link> 获取帮助
         </Text>
       </div>
     </div>

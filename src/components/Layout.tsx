@@ -104,7 +104,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (path === '/') return '首页';
     if (path.startsWith('/projects') || path.startsWith('/project')) return '项目管理';
     if (path.startsWith('/settings')) return '设置';
-    return 'ClipFlow';
+    return 'StoryForge';
   };
 
   const userMenu = {
@@ -170,7 +170,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           }} onClick={() => navigate('/')}>
             <img
               src="/logo.svg"
-              alt="ClipFlow"
+              alt="StoryForge"
               style={{
                 width: 36,
                 height: 36,
@@ -189,7 +189,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 WebkitTextFillColor: 'transparent',
                 fontWeight: 700
               }}>
-                ClipFlow
+                StoryForge
               </Title>
             )}
           </div>
@@ -270,7 +270,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             whiteSpace: 'nowrap',
             color: isDarkMode ? CINEMA_COLORS.textPrimary : 'inherit'
           }}>
-            ClipFlow
+            StoryForge
           </Title>
         </div>
 

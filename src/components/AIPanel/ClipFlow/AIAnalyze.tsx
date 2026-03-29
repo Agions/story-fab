@@ -26,12 +26,12 @@ import {
   AimOutlined,
   TableOutlined,
 } from '@ant-design/icons';
-import { useClipFlow } from '../AIEditorContext';
+import { useStoryForge } from '../AIEditorContext';
 import { visionService } from '@/core/services/vision.service';
 import { ProcessingProgress } from '@/components/common';
 import { notify } from '@/shared';
 import type { Scene, AIAnalyzeProps } from '@/core/types';
-import styles from './ClipFlow.module.less';
+import styles from './StoryForge.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -67,7 +67,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
     setAnalysis, 
     goToNextStep,
     dispatch 
-  } = useClipFlow();
+  } = useStoryForge();
   
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);

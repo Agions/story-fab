@@ -8,12 +8,12 @@ import { logger } from '@/utils/logger';
 import React, { useMemo, useState } from 'react';
 import { Form, Input, Select, Button, Card, Typography, Divider, Tag } from 'antd';
 import { PlusOutlined, ArrowRightOutlined, CheckCircleOutlined, VideoCameraOutlined, BookOutlined, CustomerServiceOutlined, FileTextOutlined, SettingOutlined } from '@ant-design/icons';
-import { useClipFlow } from '../AIEditorContext';
+import { useStoryForge } from '../AIEditorContext';
 import type { ProjectData } from '@/core/types';
 import { saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
-import styles from './ClipFlow.module.less';
+import styles from './StoryForge.module.less';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -110,7 +110,7 @@ const createDefaultProjectName = () => {
 };
 
 const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
-  const { state, setProject, goToNextStep } = useClipFlow();
+  const { state, setProject, goToNextStep } = useStoryForge();
   const { addRecentProject } = useSettings();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();

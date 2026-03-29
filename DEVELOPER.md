@@ -52,7 +52,7 @@ StoryForge/
 │   ├── components/          # React 组件
 │   │   ├── AIPanel/        # AI 功能面板
 │   │   │   ├── AIEditorContext.tsx  # AI 编辑器上下文
-│   │   │   └── ClipFlow/             # 剪辑模式组件
+│   │   │   └── StoryForge/             # 剪辑模式组件
 │   │   ├── editor/          # 时间线 / 轨道编辑器
 │   │   └── common/          # 通用组件
 │   ├── core/

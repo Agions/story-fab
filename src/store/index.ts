@@ -1,5 +1,5 @@
 /**
- * ClipFlow 状态管理 - 统一导出
+ * StoryForge 状态管理 - 统一导出
  * 使用 Zustand v5 + 持久化存储
  */
 

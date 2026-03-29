@@ -229,7 +229,7 @@ const Settings: React.FC = () => {
           >
             <Card title="隐私与数据">
               <Paragraph>
-                ClipFlow
+                StoryForge
                 高度重视您的隐私。所有API密钥和个人设置仅存储在您的本地设备上，没有任何数据会传输到我们的服务器。
               </Paragraph>
             </Card>

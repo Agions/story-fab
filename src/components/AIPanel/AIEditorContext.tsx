@@ -10,7 +10,7 @@ import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings 
 export type AIFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
 
 // AI 剪辑流程步骤
-export type ClipFlowStep = 
+export type StoryForgeStep = 
   | 'project-create'    // 1. 创建项目
   | 'video-upload'      // 2. 上传视频
   | 'ai-analyze'        // 3. AI视频分析
@@ -19,9 +19,9 @@ export type ClipFlowStep =
   | 'export';          // 6. 导出
 
 // 流程状态
-export interface ClipFlowState {
+export interface StoryForgeState {
   // 当前流程步骤
-  currentStep: ClipFlowStep;
+  currentStep: StoryForgeStep;
   
   // 步骤完成状态
   stepStatus: {
@@ -102,9 +102,9 @@ export interface ClipFlowState {
 }
 
 // 动作类型
-type ClipFlowAction =
-  | { type: 'SET_STEP'; payload: ClipFlowStep }
-  | { type: 'SET_STEP_COMPLETE'; payload: { step: ClipFlowStep; complete: boolean } }
+type StoryForgeAction =
+  | { type: 'SET_STEP'; payload: StoryForgeStep }
+  | { type: 'SET_STEP_COMPLETE'; payload: { step: StoryForgeStep; complete: boolean } }
   | { type: 'SET_FEATURE'; payload: AIFeatureType }
   | { type: 'SET_PROJECT'; payload: ProjectData | null }
   | { type: 'SET_VIDEO'; payload: VideoInfo | null }
@@ -127,10 +127,10 @@ type ClipFlowAction =
   | { type: 'SET_DURATION'; payload: number }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' }
-  | { type: 'RESET_STEP'; payload: ClipFlowStep };
+  | { type: 'RESET_STEP'; payload: StoryForgeStep };
 
 // 初始状态
-const initialState: ClipFlowState = {
+const initialState: StoryForgeState = {
   currentStep: 'project-create',
   stepStatus: {
     'project-create': false,
@@ -188,8 +188,8 @@ const initialState: ClipFlowState = {
 };
 
 // 获取下一步骤
-const getNextStep = (currentStep: ClipFlowStep): ClipFlowStep => {
-  const steps: ClipFlowStep[] = [
+const getNextStep = (currentStep: StoryForgeStep): StoryForgeStep => {
+  const steps: StoryForgeStep[] = [
     'project-create',
     'video-upload',
     'ai-analyze',
@@ -202,7 +202,7 @@ const getNextStep = (currentStep: ClipFlowStep): ClipFlowStep => {
 };
 
 // reducer
-function clipFlowReducer(state: ClipFlowState, action: ClipFlowAction): ClipFlowState {
+function clipFlowReducer(state: StoryForgeState, action: StoryForgeAction): StoryForgeState {
   switch (action.type) {
     case 'SET_STEP':
       return { ...state, currentStep: action.payload };
@@ -353,7 +353,7 @@ function clipFlowReducer(state: ClipFlowState, action: ClipFlowAction): ClipFlow
     
     case 'RESET_STEP': {
       // 重置指定步骤及其后续步骤
-      const steps: ClipFlowStep[] = [
+      const steps: StoryForgeStep[] = [
         'project-create',
         'video-upload',
         'ai-analyze',
@@ -388,11 +388,11 @@ function clipFlowReducer(state: ClipFlowState, action: ClipFlowAction): ClipFlow
 }
 
 // 上下文类型
-interface ClipFlowContextType {
-  state: ClipFlowState;
-  dispatch: React.Dispatch<ClipFlowAction>;
+interface StoryForgeContextType {
+  state: StoryForgeState;
+  dispatch: React.Dispatch<StoryForgeAction>;
   // 便捷方法
-  setStep: (step: ClipFlowStep) => void;
+  setStep: (step: StoryForgeStep) => void;
   setFeature: (feature: AIFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
@@ -410,7 +410,7 @@ interface ClipFlowContextType {
   goToNextStep: () => void;
   goToPrevStep: () => void;
   reset: () => void;
-  resetStep: (step: ClipFlowStep) => void;
+  resetStep: (step: StoryForgeStep) => void;
   // 计算属性
   canProceed: () => boolean;
   completedSteps: number;
@@ -418,18 +418,18 @@ interface ClipFlowContextType {
 }
 
 // 创建上下文
-const ClipFlowContext = createContext<ClipFlowContextType | undefined>(undefined);
+const StoryForgeContext = createContext<StoryForgeContextType | undefined>(undefined);
 
 // Provider 组件
-interface ClipFlowProviderProps {
+interface StoryForgeProviderProps {
   children: ReactNode;
 }
 
-export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) => {
+export const StoryForgeProvider: React.FC<StoryForgeProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(clipFlowReducer, initialState);
   
   // 便捷方法
-  const setStep = (step: ClipFlowStep) => {
+  const setStep = (step: StoryForgeStep) => {
     dispatch({ type: 'SET_STEP', payload: step });
   };
   
@@ -501,7 +501,7 @@ export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) 
   };
   
   const goToPrevStep = () => {
-    const steps: ClipFlowStep[] = [
+    const steps: StoryForgeStep[] = [
       'project-create',
       'video-upload',
       'ai-analyze',
@@ -519,7 +519,7 @@ export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) 
     dispatch({ type: 'RESET' });
   };
   
-  const resetStep = (step: ClipFlowStep) => {
+  const resetStep = (step: StoryForgeStep) => {
     dispatch({ type: 'RESET_STEP', payload: step });
   };
   
@@ -535,7 +535,7 @@ export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) 
   
   const totalSteps = 6;
   
-  const value: ClipFlowContextType = {
+  const value: StoryForgeContextType = {
     state,
     dispatch,
     setStep,
@@ -562,24 +562,24 @@ export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) 
   };
   
   return (
-    <ClipFlowContext.Provider value={value}>
+    <StoryForgeContext.Provider value={value}>
       {children}
-    </ClipFlowContext.Provider>
+    </StoryForgeContext.Provider>
   );
 };
 
 // 使用上下文的 Hook
-export const useClipFlow = (): ClipFlowContextType => {
-  const context = useContext(ClipFlowContext);
+export const useStoryForge = (): StoryForgeContextType => {
+  const context = useContext(StoryForgeContext);
   if (!context) {
-    throw new Error('useClipFlow must be used within ClipFlowProvider');
+    throw new Error('useStoryForge must be used within StoryForgeProvider');
   }
   return context;
 };
 
 // 导出旧版兼容 Hook（别名）
-export const useAIEditor = useClipFlow;
+export const useAIEditor = useStoryForge;
 
 // 导出类型
-export { ClipFlowContext };
-export type { ClipFlowAction };
+export { StoryForgeContext };
+export type { StoryForgeAction };

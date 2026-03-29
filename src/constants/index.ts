@@ -4,11 +4,11 @@
 
 // 应用信息
 export const APP = {
-  name: 'ClipFlow',
+  name: 'StoryForge',
   version: '1.0.0',
   description: 'AI 驱动的专业视频内容创作平台',
   author: 'Agions',
-  website: 'https://github.com/Agions/ClipFlow',
+  website: 'https://github.com/Agions/StoryForge',
 };
 
 // 支持的视频格式
@@ -127,12 +127,12 @@ export const HOTKEYS = {
 
 // 存储键名
 export const STORAGE_KEYS = {
-  user: 'clipflow_user',
-  projects: 'clipflow_projects',
-  settings: 'clipflow_settings',
-  theme: 'clipflow_theme',
-  language: 'clipflow_language',
-  recentFiles: 'clipflow_recent_files',
+  user: 'storyforge_user',
+  projects: 'storyforge_projects',
+  settings: 'storyforge_settings',
+  theme: 'storyforge_theme',
+  language: 'storyforge_language',
+  recentFiles: 'storyforge_recent_files',
 };
 
 // API 端点

@@ -4,12 +4,12 @@
 
 // 存储键名
 export const STORAGE_KEYS = {
-  PROJECTS: 'clipflow_projects',
-  APP_STATE: 'clipflow_app_state',
-  USER_PREFERENCES: 'clipflow_preferences',
-  RECENT_FILES: 'clipflow_recent_files',
-  MODEL_SETTINGS: 'clipflow_model_settings',
-  EXPORT_HISTORY: 'clipflow_export_history'
+  PROJECTS: 'storyforge_projects',
+  APP_STATE: 'storyforge_app_state',
+  USER_PREFERENCES: 'storyforge_preferences',
+  RECENT_FILES: 'storyforge_recent_files',
+  MODEL_SETTINGS: 'storyforge_model_settings',
+  EXPORT_HISTORY: 'storyforge_export_history'
 } as const;
 
 // 路由路径

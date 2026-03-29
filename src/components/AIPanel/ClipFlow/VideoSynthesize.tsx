@@ -18,7 +18,7 @@ import {
   FontSizeOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { useClipFlow } from '../AIEditorContext';
+import { useStoryForge } from '../AIEditorContext';
 import { voiceSynthesisService } from '@/core/services/voice-synthesis.service';
 import { videoEffectService } from '@/core/services/video-effect.service';
 import { audioVideoSyncService } from '@/core/services/audio-sync.service';
@@ -27,7 +27,7 @@ import { orchestrateCommentaryAgents } from '@/core/services/workflow/agents';
 import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '@/core/workflow/alignmentGate';
 import { FEATURE_TO_FUNCTION, FUNCTION_TO_MODE } from './functionModeMap';
 import { notify } from '@/shared';
-import styles from './ClipFlow.module.less';
+import styles from './StoryForge.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
@@ -82,7 +82,7 @@ const EFFECT_PRESET_MAP: Record<string, string | null> = {
 };
 
 const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
-  const { state, setVoice, setSynthesis, goToNextStep, dispatch } = useClipFlow();
+  const { state, setVoice, setSynthesis, goToNextStep, dispatch } = useStoryForge();
   const [synthesizing, setSynthesizing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeTab, setActiveTab] = useState('voice');

@@ -161,7 +161,7 @@ export const useProjectStore = create<ProjectState>()(
       },
     }),
     {
-      name: 'clipflow-projects',
+      name: 'storyforge-projects',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         projects: state.projects,

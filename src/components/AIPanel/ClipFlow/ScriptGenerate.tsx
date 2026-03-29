@@ -26,7 +26,7 @@ import {
   FullscreenOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
-import { useClipFlow } from '../AIEditorContext';
+import { useStoryForge } from '../AIEditorContext';
 import { aiService } from '@/core/services/ai.service';
 import type { ScriptData, ScriptSegment, ScriptMetadata, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
@@ -41,7 +41,7 @@ import {
   FUNCTION_TO_MODE,
   type AIFunctionType,
 } from './functionModeMap';
-import styles from './ClipFlow.module.less';
+import styles from './StoryForge.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -125,7 +125,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = ({ onNext }) => {
     setFeature,
     goToNextStep,
     dispatch,
-  } = useClipFlow();
+  } = useStoryForge();
 
   const [generating, setGenerating] = useState(false);
   const [generatingType, setGeneratingType] = useState<AIFunctionType | null>(null);

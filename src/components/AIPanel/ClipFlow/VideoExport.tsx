@@ -14,10 +14,10 @@ import {
   PlayCircleOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { useClipFlow } from '../AIEditorContext';
+import { useStoryForge } from '../AIEditorContext';
 import { notify } from '@/shared';
 import type { ExportSettings } from '@/core/types';
-import styles from './ClipFlow.module.less';
+import styles from './StoryForge.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -57,7 +57,7 @@ interface VideoExportProps {
 }
 
 const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
-  const { state, setExportSettings, goToNextStep, dispatch } = useClipFlow();
+  const { state, setExportSettings, goToNextStep, dispatch } = useStoryForge();
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exported, setExported] = useState(false);

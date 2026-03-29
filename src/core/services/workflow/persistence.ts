@@ -7,7 +7,7 @@ import { WorkflowData, WorkflowStep, WorkflowState, WorkflowConfig } from './typ
 import { workflowCacheManager, WorkflowCache } from './cacheManager';
 import { logger } from '@/utils/logger';
 
-const STORAGE_KEY_PREFIX = 'clipflow_workflow_';
+const STORAGE_KEY_PREFIX = 'storyforge_workflow_';
 const MAX_STORED_WORKFLOWS = 5;
 
 /**

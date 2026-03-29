@@ -216,7 +216,7 @@ export const useEditorStore = create<EditorState>()(
       reset: () => set(initialState),
     }),
     {
-      name: 'clipflow-editor',
+      name: 'storyforge-editor',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         video: state.video,

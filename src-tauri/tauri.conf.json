@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
-  "productName": "ClipFlow",
+  "productName": "StoryForge",
   "version": "1.0.0-beta",
-  "identifier": "com.clipflow.desktop",
+  "identifier": "com.storyforge.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "ClipFlow - AI 视频创作平台",
+        "title": "StoryForge - AI 视频创作平台",
         "width": 1200,
         "height": 800,
         "center": true,

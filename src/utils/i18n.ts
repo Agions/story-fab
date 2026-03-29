@@ -7,7 +7,7 @@ interface Translations {
 }
 
 const translations: Translations = {
-  'app.name': 'ClipFlow',
+  'app.name': 'StoryForge',
   'app.save': '保存',
   'app.cancel': '取消',
   'app.confirm': '确认',
