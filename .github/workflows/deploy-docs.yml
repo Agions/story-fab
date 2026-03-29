@@ -27,14 +27,13 @@ jobs:
 
       - uses: actions/configure-pages@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Build Documentation
+      - name: Copy Documentation Files
         run: |
-          npx docsify-cli build docs -o _site
+          mkdir -p _site
+          # Copy docs to _site
+          cp -r docs/* _site/
+          # Copy README as index if exists
+          cp README.md _site/README.md 2>/dev/null || true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
