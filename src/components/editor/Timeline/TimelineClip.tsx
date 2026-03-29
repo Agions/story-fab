@@ -124,7 +124,6 @@ const TimelineClip: React.FC<TimelineClipProps> = memo(({
   const handleDoubleClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     // TODO: 打开 clip 编辑器
-    console.log('Edit clip:', clip.id)
   }, [clip.id])
 
   return (
