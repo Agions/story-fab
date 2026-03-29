@@ -6,6 +6,7 @@ on:
     paths:
       - 'docs/**'
       - 'README.md'
+      - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
 permissions:
@@ -31,11 +32,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Docsify
-        run: npm install -g docsify-cli
-
       - name: Build Documentation
-        run: docsify build docs -o _site
+        run: |
+          npx docsify-cli build docs -o _site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
