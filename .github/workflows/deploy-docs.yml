@@ -3,6 +3,9 @@ name: Deploy Documentation
 on:
   push:
     branches: [main]
+    paths:
+      - 'docs/**'
+      - 'README.md'
   workflow_dispatch:
 
 permissions:
@@ -12,41 +15,30 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   docs:
-    name: Build & Deploy Docs
+    name: Deploy Docs
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - uses: actions/configure-pages@v4
 
-      - name: Build Docs
-        run: |
-          mkdir -p _site
-          # Copy docs content to _site
-          cp -r docs/* _site/ 2>/dev/null || true
-          # Ensure index.html exists
-          if [ ! -f _site/index.html ]; then
-            cat > _site/index.html << 'HTMLEOF'
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>StoryForge 文档</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-  <h1>StoryForge 文档</h1>
-  <p>正在构建中...</p>
-</body>
-</html>
-HTMLEOF
-          fi
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Docsify
+        run: npm install -g docsify-cli
+
+      - name: Build Documentation
+        run: docsify build docs -o _site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
