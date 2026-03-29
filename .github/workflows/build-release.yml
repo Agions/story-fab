@@ -38,8 +38,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - run: npm ci
+      - run: npm install
       - run: npm run lint
 
   build:
@@ -51,8 +50,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - run: npm ci
+      - run: npm install
       - run: npm run build
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
@@ -80,7 +78,7 @@ jobs:
           draft: false
           prerelease: ${{ contains(needs.version.outputs.version, 'dev') }}
           generate_release_notes: true
-          assets: artifacts/**
+          files: artifacts/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -103,6 +101,6 @@ jobs:
           draft: true
           prerelease: ${{ contains(needs.version.outputs.version, 'dev') }}
           generate_release_notes: true
-          assets: artifacts/**
+          files: artifacts/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
