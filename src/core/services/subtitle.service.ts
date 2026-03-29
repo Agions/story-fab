@@ -70,16 +70,82 @@ class SubtitleService {
 
     logger.info('[SubtitleService] 提取字幕:', { videoPath, language });
 
-    // TODO: 接入 OCR 服务提取文字 + ASR 服务提取语音
-    // 目前返回空字幕
-    const entries: SubtitleEntry[] = [];
+    // 导入 ASR 服务（延迟导入避免循环依赖）
+    const { asrService } = await import('./asr.service');
 
-    return {
-      id: crypto.randomUUID(),
-      language,
-      entries,
-      style: DEFAULT_SUBTITLE_STYLE,
+    // 语言映射
+    const langMap: Record<string, 'zh_cn' | 'en_us' | 'ja_jp' | 'ko_kr'> = {
+      'zh-CN': 'zh_cn',
+      'en': 'en_us',
+      'ja-JP': 'ja_jp',
+      'ko-KR': 'ko_kr',
     };
+
+    try {
+      // 调用 ASR 服务提取语音
+      // 需要构建 VideoInfo 对象
+      const videoInfo = {
+        id: crypto.randomUUID(),
+        path: videoPath,
+        name: videoPath.split('/').pop() || 'video',
+        duration: 0, // ASR 服务会自行获取
+        size: 0,
+        format: '',
+        fps: 0,
+        width: 0,
+        height: 0,
+        bitrate: 0,
+        hasAudio: true,
+        hasVideo: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const asrResult = await asrService.recognizeSpeech(videoInfo, {
+        language: langMap[language] || 'zh_cn',
+        enableTimestamp: true,
+        enablePunctuation: true,
+      });
+
+      // 转换 ASR 结果为字幕条目
+      const entries: SubtitleEntry[] = asrResult.segments.map((segment, index) => ({
+        id: `subtitle-${index}`,
+        startTime: segment.startTime,
+        endTime: segment.endTime,
+        text: segment.text,
+        confidence: segment.confidence,
+      }));
+
+      // 如果指定了最大时长，截断字幕
+      let finalEntries = entries;
+      if (maxDuration && entries.length > 0) {
+        const lastValidIndex = entries.findIndex(e => e.endTime > maxDuration);
+        if (lastValidIndex > 0) {
+          finalEntries = entries.slice(0, lastValidIndex);
+        }
+      }
+
+      logger.info('[SubtitleService] 字幕提取完成:', {
+        count: finalEntries.length,
+        language,
+      });
+
+      return {
+        id: crypto.randomUUID(),
+        language,
+        entries: finalEntries,
+        style: DEFAULT_SUBTITLE_STYLE,
+      };
+    } catch (error) {
+      logger.error('[SubtitleService] ASR 识别失败:', error);
+      // 返回空字幕而非抛出异常
+      return {
+        id: crypto.randomUUID(),
+        language,
+        entries: [],
+        style: DEFAULT_SUBTITLE_STYLE,
+      };
+    }
   }
 
   /**

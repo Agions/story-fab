@@ -3,7 +3,7 @@ import { Card, Typography, Button, Space, Select, Progress, List, Input, Empty, 
 import { AudioOutlined, FileTextOutlined, EditOutlined, DownloadOutlined, SyncOutlined } from '@ant-design/icons';
 import { motion } from '@/components/common/motion-shim';
 import { notify } from '@/shared';
-import { subtitleService as _subtitleService } from '@/core/services';
+import { subtitleService } from '@/core/services';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -44,22 +44,39 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     setExtractedSubtitles([]);
     
     try {
-      // 模拟进度更新 - TODO: Replace with actual subtitle service call
+      // 启动进度更新
       const progressInterval = setInterval(() => {
         setProgress(prev => Math.min(prev + 10, 90));
       }, 300);
 
-      // TODO: 调用实际的字幕服务 (subtitleService.recognizeSpeech)
-      // 需要获取视频的音频轨道并传给 ASR
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      // 调用字幕服务
+      const result = await subtitleService.extractSubtitles(videoUrl, {
+        language: 'zh-CN',
+      });
+
       clearInterval(progressInterval);
       setProgress(100);
       
-      // TODO: 替换为实际字幕结果
-      // const result = await subtitleService.recognizeSpeech(audioBuffer, options);
+      // 转换字幕格式
+      const subtitles: SubtitleSegment[] = result.entries.map(entry => ({
+        id: entry.id,
+        start: formatTime(entry.startTime),
+        end: formatTime(entry.endTime),
+        text: entry.text,
+      }));
       
-      notify.success('字幕提取功能待实现');
+      setExtractedSubtitles(subtitles);
+      
+      // 回调通知
+      if (onExtracted) {
+        onExtracted(subtitles);
+      }
+      
+      if (subtitles.length > 0) {
+        notify.success(`成功提取 ${subtitles.length} 条字幕`);
+      } else {
+        notify.warning('未检测到语音内容');
+      }
       
     } catch (error) {
       notify.error(error, '字幕提取失败，请重试');
@@ -67,6 +84,15 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
       setIsExtracting(false);
     }
   }, [videoUrl, onExtracted]);
+
+  // 格式化时间辅助函数
+  const formatTime = (seconds: number): string => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 1000);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
+  };
 
   const handleSaveEdit = (id: string) => {
     setExtractedSubtitles(prev => prev.map(s => s.id === id ? { ...s, text: editingText } : s));
