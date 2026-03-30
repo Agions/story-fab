@@ -1,13 +1,13 @@
 [package]
-name = "ClipFlow"
-version = "0.1.0"
-description = "ClipFlow - AI 视频创作平台"
-authors = ["ClipFlow Team"]
+name = "StoryForge"
+version = "1.0.0"
+description = "StoryForge - AI 驱动的专业智能视频剪辑工具"
+authors = ["Agions <agions@qq.com>"]
 license = "MIT"
 edition = "2021"
 
 [lib]
-name = "clipflow_lib"
+name = "storyforge_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

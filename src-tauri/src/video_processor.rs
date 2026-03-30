@@ -132,7 +132,7 @@ impl FFmpegResolver {
         }
 
         // Check environment variables
-        let env_key = format!("CLIPFLOW_{}_PATH", binary.to_uppercase());
+        let env_key = format!("STORYFORGE_{}_PATH", binary.to_uppercase());
         if let Ok(path) = std::env::var(&env_key) {
             if !path.trim().is_empty() && PathBuf::from(&path).exists() {
                 return path;
@@ -141,7 +141,7 @@ impl FFmpegResolver {
 
         // For ffprobe, check if it's alongside ffmpeg
         if binary == "ffprobe" {
-            if let Ok(ffmpeg_path) = std::env::var("CLIPFLOW_FFMPEG_PATH") {
+            if let Ok(ffmpeg_path) = std::env::var("STORYFORGE_FFMPEG_PATH") {
                 let ffmpeg = PathBuf::from(&ffmpeg_path);
                 if let Some(parent) = ffmpeg.parent() {
                     let probe = parent.join("ffprobe");
@@ -285,7 +285,7 @@ impl VideoProcessor {
     pub fn new() -> Self {
         Self {
             ffmpeg: FFmpegResolver::new(),
-            temp_dir: std::env::temp_dir().join(format!("clipflow_{}", chrono_timestamp())),
+            temp_dir: std::env::temp_dir().join(format!("storyforge_{}", chrono_timestamp())),
         }
     }
 

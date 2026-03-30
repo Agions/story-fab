@@ -36,13 +36,13 @@ impl VideoProcessor {
     }
 
     fn resolve_binaries() -> (String, String) {
-        let ffmpeg = std::env::var("CLIPFLOW_FFMPEG_PATH")
+        let ffmpeg = std::env::var("STORYFORGE_FFMPEG_PATH")
             .or_else(|_| std::env::var("FFMPEG_PATH"))
             .unwrap_or_else(|_| "ffmpeg".to_string());
         
-        let ffprobe = std::env::var("CLIPFLOW_FFPROBE_PATH")
+        let ffprobe = std::env::var("STORYFORGE_FFPROBE_PATH")
             .or_else(|_| {
-                if let Ok(ffmpeg_dir) = std::env::var("CLIPFLOW_FFMPEG_PATH") {
+                if let Ok(ffmpeg_dir) = std::env::var("STORYFORGE_FFMPEG_PATH") {
                     let parent = PathBuf::from(&ffmpeg_dir).parent();
                     parent.map(|p| p.join("ffprobe").to_string_lossy().to_string())
                 } else {
@@ -134,7 +134,7 @@ impl VideoProcessor {
 
     pub fn extract_keyframes(&self, path: &str, max_frames: u32, scene_threshold: f64) -> Result<Vec<String>, String> {
         let temp_dir = std::env::temp_dir()
-            .join(format!("clipflow_frames_{}_{}", std::process::id(), chrono_now()));
+            .join(format!("storyforge_frames_{}_{}", std::process::id(), chrono_now()));
 
         fs::create_dir_all(&temp_dir)
             .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -272,7 +272,7 @@ impl VideoProcessor {
 
     pub fn generate_thumbnail(&self, path: &str, time: f64) -> Result<String, String> {
         let temp_dir = std::env::temp_dir()
-            .join(format!("clipflow_thumb_{}_{}", std::process::id(), chrono_now()));
+            .join(format!("storyforge_thumb_{}_{}", std::process::id(), chrono_now()));
 
         fs::create_dir_all(&temp_dir)
             .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -387,7 +387,7 @@ pub fn cut_video(
 ) -> Result<String, String> {
     let processor = VideoProcessor::new();
     let temp_dir = std::env::temp_dir()
-        .join(format!("clipflow_cut_{}", chrono_now()));
+        .join(format!("storyforge_cut_{}", chrono_now()));
 
     fs::create_dir_all(&temp_dir)
         .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -434,7 +434,7 @@ pub fn render_autonomous_cut_optimized(input: serde_json::Value) -> Result<Strin
         .ok_or("缺少 segments")?;
 
     let temp_dir = std::env::temp_dir()
-        .join(format!("clipflow_render_{}", chrono_now()));
+        .join(format!("storyforge_render_{}", chrono_now()));
 
     fs::create_dir_all(&temp_dir)
         .map_err(|e| format!("创建临时目录失败: {}", e))?;

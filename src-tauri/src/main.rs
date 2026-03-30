@@ -5,5 +5,5 @@
 )]
 
 fn main() {
-    clipflow_lib::run();
+    storyforge_lib::run();
 }

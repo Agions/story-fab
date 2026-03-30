@@ -101,7 +101,7 @@ struct VideoMetadataResult {
 }
 
 fn resolve_binary_path(binary_name: &str) -> String {
-    let env_key = format!("CLIPFLOW_{}_PATH", binary_name.to_uppercase());
+    let env_key = format!("STORYFORGE_{}_PATH", binary_name.to_uppercase());
     if let Ok(path) = std::env::var(&env_key) {
         if !path.trim().is_empty() && Path::new(&path).exists() {
             return path;
@@ -109,7 +109,7 @@ fn resolve_binary_path(binary_name: &str) -> String {
     }
 
     if binary_name == "ffprobe" {
-        if let Ok(ffmpeg_path) = std::env::var("CLIPFLOW_FFMPEG_PATH") {
+        if let Ok(ffmpeg_path) = std::env::var("STORYFORGE_FFMPEG_PATH") {
             let ffmpeg = PathBuf::from(ffmpeg_path);
             if let Some(parent) = ffmpeg.parent() {
                 let probe = parent.join("ffprobe");
@@ -265,7 +265,7 @@ fn generate_thumbnail(path: String) -> Result<String, String> {
     }
 
     let output_path = std::env::temp_dir().join(format!(
-        "clipflow_thumb_{}_{}.jpg",
+        "storyforge_thumb_{}_{}.jpg",
         std::process::id(),
         chrono_like_timestamp()
     ));
@@ -302,7 +302,7 @@ fn extract_key_frames(path: String, count: Option<u32>) -> Result<Vec<String>, S
 
     let frame_count = count.unwrap_or(10).clamp(1, 60);
     let output_dir = std::env::temp_dir().join(format!(
-        "clipflow_frames_{}_{}",
+        "storyforge_frames_{}_{}",
         std::process::id(),
         chrono_like_timestamp()
     ));
@@ -415,9 +415,9 @@ fn check_app_data_directory(app: tauri::AppHandle) -> Result<String, String> {
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let clipflow_dir = app_dir.join("ClipFlow");
-    fs::create_dir_all(&clipflow_dir).map_err(|e| format!("创建目录失败: {e}"))?;
-    Ok(clipflow_dir.to_string_lossy().to_string())
+    let storyforge_dir = app_dir.join("StoryForge");
+    fs::create_dir_all(&storyforge_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+    Ok(storyforge_dir.to_string_lossy().to_string())
 }
 
 #[tauri::command]
@@ -426,10 +426,10 @@ fn save_project_file(app: tauri::AppHandle, project_id: String, content: String)
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let clipflow_dir = app_dir.join("ClipFlow");
-    fs::create_dir_all(&clipflow_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+    let storyforge_dir = app_dir.join("StoryForge");
+    fs::create_dir_all(&storyforge_dir).map_err(|e| format!("创建目录失败: {e}"))?;
 
-    let mut target_path = PathBuf::from(&clipflow_dir);
+    let mut target_path = PathBuf::from(&storyforge_dir);
     target_path.push(format!("{project_id}.json"));
     fs::write(&target_path, content).map_err(|e| format!("写入项目文件失败: {e}"))?;
     Ok(())
@@ -441,8 +441,8 @@ fn load_project_file(app: tauri::AppHandle, project_id: String) -> Result<String
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let clipflow_dir = app_dir.join("ClipFlow");
-    let target_path = clipflow_dir.join(format!("{project_id}.json"));
+    let storyforge_dir = app_dir.join("StoryForge");
+    let target_path = storyforge_dir.join(format!("{project_id}.json"));
 
     fs::read_to_string(&target_path).map_err(|e| format!("读取项目文件失败: {e}"))
 }
@@ -453,8 +453,8 @@ fn delete_project_file(app: tauri::AppHandle, project_id: String) -> Result<(), 
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let clipflow_dir = app_dir.join("ClipFlow");
-    let target_path = clipflow_dir.join(format!("{project_id}.json"));
+    let storyforge_dir = app_dir.join("StoryForge");
+    let target_path = storyforge_dir.join(format!("{project_id}.json"));
 
     if target_path.exists() {
         fs::remove_file(&target_path).map_err(|e| format!("删除项目文件失败: {e}"))?;
@@ -469,11 +469,11 @@ fn list_project_files(app: tauri::AppHandle) -> Result<Vec<serde_json::Value>, S
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let clipflow_dir = app_dir.join("ClipFlow");
-    fs::create_dir_all(&clipflow_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+    let storyforge_dir = app_dir.join("StoryForge");
+    fs::create_dir_all(&storyforge_dir).map_err(|e| format!("创建目录失败: {e}"))?;
 
     let mut result: Vec<serde_json::Value> = Vec::new();
-    let entries = fs::read_dir(&clipflow_dir).map_err(|e| format!("读取项目目录失败: {e}"))?;
+    let entries = fs::read_dir(&storyforge_dir).map_err(|e| format!("读取项目目录失败: {e}"))?;
     for entry in entries {
         let path = entry.map_err(|e| format!("读取目录项失败: {e}"))?.path();
         if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
@@ -540,7 +540,7 @@ fn delete_file(path: String) -> Result<(), String> {
     for dir in forbidden {
         if canonical.starts_with(dir) && canonical != PathBuf::from(dir) {
             // 允许在 /tmp 下删除，但不允许删除根目录等
-            if !canonical.starts_with("/tmp/clipflow") {
+            if !canonical.starts_with("/tmp/storyforge") {
                 return Err("禁止删除此路径".to_string());
             }
         }
@@ -559,7 +559,7 @@ fn read_text_file(path: String) -> Result<String, String> {
     let canonical = target.canonicalize().map_err(|e| format!("路径无效: {e}"))?;
 
     // 限制只能读取特定目录
-    let allowed_dirs = ["/tmp/clipflow", ".clipflow"];
+    let allowed_dirs = ["/tmp/storyforge", ".storyforge"];
     let is_allowed = allowed_dirs.iter().any(|dir| canonical.starts_with(dir));
     if !is_allowed && !path.starts_with("/tmp/") && !path.starts_with(".") {
         return Err("禁止读取此路径".to_string());
@@ -575,9 +575,9 @@ fn get_file_size(path: String) -> Result<u64, String> {
     let canonical = target.canonicalize().map_err(|e| format!("路径无效: {e}"))?;
 
     // 限制只能获取特定目录下的文件大小
-    let allowed_prefixes = ["/tmp/clipflow", "/tmp/ClipFlow"];
+    let allowed_prefixes = ["/tmp/storyforge", "/tmp/StoryForge"];
     let is_allowed = allowed_prefixes.iter().any(|prefix| canonical.starts_with(prefix));
-    if !is_allowed && !path.starts_with("/tmp/") && !path.contains("clipflow") {
+    if !is_allowed && !path.starts_with("/tmp/") && !path.contains("storyforge") {
         return Err("禁止获取此文件的信息".to_string());
     }
 
@@ -599,7 +599,7 @@ fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, String>
     let transition_duration = input.transition_duration.unwrap_or(0.35).clamp(0.0, 1.5);
 
     let temp_root = std::env::temp_dir().join(format!(
-        "clipflow_autocut_{}_{}",
+        "storyforge_autocut_{}_{}",
         std::process::id(),
         chrono_like_timestamp()
     ));
@@ -1095,32 +1095,32 @@ pub fn run() {
             extract_key_frames
         ])
         .setup(|app| {
-            println!("[ClipFlow] 启动应用...");
+            println!("[StoryForge] 启动应用...");
 
             let app_data_dir = app.path().app_data_dir().unwrap_or_default();
-            println!("[ClipFlow] App数据目录: {:?}", app_data_dir);
+            println!("[StoryForge] App数据目录: {:?}", app_data_dir);
 
             if let Ok(resource_path) = app.path().resource_dir() {
-                println!("[ClipFlow] 资源目录: {:?}", resource_path);
+                println!("[StoryForge] 资源目录: {:?}", resource_path);
             }
 
             if let Some(window) = app.get_webview_window("main") {
-                println!("[ClipFlow] 获取到主窗口");
+                println!("[StoryForge] 获取到主窗口");
 
-                if let Err(e) = window.set_title("ClipFlow - AI 自主剪辑工作台") {
-                    println!("[ClipFlow] 设置窗口标题失败: {:?}", e);
+                if let Err(e) = window.set_title("StoryForge - AI 自主剪辑工作台") {
+                    println!("[StoryForge] 设置窗口标题失败: {:?}", e);
                 } else {
-                    println!("[ClipFlow] 窗口标题设置成功");
+                    println!("[StoryForge] 窗口标题设置成功");
                 }
 
                 if let Ok(url) = window.url() {
-                    println!("[ClipFlow] 当前URL: {:?}", url);
+                    println!("[StoryForge] 当前URL: {:?}", url);
                 }
             } else {
-                println!("[ClipFlow] 无法获取主窗口!");
+                println!("[StoryForge] 无法获取主窗口!");
             }
 
-            println!("[ClipFlow] 应用启动完成");
+            println!("[StoryForge] 应用启动完成");
             Ok(())
         })
         .run(tauri::generate_context!())
