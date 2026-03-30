@@ -13,7 +13,10 @@ export default defineConfig({
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#2563eb' }],
+    ['script', { id: 'check-dark-mode' }, 'document.documentElement.classList.remove("dark");'],
   ],
+
+  appearance: false,
 
   themeConfig: {
     logo: '/logo.svg',
