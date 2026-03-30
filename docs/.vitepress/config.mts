@@ -4,6 +4,8 @@ export default defineConfig({
   title: 'StoryForge',
   description: 'AI 驱动的专业智能视频剪辑工具',
   
+  base: '/StoryForge/',
+  
   lang: 'zh-CN',
   
   cleanUrls: true,
@@ -11,7 +13,7 @@ export default defineConfig({
   ignoreDeadLinks: true,
   
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/StoryForge/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#ffffff' }],
     ['script', { id: 'check-dark-mode' }, `
       (function() {
@@ -45,7 +47,7 @@ export default defineConfig({
   appearance: false,
 
   themeConfig: {
-    logo: '/logo.svg',
+    logo: 'logo.svg',
     siteTitle: 'StoryForge',
     
     nav: [
