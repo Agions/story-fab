@@ -12,8 +12,34 @@ export default defineConfig({
   
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
-    ['meta', { name: 'theme-color', content: '#2563eb' }],
-    ['script', { id: 'check-dark-mode' }, 'document.documentElement.classList.remove("dark");'],
+    ['meta', { name: 'theme-color', content: '#ffffff' }],
+    ['script', { id: 'check-dark-mode' }, `
+      (function() {
+        document.documentElement.classList.remove("dark");
+        document.documentElement.classList.add("light");
+        document.documentElement.setAttribute("data-theme", "light");
+        document.body.style.backgroundColor = "#ffffff";
+        document.body.style.color = "#3c3c43";
+      })();
+    `],
+    ['style', {}, `
+      html, body, .vp-nav, .VPContent, .vp-doc, .VPHero, .VPFeature, .VPFooter {
+        background-color: #ffffff !important;
+        color: #3c3c43 !important;
+      }
+      html.dark, html.dark body {
+        background-color: #ffffff !important;
+        color: #3c3c43 !important;
+      }
+      .vp-c-text-1 { color: #3c3c43 !important; }
+      .vp-c-text-2 { color: #67676c !important; }
+      .vp-c-bg { background-color: #ffffff !important; }
+      .vp-c-bg-alt { background-color: #f6f6f7 !important; }
+      .vp-c-bg-soft { background-color: #f6f6f7 !important; }
+      .vp-nav { background-color: #ffffff !important; }
+      .VPNavBar { background-color: #ffffff !important; }
+      .VPFooter { background-color: #ffffff !important; }
+    `],
   ],
 
   appearance: false,
