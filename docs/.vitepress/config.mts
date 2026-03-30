@@ -2,64 +2,66 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'StoryForge',
-  description: 'AI 驱动的专业智能视频剪辑工具',
+  description: 'AI 驱动的专业智能视频剪辑工具 — React + Tauri 桌面应用',
   
+  // GitHub Pages 路径前缀
   base: '/StoryForge/',
   
-  lang: 'zh-CN',
-  
-  cleanUrls: true,
-  
+  // 忽略死链接，兼容多版本文档
   ignoreDeadLinks: true,
+  
+  lang: 'zh-CN',
+  cleanUrls: true,
   
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/StoryForge/logo.svg' }],
-    ['meta', { name: 'theme-color', content: '#ffffff' }],
-    ['script', { id: 'check-dark-mode' }, `
-      (function() {
-        document.documentElement.classList.remove("dark");
-        document.documentElement.classList.add("light");
-        document.documentElement.setAttribute("data-theme", "light");
-        document.body.style.backgroundColor = "#ffffff";
-        document.body.style.color = "#3c3c43";
-      })();
-    `],
-    ['style', {}, `
-      html, body, .vp-nav, .VPContent, .vp-doc, .VPHero, .VPFeature, .VPFooter {
-        background-color: #ffffff !important;
-        color: #3c3c43 !important;
-      }
-      html.dark, html.dark body {
-        background-color: #ffffff !important;
-        color: #3c3c43 !important;
-      }
-      .vp-c-text-1 { color: #3c3c43 !important; }
-      .vp-c-text-2 { color: #67676c !important; }
-      .vp-c-bg { background-color: #ffffff !important; }
-      .vp-c-bg-alt { background-color: #f6f6f7 !important; }
-      .vp-c-bg-soft { background-color: #f6f6f7 !important; }
-      .vp-nav { background-color: #ffffff !important; }
-      .VPNavBar { background-color: #ffffff !important; }
-      .VPFooter { background-color: #ffffff !important; }
-    `],
+    ['meta', { name: 'theme-color', content: '#10B981' }],
+    ['meta', { name: 'og:type', content: 'website' }],
+    ['meta', { name: 'og:site_name', content: 'StoryForge' }],
   ],
 
-  appearance: false,
+  // 导入自定义样式
+  vite: {
+    css: {
+      preprocessorOptions: {}
+    }
+  },
 
+  // VitePress 主题配置
   themeConfig: {
-    logo: 'logo.svg',
+    logo: '/logo.svg',
     siteTitle: 'StoryForge',
-    
+
+    // 导航栏
     nav: [
-      { text: '文档', link: '/' },
-      { text: '快速开始', link: '/getting-started' },
+      { text: '首页', link: '/' },
+      { 
+        text: '指南',
+        items: [
+          { text: '快速开始', link: '/guide/quick-start' },
+          { text: '批量处理', link: '/guide/batch-processing' },
+          { text: '短视频创作', link: '/guide/short-video' },
+          { text: '字幕处理', link: '/guide/subtitle' },
+          { text: '导出格式', link: '/guide/export' },
+        ]
+      },
       { text: '功能介绍', link: '/features' },
       { 
-        text: '更多',
+        text: '配置',
         items: [
           { text: '安装配置', link: '/installation' },
           { text: 'AI 模型配置', link: '/ai-config' },
+          { text: '项目结构', link: '/project-structure' },
+        ]
+      },
+      {
+        text: '更多',
+        items: [
+          { text: '架构概览', link: '/architecture' },
+          { text: '安全设计', link: '/security' },
+          { text: '贡献指南', link: '/contributing' },
           { text: '常见问题', link: '/faq' },
+          { text: '更新日志', link: '/changelog' },
         ]
       },
       { 
@@ -68,18 +70,29 @@ export default defineConfig({
       }
     ],
 
+    // 侧边栏
     sidebar: {
       '/': [
         {
-          text: '入门',
+          text: '快速导航',
           items: [
-            { text: '概述', link: '/' },
-            { text: '快速开始', link: '/getting-started' },
+            { text: '首页', link: '/' },
+            { text: '快速开始', link: '/guide/quick-start' },
             { text: '功能介绍', link: '/features' },
           ]
         },
         {
-          text: '指南',
+          text: 'AI 视频创作指南',
+          items: [
+            { text: '快速开始', link: '/guide/quick-start' },
+            { text: '批量处理', link: '/guide/batch-processing' },
+            { text: '短视频创作', link: '/guide/short-video' },
+            { text: '字幕处理', link: '/guide/subtitle' },
+            { text: '导出格式', link: '/guide/export' },
+          ]
+        },
+        {
+          text: '配置指南',
           items: [
             { text: '安装配置', link: '/installation' },
             { text: 'AI 模型配置', link: '/ai-config' },
@@ -87,32 +100,87 @@ export default defineConfig({
           ]
         },
         {
-          text: '其他',
+          text: '参考',
           items: [
+            { text: '架构概览', link: '/architecture' },
+            { text: '安全设计', link: '/security' },
             { text: '常见问题', link: '/faq' },
             { text: '更新日志', link: '/changelog' },
           ]
-        }
-      ]
+        },
+      ],
+      '/guide/': [
+        {
+          text: '入门指南',
+          items: [
+            { text: '5 分钟快速开始', link: '/guide/quick-start' },
+            { text: '短视频创作', link: '/guide/short-video' },
+            { text: '字幕处理', link: '/guide/subtitle' },
+          ]
+        },
+        {
+          text: '高级功能',
+          items: [
+            { text: '批量处理', link: '/guide/batch-processing' },
+            { text: '导出格式', link: '/guide/export' },
+          ]
+        },
+      ],
     },
 
-    footer: {
-      message: '基于 MIT 许可证发布',
-      copyright: 'Copyright © 2025-2026 Agions'
-    },
-
+    // 社交链接
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Agions/StoryForge' }
+      { icon: 'github', link: 'https://github.com/Agions/StoryForge' },
     ],
 
-    editLink: {
-      pattern: 'https://github.com/Agions/StoryForge/edit/main/docs/:path',
-      text: '在 GitHub 上编辑此页'
+    // 页脚
+    footer: {
+      message: 'MIT License',
+      copyright: 'Copyright © 2025-2026 Agions. 基于开源精神构建。'
     },
 
+    // 编辑链接
+    editLink: {
+      pattern: 'https://github.com/Agions/StoryForge/edit/main/docs/:path',
+      text: '在 GitHub 上编辑此页面'
+    },
+
+    // 最后更新时间
+    lastUpdated: {
+      text: '最后更新',
+      formatOptions: {
+        dateStyle: 'short',
+        timeStyle: 'short'
+      }
+    },
+
+    // 本地搜索
     search: {
-      provider: 'local'
-    }
+      provider: 'local',
+      options: {
+        placeholder: '搜索文档...',
+        translations: {
+          button: {
+            buttonText: '搜索',
+            buttonAriaLabel: '搜索'
+          }
+        }
+      }
+    },
+
+    // 返回顶部
+    returnToTopLabel: '返回顶部',
+    sidebarMenuLabel: '菜单',
+    docFooter: {
+      prev: '上一篇',
+      next: '下一篇'
+    },
+
+    // 大纲（右侧标题导航）
+    outline: {
+      level: [2, 3],
+      label: '目录'
+    },
   },
 
   markdown: {
