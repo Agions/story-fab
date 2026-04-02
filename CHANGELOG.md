@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2026-04-02
+
+### 🔧 代码优化
+
+- Editor 页面：移除未使用 import（Row/Col/Drawer）
+- Editor 页面：修复 useEffect 依赖缺失问题
+- Editor 页面：复制按钮添加完整处理逻辑
+- Editor 页面：字幕文字截断逻辑优化（短文本不显示省略号）
+- Editor 页面：效果面板添加占位提示
+- Editor 编辑器：完整实现 copyClip 复制功能
+  - 新增 `COPY_CLIP` action 类型
+  - 新增 `copyClip` timeline 操作函数
+  - 新增 `copyClip` hook 操作
+
+### 📖 文档更新
+
+- README.md：优化文档结构，更新项目结构说明
+- AI 模型配置：完善多厂商配置文档
+- 文档精品化升级（VitePress 专业设计）
+
+---
+
 ## [1.1.0] - 2026-03-28
 
 ### 🎭 新功能
