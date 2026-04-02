@@ -103,6 +103,7 @@ const ProjectDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState<string>('analyze');
   const [project, setProject] = useState<ProjectData | null>(null);
+  const projectRef = useRef<ProjectData | null>(null);
   const [activeScript, setActiveScript] = useState<Script | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -113,6 +114,11 @@ const ProjectDetail: React.FC = () => {
   const scriptPersistTimerRef = useRef<number | null>(null);
   const createScriptLockRef = useRef(false);
   const generateScriptLockRef = useRef(false);
+
+  // 同步 project 到 ref（供 hooks 在条件返回后使用）
+  useEffect(() => {
+    projectRef.current = project;
+  }, [project]);
 
   useEffect(() => {
     return () => {
@@ -317,8 +323,7 @@ const ProjectDetail: React.FC = () => {
       />
     );
   }
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  if (!project) return null;
+
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const handleAnalysisComplete = useCallback((analysis: VideoAnalysis) => {
@@ -445,6 +450,9 @@ const ProjectDetail: React.FC = () => {
     project.id,
     project.videoUrl,
   ]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  if (!project) return null;
 
   return (
     <div className={styles.container}>
