@@ -1,11 +1,11 @@
 ---
 title: AI 模型配置
-description: StoryForge 支持的 AI 模型提供商配置详解，2026年3月最新模型推荐。
+description: StoryForge 支持的 AI 模型提供商配置详解。
 ---
 
 # AI 模型配置
 
-StoryForge 支持多种 AI 模型服务提供商。所有模型均已更新至 **2026年3月最新版本**。
+StoryForge 支持多种 AI 模型服务提供商，可根据场景灵活选择。
 
 ---
 
@@ -26,7 +26,7 @@ VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
 ::: tip 推荐配置
-初次使用推荐 **DeepSeek V3.2**，性价比最高，效果出色。
+初次使用推荐 **DeepSeek V3**，性价比最高，效果出色。
 :::
 
 ---
@@ -35,7 +35,7 @@ VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 
 ### OpenAI
 
-使用 GPT-5.4 系列模型进行文本生成和分析。
+使用 GPT 系列模型进行文本生成和分析。
 
 ```bash
 VITE_DEFAULT_PROVIDER=openai
@@ -45,8 +45,9 @@ VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 
 | 推荐模型 | 特点 |
 |----------|------|
-| `gpt-5.4` | 最强通用能力 |
-| `gpt-4o` | 多模态，支持视觉 |
+| `gpt-4o` | 全能型，多模态，支持视觉 |
+| `gpt-4o-mini` | 轻量快速，性价比高 |
+| `o3` | 推理能力突出 |
 
 获取 API 密钥：[platform.openai.com](https://platform.openai.com/api-keys)
 
@@ -54,24 +55,20 @@ VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 
 ### Anthropic Claude
 
-使用 Claude Sonnet 4.6 / Opus 4.6 模型。
-
 ```bash
 VITE_ANTHROPIC_API_KEY=sk-ant-xxxx
 ```
 
 | 推荐模型 | 特点 |
 |----------|------|
-| `claude-opus-4.6` | 最强能力，长上下文 |
-| `claude-sonnet-4.6` | 性价比高 |
+| `claude-3-5-sonnet` | 性价比高，日常首选 |
+| `claude-3-opus` | 最强能力，长上下文 |
 
 获取 API 密钥：[console.anthropic.com](https://console.anthropic.com/)
 
 ---
 
 ### Google Gemini
-
-使用 Gemini 3.1 Pro 模型。
 
 ```bash
 VITE_GOOGLE_API_KEY=xxxx
@@ -80,7 +77,8 @@ VITE_DEFAULT_PROVIDER=gemini
 
 | 推荐模型 | 特点 |
 |----------|------|
-| `gemini-3.1-pro` | 1M 超长上下文，多模态 |
+| `gemini-2.0-flash` | 最新高速，多模态 |
+| `gemini-1.5-pro` | 长上下文，支持 1M token |
 
 获取 API 密钥：[AI Studio](https://aistudio.google.com/app/apikey)
 
@@ -88,7 +86,7 @@ VITE_DEFAULT_PROVIDER=gemini
 
 ### DeepSeek
 
-使用 DeepSeek V3.2 模型，性价比极高。
+性价比极高的国产模型。
 
 ```bash
 VITE_DEEPSEEK_API_KEY=sk-xxxx
@@ -97,7 +95,8 @@ VITE_DEFAULT_PROVIDER=deepseek
 
 | 推荐模型 | 特点 |
 |----------|------|
-| `deepseek-v3.2` | 🏆 性价比最高 |
+| `deepseek-v3` | 🏆 性价比最高 |
+| `deepseek-r1` | 推理能力突出 |
 
 获取 API 密钥：[platform.deepseek.com](https://platform.deepseek.com/)
 
@@ -105,7 +104,7 @@ VITE_DEFAULT_PROVIDER=deepseek
 
 ### 通义千问 (Qwen)
 
-使用阿里 Qwen 2.5 Max 模型，中文优化出色。
+阿里中文优化模型。
 
 ```bash
 VITE_QIANWEN_API_KEY=xxxx
@@ -114,16 +113,14 @@ VITE_DEFAULT_PROVIDER=qianwen
 
 | 推荐模型 | 特点 |
 |----------|------|
-| `qwen2.5-max` | 中文优化，性价比高 |
-| `qwen2.5-plus` | 日常任务首选 |
+| `qwen-max` | 最强中文能力 |
+| `qwen-plus` | 日常任务首选 |
 
 获取 API 密钥：[阿里云百炼](https://bailian.console.aliyun.com/)
 
 ---
 
 ### 智谱 AI (GLM)
-
-使用智谱 GLM-5 系列模型。
 
 ```bash
 VITE_ZHIPU_API_KEY=xxxx
@@ -132,7 +129,8 @@ VITE_DEFAULT_PROVIDER=zhipu
 
 | 推荐模型 | 特点 |
 |----------|------|
-| `glm-5` | 中文优化 |
+| `glm-4` | 中文优化 |
+| `glm-4v` | 多模态视觉支持 |
 
 获取 API 密钥：[智谱 AI 开放平台](https://open.bigmodel.cn/)
 
@@ -140,7 +138,7 @@ VITE_DEFAULT_PROVIDER=zhipu
 
 ### Moonshot Kimi
 
-使用 Kimi K2.5 模型，超长上下文支持。
+超长上下文支持。
 
 ```bash
 VITE_MOONSHOT_API_KEY=sk-xxxx
@@ -149,7 +147,7 @@ VITE_DEFAULT_PROVIDER=moonshot
 
 | 推荐模型 | 特点 |
 |----------|------|
-| `kimi-k2.5` | 200K+ 超长上下文 |
+| `moonshot-v1` | 128K 上下文 |
 
 获取 API 密钥：[Moonshot Console](https://platform.moonshot.cn/)
 
@@ -157,7 +155,7 @@ VITE_DEFAULT_PROVIDER=moonshot
 
 ### 讯飞星火
 
-使用讯飞星火 V3.5 模型。
+中文语音场景优化。
 
 ```bash
 VITE_SPARK_API_KEY=xxxx
@@ -172,11 +170,7 @@ VITE_DEFAULT_PROVIDER=spark
 
 ---
 
-## 配置方式
-
-### 环境变量配置
-
-在 `.env` 文件中配置：
+## 环境变量配置
 
 ```bash
 # ===================
@@ -212,30 +206,29 @@ VITE_ANTHROPIC_API_KEY=sk-ant-xxxx
 
 ---
 
-## 模型推荐 (2026年3月)
+## 场景模型推荐
 
 | 场景 | 推荐模型 | 说明 |
 |------|----------|------|
-| 剧情分析 | GPT-5.4 / Claude Opus 4.6 | 强大的推理和分析能力 |
-| 脚本生成 | GPT-5.4 / Qwen 2.5-Max | 高质量的文本生成 |
-| 字幕翻译 | GPT-5.4 / DeepSeek V3.2 | 准确的翻译能力 |
-| 语音合成 | Azure TTS / 阿里语音 | 自然的语音输出 |
-| 多模态分析 | Gemini 3.1 Pro | 出色的视觉理解能力 |
+| 剧情分析 | GPT-4o / Claude 3.5 Sonnet | 强大的推理和分析能力 |
+| 脚本生成 | GPT-4o / Qwen-Max | 高质量文本生成 |
+| 字幕翻译 | DeepSeek-V3 / GPT-4o | 准确翻译 |
+| 多模态分析 | Gemini 2.0 Flash | 出色的视觉理解能力 |
+| 长文本理解 | Claude 3.5 Sonnet / Kimi moonshot-v1 | 超长上下文 |
 
 ---
 
-## 模型对比 (2026年3月)
+## 模型对比
 
 | 模型 | 上下文 | 优势 | 适合场景 |
 |------|--------|------|----------|
-| GPT-5.4 | 128K | 全能型，推理能力强 | 复杂分析、创意写作 |
-| Claude Opus 4.6 | 200K | 超长上下文，安全性高 | 长文本分析、代码 |
-| Claude Sonnet 4.6 | 200K | 性价比高 | 日常任务、翻译 |
-| Gemini 3.1 Pro | 1M | 超长上下文，多模态 | 视频理解、超长文本 |
-| Qwen 2.5-Max | 128K | 中文优化，性价比高 | 中文内容创作 |
-| DeepSeek V3.2 | 128K | 开源友好，价格低 | 日常任务、翻译 |
-| GLM-5 | 128K | 中文优化 | 中文内容创作 |
-| Kimi K2.5 | 200K+ | 超长上下文 | 长文本分析 |
+| GPT-4o | 128K | 全能型，多模态 | 复杂分析、创意写作 |
+| Claude 3.5 Sonnet | 200K | 性价比高，安全性高 | 日常任务、翻译 |
+| Gemini 2.0 Flash | 1M | 高速，多模态 | 视频理解、超长文本 |
+| DeepSeek-V3 | 128K | 开源友好，价格低 | 日常任务、翻译 |
+| Qwen-Max | 128K | 中文优化 | 中文内容创作 |
+| GLM-4 | 128K | 中文优化 | 中文内容创作 |
+| moonshot-v1 | 128K | 超长上下文 | 长文本分析 |
 
 ---
 
@@ -244,10 +237,7 @@ VITE_ANTHROPIC_API_KEY=sk-ant-xxxx
 如果无法直接访问某些 AI 服务，可以配置代理：
 
 ```bash
-# HTTP 代理
 VITE_HTTP_PROXY=http://127.0.0.1:7890
-
-# HTTPS 代理
 VITE_HTTPS_PROXY=http://127.0.0.1:7890
 ```
 
