@@ -340,7 +340,9 @@ export const EditorPage: React.FC = () => {
               <div className={styles.trackHeader}>
                 <span>音频 {index + 1}</span>
               </div>
-              <div className={styles.trackContent}>{/* 音频片段 */}</div>
+              <div className={styles.trackContent}>
+                <span style={{ color: '#666', fontSize: 11, padding: 4 }}>拖拽音频到此处</span>
+              </div>
             </div>
           )
         )}
@@ -386,8 +388,10 @@ export const EditorPage: React.FC = () => {
       <Tabs activeKey={activePanel} onChange={key => isPanelKey(key) && setActivePanel(key)}>
         <TabPane tab="媒体" key="media">
           <div className={styles.panelContent}>
-            <p>媒体库</p>
-            {/* 媒体列表 */}
+            <p style={{ color: '#888', fontSize: 12 }}>从左侧拖拽或点击添加视频、音频、图片素材</p>
+            <Button icon={<FileAddOutlined />} block style={{ marginTop: 8 }}>
+              导入素材
+            </Button>
           </div>
         </TabPane>
         <TabPane tab="效果" key="effects">
@@ -413,14 +417,20 @@ export const EditorPage: React.FC = () => {
         </TabPane>
         <TabPane tab="文字" key="text">
           <div className={styles.panelContent}>
-            <p>文字样式</p>
-            {/* 文字设置 */}
+            <p style={{ color: '#888', fontSize: 12 }}>添加字幕或标题文字</p>
+            <Space direction="vertical" style={{ width: '100%' }} size="small">
+              <Button icon={<PlusOutlined />} block>添加字幕</Button>
+              <Button icon={<PlusOutlined />} block>添加标题</Button>
+              <Button icon={<PlusOutlined />} block>添加贴片</Button>
+            </Space>
           </div>
         </TabPane>
         <TabPane tab="音频" key="audio">
           <div className={styles.panelContent}>
-            <p>音频库</p>
-            {/* 音频列表 */}
+            <p style={{ color: '#888', fontSize: 12 }}>添加背景音乐或配音</p>
+            <Button icon={<FileAddOutlined />} block style={{ marginTop: 8 }}>
+              导入音频
+            </Button>
           </div>
         </TabPane>
       </Tabs>
