@@ -276,3 +276,34 @@ export function adjustVolume(timeline: Timeline, trackId: string, volume: number
     updatedAt: new Date().toISOString()
   };
 }
+
+export function copyClip(timeline: Timeline, clipId: string): Timeline {
+  // 在所有视频轨道中查找该片段
+  for (const track of timeline.videoTracks) {
+    const clip = track.clips.find((c) => c.id === clipId);
+    if (clip) {
+      const duration = clip.endTime - clip.startTime;
+      const newClip: VideoClip = {
+        ...clip,
+        id: `clip_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        startTime: clip.endTime,
+        endTime: clip.endTime + duration
+      };
+
+      const updatedTrack = {
+        ...track,
+        clips: [...track.clips, newClip].sort((a, b) => a.startTime - b.startTime)
+      };
+
+      return {
+        ...timeline,
+        videoTracks: timeline.videoTracks.map((t) =>
+          t.id === track.id ? updatedTrack : t
+        ),
+        duration: Math.max(timeline.duration, newClip.endTime),
+        updatedAt: new Date().toISOString()
+      };
+    }
+  }
+  return timeline;
+}

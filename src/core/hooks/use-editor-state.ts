@@ -44,6 +44,7 @@ export interface EditorOperations {
   addClip: (trackId: string, clip: VideoClip, position: number) => void;
   removeClip: (trackId: string, clipId: string) => void;
   moveClip: (trackId: string, clipId: string, newPosition: number) => void;
+  copyClip: (clipId: string) => void;
   trimClip: (clipId: string, startTime: number, endTime: number) => void;
   splitClip: (clipId: string, splitTime: number) => void;
 
@@ -221,6 +222,13 @@ export function useEditor(_config?: Partial<EditorConfig>): {
       trackId,
       clipId,
       newPosition
+    });
+  }, []);
+
+  const copyClip = useCallback((clipId: string) => {
+    editorService.dispatch({
+      type: 'COPY_CLIP',
+      clipId
     });
   }, []);
 
@@ -408,6 +416,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
       addClip,
       removeClip,
       moveClip,
+      copyClip,
       trimClip,
       splitClip,
       addTransition,

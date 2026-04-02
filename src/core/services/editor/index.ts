@@ -10,6 +10,7 @@ import {
   addClip,
   removeClip,
   moveClip,
+  copyClip,
   trimClip,
   splitClip,
   addTransition,
@@ -98,6 +99,8 @@ export class EditorService {
         return adjustSpeed(timeline, action.clipId, action.speed);
       case 'ADJUST_VOLUME':
         return adjustVolume(timeline, action.trackId, action.volume);
+      case 'COPY_CLIP':
+        return copyClip(timeline, action.clipId);
       case 'UNDO':
         return this.undo();
       case 'REDO':

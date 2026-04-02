@@ -137,6 +137,7 @@ export type EditorAction =
   | { type: 'ADD_AUDIO'; trackId: string; audio: AudioClip; position: number }
   | { type: 'ADJUST_SPEED'; clipId: string; speed: number }
   | { type: 'ADJUST_VOLUME'; trackId: string; volume: number }
+  | { type: 'COPY_CLIP'; clipId: string }
   | { type: 'UNDO' }
   | { type: 'REDO' };
 
