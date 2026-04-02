@@ -57,7 +57,7 @@ interface VideoExportProps {
 }
 
 const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
-  const { state, setExportSettings, goToNextStep, dispatch } = useStoryForge();
+  const { state, setExportSettings, dispatch } = useStoryForge();
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exported, setExported] = useState(false);
