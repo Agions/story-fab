@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 新增 `COPY_CLIP` action 类型
   - 新增 `copyClip` timeline 操作函数
   - 新增 `copyClip` hook 操作
+- Timeline 组件：新增 clipMap（HashMap），片段查找从 O(n²) 降为 O(1)
+- Timeline 组件：handlePasteClip bug 修复（精确匹配轨道 ID）
+- TimelineRuler：window.innerWidth 改为常量，避免非响应式引用
 
 ### 📖 文档更新
 
