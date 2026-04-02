@@ -81,13 +81,13 @@ StoryForge 支持多厂商 AI 模型接入，可根据场景灵活切换：
 
 | 提供商 | 推荐模型 | 场景 |
 |--------|----------|------|
-| OpenAI | GPT-4o / o4-o3 | 剧情分析、脚本生成 |
-| Anthropic | Claude 3.5 Sonnet | 长文本分析、内容理解 |
-| Google | Gemini 2.0 Flash | 多模态理解 |
-| DeepSeek | DeepSeek-V3 / R1 | 翻译、推理任务 |
-| 阿里云 | Qwen-Max / Qwen-Plus | 中文内容创作 |
-| 智谱 | GLM-4 / GLM-4V | 中文内容创作 |
-| Kimi | moonshot-v1 | 长文本分析 |
+| OpenAI | GPT-5.4 | 剧情分析、脚本生成 |
+| Anthropic | Claude Sonnet 4.6 | 长文本分析、内容理解 |
+| Google | Gemini 3.1 Pro | 多模态理解 |
+| DeepSeek | V3.2 | 翻译、日常任务 |
+| 阿里云 | Qwen 2.5-Max | 中文内容创作 |
+| 智谱 | GLM-5 | 中文内容创作 |
+| Kimi | K2.5 | 长文本分析 |
 
 详细配置请参考 [AI 模型配置](docs/ai-config.md)。
 
