@@ -3,7 +3,6 @@
  * 渲染单个 clip，支持拖拽和调整大小
  */
 import React, { memo, useCallback, useState, useRef, useEffect } from 'react'
-import { Badge } from 'antd'
 import type { TimelineClip as TimelineClipType, TimelineScale } from './types'
 
 interface TimelineClipProps {
@@ -124,7 +123,7 @@ const TimelineClip: React.FC<TimelineClipProps> = memo(({
   const handleDoubleClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     // TODO: 打开 clip 编辑器
-  }, [clip.id])
+  }, [])
 
   return (
     <div

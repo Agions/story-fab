@@ -748,15 +748,7 @@ ${script}
   }
 
   // ⚠️ 以下 mock 方法已废弃，场景和关键帧现由 visionService 实时分析生成
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private generateMockScenes(duration: number): Array<any> {
-    return [];
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private generateMockKeyframes(duration: number): Array<any> {
-    return [];
-  }
+  // (已移除 deprecated 方法，真实实现在 useVideo.ts)
 
   /**
    * 取消进行中的请求

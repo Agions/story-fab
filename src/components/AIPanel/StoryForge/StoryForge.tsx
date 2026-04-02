@@ -8,7 +8,7 @@
  * 3. AI 混剪 - 自动识别精彩片段并添加旁白
  */
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { 
   Steps, Card, Button, Space, 
   Alert, Progress, Typography, Tag, Tooltip, Badge 

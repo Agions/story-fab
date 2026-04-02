@@ -52,6 +52,8 @@ const Timeline: React.FC<TimelineProps> = ({
   duration,
   tracks: initialTracks,
   onTimeUpdate,
+  onPlay,
+  onPause,
   onTrackUpdate,
   onClipSelect,
   onClipUpdate
@@ -168,13 +170,13 @@ const Timeline: React.FC<TimelineProps> = ({
 
   const handlePlay = useCallback(() => {
     setIsPlaying(true);
-    // TODO: 实现播放逻辑
-  }, []);
+    onPlay?.();
+  }, [onPlay]);
 
   const handlePause = useCallback(() => {
     setIsPlaying(false);
-    // TODO: 实现暂停逻辑
-  }, []);
+    onPause?.();
+  }, [onPause]);
 
   const handleStop = useCallback(() => {
     setIsPlaying(false);

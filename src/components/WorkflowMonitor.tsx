@@ -2,7 +2,6 @@
  * 工作流监控面板组件
  * 实时显示工作流状态、进度和详细信息
  */
-/* eslint-disable react/jsx-key */
 
 import React, { useMemo } from 'react';
 import { Card, Progress, Timeline, Tag, Space, Typography, Statistic, Row, Col, Tooltip } from 'antd';
@@ -239,6 +238,7 @@ export const WorkflowMonitor: React.FC<WorkflowMonitorProps> = ({
             const isCurrent = step.key === currentStep;
 
             return {
+              key: step.key,
               dot: getStepStatusIcon(step.key as WorkflowStep, currentStep, completedSteps, status),
               color: getStepStatusColor(step.key as WorkflowStep, currentStep, completedSteps, status),
               children: (

@@ -105,6 +105,8 @@ export interface TimelineProps {
   duration: number;
   tracks: Track[];
   onTimeUpdate: (time: number) => void;
+  onPlay?: () => void;
+  onPause?: () => void;
   onTrackUpdate?: (tracks: Track[]) => void;
   onClipSelect?: (clip: Clip | null) => void;
   onClipUpdate?: (clip: Clip) => void;
