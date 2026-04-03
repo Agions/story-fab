@@ -2,25 +2,25 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'StoryForge',
-  description: 'AI 驱动的专业智能视频剪辑工具 — React + Tauri 桌面应用',
-  
+  description: 'AI 驱动的专业智能视频剪辑工具 — Cinematic Dark × Warm Amber',
+
   // GitHub Pages 路径前缀
   base: '/StoryForge/',
-  
+
   // 忽略死链接，兼容多版本文档
   ignoreDeadLinks: true,
-  
+
   lang: 'zh-CN',
   cleanUrls: true,
-  
+
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/StoryForge/logo.svg' }],
-    ['meta', { name: 'theme-color', content: '#10B981' }],
+    ['meta', { name: 'theme-color', content: '#1a1a2e' }],
     ['meta', { name: 'og:type', content: 'website' }],
     ['meta', { name: 'og:site_name', content: 'StoryForge' }],
+    ['meta', { name: 'description', content: 'AI 驱动的专业智能视频剪辑工具，支持智能混剪、剧情分析、字幕生成等全链路 AI 剪辑能力' }],
   ],
 
-  // 导入自定义样式
   vite: {
     css: {
       preprocessorOptions: {}
@@ -35,7 +35,7 @@ export default defineConfig({
     // 导航栏
     nav: [
       { text: '首页', link: '/' },
-      { 
+      {
         text: '指南',
         items: [
           { text: '快速开始', link: '/guide/quick-start' },
@@ -46,7 +46,7 @@ export default defineConfig({
         ]
       },
       { text: '功能介绍', link: '/features' },
-      { 
+      {
         text: '配置',
         items: [
           { text: '安装配置', link: '/installation' },
@@ -64,9 +64,9 @@ export default defineConfig({
           { text: '更新日志', link: '/changelog' },
         ]
       },
-      { 
+      {
         text: 'GitHub',
-        link: 'https://github.com/Agions/StoryForge' 
+        link: 'https://github.com/Agions/StoryForge'
       }
     ],
 

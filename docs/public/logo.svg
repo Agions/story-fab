@@ -1,10 +1,58 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140" width="160" height="140">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#2563eb"/>
-      <stop offset="100%" style="stop-color:#f59e0b"/>
+    <!-- Amber gradient for background accent -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16162a"/>
+    </linearGradient>
+    <!-- Amber accent glow from top-right -->
+    <radialGradient id="amberGlow" cx="85%" cy="15%" r="55%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.22"/>
+      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Play triangle gradient -->
+    <linearGradient id="playGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fcd34d"/>
+    </linearGradient>
+    <!-- Bottom border accent -->
+    <linearGradient id="borderAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#f59e0b" stop-opacity="0.6"/>
+      <stop offset="70%" stop-color="#f59e0b" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect x="4" y="4" width="32" height="32" rx="8" fill="url(#grad)"/>
-  <polygon points="14,12 28,20 14,28" fill="white"/>
+
+  <!-- Film slate background -->
+  <rect width="160" height="140" rx="20" fill="url(#bgGrad)"/>
+
+  <!-- Amber radial glow -->
+  <rect width="160" height="140" rx="20" fill="url(#amberGlow)"/>
+
+  <!-- Subtle grid lines (film slate texture) -->
+  <g stroke="#f59e0b" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="35" x2="160" y2="35"/>
+    <line x1="0" y1="70" x2="160" y2="70"/>
+    <line x1="0" y1="105" x2="160" y2="105"/>
+    <line x1="40" y1="0" x2="40" y2="115"/>
+    <line x1="80" y1="0" x2="80" y2="115"/>
+    <line x1="120" y1="0" x2="120" y2="115"/>
+  </g>
+
+  <!-- Amber bottom border line -->
+  <rect x="20" y="113" width="120" height="2" rx="1" fill="url(#borderAccent)"/>
+
+  <!-- Play triangle (film/play button symbol) -->
+  <polygon points="58,42 112,72 58,102" fill="url(#playGrad)"/>
+
+  <!-- "StoryForge" wordmark below icon -->
+  <text x="80" y="132"
+        text-anchor="middle"
+        font-family="'Syne', 'Inter', system-ui, sans-serif"
+        font-size="13"
+        font-weight="700"
+        letter-spacing="0.08em"
+        fill="#f8fafc">STORYFORGE</text>
 </svg>
