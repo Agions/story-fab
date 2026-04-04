@@ -132,35 +132,4 @@ export function useApiKeyState(initialValue: string = '') {
   return { value, setValue, isValid, isTesting, testKey, reset };
 }
 
-/**
- * 设置状态 Hook
- */
-export function useAppSettings() {
-  const [autoSave, setAutoSave] = useLocalStorage('storyforge-autosave', true);
-  const [compactMode, setCompactMode] = useLocalStorage('storyforge-compact', false);
-  const [theme, setTheme] = useLocalStorage('storyforge-theme', 'light');
-  const [defaultModel, setDefaultModel] = useLocalStorage('storyforge-default-model', 'deepseek-chat');
-  const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
-  const [outputPath, setOutputPath] = useLocalStorage('storyforge-output-path', '');
 
-  const resetAll = useCallback(() => {
-    setAutoSave(true);
-    setCompactMode(false);
-    setTheme('light');
-    setDefaultModel('deepseek-chat');
-    setProjectSaveBehavior('stay');
-    setOutputPath('');
-  }, [setAutoSave, setCompactMode, setTheme, setDefaultModel, setProjectSaveBehavior, setOutputPath]);
-
-  return {
-    autoSave, setAutoSave,
-    compactMode, setCompactMode,
-    language: 'zh-CN',
-    setLanguage: (_value: string) => {},
-    theme, setTheme,
-    defaultModel, setDefaultModel,
-    projectSaveBehavior, setProjectSaveBehavior,
-    outputPath, setOutputPath,
-    resetAll,
-  };
-}
