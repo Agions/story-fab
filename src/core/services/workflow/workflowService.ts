@@ -1,3 +1,21 @@
+/**
+ * @deprecated since v1.2.0
+ *
+ * WorkflowService — 旧版工作流编排器（函数式，逐步手动执行）。
+ *
+ * 此服务仍可用于需要细粒度步骤控制（stepAnalyze / stepTemplateSelect …）的场景，
+ * 但新开发应使用 WorkflowEngine + useWorkflowEngine hook。
+ *
+ * 主要差异：
+ * |                    | WorkflowService          | WorkflowEngine              |
+ * |--------------------|--------------------------|-----------------------------|
+ * | 执行模型            | 手动逐步调用              | 自动执行步骤图               |
+ * | 步骤重试           | 手动管理                  | 引擎自动处理                 |
+ * | 状态同步           | 内部状态 + callbacks      | Subscriber 模式               |
+ * | 实例管理           | 单例                      | 每次 createWorkflowEngine()  |
+ *
+ * 导出保持不变，使用方式不变，仅标记为 deprecated。
+ */
 import { storageService } from '../storage.service';
 import {
   executeUploadStep,
