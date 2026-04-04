@@ -31,33 +31,32 @@ src/
 │   ├── services/                  # 业务服务（类）
 │   │   ├── editor/               # 编辑器服务
 │   │   ├── workflow/             # 工作流引擎
-│   │   │   ├── WorkflowEngine.ts # 状态机引擎（订阅者模式）
-│   │   │   ├── steps/           # 步骤执行器
-│   │   │   │   ├── adapters.ts  # IStepExecutor 适配器
-│   │   │   │   └── steps/*.ts   # 各步骤实现
+│   │   │   ├── WorkflowEngine.ts  # 状态机引擎（订阅者模式）
+│   │   │   ├── steps/            # 步骤执行器
+│   │   │   │   ├── adapters.ts   # IStepExecutor 适配器（v1.2.0 新增）
+│   │   │   │   └── steps/*.ts    # 各步骤实现
 │   │   │   └── types.ts
-│   │   ├── ai.service.ts        # AI 模型调用
-│   │   ├── vision.service.ts    # 场景/情绪/对象检测
-│   │   └── ...
+│   │   ├── ai.service.ts         # AI 模型调用
+│   │   └── vision.service.ts     # 场景/情绪/对象检测
 │   ├── workflow/                  # 工作流定义
-│   │   ├── featureBlueprint.ts  # 模式步骤定义
-│   │   └── alignmentGate.ts     # 对齐门禁
+│   │   ├── featureBlueprint.ts   # 模式步骤定义
+│   │   └── alignmentGate.ts      # 对齐门禁
 │   ├── hooks/                    # React Hooks（StoryForge 专用）
-│   │   ├── useWorkflowEngine.ts # 新版工作流 hook
-│   │   └── useWorkflow.ts       # 旧版 hook（deprecated）
-│   └── constants/                # 常量定义
-├── hooks/                        # 通用 Hooks（跨项目可用）
+│   │   ├── useWorkflowEngine.ts  # 新版工作流 hook（v1.2.0 新增）
+│   │   └── useWorkflow.ts        # 旧版 hook（deprecated v1.2.0）
+│   └── constants/                 # 常量定义
+├── hooks/                         # 通用 Hooks（跨项目可用）
 │   ├── use-timeline.ts
 │   ├── useHistory.ts
 │   ├── useLocalStorage.ts
 │   └── useSettings.ts
-├── store/                        # Zustand Stores（UI 状态）
+├── store/                         # Zustand Stores（UI 状态）
 │   ├── appStore.ts              # App 级（主题、侧边栏、通知）
-│   ├── projectStore.ts          # 项目列表/筛选/排序
+│   ├── projectStore.ts           # 项目列表/筛选/排序
 │   ├── editorStore.ts            # 编辑器状态（时间线、轨道）
-│   └── mainStore.ts             # AI 模型设置 → useModelStore
-└── services/                     # 兼容层 Facade
-    ├── video.ts                  # → @/core/video
+│   └── mainStore.ts              # AI 模型设置 → useModelStore（v1.2.0 重命名）
+└── services/                      # 兼容层 Facade
+    ├── video.ts                   # → @/core/video
     └── export.ts                 # 导出服务
 ```
 
@@ -107,7 +106,7 @@ React 连接 → useWorkflowEngine() hook
 | `useAppStore` | 主题、侧边栏、通知 | ✅ |
 | `useModelStore` | AI 模型选择/设置 | ✅ |
 | `projectStore` | 项目列表、筛选、排序 | ✅ |
-| `editorStore` | 时间线、轨道、片段 | ❌ |
+| `editorStore` | 时间线、轨道、片段 | ⚠️ 仅 video/zoom/volume |
 
 ---
 
@@ -126,7 +125,7 @@ React 连接 → useWorkflowEngine() hook
 |------|---------|------|
 | `useWorkflow` | v1.2.0 | `useWorkflowEngine` |
 | `WorkflowService` | v1.2.0 | `WorkflowEngine` + `createWorkflowEngine()` |
-| `store/types.ts` | v1.2.0 | `@/core/types` |
+| `store/types.ts` | v1.2.0 | `@/core/types`（通用类型）+ `editorStore.ts` 内联（Store 私有类型） |
 | `IVideoProcessor` 直接实现 | v1.2.0 | 继承 `BaseVideoProcessor` |
 
 ---
