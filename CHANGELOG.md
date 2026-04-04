@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 新增 `createWorkflowEngine(maxRetries?)`：工厂函数，创建已注册全部步骤执行器的 `WorkflowEngine` 实例
   - `script-edit` 抛出 `SkipRequest`（人工介入步骤，引擎不自动执行）
   - `ai-clip` 根据 `cfg.aiClipConfig.enabled` 动态判断是否执行
+  - 新增 `useWorkflowEngine` hook：React hook 包装 `WorkflowEngine`，连接 subscriber 模式到 `useState`，暴露 `run/pause/resume/abort/reset`
+  - `useWorkflow` 标记 `@deprecated`（旧版基于 WorkflowService 单例，逐步手动执行）
 
 - **Video Pipeline 重构**：
   - 新增 `BaseVideoProcessor.ts` 抽象基类：统一错误归一化（`VideoProcessingError` 带 `isRetryable` 标记）、FFmpeg 缓存（30s TTL）、参数校验
@@ -27,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `useModelStore` 类型别名从 `AppStore` 改为 `AIModelStore`
   - 同步更新 4 处引用：ModelCard.tsx、useModel.ts、Settings/index.tsx、ProjectDetail/index.tsx
   - 删除 `store/types.ts`（未使用，所有类型已定义在 `@/core/types`）
+  - `store/index.ts`：移除对已删除 `types.ts` 的 re-export
 
 - **Services 索引修复**：
   - `core/services/index.ts`：`'./workflow.service'` → `'./workflow/workflowService'`（路径不存在）
@@ -35,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Video 模块导出增强**：
   - `core/video/index.ts`：新增 `BaseVideoProcessor`、`VideoProcessingError`、`normalizeVideoError` 导出
   - 新增 WebCodecs 驱动实现示例注释
+
+- **WorkflowService 标记 deprecated**：旧版 `workflowService.ts` 保留但标记 `@deprecated`，新开发请使用 `WorkflowEngine` + `useWorkflowEngine`
 
 ## [1.1.1] - 2026-04-02
 
