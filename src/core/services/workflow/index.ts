@@ -2,6 +2,8 @@ export * from './types';
 export * from './workflowService';
 export * from './steps';
 export * from './agents';
+export * from './WorkflowEngine';
+export * from './IStepExecutor';
 export { WorkflowCacheManager, workflowCacheManager } from './cacheManager';
 export { WorkflowPersistenceService } from './persistence';
 export { WorkflowErrorHandler, workflowErrorHandler, createWorkflowError, ErrorCode } from './errorHandler';
