@@ -10,7 +10,8 @@ export { useAutoSave } from './use-auto-save';
 export { useSmartModel } from './use-smart-model';
 
 // 工作流
-export { useWorkflow } from './use-workflow';
+export { useWorkflow } from './use-workflow';           // 旧版：基于 WorkflowService 单例，逐步执行
+export { useWorkflowEngine } from './useWorkflowEngine'; // 新版：基于 WorkflowEngine 状态机，自动执行
 export { useProject } from './use-project';
 export { useVideo } from './use-video';
 export { useModel } from './use-model';

@@ -1,6 +1,19 @@
 /**
- * 工作流 Hook
- * 用于管理解说混剪完整流程
+ * @deprecated since v1.2.0
+ *
+ * 工作流 Hook（旧版，基于 WorkflowService 单例，逐步手动执行）。
+ *
+ * 新代码请使用 useWorkflowEngine（基于 WorkflowEngine 状态机，自动执行步骤图，
+ * 支持步骤级原子重试、订阅者模式）。
+ *
+ * 迁移方式：
+ *   // 旧（useWorkflow）
+ *   const { state, start, stepAnalyze, stepTemplateSelect } = useWorkflow(callbacks);
+ *   await start(projectId, videoFile, config);
+ *
+ *   // 新（useWorkflowEngine）
+ *   const { state, run, pause, resume, abort } = useWorkflowEngine({ maxRetries: 2 });
+ *   const data = await run(projectId, 'ai-commentary', config);
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
