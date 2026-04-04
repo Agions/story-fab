@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Button, Tag, Space, Typography, Tooltip, Badge, Modal } from 'antd';
 import { RobotOutlined, CheckCircleFilled, WarningOutlined, ApiOutlined, SettingOutlined, ExportOutlined, LinkOutlined } from '@ant-design/icons';
 import { AIModelType, AI_MODEL_INFO } from '@/types';
-import { useStore } from '@/store';
+import { useModelStore } from '@/store';
 import { useNavigate } from 'react-router-dom';
 import styles from './ModelCard.module.less';
 
@@ -31,7 +31,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
   onSelect,
   onRequestApiKey
 }) => {
-  const { aiModelsSettings, selectedAIModel } = useStore();
+  const { aiModelsSettings, selectedAIModel } = useModelStore();
   const navigate = useNavigate();
   const modelInfo = AI_MODEL_INFO[modelType];
   const isEnabled = aiModelsSettings[modelType]?.enabled;

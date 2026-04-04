@@ -13,7 +13,7 @@ interface AppState {
 }
 
 // 创建 store
-export const useStore = create<AppState>()(
+export const useModelStore = create<AppState>()(
   persist(
     (set) => ({
       // 初始 AI 模型为 OpenAI GPT-5.3
@@ -57,4 +57,4 @@ export const useStore = create<AppState>()(
 );
 
 // 导出类型，方便使用
-export type AppStore = ReturnType<typeof useStore>; 
+export type AIModelStore = ReturnType<typeof useModelStore>; 

@@ -26,7 +26,7 @@ import {
   getAvailableModelsFromApiKeys,
   resolveDefaultModelId,
 } from '@/core/utils/model-availability';
-import { useStore } from '@/store';
+import { useModelStore } from '@/store';
 import { notify } from '@/shared';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';
 import styles from './index.module.less';
@@ -45,7 +45,7 @@ const Settings: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState('models');
   const [isLoading, setIsLoading] = useState(true);
-  const updateAIModelSettings = useStore(state => state.updateAIModelSettings);
+  const updateAIModelSettings = useModelStore(state => state.updateAIModelSettings);
 
   // 设置状态
   const [defaultModel, setDefaultModel] = useLocalStorage<string>(

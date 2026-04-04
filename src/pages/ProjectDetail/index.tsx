@@ -14,7 +14,7 @@ import {
   DashboardOutlined
 } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
-import { useStore } from '@/store';
+import { useModelStore } from '@/store';
 import { saveProjectToFile, getApiKey, loadProjectWithRetry, deleteProject } from '@/services/tauri';
 import { useSettings } from '@/context/SettingsContext';
 import { notify } from '@/shared';
@@ -99,7 +99,7 @@ const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { addRecentProject } = useSettings();
-  const { selectedAIModel, aiModelsSettings } = useStore();
+  const { selectedAIModel, aiModelsSettings } = useModelStore();
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState<string>('analyze');
   const [project, setProject] = useState<ProjectData | null>(null);

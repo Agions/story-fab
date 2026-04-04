@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useStore } from '@/store';
+import { useModelStore } from '@/store';
 import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS, getModelById, getModelsByProvider, getRecommendedModels } from '@/core/config/models.config';
 import type { AIModel, ModelProvider, ModelCategory, AIModelSettings } from '@/core/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
@@ -41,7 +41,7 @@ export interface UseModelReturn {
 }
 
 export function useModel(): UseModelReturn {
-  const store = useStore();
+  const store = useModelStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [apiKeys] = useLocalStorage<Partial<Record<ModelProvider, { key: string; isValid?: boolean }>>>('api_keys', {});

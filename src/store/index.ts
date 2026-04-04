@@ -11,5 +11,5 @@ export { useAppStore } from './appStore';
 export { useProjectStore } from './projectStore';
 export { useEditorStore } from './editorStore';
 
-// mainStore 导出为 useStore（包含 AI 模型相关状态）
-export { useStore } from './mainStore';
+// mainStore 导出为 useModelStore（AI 模型相关状态）
+export { useModelStore } from './mainStore';
