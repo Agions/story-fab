@@ -11,35 +11,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🏗️ 架构升级
 
-- **Workflow Engine 接入**：
-  - 新增 `steps/adapters.ts`：`IStepExecutor` 包装器适配所有步骤（upload/analyze/template-select/script-generate/script-dedup/script-edit/ai-clip/timeline-edit/preview/export）
-  - 新增 `createWorkflowEngine(maxRetries?)`：工厂函数，创建已注册全部步骤执行器的 `WorkflowEngine` 实例
-  - `script-edit` 抛出 `SkipRequest`（人工介入步骤，引擎不自动执行）
-  - `ai-clip` 根据 `cfg.aiClipConfig.enabled` 动态判断是否执行
-  - 新增 `useWorkflowEngine` hook：React hook 包装 `WorkflowEngine`，连接 subscriber 模式到 `useState`，暴露 `run/pause/resume/abort/reset`
-  - `useWorkflow` 标记 `@deprecated`（旧版基于 WorkflowService 单例，逐步手动执行）
-
-- **Video Pipeline 重构**：
-  - 新增 `BaseVideoProcessor.ts` 抽象基类：统一错误归一化（`VideoProcessingError` 带 `isRetryable` 标记）、FFmpeg 缓存（30s TTL）、参数校验
-  - `TauriVideoProcessor` 继承 `BaseVideoProcessor`，实现 `do*` 平台方法，代码量从 ~210 行减少至 ~95 行
-  - 新增 `VideoProcessingError` 异常类（带 operation 和 isRetryable 字段）
-
 - **Zustand Store 治理**：
-  - `mainStore.ts`：`useStore` 重命名为 `useModelStore`（消除与 `appStore/useAppStore` 的命名歧义）
-  - `useModelStore` 类型别名从 `AppStore` 改为 `AIModelStore`
-  - 同步更新 4 处引用：ModelCard.tsx、useModel.ts、Settings/index.tsx、ProjectDetail/index.tsx
-  - 删除 `store/types.ts`（未使用，所有类型已定义在 `@/core/types`）
-  - `store/index.ts`：移除对已删除 `types.ts` 的 re-export
+  - `mainStore.ts`：移除 dead field `autoSave`/`isDarkMode`（与 `appStore` 重复，无任何引用点）
+  - `appStore.ts`：`autoSave` 从嵌套 `userSettings` 提升到顶层字段 `autoSave`，并新增 `setAutoSave` action
+  - `src/store/theme.ts`：删除（与 `ThemeContext.useTheme` 命名冲突，无调用点）
+  - `src/hooks/useSettings.ts`：删除 `useAppSettings` 函数（dead function，无调用点）
+  - 状态拓扑收束：`appStore`=UI+设置，`mainStore`=AI模型配置，各自职责清晰
 
-- **Services 索引修复**：
-  - `core/services/index.ts`：`'./workflow.service'` → `'./workflow/workflowService'`（路径不存在）
-  - 新增 `WorkflowEngine`、`WorkflowState/WorkflowConfig/WorkflowStep` 类型导出
+- **视频处理管道接口抽象**：
+  - 新建 `src/core/video/`：types.ts | IVideoProcessor.ts | TauriVideoProcessor.ts | formatters.ts | index.ts
+  - `IVideoProcessor`：后端无关接口，定义 `analyze / extractKeyFrames / generateThumbnail / cut / preview`
+  - `TauriVideoProcessor`：Tauri invoke 实现类，单例 `videoProcessor`，parseVideoError 收敛于此
+  - `formatters`：纯函数（`formatDuration / formatResolution / formatBitrate / formatFileSize`），无副作用
+  - `video.ts` 降级为 facade，代理所有导出，兼容已有调用点
+  - 核心收益：可切换实现（Tauri → WebCodecs 或测试 mock）
 
-- **Video 模块导出增强**：
-  - `core/video/index.ts`：新增 `BaseVideoProcessor`、`VideoProcessingError`、`normalizeVideoError` 导出
-  - 新增 WebCodecs 驱动实现示例注释
+- **Workflow 引擎状态机化**：
+  - 新增 `WorkflowEngine.ts`：图执行器，基于 `WORKFLOW_MODE_DEFINITIONS` 构建实际执行序列
+  - 新增 `IStepExecutor.ts`：步骤执行器接口，`execute(ctx)` 返回表示成功
+  - 条件跳过：`config` 驱动（`autoAnalyze / autoGenerateScript / autoDedup / aiClipConfig`）
+  - 重试机制：`ctx.retry()` 抛出 `RetryRequest`，引擎自动 `attempt++` 后重试
+  - 跳过机制：`ctx.skip()` 抛出 `SkipRequest`，继续下一步骤
+  - 进度广播：订阅者模式 + `STEP_WEIGHTS` 映射表，总进度 0-100
+  - `pause / resume / abort` 支持
+  - 原有 `workflowService.ts` 和 step executor 函数完全保留，向后兼容
 
-- **WorkflowService 标记 deprecated**：旧版 `workflowService.ts` 保留但标记 `@deprecated`，新开发请使用 `WorkflowEngine` + `useWorkflowEngine`
+- **Services 索引更新**：
+  - `workflow/index.ts`：新增 `WorkflowEngine`、`IStepExecutor` 导出
 
 ## [1.1.1] - 2026-04-02
 
