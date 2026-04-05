@@ -1,3 +1,35 @@
+## [1.3.0] - 2026-04-05
+
+### 🎨 UI 全面升级 — AI Cinema Studio
+
+- **设计系统重构**：深炭底 #0C0D14 + 琥珀光 #FF9F43 + 电青色 #00D4FF
+- **字体升级**：Outfit（标题）+ Figtree（正文）+ JetBrains Mono（时间码）
+- **玻璃拟态**：所有卡片采用 rgba(20,21,32,0.8) + backdrop-filter blur(20px)
+- **全局动画**：神经网络脉冲、扫描线纹理、自定义滚动条
+
+### ✨ 组件重设计
+
+- **Layout**：全新侧栏（琥珀光强调）+ 顶栏（用户信息）
+- **Dashboard**：玻璃拟态卡片 + 状态 Badge（琥珀/电青/灰）
+- **Landing**：Canvas 粒子 Hero + 3步骤流 + 4列特性网格
+- **CutDeck 工作流**：垂直步骤列表 + 四态动画（完成/进行/等待）
+- **VideoUpload**：拖拽脉冲动画 + 琥珀光进度条
+- **AIAnalyze**：神经网络可视化（电青脉冲点阵）
+- **ProjectCreate / ScriptGenerate / VideoSynthesize / VideoExport**：全组件重设计
+- **EffectsPanel**：4×3 滤镜网格 + 琥珀滑块
+- **HighlightPanel / SmartSegmentPanel**：JetBrains Mono 时间码 + 热度条
+- **SubtitleEditor**：Canvas 波形 + 琥珀播放头
+
+### 🛠️ antd Tooltip 深色主题覆盖
+
+- 自定义深色 Tooltip + 四个方向箭头修正
+- 带琥珀光晕的 accent 变体
+
+### 🐛 修复
+
+- Dashboard index.module.less 缺失 @radius-full 变量
+
+---
 # 更新日志
 
 All notable changes to this project will be documented in this file.
