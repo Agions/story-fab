@@ -359,7 +359,7 @@ print(json.dumps(result, ensure_ascii=False))
         if stderr.contains("No module named") || stderr.contains("ModuleNotFoundError") {
             return Err("faster-whisper 未安装。请运行: pip install faster-whisper".to_string());
         }
-        if stderr.contains("model not found") || stderr.contains("download")) {
+        if stderr.contains("model not found") || stderr.contains("download") {
             return Err(format!(
                 "Whisper {} 模型未找到，faster-whisper 会自动下载。错误: {}",
                 model, stderr
