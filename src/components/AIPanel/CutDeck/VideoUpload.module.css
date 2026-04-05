@@ -1,0 +1,525 @@
+/**
+ * VideoUpload - AI Cinema Studio Design System
+ * Deep Charcoal #0C0D14 | Amber #FF9F43 | Electric Cyan #00D4FF
+ */
+
+/* ==================== Layout ==================== */
+.stepContent {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+.stepTitle {
+  margin-bottom: 28px;
+}
+
+.stepTitle h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.stepTitle p {
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ==================== Upload Zone ==================== */
+.uploadZone {
+  position: relative;
+  border: 2px dashed rgba(255, 159, 67, 0.3);
+  border-radius: 16px;
+  padding: 56px 32px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(12, 13, 20, 0.6);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+
+.uploadZone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 159, 67, 0.05) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.uploadZone:hover {
+  border-color: #FF9F43;
+  box-shadow:
+    0 0 20px rgba(255, 159, 67, 0.15),
+    0 0 40px rgba(255, 159, 67, 0.08),
+    inset 0 0 20px rgba(255, 159, 67, 0.03);
+  transform: translateY(-1px);
+}
+
+.uploadZone:hover::before {
+  opacity: 1;
+}
+
+.uploadZone.dragActive {
+  border-color: #FF9F43;
+  background: rgba(255, 159, 67, 0.06);
+  transform: scale(1.01);
+  box-shadow:
+    0 0 30px rgba(255, 159, 67, 0.2),
+    0 0 60px rgba(255, 159, 67, 0.1),
+    inset 0 0 30px rgba(255, 159, 67, 0.05);
+}
+
+.uploadZone.dragActive::before {
+  opacity: 1;
+  animation: pulseBg 1.2s ease-in-out infinite;
+}
+
+@keyframes pulseBg {
+  0%, 100% {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 159, 67, 0.05) 0%,
+      transparent 70%
+    );
+  }
+  50% {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 159, 67, 0.12) 0%,
+      transparent 70%
+    );
+  }
+}
+
+/* Grid dot pattern overlay */
+.uploadZone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 159, 67, 0.08) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.uploadZone:hover::after,
+.uploadZone.dragActive::after {
+  opacity: 1;
+}
+
+/* ==================== Upload Icon ==================== */
+.uploadIcon {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadIconSvg {
+  width: 56px;
+  height: 56px;
+  color: rgba(255, 159, 67, 0.7);
+  transition: all 0.35s ease;
+  filter: drop-shadow(0 0 8px rgba(255, 159, 67, 0.3));
+}
+
+.uploadZone:hover .uploadIconSvg {
+  color: #FF9F43;
+  transform: translateY(-3px);
+  filter: drop-shadow(0 0 16px rgba(255, 159, 67, 0.5));
+}
+
+.uploadZone.dragActive .uploadIconSvg {
+  color: #FF9F43;
+  animation: bounceIcon 0.6s ease infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 159, 67, 0.6));
+}
+
+@keyframes bounceIcon {
+  0%, 100% { transform: translateY(-3px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ==================== Upload Text ==================== */
+.uploadPrimary {
+  position: relative;
+  z-index: 1;
+  font-family: 'Figtree', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 8px 0;
+  transition: color 0.35s ease;
+}
+
+.uploadZone:hover .uploadPrimary {
+  color: #ffffff;
+}
+
+.uploadSecondary {
+  position: relative;
+  z-index: 1;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+.formatHint {
+  position: relative;
+  z-index: 1;
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.formatDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 159, 67, 0.5);
+}
+
+/* ==================== Hidden File Input ==================== */
+.hiddenInput {
+  display: none;
+}
+
+/* ==================== Progress Section ==================== */
+.progressSection {
+  padding: 8px 0;
+}
+
+.progressHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.progressFileIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 159, 67, 0.1);
+  border: 1px solid rgba(255, 159, 67, 0.2);
+  border-radius: 10px;
+  color: #FF9F43;
+}
+
+.progressInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.progressFileName {
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progressMeta {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 2px;
+}
+
+/* ==================== Progress Bar ==================== */
+.progressTrack {
+  position: relative;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progressFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #FF9F43, #FFB86B, #FF9F43);
+  background-size: 200% 100%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.progressTrack::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  animation: progressGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes progressGlow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* ==================== Progress Footer ==================== */
+.progressFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.progressPercent {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #FF9F43;
+  line-height: 1;
+}
+
+.progressStatus {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ==================== Video Info Card ==================== */
+.videoCard {
+  background: rgba(20, 21, 32, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.videoPreview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.videoPreview video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.videoOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.videoPreview:hover .videoOverlay {
+  opacity: 1;
+}
+
+.playBtn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 159, 67, 0.9);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px rgba(255, 159, 67, 0.4);
+}
+
+.playBtn:hover {
+  transform: scale(1.08);
+  background: #FF9F43;
+  box-shadow: 0 0 40px rgba(255, 159, 67, 0.6);
+}
+
+.playBtnSvg {
+  width: 24px;
+  height: 24px;
+  color: #0C0D14;
+  margin-left: 3px;
+}
+
+/* ==================== Video Details Grid ==================== */
+.videoDetails {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .videoDetails {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.detailItem {
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.detailItem:hover {
+  background: rgba(255, 159, 67, 0.05);
+  border-color: rgba(255, 159, 67, 0.15);
+}
+
+.detailLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.detailValue {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================== Video Actions ==================== */
+.videoActions {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  padding-top: 0;
+}
+
+.actionBtn {
+  flex: 1;
+  height: 44px;
+  border-radius: 10px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.actionBtnPrimary {
+  background: linear-gradient(135deg, #FF9F43, #FFB86B);
+  color: #0C0D14;
+  box-shadow: 0 4px 16px rgba(255, 159, 67, 0.3);
+}
+
+.actionBtnPrimary:hover {
+  background: linear-gradient(135deg, #FFB86B, #FF9F43);
+  box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4);
+  transform: translateY(-1px);
+}
+
+.actionBtnDanger {
+  background: rgba(255, 77, 79, 0.1);
+  border: 1px solid rgba(255, 77, 79, 0.2);
+  color: #ff4d4f;
+}
+
+.actionBtnDanger:hover {
+  background: rgba(255, 77, 79, 0.15);
+  border-color: rgba(255, 77, 79, 0.3);
+}
+
+/* ==================== Hint Alert ==================== */
+.hintAlert {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: rgba(0, 212, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  border-radius: 12px;
+}
+
+.hintAlertHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #00D4FF;
+}
+
+.hintIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.hintList {
+  margin: 0;
+  padding-left: 20px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.8;
+}
+
+.hintList li {
+  margin-bottom: 2px;
+}

@@ -1,0 +1,736 @@
+/**
+ * AIAnalyze - AI Cinema Studio Design System
+ * Deep Charcoal #0C0D14 | Amber #FF9F43 | Electric Cyan #00D4FF
+ */
+
+/* ==================== Layout ==================== */
+.stepContent {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+.stepTitle {
+  margin-bottom: 28px;
+}
+
+.stepTitle h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.stepTitle p {
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ==================== Neural Network Visualization ==================== */
+.neuralViz {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px 40px;
+  background: rgba(20, 21, 32, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.neuralCanvas {
+  position: relative;
+  width: 280px;
+  height: 120px;
+  margin-bottom: 32px;
+}
+
+/* Neural network nodes */
+.neuralNode {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00D4FF;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.6), 0 0 16px rgba(0, 212, 255, 0.3);
+  animation: nodePulse 2s ease-in-out infinite;
+}
+
+.neuralNode:nth-child(1) { left: 0%; top: 50%; animation-delay: 0s; }
+.neuralNode:nth-child(2) { left: 16%; top: 20%; animation-delay: 0.2s; }
+.neuralNode:nth-child(3) { left: 16%; top: 80%; animation-delay: 0.4s; }
+.neuralNode:nth-child(4) { left: 40%; top: 30%; animation-delay: 0.6s; }
+.neuralNode:nth-child(5) { left: 40%; top: 70%; animation-delay: 0.8s; }
+.neuralNode:nth-child(6) { left: 64%; top: 15%; animation-delay: 1.0s; }
+.neuralNode:nth-child(7) { left: 64%; top: 50%; animation-delay: 1.2s; }
+.neuralNode:nth-child(8) { left: 64%; top: 85%; animation-delay: 1.4s; }
+.neuralNode:nth-child(9) { left: 88%; top: 35%; animation-delay: 1.6s; }
+.neuralNode:nth-child(10) { left: 88%; top: 65%; animation-delay: 1.8s; }
+
+/* Completed nodes */
+.neuralNode.completed {
+  background: #FF9F43;
+  box-shadow: 0 0 8px rgba(255, 159, 67, 0.6), 0 0 16px rgba(255, 159, 67, 0.3);
+  animation: none;
+}
+
+@keyframes nodePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+    box-shadow: 0 0 4px rgba(0, 212, 255, 0.4);
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.8), 0 0 24px rgba(0, 212, 255, 0.4);
+  }
+}
+
+/* Neural connection lines */
+.neuralLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.neuralLine {
+  stroke: rgba(0, 212, 255, 0.15);
+  stroke-width: 1;
+  fill: none;
+  animation: lineFlow 3s ease-in-out infinite;
+}
+
+.neuralLine.active {
+  stroke: rgba(0, 212, 255, 0.5);
+  animation: lineFlowActive 1.5s ease-in-out infinite;
+}
+
+.neuralLine.completed {
+  stroke: rgba(255, 159, 67, 0.4);
+  animation: none;
+}
+
+@keyframes lineFlow {
+  0%, 100% { stroke-opacity: 0.1; }
+  50% { stroke-opacity: 0.3; }
+}
+
+@keyframes lineFlowActive {
+  0%, 100% { stroke-opacity: 0.3; stroke-dashoffset: 0; }
+  50% { stroke-opacity: 0.8; }
+}
+
+/* Pulse ring emanating from active node */
+.pulseRing {
+  position: absolute;
+  left: 40%;
+  top: 30%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 212, 255, 0.6);
+  animation: pulseRingExpand 1.5s ease-out infinite;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes pulseRingExpand {
+  0% {
+    width: 10px;
+    height: 10px;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    width: 60px;
+    height: 60px;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ==================== Progress Number ==================== */
+.progressNumber {
+  font-family: 'Outfit', sans-serif;
+  font-size: 72px;
+  font-weight: 700;
+  color: #00D4FF;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+  transition: all 0.4s ease;
+  letter-spacing: -2px;
+}
+
+.progressNumber.completed {
+  color: #FF9F43;
+  text-shadow: 0 0 30px rgba(255, 159, 67, 0.4);
+}
+
+.progressLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 32px;
+}
+
+/* ==================== Task List ==================== */
+.taskList {
+  width: 100%;
+  max-width: 360px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.taskItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.35);
+  transition: all 0.4s ease;
+  opacity: 0;
+  transform: translateX(-12px);
+}
+
+.taskItem.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.taskItem.active {
+  background: rgba(0, 212, 255, 0.06);
+  border-color: rgba(0, 212, 255, 0.15);
+  color: #00D4FF;
+}
+
+.taskItem.completed {
+  background: rgba(255, 159, 67, 0.06);
+  border-color: rgba(255, 159, 67, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Stagger delays */
+.taskItem:nth-child(1).visible { transition-delay: 0.1s; }
+.taskItem:nth-child(2).visible { transition-delay: 0.25s; }
+.taskItem:nth-child(3).visible { transition-delay: 0.4s; }
+.taskItem:nth-child(4).visible { transition-delay: 0.55s; }
+.taskItem:nth-child(5).visible { transition-delay: 0.7s; }
+
+.taskIcon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.taskIconSvg {
+  width: 18px;
+  height: 18px;
+}
+
+.taskItem.active .taskIconSvg {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.taskLabel {
+  flex: 1;
+}
+
+.checkIcon {
+  width: 18px;
+  height: 18px;
+  color: #FF9F43;
+  flex-shrink: 0;
+}
+
+/* ==================== Analyzing Card ==================== */
+.analyzingCard {
+  background: rgba(20, 21, 32, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* ==================== Completion Card ==================== */
+.completionCard {
+  background: rgba(20, 21, 32, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 159, 67, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(255, 159, 67, 0.08);
+  animation: cardGlow 3s ease-in-out infinite;
+}
+
+@keyframes cardGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 159, 67, 0.06);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 159, 67, 0.12);
+  }
+}
+
+.completionHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.completionBadge {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255, 159, 67, 0.2), rgba(255, 159, 67, 0.05));
+  border: 1px solid rgba(255, 159, 67, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.completionBadgeSvg {
+  width: 26px;
+  height: 26px;
+  color: #FF9F43;
+}
+
+.completionTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #FF9F43;
+  margin: 0 0 4px 0;
+}
+
+.completionSubtitle {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+/* ==================== Result Grid ==================== */
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 20px 24px;
+}
+
+@media (max-width: 480px) {
+  .resultGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.resultItem {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.resultItem:hover {
+  background: rgba(255, 159, 67, 0.04);
+  border-color: rgba(255, 159, 67, 0.12);
+}
+
+.resultValue {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #FF9F43;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.resultLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ==================== Scene List ==================== */
+.sceneSection {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sceneSectionTitle {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sceneSectionIcon {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 159, 67, 0.6);
+}
+
+.sceneList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sceneItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.sceneItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sceneTime {
+  font-family: 'Outfit', monospace;
+  font-size: 12px;
+  color: #00D4FF;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  padding: 3px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.sceneDesc {
+  flex: 1;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sceneTag {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.sceneMore {
+  text-align: center;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 6px;
+}
+
+/* ==================== Action Buttons ==================== */
+.actionBar {
+  display: flex;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.actionBtn {
+  flex: 1;
+  height: 44px;
+  border-radius: 10px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.actionBtnPrimary {
+  background: linear-gradient(135deg, #FF9F43, #FFB86B);
+  color: #0C0D14;
+  box-shadow: 0 4px 16px rgba(255, 159, 67, 0.3);
+}
+
+.actionBtnPrimary:hover {
+  background: linear-gradient(135deg, #FFB86B, #FF9F43);
+  box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4);
+  transform: translateY(-1px);
+}
+
+.actionBtnSecondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.actionBtnSecondary:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.actionBtnSvg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==================== Start Analysis Button ==================== */
+.startSection {
+  padding: 20px 0;
+}
+
+.startButton {
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Figtree', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #00D4FF, #00A8CC);
+  color: #0C0D14;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.25);
+  letter-spacing: 0.3px;
+}
+
+.startButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #00E5FF, #00D4FF);
+  box-shadow: 0 6px 28px rgba(0, 212, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.startButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.startButtonSvg {
+  width: 18px;
+  height: 18px;
+}
+
+.taskCount {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* ==================== Analysis Config (Pre-start) ==================== */
+.configSection {
+  margin-bottom: 20px;
+}
+
+.configGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .configGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.configCard {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.configCard:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.configCard.active {
+  background: rgba(0, 212, 255, 0.06);
+  border-color: rgba(0, 212, 255, 0.2);
+}
+
+.configCardCheckbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.configCard.active .configCardCheckbox {
+  background: #00D4FF;
+  border-color: #00D4FF;
+}
+
+.configCardCheckmark {
+  width: 10px;
+  height: 10px;
+  color: #0C0D14;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.configCard.active .configCardCheckmark {
+  opacity: 1;
+}
+
+.configCardIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.configCard.active .configCardIcon {
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.configCardIconSvg {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.3s ease;
+}
+
+.configCard.active .configCardIconSvg {
+  color: #00D4FF;
+}
+
+.configCardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.configCardName {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2px;
+}
+
+.configCardDesc {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== Video Info Strip ==================== */
+.videoInfoStrip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.videoInfoDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF9F43;
+  flex-shrink: 0;
+}
+
+.videoInfoName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.videoInfoMeta {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.videoInfoTag {
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ==================== Warning State ==================== */
+.noVideoWarning {
+  padding: 32px 24px;
+  text-align: center;
+  background: rgba(255, 77, 79, 0.05);
+  border: 1px solid rgba(255, 77, 79, 0.12);
+  border-radius: 12px;
+  font-family: 'Figtree', sans-serif;
+  color: rgba(255, 255, 255, 0.6);
+}
