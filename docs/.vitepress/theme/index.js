@@ -1,6 +1,6 @@
-// VitePress Theme Entry — StoryForge
-// Note: Custom styles are loaded via .vitepress/style.css (auto-loaded by VitePress)
+// VitePress Theme Entry — CutDeck
 import DefaultTheme from 'vitepress/theme'
+import '../style.css'
 
 export default {
   extends: DefaultTheme,
