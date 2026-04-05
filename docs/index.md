@@ -1,87 +1,38 @@
 ---
 layout: home
-title: CutDeck
+
+hero:
+  name: CutDeck
+  text: AI 驱动的专业视频剪辑工具
+  tagline: 上传长视频 · AI 分析高光 · 输出精彩片段
+  image:
+    src: /logo.svg
+    alt: CutDeck Logo
+  actions:
+    - theme: brand
+      text: 快速开始
+      link: /guide/quick-start
+    - theme: alt
+      text: 了解功能
+      link: /features
+
+features:
+  - icon: 🕐
+    title: AI 高光检测
+    details: 本地 AI 分析视频内容，自动识别最具传播力的精彩片段
+  - icon: 🎬
+    title: 智能多轨剪辑
+    details: 多轨道时间轴 + FFmpeg 专业渲染管线，支持 12+ 视频特效
+  - icon: 🎙️
+    title: Whisper 字幕
+    details: faster-whisper 本地转写，精准语音识别与时间轴对齐
+  - icon: ⚡
+    title: 剧本生成
+    details: DeepSeek / GPT 生成剪辑脚本与解说词，一键合成视频
+  - icon: 🔒
+    title: 本地优先
+    details: 全部运行在本地，无需上传，隐私安全，断网可用
+  - icon: 📦
+    title: 桌面端 Tauri
+    details: Tauri 2 + React 18，原生性能，开箱即用
 ---
-
-<div class="sf-home">
-
-<div class="sf-hero">
-  <div class="sf-glow-center"></div>
-  <div class="sf-hero-content">
-    <h1 class="sf-title"><span class="sf-title-main">CutDeck</span></h1>
-    <p class="sf-hero-desc">AI 驱动的专业视频剪辑工具</p>
-    <div class="sf-hero-actions">
-      <a href="/" class="sf-btn sf-btn-brand">快速开始</a>
-      <a href="/" class="sf-btn sf-btn-ghost">了解功能</a>
-    </div>
-  </div>
-</div>
-
-<div class="sf-stats-bar">
-  <div class="sf-stat">
-    <span class="sf-stat-value">Tauri 2</span>
-    <span class="sf-stat-label">桌面端</span>
-  </div>
-  <div class="sf-stat-divider"></div>
-  <div class="sf-stat">
-    <span class="sf-stat-value">6 大</span>
-    <span class="sf-stat-label">AI 能力</span>
-  </div>
-</div>
-
-<div class="sf-section">
-  <div class="sf-section-header">
-    <h2 class="sf-section-title">核心功能</h2>
-  </div>
-  <div class="sf-features-grid">
-    <div class="sf-feature-card">
-      <div class="sf-feature-icon">icon</div>
-      <div class="sf-feature-body">
-        <h3>AI 高光检测</h3>
-        <p>本地 AI 分析视频</p>
-      </div>
-    </div>
-    <div class="sf-feature-card">
-      <div class="sf-feature-icon">icon</div>
-      <div class="sf-feature-body">
-        <h3>智能剪辑</h3>
-        <p>多轨道时间轴</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="sf-section sf-section--dark">
-  <div class="sf-section-header">
-    <h2 class="sf-section-title">快速开始</h2>
-  </div>
-  <div class="sf-steps">
-    <div class="sf-step">
-      <div class="sf-step-line"></div>
-      <div class="sf-step-num">1</div>
-      <div class="sf-step-body">
-        <h3>克隆</h3>
-        <div class="sf-code">git clone</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="sf-section">
-  <div class="sf-section-header">
-    <h2 class="sf-section-title">技术栈</h2>
-  </div>
-  <div class="sf-tech-row">
-    <div class="sf-tech-badge">React 18</div>
-  </div>
-</div>
-
-<div class="sf-footer-cta">
-  <p class="sf-footer-cta-text">MIT 协议</p>
-  <div class="sf-footer-cta-actions">
-    <a href="/" class="sf-btn sf-btn-brand">GitHub</a>
-    <a href="/" class="sf-btn sf-btn-ghost">文档</a>
-  </div>
-</div>
-
-</div>

@@ -181,6 +181,7 @@ export default defineConfig({
       level: [2, 3],
       label: '目录'
     },
+
   },
 
   markdown: {
