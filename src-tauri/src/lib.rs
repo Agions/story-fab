@@ -5,6 +5,18 @@ use std::path::PathBuf;
 use std::process::Command;
 use tauri::Manager;
 
+mod video_effects;
+mod subtitle;
+mod highlight_detector;
+mod smart_segmenter;
+
+use video_effects::{
+    apply_filter, apply_filter_chain, build_filter_chain, build_filtergraph,
+    generate_chain_preview, generate_filter_preview,
+};
+use highlight_detector::{HighlightOptions, HighlightSegment};
+use smart_segmenter::{SegmentOptions, VideoSegment};
+
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct DirectorSceneInput {
@@ -100,7 +112,7 @@ struct VideoMetadataResult {
     bitrate: u64,
 }
 
-fn resolve_binary_path(binary_name: &str) -> String {
+pub(crate) fn resolve_binary_path(binary_name: &str) -> String {
     let env_key = format!("CUTDECK_{}_PATH", binary_name.to_uppercase());
     if let Ok(path) = std::env::var(&env_key) {
         if !path.trim().is_empty() && Path::new(&path).exists() {
@@ -131,11 +143,11 @@ fn resolve_binary_path(binary_name: &str) -> String {
     binary_name.to_string()
 }
 
-fn ffmpeg_binary() -> String {
+pub(crate) fn ffmpeg_binary() -> String {
     resolve_binary_path("ffmpeg")
 }
 
-fn ffprobe_binary() -> String {
+pub(crate) fn ffprobe_binary() -> String {
     resolve_binary_path("ffprobe")
 }
 
@@ -1003,7 +1015,7 @@ fn probe_duration(path: &PathBuf) -> Result<f64, String> {
         .map_err(|e| format!("解析时长失败: {e}"))
 }
 
-fn chrono_like_timestamp() -> u128 {
+pub(crate) fn chrono_like_timestamp() -> u128 {
     use std::time::{SystemTime, UNIX_EPOCH};
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -1044,6 +1056,72 @@ struct OverlayLayout {
     x: String,
     y: String,
     scale: f64,
+}
+
+// ============== Highlight Detection Commands ==============
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DetectHighlightsInput {
+    video_path: String,
+    threshold: Option<f32>,
+    min_duration_ms: Option<u64>,
+    top_n: Option<usize>,
+    window_ms: Option<u64>,
+    detect_scene: Option<bool>,
+    scene_threshold: Option<f32>,
+}
+
+#[tauri::command]
+fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<HighlightSegment>, String> {
+    if input.video_path.trim().is_empty() {
+        return Err("视频路径不能为空".to_string());
+    }
+
+    let detector = highlight_detector::HighlightDetector::new();
+    let options = HighlightOptions {
+        threshold: input.threshold,
+        min_duration_ms: input.min_duration_ms,
+        top_n: input.top_n,
+        window_ms: input.window_ms,
+        detect_scene: input.detect_scene,
+        scene_threshold: input.scene_threshold,
+    };
+
+    let highlights = detector.get_highlights(&input.video_path, &options);
+    Ok(highlights)
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DetectSmartSegmentsInput {
+    video_path: String,
+    min_duration_ms: Option<u64>,
+    max_duration_ms: Option<u64>,
+    scene_threshold: Option<f32>,
+    silence_threshold_db: Option<f32>,
+    detect_dialogue: Option<bool>,
+    detect_transitions: Option<bool>,
+}
+
+#[tauri::command]
+fn detect_smart_segments(input: DetectSmartSegmentsInput) -> Result<Vec<VideoSegment>, String> {
+    if input.video_path.trim().is_empty() {
+        return Err("视频路径不能为空".to_string());
+    }
+
+    let segmenter = smart_segmenter::SmartSegmenter::new();
+    let options = SegmentOptions {
+        min_duration_ms: input.min_duration_ms,
+        max_duration_ms: input.max_duration_ms,
+        scene_threshold: input.scene_threshold,
+        silence_threshold_db: input.silence_threshold_db,
+        detect_dialogue: input.detect_dialogue,
+        detect_transitions: input.detect_transitions,
+    };
+
+    let segments = segmenter.smart_segment(&input.video_path, &options);
+    Ok(segments)
 }
 
 fn pick_overlay_layout_for_marker(marker: &AutonomousOverlayMarker, index: usize) -> OverlayLayout {
@@ -1092,7 +1170,23 @@ pub fn run() {
             check_ffmpeg,
             analyze_video,
             generate_thumbnail,
-            extract_key_frames
+            extract_key_frames,
+            // Video effects
+            build_filtergraph,
+            build_filter_chain,
+            apply_filter,
+            apply_filter_chain,
+            generate_filter_preview,
+            generate_chain_preview,
+            // Whisper subtitle transcription
+            subtitle::transcribe_audio,
+            subtitle::check_faster_whisper,
+            subtitle::list_whisper_models,
+            subtitle::download_whisper_model,
+            subtitle::get_whisper_supported_languages,
+            // Highlight detection & smart segmentation
+            detect_highlights,
+            detect_smart_segments,
         ])
         .setup(|app| {
             println!("[CutDeck] 启动应用...");
