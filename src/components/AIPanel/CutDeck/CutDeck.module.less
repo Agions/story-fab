@@ -1,1223 +1,408 @@
 /**
- * AI 剪辑流程样式
+ * CutDeck.module.less
+ * AI Cinema Studio 设计系统
+ *
+ * 色彩规范：
+ * - 深炭底：#0C0D14（背景）
+ * - 琥珀光：#FF9F43（主强调/CTA）
+ * - 电青色：#00D4FF（AI 状态/信息）
+ * - 玻璃拟态：rgba(20, 21, 32, 0.8) + backdrop-filter: blur(20px)
+ *
+ * 字体：Outfit（标题）+ Figtree（正文）
  */
-.clipFlow {
+
+// ============================================================================
+// 变量
+// ============================================================================
+
+@bg-deep: #0C0D14;
+@amber: #FF9F43;
+@cyan: #00D4FF;
+@text-primary: #FFFFFF;
+@text-secondary: rgba(255, 255, 255, 0.65);
+@text-muted: rgba(255, 255, 255, 0.4);
+
+@glass-bg: rgba(20, 21, 32, 0.8);
+@glass-border: rgba(255, 255, 255, 0.08);
+@glass-highlight: rgba(255, 255, 255, 0.12);
+
+@amber-glow: rgba(255, 159, 67, 0.3);
+@cyan-glow: rgba(0, 212, 255, 0.4);
+
+@radius-lg: 16px;
+@radius-md: 10px;
+@radius-sm: 6px;
+
+// ============================================================================
+// 关键帧动画
+// ============================================================================
+
+// 电青色脉冲（进行中状态）
+@keyframes cyanPulse {
+  0% {
+    box-shadow: 0 0 0 0 @cyan-glow;
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+    opacity: 0.85;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
+    opacity: 1;
+  }
+}
+
+// 内容入场动画
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// 步骤图标旋转（完成瞬间）
+@keyframes checkBounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// 连接线填充动画
+@keyframes connectorFill {
+  from {
+    height: 0;
+  }
+  to {
+    height: 100%;
+  }
+}
+
+// ============================================================================
+// 主容器
+// ============================================================================
+
+.cutDeck {
   display: flex;
-  flex-direction: column;
+  width: 100%;
   height: 100%;
-  background: #fff;
-  border-radius: 8px;
+  background: @bg-deep;
+  gap: 0;
+  position: relative;
   overflow: hidden;
 }
 
-.stepsContainer {
-  padding: 16px 24px;
-  background: #fafafa;
-  border-bottom: 1px solid #f0f0f0;
-}
+// ============================================================================
+// 左侧边栏 - 步骤列表
+// ============================================================================
 
-.steps {
-  :global {
-    .ant-steps-item-title {
-      font-size: 13px;
-    }
-    .ant-steps-item-description {
-      font-size: 12px;
-    }
-  }
-}
-
-.content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-}
-
-.navigation {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  background: #fafafa;
-  border-top: 1px solid #f0f0f0;
-}
-
-.progress {
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  min-width: 150px;
-  
-  .ant-typography {
-    font-size: 12px;
-    margin-bottom: 4px;
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid @glass-border;
+  padding: 28px 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // 滚动条美化
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
   }
 }
 
-.alert {
-  margin: 16px 24px;
+.sidebarHeader {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid @glass-border;
 }
 
-/* 步骤内容区域 */
-.stepContent {
-  max-width: 800px;
-  margin: 0 auto;
+.sidebarTitle {
+  font-family: 'Outfit', 'Segoe UI', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: @text-primary;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.01em;
+}
+
+.sidebarSubtitle {
+  font-family: 'Figtree', 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: @text-muted;
+  margin: 0;
+}
+
+// ============================================================================
+// 步骤列表
+// ============================================================================
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.stepWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+// 连接线
+.stepConnector {
+  width: 2px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-left: 27px; // 居中于图标
+  transition: background 0.4s ease;
+  border-radius: 1px;
+
+  &.connectorCompleted {
+    background: linear-gradient(
+      to bottom,
+      @amber,
+      rgba(255, 159, 67, 0.6)
+    );
+  }
+}
+
+// ============================================================================
+// 步骤项
+// ============================================================================
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: @radius-md;
+  cursor: default;
+  transition: all 0.25s ease;
+  position: relative;
+  user-select: none;
+
+  &.stepItemAccessible {
+    cursor: pointer;
+
+    &:hover:not(.stepItemActive):not(.stepItemCompleted) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  // 默认/等待态
+  &.stepItemPending {
+    .stepIcon {
+      background: rgba(255, 255, 255, 0.06);
+      color: @text-muted;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stepTitle {
+      color: @text-muted;
+    }
+  }
+
+  // 激活态（当前步骤但未完成）
+  &.stepItemActive {
+    background: rgba(0, 212, 255, 0.08);
+
+    .stepIcon {
+      background: rgba(0, 212, 255, 0.15);
+      color: @cyan;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
+    .stepTitle {
+      color: @text-primary;
+      font-weight: 500;
+    }
+  }
+
+  // 进行中态（当前步骤正在执行）
+  &.stepItemInProgress {
+    background: rgba(0, 212, 255, 0.08);
+
+    .stepIcon {
+      background: rgba(0, 212, 255, 0.15);
+      color: @cyan;
+      border: 1px solid @cyan;
+      animation: cyanPulse 1.8s ease-in-out infinite;
+    }
+
+    .stepTitle {
+      color: @text-primary;
+      font-weight: 600;
+    }
+  }
+
+  // 完成态
+  &.stepItemCompleted {
+    .stepIcon {
+      background: linear-gradient(135deg, @amber 0%, #FFB366 100%);
+      color: @bg-deep;
+      border: none;
+      animation: checkBounce 0.4s ease-out;
+    }
+
+    .stepTitle {
+      color: @text-secondary;
+    }
+  }
+}
+
+// ============================================================================
+// 步骤图标
+// ============================================================================
+
+.stepIconWrapper {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.stepIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 16px;
+  transition: all 0.3s ease;
+
+  &.iconPending {
+    background: rgba(255, 255, 255, 0.06);
+    color: @text-muted;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &.iconInProgress {
+    background: rgba(0, 212, 255, 0.15);
+    color: @cyan;
+    border: 1px solid @cyan;
+    animation: cyanPulse 1.8s ease-in-out infinite;
+  }
+
+  &.iconCompleted {
+    background: linear-gradient(135deg, @amber 0%, #FFB366 100%);
+    color: @bg-deep;
+    border: none;
+    animation: checkBounce 0.4s ease-out;
+  }
+}
+
+// ============================================================================
+// 步骤文字
+// ============================================================================
+
+.stepText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .stepTitle {
-  margin-bottom: 24px;
-  
-  h2 {
-    margin-bottom: 8px;
-  }
-  
-  p {
-    color: rgba(0, 0, 0, 0.45);
-    margin: 0;
-  }
+  font-family: 'Figtree', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: @text-muted;
+  transition: color 0.25s ease;
+  line-height: 1.4;
 }
 
-/* ==================== 1. 创建项目优化样式 ==================== */
-
-/* 项目模板选择 */
-.templateGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+.stepStatus {
+  font-family: 'Figtree', 'Segoe UI', sans-serif;
+  font-size: 11px;
+  color: @amber;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
-.templateCard {
-  padding: 20px;
-  border: 2px solid #e8e8e8;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  background: #fff;
-  
-  &:hover {
-    border-color: #d4a574;
-    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
-    transform: translateY(-2px);
-  }
-  
-  &.active {
-    border-color: #d4a574;
-    background: rgba(24, 144, 255, 0.04);
-  }
-  
-  .templateIcon {
-    font-size: 36px;
-    margin-bottom: 12px;
-    display: block;
-  }
-  
-  .templateName {
-    font-weight: 500;
-    font-size: 14px;
-    margin-bottom: 4px;
-  }
-  
-  .templateDesc {
-    font-size: 12px;
-    color: rgba(0, 0, 0, 0.45);
-  }
+.stepStatusInProgress {
+  font-family: 'Figtree', 'Segoe UI', sans-serif;
+  font-size: 11px;
+  color: @cyan;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
-/* 表单优化 */
-.formCard {
-  :global {
-    .ant-form-item-label > label {
-      font-weight: 500;
-    }
-  }
-  
-  .inputCount {
-    font-size: 12px;
-    color: rgba(0, 0, 0, 0.45);
-  }
-}
+// ============================================================================
+// 右侧内容区
+// ============================================================================
 
-/* 项目信息卡片 */
-.projectInfoCard {
-  .projectHeader {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #f0f0f0;
-    
-    .projectIcon {
-      font-size: 48px;
-      color: #d4a574;
-    }
-    
-    .projectMeta {
-      flex: 1;
-      
-      .projectName {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 4px;
-      }
-      
-      .projectDesc {
-        color: rgba(0, 0, 0, 0.45);
-      }
-    }
-  }
-  
-  .infoList {
-    .infoItem {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f5f5f5;
-      
-      &:last-child {
-        border-bottom: none;
-      }
-      
-      .infoLabel {
-        color: rgba(0, 0, 0, 0.45);
-      }
-      
-      .infoValue {
-        font-weight: 500;
-      }
-    }
-  }
-}
-
-/* ==================== 2. 上传视频优化样式 ==================== */
-
-/* 上传区域 */
-.uploadArea {
-  border: 2px dashed #d9d9d9;
-  border-radius: 12px;
-  padding: 48px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  background: linear-gradient(135deg, #fafafa 0%, #fff 100%);
-  
-  &:hover {
-    border-color: #d4a574;
-    background: linear-gradient(135deg, rgba(24, 144, 255, 0.04) 0%, rgba(24, 144, 255, 0.08) 100%);
-  }
-  
-  &.dragOver {
-    border-color: #d4a574;
-    background: linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.12) 100%);
-    transform: scale(1.01);
-  }
-  
-  .uploadIcon {
-    font-size: 64px;
-    color: rgba(0, 0, 0, 0.15);
-    margin-bottom: 20px;
-    transition: all 0.3s;
-    
-    &:hover {
-      color: #d4a574;
-      transform: scale(1.1);
-    }
-  }
-  
-  .uploadText {
-    font-size: 16px;
-    color: rgba(0, 0, 0, 0.65);
-    margin-bottom: 8px;
-    
-    p {
-      margin: 8px 0 0;
-    }
-    
-    .subText {
-      font-size: 13px;
-      color: rgba(0, 0, 0, 0.35);
-    }
-  }
-}
-
-/* 上传进度 */
-.uploadProgress {
-  padding: 32px;
-  
-  .progressWrapper {
-    max-width: 300px;
-    margin: 0 auto 24px;
-  }
-  
-  .progressInfo {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 12px;
-    font-size: 13px;
-    
-    .fileName {
-      color: rgba(0, 0, 0, 0.65);
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
-    .fileSize {
-      color: rgba(0, 0, 0, 0.45);
-    }
-  }
-  
-  .progressTip {
-    margin-top: 16px;
-    font-size: 13px;
-    color: rgba(0, 0, 0, 0.45);
-  }
-}
-
-/* 视频信息卡片 */
-.videoInfoCard {
-  .videoPreview {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #000;
-    aspect-ratio: 16/9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    
-    video {
-      max-width: 100%;
-      max-height: 100%;
-    }
-    
-    .playOverlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.3);
-      opacity: 0;
-      transition: opacity 0.3s;
-      cursor: pointer;
-      
-      &:hover {
-        opacity: 1;
-      }
-      
-      .playIcon {
-        font-size: 48px;
-        color: #fff;
-      }
-    }
-  }
-  
-  .videoDetails {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 16px;
-    
-    .detailItem {
-      padding: 12px;
-      background: #fafafa;
-      border-radius: 8px;
-      text-align: center;
-      
-      .detailLabel {
-        font-size: 12px;
-        color: rgba(0, 0, 0, 0.45);
-        margin-bottom: 4px;
-      }
-      
-      .detailValue {
-        font-size: 14px;
-        font-weight: 600;
-        color: rgba(0, 0, 0, 0.85);
-      }
-    }
-  }
-  
-  .videoActions {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #f0f0f0;
-  }
-}
-
-/* ==================== 3. AI分析优化样式 ==================== */
-
-/* 分析配置卡片 */
-.analysisConfig {
-  margin-bottom: 20px;
-  
-  .configCard {
-    border-radius: 12px;
-    
-    .configItem {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid #f5f5f5;
-      
-      &:last-child {
-        border-bottom: none;
-      }
-      
-      .configLabel {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        
-        .configIcon {
-          font-size: 18px;
-          color: #d4a574;
-        }
-      }
-    }
-  }
-}
-
-/* 分析进度 */
-.analysisProgress {
-  text-align: center;
-  padding: 48px;
-  
-  .progressIcon {
-    font-size: 56px;
-    color: #d4a574;
-    margin-bottom: 24px;
-  }
-  
-  .progressText {
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-  
-  .progressStatus {
-    margin-top: 24px;
-    
-    .ant-progress-text {
-      font-size: 16px;
-      font-weight: 500;
-    }
-  }
-  
-  .taskList {
-    margin-top: 32px;
-    text-align: left;
-    max-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
-    
-    .taskItem {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-      color: rgba(0, 0, 0, 0.45);
-      
-      &.active {
-        color: #d4a574;
-        font-weight: 500;
-      }
-      
-      &.completed {
-        color: #52c41a;
-      }
-      
-      .taskIcon {
-        font-size: 16px;
-      }
-    }
-  }
-}
-
-/* 分析结果 */
-.analysisResult {
-  .resultSummary {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    
-    .summaryCard {
-      flex: 1;
-      min-width: 140px;
-      padding: 16px;
-      background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
-      border-radius: 12px;
-      text-align: center;
-      
-      .summaryValue {
-        font-size: 28px;
-        font-weight: 700;
-        color: #d4a574;
-        margin-bottom: 4px;
-      }
-      
-      .summaryLabel {
-        font-size: 13px;
-        color: rgba(0, 0, 0, 0.65);
-      }
-    }
-  }
-  
-  .sceneList {
-    margin-top: 20px;
-    
-    .sceneItem {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px;
-      border: 1px solid #e8e8e8;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      transition: all 0.3s;
-      
-      &:hover {
-        border-color: #d4a574;
-        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
-      }
-      
-      .sceneThumbnail {
-        width: 80px;
-        height: 45px;
-        background: #f0f0f0;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-      
-      .sceneInfo {
-        flex: 1;
-        
-        .sceneTime {
-          font-size: 12px;
-          color: rgba(0, 0, 0, 0.45);
-          font-family: monospace;
-        }
-        
-        .sceneDesc {
-          font-weight: 500;
-          margin-top: 4px;
-        }
-      }
-    }
-  }
-}
-
-/* 字幕预览 */
-.subtitlePreview {
-  .subtitleItem {
-    padding: 12px 16px;
-    border-left: 3px solid #d4a574;
-    background: #fafafa;
-    margin-bottom: 8px;
-    border-radius: 0 8px 8px 0;
-    transition: all 0.2s;
-    
-    &:hover {
-      background: #f0f5ff;
-      border-left-color: #52c41a;
-    }
-    
-    .timeRange {
-      font-size: 12px;
-      color: #d4a574;
-      font-family: monospace;
-      margin-bottom: 4px;
-    }
-    
-    .subtitleText {
-      font-size: 14px;
-      line-height: 1.6;
-    }
-  }
-}
-
-/* ==================== 4. 生成文案优化样式 ==================== */
-
-/* 功能选择卡片 */
-.functionSelect {
-  margin-bottom: 24px;
-  
-  .functionCard {
-    padding: 20px 24px;
-    border: 2px solid #e8e8e8;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    
-    &:hover {
-      border-color: #d4a574;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
-    }
-    
-    &.active {
-      border-color: #d4a574;
-      background: linear-gradient(135deg, rgba(24, 144, 255, 0.04) 0%, rgba(24, 144, 255, 0.08) 100%);
-    }
-    
-    .functionHeader {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      
-      .functionIcon {
-        font-size: 32px;
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%);
-      }
-      
-      .functionInfo {
-        flex: 1;
-        
-        .functionName {
-          font-size: 16px;
-          font-weight: 600;
-          margin-bottom: 4px;
-        }
-        
-        .functionDesc {
-          font-size: 13px;
-          color: rgba(0, 0, 0, 0.45);
-        }
-      }
-      
-      .checkBadge {
-        font-size: 20px;
-        color: #52c41a;
-      }
-    }
-  }
-}
-
-/* 文案配置 */
-.scriptConfig {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  
-  .configItem {
-    flex: 1;
-    min-width: 150px;
-    
-    .configLabel {
-      font-weight: 500;
-      margin-bottom: 8px;
-      display: block;
-    }
-  }
-}
-
-/* 文案编辑器 */
-.scriptEditorWrapper {
-  .editorToolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: #fafafa;
-    border: 1px solid #e8e8e8;
-    border-bottom: none;
-    border-radius: 8px 8px 0 0;
-    
-    .toolbarLeft {
-      display: flex;
-      gap: 8px;
-    }
-    
-    .toolbarRight {
-      display: flex;
-      gap: 12px;
-      font-size: 13px;
-      color: rgba(0, 0, 0, 0.45);
-    }
-  }
-  
-  .editorContent {
-    min-height: 300px;
-    padding: 16px;
-    border: 1px solid #e8e8e8;
-    border-radius: 0 0 8px 8px;
-    background: #fff;
-    
-    textarea {
-      border: none;
-      outline: none;
-      resize: none;
-      width: 100%;
-      font-family: '思源黑体', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 15px;
-      line-height: 1.8;
-      
-      &::placeholder {
-        color: rgba(0, 0, 0, 0.25);
-      }
-    }
-  }
-}
-
-/* 配音选择 */
-.voiceSelect {
-  .voiceList {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    
-    .voiceItem {
-      padding: 16px;
-      border: 2px solid #e8e8e8;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-      
-      &:hover {
-        border-color: #d4a574;
-        background: #f0f5ff;
-      }
-      
-      &.active {
-        border-color: #d4a574;
-        background: linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.04) 100%);
-      }
-      
-      .voiceName {
-        font-weight: 500;
-        margin-bottom: 4px;
-      }
-      
-      .voiceTags {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-        
-        .voiceTag {
-          font-size: 11px;
-          padding: 2px 8px;
-          background: #f0f0f0;
-          border-radius: 4px;
-          color: rgba(0, 0, 0, 0.65);
-        }
-      }
-    }
-  }
-  
-  .voicePreview {
-    margin-top: 20px;
-    padding: 20px;
-    background: #fafafa;
-    border-radius: 12px;
-    text-align: center;
-    
-    .previewBtn {
-      margin-bottom: 12px;
-    }
-    
-    .previewTip {
-      font-size: 13px;
-      color: rgba(0, 0, 0, 0.45);
-    }
-  }
-}
-
-/* ==================== 5. 视频合成优化样式 ==================== */
-
-/* 合成预览 */
-.synthesizePreview {
-  .videoContainer {
-    position: relative;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 16/9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    video {
-      max-width: 100%;
-      max-height: 100%;
-    }
-    
-    .previewOverlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.4);
-      opacity: 0;
-      transition: opacity 0.3s;
-      cursor: pointer;
-      
-      &:hover {
-        opacity: 1;
-      }
-      
-      .overlayIcon {
-        font-size: 56px;
-        color: #fff;
-        margin-bottom: 12px;
-      }
-      
-      .overlayText {
-        color: #fff;
-        font-size: 14px;
-      }
-    }
-  }
-  
-  .timeline {
-    margin-top: 16px;
-    padding: 16px;
-    background: #fafafa;
-    border-radius: 8px;
-    
-    .timelineBar {
-      height: 4px;
-      background: #e8e8e8;
-      border-radius: 2px;
-      position: relative;
-      
-      .timelineProgress {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        background: linear-gradient(90deg, #d4a574, #52c41a);
-        border-radius: 2px;
-        transition: width 0.3s;
-      }
-    }
-  }
-}
-
-/* 合成配置标签页 */
-.synthesizeConfig {
-  .configTabs {
-    :global {
-      .ant-tabs-nav {
-        margin-bottom: 16px;
-      }
-      
-      .ant-tabs-tab {
-        padding: 12px 16px;
-        
-        .anticon {
-          margin-right: 8px;
-        }
-      }
-    }
-  }
-  
-  .configContent {
-    .configSection {
-      margin-bottom: 20px;
-      
-      .sectionTitle {
-        font-weight: 500;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      
-      .sliderWrapper {
-        padding: 0 8px;
-        
-        .sliderLabel {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 8px;
-          font-size: 13px;
-          color: rgba(0, 0, 0, 0.65);
-        }
-      }
-    }
-  }
-}
-
-/* 合成进度 */
-.synthesizeProgress {
-  text-align: center;
-  padding: 32px;
-  
-  .progressSteps {
-    display: flex;
-    justify-content: center;
-    gap: 48px;
-    margin-bottom: 32px;
-    
-    .stepItem {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      opacity: 0.5;
-      transition: all 0.3s;
-      
-      &.active {
-        opacity: 1;
-        
-        .stepIcon {
-          color: #d4a574;
-          transform: scale(1.1);
-        }
-      }
-      
-      &.completed {
-        opacity: 1;
-        
-        .stepIcon {
-          color: #52c41a;
-        }
-      }
-      
-      .stepIcon {
-        font-size: 28px;
-        transition: all 0.3s;
-      }
-      
-      .stepLabel {
-        font-size: 13px;
-        color: rgba(0, 0, 0, 0.65);
-      }
-    }
-  }
-}
-
-/* ==================== 6. 导出优化样式 ==================== */
-
-/* 导出预览 */
-.exportPreview {
-  .previewCard {
-    border-radius: 12px;
-    overflow: hidden;
-    
-    .previewVideo {
-      position: relative;
-      background: #000;
-      aspect-ratio: 16/9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      
-      video {
-        max-width: 100%;
-        max-height: 100%;
-      }
-    }
-  }
-}
-
-/* 导出设置 */
-.exportSettings {
-  .settingsCard {
-    border-radius: 12px;
-  }
-  
-  .settingGroup {
-    margin-bottom: 24px;
-    
-    &:last-child {
-      margin-bottom: 0;
-    }
-    
-    .groupTitle {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #f0f0f0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-  }
-  
-  .settingItem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid #f5f5f5;
-    
-    &:last-child {
-      border-bottom: none;
-    }
-    
-    .settingLabel {
-      .labelText {
-        font-weight: 500;
-      }
-      
-      .labelDesc {
-        font-size: 12px;
-        color: rgba(0, 0, 0, 0.45);
-        margin-top: 2px;
-      }
-    }
-    
-    .settingControl {
-      min-width: 150px;
-    }
-  }
-  
-  /* 文件大小估算 */
-  .fileEstimate {
-    padding: 16px;
-    background: linear-gradient(135deg, #f6ffed 0%, #f0f5ff 100%);
-    border-radius: 10px;
-    margin-top: 16px;
-    
-    .estimateGrid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      
-      .estimateItem {
-        text-align: center;
-        
-        .estimateValue {
-          font-size: 18px;
-          font-weight: 600;
-          color: #52c41a;
-        }
-        
-        .estimateLabel {
-          font-size: 12px;
-          color: rgba(0, 0, 0, 0.45);
-          margin-top: 4px;
-        }
-      }
-    }
-  }
-}
-
-/* 导出进度 */
-.exportProgress {
-  .exportSteps {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 24px;
-    
-    .exportStep {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: #fafafa;
-      border-radius: 8px;
-      
-      &.active {
-        background: linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%);
-      }
-      
-      &.completed {
-        background: #f6ffed;
-        
-        .stepIcon {
-          color: #52c41a;
-        }
-      }
-      
-      .stepIcon {
-        font-size: 18px;
-        color: rgba(0, 0, 0, 0.25);
-      }
-      
-      .stepLabel {
-        flex: 1;
-        font-size: 14px;
-      }
-      
-      .stepPercent {
-        font-weight: 500;
-        color: #d4a574;
-      }
-    }
-  }
-}
-
-/* 导出完成 */
-.flowComplete {
-  text-align: center;
-  padding: 48px 40px;
-  
-  .completeIcon {
-    font-size: 80px;
-    color: #52c41a;
-    margin-bottom: 24px;
-    animation: bounceIn 0.6s ease;
-  }
-  
-  @keyframes bounceIn {
-    0% {
-      transform: scale(0);
-      opacity: 0;
-    }
-    50% {
-      transform: scale(1.2);
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-  
-  .completeTitle {
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 12px;
-  }
-  
-  .completeDesc {
-    color: rgba(0, 0, 0, 0.65);
-    margin-bottom: 32px;
-    font-size: 15px;
-  }
-  
-  .completeInfo {
-    max-width: 400px;
-    margin: 0 auto 32px;
-    text-align: left;
-    padding: 20px;
-    background: #fafafa;
-    border-radius: 12px;
-    
-    .infoRow {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #f0f0f0;
-      
-      &:last-child {
-        border-bottom: none;
-      }
-      
-      .infoLabel {
-        color: rgba(0, 0, 0, 0.45);
-      }
-      
-      .infoValue {
-        font-weight: 500;
-      }
-    }
-  }
-  
-  .completeActions {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    
-    .primaryBtn {
-      height: 44px;
-      padding: 0 32px;
-      font-size: 15px;
-    }
-    
-    .secondaryBtn {
-      height: 44px;
-      padding: 0 24px;
-      font-size: 15px;
-    }
-  }
-  
-  .shareButtons {
-    margin-top: 24px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    
-    .shareBtn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-  }
-}
-
-/* 字幕列表 */
-.subtitleList {
-  max-height: 400px;
+.contentArea {
+  flex: 1;
+  height: 100%;
   overflow-y: auto;
-  
-  .subtitleItem {
-    padding: 12px;
-    border-bottom: 1px solid #f0f0f0;
-    display: flex;
-    gap: 12px;
-    
-    &:last-child {
-      border-bottom: none;
-    }
-    
-    .timeTag {
-      flex-shrink: 0;
-      font-family: monospace;
-      font-size: 12px;
-    }
-    
-    .text {
-      flex: 1;
-    }
+  padding: 32px;
+  box-sizing: border-box;
+  background: @bg-deep;
+
+  // 滚动条美化
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  // 内容入场动画
+  &.contentEntering {
+    animation: contentFadeIn 0.35s ease-out;
   }
 }
 
-/* 文案编辑 */
-.scriptEditor {
-  .scriptHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-  
-  .scriptContent {
-    min-height: 300px;
-    padding: 16px;
-    border: 1px solid #d9d9d9;
-    border-radius: 8px;
-    background: #fafafa;
-    white-space: pre-wrap;
-    font-family: inherit;
-    line-height: 1.8;
-  }
-}
-
-/* 合成预览 */
-.synthesisPreview {
-  .videoContainer {
-    background: #000;
-    border
-
-    border-radius: 4px;
-  }
+.contentCard {
+  max-width: 960px;
+  margin: 0 auto;
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  padding: 32px;
+  min-height: calc(100% - 64px);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 @glass-highlight;
 }
