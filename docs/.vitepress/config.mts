@@ -13,6 +13,9 @@ export default defineConfig({
   lang: 'zh-CN',
   cleanUrls: true,
 
+  // 禁用自动主题切换，由 CSS 完全控制深色主题
+  appearance: false,
+
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/CutDeck/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#1a1a2e' }],
