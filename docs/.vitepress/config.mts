@@ -1,11 +1,11 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'StoryForge',
+  title: 'CutDeck',
   description: 'AI 驱动的专业智能视频剪辑工具 — Cinematic Dark × Warm Amber',
 
   // GitHub Pages 路径前缀
-  base: '/StoryForge/',
+  base: '/CutDeck/',
 
   // 忽略死链接，兼容多版本文档
   ignoreDeadLinks: true,
@@ -14,10 +14,10 @@ export default defineConfig({
   cleanUrls: true,
 
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/StoryForge/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/CutDeck/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#1a1a2e' }],
     ['meta', { name: 'og:type', content: 'website' }],
-    ['meta', { name: 'og:site_name', content: 'StoryForge' }],
+    ['meta', { name: 'og:site_name', content: 'CutDeck' }],
     ['meta', { name: 'description', content: 'AI 驱动的专业智能视频剪辑工具，支持智能混剪、剧情分析、字幕生成等全链路 AI 剪辑能力' }],
   ],
 
@@ -30,7 +30,7 @@ export default defineConfig({
   // VitePress 主题配置
   themeConfig: {
     logo: '/logo.svg',
-    siteTitle: 'StoryForge',
+    siteTitle: 'CutDeck',
 
     // 导航栏
     nav: [
@@ -66,7 +66,7 @@ export default defineConfig({
       },
       {
         text: 'GitHub',
-        link: 'https://github.com/Agions/StoryForge'
+        link: 'https://github.com/Agions/CutDeck'
       }
     ],
 
@@ -130,7 +130,7 @@ export default defineConfig({
 
     // 社交链接
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Agions/StoryForge' },
+      { icon: 'github', link: 'https://github.com/Agions/CutDeck' },
     ],
 
     // 页脚
@@ -141,7 +141,7 @@ export default defineConfig({
 
     // 编辑链接
     editLink: {
-      pattern: 'https://github.com/Agions/StoryForge/edit/main/docs/:path',
+      pattern: 'https://github.com/Agions/CutDeck/edit/main/docs/:path',
       text: '在 GitHub 上编辑此页面'
     },
 
@@ -192,6 +192,6 @@ export default defineConfig({
   },
 
   sitemap: {
-    hostname: 'https://agions.github.io/StoryForge'
+    hostname: 'https://agions.github.io/CutDeck'
   }
 })
