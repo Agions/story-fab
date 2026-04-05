@@ -1332,3 +1332,203 @@ body {
     font-size: 2.25rem;
   }
 }
+
+/* ============================================
+   VitePress Native Home Layout Overrides
+   Cinematic Dark × Warm Amber
+   ============================================ */
+
+/* ---- VPHome container ---- */
+.VPHome {
+  max-width: 900px !important;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+}
+
+/* ---- Hero ---- */
+.VPHomeHero {
+  padding: 5rem 0 3.5rem !important;
+  position: relative;
+}
+
+.VPHomeHero::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 680px;
+  height: 420px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.1) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.VPHero .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo image in hero */
+.VPHero .image-container {
+  margin-bottom: 1.5rem !important;
+}
+
+.VPHero .image-container img,
+.VPHero .image-container .VPImage {
+  width: 96px !important;
+  height: 96px !important;
+  border-radius: 20px !important;
+  filter: drop-shadow(0 4px 20px rgba(245, 158, 11, 0.2)) !important;
+}
+
+/* Title */
+.VPHero .name {
+  font-family: 'Syne', sans-serif !important;
+  font-size: 3.5rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  background: linear-gradient(160deg, #f8fafc 30%, #fcd34d 65%, #f59e0b 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  line-height: 1.05 !important;
+  margin-bottom: 0.75rem !important;
+}
+
+/* Subtitle text */
+.VPHero .text {
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 1.1rem !important;
+  color: #e2e8f0 !important;
+  font-weight: 400 !important;
+  margin-bottom: 0.5rem !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* Tagline */
+.VPHero .tagline {
+  font-size: 0.925rem !important;
+  color: #64748b !important;
+  margin-bottom: 2.5rem !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Action buttons */
+.VPHero .actions {
+  gap: 0.875rem !important;
+}
+
+.VPHero .action .VPButton {
+  padding: 0.7rem 1.75rem !important;
+  border-radius: 8px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  transition: all 0.2s ease !important;
+}
+
+.VPHero .action .VPButton.brand {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  border: none !important;
+  color: #090910 !important;
+  box-shadow: 0 2px 14px rgba(245, 158, 11, 0.32) !important;
+}
+
+.VPHero .action .VPButton.brand:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 22px rgba(245, 158, 11, 0.42) !important;
+  color: #090910 !important;
+}
+
+.VPHero .action .VPButton.alt {
+  background: transparent !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  color: #94a3b8 !important;
+}
+
+.VPHero .action .VPButton.alt:hover {
+  border-color: rgba(148, 163, 184, 0.5) !important;
+  color: #f8fafc !important;
+  background: rgba(148, 163, 184, 0.06) !important;
+}
+
+/* ---- Features ---- */
+.VPHomeFeatures {
+  padding: 0 !important;
+  max-width: 860px !important;
+  margin: 0 auto !important;
+}
+
+.VPHomeFeatures .title {
+  display: none !important;
+}
+
+.VPFeature {
+  background: rgba(19, 19, 31, 0.8) !important;
+  border: 1px solid rgba(245, 158, 11, 0.09) !important;
+  border-radius: 14px !important;
+  padding: 1.5rem 1.25rem !important;
+  transition: all 0.25s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.VPFeature::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  opacity: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.06) 0%, transparent 60%);
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.VPFeature:hover {
+  border-color: rgba(245, 158, 11, 0.25) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(245, 158, 11, 0.06) !important;
+}
+
+.VPFeature:hover::before {
+  opacity: 1;
+}
+
+/* Feature icon */
+.VPFeature .icon {
+  font-size: 1.6rem !important;
+  margin-bottom: 0.75rem !important;
+  display: block !important;
+  line-height: 1 !important;
+}
+
+/* Feature title */
+.VPFeature .title {
+  font-family: 'Syne', sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  margin-bottom: 0.4rem !important;
+  border: none !important;
+  padding: 0 !important;
+  background: none !important;
+  -webkit-text-fill-color: #f8fafc !important;
+}
+
+/* Feature details */
+.VPFeature .details {
+  font-size: 0.8rem !important;
+  color: #475569 !important;
+  line-height: 1.6 !important;
+  margin: 0 !important;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+  .VPHero .name { font-size: 2.5rem !important; }
+  .VPHome { padding: 0 1rem 3rem !important; }
+  .VPHomeHero { padding: 3.5rem 0 2.5rem !important; }
+}
