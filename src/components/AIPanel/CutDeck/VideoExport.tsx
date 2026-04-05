@@ -1,67 +1,51 @@
-import { logger } from '@/utils/logger';
 /**
- * 步骤6: 导出视频 - 优化版
+ * 步骤6: 导出视频 — AI Cinema Studio Redesign
  */
 import React, { useState } from 'react';
-import { 
-  Card, Button, Space, Typography,
-  Switch, Alert, Divider, Progress, Result, Tag, Row, Col, Radio, Badge
-} from 'antd';
-import {
-  ExportOutlined,
-  DownloadOutlined,
-  CheckCircleOutlined,
-  PlayCircleOutlined,
-  VideoCameraOutlined,
-} from '@ant-design/icons';
 import { useCutDeck } from '../AIEditorContext';
 import { notify } from '@/shared';
 import type { ExportSettings } from '@/core/types';
-import styles from './CutDeck.module.less';
-
-const { Title, Text, Paragraph } = Typography;
-
-// 导出格式
-const FORMAT_OPTIONS = [
-  { value: 'mp4', label: 'MP4', desc: '通用格式，兼容性最好', icon: '🎬' },
-  { value: 'mov', label: 'MOV', desc: 'Apple 格式，画质优秀', icon: '🍎' },
-  { value: 'webm', label: 'WEBM', desc: 'Web 格式，适合在线播放', icon: '🌐' },
-  { value: 'mkv', label: 'MKV', desc: '封装灵活，适合归档', icon: '📦' },
-] as const;
-
-// 质量选项
-const QUALITY_OPTIONS = [
-  { value: 'low', label: '流畅', desc: '文件小，省流量', bitrate: '1-2Mbps', size: '~10MB/min' },
-  { value: 'medium', label: '标清', desc: '平衡画质和大小', bitrate: '3-5Mbps', size: '~30MB/min' },
-  { value: 'high', label: '高清', desc: '清晰画质', bitrate: '8-12Mbps', size: '~60MB/min' },
-  { value: 'ultra', label: '超清', desc: '4K 超高清', bitrate: '25-35Mbps', size: '~200MB/min' },
-] as const;
-
-// 分辨率选项
-const RESOLUTION_OPTIONS = [
-  { value: '720p', label: '720p HD', desc: '1280x720', ratio: '16:9' },
-  { value: '1080p', label: '1080p Full HD', desc: '1920x1080', ratio: '16:9' },
-  { value: '2k', label: '2K QHD', desc: '2560x1440', ratio: '16:9' },
-  { value: '4k', label: '4K UHD', desc: '3840x2160', ratio: '16:9' },
-] as const;
-
-// 帧率选项
-const FPS_OPTIONS = [
-  { value: 24, label: '24 fps', desc: '电影感', icon: '🎬' },
-  { value: 30, label: '30 fps', desc: '标准', icon: '📺' },
-  { value: 60, label: '60 fps', desc: '流畅', icon: '⚡' },
-] as const;
+import styles from './VideoExport.module.less';
 
 interface VideoExportProps {
   onComplete?: () => void;
 }
+
+// 导出格式
+const FORMAT_OPTIONS = [
+  { value: 'mp4', label: 'MP4', desc: '通用格式', emoji: '🎬' },
+  { value: 'mov', label: 'MOV', desc: 'Apple 高质量', emoji: '🍎' },
+  { value: 'gif', label: 'GIF', desc: '动画格式', emoji: '🎞️' },
+] as const;
+
+// 质量选项
+const QUALITY_OPTIONS = [
+  { value: '1080p', label: 'Full HD' },
+  { value: '720p', label: 'HD' },
+  { value: '480p', label: 'SD' },
+] as const;
+
+// 分辨率选项
+const RESOLUTION_OPTIONS = [
+  { value: '1080p', label: '1080p Full HD', res: '1920×1080' },
+  { value: '720p', label: '720p HD', res: '1280×720' },
+  { value: '480p', label: '480p SD', res: '854×480' },
+  { value: '2k', label: '2K QHD', res: '2560×1440' },
+] as const;
+
+// 帧率选项
+const FPS_OPTIONS = [
+  { value: 24, label: '24 fps' },
+  { value: 30, label: '30 fps' },
+  { value: 60, label: '60 fps' },
+] as const;
 
 const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
   const { state, setExportSettings, dispatch } = useCutDeck();
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exported, setExported] = useState(false);
-  // 导出配置
+
   const [config, setConfig] = useState<ExportSettings>({
     format: state.exportSettings?.format || 'mp4',
     quality: state.exportSettings?.quality || 'high',
@@ -73,7 +57,6 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
     includeWatermark: state.exportSettings?.includeWatermark ?? false,
   });
 
-  // 预估文件大小
   const estimateFileSize = () => {
     if (!state.currentVideo?.duration) return '0 MB';
     const bitrateMap: Record<string, number> = { low: 1.5, medium: 4, high: 10, ultra: 30 };
@@ -82,7 +65,6 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
     return sizeMB > 1000 ? `${(sizeMB / 1000).toFixed(1)} GB` : `${sizeMB.toFixed(1)} MB`;
   };
 
-  // 处理导出
   const handleExport = async () => {
     if (!state.synthesisData?.finalVideoUrl) {
       notify.warning('请先完成视频合成');
@@ -93,94 +75,140 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
     setProgress(0);
 
     try {
-      // TODO: 实现实际的视频导出
-      // 调用 Tauri 后端或 FFmpeg 进行视频合成
-      setProgress(10); await new Promise(r => setTimeout(r, 500));
-      setProgress(30); await new Promise(r => setTimeout(r, 800));
-      setProgress(50); await new Promise(r => setTimeout(r, 600));
-      setProgress(70); await new Promise(r => setTimeout(r, 700));
-      setProgress(90); await new Promise(r => setTimeout(r, 500));
+      setProgress(15);
+      await new Promise(r => setTimeout(r, 500));
+      setProgress(40);
+      await new Promise(r => setTimeout(r, 700));
+      setProgress(65);
+      await new Promise(r => setTimeout(r, 600));
+      setProgress(85);
+      await new Promise(r => setTimeout(r, 500));
       setProgress(100);
 
-      // 保存设置
       setExportSettings(config);
       setExported(true);
       notify.info('视频导出功能待实现');
 
     } catch (error) {
-      logger.error('导出失败:', { error });
       notify.error(error, '导出失败，请重试');
     } finally {
       setExporting(false);
     }
   };
 
-  // 检查前置条件
   const hasSynthesis = !!state.synthesisData?.finalVideoUrl;
 
+  // 前置检查
   if (!hasSynthesis) {
     return (
-      <Alert
-        message="请先完成视频合成"
-        description="请先完成视频合成步骤"
-        type="warning"
-        showIcon
-        action={
-          <Button type="primary" onClick={() => dispatch({ type: 'SET_STEP', payload: 'video-synthesize' })}>
+      <div className={styles.stepContent}>
+        <div className={styles.stepTitle}>
+          <div className={styles.stepTitleLeft}>
+            <h2>📤 导出设置</h2>
+          </div>
+        </div>
+        <div className={styles.warningAlert}>
+          ⚠️ 请先完成视频合成
+          <button
+            className={styles.warningAlertBtn}
+            onClick={() => dispatch({ type: 'SET_STEP', payload: 'video-synthesize' })}
+          >
             去合成
-          </Button>
-        }
-      />
+          </button>
+        </div>
+      </div>
     );
   }
 
   // 导出完成
   if (exported) {
     return (
-      <Card>
-        <Result
-          status="success"
-          icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-          title="🎉 视频导出成功！"
-          subTitle={
-            <Space direction="vertical">
-              <Text>文件格式: {config.format.toUpperCase()}</Text>
-              <Text>分辨率: {config.resolution}</Text>
-              <Text>预估大小: {estimateFileSize()}</Text>
-            </Space>
-          }
-          extra={[
-            <Button key="preview" icon={<PlayCircleOutlined />}>预览</Button>,
-            <Button key="download" type="primary" icon={<DownloadOutlined />}>下载视频</Button>,
-            <Button key="share" icon={<ExportOutlined />}>分享</Button>,
-          ]}
-        />
-      </Card>
+      <div className={styles.stepContent}>
+        <div className={styles.completeCard}>
+          <svg className={styles.completeIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+          <h3 className={styles.completeTitle}>🎉 视频导出成功！</h3>
+          <div className={styles.completeMeta}>
+            <span className={styles.completeMetaTag}>{config.format.toUpperCase()}</span>
+            <span className={styles.completeMetaTag}>{config.resolution}</span>
+            <span className={styles.completeMetaTag}>{config.frameRate}fps</span>
+          </div>
+          <div className={styles.completeSub}>预估大小：{estimateFileSize()}</div>
+          <div className={styles.completeActions}>
+            <button className={`${styles.completeBtn} ${styles.completeBtnSecondary}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="10 8 16 12 10 16 10 8" />
+              </svg>
+              预览
+            </button>
+            <button className={`${styles.completeBtn} ${styles.completeBtnPrimary}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              下载视频
+            </button>
+            <button className={`${styles.completeBtn} ${styles.completeBtnSecondary}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              </svg>
+              分享
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 
   // 导出中
   if (exporting) {
+    const circumference = 2 * Math.PI * 45;
+    const offset = circumference - (progress / 100) * circumference;
+
     return (
-      <Card>
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <Progress 
-            type="circle" 
-            percent={progress} 
-            status="active"
-            strokeColor={{ '0%': '#108ee9', '100%': '#52c41a' }}
-          />
-          <div style={{ marginTop: 24 }}>
-            <Title level={4}>
-              {progress < 30 ? '🎬 视频编码中...' : 
-               progress < 60 ? '🔊 音频编码中...' : 
-               progress < 90 ? '💾 生成文件...' : 
-               '✨ 导出完成！'}
-            </Title>
+      <div className={styles.stepContent}>
+        <div className={styles.exportingCard}>
+          <div className={styles.progressCircle}>
+            <svg className={styles.progressCircleSvg} viewBox="0 0 100 100">
+              <circle className={styles.progressCircleTrack} cx="50" cy="50" r="45" />
+              <circle
+                className={styles.progressCircleFill}
+                cx="50"
+                cy="50"
+                r="45"
+                style={{ strokeDashoffset: offset }}
+              />
+            </svg>
+            <div className={styles.progressPercent}>{progress}%</div>
           </div>
-          <Text type="secondary">请耐心等待...</Text>
+          <div className={styles.progressLabel}>
+            {progress < 30 ? '🎬 视频编码中...' :
+             progress < 60 ? '🔊 音频编码中...' :
+             progress < 90 ? '💾 生成文件...' :
+             '✨ 导出完成！'}
+          </div>
+          <div className={styles.progressSub}>请耐心等待...</div>
+
+          {/* 进度条 */}
+          <div className={styles.progressBarSection}>
+            <div className={styles.progressBarTrack}>
+              <div
+                className={styles.progressBarFill}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className={styles.progressBarPercent}>{progress}%</div>
+          </div>
         </div>
-      </Card>
+      </div>
     );
   }
 
@@ -188,180 +216,216 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepTitle}>
-        <Space>
-          <Title level={4} style={{ margin: 0 }}>📤 导出设置</Title>
-          <Tag icon={<VideoCameraOutlined />}>{config.format.toUpperCase()}</Tag>
-          <Tag>{config.resolution}</Tag>
-          <Tag>{config.frameRate}fps</Tag>
-        </Space>
+        <div className={styles.stepTitleLeft}>
+          <h2>📤 导出设置</h2>
+          <div className={styles.tagGroup}>
+            <span className={styles.tag}>{config.format.toUpperCase()}</span>
+            <span className={styles.tag}>{config.resolution}</span>
+            <span className={styles.tag}>{config.frameRate}fps</span>
+          </div>
+        </div>
       </div>
 
-      <Row gutter={16}>
-        {/* 左侧：设置 */}
-        <Col xs={24} lg={14}>
-          {/* 格式选择 */}
-          <Card title="🎬 输出格式" size="small" style={{ marginBottom: 16 }}>
-            <Radio.Group 
-              value={config.format}
-              onChange={(e) => setConfig({ ...config, format: e.target.value as ExportSettings['format'] })}
-              style={{ width: '100%' }}
-            >
-              <Space direction="vertical" style={{ width: '100%' }}>
+      <div className={styles.columns}>
+        {/* ====== 左侧：设置面板 ====== */}
+        <div className={styles.settingsCard}>
+          <div className={styles.cardHeader}>
+            <svg className={styles.cardHeaderIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <h3 className={styles.cardTitle}>导出配置</h3>
+          </div>
+
+          <div className={styles.cardBody}>
+            {/* 格式选择 */}
+            <div className={styles.formatSection}>
+              <span className={styles.sectionLabel}>输出格式</span>
+              <div className={styles.formatGrid}>
                 {FORMAT_OPTIONS.map(fmt => (
-                  <Radio key={fmt.value} value={fmt.value} style={{ width: '100%', marginRight: 0, padding: '10px', border: `1px solid ${config.format === fmt.value ? '#1890ff' : '#e8e8e8'}`, borderRadius: 8 }}>
-                    <Space>
-                      <span style={{ fontSize: 18 }}>{fmt.icon}</span>
-                      <div>
-                        <Text strong>{fmt.label}</Text>
-                        <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>{fmt.desc}</Text>
-                      </div>
-                    </Space>
-                  </Radio>
+                  <div
+                    key={fmt.value}
+                    className={`${styles.formatItem} ${config.format === fmt.value ? styles.formatActive : ''}`}
+                    onClick={() => setConfig({ ...config, format: fmt.value as ExportSettings['format'] })}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, format: fmt.value as ExportSettings['format'] })}
+                  >
+                    <div className={styles.formatCheck}>
+                      <div className={styles.formatCheckDot} />
+                    </div>
+                    <span className={styles.formatEmoji}>{fmt.emoji}</span>
+                    <span className={styles.formatName}>{fmt.label}</span>
+                    <span className={styles.formatDesc}>{fmt.desc}</span>
+                  </div>
                 ))}
-              </Space>
-            </Radio.Group>
-          </Card>
-
-          {/* 质量和分辨率 */}
-          <Card size="small" style={{ marginBottom: 16 }}>
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
-              {/* 分辨率 */}
-              <div>
-                <Text strong style={{ marginBottom: 8, display: 'block' }}>📐 分辨率</Text>
-                <Radio.Group 
-                  value={config.resolution}
-                  onChange={(e) => setConfig({ ...config, resolution: e.target.value as ExportSettings['resolution'] })}
-                >
-                  <Space wrap>
-                    {RESOLUTION_OPTIONS.map(res => (
-                      <Radio.Button key={res.value} value={res.value}>
-                        {res.label}
-                      </Radio.Button>
-                    ))}
-                  </Space>
-                </Radio.Group>
               </div>
+            </div>
 
-              {/* 帧率 */}
-              <div>
-                <Text strong style={{ marginBottom: 8, display: 'block' }}>⚡ 帧率</Text>
-                <Radio.Group 
-                  value={config.frameRate}
-                  onChange={(e) => setConfig({ ...config, frameRate: e.target.value as ExportSettings['frameRate'] })}
-                >
-                  <Space>
-                    {FPS_OPTIONS.map(fps => (
-                      <Radio key={fps.value} value={fps.value}>
-                        {fps.label} <Text type="secondary" style={{ fontSize: 12 }}>({fps.desc})</Text>
-                      </Radio>
-                    ))}
-                  </Space>
-                </Radio.Group>
+            {/* 质量选择 */}
+            <div className={styles.qualitySection}>
+              <span className={styles.sectionLabel}>输出质量</span>
+              <div className={styles.qualityGrid}>
+                {QUALITY_OPTIONS.map(q => (
+                  <div
+                    key={q.value}
+                    className={`${styles.qualityItem} ${config.resolution === q.value ? styles.qualityActive : ''}`}
+                    onClick={() => setConfig({ ...config, resolution: q.value as ExportSettings['resolution'] })}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, resolution: q.value as ExportSettings['resolution'] })}
+                  >
+                    <span className={styles.qualityValue}>{q.value}</span>
+                    <span className={styles.qualityLabel}>{q.label}</span>
+                  </div>
+                ))}
               </div>
+            </div>
 
-              {/* 质量 */}
-              <div>
-                <Text strong style={{ marginBottom: 8, display: 'block' }}>🎯 质量</Text>
-                <Radio.Group 
-                  value={config.quality}
-                  onChange={(e) => setConfig({ ...config, quality: e.target.value as ExportSettings['quality'] })}
-                  style={{ width: '100%' }}
-                >
-                  <Row gutter={[8, 8]}>
-                    {QUALITY_OPTIONS.map(q => (
-                      <Col span={12} key={q.value}>
-                        <div 
-                          style={{ 
-                            padding: 12, 
-                            border: `2px solid ${config.quality === q.value ? '#1890ff' : '#e8e8e8'}`,
-                            borderRadius: 8,
-                            background: config.quality === q.value ? '#e6f7ff' : '#fff',
-                            cursor: 'pointer'
-                          }}
-                          onClick={() => setConfig({ ...config, quality: q.value as ExportSettings['quality'] })}
-                        >
-                          <Text strong>{q.label}</Text>
-                          <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>{q.desc}</Text>
-                          <Text type="secondary" style={{ fontSize: 11 }}>{q.bitrate}</Text>
-                        </div>
-                      </Col>
+            {/* 分辨率和帧率 */}
+            <div className={styles.rowGroup}>
+              <div className={styles.optionGroup}>
+                <label htmlFor="resolutionSelect">分辨率</label>
+                <div className={styles.optionWrapper}>
+                  <select
+                    id="resolutionSelect"
+                    className={styles.optionSelect}
+                    value={config.resolution}
+                    onChange={(e) => setConfig({ ...config, resolution: e.target.value as ExportSettings['resolution'] })}
+                  >
+                    {RESOLUTION_OPTIONS.map(r => (
+                      <option key={r.value} value={r.value}>{r.label} ({r.res})</option>
                     ))}
-                  </Row>
-                </Radio.Group>
+                  </select>
+                  <svg className={styles.optionArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
               </div>
-            </Space>
-          </Card>
+              <div className={styles.optionGroup}>
+                <label htmlFor="fpsSelect">帧率</label>
+                <div className={styles.optionWrapper}>
+                  <select
+                    id="fpsSelect"
+                    className={styles.optionSelect}
+                    value={config.frameRate}
+                    onChange={(e) => setConfig({ ...config, frameRate: Number(e.target.value) as ExportSettings['frameRate'] })}
+                  >
+                    {FPS_OPTIONS.map(f => (
+                      <option key={f.value} value={f.value}>{f.label}</option>
+                    ))}
+                  </select>
+                  <svg className={styles.optionArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+              </div>
+            </div>
 
-          {/* 字幕选项 */}
-          <Card title="📝 字幕选项" size="small">
-            <Space direction="vertical" style={{ width: '100%' }}>
-              <div>
-                <Switch 
-                  checked={config.includeSubtitles}
-                  onChange={(v) => setConfig({ ...config, includeSubtitles: v })}
+            {/* 字幕选项 */}
+            <div className={styles.toggleSection}>
+              <div className={styles.toggleRow}>
+                <div className={styles.toggleLabelGroup}>
+                  <span className={styles.toggleLabel}>包含字幕文件</span>
+                  <span className={styles.toggleSubLabel}>导出 .srt 字幕文件</span>
+                </div>
+                <button
+                  className={`${styles.toggle} ${config.includeSubtitles ? styles.toggleOn : ''}`}
+                  onClick={() => setConfig({ ...config, includeSubtitles: !config.includeSubtitles })}
+                  role="switch"
+                  aria-checked={config.includeSubtitles}
                 />
-                <Text style={{ marginLeft: 8 }}>包含字幕文件</Text>
               </div>
-              <div>
-                <Switch 
-                  checked={config.burnSubtitles}
-                  onChange={(v) => setConfig({ ...config, burnSubtitles: v })}
+              <div className={styles.toggleRow}>
+                <div className={styles.toggleLabelGroup}>
+                  <span className={styles.toggleLabel}>烧录字幕到视频</span>
+                  <span className={styles.toggleSubLabel}>字幕将永久显示在画面上</span>
+                </div>
+                <button
+                  className={`${styles.toggle} ${config.burnSubtitles ? styles.toggleOn : ''}`}
+                  onClick={() => setConfig({ ...config, burnSubtitles: !config.burnSubtitles })}
+                  role="switch"
+                  aria-checked={config.burnSubtitles}
                 />
-                <Text style={{ marginLeft: 8 }}>烧录字幕到视频</Text>
-                <Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
-                  (烧录后字幕将永久显示在画面上)
-                </Text>
               </div>
-            </Space>
-          </Card>
-        </Col>
+            </div>
+          </div>
+        </div>
 
-        {/* 右侧：预览 */}
-        <Col xs={24} lg={10}>
-          {/* 导出信息 */}
-          <Card title="📋 导出信息" size="small" style={{ marginBottom: 16 }}>
-            <Space direction="vertical" style={{ width: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Text type="secondary">原始视频</Text>
-                <Text>{state.currentVideo?.name || '-'}</Text>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Text type="secondary">时长</Text>
-                <Text>{Math.floor(state.currentVideo?.duration || 0)} 秒</Text>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Text type="secondary">格式</Text>
-                <Tag>{config.format.toUpperCase()}</Tag>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Text type="secondary">分辨率</Text>
-                <Tag>{config.resolution}</Tag>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Text type="secondary">帧率</Text>
-                <Text>{config.frameRate} fps</Text>
-              </div>
-              <Divider style={{ margin: '12px 0' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text strong>预估大小</Text>
-                <Badge count={estimateFileSize()} style={{ backgroundColor: '#1890ff' }} />
-              </div>
-            </Space>
-          </Card>
+        {/* ====== 右侧：导出信息 ====== */}
+        <div className={styles.infoCard}>
+          <div className={styles.infoHeader}>
+            <svg className={styles.cardHeaderIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+            <h3 className={styles.infoTitle}>导出信息</h3>
+          </div>
 
-          {/* 快捷导出 */}
-          <Card title="⚡ 快速导出" size="small">
-            <Space direction="vertical" style={{ width: '100%' }}>
-              <Button block type="primary" icon={<DownloadOutlined />} onClick={handleExport}>
-                一键导出 (MP4/1080p/高清)
-              </Button>
-              <Button block icon={<ExportOutlined />} onClick={handleExport}>
+          <div className={styles.infoBody}>
+            <div className={styles.infoList}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoKey}>原始视频</span>
+                <span className={styles.infoValue} style={{ fontSize: 12, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {state.currentVideo?.name || '-'}
+                </span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoKey}>时长</span>
+                <span className={styles.infoValue}>{Math.floor(state.currentVideo?.duration || 0)} 秒</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoKey}>格式</span>
+                <span className={styles.infoTag}>{config.format.toUpperCase()}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoKey}>分辨率</span>
+                <span className={styles.infoTag}>{config.resolution}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoKey}>帧率</span>
+                <span className={styles.infoValue}>{config.frameRate} fps</span>
+              </div>
+            </div>
+
+            <div className={styles.divider} />
+
+            <div className={styles.sizeEstimate}>
+              <span className={styles.sizeLabel}>预估大小</span>
+              <span className={styles.sizeValue}>{estimateFileSize()}</span>
+            </div>
+
+            <div className={styles.exportActions}>
+              {/* 一键导出 */}
+              <button
+                className={`${styles.exportBtn} ${styles.exportBtnPrimary}`}
+                onClick={handleExport}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                一键导出
+              </button>
+
+              {/* 自定义导出 */}
+              <button
+                className={`${styles.exportBtn} ${styles.exportBtnSecondary}`}
+                onClick={handleExport}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
                 自定义导出
-              </Button>
-            </Space>
-          </Card>
-        </Col>
-      </Row>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,103 +1,68 @@
-import { logger } from '@/utils/logger';
 /**
- * 步骤1: 创建项目
- * 
+ * 步骤1: 创建项目 — AI Cinema Studio Redesign
  * 数据输出: project (ProjectData)
  * 流转到: VideoUpload
  */
-import React, { useMemo, useState } from 'react';
-import { Form, Input, Select, Button, Card, Typography, Divider, Tag } from 'antd';
-import { PlusOutlined, ArrowRightOutlined, CheckCircleOutlined, VideoCameraOutlined, BookOutlined, CustomerServiceOutlined, FileTextOutlined, SettingOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
 import { useCutDeck } from '../AIEditorContext';
 import type { ProjectData } from '@/core/types';
 import { saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
-import styles from './CutDeck.module.less';
-
-const { Title, Paragraph } = Typography;
-const { TextArea } = Input;
+import styles from './ProjectCreate.module.less';
 
 interface ProjectCreateProps {
   onNext?: () => void;
 }
 
-// 项目模板配置
-const PROJECT_TEMPLATES = [
+// 三种创作模式配置
+const MODE_OPTIONS = [
   {
-    id: 'marketing',
-    name: '营销推广',
-    icon: <VideoCameraOutlined />,
-    desc: '产品宣传、活动推广',
-    color: '#1890ff',
-    settings: {
-      videoQuality: 'high' as const,
-      outputFormat: 'mp4' as const,
-      resolution: '1080p' as const,
-      frameRate: 30 as 24 | 30 | 60,
-      subtitleEnabled: true,
-    },
+    id: 'first-person',
+    name: 'AI第一人称',
+    desc: '以第一人称视角，像主播一样与观众互动',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    ),
   },
   {
-    id: 'education',
-    name: '教育培训',
-    icon: <BookOutlined />,
-    desc: '课程讲解、技能培训',
-    color: '#52c41a',
-    settings: {
-      videoQuality: 'high' as const,
-      outputFormat: 'mp4' as const,
-      resolution: '1080p' as const,
-      frameRate: 30 as 24 | 30 | 60,
-      subtitleEnabled: true,
-    },
+    id: 'narration',
+    name: 'AI解说',
+    desc: '对视频内容进行专业解说，适合教程和科普',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+      </svg>
+    ),
   },
   {
-    id: 'entertainment',
-    name: '娱乐内容',
-    icon: <CustomerServiceOutlined />,
-    desc: '搞笑集锦、影视解说',
-    color: '#fa8c16',
-    settings: {
-      videoQuality: 'medium' as const,
-      outputFormat: 'mp4' as const,
-      resolution: '1080p' as const,
-      frameRate: 30 as 24 | 30 | 60,
-      subtitleEnabled: true,
-    },
-  },
-  {
-    id: 'news',
-    name: '新闻资讯',
-    icon: <FileTextOutlined />,
-    desc: '热点解读、时事评论',
-    color: '#eb2f96',
-    settings: {
-      videoQuality: 'high' as const,
-      outputFormat: 'mp4' as const,
-      resolution: '1080p' as const,
-      frameRate: 30 as 24 | 30 | 60,
-      subtitleEnabled: true,
-    },
-  },
-  {
-    id: 'custom',
-    name: '自定义',
-    icon: <SettingOutlined />,
-    desc: '自定义设置',
-    color: '#722ed1',
-    settings: {
-      videoQuality: 'high' as const,
-      outputFormat: 'mp4' as const,
-      resolution: '1080p' as const,
-      frameRate: 30 as 24 | 30 | 60,
-      subtitleEnabled: true,
-    },
+    id: 'remix',
+    name: 'AI混剪',
+    desc: '自动识别精彩片段，生成节奏感强的混剪',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="6" cy="6" r="3" />
+        <circle cx="18" cy="6" r="3" />
+        <circle cx="6" cy="18" r="3" />
+        <circle cx="18" cy="18" r="3" />
+        <line x1="6" y1="9" x2="6" y2="15" />
+        <line x1="18" y1="9" x2="18" y2="15" />
+        <line x1="9" y1="6" x2="15" y2="6" />
+        <line x1="9" y1="18" x2="15" y2="18" />
+      </svg>
+    ),
   },
 ];
 
-const getTemplateById = (templateId?: string) => {
-  return PROJECT_TEMPLATES.find((template) => template.id === templateId) || PROJECT_TEMPLATES[4];
+// 项目模板（内部使用，不对外展示）
+const PROJECT_TEMPLATES_INTERNAL = {
+  'first-person': { videoQuality: 'high' as const, outputFormat: 'mp4' as const, resolution: '1080p' as const, frameRate: 30 as 24 | 30 | 60, subtitleEnabled: true },
+  narration: { videoQuality: 'high' as const, outputFormat: 'mp4' as const, resolution: '1080p' as const, frameRate: 30 as 24 | 30 | 60, subtitleEnabled: true },
+  remix: { videoQuality: 'medium' as const, outputFormat: 'mp4' as const, resolution: '1080p' as const, frameRate: 30 as 24 | 30 | 60, subtitleEnabled: true },
 };
 
 const normalizeText = (value?: string) => value?.trim().replace(/\s+/g, ' ') || '';
@@ -113,53 +78,25 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
   const { state, setProject, goToNextStep } = useCutDeck();
   const { addRecentProject } = useSettings();
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('marketing');
-  const [defaultProjectName] = useState<string>(() => createDefaultProjectName());
+  const [selectedMode, setSelectedMode] = useState<string>('first-person');
+  const [projectName, setProjectName] = useState<string>(() => createDefaultProjectName());
+  const [description, setDescription] = useState<string>('');
 
-  const currentTemplate = useMemo(() => {
-    if (!state.project) {
-      return PROJECT_TEMPLATES[0];
-    }
-    if (state.project.templateId) {
-      return getTemplateById(state.project.templateId);
-    }
-    const templateByName = PROJECT_TEMPLATES.find((template) => template.name === state.project?.templateName);
-    if (templateByName) {
-      return templateByName;
-    }
-    return PROJECT_TEMPLATES.find((template) => (
-      template.settings.videoQuality === state.project?.settings?.videoQuality &&
-      template.settings.outputFormat === state.project?.settings?.outputFormat &&
-      template.settings.resolution === state.project?.settings?.resolution &&
-      template.settings.frameRate === state.project?.settings?.frameRate
-    )) || PROJECT_TEMPLATES[4];
-  }, [state.project]);
+  const handleCreateProject = async () => {
+    if (loading) return;
 
-  // 处理创建项目
-  const handleCreateProject = async (values: {
-    name: string;
-    type: string;
-    description?: string;
-  }) => {
-    if (loading) {
-      return;
-    }
+    const normalizedName = normalizeText(projectName) || createDefaultProjectName();
+    const normalizedDescription = normalizeText(description);
+    const template = PROJECT_TEMPLATES_INTERNAL[selectedMode as keyof typeof PROJECT_TEMPLATES_INTERNAL] || PROJECT_TEMPLATES_INTERNAL.narration;
 
     setLoading(true);
     try {
-      // 获取选中的模板设置
-      const template = getTemplateById(values.type || selectedTemplate);
-      const normalizedName = normalizeText(values.name) || createDefaultProjectName();
-      const normalizedDescription = normalizeText(values.description);
       const now = new Date().toISOString();
-      
-      // 创建项目数据
       const newProject: ProjectData = {
         id: `project_${Date.now()}`,
         name: normalizedName,
-        templateId: template.id,
-        templateName: template.name,
+        templateId: selectedMode,
+        templateName: MODE_OPTIONS.find(m => m.id === selectedMode)?.name || 'AI解说',
         description: normalizedDescription || undefined,
         videoPath: '',
         videoUrl: undefined,
@@ -169,7 +106,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
         createdAt: now,
         updatedAt: now,
         settings: {
-          ...template.settings,
+          ...template,
           audioCodec: 'aac',
           videoCodec: 'h264',
           subtitleStyle: {
@@ -188,38 +125,37 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
       await saveProjectToFile(newProject.id, newProject);
       addRecentProject(newProject.id);
       setProject(newProject);
-      form.setFieldValue('name', normalizedName);
+      setProjectName(normalizedName);
       notify.success('项目创建成功');
-      
-      // 跳转到下一步
+
       if (onNext) {
         onNext();
       } else {
         goToNextStep();
       }
     } catch (error) {
-      logger.error('项目创建失败:', { error });
       notify.error(error, '项目创建失败');
     } finally {
       setLoading(false);
     }
   };
 
-  // 如果已有项目，显示项目信息
+  // 已有项目时显示信息卡
   if (state.project) {
+    const mode = MODE_OPTIONS.find(m => m.id === state.project?.templateId) || MODE_OPTIONS[1];
+    const templateSettings = PROJECT_TEMPLATES_INTERNAL[state.project.templateId as keyof typeof PROJECT_TEMPLATES_INTERNAL] || PROJECT_TEMPLATES_INTERNAL.narration;
+
     return (
       <div className={styles.stepContent}>
         <div className={styles.stepTitle}>
-          <Title level={4}>当前项目</Title>
-          <Paragraph>
-            项目已创建，您可以继续下一步或重新创建
-          </Paragraph>
+          <h2>当前项目</h2>
+          <p>项目已创建，可以继续下一步或重新创建</p>
         </div>
 
-        <Card className={styles.projectInfoCard}>
+        <div className={styles.projectCard}>
           <div className={styles.projectHeader}>
-            <div className={styles.projectIcon}>
-              {currentTemplate.icon || <VideoCameraOutlined />}
+            <div className={styles.projectIconBox}>
+              {mode.icon}
             </div>
             <div className={styles.projectMeta}>
               <div className={styles.projectName}>{state.project.name}</div>
@@ -228,46 +164,35 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
               )}
             </div>
           </div>
-          
-          <div className={styles.infoList}>
+
+          <div className={styles.infoGrid}>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>项目类型</span>
-              <span className={styles.infoValue}>
-                <Tag color="blue">{currentTemplate.name || '自定义'}</Tag>
-              </span>
+              <span className={styles.infoLabel}>创作模式</span>
+              <span className={styles.infoValue}>{mode.name}</span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>创建时间</span>
               <span className={styles.infoValue}>
-                {new Date(state.project.createdAt).toLocaleString('zh-CN')}
+                {new Date(state.project.createdAt).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>输出格式</span>
-              <span className={styles.infoValue}>
-                {state.project.settings?.outputFormat?.toUpperCase() || 'MP4'}
-              </span>
+              <span className={styles.infoValue}>{templateSettings.outputFormat.toUpperCase()}</span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>分辨率</span>
-              <span className={styles.infoValue}>
-                {state.project.settings?.resolution || '1080p'}
-              </span>
+              <span className={styles.infoValue}>{templateSettings.resolution}</span>
             </div>
           </div>
-          
-          <Divider />
-          
-          <Button 
-            type="primary" 
-            icon={<ArrowRightOutlined />}
-            onClick={goToNextStep}
-            block
-            size="large"
-          >
+
+          <button className={styles.nextBtn} onClick={goToNextStep}>
             下一步：上传视频
-          </Button>
-        </Card>
+            <svg className={styles.nextBtnArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
     );
   }
@@ -276,106 +201,86 @@ const ProjectCreate: React.FC<ProjectCreateProps> = ({ onNext }) => {
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepTitle}>
-        <Title level={4}>创建新项目</Title>
-        <Paragraph>
-          选择项目模板，快速创建您的视频剪辑项目
-        </Paragraph>
+        <h2>创建新项目</h2>
+        <p>选择创作模式，为你的视频选择最适合的 AI 表达方式</p>
       </div>
 
-      {/* 项目模板选择 */}
-      <div className={styles.templateGrid}>
-        {PROJECT_TEMPLATES.map((template) => (
-          <div
-            key={template.id}
-            className={`${styles.templateCard} ${selectedTemplate === template.id ? styles.active : ''}`}
-            onClick={() => {
-              setSelectedTemplate(template.id);
-              form.setFieldValue('type', template.id);
-            }}
-          >
-            <span 
-              className={styles.templateIcon}
-              style={{ color: template.color }}
+      {/* 模式选择 */}
+      <div className={styles.modeSection}>
+        <span className={styles.modeLabel}>选择创作模式</span>
+        <div className={styles.modeGrid}>
+          {MODE_OPTIONS.map((mode) => (
+            <div
+              key={mode.id}
+              className={`${styles.modeCard} ${selectedMode === mode.id ? styles.modeActive : ''}`}
+              onClick={() => setSelectedMode(mode.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setSelectedMode(mode.id)}
+              aria-pressed={selectedMode === mode.id}
             >
-              {template.icon}
-            </span>
-            <div className={styles.templateName}>{template.name}</div>
-            <div className={styles.templateDesc}>{template.desc}</div>
-            {selectedTemplate === template.id && (
-              <CheckCircleOutlined style={{ color: template.color, marginTop: 8 }} />
-            )}
-          </div>
-        ))}
+              <div className={styles.modeCheckIcon}>
+                <div className={styles.modeCheckDot} />
+              </div>
+              <span className={styles.modeIcon}>{mode.icon}</span>
+              <span className={styles.modeName}>{mode.name}</span>
+              <span className={styles.modeDesc}>{mode.desc}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <Card className={styles.formCard}>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleCreateProject}
-          initialValues={{
-            type: 'marketing',
-            name: defaultProjectName,
-          }}
-        >
-          <Form.Item
-            name="name"
-            label="项目名称"
-            rules={[
-              {
-                validator: (_, value: string) => {
-                  const normalizedValue = normalizeText(value);
-                  if (normalizedValue && normalizedValue.length < 2) {
-                    return Promise.reject(new Error('项目名称至少2个字符'));
-                  }
-                  return Promise.resolve();
-                },
-              },
-            ]}
-          >
-            <Input 
-              placeholder="例如：产品宣传视频" 
+      {/* 玻璃拟态表单卡片 */}
+      <div className={styles.formCard}>
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel} htmlFor="projectName">项目名称</label>
+          <div className={styles.inputWrapper}>
+            <input
+              id="projectName"
+              className={styles.textInput}
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              placeholder="例如：产品宣传视频"
               maxLength={50}
-              showCount
-              size="large"
+              aria-label="项目名称"
             />
-          </Form.Item>
+          </div>
+        </div>
 
-          <Form.Item
-            name="type"
-            label="项目类型"
-            rules={[{ required: true, message: '请选择项目类型' }]}
-            hidden
-          >
-            <Select />
-          </Form.Item>
-
-          <Form.Item
-            name="description"
-            label="项目描述（可选）"
-          >
-            <TextArea 
-              placeholder="简要描述项目的目标和内容..." 
-              rows={3}
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel} htmlFor="projectDesc">项目描述（可选）</label>
+          <div className={styles.inputWrapper}>
+            <textarea
+              id="projectDesc"
+              className={styles.textareaInput}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="简要描述项目的目标和内容..."
               maxLength={200}
-              showCount
+              rows={3}
+              aria-label="项目描述"
             />
-          </Form.Item>
+          </div>
+        </div>
 
-          <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={loading}
-              icon={<PlusOutlined />}
-              block
-              size="large"
-            >
-              创建项目
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
+        <button
+          className={styles.createBtn}
+          onClick={handleCreateProject}
+          disabled={loading}
+          aria-busy={loading}
+        >
+          <svg className={styles.createBtnIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span className={styles.createBtnText}>{loading ? '创建中...' : '创建项目'}</span>
+        </button>
+      </div>
+
+      <div className={styles.hintAlert}>
+        <strong>💡 提示：</strong> 选择创作模式后，AI 将根据该模式生成最适合的文案和效果
+      </div>
     </div>
   );
 };

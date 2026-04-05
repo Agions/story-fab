@@ -1,23 +1,9 @@
-import { logger } from '@/utils/logger';
 /**
- * 步骤5: 视频合成 - 优化版
- * 
+ * 步骤5: 视频合成 — AI Cinema Studio Redesign
  * 数据输入: video, script, voice
  * 数据输出: synthesis (最终合成视频)
  */
 import React, { useState, useCallback, useMemo } from 'react';
-import { 
-  Card, Button, Space, Typography, Tag,
-  Switch, Slider, Alert, Progress, Tabs, Row, Col, Badge, Radio
-} from 'antd';
-import {
-  PlayCircleOutlined,
-  SoundOutlined,
-  VideoCameraOutlined,
-  SyncOutlined,
-  FontSizeOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons';
 import { useCutDeck } from '../AIEditorContext';
 import { voiceSynthesisService } from '@/core/services/voice-synthesis.service';
 import { videoEffectService } from '@/core/services/video-effect.service';
@@ -27,34 +13,7 @@ import { orchestrateCommentaryAgents } from '@/core/services/workflow/agents';
 import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '@/core/workflow/alignmentGate';
 import { FEATURE_TO_FUNCTION, FUNCTION_TO_MODE } from './functionModeMap';
 import { notify } from '@/shared';
-import styles from './CutDeck.module.less';
-
-const { Title, Text, Paragraph } = Typography;
-const { TabPane } = Tabs;
-
-// 配音角色
-const VOICE_OPTIONS = [
-  { value: 'female_zh', label: '🎤 女声 (中文)', desc: '温柔甜美', style: 'warm' },
-  { value: 'male_zh', label: '🎤 男声 (中文)', desc: '成熟稳重', style: 'deep' },
-  { value: 'neutral', label: '🎤 中性声音', desc: '通用场景', style: 'neutral' },
-];
-
-// 特效风格
-const EFFECT_STYLES = [
-  { value: 'none', label: '无', desc: '保持原样' },
-  { value: 'cinematic', label: '电影感', desc: '调色+暗角' },
-  { value: 'vivid', label: '鲜艳', desc: '色彩增强' },
-  { value: 'retro', label: '复古', desc: '怀旧色调' },
-  { value: 'cool', label: '冷色调', desc: '蓝色系' },
-  { value: 'warm', label: '暖色调', desc: '橙色系' },
-];
-
-// 字幕位置
-const SUBTITLE_POSITIONS = [
-  { value: 'bottom', label: '底部' },
-  { value: 'center', label: '中间' },
-  { value: 'top', label: '顶部' },
-];
+import styles from './VideoSynthesize.module.less';
 
 interface VideoSynthesizeProps {
   onNext?: () => void;
@@ -81,13 +40,36 @@ const EFFECT_PRESET_MAP: Record<string, string | null> = {
   warm: 'warm',
 };
 
+// 配音角色
+const VOICE_OPTIONS = [
+  { value: 'female_zh', label: '女声 (中文)', desc: '温柔甜美', emoji: '🎤' },
+  { value: 'male_zh', label: '男声 (中文)', desc: '成熟稳重', emoji: '🎙️' },
+  { value: 'neutral', label: '中性声音', desc: '通用场景', emoji: '🔊' },
+];
+
+// 特效风格
+const EFFECT_STYLES = [
+  { value: 'none', label: '无', desc: '保持原样' },
+  { value: 'cinematic', label: '电影感', desc: '调色+暗角' },
+  { value: 'vivid', label: '鲜艳', desc: '色彩增强' },
+  { value: 'retro', label: '复古', desc: '怀旧色调' },
+  { value: 'cool', label: '冷色调', desc: '蓝色系' },
+  { value: 'warm', label: '暖色调', desc: '橙色系' },
+];
+
+// 字幕位置
+const SUBTITLE_POSITIONS = [
+  { value: 'bottom', label: '底部' },
+  { value: 'center', label: '中间' },
+  { value: 'top', label: '顶部' },
+];
+
 const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
   const { state, setVoice, setSynthesis, goToNextStep, dispatch } = useCutDeck();
   const [synthesizing, setSynthesizing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [activeTab, setActiveTab] = useState('voice');
-  
-  // 合成配置
+  const [activeTab, setActiveTab] = useState<'voice' | 'subtitle' | 'effect'>('voice');
+
   const [config, setConfig] = useState<SynthesizeConfig>({
     voiceId: 'female_zh',
     voiceSpeed: 100,
@@ -130,7 +112,6 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
     };
   }, [state.analysis, state.scriptData.narration, state.scriptData.remix, state.selectedFeature]);
 
-  // 生成配音
   const handleGenerateVoice = useCallback(async () => {
     const scriptContent = getCurrentScriptContent();
     if (!scriptContent) {
@@ -142,12 +123,10 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
     setProgress(0);
 
     try {
-      // TODO: 实际配音生成
       setProgress(30);
       const voiceResult = await voiceSynthesisService.synthesize(scriptContent);
-      
+
       setProgress(60);
-      // TODO: voiceResult.audioUrl 应为实际的配音 URL
       if (voiceResult.audioUrl) {
         setVoice(voiceResult.audioUrl, {
           voiceId: config.voiceId,
@@ -155,18 +134,16 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
           volume: config.voiceVolume / 100
         });
       }
-      
+
       setProgress(100);
       notify.success('配音生成功能待实现');
     } catch (error) {
-      logger.error('配音生成失败:', { error });
       notify.error(error, '配音生成失败');
     } finally {
       setSynthesizing(false);
     }
   }, [config.voiceId, config.voiceSpeed, config.voiceVolume, setVoice]);
 
-  // 开始合成
   const handleSynthesize = async () => {
     if (!state.currentVideo) {
       notify.warning('请先上传视频');
@@ -183,19 +160,16 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
     setProgress(0);
 
     try {
-      // 1. 生成配音
       if (config.enableVoice && !state.voiceData.audioUrl) {
         setProgress(20);
         await handleGenerateVoice();
       }
 
-      // 2. 生成字幕
       if (config.enableSubtitle) {
         setProgress(40);
         await subtitleService.generateFromAudio(state.voiceData.audioUrl || state.currentVideo.path);
       }
 
-      // 3. 应用特效
       if (config.enableEffect) {
         setProgress(60);
         const presetId = EFFECT_PRESET_MAP[config.effectStyle];
@@ -206,13 +180,11 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
         }
       }
 
-      // 4. 音画同步
       if (config.syncAudioVideo) {
         setProgress(80);
         await audioVideoSyncService.autoSync(state.currentVideo.path, state.voiceData.audioUrl || undefined);
       }
 
-      // 5. 完成
       setProgress(100);
       setSynthesis(`${state.currentVideo.path}?synthesized=${Date.now()}`, {
         syncAudioVideo: config.syncAudioVideo,
@@ -228,14 +200,13 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
       }, 500);
 
     } catch (error) {
-      logger.error('合成失败:', { error });
       notify.error(error, '视频合成失败');
     } finally {
       setSynthesizing(false);
     }
   };
 
-  // 检查前置条件
+  // ==== 前置条件检查 ====
   const hasVideo = !!state.currentVideo;
   const hasScript = !!getCurrentScriptContent();
   const hasVoice = !!state.voiceData.audioUrl;
@@ -243,278 +214,428 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = ({ onNext }) => {
 
   if (!hasVideo) {
     return (
-      <Alert
-        message="请先上传视频"
-        description="请先完成视频上传"
-        type="warning"
-        showIcon
-        action={
-          <Button type="primary" onClick={() => dispatch({ type: 'SET_STEP', payload: 'video-upload' })}>
+      <div className={styles.stepContent}>
+        <div className={styles.stepTitle}>
+          <div className={styles.stepTitleLeft}>
+            <h2>⚙️ 视频合成配置</h2>
+          </div>
+        </div>
+        <div className={styles.warningAlert}>
+          ⚠️ 请先上传视频
+          <button
+            className={styles.warningAlertBtn}
+            onClick={() => dispatch({ type: 'SET_STEP', payload: 'video-upload' })}
+          >
             去上传
-          </Button>
-        }
-      />
+          </button>
+        </div>
+      </div>
     );
   }
 
   if (!hasScript && config.enableVoice) {
     return (
-      <Alert
-        message="请先生成文案"
-        description="请先完成文案生成步骤"
-        type="warning"
-        showIcon
-        action={
-          <Button type="primary" onClick={() => dispatch({ type: 'SET_STEP', payload: 'script-generate' })}>
+      <div className={styles.stepContent}>
+        <div className={styles.stepTitle}>
+          <div className={styles.stepTitleLeft}>
+            <h2>⚙️ 视频合成配置</h2>
+          </div>
+        </div>
+        <div className={styles.warningAlert}>
+          ⚠️ 请先生成文案
+          <button
+            className={styles.warningAlertBtn}
+            onClick={() => dispatch({ type: 'SET_STEP', payload: 'script-generate' })}
+          >
             去生成文案
-          </Button>
-        }
-      />
+          </button>
+        </div>
+      </div>
     );
   }
 
-  // 已合成
+  // ==== 合成中 ====
+  if (synthesizing) {
+    const circumference = 2 * Math.PI * 45; // r=45
+    const offset = circumference - (progress / 100) * circumference;
+
+    return (
+      <div className={styles.stepContent}>
+        <div className={styles.synthesizingCard}>
+          <div className={styles.synthesizeProgressCircle}>
+            <svg className={styles.synthesizeProgressCircleSvg} viewBox="0 0 100 100">
+              <circle className={styles.synthesizeProgressCircleTrack} cx="50" cy="50" r="45" />
+              <circle
+                className={styles.synthesizeProgressCircleFill}
+                cx="50"
+                cy="50"
+                r="45"
+                style={{ strokeDashoffset: offset }}
+              />
+            </svg>
+            <div className={styles.synthesizeProgressPercent}>{progress}%</div>
+          </div>
+          <div className={styles.synthesizeProgressLabel}>
+            {progress < 30 ? '🎤 生成配音中...' :
+             progress < 60 ? '📝 生成字幕中...' :
+             progress < 80 ? '✨ 应用特效中...' :
+             '🔗 音画同步中...'}
+          </div>
+          <div className={styles.synthesizeProgressSub}>请耐心等待...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==== 已合成完成 ====
   if (state.synthesisData?.finalVideoUrl && state.stepStatus['video-synthesize']) {
     return (
       <div className={styles.stepContent}>
         <div className={styles.stepTitle}>
-          <Space>
-            <Title level={4} style={{ margin: 0 }}>🎬 视频合成完成</Title>
-            <Badge status="success" text="已合成" />
-          </Space>
+          <div className={styles.stepTitleLeft}>
+            <h2>🎬 视频合成完成</h2>
+            <span className={styles.statusBadge}>
+              <span className={styles.statusBadgeDot} />
+              已合成
+            </span>
+          </div>
         </div>
 
-        <Card>
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <div style={{ fontSize: 64, marginBottom: 16 }}>✅</div>
-            <Title level={3}>视频合成成功！</Title>
-            <Paragraph>您的视频已准备就绪，可以进行导出</Paragraph>
-            <Space>
-              <Button icon={<PlayCircleOutlined />}>预览效果</Button>
-              <Button type="primary" icon={<VideoCameraOutlined />} onClick={goToNextStep}>
-                下一步：导出视频
-              </Button>
-            </Space>
+        <div className={styles.completeCard}>
+          <svg className={styles.completeIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+          <h3 className={styles.completeTitle}>视频合成成功！</h3>
+          <p className={styles.completeDesc}>您的视频已准备就绪，可以进行导出</p>
+          <div className={styles.completeActions}>
+            <button className={`${styles.completeBtn} ${styles.completeBtnSecondary}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="10 8 16 12 10 16 10 8" />
+              </svg>
+              预览效果
+            </button>
+            <button
+              className={`${styles.completeBtn} ${styles.completeBtnPrimary}`}
+              onClick={goToNextStep}
+            >
+              下一步：导出视频
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
-        </Card>
+        </div>
       </div>
     );
   }
 
-  // 合成中
-  if (synthesizing) {
-    return (
-      <Card>
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <Progress 
-            type="circle" 
-            percent={progress} 
-            status="active"
-            strokeColor={{ '0%': '#108ee9', '100%': '#52c41a' }}
-          />
-          <div style={{ marginTop: 24 }}>
-            <Title level={4}>
-              {progress < 30 ? '🎤 生成配音中...' : 
-               progress < 60 ? '📝 生成字幕中...' : 
-               progress < 80 ? '✨ 应用特效中...' : 
-               '🔗 音画同步中...'}
-            </Title>
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
-  // 配置界面
+  // ==== 配置界面 ====
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepTitle}>
-        <Space>
-          <Title level={4} style={{ margin: 0 }}>⚙️ 视频合成配置</Title>
-        </Space>
+        <div className={styles.stepTitleLeft}>
+          <h2>⚙️ 视频合成配置</h2>
+        </div>
       </div>
 
       {alignmentQuality && (
-        <Alert
-          type={alignmentQuality.passed ? 'success' : 'warning'}
-          showIcon
-          style={{ marginBottom: 16 }}
-          message={alignmentQuality.passed ? '音画对齐质量通过' : '音画对齐建议优化'}
-          description={`平均置信度 ${alignmentQuality.averageConfidence.toFixed(2)}（阈值 ${ALIGNMENT_GATE_THRESHOLD.minConfidence}），最大漂移 ${alignmentQuality.maxDriftSeconds.toFixed(2)}s（阈值 ${ALIGNMENT_GATE_THRESHOLD.maxDriftSeconds}s），原画覆盖建议 ${alignmentQuality.overlayCount} 段。`}
-        />
+        <div className={`${styles.alignmentAlert} ${alignmentQuality.passed ? styles.alertSuccess : styles.alertWarning}`}>
+          <svg className={styles.alertIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {alignmentQuality.passed
+              ? <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></>
+              : <><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></>}
+          </svg>
+          <div>
+            <div className={styles.alertTitle}>
+              {alignmentQuality.passed ? '✓ 音画对齐质量通过' : '⚠ 音画对齐建议优化'}
+            </div>
+            <div>
+              平均置信度 {alignmentQuality.averageConfidence.toFixed(2)}（阈值 {ALIGNMENT_GATE_THRESHOLD.minConfidence}），
+              最大漂移 {alignmentQuality.maxDriftSeconds.toFixed(2)}s（阈值 {ALIGNMENT_GATE_THRESHOLD.maxDriftSeconds}s），
+              原画覆盖建议 {alignmentQuality.overlayCount} 段。
+            </div>
+          </div>
+        </div>
       )}
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        {/* 配音设置 */}
-        <TabPane tab={<><SoundOutlined /> 配音设置</>} key="voice">
-          <Card size="small">
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
-              <div>
-                <Switch 
-                  checked={config.enableVoice} 
-                  onChange={(v) => setConfig({ ...config, enableVoice: v })}
-                />
-                <Text style={{ marginLeft: 8 }}>启用配音</Text>
+      {/* 预览播放器 */}
+      <div className={styles.previewSection}>
+        <div className={styles.previewPlayer}>
+          {state.currentVideo ? (
+            <>
+              <video
+                className={styles.previewVideo}
+                src={state.currentVideo.path}
+                muted
+                aria-label="视频预览"
+              />
+              <div className={styles.previewOverlay}>
+                <button className={styles.playBtn} aria-label="播放预览">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </button>
               </div>
+            </>
+          ) : (
+            <div className={styles.previewPlaceholder}>
+              <svg className={styles.previewPlaceholderIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7" />
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+              </svg>
+              <span className={styles.previewPlaceholderText}>视频预览</span>
+            </div>
+          )}
+        </div>
+      </div>
 
-              {config.enableVoice && (
-                <>
-                  <div>
-                    <Text strong style={{ display: 'block', marginBottom: 8 }}>选择音色</Text>
-                    <Radio.Group 
-                      value={config.voiceId} 
-                      onChange={(e) => setConfig({ ...config, voiceId: e.target.value })}
+      {/* Tab 切换 */}
+      <div className={styles.tabs}>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'voice' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('voice')}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
+          </svg>
+          配音设置
+        </button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'subtitle' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('subtitle')}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="15" width="20" height="4" rx="1" />
+            <path d="M6 11h4M14 11h4M6 7h12" />
+          </svg>
+          字幕设置
+        </button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'effect' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('effect')}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+          特效设置
+        </button>
+      </div>
+
+      <div className={styles.panelCard}>
+        {/* 配音设置 */}
+        {activeTab === 'voice' && (
+          <div className={styles.panelBody}>
+            <div className={styles.switchRow}>
+              <div>
+                <div className={styles.switchLabel}>启用配音</div>
+                <div className={styles.switchSub}>为视频添加 AI 配音</div>
+              </div>
+              <button
+                className={`${styles.toggle} ${config.enableVoice ? styles.toggleOn : ''}`}
+                onClick={() => setConfig({ ...config, enableVoice: !config.enableVoice })}
+                role="switch"
+                aria-checked={config.enableVoice}
+              />
+            </div>
+
+            {config.enableVoice && (
+              <>
+                {/* 音色选择 */}
+                <div className={styles.voiceGrid}>
+                  {VOICE_OPTIONS.map(voice => (
+                    <div
+                      key={voice.value}
+                      className={`${styles.voiceItem} ${config.voiceId === voice.value ? styles.voiceActive : ''}`}
+                      onClick={() => setConfig({ ...config, voiceId: voice.value })}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, voiceId: voice.value })}
                     >
-                      <Space direction="vertical" style={{ width: '100%' }}>
-                        {VOICE_OPTIONS.map(voice => (
-                          <Radio key={voice.value} value={voice.value} style={{ width: '100%', marginRight: 0, padding: '8px 12px', border: config.voiceId === voice.value ? '1px solid #1890ff' : '1px solid #d9d9d9', borderRadius: 8 }}>
-                            <Space>
-                              <Text>{voice.label}</Text>
-                              <Text type="secondary" style={{ fontSize: 12 }}>({voice.desc})</Text>
-                            </Space>
-                          </Radio>
-                        ))}
-                      </Space>
-                    </Radio.Group>
+                      <div className={styles.voiceCheck}>
+                        <div className={styles.voiceCheckDot} />
+                      </div>
+                      <div className={styles.voiceName}>
+                        <span className={styles.voiceEmoji}>{voice.emoji}</span>
+                        {voice.label}
+                      </div>
+                      <div className={styles.voiceDesc}>{voice.desc}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 语速滑块 */}
+                <div className={styles.sliderGroup}>
+                  <div className={styles.sliderHeader}>
+                    <span className={styles.sliderLabel}>语速</span>
+                    <span className={styles.sliderValue}>{config.voiceSpeed}%</span>
                   </div>
+                  <div className={styles.sliderTrack}>
+                    <div
+                      className={styles.sliderFill}
+                      style={{ width: `${((config.voiceSpeed - 50) / 100) * 100}%` }}
+                    />
+                    <div className={styles.sliderThumb} style={{ left: `${((config.voiceSpeed - 50) / 100) * 100}%` }} />
+                    <input
+                      type="range"
+                      className={styles.sliderInput}
+                      min={50}
+                      max={150}
+                      value={config.voiceSpeed}
+                      onChange={(e) => setConfig({ ...config, voiceSpeed: Number(e.target.value) })}
+                      aria-label="语速"
+                    />
+                  </div>
+                </div>
 
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Text strong style={{ display: 'block', marginBottom: 8 }}>语速: {config.voiceSpeed}%</Text>
-                      <Slider 
-                        min={50} 
-                        max={150} 
-                        value={config.voiceSpeed}
-                        onChange={(value) => setConfig({ ...config, voiceSpeed: Array.isArray(value) ? value[0] : value })}
-                      />
-                    </Col>
-                    <Col span={12}>
-                      <Text strong style={{ display: 'block', marginBottom: 8 }}>音量: {config.voiceVolume}%</Text>
-                      <Slider 
-                        min={0} 
-                        max={100} 
-                        value={config.voiceVolume}
-                        onChange={(value) => setConfig({ ...config, voiceVolume: Array.isArray(value) ? value[0] : value })}
-                      />
-                    </Col>
-                  </Row>
+                {/* 音量滑块 */}
+                <div className={styles.sliderGroup}>
+                  <div className={styles.sliderHeader}>
+                    <span className={styles.sliderLabel}>音量</span>
+                    <span className={styles.sliderValue}>{config.voiceVolume}%</span>
+                  </div>
+                  <div className={styles.sliderTrack}>
+                    <div
+                      className={styles.sliderFill}
+                      style={{ width: `${config.voiceVolume}%` }}
+                    />
+                    <div className={styles.sliderThumb} style={{ left: `${config.voiceVolume}%` }} />
+                    <input
+                      type="range"
+                      className={styles.sliderInput}
+                      min={0}
+                      max={100}
+                      value={config.voiceVolume}
+                      onChange={(e) => setConfig({ ...config, voiceVolume: Number(e.target.value) })}
+                      aria-label="音量"
+                    />
+                  </div>
+                </div>
 
-                  <Space>
-                    <Button 
-                      icon={<SoundOutlined />} 
-                      onClick={handleGenerateVoice}
-                      loading={synthesizing}
-                    >
-                      {hasVoice ? '重新生成配音' : '生成配音'}
-                    </Button>
-                    {hasVoice && <Badge status="success" text="已生成" />}
-                  </Space>
-                </>
-              )}
-            </Space>
-          </Card>
-        </TabPane>
+                {/* 生成配音按钮 */}
+                <div className={styles.statusRow}>
+                  {hasVoice ? (
+                    <>
+                      <span className={`${styles.statusDot} ${styles.dotGreen}`} />
+                      <span>配音已就绪</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className={`${styles.statusDot} ${styles.dotRed}`} />
+                      <span>请先生成配音</span>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* 字幕设置 */}
-        <TabPane tab={<><FontSizeOutlined /> 字幕设置</>} key="subtitle">
-          <Card size="small">
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        {activeTab === 'subtitle' && (
+          <div className={styles.panelBody}>
+            <div className={styles.switchRow}>
               <div>
-                <Switch 
-                  checked={config.enableSubtitle} 
-                  onChange={(v) => setConfig({ ...config, enableSubtitle: v })}
-                />
-                <Text style={{ marginLeft: 8 }}>启用字幕</Text>
+                <div className={styles.switchLabel}>启用字幕</div>
+                <div className={styles.switchSub}>自动生成同步字幕</div>
               </div>
+              <button
+                className={`${styles.toggle} ${config.enableSubtitle ? styles.toggleOn : ''}`}
+                onClick={() => setConfig({ ...config, enableSubtitle: !config.enableSubtitle })}
+                role="switch"
+                aria-checked={config.enableSubtitle}
+              />
+            </div>
 
-              {config.enableSubtitle && (
-                <>
-                  <div>
-                    <Text strong style={{ display: 'block', marginBottom: 8 }}>字幕位置</Text>
-                    <Radio.Group 
-                      value={config.subtitlePosition}
-                      onChange={(e) => setConfig({ ...config, subtitlePosition: e.target.value })}
+            {config.enableSubtitle && (
+              <>
+                <div className={styles.sliderLabel} style={{ marginBottom: '10px', display: 'block' }}>字幕位置</div>
+                <div className={styles.positionGroup}>
+                  {SUBTITLE_POSITIONS.map(pos => (
+                    <button
+                      key={pos.value}
+                      className={`${styles.positionBtn} ${config.subtitlePosition === pos.value ? styles.positionActive : ''}`}
+                      onClick={() => setConfig({ ...config, subtitlePosition: pos.value as 'bottom' | 'center' | 'top' })}
                     >
-                      {SUBTITLE_POSITIONS.map(pos => (
-                        <Radio.Button key={pos.value} value={pos.value}>{pos.label}</Radio.Button>
-                      ))}
-                    </Radio.Group>
-                  </div>
-                </>
-              )}
-            </Space>
-          </Card>
-        </TabPane>
+                      {pos.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* 特效设置 */}
-        <TabPane tab={<><ThunderboltOutlined /> 特效设置</>} key="effect">
-          <Card size="small">
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        {activeTab === 'effect' && (
+          <div className={styles.panelBody}>
+            <div className={styles.switchRow}>
               <div>
-                <Switch 
-                  checked={config.enableEffect} 
-                  onChange={(v) => setConfig({ ...config, enableEffect: v })}
-                />
-                <Text style={{ marginLeft: 8 }}>启用视频特效</Text>
+                <div className={styles.switchLabel}>启用视频特效</div>
+                <div className={styles.switchSub}>为视频添加视觉特效</div>
               </div>
+              <button
+                className={`${styles.toggle} ${config.enableEffect ? styles.toggleOn : ''}`}
+                onClick={() => setConfig({ ...config, enableEffect: !config.enableEffect })}
+                role="switch"
+                aria-checked={config.enableEffect}
+              />
+            </div>
 
-              {config.enableEffect && (
-                <>
-                  <Text strong style={{ display: 'block', marginBottom: 8 }}>特效风格</Text>
-                  <Row gutter={[8, 8]}>
-                    {EFFECT_STYLES.map(style => (
-                      <Col span={8} key={style.value}>
-                        <div 
-                          onClick={() => setConfig({ ...config, effectStyle: style.value })}
-                          style={{ 
-                            padding: 12, 
-                            textAlign: 'center',
-                            border: `2px solid ${config.effectStyle === style.value ? '#1890ff' : '#e8e8e8'}`,
-                            borderRadius: 8,
-                            cursor: 'pointer',
-                            background: config.effectStyle === style.value ? '#e6f7ff' : '#fff',
-                          }}
-                        >
-                          <Text strong>{style.label}</Text>
-                          <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>
-                            {style.desc}
-                          </Text>
-                        </div>
-                      </Col>
-                    ))}
-                  </Row>
-                </>
-              )}
-            </Space>
-          </Card>
-        </TabPane>
-      </Tabs>
+            {config.enableEffect && (
+              <>
+                <div className={styles.sliderLabel} style={{ marginBottom: '10px', display: 'block' }}>特效风格</div>
+                <div className={styles.effectGrid}>
+                  {EFFECT_STYLES.map(style => (
+                    <div
+                      key={style.value}
+                      className={`${styles.effectItem} ${config.effectStyle === style.value ? styles.effectActive : ''}`}
+                      onClick={() => setConfig({ ...config, effectStyle: style.value })}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, effectStyle: style.value })}
+                    >
+                      <div className={styles.effectName}>{style.label}</div>
+                      <div className={styles.effectDesc}>{style.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* 合成按钮 */}
-      <Card style={{ marginTop: 16 }}>
-        <div style={{ textAlign: 'center' }}>
-          <Space direction="vertical">
-            <div>
-              <Text type="secondary">
-                {hasVoice ? '✅ 配音已就绪' : '❌ 请先生成配音'}
-              </Text>
-            </div>
-            <Button 
-              type="primary" 
-              size="large"
-              icon={<SyncOutlined />}
-              onClick={handleSynthesize}
-              disabled={!canProceed}
-              style={{ 
-                background: canProceed ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined,
-                border: 'none'
-              }}
-            >
-              开始合成视频
-            </Button>
-          </Space>
+      <div className={styles.synthesizeSection}>
+        <div className={styles.statusRow}>
+          {hasVoice ? (
+            <>
+              <span className={`${styles.statusDot} ${styles.dotGreen}`} />
+              <span>✅ 配音已就绪</span>
+            </>
+          ) : (
+            <>
+              <span className={`${styles.statusDot} ${styles.dotRed}`} />
+              <span>❌ 请先生成配音</span>
+            </>
+          )}
         </div>
-      </Card>
+        <button
+          className={`${styles.synthesizeBtn} ${canProceed ? styles.synthesizeBtnReady : ''}`}
+          onClick={handleSynthesize}
+          disabled={!canProceed}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+          开始合成视频
+        </button>
+      </div>
     </div>
   );
 };
