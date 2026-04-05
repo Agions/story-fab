@@ -1,5 +1,5 @@
 /**
- * StoryForge 设计系统
+ * CutDeck 设计系统
  * 电影级视频创作平台的视觉语言
  * 
  * 设计理念：Cinematic Dark - 深邃的电影级界面

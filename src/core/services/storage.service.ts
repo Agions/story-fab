@@ -9,12 +9,12 @@ type StoredAppState = Record<string, unknown>;
 
 // 存储键名
 const STORAGE_KEYS = {
-  PROJECTS: 'storyforge_projects',
-  APP_STATE: 'storyforge_app_state',
-  USER_PREFERENCES: 'storyforge_preferences',
-  RECENT_FILES: 'storyforge_recent_files',
-  MODEL_SETTINGS: 'storyforge_model_settings',
-  EXPORT_HISTORY: 'storyforge_export_history'
+  PROJECTS: 'cutdeck_projects',
+  APP_STATE: 'cutdeck_app_state',
+  USER_PREFERENCES: 'cutdeck_preferences',
+  RECENT_FILES: 'cutdeck_recent_files',
+  MODEL_SETTINGS: 'cutdeck_model_settings',
+  EXPORT_HISTORY: 'cutdeck_export_history'
 };
 
 export class StorageService {
@@ -215,16 +215,16 @@ export class StorageService {
    * 通用存储
    */
   set<T>(key: string, value: T): void {
-    localStorage.setItem(`storyforge_${key}`, JSON.stringify(value));
+    localStorage.setItem(`cutdeck_${key}`, JSON.stringify(value));
   }
 
   get<T>(key: string, defaultValue?: T): T | undefined {
-    const data = localStorage.getItem(`storyforge_${key}`);
+    const data = localStorage.getItem(`cutdeck_${key}`);
     return data ? JSON.parse(data) : defaultValue;
   }
 
   remove(key: string): void {
-    localStorage.removeItem(`storyforge_${key}`);
+    localStorage.removeItem(`cutdeck_${key}`);
   }
 
   /**
@@ -235,11 +235,11 @@ export class StorageService {
       localStorage.removeItem(key);
     });
 
-    // 清理所有 storyforge_ 前缀的数据
+    // 清理所有 cutdeck_ 前缀的数据
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('storyforge_')) {
+      if (key?.startsWith('cutdeck_')) {
         keysToRemove.push(key);
       }
     }
@@ -254,7 +254,7 @@ export class StorageService {
 
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('storyforge_')) {
+      if (key?.startsWith('cutdeck_')) {
         const value = localStorage.getItem(key);
         data[key] = value ? JSON.parse(value) : null;
       }
@@ -285,7 +285,7 @@ export class StorageService {
     let used = 0;
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('storyforge_')) {
+      if (key?.startsWith('cutdeck_')) {
         const value = localStorage.getItem(key);
         if (value) {
           used += key.length + value.length;

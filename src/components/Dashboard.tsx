@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
       } catch (error) {
         // API 不可用时使用本地存储
         logger.warn('API 不可用，使用本地存储');
-        const localProjects = localStorage.getItem('storyforge_projects');
+        const localProjects = localStorage.getItem('cutdeck_projects');
         setProjects(localProjects ? JSON.parse(localProjects) : []);
       } finally {
         setLoading(false);
@@ -88,9 +88,9 @@ const Dashboard: React.FC = () => {
       setProjects(prev => [newProject, ...prev]);
       
       // 保存到本地存储作为备份
-      const localProjects = JSON.parse(localStorage.getItem('storyforge_projects') || '[]');
+      const localProjects = JSON.parse(localStorage.getItem('cutdeck_projects') || '[]');
       localProjects.unshift(newProject);
-      localStorage.setItem('storyforge_projects', JSON.stringify(localProjects));
+      localStorage.setItem('cutdeck_projects', JSON.stringify(localProjects));
       
       notify.success('项目创建成功');
     } catch (error) {
@@ -107,9 +107,9 @@ const Dashboard: React.FC = () => {
       
       setProjects(prev => [localProject, ...prev]);
       
-      const localProjects = JSON.parse(localStorage.getItem('storyforge_projects') || '[]');
+      const localProjects = JSON.parse(localStorage.getItem('cutdeck_projects') || '[]');
       localProjects.unshift(localProject);
-      localStorage.setItem('storyforge_projects', JSON.stringify(localProjects));
+      localStorage.setItem('cutdeck_projects', JSON.stringify(localProjects));
       
       notify.success('项目已保存到本地');
     }
@@ -150,9 +150,9 @@ const Dashboard: React.FC = () => {
         setProjects(prev => prev.filter(project => project.id !== projectId));
         
         // 从本地存储删除
-        const localProjects = JSON.parse(localStorage.getItem('storyforge_projects') || '[]');
+        const localProjects = JSON.parse(localStorage.getItem('cutdeck_projects') || '[]');
         const filtered = localProjects.filter((p: Project) => p.id !== projectId);
-        localStorage.setItem('storyforge_projects', JSON.stringify(filtered));
+        localStorage.setItem('cutdeck_projects', JSON.stringify(filtered));
       }
     });
   };

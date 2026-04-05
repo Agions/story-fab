@@ -1,5 +1,5 @@
 /**
- * StoryForge Landing Page
+ * CutDeck Landing Page
  * 电影级 AI 视频创作平台首页
  */
 
@@ -138,7 +138,7 @@ export const LandingPage: React.FC = () => {
               <rect x="4" y="4" width="32" height="32" rx="8" fill="url(#logoGradient)" />
               <path d="M14 12L28 20L14 28V12Z" fill="white" />
             </svg>
-            <span className={styles.logoText}>StoryForge</span>
+            <span className={styles.logoText}>CutDeck</span>
           </div>
 
           <div className={styles.navLinks}>
@@ -176,7 +176,7 @@ export const LandingPage: React.FC = () => {
           </h1>
 
           <p className={styles.heroDescription}>
-            StoryForge 是一款 AI 驱动的视频创作平台。智能分析剧情、精准提取高光、
+            CutDeck 是一款 AI 驱动的视频创作平台。智能分析剧情、精准提取高光、
             <br />
             一键生成专业级剪辑，让创作变得前所未有的简单。
           </p>
@@ -214,7 +214,7 @@ export const LandingPage: React.FC = () => {
           <span className={styles.sectionBadge}>核心功能</span>
           <h2 className={styles.sectionTitle}>为创作者打造的强大功能</h2>
           <p className={styles.sectionDescription}>
-            从剧情分析到智能剪辑，StoryForge 提供完整的 AI 视频创作解决方案
+            从剧情分析到智能剪辑，CutDeck 提供完整的 AI 视频创作解决方案
           </p>
         </div>
 
@@ -264,7 +264,7 @@ export const LandingPage: React.FC = () => {
         <div className={styles.ctaContent}>
           <h2 className={styles.ctaTitle}>准备好开始创作了吗？</h2>
           <p className={styles.ctaDescription}>
-            立即加入 StoryForge，开启 AI 驱动的视频创作之旅
+            立即加入 CutDeck，开启 AI 驱动的视频创作之旅
           </p>
           <div className={styles.ctaActions}>
             <Link to="/register" className={styles.btnCtaPrimary}>
@@ -292,7 +292,7 @@ export const LandingPage: React.FC = () => {
                 <rect x="4" y="4" width="32" height="32" rx="8" fill="url(#logoGradient2)" />
                 <path d="M14 12L28 20L14 28V12Z" fill="white" />
               </svg>
-              <span className={styles.logoText}>StoryForge</span>
+              <span className={styles.logoText}>CutDeck</span>
             </div>
             <p className={styles.footerTagline}>
               AI 驱动的视频创作平台
@@ -322,7 +322,7 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div className={styles.footerBottom}>
-          <p>&copy; 2025-2026 StoryForge. All rights reserved.</p>
+          <p>&copy; 2025-2026 CutDeck. All rights reserved.</p>
           <div className={styles.footerSocial}>
             <a href="#github" aria-label="GitHub">
               <svg viewBox="0 0 24 24" fill="currentColor">

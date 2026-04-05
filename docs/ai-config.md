@@ -1,11 +1,11 @@
 ---
 title: AI 模型配置
-description: StoryForge 支持的 AI 模型提供商配置详解，2026年3月最新模型推荐。
+description: CutDeck 支持的 AI 模型提供商配置详解，2026年3月最新模型推荐。
 ---
 
 # AI 模型配置
 
-StoryForge 支持多种 AI 模型服务提供商。所有模型均已更新至 **2026年3月最新版本**。
+CutDeck 支持多种 AI 模型服务提供商。所有模型均已更新至 **2026年3月最新版本**。
 
 ---
 

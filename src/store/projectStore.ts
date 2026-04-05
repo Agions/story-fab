@@ -161,7 +161,7 @@ export const useProjectStore = create<ProjectState>()(
       },
     }),
     {
-      name: 'storyforge-projects',
+      name: 'cutdeck-projects',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         projects: state.projects,

@@ -1,58 +1,86 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140" width="160" height="140">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
   <defs>
-    <!-- Amber gradient for background accent -->
+    <!-- Dark cinematic background -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#1a1a2e"/>
-      <stop offset="100%" stop-color="#16162a"/>
+      <stop offset="100%" stop-color="#0f0f1e"/>
     </linearGradient>
-    <!-- Amber accent glow from top-right -->
-    <radialGradient id="amberGlow" cx="85%" cy="15%" r="55%">
-      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.22"/>
-      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.06"/>
+    <!-- Amber glow from top-right -->
+    <radialGradient id="amberGlow" cx="80%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.18"/>
+      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.05"/>
       <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
     </radialGradient>
-    <!-- Play triangle gradient -->
-    <linearGradient id="playGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#fcd34d"/>
-    </linearGradient>
-    <!-- Bottom border accent -->
-    <linearGradient id="borderAccent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0"/>
-      <stop offset="30%" stop-color="#f59e0b" stop-opacity="0.6"/>
-      <stop offset="70%" stop-color="#f59e0b" stop-opacity="0.6"/>
+    <!-- Cyan accent glow bottom-left -->
+    <radialGradient id="cyanGlow" cx="20%" cy="80%" r="45%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Cut line gradient (amber to transparent) -->
+    <linearGradient id="cutGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.9"/>
       <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Film frame gradient -->
+    <linearGradient id="frameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a2a4a"/>
+      <stop offset="100%" stop-color="#1e1e38"/>
     </linearGradient>
   </defs>
 
-  <!-- Film slate background -->
-  <rect width="160" height="140" rx="20" fill="url(#bgGrad)"/>
+  <!-- Background -->
+  <rect width="160" height="160" rx="24" fill="url(#bgGrad)"/>
+  <rect width="160" height="160" rx="24" fill="url(#amberGlow)"/>
+  <rect width="160" height="160" rx="24" fill="url(#cyanGlow)"/>
 
-  <!-- Amber radial glow -->
-  <rect width="160" height="140" rx="20" fill="url(#amberGlow)"/>
-
-  <!-- Subtle grid lines (film slate texture) -->
-  <g stroke="#f59e0b" stroke-opacity="0.04" stroke-width="1">
-    <line x1="0" y1="35" x2="160" y2="35"/>
-    <line x1="0" y1="70" x2="160" y2="70"/>
-    <line x1="0" y1="105" x2="160" y2="105"/>
-    <line x1="40" y1="0" x2="40" y2="115"/>
-    <line x1="80" y1="0" x2="80" y2="115"/>
-    <line x1="120" y1="0" x2="120" y2="115"/>
+  <!-- Film strip sprocket holes (left side) -->
+  <g fill="#f59e0b" opacity="0.25">
+    <rect x="22" y="28" width="8" height="5" rx="1.5"/>
+    <rect x="22" y="42" width="8" height="5" rx="1.5"/>
+    <rect x="22" y="56" width="8" height="5" rx="1.5"/>
+    <rect x="22" y="70" width="8" height="5" rx="1.5"/>
+    <rect x="22" y="84" width="8" height="5" rx="1.5"/>
+    <rect x="22" y="98" width="8" height="5" rx="1.5"/>
+    <rect x="22" y="112" width="8" height="5" rx="1.5"/>
+  </g>
+  <!-- Film strip sprocket holes (right side) -->
+  <g fill="#f59e0b" opacity="0.25">
+    <rect x="130" y="28" width="8" height="5" rx="1.5"/>
+    <rect x="130" y="42" width="8" height="5" rx="1.5"/>
+    <rect x="130" y="56" width="8" height="5" rx="1.5"/>
+    <rect x="130" y="70" width="8" height="5" rx="1.5"/>
+    <rect x="130" y="84" width="8" height="5" rx="1.5"/>
+    <rect x="130" y="98" width="8" height="5" rx="1.5"/>
+    <rect x="130" y="112" width="8" height="5" rx="1.5"/>
   </g>
 
-  <!-- Amber bottom border line -->
-  <rect x="20" y="113" width="120" height="2" rx="1" fill="url(#borderAccent)"/>
+  <!-- Main film frame -->
+  <rect x="38" y="24" width="84" height="84" rx="6" fill="url(#frameGrad)" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.5"/>
 
-  <!-- Play triangle (film/play button symbol) -->
-  <polygon points="58,42 112,72 58,102" fill="url(#playGrad)"/>
+  <!-- Play triangle in center (white to amber) -->
+  <polygon points="68,50 104,68 68,86" fill="url(#playGrad)"/>
+  <linearGradient id="playGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#ffffff"/>
+    <stop offset="100%" stop-color="#fcd34d"/>
+  </linearGradient>
 
-  <!-- "StoryForge" wordmark below icon -->
-  <text x="80" y="132"
+  <!-- Diagonal cut line through frame (amber blade) -->
+  <line x1="38" y1="108" x2="122" y2="24"
+        stroke="url(#cutGrad)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Cut indicator dots at cut line endpoints -->
+  <circle cx="38" cy="108" r="4" fill="#f59e0b"/>
+  <circle cx="122" cy="24" r="4" fill="#06b6d4"/>
+
+  <!-- "CUTDECK" wordmark -->
+  <text x="80" y="136"
         text-anchor="middle"
         font-family="'Syne', 'Inter', system-ui, sans-serif"
-        font-size="13"
-        font-weight="700"
-        letter-spacing="0.08em"
-        fill="#f8fafc">STORYFORGE</text>
+        font-size="12"
+        font-weight="800"
+        letter-spacing="0.15em"
+        fill="#f8fafc">CUTDECK</text>
+
+  <!-- Subtle bottom border accent -->
+  <rect x="50" y="146" width="60" height="1.5" rx="0.75" fill="#f59e0b" opacity="0.4"/>
 </svg>

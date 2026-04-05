@@ -1,4 +1,4 @@
-# StoryForge 架构文档
+# CutDeck 架构文档
 
 > 最后更新：2026-04-04 | v1.2.0
 
@@ -41,7 +41,7 @@ src/
 │   ├── workflow/                  # 工作流定义
 │   │   ├── featureBlueprint.ts   # 模式步骤定义
 │   │   └── alignmentGate.ts      # 对齐门禁
-│   ├── hooks/                    # React Hooks（StoryForge 专用）
+│   ├── hooks/                    # React Hooks（CutDeck 专用）
 │   │   ├── useWorkflowEngine.ts  # 新版工作流 hook（v1.2.0 新增）
 │   │   └── useWorkflow.ts        # 旧版 hook（deprecated v1.2.0）
 │   └── constants/                 # 常量定义

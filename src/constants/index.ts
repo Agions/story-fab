@@ -4,11 +4,11 @@
 
 // 应用信息
 export const APP = {
-  name: 'StoryForge',
+  name: 'CutDeck',
   version: '1.0.0',
   description: 'AI 驱动的专业视频内容创作平台',
   author: 'Agions',
-  website: 'https://github.com/Agions/StoryForge',
+  website: 'https://github.com/Agions/CutDeck',
 };
 
 // 支持的视频格式
@@ -127,12 +127,12 @@ export const HOTKEYS = {
 
 // 存储键名
 export const STORAGE_KEYS = {
-  user: 'storyforge_user',
-  projects: 'storyforge_projects',
-  settings: 'storyforge_settings',
-  theme: 'storyforge_theme',
-  language: 'storyforge_language',
-  recentFiles: 'storyforge_recent_files',
+  user: 'cutdeck_user',
+  projects: 'cutdeck_projects',
+  settings: 'cutdeck_settings',
+  theme: 'cutdeck_theme',
+  language: 'cutdeck_language',
+  recentFiles: 'cutdeck_recent_files',
 };
 
 // API 端点

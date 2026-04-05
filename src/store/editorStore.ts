@@ -237,7 +237,7 @@ export const useEditorStore = create<EditorState>()(
       reset: () => set(initialState),
     }),
     {
-      name: 'storyforge-editor',
+      name: 'cutdeck-editor',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         video: state.video,

@@ -26,12 +26,12 @@ import {
   AimOutlined,
   TableOutlined,
 } from '@ant-design/icons';
-import { useStoryForge } from '../AIEditorContext';
+import { useCutDeck } from '../AIEditorContext';
 import { visionService } from '@/core/services/vision.service';
 import { ProcessingProgress } from '@/components/common';
 import { notify } from '@/shared';
 import type { Scene, AIAnalyzeProps } from '@/core/types';
-import styles from './StoryForge.module.less';
+import styles from './CutDeck.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -67,7 +67,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = ({ onNext }) => {
     setAnalysis, 
     goToNextStep,
     dispatch 
-  } = useStoryForge();
+  } = useCutDeck();
   
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);

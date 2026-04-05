@@ -48,13 +48,13 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
  * 设置状态 Hook (兼容 SettingsContext)
  */
 export function useSettingsStore() {
-  const [autoSave, setAutoSave] = useLocalStorage('storyforge-autosave', true);
-  const [compactMode, setCompactMode] = useLocalStorage('storyforge-compact', false);
-  const [theme, setTheme] = useLocalStorage('storyforge-theme', 'light');
-  const [defaultModel, setDefaultModel] = useLocalStorage('storyforge-default-model', 'deepseek-chat');
+  const [autoSave, setAutoSave] = useLocalStorage('cutdeck-autosave', true);
+  const [compactMode, setCompactMode] = useLocalStorage('cutdeck-compact', false);
+  const [theme, setTheme] = useLocalStorage('cutdeck-theme', 'light');
+  const [defaultModel, setDefaultModel] = useLocalStorage('cutdeck-default-model', 'deepseek-chat');
   const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
-  const [outputPath, setOutputPath] = useLocalStorage('storyforge-output-path', '');
-  const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('storyforge-recent-projects', []);
+  const [outputPath, setOutputPath] = useLocalStorage('cutdeck-output-path', '');
+  const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('cutdeck-recent-projects', []);
 
   const settings = useMemo<AppSettings>(() => ({
     autoSave,

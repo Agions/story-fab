@@ -1,16 +1,16 @@
 ---
 title: 项目结构
-description: StoryForge 项目目录结构详解，帮助你快速了解项目代码组织方式。
+description: CutDeck 项目目录结构详解，帮助你快速了解项目代码组织方式。
 ---
 
 # 项目结构
 
-StoryForge 使用 React + TypeScript + Vite + Tauri 构建。
+CutDeck 使用 React + TypeScript + Vite + Tauri 构建。
 
 ## 整体目录结构
 
 ```
-StoryForge/
+CutDeck/
 ├── src/                        # React 前端源码
 │   ├── components/             # React UI 组件
 │   ├── core/                  # 核心逻辑

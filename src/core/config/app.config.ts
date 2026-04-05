@@ -5,21 +5,21 @@
 
 // 应用信息
 export const APP_CONFIG = {
-  name: 'StoryForge',
+  name: 'CutDeck',
   version: '1.0.0',
   description: 'AI驱动的专业视频内容创作平台',
-  repository: 'https://github.com/Agions/storyforge',
+  repository: 'https://github.com/Agions/cutdeck',
   license: 'MIT'
 } as const;
 
 // 存储配置
 export const STORAGE_CONFIG = {
-  prefix: 'storyforge_',
+  prefix: 'cutdeck_',
   keys: {
-    store: 'storyforge-store',
-    settings: 'storyforge-settings',
-    projects: 'storyforge-projects',
-    cache: 'storyforge-cache'
+    store: 'cutdeck-store',
+    settings: 'cutdeck-settings',
+    projects: 'cutdeck-projects',
+    cache: 'cutdeck-cache'
   }
 } as const;
 

@@ -47,7 +47,7 @@ export const useModelStore = create<AppState>()(
         })),
     }),
     {
-      name: 'storyforge-app-settings',
+      name: 'cutdeck-app-settings',
       partialize: (state) => ({
         selectedAIModel: state.selectedAIModel,
         aiModelsSettings: state.aiModelsSettings,

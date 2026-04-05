@@ -9,7 +9,7 @@ describe('project-id utils', () => {
 
   it('buildProjectIdCandidates should include decoded and basename variants', () => {
     const candidates = buildProjectIdCandidates(
-      '/tmp/storyforge%2Fproject-01.json'
+      '/tmp/cutdeck%2Fproject-01.json'
     );
     expect(candidates).toContain('project-01');
     expect(candidates).toContain('project-01.json'.replace(/\.json$/i, ''));

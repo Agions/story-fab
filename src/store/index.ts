@@ -1,5 +1,5 @@
 /**
- * StoryForge 状态管理 - 统一导出
+ * CutDeck 状态管理 - 统一导出
  * 使用 Zustand v5 + 持久化存储
  *
  * 类型统一从 @/core/types 导入，不要在此目录定义类型。

@@ -1,11 +1,11 @@
 ---
 title: 贡献指南
-description: 如何参与 StoryForge 的开发、报告问题和完善文档。
+description: 如何参与 CutDeck 的开发、报告问题和完善文档。
 ---
 
 # 贡献指南
 
-感谢你愿意为 StoryForge 贡献力量！无论是报告 Bug、提交代码还是完善文档，每一份贡献都让这个项目变得更好。 🎉
+感谢你愿意为 CutDeck 贡献力量！无论是报告 Bug、提交代码还是完善文档，每一份贡献都让这个项目变得更好。 🎉
 
 ---
 
@@ -13,8 +13,8 @@ description: 如何参与 StoryForge 的开发、报告问题和完善文档。
 
 | 方式 | 说明 | 入口 |
 |------|------|------|
-| 🐛 报告 Bug | 帮助我们发现和修复问题 | [GitHub Issues](https://github.com/Agions/StoryForge/issues/new?template=bug_report.md) |
-| 💡 功能建议 | 提出新功能想法 | [Feature Request](https://github.com/Agions/StoryForge/issues/new?template=feature_request.md) |
+| 🐛 报告 Bug | 帮助我们发现和修复问题 | [GitHub Issues](https://github.com/Agions/CutDeck/issues/new?template=bug_report.md) |
+| 💡 功能建议 | 提出新功能想法 | [Feature Request](https://github.com/Agions/CutDeck/issues/new?template=feature_request.md) |
 | 📝 完善文档 | 修正错别字、补充说明、翻译 | 直接提交 PR |
 | 🔧 提交代码 | Bug 修复、新功能实现 | 提交 Pull Request |
 | ⭐ 推广项目 | 分享给更多人 | Star、Fork、在社交媒体介绍 |
@@ -36,11 +36,11 @@ description: 如何参与 StoryForge 的开发、报告问题和完善文档。
 
 ```bash
 # 1. Fork 项目到你的 GitHub 账户
-# 访问 https://github.com/Agions/StoryForge 点击 Fork
+# 访问 https://github.com/Agions/CutDeck 点击 Fork
 
 # 2. 克隆你的 Fork
-git clone https://github.com/YOUR_USERNAME/StoryForge.git
-cd StoryForge
+git clone https://github.com/YOUR_USERNAME/CutDeck.git
+cd CutDeck
 
 # 3. 安装依赖
 npm install
@@ -159,7 +159,7 @@ interface AIClipPanelProps {
 
 ## 行为准则
 
-作为 StoryForge 的贡献者，请遵守以下原则：
+作为 CutDeck 的贡献者，请遵守以下原则：
 
 - **尊重** — 尊重所有参与者的观点和背景
 - **包容** — 欢迎各种经验水平的贡献者
@@ -172,8 +172,8 @@ interface AIClipPanelProps {
 
 | 渠道 | 用途 |
 |------|------|
-| [GitHub Issues](https://github.com/Agions/StoryForge/issues) | Bug 报告、功能请求 |
-| [GitHub Discussions](https://github.com/Agions/StoryForge/discussions) | 提问、讨论 |
+| [GitHub Issues](https://github.com/Agions/CutDeck/issues) | Bug 报告、功能请求 |
+| [GitHub Discussions](https://github.com/Agions/CutDeck/discussions) | 提问、讨论 |
 
 ---
 

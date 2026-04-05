@@ -5,5 +5,5 @@
 )]
 
 fn main() {
-    storyforge_lib::run();
+    cutdeck_lib::run();
 }

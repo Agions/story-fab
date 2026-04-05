@@ -115,7 +115,7 @@ class AutoMusicService {
       {
         id: 'preset-1',
         name: 'Upbeat Corporate',
-        artist: 'StoryForge',
+        artist: 'CutDeck',
         duration: 120,
         genre: 'corporate',
         mood: 'upbeat',
@@ -125,7 +125,7 @@ class AutoMusicService {
       {
         id: 'preset-2',
         name: 'Ambient Chill',
-        artist: 'StoryForge',
+        artist: 'CutDeck',
         duration: 180,
         genre: 'ambient',
         mood: 'relaxing',
@@ -135,7 +135,7 @@ class AutoMusicService {
       {
         id: 'preset-3',
         name: 'Epic Cinematic',
-        artist: 'StoryForge',
+        artist: 'CutDeck',
         duration: 240,
         genre: 'cinematic',
         mood: 'epic',

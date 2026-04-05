@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
-  "productName": "StoryForge",
+  "productName": "CutDeck",
   "version": "1.0.0-beta",
-  "identifier": "com.storyforge.desktop",
+  "identifier": "com.cutdeck.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "StoryForge - AI 视频创作平台",
+        "title": "CutDeck - AI 视频创作平台",
         "width": 1200,
         "height": 800,
         "center": true,

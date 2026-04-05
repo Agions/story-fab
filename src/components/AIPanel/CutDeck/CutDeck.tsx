@@ -29,13 +29,13 @@ import {
   PlayCircleOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
-import { useStoryForge, StoryForgeStep, StoryForgeState } from '../AIEditorContext';
-import styles from './StoryForge.module.less';
+import { useCutDeck, CutDeckStep, CutDeckState } from '../AIEditorContext';
+import styles from './CutDeck.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 
 // 流程步骤配置 - 体现三大核心功能
-const stepConfig: Record<StoryForgeStep, {
+const stepConfig: Record<CutDeckStep, {
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -82,8 +82,8 @@ const stepConfig: Record<StoryForgeStep, {
 };
 
 // 获取步骤索引
-const getStepIndex = (step: StoryForgeStep): number => {
-  const steps: StoryForgeStep[] = [
+const getStepIndex = (step: CutDeckStep): number => {
+  const steps: CutDeckStep[] = [
     'project-create',
     'video-upload', 
     'ai-analyze',
@@ -95,7 +95,7 @@ const getStepIndex = (step: StoryForgeStep): number => {
 };
 
 // 检查是否可以进入下一步
-const canProceedToStep = (state: StoryForgeState, targetStep: StoryForgeStep): boolean => {
+const canProceedToStep = (state: CutDeckState, targetStep: CutDeckStep): boolean => {
   const currentIndex = getStepIndex(state.currentStep);
   const targetIndex = getStepIndex(targetStep);
   
@@ -112,13 +112,13 @@ const canProceedToStep = (state: StoryForgeState, targetStep: StoryForgeStep): b
   return true;
 };
 
-interface StoryForgeProps {
+interface CutDeckProps {
   children?: React.ReactNode;
   showSteps?: boolean;
   showNavigation?: boolean;
 }
 
-const StoryForge: React.FC<StoryForgeProps> = ({
+const CutDeck: React.FC<CutDeckProps> = ({
   children,
   showSteps = true,
   showNavigation = true,
@@ -133,7 +133,7 @@ const StoryForge: React.FC<StoryForgeProps> = ({
     canProceed,
     completedSteps,
     totalSteps,
-  } = useStoryForge();
+  } = useCutDeck();
 
   // 从 URL 同步项目 ID
   React.useEffect(() => {
@@ -143,7 +143,7 @@ const StoryForge: React.FC<StoryForgeProps> = ({
   }, [projectId]);
 
   // 步骤变化处理
-  const handleStepClick = (step: StoryForgeStep) => {
+  const handleStepClick = (step: CutDeckStep) => {
     if (canProceedToStep(state, step)) {
       setStep(step);
     }
@@ -201,7 +201,7 @@ const StoryForge: React.FC<StoryForgeProps> = ({
 
   // 渲染步骤条 - 优化版
   const renderSteps = () => {
-    const steps: StoryForgeStep[] = [
+    const steps: CutDeckStep[] = [
       'project-create',
       'video-upload',
       'ai-analyze', 
@@ -267,7 +267,7 @@ const StoryForge: React.FC<StoryForgeProps> = ({
 
   // 渲染导航按钮 - 优化版
   const renderNavigation = () => {
-    const steps: StoryForgeStep[] = [
+    const steps: CutDeckStep[] = [
       'project-create',
       'video-upload',
       'ai-analyze',
@@ -414,7 +414,7 @@ const StoryForge: React.FC<StoryForgeProps> = ({
     return (
       <Card style={{ marginBottom: 16, textAlign: 'center' }}>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          <Title level={4}>🎬 欢迎使用 StoryForge AI 剪辑</Title>
+          <Title level={4}>🎬 欢迎使用 CutDeck AI 剪辑</Title>
           <Paragraph>
             三大核心功能：AI 视频解说、AI 第一人称解说、AI 混剪
           </Paragraph>
@@ -446,4 +446,4 @@ const StoryForge: React.FC<StoryForgeProps> = ({
   );
 };
 
-export default StoryForge;
+export default CutDeck;

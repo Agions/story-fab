@@ -58,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - WorkflowMonitor：移除 eslint-disable，Timeline items 添加 key
 - TimelineClip：移除未使用 Badge import，修复 handleDoubleClick 依赖
 - ai.service：移除废弃的 generateMockScenes/generateMockKeyframes
-- StoryForge.tsx / VideoExport.tsx：移除未使用 import
+- CutDeck.tsx / VideoExport.tsx：移除未使用 import
 
 ### 📖 文档更新
 
@@ -104,8 +104,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 项目重命名
 
-- **旧名称**: StoryForge (126+ 同名项目，侵权风险)
-- **新名称**: StoryForge
+- **旧名称**: CutDeck (126+ 同名项目，侵权风险)
+- **新名称**: CutDeck
 - 体现"AI视频创作 + 故事叙事"的核心价值
 
 ### 📚 文档更新
@@ -215,4 +215,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 旧版本
 
-- 查看 [GitHub Releases](https://github.com/agions/storyforge/releases)
+- 查看 [GitHub Releases](https://github.com/agions/cutdeck/releases)

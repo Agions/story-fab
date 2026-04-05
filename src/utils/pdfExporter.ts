@@ -29,8 +29,8 @@ export const exportScriptToPDF = (script: Script, projectName: string) => {
   const title = `${projectName} - 解说脚本`;
   doc.setProperties({
     title,
-    author: 'StoryForge',
-    creator: 'StoryForge Script Generator',
+    author: 'CutDeck',
+    creator: 'CutDeck Script Generator',
     subject: '视频解说脚本',
   });
   
@@ -88,7 +88,7 @@ export const exportScriptToPDF = (script: Script, projectName: string) => {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     doc.text(
-      `StoryForge - 第 ${i} 页，共 ${pageCount} 页`,
+      `CutDeck - 第 ${i} 页，共 ${pageCount} 页`,
       pageWidth / 2,
       pageHeight - 10,
       { align: 'center' }

@@ -1,11 +1,11 @@
 ---
 title: 安全设计
-description: StoryForge 的安全机制、API 密钥管理和数据保护措施。
+description: CutDeck 的安全机制、API 密钥管理和数据保护措施。
 ---
 
 # 安全设计
 
-StoryForge 在设计之初就将安全作为核心考量，保护用户的敏感数据和隐私。
+CutDeck 在设计之初就将安全作为核心考量，保护用户的敏感数据和隐私。
 
 ---
 
@@ -13,7 +13,7 @@ StoryForge 在设计之初就将安全作为核心考量，保护用户的敏感
 
 ### 存储层级
 
-StoryForge 采用多层级密钥存储策略：
+CutDeck 采用多层级密钥存储策略：
 
 ```
 优先 → OS Keychain (系统级安全存储)
@@ -53,7 +53,7 @@ echo ".env" >> .gitignore
 
 ### 路径安全
 
-StoryForge 对所有文件路径进行严格验证：
+CutDeck 对所有文件路径进行严格验证：
 
 | 检查项 | 说明 |
 |--------|------|
@@ -68,7 +68,7 @@ StoryForge 对所有文件路径进行严格验证：
 
 ### FFmpeg 白名单
 
-StoryForge 仅允许执行经过白名单验证的 FFmpeg 命令：
+CutDeck 仅允许执行经过白名单验证的 FFmpeg 命令：
 
 ```typescript
 // 允许的命令
@@ -107,7 +107,7 @@ const BLOCKED_PATTERNS = [
 
 | 方式 | 说明 |
 |------|------|
-| GitHub Security Advisory | [报告安全漏洞](https://github.com/Agions/StoryForge/security/advisories/new) |
+| GitHub Security Advisory | [报告安全漏洞](https://github.com/Agions/CutDeck/security/advisories/new) |
 
 **请不要**在公开的 GitHub Issues 中报告安全问题。
 

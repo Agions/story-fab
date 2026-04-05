@@ -7,7 +7,7 @@ import { logger } from '@/utils/logger';
 /**
  * 本地存储键名前缀
  */
-const STORAGE_PREFIX = 'storyforge_';
+const STORAGE_PREFIX = 'cutdeck_';
 
 /**
  * 存储键名

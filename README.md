@@ -2,7 +2,7 @@
 
 <!-- Hero -->
 <p align="center">
-  <img src="./docs/public/logo.svg" alt="StoryForge" width="140" />
+  <img src="./docs/public/logo.svg" alt="CutDeck" width="140" />
 </p>
 
 <h1 style="
@@ -15,7 +15,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0.5rem 0;
-">StoryForge</h1>
+">CutDeck</h1>
 
 <p style="
   font-size: 1.1rem;
@@ -26,7 +26,7 @@
 <!-- Badges -->
 <p align="center">
 
-[![Stars](https://img.shields.io/github/stars/Agions/StoryForge?style=for-the-badge&logo=github&color=f59e0b)](https://github.com/Agions/StoryForge)
+[![Stars](https://img.shields.io/github/stars/Agions/CutDeck?style=for-the-badge&logo=github&color=f59e0b)](https://github.com/Agions/CutDeck)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=opensourceinitiative)](LICENSE)
 [![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -56,8 +56,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/Agions/StoryForge.git
-cd StoryForge
+git clone https://github.com/Agions/CutDeck.git
+cd CutDeck
 
 # 安装依赖
 npm install
@@ -96,7 +96,7 @@ npm run dev
 ## 🏗️ 项目架构
 
 ```
-StoryForge/
+CutDeck/
 ├── src/
 │   ├── components/          # React 组件
 │   │   ├── AIPanel/         # AI 功能面板
@@ -141,13 +141,13 @@ StoryForge/
 
 | 文档 | 说明 |
 |------|------|
-| [快速开始](docs/guide/quick-start.md) | 5 分钟上手 StoryForge |
+| [快速开始](docs/guide/quick-start.md) | 5 分钟上手 CutDeck |
 | [功能介绍](docs/features.md) | 全部核心功能详解 |
 | [AI 配置](docs/ai-config.md) | 多厂商 AI API 配置指南 |
 | [安装配置](docs/installation.md) | 详细安装与故障排查 |
 | [常见问题](docs/faq.md) | FAQ 常见问题解答 |
 
-完整文档站点：https://agions.github.io/StoryForge
+完整文档站点：https://agions.github.io/CutDeck
 
 ---
 
@@ -157,9 +157,9 @@ StoryForge/
 
 | 贡献方式 | 说明 |
 |----------|------|
-| 🐛 报告 Bug | [GitHub Issues](https://github.com/Agions/StoryForge/issues) |
+| 🐛 报告 Bug | [GitHub Issues](https://github.com/Agions/CutDeck/issues) |
 | 📝 完善文档 | 直接提交 PR |
-| 💡 功能建议 | [GitHub Discussions](https://github.com/Agions/StoryForge/discussions) |
+| 💡 功能建议 | [GitHub Discussions](https://github.com/Agions/CutDeck/discussions) |
 | 🔧 提交代码 | 提交 Pull Request |
 
 参考 [贡献指南](docs/contributing.md) 了解更多。

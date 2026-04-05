@@ -92,7 +92,7 @@ export const useAppStore = create<AppState>()(
       setAutoSave: (autoSave) => set({ autoSave }),
     }),
     {
-      name: 'storyforge-app',
+      name: 'cutdeck-app',
       storage: createJSONStorage(() => localStorage),
       // 只持久化这些字段
       partialize: (state) => ({

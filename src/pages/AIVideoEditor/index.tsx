@@ -8,17 +8,17 @@ import {
   UserOutlined,
   ScissorOutlined,
 } from '@ant-design/icons';
-import { StoryForgeProvider, useStoryForge } from '@/components/AIPanel/AIEditorContext';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/AIPanel/StoryForge/functionModeMap';
+import { CutDeckProvider, useCutDeck } from '@/components/AIPanel/AIEditorContext';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/AIPanel/CutDeck/functionModeMap';
 import styles from './index.module.less';
 
-const StoryForgeComponent = lazy(() => import('@/components/AIPanel/StoryForge/StoryForge'));
-const ProjectCreate = lazy(() => import('@/components/AIPanel/StoryForge/ProjectCreate'));
-const VideoUpload = lazy(() => import('@/components/AIPanel/StoryForge/VideoUpload'));
-const AIAnalyze = lazy(() => import('@/components/AIPanel/StoryForge/AIAnalyze'));
-const ScriptGenerate = lazy(() => import('@/components/AIPanel/StoryForge/ScriptGenerate'));
-const VideoSynthesize = lazy(() => import('@/components/AIPanel/StoryForge/VideoSynthesize'));
-const VideoExport = lazy(() => import('@/components/AIPanel/StoryForge/VideoExport'));
+const CutDeckComponent = lazy(() => import('@/components/AIPanel/CutDeck/CutDeck'));
+const ProjectCreate = lazy(() => import('@/components/AIPanel/CutDeck/ProjectCreate'));
+const VideoUpload = lazy(() => import('@/components/AIPanel/CutDeck/VideoUpload'));
+const AIAnalyze = lazy(() => import('@/components/AIPanel/CutDeck/AIAnalyze'));
+const ScriptGenerate = lazy(() => import('@/components/AIPanel/CutDeck/ScriptGenerate'));
+const VideoSynthesize = lazy(() => import('@/components/AIPanel/CutDeck/VideoSynthesize'));
+const VideoExport = lazy(() => import('@/components/AIPanel/CutDeck/VideoExport'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
@@ -62,7 +62,7 @@ const AI_FUNCTIONS = [
 
 const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
-  const { state, goToNextStep, setFeature } = useStoryForge();
+  const { state, goToNextStep, setFeature } = useCutDeck();
 
   useEffect(() => {
     const targetFeature = TAB_TO_FEATURE[activeTab];
@@ -125,9 +125,9 @@ const AIVideoEditorContent: React.FC = () => {
             </div>
           }
         >
-          <StoryForgeComponent showSteps={true} showNavigation={true}>
+          <CutDeckComponent showSteps={true} showNavigation={true}>
             {renderStepContent()}
-          </StoryForgeComponent>
+          </CutDeckComponent>
         </Suspense>
       </div>
     </div>
@@ -136,9 +136,9 @@ const AIVideoEditorContent: React.FC = () => {
 
 const AIVideoEditor: React.FC = () => {
   return (
-    <StoryForgeProvider>
+    <CutDeckProvider>
       <AIVideoEditorContent />
-    </StoryForgeProvider>
+    </CutDeckProvider>
   );
 };
 

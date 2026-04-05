@@ -10,7 +10,7 @@ import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings 
 export type AIFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
 
 // AI 剪辑流程步骤
-export type StoryForgeStep = 
+export type CutDeckStep = 
   | 'project-create'    // 1. 创建项目
   | 'video-upload'      // 2. 上传视频
   | 'ai-analyze'        // 3. AI视频分析
@@ -19,9 +19,9 @@ export type StoryForgeStep =
   | 'export';          // 6. 导出
 
 // 流程状态
-export interface StoryForgeState {
+export interface CutDeckState {
   // 当前流程步骤
-  currentStep: StoryForgeStep;
+  currentStep: CutDeckStep;
   
   // 步骤完成状态
   stepStatus: {
@@ -102,9 +102,9 @@ export interface StoryForgeState {
 }
 
 // 动作类型
-type StoryForgeAction =
-  | { type: 'SET_STEP'; payload: StoryForgeStep }
-  | { type: 'SET_STEP_COMPLETE'; payload: { step: StoryForgeStep; complete: boolean } }
+type CutDeckAction =
+  | { type: 'SET_STEP'; payload: CutDeckStep }
+  | { type: 'SET_STEP_COMPLETE'; payload: { step: CutDeckStep; complete: boolean } }
   | { type: 'SET_FEATURE'; payload: AIFeatureType }
   | { type: 'SET_PROJECT'; payload: ProjectData | null }
   | { type: 'SET_VIDEO'; payload: VideoInfo | null }
@@ -127,10 +127,10 @@ type StoryForgeAction =
   | { type: 'SET_DURATION'; payload: number }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' }
-  | { type: 'RESET_STEP'; payload: StoryForgeStep };
+  | { type: 'RESET_STEP'; payload: CutDeckStep };
 
 // 初始状态
-const initialState: StoryForgeState = {
+const initialState: CutDeckState = {
   currentStep: 'project-create',
   stepStatus: {
     'project-create': false,
@@ -188,8 +188,8 @@ const initialState: StoryForgeState = {
 };
 
 // 获取下一步骤
-const getNextStep = (currentStep: StoryForgeStep): StoryForgeStep => {
-  const steps: StoryForgeStep[] = [
+const getNextStep = (currentStep: CutDeckStep): CutDeckStep => {
+  const steps: CutDeckStep[] = [
     'project-create',
     'video-upload',
     'ai-analyze',
@@ -202,7 +202,7 @@ const getNextStep = (currentStep: StoryForgeStep): StoryForgeStep => {
 };
 
 // reducer
-function clipFlowReducer(state: StoryForgeState, action: StoryForgeAction): StoryForgeState {
+function clipFlowReducer(state: CutDeckState, action: CutDeckAction): CutDeckState {
   switch (action.type) {
     case 'SET_STEP':
       return { ...state, currentStep: action.payload };
@@ -353,7 +353,7 @@ function clipFlowReducer(state: StoryForgeState, action: StoryForgeAction): Stor
     
     case 'RESET_STEP': {
       // 重置指定步骤及其后续步骤
-      const steps: StoryForgeStep[] = [
+      const steps: CutDeckStep[] = [
         'project-create',
         'video-upload',
         'ai-analyze',
@@ -388,11 +388,11 @@ function clipFlowReducer(state: StoryForgeState, action: StoryForgeAction): Stor
 }
 
 // 上下文类型
-interface StoryForgeContextType {
-  state: StoryForgeState;
-  dispatch: React.Dispatch<StoryForgeAction>;
+interface CutDeckContextType {
+  state: CutDeckState;
+  dispatch: React.Dispatch<CutDeckAction>;
   // 便捷方法
-  setStep: (step: StoryForgeStep) => void;
+  setStep: (step: CutDeckStep) => void;
   setFeature: (feature: AIFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
@@ -410,7 +410,7 @@ interface StoryForgeContextType {
   goToNextStep: () => void;
   goToPrevStep: () => void;
   reset: () => void;
-  resetStep: (step: StoryForgeStep) => void;
+  resetStep: (step: CutDeckStep) => void;
   // 计算属性
   canProceed: () => boolean;
   completedSteps: number;
@@ -418,18 +418,18 @@ interface StoryForgeContextType {
 }
 
 // 创建上下文
-const StoryForgeContext = createContext<StoryForgeContextType | undefined>(undefined);
+const CutDeckContext = createContext<CutDeckContextType | undefined>(undefined);
 
 // Provider 组件
-interface StoryForgeProviderProps {
+interface CutDeckProviderProps {
   children: ReactNode;
 }
 
-export const StoryForgeProvider: React.FC<StoryForgeProviderProps> = ({ children }) => {
+export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(clipFlowReducer, initialState);
   
   // 便捷方法
-  const setStep = (step: StoryForgeStep) => {
+  const setStep = (step: CutDeckStep) => {
     dispatch({ type: 'SET_STEP', payload: step });
   };
   
@@ -501,7 +501,7 @@ export const StoryForgeProvider: React.FC<StoryForgeProviderProps> = ({ children
   };
   
   const goToPrevStep = () => {
-    const steps: StoryForgeStep[] = [
+    const steps: CutDeckStep[] = [
       'project-create',
       'video-upload',
       'ai-analyze',
@@ -519,7 +519,7 @@ export const StoryForgeProvider: React.FC<StoryForgeProviderProps> = ({ children
     dispatch({ type: 'RESET' });
   };
   
-  const resetStep = (step: StoryForgeStep) => {
+  const resetStep = (step: CutDeckStep) => {
     dispatch({ type: 'RESET_STEP', payload: step });
   };
   
@@ -535,7 +535,7 @@ export const StoryForgeProvider: React.FC<StoryForgeProviderProps> = ({ children
   
   const totalSteps = 6;
   
-  const value: StoryForgeContextType = {
+  const value: CutDeckContextType = {
     state,
     dispatch,
     setStep,
@@ -562,24 +562,24 @@ export const StoryForgeProvider: React.FC<StoryForgeProviderProps> = ({ children
   };
   
   return (
-    <StoryForgeContext.Provider value={value}>
+    <CutDeckContext.Provider value={value}>
       {children}
-    </StoryForgeContext.Provider>
+    </CutDeckContext.Provider>
   );
 };
 
 // 使用上下文的 Hook
-export const useStoryForge = (): StoryForgeContextType => {
-  const context = useContext(StoryForgeContext);
+export const useCutDeck = (): CutDeckContextType => {
+  const context = useContext(CutDeckContext);
   if (!context) {
-    throw new Error('useStoryForge must be used within StoryForgeProvider');
+    throw new Error('useCutDeck must be used within CutDeckProvider');
   }
   return context;
 };
 
 // 导出旧版兼容 Hook（别名）
-export const useAIEditor = useStoryForge;
+export const useAIEditor = useCutDeck;
 
 // 导出类型
-export { StoryForgeContext };
-export type { StoryForgeAction };
+export { CutDeckContext };
+export type { CutDeckAction };

@@ -4,12 +4,12 @@
 
 // 存储键名
 export const STORAGE_KEYS = {
-  PROJECTS: 'storyforge_projects',
-  APP_STATE: 'storyforge_app_state',
-  USER_PREFERENCES: 'storyforge_preferences',
-  RECENT_FILES: 'storyforge_recent_files',
-  MODEL_SETTINGS: 'storyforge_model_settings',
-  EXPORT_HISTORY: 'storyforge_export_history'
+  PROJECTS: 'cutdeck_projects',
+  APP_STATE: 'cutdeck_app_state',
+  USER_PREFERENCES: 'cutdeck_preferences',
+  RECENT_FILES: 'cutdeck_recent_files',
+  MODEL_SETTINGS: 'cutdeck_model_settings',
+  EXPORT_HISTORY: 'cutdeck_export_history'
 } as const;
 
 // 路由路径

@@ -1,13 +1,13 @@
 [package]
-name = "StoryForge"
+name = "CutDeck"
 version = "1.0.0"
-description = "StoryForge - AI 驱动的专业智能视频剪辑工具"
+description = "CutDeck - AI 驱动的专业智能视频剪辑工具"
 authors = ["Agions <agions@qq.com>"]
 license = "MIT"
 edition = "2021"
 
 [lib]
-name = "storyforge_lib"
+name = "cutdeck_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

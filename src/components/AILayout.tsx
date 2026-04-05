@@ -267,7 +267,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
             onClick={() => navigate('/')}
           >
             <span className={styles.logoIcon}>🎬</span>
-            <span className={styles.logoText}>StoryForge</span>
+            <span className={styles.logoText}>CutDeck</span>
           </div>
           <Divider type="vertical" />
           <Text className={styles.projectName}>未命名项目</Text>

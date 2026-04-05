@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/acl-manifests.json",
   "identifier": "default",
-  "description": "Default capabilities for StoryForge",
+  "description": "Default capabilities for CutDeck",
   "windows": ["main"],
   "permissions": [
     "core:default",

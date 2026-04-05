@@ -1,6 +1,6 @@
 ---
 layout: home
-title: StoryForge
+title: CutDeck
 ---
 
 <div class="sf-home">
@@ -9,10 +9,10 @@ title: StoryForge
 <div class="sf-hero">
   <div class="sf-hero-glow"></div>
   <div class="sf-hero-logo">
-    <img src="/logo.svg" alt="StoryForge" width="140" height="140" />
+    <img src="/logo.svg" alt="CutDeck" width="140" height="140" />
   </div>
   <h1 class="sf-hero-title">
-    <span class="sf-hero-name">StoryForge</span>
+    <span class="sf-hero-name">CutDeck</span>
     <span class="sf-hero-sub">AI-Powered Professional Video Editing</span>
   </h1>
   <p class="sf-hero-desc">
@@ -74,7 +74,7 @@ title: StoryForge
   <img src="https://img.shields.io/badge/TypeScript-5+-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Tauri-2.x-FFC131?style=for-the-badge&logo=tauri&logoColor=black" alt="Tauri" />
   <img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/github/stars/Agions/StoryForge?style=for-the-badge&logo=github&color=f59e0b" alt="Stars" />
+  <img src="https://img.shields.io/github/stars/Agions/CutDeck?style=for-the-badge&logo=github&color=f59e0b" alt="Stars" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=opensourceinitiative" alt="License" />
 </div>
 
@@ -86,7 +86,7 @@ title: StoryForge
 
     <div class="sf-step">
       <div class="sf-step-num">1</div>
-      <div class="sf-step-body"><h3>克隆项目</h3><pre><code>git clone https://github.com/Agions/StoryForge.git &amp;&amp; cd StoryForge &amp;&amp; npm install</code></pre></div>
+      <div class="sf-step-body"><h3>克隆项目</h3><pre><code>git clone https://github.com/Agions/CutDeck.git &amp;&amp; cd CutDeck &amp;&amp; npm install</code></pre></div>
     </div>
 
     <div class="sf-step">
@@ -172,25 +172,25 @@ title: StoryForge
       <span class="sf-contrib-icon">🐛</span>
       <h3>报告 Bug</h3>
       <p>在 GitHub Issues 提交问题</p>
-      <a href="https://github.com/Agions/StoryForge/issues" class="sf-btn sf-btn-outline sf-btn-sm">提交 Issue</a>
+      <a href="https://github.com/Agions/CutDeck/issues" class="sf-btn sf-btn-outline sf-btn-sm">提交 Issue</a>
     </div>
     <div class="sf-contrib-card">
       <span class="sf-contrib-icon">📝</span>
       <h3>完善文档</h3>
       <p>直接提交 PR 完善文档</p>
-      <a href="https://github.com/Agions/StoryForge/edit/main/docs" class="sf-btn sf-btn-outline sf-btn-sm">编辑文档</a>
+      <a href="https://github.com/Agions/CutDeck/edit/main/docs" class="sf-btn sf-btn-outline sf-btn-sm">编辑文档</a>
     </div>
     <div class="sf-contrib-card">
       <span class="sf-contrib-icon">💡</span>
       <h3>功能建议</h3>
       <p>欢迎提出功能建议和讨论</p>
-      <a href="https://github.com/Agions/StoryForge/discussions" class="sf-btn sf-btn-outline sf-btn-sm">讨论区</a>
+      <a href="https://github.com/Agions/CutDeck/discussions" class="sf-btn sf-btn-outline sf-btn-sm">讨论区</a>
     </div>
     <div class="sf-contrib-card">
       <span class="sf-contrib-icon">🔧</span>
       <h3>提交代码</h3>
       <p>提交 Pull Request 贡献代码</p>
-      <a href="https://github.com/Agions/StoryForge/pulls" class="sf-btn sf-btn-outline sf-btn-sm">提交 PR</a>
+      <a href="https://github.com/Agions/CutDeck/pulls" class="sf-btn sf-btn-outline sf-btn-sm">提交 PR</a>
     </div>
   </div>
 </div>

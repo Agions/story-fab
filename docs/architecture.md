@@ -1,17 +1,17 @@
 ---
 title: 架构概览
-description: StoryForge 系统架构和技术设计的核心要点速查。
+description: CutDeck 系统架构和技术设计的核心要点速查。
 ---
 
 # 架构概览
 
-本文档帮助你快速理解 StoryForge 的核心系统架构。
+本文档帮助你快速理解 CutDeck 的核心系统架构。
 
 ---
 
 ## 系统架构
 
-StoryForge 采用 **分层模块化架构**：
+CutDeck 采用 **分层模块化架构**：
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -36,7 +36,7 @@ StoryForge 采用 **分层模块化架构**：
 ## 目录结构
 
 ```
-StoryForge/
+CutDeck/
 ├── src/
 │   ├── components/           # React UI 组件
 │   │   ├── AIClipPanel/      # AI 剪辑面板
@@ -133,7 +133,7 @@ IDLE → ANALYZING → GENERATING → PREVIEW → EXPORT → COMPLETE
 
 ## Tauri IPC 通信
 
-StoryForge 使用 Tauri 的 IPC 机制进行前后端通信：
+CutDeck 使用 Tauri 的 IPC 机制进行前后端通信：
 
 ```typescript
 // 前端调用 Rust 后端

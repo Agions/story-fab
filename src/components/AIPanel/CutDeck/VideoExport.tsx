@@ -14,10 +14,10 @@ import {
   PlayCircleOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { useStoryForge } from '../AIEditorContext';
+import { useCutDeck } from '../AIEditorContext';
 import { notify } from '@/shared';
 import type { ExportSettings } from '@/core/types';
-import styles from './StoryForge.module.less';
+import styles from './CutDeck.module.less';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -57,7 +57,7 @@ interface VideoExportProps {
 }
 
 const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
-  const { state, setExportSettings, dispatch } = useStoryForge();
+  const { state, setExportSettings, dispatch } = useCutDeck();
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exported, setExported] = useState(false);
