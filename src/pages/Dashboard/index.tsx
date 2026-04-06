@@ -163,6 +163,26 @@ const StatusBadge: React.FC<{ status: ProjectStatus }> = ({ status }) => {
 // Dashboard 主组件
 // ============================================================================
 
+// 并发限制：避免大量文件操作同时发起
+const concurrentMap = async <T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+  limit = 8
+): Promise<R[]> => {
+  const results: R[] = new Array(items.length);
+  let index = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, () =>
+    (async () => {
+      while (index < items.length) {
+        const i = index++;
+        results[i] = await fn(items[i]);
+      }
+    })()
+  );
+  await Promise.all(workers);
+  return results;
+};
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { addRecentProject } = useSettings();
@@ -178,33 +198,33 @@ const Dashboard: React.FC = () => {
     try {
       setLoading(true);
       const rawProjects = await listProjects<RawProjectRecord>();
-      const mapped: Project[] = await Promise.all(
-        rawProjects
-          .filter((p) => typeof p.id === 'string')
-          .map(async (project, index) => {
-            const metrics = extractProjectMediaMetrics(project);
-            const videoPath = resolveProjectVideoPath(project);
-            const exactSizeMb = videoPath
-              ? (await getFileSizeBytes(videoPath)) / 1024 / 1024
-              : 0;
-            const size = pickPreferredSizeMb(
-              exactSizeMb,
-              metrics.explicitSizeMb,
-              metrics.estimatedSizeMb
-            );
+      const filtered = rawProjects.filter((p) => typeof p.id === 'string');
+      const mapped: Project[] = await concurrentMap(
+        filtered,
+        async (project, index) => {
+          const metrics = extractProjectMediaMetrics(project);
+          const videoPath = resolveProjectVideoPath(project);
+          const exactSizeMb = videoPath
+            ? (await getFileSizeBytes(videoPath)) / 1024 / 1024
+            : 0;
+          const size = pickPreferredSizeMb(
+            exactSizeMb,
+            metrics.explicitSizeMb,
+            metrics.estimatedSizeMb
+          );
 
-            return {
-              id: String(project.id),
-              title: String(project.name || '未命名项目'),
-              thumbnail: `https://picsum.photos/seed/${project.id || index}/300/200`,
-              updatedAt: String(project.updatedAt || project.createdAt || new Date().toISOString()),
-              duration: metrics.durationSec,
-              size,
-              starred: false,
-              tags: [String(project.status || 'draft')],
-              status: (project.status as ProjectStatus) ?? 'draft',
-            };
-          })
+          return {
+            id: String(project.id),
+            title: String(project.name || '未命名项目'),
+            thumbnail: `https://picsum.photos/seed/${project.id || index}/300/200`,
+            updatedAt: String(project.updatedAt || project.createdAt || new Date().toISOString()),
+            duration: metrics.durationSec,
+            size,
+            starred: false,
+            tags: [String(project.status || 'draft')],
+            status: (project.status as ProjectStatus) ?? 'draft',
+          };
+        }
       );
       setProjects(mapped);
     } catch (error) {

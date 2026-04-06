@@ -67,7 +67,7 @@ export class StorageService {
 
     export: (id: string): string => {
       const project = this.projects.getById(id);
-      return project ? JSON.stringify(project, null, 2) : '';
+      return project ? JSON.stringify(project) : '';
     },
 
     import: (json: string): ProjectData | null => {

@@ -59,6 +59,26 @@ const workflowSteps = [
 // AI 模型标签 - 2026年3月最新模型
 const aiModels = ['GPT-5.3 Codex', 'o3', 'Claude Sonnet 4.6', 'Gemini 3.1 Pro Preview', 'Gemini 3.1 Flash Lite Preview', 'Qwen-Max-Latest', 'GLM-5', 'Kimi K2.5'];
 
+// 并发限制：避免大量文件操作同时发起
+const concurrentMap = async <T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+  limit = 8
+): Promise<R[]> => {
+  const results: R[] = new Array(items.length);
+  let index = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, () =>
+    (async () => {
+      while (index < items.length) {
+        const i = index++;
+        results[i] = await fn(items[i]);
+      }
+    })()
+  );
+  await Promise.all(workers);
+  return results;
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
@@ -73,9 +93,10 @@ const Home = () => {
       if (activeRef && !activeRef.current) {
         return;
       }
-      const enriched = await Promise.all((Array.isArray(rawProjects) ? rawProjects : [])
-        .filter((project) => typeof project.id === 'string')
-        .map(async (project) => {
+      const filtered = (Array.isArray(rawProjects) ? rawProjects : []).filter(
+        (project) => typeof project.id === 'string'
+      );
+      const enriched = await concurrentMap(filtered, async (project) => {
           const metrics = extractProjectMediaMetrics(project);
           const videoPath = resolveProjectVideoPath(project);
           const exactSizeMb = videoPath ? (await getFileSizeBytes(videoPath)) / 1024 / 1024 : 0;
@@ -94,7 +115,7 @@ const Home = () => {
             durationSec: metrics.durationSec,
             sizeMb,
           } satisfies HomeProjectItem;
-        }));
+        });
       if (!activeRef || activeRef.current) {
         setProjects(enriched);
       }
