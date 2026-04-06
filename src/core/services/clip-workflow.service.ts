@@ -98,9 +98,9 @@ export class ClipWorkflowService {
     // Step 1: 视频分析
     const analysis = await this.analyzeVideo(videoInfo);
     
-    // Step 2: 场景检测
+    // Step 2: 场景切换点（复用 analyzeVideo 已有结果，无需重复调用）
     const sceneChanges = this.config.detectSceneChange
-      ? await this.detectScenes(analysis)
+      ? (analysis.scenes || []).map((s) => ({ time: s.startTime, confidence: s.confidence || 0.8 }))
       : [];
     
     // Step 3: 静音检测
@@ -146,25 +146,6 @@ export class ClipWorkflowService {
       detectEmotions: true,
     });
     return visionService.generateAnalysisReport(videoInfo, scenes, objects, emotions);
-  }
-
-  /**
-   * 检测场景切换点
-   */
-  private async detectScenes(analysis: VideoAnalysis): Promise<Array<{ time: number; confidence: number }>> {
-    const scenes = analysis.scenes || [];
-    return scenes.map(scene => ({
-      time: scene.startTime,
-      confidence: scene.confidence || 0.8,
-    }));
-  }
-
-  /**
-   * 检测静音段落
-   */
-  private async detectSilence(analysis: VideoAnalysis): Promise<Array<{ start: number; end: number }>> {
-    // 当前 VideoAnalysis 结构未包含音频分段，返回空数组保守处理
-    return [];
   }
 
   /**

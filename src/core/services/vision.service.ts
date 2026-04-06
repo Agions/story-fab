@@ -140,17 +140,17 @@ export class VisionService {
     // 2. 场景分类
     const classifiedScenes = await this.classifyScenes(baseScenes, videoInfo);
 
-    // 3. 物体检测
-    const objects = detectObjects
-      ? await this.detectObjectsInScenes(classifiedScenes, videoInfo)
-      : [];
+    // 3. 物体检测 + 情感分析（并行，独立分析维度）
+    const [objects, emotions] = await Promise.all([
+      detectObjects
+        ? this.detectObjectsInScenes(classifiedScenes, videoInfo)
+        : ([] as ObjectDetection[]),
+      detectEmotions
+        ? this.analyzeEmotions(classifiedScenes, videoInfo)
+        : ([] as EmotionAnalysis[]),
+    ]);
 
-    // 4. 情感分析
-    const emotions = detectEmotions
-      ? await this.analyzeEmotions(classifiedScenes, videoInfo)
-      : [];
-
-    // 5. 场景优化
+    // 4. 场景优化
     const optimizedScenes = this.optimizeScenes(classifiedScenes, objects, emotions);
 
     return {
@@ -449,12 +449,21 @@ export class VisionService {
     objects: ObjectDetection[],
     emotions: EmotionAnalysis[]
   ): Scene[] {
-    return scenes.map(scene => {
-      const sceneObjects = objects.filter(o => o.sceneId === scene.id);
-      const sceneEmotion = emotions.find(e => e.sceneId === scene.id);
+    // 预建查找表：sceneId → objects/emotions，避免 O(n²) 嵌套循环
+    const objectMap = new Map<string, ObjectDetection[]>();
+    for (const obj of objects) {
+      const list = objectMap.get(obj.sceneId) ?? [];
+      list.push(obj);
+      objectMap.set(obj.sceneId, list);
+    }
+    const emotionMap = new Map(emotions.map((e) => [e.sceneId, e]));
+
+    return scenes.map((scene) => {
+      const sceneObjects = objectMap.get(scene.id) ?? [];
+      const sceneEmotion = emotionMap.get(scene.id) ?? null;
 
       // 生成更准确的描述
-      const description = this.generateSceneDescription(scene, sceneObjects, sceneEmotion);
+      const description = this.generateSceneDescription(scene, sceneObjects, sceneEmotion ?? undefined);
 
       return {
         ...scene,
