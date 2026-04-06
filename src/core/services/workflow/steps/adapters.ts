@@ -13,7 +13,7 @@ import { WorkflowEngine } from '../WorkflowEngine';
 import { RetryRequest, SkipRequest } from '../WorkflowEngine';
 import type { IStepExecutor } from '../IStepExecutor';
 import type { StepContext } from '../WorkflowEngine';
-import type { WorkflowConfig } from '../types';
+import type { WorkflowConfig, WorkflowStep } from '../types';
 
 import {
   executeUploadStep,
@@ -36,7 +36,7 @@ const uploadExecutor: IStepExecutor = {
   step: 'upload',
   async execute(ctx: StepContext) {
     const { projectId, config, updateData, reportProgress } = ctx;
-    const videoFile = (config as any).videoFile as File;
+    const videoFile = config.videoFile;
     if (!videoFile) throw new Error('缺少视频文件');
     const result = await executeUploadStep(projectId, videoFile, reportProgress);
     updateData({ videoInfo: result.videoInfo, projectId: result.projectId });
@@ -59,7 +59,7 @@ const templateSelectExecutor: IStepExecutor = {
     const { data, config, reportProgress } = ctx;
     if (!data.videoAnalysis) throw new Error('缺少视频分析结果');
     reportProgress(50);
-    const result = await executeTemplateStep(data.videoAnalysis, (config as any).preferredTemplate);
+    const result = await executeTemplateStep(data.videoAnalysis, config.preferredTemplate);
     ctx.updateData({ selectedTemplate: result.template });
   },
 };
@@ -251,13 +251,12 @@ const subtitleExecutor: IStepExecutor = {
       throw new SkipRequest('ASR 服务未安装，跳过字幕识别');
     }
 
-    const cfg = config as any;
     const result = await executeSubtitleStep(
       data.videoInfo,
       ctx.projectId,
       {
-        model: cfg?.whisperModel || 'base',
-        language: cfg?.whisperLanguage || 'auto',
+        model: config.whisperConfig?.model || 'base',
+        language: config.whisperConfig?.language || 'auto',
       },
       reportProgress,
     );
@@ -265,7 +264,7 @@ const subtitleExecutor: IStepExecutor = {
   },
 };
 
-const STEP_EXECUTORS: Record<string, IStepExecutor> = {
+const STEP_EXECUTORS: Partial<Record<WorkflowStep, IStepExecutor>> = {
   upload: uploadExecutor,
   analyze: analyzeExecutor,
   'template-select': templateSelectExecutor,
@@ -289,8 +288,10 @@ const STEP_EXECUTORS: Record<string, IStepExecutor> = {
 export function createWorkflowEngine(maxRetries = 1): WorkflowEngine {
   const engine = new WorkflowEngine();
   engine.setMaxRetries(maxRetries);
-  for (const [step, executor] of Object.entries(STEP_EXECUTORS)) {
-    engine.registerStepExecutor(step as any, executor);
+  for (const [step, executor] of Object.entries(STEP_EXECUTORS) as [WorkflowStep, IStepExecutor][]) {
+    if (executor) {
+      engine.registerStepExecutor(step, executor);
+    }
   }
   return engine;
 }

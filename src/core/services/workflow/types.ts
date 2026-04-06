@@ -197,6 +197,13 @@ export interface WorkflowConfig {
     preferredGenre?: string;
     preferredMood?: string;
   };
+  /** 上传的视频文件（upload 步骤使用） */
+  videoFile?: File;
+  /** Whisper 字幕识别配置 */
+  whisperConfig?: {
+    model?: string;
+    language?: string;
+  };
 }
 
 // 工作流事件回调

@@ -161,6 +161,49 @@ export class VisionService {
   }
 
   /**
+   * 提取关键帧
+   *
+   * 从视频中按场景边界提取关键帧。
+   * 若无 FFmpeg/WebCodecs 能力，则基于已检测的场景返回边界帧。
+   */
+  async extractKeyframes(
+    videoInfo: VideoInfo,
+    options: { maxFrames?: number } = {}
+  ): Promise<Array<{ id: string; timestamp: number; thumbnail: string; description: string }>> {
+    const { maxFrames = 20 } = options;
+
+    // 优先复用已检测的场景边界作为关键帧
+    try {
+      const { scenes } = await this.detectScenesAdvanced(videoInfo, {
+        minSceneDuration: 1,
+        threshold: 0.3,
+        detectObjects: false,
+        detectEmotions: false,
+      });
+
+      // 采样：均匀抽取 maxFrames 个场景的起始帧
+      const step = Math.max(1, Math.ceil(scenes.length / maxFrames));
+      const sampled = scenes.filter((_, i) => i % step === 0).slice(0, maxFrames);
+
+      return sampled.map((scene, i) => ({
+        id: scene.id || `kf_${i}`,
+        timestamp: scene.startTime,
+        thumbnail: scene.thumbnail || '',
+        description: scene.description || '',
+      }));
+    } catch {
+      // 检测失败时，按时间均匀采样
+      const interval = Math.max(1, videoInfo.duration / maxFrames);
+      return Array.from({ length: maxFrames }, (_, i) => ({
+        id: `kf_${i}`,
+        timestamp: i * interval,
+        thumbnail: '',
+        description: '',
+      }));
+    }
+  }
+
+  /**
    * 场景分割
    */
   private async segmentScenes(

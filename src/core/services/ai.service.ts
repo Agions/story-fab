@@ -188,13 +188,15 @@ export class AIService extends BaseService {
         const response = await this.callAPI(model, settings, prompt);
         
         // 并行调用视觉分析服务获取真实数据
+        type ScenesResult = { scenes: Array<{ id: string; startTime: number; endTime: number; thumbnail?: string; description?: string; tags?: string[] }> };
+        type KeyframesResult = Array<{ id: string; timestamp: number; thumbnail?: string; description?: string }>;
         const [scenesResult, keyframesResult] = await Promise.allSettled([
-          visionService.detectScenesAdvanced(videoInfo as any, { minSceneDuration: 3, threshold: 0.3 }),
-          visionService.extractKeyframes(videoInfo as any, { maxFrames: 20 }),
-        ]);
+          visionService.detectScenesAdvanced(videoInfo as VideoInfo, { minSceneDuration: 3, threshold: 0.3 }),
+          visionService.extractKeyframes(videoInfo as VideoInfo, { maxFrames: 20 }),
+        ]) as PromiseAllSettledResult<[ScenesResult, KeyframesResult]>;
 
         const scenes = scenesResult.status === 'fulfilled'
-          ? (scenesResult.value.scenes || []).map((s: any) => ({
+          ? scenesResult.value.scenes.map((s) => ({
               id: s.id || crypto.randomUUID(),
               startTime: s.startTime,
               endTime: s.endTime,
@@ -204,7 +206,7 @@ export class AIService extends BaseService {
             }))
           : [];
         const keyframes = keyframesResult.status === 'fulfilled'
-          ? (keyframesResult.value || []).map((k: any, idx: number) => ({
+          ? keyframesResult.value.map((k, idx) => ({
               id: k.id || `kf_${idx}`,
               timestamp: k.timestamp || 0,
               thumbnail: k.thumbnail || '',
