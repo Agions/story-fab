@@ -190,7 +190,7 @@ class PlotAnalysisService {
   private async extractKeyframes(videoInfo: VideoInfo): Promise<string[]> {
     try {
       const frames = await visionService.extractKeyframes(videoInfo, { maxFrames: 30 });
-      return frames.map(f => f.path || '');
+      return frames.map(f => f.thumbnail || '').filter(Boolean);
     } catch (error) {
       logger.warn('关键帧提取失败:', { error });
       return [];
