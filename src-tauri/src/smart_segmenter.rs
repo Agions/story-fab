@@ -372,9 +372,6 @@ impl SmartSegmenter {
 
         let mut segments = Vec::new();
         let mut segment_start: Option<u64> = None;
-        let mut segment_energy_sum = 0.0f32;
-        let mut segment_energy_count = 0usize;
-
         for i in 0..energy_data.len() {
             let (time_ms, energy) = energy_data[i];
 
@@ -382,13 +379,9 @@ impl SmartSegmenter {
                 segment_start = Some(time_ms);
             }
 
-            segment_energy_sum += energy;
-            segment_energy_count += 1;
-
             // Check if we should end the segment
             let duration = time_ms.saturating_sub(segment_start.unwrap_or(0));
             let next_time = energy_data.get(i + 1).map(|(t, _)| *t);
-            let next_duration = next_time.map(|nt| nt.saturating_sub(segment_start.unwrap_or(0)));
 
             let should_end = duration >= min_duration_ms
                 && (duration >= max_duration_ms
@@ -400,8 +393,6 @@ impl SmartSegmenter {
             if should_end {
                 segments.push((segment_start.unwrap_or(0), time_ms));
                 segment_start = None;
-                segment_energy_sum = 0.0;
-                segment_energy_count = 0;
             }
         }
 
@@ -420,7 +411,7 @@ impl SmartSegmenter {
 
     fn classify_segment(&self, seg: &(u64, u64), scene_changes: &[u64], _audio_path: &str) -> (String, f32) {
         let duration = seg.1.saturating_sub(seg.0);
-        let mid_point = seg.0 + duration / 2;
+        let _mid_point = seg.0 + duration / 2;
 
         // Check if this is right at a scene change
         let at_scene_change = scene_changes.iter().any(|&sc| {
