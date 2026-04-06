@@ -221,14 +221,28 @@ const WaveformCanvas: React.FC<WaveformCanvasProps> = React.memo(
       const barGap   = 1;
       const numBars  = Math.floor(width / (barWidth + barGap));
 
+      // Pre-build active segment lookup (avoid O(n) find per bar)
+      const activeSegmentMap = new Set(
+        segments
+          .filter((s) => activeSegmentId && s.id === activeSegmentId)
+          .map((s) => s.id)
+      );
+      const segAtTMap = new Map<number, EditorSegment>();
+      for (const s of segments) {
+        for (let tMs = s.startMs; tMs <= s.endMs; tMs += 100) {
+          segAtTMap.set(tMs, s);
+        }
+      }
+
       for (let i = 0; i < numBars; i++) {
         const t        = (i / numBars) * duration;
         const amp      = 0.2 + 0.6 * Math.abs(Math.sin(i * 0.7) * Math.cos(i * 0.3));
         const barH     = amp * (height * 0.72);
         const x        = i * (barWidth + barGap);
         const y        = (height - barH) / 2;
-        const segAtT   = segments.find((s) => t * 1000 >= s.startMs && t * 1000 <= s.endMs);
-        const isActive = segAtT && activeSegmentId === segAtT.id;
+        const tMsRounded = Math.round(t * 1000 / 100) * 100;
+        const segAtT   = segAtTMap.get(tMsRounded) ?? null;
+        const isActive = segAtT && segAtT.id in activeSegmentMap;
 
         if (segAtT) {
           ctx.fillStyle  = isActive ? '#FF9F43' : '#3a3a5c';

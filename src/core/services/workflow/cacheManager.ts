@@ -156,7 +156,7 @@ export class WorkflowCacheManager {
     const checkpoint: WorkflowCheckpoint = {
       id: `cp_${Date.now()}`,
       name,
-      data: JSON.parse(JSON.stringify(cache.stepData)),
+      data: structuredClone(cache.stepData),
       createdAt: Date.now(),
     };
 
@@ -202,7 +202,7 @@ export class WorkflowCacheManager {
   exportCache(projectId: string): string | null {
     const cache = this.getCache(projectId);
     if (!cache) return null;
-    return JSON.stringify(cache, null, 2);
+    return JSON.stringify(cache);
   }
 
   /**
