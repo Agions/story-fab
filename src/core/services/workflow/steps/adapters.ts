@@ -25,6 +25,7 @@ import {
   executeTimelineStep,
   executeExportStep,
   executeSubtitleStep,
+  executeRepurposingStep,
 } from './index';
 import { musicStep, type MusicStepInput } from './musicStep';
 
@@ -123,6 +124,32 @@ const aiClipExecutor: IStepExecutor = {
     const result = await executeAIClipStep(data.videoInfo, cfg.aiClipConfig, reportProgress);
     if (result) {
       ctx.updateData({ aiClipResult: result });
+    }
+  },
+};
+
+const repurposingExecutor: IStepExecutor = {
+  step: 'repurposing',
+  async execute(ctx: StepContext) {
+    const { data, config, reportProgress } = ctx;
+    const cfg = config as WorkflowConfig;
+
+    if (!cfg.repurposingConfig?.enabled) {
+      throw new SkipRequest('内容复用未启用');
+    }
+    if (!data.videoInfo || !data.videoAnalysis) {
+      throw new Error('缺少视频信息用于内容复用');
+    }
+
+    const result = await executeRepurposingStep(
+      data.videoInfo,
+      data.videoAnalysis,
+      cfg.repurposingConfig,
+      reportProgress,
+    );
+
+    if (result) {
+      ctx.updateData({ repurposingResult: result });
     }
   },
 };
@@ -273,6 +300,7 @@ const STEP_EXECUTORS: Partial<Record<WorkflowStep, IStepExecutor>> = {
   'script-edit': scriptEditExecutor,
   subtitle: subtitleExecutor,
   'ai-clip': aiClipExecutor,
+  repurposing: repurposingExecutor,
   music: musicExecutor,
   'timeline-edit': timelineEditExecutor,
   preview: previewExecutor,

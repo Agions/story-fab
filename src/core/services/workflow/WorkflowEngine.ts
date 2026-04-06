@@ -322,6 +322,7 @@ export class WorkflowEngine {
       'script-edit':     5,
       subtitle:          5,
       'ai-clip':        20,
+      repurposing:       5,
       music:             5,
       'timeline-edit':  15,
       preview:           5,

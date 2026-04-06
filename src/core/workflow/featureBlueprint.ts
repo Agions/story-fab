@@ -4,7 +4,7 @@ import type { WorkflowStep } from '@/core/types';
  * 工作流模式定义
  * 支持三种AI创作模式
  */
-export type WorkflowMode = 'ai-commentary' | 'ai-mixclip' | 'ai-first-person';
+export type WorkflowMode = 'ai-commentary' | 'ai-mixclip' | 'ai-first-person' | 'ai-repurposing';
 
 /**
  * 工作流模式配置
@@ -89,6 +89,23 @@ export const WORKFLOW_MODE_DEFINITIONS: Record<WorkflowMode, WorkflowModeDefinit
     syncTarget: 'strict',
     autonomy: 'auto-with-review',
     estimatedDuration: 18,
+  },
+  'ai-repurposing': {
+    id: 'ai-repurposing',
+    label: 'AI 内容复用',
+    description: '长视频自动拆条为多个短视频，生成 SEO 元数据，一键多平台发布。',
+    icon: 'Share',
+    steps: [
+      'upload',
+      'analyze',
+      'repurposing',
+      'preview',
+      'export',
+    ],
+    autoOriginalOverlayDefault: false,
+    syncTarget: 'balanced',
+    autonomy: 'full-auto',
+    estimatedDuration: 10,
   },
 };
 

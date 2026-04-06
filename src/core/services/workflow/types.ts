@@ -11,6 +11,7 @@ import type { OriginalityReport } from '@/core/templates/dedup';
 import type { ContentFingerprint, UniquenessCheckResult } from '@/core/services/uniqueness.service';
 import type { ClipAnalysisResult } from '@/core/services/aiClip/types';
 import type { MusicStepOutput } from '../steps/musicStep';
+import type { RepurposingResult } from '../clipRepurposing/pipeline';
 import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
 
 // 工作流步骤
@@ -23,6 +24,7 @@ export type WorkflowStep =
   | 'script-edit'
   | 'subtitle'
   | 'ai-clip'
+  | 'repurposing'
   | 'music'
   | 'timeline-edit'
   | 'preview'
@@ -138,6 +140,8 @@ export interface WorkflowData {
   aiClipResult?: ClipAnalysisResult;
   /** 配乐结果（music 步骤产出） */
   musicStepOutput?: MusicStepOutput;
+  /** 内容复用结果（repurposing 步骤产出） */
+  repurposingResult?: RepurposingResult;
 }
 
 // 工作流状态
@@ -197,6 +201,16 @@ export interface WorkflowConfig {
     preferredGenre?: string;
     preferredMood?: string;
   };
+  repurposingConfig?: {
+    enabled: boolean;
+    targetClipCount?: number;
+    minClipDuration?: number;
+    maxClipDuration?: number;
+    platform?: 'youtube' | 'tiktok' | 'instagram';
+    exportFormats?: Array<'9:16' | '1:1' | '16:9'>;
+    multiFormat?: boolean;
+    generateSEO?: boolean;
+  };
   /** 上传的视频文件（upload 步骤使用） */
   videoFile?: File;
   /** Whisper 字幕识别配置 */
@@ -225,7 +239,8 @@ export const STEP_PROGRESS: Record<WorkflowStep, number> = {
   'script-edit': 60,
   subtitle: 63,
   'ai-clip': 65,
-  music: 67,
+  repurposing: 67,
+  music: 68,
   'timeline-edit': 70,
   preview: 90,
   export: 95,
