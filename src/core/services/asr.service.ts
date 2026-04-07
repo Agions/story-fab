@@ -89,6 +89,32 @@ class ASRService extends BaseService {
   }
 
   /**
+   * 视频路径转字幕 — SubtitleEditor 专用入口
+   * 构造最小 VideoInfo 后调用 recognizeSpeech
+   * @param videoPath 视频文件路径
+   * @param duration  视频时长（秒）
+   * @param options   ASR 选项
+   */
+  async transcribeVideo(
+    videoPath: string,
+    duration: number,
+    options?: ASROptions
+  ): Promise<ASRResult> {
+    const videoInfo: VideoInfo = {
+      id: crypto.randomUUID(),
+      name: videoPath.split('/').pop() ?? videoPath,
+      path: videoPath,
+      duration,
+      width: 0,
+      height: 0,
+      size: 0,
+      fps: 0,
+      format: '',
+    };
+    return this.recognizeSpeech(videoInfo, options);
+  }
+
+  /**
    * 语音识别 - 将音频转换为文字
    * @param videoInfo 视频信息
    * @param options ASR 选项

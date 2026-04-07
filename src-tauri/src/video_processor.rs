@@ -43,6 +43,7 @@ pub struct TranscodeOptions {
     pub audio_bitrate: Option<String>, // e.g., "128k", "256k"
     pub format: Option<String>,       // "mp4", "mkv", "webm"
     pub hw_accel: Option<String>,    // "auto", "nvenc", "qsv", "videotoolbox", "none"
+    pub aspect_ratio: Option<String>, // "9:16" | "1:1" | "16:9"
 }
 
 impl Default for TranscodeOptions {
@@ -57,6 +58,7 @@ impl Default for TranscodeOptions {
             audio_bitrate: Some("192k".to_string()),
             format: Some("mp4".to_string()),
             hw_accel: Some("auto".to_string()),
+            aspect_ratio: None,
         }
     }
 }
@@ -650,6 +652,23 @@ impl VideoProcessor {
         }
 
         Ok(output_path.to_string())
+    }
+
+    /// 构建裁切 filter 字符串，返回 (filter, target_width, target_height)
+    fn build_crop_filter(&self, aspect: &str) -> Option<(String, u32, u32)> {
+        match aspect {
+            "9:16" => Some((
+                "scale=1080:1920:force_original_aspect_ratio=decrease,crop=1080:1920:(iw-1080)/2:(ih-1920)/2,setsar=1".to_string(),
+                1080,
+                1920,
+            )),
+            "1:1" => Some((
+                "scale='min(iw,ih)':'min(iw,ih)':force_original_aspect_ratio=decrease,crop='min(iw,ih)':'min(iw,ih)',setsar=1".to_string(),
+                1080,
+                1080,
+            )),
+            _ => None,
+        }
     }
 
     fn add_encoding_args(&self, args: &mut Vec<String>, opts: &TranscodeOptions) {

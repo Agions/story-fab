@@ -43,6 +43,8 @@ import {
 import { motion } from '@/components/common/motion-shim';
 import { whisperService } from '@/core/services/subtitle.service';
 import type { WhisperProgress, WhisperResult } from '@/core/services/subtitle.service';
+import { asrService } from '@/core/services/asr.service';
+import type { ASROptions } from '@/core/services/asr.service';
 import styles from './SubtitleEditor.module.scss';
 
 const { TextArea } = Input;
@@ -565,6 +567,9 @@ const SubtitleEditor: React.FC<SubtitleEditorProps> = ({
   const [selectedLanguage, setSelectedLanguage]           = useState(language);
   const [whisperResult, setWhisperResult]                 = useState<WhisperResult | null>(null);
 
+  // ASR state
+  const [isGeneratingSubtitles, setIsGeneratingSubtitles] = useState(false);
+
   const duration = propDuration ?? 0;
 
   // Check faster-whisper availability
@@ -726,6 +731,51 @@ const SubtitleEditor: React.FC<SubtitleEditorProps> = ({
     }
   }, [mediaPath, fasterWhisperAvailable, selectedModel, selectedLanguage]);
 
+  /**
+   * AI 生成字幕 — 调用 ASR 服务自动生成时间轴
+   * 与 Whisper 转录形成互补：ASR 侧重实时/流式识别，Whisper 侧重高精度转录
+   */
+  const handleASRGenerate = useCallback(async () => {
+    if (!mediaPath) { message.error('未提供媒体文件路径'); return; }
+    if (duration <= 0) { message.error('无法获取视频时长，请先加载视频'); return; }
+
+    setIsGeneratingSubtitles(true);
+    try {
+      // language 选项映射：editor 语言值 -> ASR language 值
+      const asrLanguageMap: Record<string, ASROptions['language']> = {
+        auto: 'zh_cn',
+        zh:   'zh_cn',
+        en:   'en_us',
+        ja:   'ja_jp',
+        ko:   'ko_kr',
+      };
+      const asrOptions: ASROptions = {
+        language:         asrLanguageMap[selectedLanguage] ?? 'zh_cn',
+        enableTimestamp: true,
+        enablePunctuation: true,
+      };
+
+      const result = await asrService.transcribeVideo(mediaPath, duration, asrOptions);
+
+      // 将 ASR segments 转换为 EditorSegment 格式
+      const newSegments: EditorSegment[] = result.segments.map((seg, i) => ({
+        id:       `asr-${Date.now()}-${i}`,
+        startMs:  Math.round(seg.startTime * 1000), // 秒 → 毫秒
+        endMs:    Math.round(seg.endTime   * 1000),
+        text:     seg.text,
+      }));
+
+      setSegments(newSegments);
+      message.success(
+        `AI 字幕生成完成！识别 ${newSegments.length} 条片段${result.language ? `（语言: ${result.language}）` : ''}`
+      );
+    } catch (error: any) {
+      message.error(`AI 字幕生成失败: ${error?.message ?? error}`);
+    } finally {
+      setIsGeneratingSubtitles(false);
+    }
+  }, [mediaPath, duration, selectedLanguage]);
+
   const handleImportSRT = useCallback(() => {
     const input = document.createElement('input');
     input.type  = 'file';
@@ -859,6 +909,16 @@ const SubtitleEditor: React.FC<SubtitleEditorProps> = ({
           >
             {isTranscribing ? '转录中…' : '开始转录'}
           </Button>
+          {/* AI 生成字幕 — ASR 服务（无需本地模型） */}
+          <Button
+            icon={<ThunderboltOutlined />}
+            onClick={handleASRGenerate}
+            loading={isGeneratingSubtitles}
+            disabled={!mediaPath}
+            className={styles.transcribeBtn}
+          >
+            {isGeneratingSubtitles ? '生成中…' : 'AI 生成字幕'}
+          </Button>
         </div>
       </section>
 
@@ -875,6 +935,23 @@ const SubtitleEditor: React.FC<SubtitleEditorProps> = ({
             strokeColor={{ '0%': '#FF9F43', '100%': '#FFBE76' }}
             trailColor="#2A2D42"
             status="active"
+          />
+        </motion.div>
+      )}
+
+      {/* ASR 生成进度 */}
+      {isGeneratingSubtitles && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className={styles.progressArea}
+        >
+          <span className={styles.progressStage}>AI 正在识别语音并生成字幕…</span>
+          <Progress
+            percent={100}
+            status="active"
+            strokeColor={{ '0%': '#00D4FF', '100%': '#00A3CC' }}
+            trailColor="#2A2D42"
           />
         </motion.div>
       )}
