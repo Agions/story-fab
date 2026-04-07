@@ -2,7 +2,7 @@
  * 步骤6: 导出视频 — AI Cinema Studio Redesign
  */
 import React, { useState, useEffect } from 'react';
-import { listen, UnlistenFn } from '@tauri-apps/api/event';
+import { listen, UnlistenFn, invoke } from '@tauri-apps/api/event';
 import { useCutDeck } from '../AIEditorContext';
 import { notify } from '@/shared';
 import type { ExportSettings } from '@/core/types';
@@ -108,22 +108,15 @@ const VideoExport: React.FC<VideoExportProps> = ({ onComplete }) => {
       const outputPath = `/tmp/CutDeck/export_${Date.now()}.mp4`;
 
       setProgressStage('正在编码...');
-      // TODO: 实际调用 Rust render_autonomous_cut 或 transcode_with_crop
-      // const result = await invoke<string>('render_autonomous_cut', {
-      //   input: { input_path: state.synthesisData.finalVideoUrl, output_path: outputPath }
-      // });
 
-      // 模拟导出（实际集成时移除此段）
-      await new Promise(r => setTimeout(r, 2000));
-      setProgress(30);
-      setProgressStage('正在渲染视频...');
-      await new Promise(r => setTimeout(r, 1500));
-      setProgress(65);
-      setProgressStage('正在合成音频...');
-      await new Promise(r => setTimeout(r, 1000));
-      setProgress(90);
-      setProgressStage('写入文件...');
-      await new Promise(r => setTimeout(r, 500));
+      // 实际调用 Rust render_autonomous_cut
+      const result = await invoke<string>('render_autonomous_cut', {
+        input: {
+          input: state.synthesisData.finalVideoUrl ?? '',
+          outputPath,
+        },
+      });
+
       setProgress(100);
       setProgressStage('导出完成');
       setEtaSeconds(0);

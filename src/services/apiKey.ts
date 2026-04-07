@@ -2,6 +2,7 @@
  * API 密钥验证服务
  */
 import axios from 'axios';
+import { logger } from '@/utils/logger';
 
 export interface ApiKeyValidationResult {
   isValid: boolean;
@@ -121,7 +122,7 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
 
       default:
         // 未知提供商，跳过验证但记录警告
-        console.warn(`[ApiKeyService] 未知的 AI 提供商: ${provider}，跳过验证`);
+        logger.warn(`[ApiKeyService] 未知的 AI 提供商: ${provider}，跳过验证`);
         return { isValid: true };
     }
 

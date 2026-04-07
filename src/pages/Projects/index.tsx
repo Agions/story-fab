@@ -54,7 +54,7 @@ const ProjectManager: React.FC = () => {
   const loadProjectData = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await listProjects<Record<string, unknown>>();
+      const data = await listProjects();
       const mapped = (Array.isArray(data) ? data : [])
         .filter((item) => typeof item.id === 'string')
         .map(asProjectView);

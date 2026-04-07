@@ -197,7 +197,7 @@ const Dashboard: React.FC = () => {
   const loadProjects = useCallback(async () => {
     try {
       setLoading(true);
-      const rawProjects = await listProjects<RawProjectRecord>();
+      const rawProjects = await listProjects();
       const filtered = rawProjects.filter((p) => typeof p.id === 'string');
       const mapped: Project[] = await concurrentMap(
         filtered,

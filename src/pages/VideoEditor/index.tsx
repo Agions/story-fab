@@ -8,7 +8,7 @@ import { notify } from '@/shared';
 import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
 import { logger } from '@/utils/logger';
 import { useVideoEditor } from './hooks/useVideoEditor';
-import { exportService, ExportConfig, ExportProgress } from '@/core/services/export.service';
+import { exportService, ExportConfig } from '@/core/services/export.service';
 
 import Toolbar from './components/Toolbar';
 import VideoPlayer from './components/VideoPlayer';
@@ -143,39 +143,22 @@ const VideoEditorPage: React.FC = () => {
       // 设置导出配置
       exportService.setConfig(exportConfig);
 
-      // 准备时间轴数据
-      const timeline = {
-        segments: segments.map(s => ({
-          sourceFile: videoSrc,
-          start: s.startTime,
-          end: s.endTime,
-        })),
-        outputPath: `export/${Date.now()}.${outputFormat}`,
-      };
+      // 输出路径
+      const outputPath = `export/${Date.now()}.${outputFormat}`;
 
       // 显示进度
-      const progressMsg: any = message.loading('正在导出视频...', 0);
+      message.loading('正在导出视频...', 0);
 
-      // 执行导出
-      const result = await exportService.export(
-        timeline as any,
-        (progress: ExportProgress) => {
-          const percent = Math.round(progress.progress);
-          if (percent % 20 === 0) {
-            logger.info(`导出进度: ${percent}%`);
-          }
-        }
+      // 执行导出（调用真实 Rust export_video 命令）
+      const result = await exportService.exportVideo(
+        videoSrc,
+        outputPath,
+        exportConfig
       );
 
-      // 关闭 loading
-      progressMsg();
-
-      if (result.success) {
-        notify.success(`视频导出成功: ${result.filePath}`);
-        logger.info('导出成功:', result);
-      } else {
-        throw new Error(result.error || '导出失败');
-      }
+      // 导出成功
+      notify.success(`视频导出成功: ${result.outputPath}`);
+      logger.info('导出成功:', result);
     } catch (error) {
       logger.error('导出失败:', error);
       notify.error(error, '导出失败，请重试');

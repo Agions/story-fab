@@ -512,7 +512,7 @@ const Timeline: React.FC<TimelineProps> = ({
                       handleClipUpdate(selectedClip.id, {
                         transitions: {
                           ...selectedClip.transitions,
-                          out: { type: t.value as any, duration: 0.5 },
+                          out: { type: t.value as Transition['type'], duration: 0.5 },
                         },
                       } as Partial<Clip>);
                     }

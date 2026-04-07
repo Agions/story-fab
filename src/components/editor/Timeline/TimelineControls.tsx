@@ -78,7 +78,7 @@ const TimelineControls: React.FC<TimelineControlsProps> = memo(({
   onAddTrack,
 }) => {
   // 键盘快捷键
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
       return
     }
@@ -134,7 +134,7 @@ const TimelineControls: React.FC<TimelineControlsProps> = memo(({
   return (
     <div
       className="timeline-controls"
-      onKeyDown={handleKeyDown as unknown as React.KeyboardEventHandler}
+      onKeyDown={handleKeyDown}
       tabIndex={0}
       style={{
         height: 56,

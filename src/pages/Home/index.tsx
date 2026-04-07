@@ -89,7 +89,7 @@ const Home = () => {
   const loadProjects = useCallback(async (activeRef?: { current: boolean }) => {
     setProjectsLoading(true);
     try {
-      const rawProjects = await listProjects<RawProjectRecord>();
+      const rawProjects = await listProjects();
       if (activeRef && !activeRef.current) {
         return;
       }

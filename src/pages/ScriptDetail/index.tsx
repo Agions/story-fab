@@ -94,7 +94,7 @@ const ScriptDetail: React.FC = () => {
         if (projectId) {
           currentProject = await loadProjectWithRetry<ProjectWithScripts>(projectId, { retries: 2, retryDelayMs: 260 });
         } else {
-          const allProjects = await listProjects<ProjectWithScripts>();
+          const allProjects = await listProjects();
           currentProject = findProjectByScriptId(allProjects, scriptId);
         }
 

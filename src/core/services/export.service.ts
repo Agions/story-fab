@@ -102,6 +102,11 @@ export interface ExportResult {
 
 class ExportService {
   private currentExportId: string | null = null;
+  private config: ExportConfig | null = null;
+
+  setConfig(config: ExportConfig): void {
+    this.config = config;
+  }
 
   async exportVideo(
     inputPath: string,

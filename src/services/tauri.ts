@@ -563,7 +563,7 @@ export const openExternalUrl = async (url: string): Promise<boolean> => {
 };
 
 // 列出所有项目
-export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
+export const listProjects = async (): Promise<ProjectFileData[]> => {
   try {
     // 尝试使用 Rust 函数列出项目
     try {
@@ -572,49 +572,42 @@ export const listProjects = async <T = ProjectFileData>(): Promise<T[]> => {
         .map(normalizeListedProject)
         .filter((item): item is ProjectFileData => item !== null);
       if (normalized.length > 0) {
-        logger.info('通过 Rust 函数获取项目列表成功:', normalized.length);
-        return normalized as T[];
+        logger.info('[listProjects] Rust 项目列表获取成功:', normalized.length);
+        return normalized;
       }
-      logger.warn('Rust 项目列表为空或数据异常，切换到文件扫描兜底');
+      logger.warn('[listProjects] Rust 项目列表为空，切换到文件扫描兜底');
     } catch (rustError) {
-      logger.warn('通过 Rust 获取项目列表失败，使用 JS API 替代:', rustError);
+      logger.warn('[listProjects] Rust 获取失败，切换到 JS API 兜底:', rustError);
     }
-    
+
     // 确保应用数据目录存在
     await ensureAppDataDir();
-    
-    // 通过 Tauri API 获取所有 .json 文件
     const appDir = 'CutDeck';
-    
-    // 这里需要实现列出目录文件的逻辑，但 @tauri-apps/api/fs 没有直接的 readDir 函数
-    // 使用 invoke 调用 Rust 端的自定义函数
-    const files = await invoke('list_app_data_files', { directory: appDir });
-    
+    const files = await invoke<string[]>('list_app_data_files', { directory: appDir });
+
     if (!files || !Array.isArray(files) || files.length === 0) {
       return [];
     }
-    
-    // 加载每个项目文件
-    const projectsPromises = (files as string[])
-      .filter(file => file.endsWith('.json'))
-      .map(async (file) => {
-        try {
-          const projectId = file.replace('.json', '');
-          return await loadProjectFromFile(projectId);
-        } catch (error) {
-          logger.error(`加载项目 ${file} 失败:`, error);
-          return null;
-        }
-      });
-    
-    const projects = await Promise.all(projectsPromises);
-    const normalized = projects
+
+    const projects = await Promise.all(
+      files
+        .filter(file => file.endsWith('.json'))
+        .map(async (file) => {
+          try {
+            const projectId = file.replace('.json', '');
+            return await loadProjectFromFile(projectId);
+          } catch (error) {
+            logger.error(`[listProjects] 加载项目 ${file} 失败:`, error);
+            return null;
+          }
+        })
+    );
+
+    return projects
       .map(normalizeListedProject)
       .filter((project): project is ProjectFileData => project !== null);
-    
-    return normalized as unknown as T[];
   } catch (error) {
-    logger.error('列出项目失败:', error);
+    logger.error('[listProjects] 列出项目失败:', error);
     throw error;
   }
 };
