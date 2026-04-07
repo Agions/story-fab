@@ -173,7 +173,7 @@ interface AIClipPanelProps {
 | 渠道 | 用途 |
 |------|------|
 | [GitHub Issues](https://github.com/Agions/CutDeck/issues) | Bug 报告、功能请求 |
-| [GitHub Discussions](https://github.com/Agions/CutDeck/discussions) | 提问、讨论 |
+| [GitHub Issues](https://github.com/Agions/CutDeck/issues) | Bug 报告、功能请求 |
 
 ---
 

@@ -4,7 +4,7 @@ layout: home
 hero:
   name: CutDeck
   text: AI 驱动的专业视频剪辑工具
-  tagline: 上传长视频 · AI 分析高光 · 一键拆条 · 多格式导出
+  tagline: 长视频自动拆条 · 多格式导出 · 本地 Whisper 字幕 · Rust 渲染管线
   image:
     src: /logo.svg
     alt: CutDeck Logo

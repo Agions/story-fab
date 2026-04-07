@@ -48,6 +48,7 @@ export default defineConfig({
         items: [
           { text: '快速开始', link: '/guide/quick-start' },
           { text: '批量处理', link: '/guide/batch-processing' },
+          { text: 'AI 智能拆条', link: '/guide/clip-repurpose' },
           { text: '短视频创作', link: '/guide/short-video' },
           { text: '字幕处理', link: '/guide/subtitle' },
           { text: '导出格式', link: '/guide/export' },
@@ -122,13 +123,9 @@ export default defineConfig({
           text: '入门指南',
           items: [
             { text: '5 分钟快速开始', link: '/guide/quick-start' },
+            { text: 'AI 智能拆条', link: '/guide/clip-repurpose' },
             { text: '短视频创作', link: '/guide/short-video' },
             { text: '字幕处理', link: '/guide/subtitle' },
-          ]
-        },
-        {
-          text: '高级功能',
-          items: [
             { text: '批量处理', link: '/guide/batch-processing' },
             { text: '导出格式', link: '/guide/export' },
           ]
