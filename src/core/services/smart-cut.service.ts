@@ -5,6 +5,7 @@
 
 import { BaseService, ServiceError } from './base.service';
 import { logger } from '@/utils/logger';
+import { invoke } from '@tauri-apps/api/core';
 import type { VideoInfo } from '@/core/types';
 import type {
   AIClipConfig,
@@ -175,98 +176,120 @@ class SmartCutService extends BaseService {
   }
 
   /**
-   * 场景切换检测
+   * 场景切换检测 — 调用 Rust smart_segmenter（真实音频/视觉分析）
    */
   private async detectSceneChanges(
     videoInfo: VideoInfo,
     threshold: number
   ): Promise<CutPoint[]> {
-    const cutPoints: CutPoint[] = [];
-    const segmentDuration = 5; // 每5秒检测一次
-    const numSegments = Math.floor(videoInfo.duration / segmentDuration);
+    try {
+      const segments = await invoke<Array<{
+        start_ms: number;
+        end_ms: number;
+        segment_type: string;
+        duration_ms: number;
+        confidence: number;
+        is_scene_change?: boolean;
+        peak_energy?: number;
+        silence_ratio?: number;
+      }>>('detect_smart_segments', {
+        input: {
+          videoPath: videoInfo.path,
+          minDurationMs: 1000,
+          maxDurationMs: 30000,
+          sceneThreshold: threshold,
+          silenceThresholdDb: -40,
+          detectDialogue: true,
+          detectTransitions: true,
+        },
+      });
 
-    for (let i = 1; i < numSegments; i++) {
-      const timestamp = i * segmentDuration;
-
-      // 模拟场景变化分数
-      const sceneChangeScore = Math.random();
-
-      if (sceneChangeScore > threshold) {
-        cutPoints.push({
+      return segments
+        .filter(seg => seg.is_scene_change)
+        .map(seg => ({
           id: crypto.randomUUID(),
-          timestamp,
-          type: 'scene',
-          confidence: sceneChangeScore,
-          description: `场景切换点 (置信度: ${(sceneChangeScore * 100).toFixed(0)}%)`,
-          suggestedAction: 'keep',
+          timestamp: seg.start_ms / 1000, // ms → s
+          type: 'scene' as CutPointType,
+          confidence: seg.confidence,
+          description: `场景切换 (置信度: ${(seg.confidence * 100).toFixed(0)}%)`,
+          suggestedAction: 'keep' as const,
           metadata: {
-            sceneChange: sceneChangeScore,
+            sceneChange: seg.confidence,
+            segmentType: seg.segment_type,
+            peakEnergy: seg.peak_energy,
+            silenceRatio: seg.silence_ratio,
           },
-        });
-      }
+        }));
+    } catch (error) {
+      logger.warn('[SmartCut] Rust 场景检测失败，降级到规则检测:', error);
+      // 降级：返回空，后续用静音检测兜底
+      return [];
     }
-
-    return cutPoints;
   }
 
   /**
    * 静音检测
    */
+  /**
+   * 静音检测 — 调用 Rust smart_segmenter（真实音频能量分析）
+   */
   private async detectSilence(
     videoInfo: VideoInfo,
     config: AIClipConfig
   ): Promise<CutPoint[]> {
-    const cutPoints: CutPoint[] = [];
-    let silenceStart = 0;
-    let inSilence = false;
+    try {
+      const segments = await invoke<Array<{
+        start_ms: number;
+        end_ms: number;
+        segment_type: string;
+        duration_ms: number;
+        confidence: number;
+        is_scene_change?: boolean;
+        peak_energy?: number;
+        silence_ratio?: number;
+      }>>('detect_smart_segments', {
+        input: {
+          videoPath: videoInfo.path,
+          minDurationMs: 500,
+          maxDurationMs: 30000,
+          silenceThresholdDb: -40,
+          detectDialogue: false,
+          detectTransitions: false,
+        },
+      });
 
-    // 模拟静音区间检测（每0.5秒采样一次）
-    for (let t = 0; t < videoInfo.duration; t += 0.5) {
-      // 模拟音频电平
-      const audioLevel = Math.random();
+      const cutPoints: CutPoint[] = [];
+      for (const seg of segments) {
+        // 只处理静音类型或高静音比的片段
+        if (seg.segment_type !== 'Silence') continue;
+        if ((seg.silence_ratio ?? 0) < 0.3) continue;
 
-      if (audioLevel < 0.1 && !inSilence) {
-        // 进入静音
-        silenceStart = t;
-        inSilence = true;
-      } else if (audioLevel >= 0.1 && inSilence) {
-        // 退出静音
-        const silenceDuration = t - silenceStart;
+        const startSec = seg.start_ms / 1000;
+        const endSec = seg.end_ms / 1000;
+        const durationSec = seg.duration_ms / 1000;
 
-        if (silenceDuration >= config.minSilenceDuration) {
+        if (durationSec >= config.minSilenceDuration) {
           cutPoints.push({
             id: crypto.randomUUID(),
-            timestamp: silenceStart,
+            timestamp: startSec,
             type: 'silence',
-            confidence: 0.9,
-            description: `静音段: ${silenceStart.toFixed(1)}s - ${t.toFixed(1)}s (${silenceDuration.toFixed(1)}s)`,
+            confidence: seg.confidence,
+            description: `静音段: ${startSec.toFixed(1)}s - ${endSec.toFixed(1)}s (${durationSec.toFixed(1)}s)`,
             suggestedAction: config.removeSilence ? 'remove' : 'trim',
             metadata: {
-              audioLevel,
+              audioLevel: 1 - (seg.silence_ratio ?? 0),
+              peakEnergy: seg.peak_energy,
+              silenceRatio: seg.silence_ratio,
             },
           });
-
-          // 静音结束点也加一个剪辑点
-          if (config.removeSilence) {
-            cutPoints.push({
-              id: crypto.randomUUID(),
-              timestamp: t,
-              type: 'silence',
-              confidence: 0.9,
-              description: `静音结束`,
-              suggestedAction: 'trim',
-              metadata: {
-                audioLevel,
-              },
-            });
-          }
         }
-
-        inSilence = false;
       }
-    }
 
-    return cutPoints;
+      return cutPoints;
+    } catch (error) {
+      logger.warn('[SmartCut] Rust 静音检测失败，降级:', error);
+      return [];
+    }
   }
 
   /**
