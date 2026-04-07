@@ -19,6 +19,7 @@ const AIAnalyze = lazy(() => import('@/components/AIPanel/CutDeck/AIAnalyze'));
 const ScriptGenerate = lazy(() => import('@/components/AIPanel/CutDeck/ScriptGenerate'));
 const VideoSynthesize = lazy(() => import('@/components/AIPanel/CutDeck/VideoSynthesize'));
 const VideoExport = lazy(() => import('@/components/AIPanel/CutDeck/VideoExport'));
+const ClipRepurpose = lazy(() => import('@/components/AIPanel/CutDeck/ClipRepurpose'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
@@ -81,6 +82,8 @@ const AIVideoEditorContent: React.FC = () => {
         return <VideoUpload onNext={goToNextStep} />;
       case 'ai-analyze':
         return <AIAnalyze onNext={goToNextStep} />;
+      case 'clip-repurpose':
+        return <ClipRepurpose onNext={goToNextStep} />;
       case 'script-generate':
         return <ScriptGenerate onNext={goToNextStep} />;
       case 'video-synthesize':

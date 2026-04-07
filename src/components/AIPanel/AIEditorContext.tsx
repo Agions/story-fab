@@ -14,9 +14,10 @@ export type CutDeckStep =
   | 'project-create'    // 1. 创建项目
   | 'video-upload'      // 2. 上传视频
   | 'ai-analyze'        // 3. AI视频分析
-  | 'script-generate'   // 4. 生成文案
-  | 'video-synthesize' // 5. 视频合成
-  | 'export';          // 6. 导出
+  | 'clip-repurpose'    // 4. AI智能拆条（新增）
+  | 'script-generate'   // 5. 生成文案
+  | 'video-synthesize' // 6. 视频合成
+  | 'export';          // 7. 导出
 
 // 流程状态
 export interface CutDeckState {
@@ -136,6 +137,7 @@ const initialState: CutDeckState = {
     'project-create': false,
     'video-upload': false,
     'ai-analyze': false,
+    'clip-repurpose': false,
     'script-generate': false,
     'video-synthesize': false,
     'export': false,
@@ -193,6 +195,7 @@ const getNextStep = (currentStep: CutDeckStep): CutDeckStep => {
     'project-create',
     'video-upload',
     'ai-analyze',
+    'clip-repurpose',
     'script-generate',
     'video-synthesize',
     'export',
@@ -357,6 +360,7 @@ function clipFlowReducer(state: CutDeckState, action: CutDeckAction): CutDeckSta
         'project-create',
         'video-upload',
         'ai-analyze',
+        'clip-repurpose',
         'script-generate',
         'video-synthesize',
         'export',
@@ -505,6 +509,7 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
       'project-create',
       'video-upload',
       'ai-analyze',
+      'clip-repurpose',
       'script-generate',
       'video-synthesize',
       'export',

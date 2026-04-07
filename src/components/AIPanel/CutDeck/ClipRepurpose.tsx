@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useCutDeck } from '../AIEditorContext';
 import { Button, Progress, Tag, Checkbox, Select, message } from 'antd';
 import {
   ThunderboltOutlined,
@@ -50,18 +51,16 @@ const FORMAT_OPTIONS: { value: AspectRatio; label: string; emoji: string }[] = [
 ];
 
 interface ClipRepurposeProps {
-  videoPath: string;
-  videoInfo: { duration: number; width: number; height: number };
-  analysis: Record<string, unknown>;
-  onComplete?: (exportedPaths: string[]) => void;
+  onNext?: () => void;
 }
 
-const ClipRepurpose: React.FC<ClipRepurposeProps> = ({
-  videoPath,
-  videoInfo,
-  analysis,
-  onComplete,
-}) => {
+const ClipRepurpose: React.FC<ClipRepurposeProps> = ({ onNext }) => {
+  const { state } = useCutDeck();
+  const { currentVideo, analysis } = state;
+  const videoPath = currentVideo?.path ?? '';
+  const videoInfo = currentVideo
+    ? { duration: currentVideo.duration, width: currentVideo.width ?? 1920, height: currentVideo.height ?? 1080 }
+    : { duration: 0, width: 1920, height: 1080 };
   const [platform, setPlatform] = useState<SocialPlatform>('douyin');
   const [selectedFormats, setSelectedFormats] = useState<AspectRatio[]>(['9:16', '1:1']);
   const [targetCount, setTargetCount] = useState(5);
@@ -102,8 +101,8 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = ({
       };
 
       const result = await pipeline.run(
-        { path: videoPath, duration: videoInfo.duration } as never,
-        analysis as never,
+        { path: videoPath, duration: videoInfo.duration },
+        analysis ?? {},
         options
       );
 
@@ -149,7 +148,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = ({
       }
       setExportedPaths(exported);
       message.success(`导出完成！共 ${exported.length} 个文件`);
-      onComplete?.(exported);
+      if (exported.length > 0) onNext?.();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       message.error(`导出失败: ${msg}`);
