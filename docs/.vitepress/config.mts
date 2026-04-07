@@ -14,7 +14,7 @@ export default defineConfig({
   cleanUrls: true,
 
   // 禁用自动主题切换，由 CSS 完全控制深色主题
-  appearance: false,
+  appearance: true,  // 默认浅色，用户可手动切换深色
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/CutDeck/logo.svg' }],
@@ -32,6 +32,11 @@ export default defineConfig({
 
   // VitePress 主题配置
   themeConfig: {
+    // 深色模式切换按钮（默认开启）
+    // appearance: 'force-dark' | 'force-light' | boolean
+    // 已在上方 appearance 字段控制
+
+
     logo: '/logo.svg',
     siteTitle: 'CutDeck',
 
