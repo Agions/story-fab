@@ -1,5 +1,6 @@
 import { videoService } from '../video.service';
 import { visionService } from '../vision.service';
+import { invoke } from '@tauri-apps/api/core';
 import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
 import { DEFAULT_CLIP_CONFIG } from './types';
 import type {
@@ -114,26 +115,35 @@ async function detectSilenceSegments(
   videoInfo: VideoInfo,
   config: AIClipConfig
 ): Promise<Array<{ start: number; end: number; duration: number }>> {
-  const segments: Array<{ start: number; end: number; duration: number }> = [];
-  const duration = videoInfo.duration;
-  let currentTime = 0;
+  try {
+    const rustSegments = await invoke<Array<{
+      start_ms: number;
+      end_ms: number;
+      segment_type: string;
+      duration_ms: number;
+      silence_ratio?: number;
+    }>>('detect_smart_segments', {
+      input: {
+        videoPath: videoInfo.path,
+        minDurationMs: 500,
+        maxDurationMs: 30000,
+        silenceThresholdDb: -40,
+        detectDialogue: false,
+        detectTransitions: false,
+      },
+    });
 
-  while (currentTime < duration) {
-    if (Math.random() > 0.7) {
-      const silenceDuration = Math.random() * 2 + config.minSilenceDuration;
-      const start = currentTime;
-      const end = Math.min(start + silenceDuration, duration);
-
-      if (end - start >= config.minSilenceDuration) {
-        segments.push({ start, end, duration: end - start });
-      }
-      currentTime = end;
-    } else {
-      currentTime += Math.random() * 10 + 5;
-    }
+    return rustSegments
+      .filter(seg => seg.segment_type === 'Silence' || (seg.silence_ratio ?? 0) > 0.3)
+      .map(seg => ({
+        start: seg.start_ms / 1000,
+        end: seg.end_ms / 1000,
+        duration: seg.duration_ms / 1000,
+      }));
+  } catch (error) {
+    // Rust 失败时返回空，不阻断主流程
+    return [];
   }
-
-  return segments.sort((a, b) => a.start - b.start);
 }
 
 function generateCutPoints(

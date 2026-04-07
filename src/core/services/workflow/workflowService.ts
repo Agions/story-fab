@@ -246,10 +246,8 @@ export class WorkflowService {
   }
 
   private async rewriteScript(script: ScriptData): Promise<ScriptData> {
-    const randomSeed = Math.random().toString(36).substring(7);
     return {
       ...script,
-      content: script.content + `\n<!-- rewrite: ${randomSeed} -->`,
       updatedAt: new Date().toISOString(),
     };
   }
