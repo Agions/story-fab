@@ -68,6 +68,7 @@ const Timeline: React.FC<TimelineProps> = ({
   const [currentTool, setCurrentTool] = useState<TimelineTool>('select');
   const [isPlaying, setIsPlaying] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0); // 用于虚拟化
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   // Refs
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -177,7 +178,9 @@ const Timeline: React.FC<TimelineProps> = ({
 
   // ── 虚拟化：监听滚动位置变化 ─────────────────────────────────────────
   const handleTracksScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    scrollLeftRef.current = e.currentTarget.scrollLeft;
+    const left = e.currentTarget.scrollLeft;
+    scrollLeftRef.current = left;
+    setScrollLeft(left); // 触发虚拟化重算
   }, []);
 
   // ==============================================
@@ -385,7 +388,7 @@ const Timeline: React.FC<TimelineProps> = ({
         scale={scale}
         duration={duration}
         currentTime={currentTime}
-        scrollLeft={scrollLeftRef.current}
+        scrollLeft={scrollLeft}
         onSeek={handleSeek}
       />
 
@@ -394,7 +397,9 @@ const Timeline: React.FC<TimelineProps> = ({
         ref={tracksContainerRef}
         className={styles.tracksContainer}
         onScroll={(e) => {
-          scrollLeftRef.current = e.currentTarget.scrollLeft;
+          const left = e.currentTarget.scrollLeft;
+          scrollLeftRef.current = left;
+          setScrollLeft(left);
         }}
         onClick={(e) => {
           // 点击空白区域取消选中
@@ -434,7 +439,7 @@ const Timeline: React.FC<TimelineProps> = ({
               onClipUpdate={handleClipUpdate}
               onTrackUpdate={handleTrackUpdate}
               virtualContainerWidth={containerWidth}
-              virtualScrollLeft={scrollLeftRef.current}
+              virtualScrollLeft={scrollLeft}
             />
           ))}
 
