@@ -71,6 +71,18 @@ struct AutonomousRenderInput {
     segments: Option<Vec<AutonomousRenderSegment>>,
 }
 
+/// 多格式裁切输入参数
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct TranscodeCropInput {
+    input_path: String,
+    output_path: String,
+    aspect: String,             // "9:16" | "1:1" | "16:9"
+    start_time: Option<f64>,
+    end_time: Option<f64>,
+    quality: Option<String>,     // "low" | "medium" | "high"
+}
+
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct AutonomousRenderSegment {
@@ -595,6 +607,60 @@ fn get_file_size(path: String) -> Result<u64, String> {
 
     let metadata = fs::metadata(&path).map_err(|e| format!("读取文件信息失败: {e}"))?;
     Ok(metadata.len())
+}
+
+/// 多格式裁切导出命令
+/// 支持 9:16（抖音竖屏）、1:1（小红书方屏）、16:9（横屏）
+#[tauri::command]
+fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> {
+    if input.input_path.trim().is_empty() || input.output_path.trim().is_empty() {
+        return Err("输入或输出路径不能为空".to_string());
+    }
+
+    let mut cmd = Command::new(ffmpeg_binary());
+    cmd.arg("-y");
+
+    // 起始时间
+    if let Some(start) = input.start_time {
+        cmd.arg("-ss").arg(start.to_string());
+    }
+
+    cmd.arg("-i").arg(&input.input_path);
+
+    // 时长
+    if let (Some(start), Some(end)) = (input.start_time, input.end_time) {
+        let dur = (end - start).max(0.1);
+        cmd.arg("-t").arg(dur.to_string());
+    }
+
+    // 构建裁切 FFmpeg filter
+    let vf_filter = match input.aspect.as_str() {
+        "9:16" => "scale=1080:1920:force_original_aspect_ratio=decrease,crop=1080:1920:(iw-1080)/2:(ih-1920)/2,setsar=1".to_string(),
+        "1:1"  => "scale=min(iw,ih):min(iw,ih),crop=min(iw,ih):min(iw,ih),setsar=1".to_string(),
+        _       => return Err("不支持的宽高比，仅支持 9:16、1:1、16:9".to_string()),
+    };
+    cmd.arg("-vf").arg(vf_filter);
+
+    // 编码质量
+    let (crf, preset) = match input.quality.as_deref() {
+        Some("low")    => (28, "veryfast"),
+        Some("medium") => (23, "fast"),
+        _               => (20, "medium"),
+    };
+    cmd.args(["-c:v", "libx264", "-crf", &crf.to_string(), "-preset", preset]);
+
+    // 音频 + 封装
+    cmd.args(["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart"]);
+    cmd.arg(&input.output_path);
+
+    let output = cmd.output().map_err(|e| format!("FFmpeg 执行失败: {e}"))?;
+
+    if output.status.success() {
+        Ok(input.output_path)
+    } else {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        Err(format!("裁切导出失败: {stderr}"))
+    }
 }
 
 #[tauri::command]
@@ -1167,6 +1233,7 @@ pub fn run() {
             read_text_file,
             get_file_size,
             render_autonomous_cut,
+            transcode_with_crop,
             check_ffmpeg,
             analyze_video,
             generate_thumbnail,

@@ -662,4 +662,64 @@ export async function checkFFmpeg(): Promise<{installed: boolean, version?: stri
     logger.error('检查FFmpeg失败:', error);
     return { installed: false };
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 多格式裁切导出
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AspectRatio = '9:16' | '1:1' | '16:9';
+export type ExportQuality = 'low' | 'medium' | 'high';
+
+export interface TranscodeCropOptions {
+  inputPath: string;
+  outputPath: string;
+  aspect: AspectRatio;
+  startTime?: number;
+  endTime?: number;
+  quality?: ExportQuality;
+}
+
+export async function transcodeWithCrop(
+  options: TranscodeCropOptions
+): Promise<string> {
+  const { inputPath, outputPath, aspect, startTime, endTime, quality = 'high' } = options;
+
+  if (!inputPath || !outputPath) {
+    throw new Error('输入路径和输出路径不能为空');
+  }
+
+  if (!['9:16', '1:1', '16:9'].includes(aspect)) {
+    throw new Error('不支持的宽高比，仅支持 9:16、1:1、16:9');
+  }
+
+  return invoke<string>('transcode_with_crop', {
+    input: {
+      inputPath,
+      outputPath,
+      aspect,
+      startTime: startTime ?? null,
+      endTime: endTime ?? null,
+      quality,
+    },
+  });
+}
+
+export async function exportMultiFormat(
+  inputPath: string,
+  outputDir: string,
+  aspect: AspectRatio,
+  startTime?: number,
+  endTime?: number
+): Promise<{ success: boolean; outputPath: string; aspect: AspectRatio }> {
+  const filename = `${Date.now()}_${aspect.replace(':', 'x')}.mp4`;
+  const outputPath = `${outputDir}/${filename}`;
+
+  try {
+    await transcodeWithCrop({ inputPath, outputPath, aspect, startTime, endTime });
+    return { success: true, outputPath, aspect };
+  } catch (error) {
+    logger.error(`多格式导出失败 (${aspect}):`, error);
+    return { success: false, outputPath, aspect };
+  }
 } 

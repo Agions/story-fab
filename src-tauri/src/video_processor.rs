@@ -654,19 +654,23 @@ impl VideoProcessor {
         Ok(output_path.to_string())
     }
 
-    /// 构建裁切 filter 字符串，返回 (filter, target_width, target_height)
+    /// 构建 FFmpeg 裁切 filter 字符串和目标分辨率
+    /// aspect: "9:16" | "1:1" | "16:9"（默认不裁切）
     fn build_crop_filter(&self, aspect: &str) -> Option<(String, u32, u32)> {
         match aspect {
+            // 竖屏 9:16（抖音/短视频）
             "9:16" => Some((
                 "scale=1080:1920:force_original_aspect_ratio=decrease,crop=1080:1920:(iw-1080)/2:(ih-1920)/2,setsar=1".to_string(),
                 1080,
                 1920,
             )),
+            // 方屏 1:1（小红书）
             "1:1" => Some((
-                "scale='min(iw,ih)':'min(iw,ih)':force_original_aspect_ratio=decrease,crop='min(iw,ih)':'min(iw,ih)',setsar=1".to_string(),
+                "scale=min(iw,ih):min(iw,ih),crop=min(iw,ih):min(iw,ih),setsar=1".to_string(),
                 1080,
                 1080,
             )),
+            // 横屏 16:9（默认，不裁切）
             _ => None,
         }
     }
@@ -724,6 +728,13 @@ impl VideoProcessor {
 
         // Faststart for web playback
         args.extend(["-movflags".to_string(), "+faststart".to_string()]);
+
+        // 多格式裁切 filter
+        if let Some(ref aspect) = opts.aspect_ratio {
+            if let Some((vf_filter, _, _)) = self.build_crop_filter(aspect) {
+                args.extend(["-vf".to_string(), vf_filter]);
+            }
+        }
     }
 
     fn merge_segments(
