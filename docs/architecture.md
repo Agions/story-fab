@@ -16,20 +16,20 @@ CutDeck 采用 **分层模块化架构**：
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                        UI 层 (React 18)                     │
-│     主界面 · 素材面板 · 预览区域 · 时间线面板 · AI 控制台      │
+│     Landing 页面 · Dashboard · 编辑器 · AI 控制台             │
 ├──────────────────────────────────────────────────────────────┤
-│                       服务层 (Services)                      │
-│   AI 服务 · 视频处理服务 · 音频服务 · 导出服务                 │
+│                       核心层 (core/)                         │
+│   services/  · workflow/  · hooks/  · video/  · types/       │
 ├──────────────────────────────────────────────────────────────┤
-│                        核心层 (Core)                         │
-│   配置管理 · 事件总线 · 状态管理 · 依赖注入                    │
+│                       状态层 (store/)                        │
+│   Zustand v5 持久化 stores                                   │
 ├──────────────────────────────────────────────────────────────┤
-│                        外部依赖层                             │
-│        FFmpeg · Vite · Tauri IPC · AI APIs                 │
+│                       外部依赖层                              │
+│        FFmpeg · Tauri IPC (Rust) · AI APIs                  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-**设计原则**：UI 层与业务逻辑完全解耦，核心逻辑通过 Tauri IPC 与后端通信。
+**设计原则**：UI 层与业务逻辑完全解耦，核心逻辑通过 Tauri IPC 与 Rust 后端通信。
 
 ---
 
@@ -37,41 +37,53 @@ CutDeck 采用 **分层模块化架构**：
 
 ```
 CutDeck/
-├── src/
-│   ├── components/           # React UI 组件
-│   │   ├── AIClipPanel/      # AI 剪辑面板
-│   │   ├── AIPanel/          # AI 功能面板
-│   │   ├── Dashboard/        # 仪表板
-│   │   ├── VideoAnalyzer/    # 视频分析
-│   │   └── editor/           # 编辑器组件
+├── src/                          # React 前端
+│   ├── core/                     # 核心业务模块（域驱动）
+│   │   ├── types.ts              # 全局类型定义（唯一类型出口）
+│   │   ├── video/                # 视频处理管道
+│   │   │   ├── IVideoProcessor.ts   # 接口
+│   │   │   ├── BaseVideoProcessor.ts# 基类（FFmpeg 缓存、错误归一化）
+│   │   │   └── TauriVideoProcessor.ts# Tauri invoke 实现
+│   │   ├── services/             # 业务服务
+│   │   │   ├── ai.service.ts        # AI 模型调用（769 行）
+│   │   │   ├── vision.service.ts     # 场景/情绪/对象检测
+│   │   │   ├── asr.service.ts        # Whisper ASR 集成
+│   │   │   ├── subtitle.service.ts   # 字幕处理
+│   │   │   ├── export.service.ts     # 导出服务
+│   │   │   ├── workflow.service.ts   # 工作流管理
+│   │   │   └── smart-cut.service.ts  # 智能裁切
+│   │   ├── workflow/             # 工作流引擎
+│   │   │   ├── WorkflowEngine.ts     # 状态机引擎
+│   │   │   ├── steps/               # 步骤执行器
+│   │   │   └── types.ts
+│   │   ├── hooks/                # React Hooks（CutDeck 专用）
+│   │   │   ├── useWorkflowEngine.ts  # 工作流 hook（v1.2.0 新增）
+│   │   │   ├── useVideo.ts
+│   │   │   └── useAIClip.ts
+│   │   └── constants/            # 常量定义（含 AI 模型列表）
 │   │
-│   ├── core/                 # 核心逻辑
-│   │   ├── services/          # 服务层
-│   │   │   ├── ai.service.ts   # AI 模型调用
-│   │   │   ├── video.service.ts # 视频处理
-│   │   │   ├── vision.service.ts # 视觉分析
-│   │   │   └── workflow.service.ts # 工作流引擎
-│   │   ├── types/             # TypeScript 类型定义
-│   │   └── constants/         # 常量定义
+│   ├── store/                    # Zustand Stores（UI 状态）
+│   │   ├── appStore.ts             # App 级（主题、侧边栏、通知）
+│   │   ├── projectStore.ts          # 项目列表/筛选/排序
+│   │   ├── editorStore.ts           # 编辑器状态（时间线、轨道）
+│   │   └── mainStore.ts             # AI 模型设置（→ useModelStore）
 │   │
-│   ├── pages/                # 页面组件
-│   │   └── Landing/           # 主入口页面
-│   │
-│   ├── hooks/                # 自定义 React Hooks
-│   │   └── useAI.ts          # AI 交互 Hook
-│   │   └── useVideo.ts       # 视频操作 Hook
-│   │
-│   └── utils/                # 工具函数
-│       ├── format.ts          # 格式化工具
-│       └── storage.ts         # 本地存储
+│   ├── components/               # React UI 组件
+│   ├── pages/                    # 页面组件
+│   ├── hooks/                    # 通用 Hooks（跨项目可用）
+│   └── services/                 # 兼容层 Facade
 │
-├── public/                   # 静态资源
-├── docs/                     # 项目文档
-├── src-tauri/               # Tauri 后端 (Rust)
-│   ├── src/
-│   │   └── main.rs           # Tauri 入口
-│   └── Cargo.toml            # Rust 依赖
+├── src-tauri/                    # Tauri 后端 (Rust)
+│   └── src/
+│       ├── main.rs                 # Tauri 入口
+│       ├── lib.rs                  # 命令注册
+│       ├── video_processor.rs      # 视频处理
+│       ├── smart_segmenter.rs       # 智能分段
+│       ├── highlight_detector.rs    # 高光检测
+│       ├── subtitle.rs              # 字幕处理
+│       └── video_effects.rs        # FFmpeg 滤镜
 │
+├── docs/                        # VitePress 文档
 ├── package.json
 ├── vite.config.ts
 └── tsconfig.json
@@ -81,38 +93,47 @@ CutDeck/
 
 ## 核心模块
 
-### 1. AI Service
-
-AI 服务的统一管理器，负责与各 AI 提供商通信。
-
-| 方法 | 说明 |
-|------|------|
-| `analyze(videoPath)` | 视频内容分析 |
-| `generateScript(context)` | 生成解说文案 |
-| `transcribe(audioPath)` | 语音转文字 |
-| `synthesize(text)` | 文字转语音 |
-
-### 2. Video Service
-
-视频处理服务，封装 FFmpeg 和 Tauri IPC 调用。
-
-| 方法 | 说明 |
-|------|------|
-| `extractFrames(videoPath)` | 提取关键帧 |
-| `getMetadata(videoPath)` | 获取视频元数据 |
-| `trim(start, end)` | 视频裁剪 |
-| `concat(clips)` | 视频拼接 |
-
-### 3. Workflow Service
-
-工作流引擎，管理 AI 剪辑的完整流程。
+### 视频处理管道
 
 ```
-工作流状态机：
-IDLE → ANALYZING → GENERATING → PREVIEW → EXPORT → COMPLETE
-         ↓           ↓           ↓         ↓
-       ERROR       ERROR       ERROR     ERROR
+IVideoProcessor（接口）
+    ↑
+BaseVideoProcessor（基类） — FFmpeg 缓存、错误归一化、参数校验
+    ↑
+TauriVideoProcessor（实现） — 调用 Tauri invoke → Rust FFmpeg
 ```
+
+**扩展新驱动**（WebCodecs 等）：
+```typescript
+class WebCodecsVideoProcessor extends BaseVideoProcessor {
+  protected doAnalyze(path) { /* ... */ }
+  protected doCut(input, output, segments, opts) { /* ... */ }
+}
+```
+
+### 工作流引擎
+
+```
+WorkflowEngine（状态机）
+    ├── subscriber 模式（状态变更广播）
+    ├── RetryRequest / SkipRequest 信号
+    └── executeStep()（自动重试 + 步骤图执行）
+
+步骤注册 → createWorkflowEngine() → engine.run()
+React 连接 → useWorkflowEngine() hook
+```
+
+**已注册步骤**：`upload / analyze / template-select / script-generate / script-dedup / script-edit / subtitle / ai-clip / music / timeline-edit / preview / export`
+
+### Rust 后端命令
+
+| 命令 | 说明 |
+|------|------|
+| `transcode_with_crop` | 多格式裁切（9:16/1:1/16:9） |
+| `detect_smart_segments` | 智能场景分段 |
+| `detect_highlights` | 高光时刻检测 |
+| `apply_filter_chain` | FFmpeg 滤镜链 |
+| `get_video_metadata` | 获取视频元数据 |
 
 ---
 
@@ -122,26 +143,32 @@ IDLE → ANALYZING → GENERATING → PREVIEW → EXPORT → COMPLETE
 |------|----------|
 | UI 框架 | **React 18** + TypeScript |
 | 构建工具 | **Vite 6** |
-| 桌面框架 | **Tauri 2.x** |
-| UI 库 | **Ant Design 5** |
-| 样式 | CSS Modules + Less |
-| 状态管理 | React Context + useReducer |
-| 路由 | React Router 6 |
+| 桌面框架 | **Tauri v2**（Rust 后端） |
+| 状态管理 | **Zustand v5**（持久化） |
+| 样式 | **Tailwind CSS** + CSS Variables |
+| AI 服务 | 多 Provider（OpenAI/Anthropic/Google/DeepSeek/阿里/智谱/Kimi） |
+| ASR | **faster-whisper**（本地） |
 | 文档 | VitePress |
 
 ---
 
 ## Tauri IPC 通信
 
-CutDeck 使用 Tauri 的 IPC 机制进行前后端通信：
+CutDeck 使用 Tauri IPC 前后端通信：
 
 ```typescript
 // 前端调用 Rust 后端
 import { invoke } from '@tauri-apps/api/tauri'
 
-// 调用后端命令
-const result = await invoke('get_video_metadata', {
+const metadata = await invoke('get_video_metadata', {
   path: '/path/to/video.mp4'
+})
+
+const result = await invoke('transcode_with_crop', {
+  inputPath: '/path/to/input.mp4',
+  outputPath: '/path/to/output.mp4',
+  aspect: '9:16',
+  quality: 'high'
 })
 ```
 

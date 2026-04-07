@@ -1,11 +1,11 @@
 ---
 title: AI 模型配置
-description: CutDeck 支持的 AI 模型提供商配置详解，2026年3月最新模型推荐。
+description: CutDeck 支持的 AI 模型提供商配置详解，基于 2026 年 3 月最新模型列表。
 ---
 
 # AI 模型配置
 
-CutDeck 支持多种 AI 模型服务提供商。所有模型均已更新至 **2026年3月最新版本**。
+CutDeck 支持多种 AI 模型服务提供商。模型列表与代码常量同步更新至 **2026 年 3 月**。
 
 ---
 
@@ -26,7 +26,7 @@ VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
 ::: tip 推荐配置
-初次使用推荐 **DeepSeek V3.2**，性价比最高，效果出色。
+初次使用推荐 **DeepSeek Chat**，性价比最高，中文能力出色。
 :::
 
 ---
@@ -35,18 +35,18 @@ VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 
 ### OpenAI
 
-使用 GPT-5.4 系列模型进行文本生成和分析。
-
 ```bash
 VITE_DEFAULT_PROVIDER=openai
 VITE_OPENAI_API_KEY=sk-xxxx
 VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
-| 推荐模型 | 特点 |
-|----------|------|
-| `gpt-5.4` | 最强通用能力 |
-| `gpt-4o` | 多模态，支持视觉 |
+| 模型 ID | 名称 | 特点 |
+|---------|------|------|
+| `gpt-4o` | GPT-4o | 🏆 旗舰多模态，支持视觉和函数调用 |
+| `gpt-4o-mini` | GPT-4o mini | 轻量高速，性价比高 |
+| `gpt-4-turbo` | GPT-4 Turbo | GPT-4 高速版 |
+| `o3-mini` | o3-mini | 最新推理模型，专注复杂推理 |
 
 获取 API 密钥：[platform.openai.com](https://platform.openai.com/api-keys)
 
@@ -54,16 +54,15 @@ VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 
 ### Anthropic Claude
 
-使用 Claude Sonnet 4.6 / Opus 4.6 模型。
-
 ```bash
 VITE_ANTHROPIC_API_KEY=sk-ant-xxxx
 ```
 
-| 推荐模型 | 特点 |
-|----------|------|
-| `claude-opus-4.6` | 最强能力，长上下文 |
-| `claude-sonnet-4.6` | 性价比高 |
+| 模型 ID | 名称 | 特点 |
+|---------|------|------|
+| `claude-sonnet-4-20250514` | Claude 4 Sonnet | 中高端，速度与能力平衡 |
+| `claude-3-5-sonnet-20241022` | Claude 3.5 Sonnet | 旗舰级，长上下文处理能力强 |
+| `claude-3-5-haiku-20241022` | Claude 3.5 Haiku | 轻量快速 |
 
 获取 API 密钥：[console.anthropic.com](https://console.anthropic.com/)
 
@@ -71,16 +70,16 @@ VITE_ANTHROPIC_API_KEY=sk-ant-xxxx
 
 ### Google Gemini
 
-使用 Gemini 3.1 Pro 模型。
-
 ```bash
 VITE_GOOGLE_API_KEY=xxxx
-VITE_DEFAULT_PROVIDER=gemini
+VITE_DEFAULT_PROVIDER=google
 ```
 
-| 推荐模型 | 特点 |
-|----------|------|
-| `gemini-3.1-pro` | 1M 超长上下文，多模态 |
+| 模型 ID | 名称 | 特点 |
+|---------|------|------|
+| `gemini-2.0-flash` | Gemini 2.0 Flash | 最新高速模型，多模态能力强 |
+| `gemini-1.5-pro` | Gemini 1.5 Pro | 2M 超长上下文（免费额度） |
+| `gemini-1.5-flash` | Gemini 1.5 Flash | 轻量快速（免费额度） |
 
 获取 API 密钥：[AI Studio](https://aistudio.google.com/app/apikey)
 
@@ -88,16 +87,15 @@ VITE_DEFAULT_PROVIDER=gemini
 
 ### DeepSeek
 
-使用 DeepSeek V3.2 模型，性价比极高。
-
 ```bash
 VITE_DEEPSEEK_API_KEY=sk-xxxx
 VITE_DEFAULT_PROVIDER=deepseek
 ```
 
-| 推荐模型 | 特点 |
-|----------|------|
-| `deepseek-v3.2` | 🏆 性价比最高 |
+| 模型 ID | 名称 | 特点 |
+|---------|------|------|
+| `deepseek-chat` | DeepSeek Chat | 中文能力强，性价比最高 |
+| `deepseek-reasoner` | DeepSeek R1 | 推理模型，复杂推理任务优秀 |
 
 获取 API 密钥：[platform.deepseek.com](https://platform.deepseek.com/)
 
@@ -105,17 +103,16 @@ VITE_DEFAULT_PROVIDER=deepseek
 
 ### 通义千问 (Qwen)
 
-使用阿里 Qwen 2.5 Max 模型，中文优化出色。
-
 ```bash
 VITE_QIANWEN_API_KEY=xxxx
-VITE_DEFAULT_PROVIDER=qianwen
+VITE_DEFAULT_PROVIDER=dashscope
 ```
 
-| 推荐模型 | 特点 |
-|----------|------|
-| `qwen2.5-max` | 中文优化，性价比高 |
-| `qwen2.5-plus` | 日常任务首选 |
+| 模型 ID | 名称 | 特点 |
+|---------|------|------|
+| `qwen-plus` | 通义千问 Plus | 中文理解能力突出 |
+| `qwen-turbo` | 通义千问 Turbo | 高速模型 |
+| `qwen-long` | 通义千问 Long | 1M 超长上下文 |
 
 获取 API 密钥：[阿里云百炼](https://bailian.console.aliyun.com/)
 
@@ -123,16 +120,16 @@ VITE_DEFAULT_PROVIDER=qianwen
 
 ### 智谱 AI (GLM)
 
-使用智谱 GLM-5 系列模型。
-
 ```bash
 VITE_ZHIPU_API_KEY=xxxx
-VITE_DEFAULT_PROVIDER=zhipu
+VITE_DEFAULT_PROVIDER=zhipuai
 ```
 
-| 推荐模型 | 特点 |
-|----------|------|
-| `glm-5` | 中文优化 |
+| 模型 ID | 名称 | 特点 |
+|---------|------|------|
+| `glm-4` | GLM-4 | 中文能力突出 |
+| `glm-4v` | GLM-4V | 视觉理解模型 |
+| `glm-4-alloy` | GLM-4 Alloy | 高速对话模型 |
 
 获取 API 密钥：[智谱 AI 开放平台](https://open.bigmodel.cn/)
 
@@ -140,43 +137,24 @@ VITE_DEFAULT_PROVIDER=zhipu
 
 ### Moonshot Kimi
 
-使用 Kimi K2.5 模型，超长上下文支持。
-
 ```bash
 VITE_MOONSHOT_API_KEY=sk-xxxx
 VITE_DEFAULT_PROVIDER=moonshot
 ```
 
-| 推荐模型 | 特点 |
-|----------|------|
-| `kimi-k2.5` | 200K+ 超长上下文 |
+| 模型 ID | 名称 | 特点 |
+|---------|------|------|
+| `moonshot-v1-128k` | Kimi 128K | 128K 超长上下文 |
+| `moonshot-v1-32k` | Kimi 32K | 标准上下文模型 |
+| `moonshot-v1-8k` | Kimi 8K | 快速对话模型 |
 
 获取 API 密钥：[Moonshot Console](https://platform.moonshot.cn/)
-
----
-
-### 讯飞星火
-
-使用讯飞星火 V3.5 模型。
-
-```bash
-VITE_SPARK_API_KEY=xxxx
-VITE_DEFAULT_PROVIDER=spark
-```
-
-| 推荐模型 | 特点 |
-|----------|------|
-| `generalv3.5` | 中文语音优化 |
-
-获取 API 密钥：[讯飞开放平台](https://xinghuo.xfyun.cn/)
 
 ---
 
 ## 配置方式
 
 ### 环境变量配置
-
-在 `.env` 文件中配置：
 
 ```bash
 # ===================
@@ -212,30 +190,16 @@ VITE_ANTHROPIC_API_KEY=sk-ant-xxxx
 
 ---
 
-## 模型推荐 (2026年3月)
+## 场景推荐
 
 | 场景 | 推荐模型 | 说明 |
 |------|----------|------|
-| 剧情分析 | GPT-5.4 / Claude Opus 4.6 | 强大的推理和分析能力 |
-| 脚本生成 | GPT-5.4 / Qwen 2.5-Max | 高质量的文本生成 |
-| 字幕翻译 | GPT-5.4 / DeepSeek V3.2 | 准确的翻译能力 |
-| 语音合成 | Azure TTS / 阿里语音 | 自然的语音输出 |
-| 多模态分析 | Gemini 3.1 Pro | 出色的视觉理解能力 |
-
----
-
-## 模型对比 (2026年3月)
-
-| 模型 | 上下文 | 优势 | 适合场景 |
-|------|--------|------|----------|
-| GPT-5.4 | 128K | 全能型，推理能力强 | 复杂分析、创意写作 |
-| Claude Opus 4.6 | 200K | 超长上下文，安全性高 | 长文本分析、代码 |
-| Claude Sonnet 4.6 | 200K | 性价比高 | 日常任务、翻译 |
-| Gemini 3.1 Pro | 1M | 超长上下文，多模态 | 视频理解、超长文本 |
-| Qwen 2.5-Max | 128K | 中文优化，性价比高 | 中文内容创作 |
-| DeepSeek V3.2 | 128K | 开源友好，价格低 | 日常任务、翻译 |
-| GLM-5 | 128K | 中文优化 | 中文内容创作 |
-| Kimi K2.5 | 200K+ | 超长上下文 | 长文本分析 |
+| 视频内容分析 | GPT-4o / Gemini 2.0 Flash | 多模态视觉理解 |
+| 字幕生成 | Claude 3.5 Sonnet | 精准的上下文处理 |
+| 脚本生成 | GPT-4o / Qwen Plus | 高质量文本生成 |
+| 中文内容 | Qwen Plus / GLM-4 | 中文优化出色 |
+| 长视频分析 | Gemini 1.5 Pro | 2M 超长上下文 |
+| 性价比首选 | **DeepSeek Chat** | 成本极低，效果出色 |
 
 ---
 
@@ -258,6 +222,7 @@ VITE_HTTPS_PROXY=http://127.0.0.1:7890
 | 建议 | 说明 |
 |------|------|
 | 使用 DeepSeek | 性价比最高，效果不输 GPT-4 |
+| Gemini 免费额度 | 1.5 Pro/Flash 在免费额度内使用 |
 | 批量处理 | 合理安排任务，减少 API 调用 |
 | 缓存分析结果 | 相同视频不要重复分析 |
 | 选择合适的模型 | 简单任务用小模型，复杂任务用大模型 |
