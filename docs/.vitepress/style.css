@@ -1,19 +1,30 @@
-/*!
- * CutDeck — Cinematic Dark × Warm Amber
- * VitePress Custom Theme
- */
-
-/* ============================================
-   Google Fonts Import
-   ============================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* ============================================
-   CSS Variables — Design Tokens
-   ============================================ */
+:
+
+:
 
 :root {
+  --vp-home-hero-name-color: #0f172a;
+  --vp-home-hero-name-background: transparent;
+}
+html.dark {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #2684ff 0%, #9f7aea 50%, #2684ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+:root {
+  --vp-code-color: #92400e;
+  --vp-code-bg: #fef3c7;
+}
+html.dark {
+  --vp-code-color: #fbbf24;
+  --vp-code-bg: #1a1a2e;
+}
+
+
+root {
   /* Brand: Cinematic Dark × Warm Amber */
   --sf-indigo: #1a1a2e;
   --sf-indigo-light: #232340;
