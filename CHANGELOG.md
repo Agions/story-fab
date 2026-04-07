@@ -1,17 +1,22 @@
 ## [1.7.0] - 2026-04-07
 
-### 🎉 Phase 1 + Phase 2 功能升级
+### 🎉 Phase 1 + Phase 2 + Phase 3 功能升级
+
+#### Phase 1 — 核心功能集成
+
+- **多格式裁切导出**: Rust 层实现 `transcode_with_crop` 命令，支持 9:16（抖音竖屏）/ 1:1（小红书方屏）/ 16:9 三种格式，FFmpeg scale+crop filter 注入
+- **ClipRepurposing Pipeline**: 新增完整 UI（ClipRepurpose.tsx），集成 6 维评分引擎（笑声/情感/完整度/静默比/节奏/关键词）+ SEO 元数据 + 多格式导出
+- **AI 字幕生成**: SubtitleEditor 接入 Whisper ASR 服务，支持模型选择 + 语言设置 + 一键生成字幕
+- **主流程串联**: AI 拆条步骤完整接入主流程（7步完整链路）
 
 #### Phase 2 — 体验完善
 
 - **快捷键体系**: 新增 `useKeyboardShortcuts` Hook（空格/K/J/L/I/O/Delete/⌘Z/⌘E等），接入 AIVideoEditor
 - **导出进度细化**: VideoExport 接入 Rust `processing-progress` 事件监听，实时显示阶段名称（编码/渲染/合成/写入）+ ETA 剩余时间
 
+#### Phase 3 — 架构优化
 
-- **多格式裁切导出**: Rust 层实现 `transcode_with_crop` 命令，支持 9:16（抖音竖屏）/ 1:1（小红书方屏）/ 16:9 三种格式，FFmpeg scale+crop filter 注入
-- **ClipRepurposing Pipeline**: 新增完整 UI（ClipRepurpose.tsx），集成 6 维评分引擎（笑声/情感/完整度/静默比/节奏/关键词）+ SEO 元数据 + 多格式导出
-- **AI 字幕生成**: SubtitleEditor 接入 Whisper ASR 服务，支持模型选择 + 语言设置 + 一键生成字幕
-- **主流程串联**: AI 拆条步骤完整接入主流程（project-create → video-upload → ai-analyze → clip-repurpose → script-generate → video-synthesize → export）
+- **Timeline 虚拟化**: `useVirtualTimeline` Hook，基于二分查找计算可见 clip 范围，ResizeObserver 监听容器宽度，滚动时仅渲染可见区域 + 两侧各 3 个 buffer clips，大幅降低 100+ clips 时的渲染开销
 
 ---
 

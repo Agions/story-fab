@@ -2,7 +2,7 @@
  * TimelineTrack - 轨道组件
  * 渲染单个轨道及其上的 clips
  */
-import React, { memo, useCallback } from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import { Badge } from 'antd'
 import type { TimelineTrack as TimelineTrackType, TimelineClip as TimelineClipType, TimelineScale } from './types'
 import TimelineClip from './TimelineClip'
@@ -15,6 +15,10 @@ interface TimelineTrackProps {
   onClipSelect: (clipId: string) => void
   onClipUpdate: (clipId: string, updates: Partial<TimelineClipType>) => void
   onTrackUpdate: (trackId: string, updates: Partial<TimelineTrackType>) => void
+  /** 虚拟化模式：容器宽度（px），传入时启用虚拟化 */
+  virtualContainerWidth?: number
+  /** 虚拟化模式：滚动位置（px） */
+  virtualScrollLeft?: number
 }
 
 // 轨道类型对应的颜色
@@ -34,6 +38,8 @@ const TimelineTrack: React.FC<TimelineTrackProps> = memo(({
   onClipSelect,
   onClipUpdate,
   onTrackUpdate,
+  virtualContainerWidth,
+  virtualScrollLeft = 0,
 }) => {
   // 处理 clip 选中
   const handleClipSelect = useCallback((clipId: string, e: React.MouseEvent) => {
@@ -65,6 +71,36 @@ const TimelineTrack: React.FC<TimelineTrackProps> = memo(({
   }, [track.id, track.locked, onTrackUpdate])
 
   const trackColor = TRACK_TYPE_COLORS[track.type] || TRACK_TYPE_COLORS.video
+
+  // ── 虚拟化：计算可见 clip 范围 ────────────────────────────────────────
+  const visibleClips = useMemo(() => {
+    if (!virtualContainerWidth || !clips.length) return clips;
+
+    const buffer = 3; // 每侧额外渲染 buffer 个 clips
+    const visibleStartMs = virtualScrollLeft / scale;
+    const visibleEndMs = (virtualScrollLeft + virtualContainerWidth) / scale;
+
+    // 二分查找第一个可能可见的 clip
+    let lo = 0, hi = clips.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (clips[mid].endMs <= visibleStartMs) lo = mid + 1;
+      else hi = mid;
+    }
+    const startIdx = Math.max(0, lo - buffer);
+
+    // 二分查找最后一个可能可见的 clip
+    lo = startIdx;
+    hi = clips.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (clips[mid].startMs >= visibleEndMs) hi = mid - 1;
+      else lo = mid;
+    }
+    const endIdx = Math.min(clips.length - 1, lo + buffer);
+
+    return clips.slice(startIdx, endIdx + 1);
+  }, [clips, scale, virtualContainerWidth, virtualScrollLeft]);
 
   return (
     <div
@@ -176,8 +212,8 @@ const TimelineTrack: React.FC<TimelineTrackProps> = memo(({
           }}
         />
 
-        {/* Clips */}
-        {clips.map(clip => (
+        {/* Clips（虚拟化：渲染可见区域 clips，超出容器 hidden 截断）*/}
+        {visibleClips.map(clip => (
           <TimelineClip
             key={clip.id}
             clip={clip}

@@ -67,6 +67,7 @@ const Timeline: React.FC<TimelineProps> = ({
   const [showKeyframePanel, setShowKeyframePanel] = useState(false);
   const [currentTool, setCurrentTool] = useState<TimelineTool>('select');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0); // 用于虚拟化
 
   // Refs
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -159,6 +160,25 @@ const Timeline: React.FC<TimelineProps> = ({
       }
     }
   }, [playheadPosition]);
+
+  // ── 虚拟化：监听容器宽度变化 ─────────────────────────────────────────
+  useEffect(() => {
+    const el = tracksContainerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    observer.observe(el);
+    setContainerWidth(el.clientWidth);
+    return () => observer.disconnect();
+  }, []);
+
+  // ── 虚拟化：监听滚动位置变化 ─────────────────────────────────────────
+  const handleTracksScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    scrollLeftRef.current = e.currentTarget.scrollLeft;
+  }, []);
 
   // ==============================================
   // Event Handlers
@@ -413,6 +433,8 @@ const Timeline: React.FC<TimelineProps> = ({
               onClipSelect={handleClipSelect}
               onClipUpdate={handleClipUpdate}
               onTrackUpdate={handleTrackUpdate}
+              virtualContainerWidth={containerWidth}
+              virtualScrollLeft={scrollLeftRef.current}
             />
           ))}
 
