@@ -92,3 +92,8 @@ TIMELINE_REFACTOR.md
 .vitepress/cache/
 .vitepress/dist/
 
+
+# Internal planning docs
+SPEC.md
+ARCHITECTURE.md
+ROADMAP.md
