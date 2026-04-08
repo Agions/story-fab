@@ -2,7 +2,7 @@
   "name": "cutdeck",
   "private": true,
   "version": "1.7.0",
-  "description": "CutDeck — Cinematic Dark × Warm Amber · AI 驱动的专业智能视频剪辑工具，支持智能混剪、剧情分析、字幕生成等全链路 AI 剪辑能力",
+  "description": "开源AI视频剪辑工具。长视频自动拆条为爆款短片段 · 9:16/1:1/16:9多格式导出 · 本地Whisper字幕 · Rust渲染管线 · 无需上传",
   "author": "Agions <agions@qq.com>",
   "license": "MIT",
   "type": "module",
