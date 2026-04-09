@@ -2,12 +2,18 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// NOTE: unplugin-auto-import & unplugin-vue-components removed
-//       — packages not installed; import manually where needed
-
 export default defineConfig({
   base: './',
-  plugins: [react()],
+  plugins: [
+    react({
+      babel: {
+        plugins: [
+          // antd component-level tree-shaking via babel
+          ['import', { libraryName: 'antd', customName: (name: string) => `antd/es/${name}` }],
+        ],
+      },
+    }),
+  ],
   clearScreen: false,
   server: {
     port: 1430,

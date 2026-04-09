@@ -88,24 +88,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // 使用科技暗黑设计系统配色
     if (dark) {
       rootElement.classList.add('dark-theme');
-      document.body.style.backgroundColor = '#0a0a0f'; // 主背景 - 深邃黑
+      document.body.style.backgroundColor = '#0C0D14'; // 主背景 - 深炭底
       document.body.style.color = '#f1f5f9';
 
       // 科技暗黑配色系统
       rootElement.style.setProperty('--text-color-primary', '#f1f5f9');
       rootElement.style.setProperty('--text-color-secondary', '#94a3b8');
       rootElement.style.setProperty('--text-color-disabled', '#475569');
-      rootElement.style.setProperty('--bg-color-primary', '#0a0a0f');
+      rootElement.style.setProperty('--bg-color-primary', '#0C0D14');
       rootElement.style.setProperty('--bg-color-secondary', '#12121a');
       rootElement.style.setProperty('--bg-color-component', '#12121a');
       rootElement.style.setProperty('--border-color', '#2a2a3a');
-      rootElement.style.setProperty('--primary-color', '#6366f1');
+      rootElement.style.setProperty('--primary-color', '#FF9F43');
       rootElement.style.setProperty('--form-label-color', '#f1f5f9');
 
       // 背景渐变装饰
       document.body.style.backgroundImage =
-        'radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%), ' +
-        'radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.06) 0%, transparent 50%)';
+        'radial-gradient(ellipse at 20% 0%, rgba(255, 159, 67, 0.08) 0%, transparent 50%), ' +
+        'radial-gradient(ellipse at 80% 100%, rgba(0, 212, 255, 0.06) 0%, transparent 50%)';
       document.body.style.backgroundAttachment = 'fixed';
 
       // 避免深色下的半透明叠加
@@ -126,7 +126,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       rootElement.style.setProperty('--bg-color-secondary', '#f0f2f5');
       rootElement.style.setProperty('--bg-color-component', '#ffffff');
       rootElement.style.setProperty('--border-color', '#d9d9d9');
-      rootElement.style.setProperty('--primary-color', '#1890ff');
+      rootElement.style.setProperty('--primary-color', '#E8891C');
       rootElement.style.setProperty('--form-label-color', 'rgba(0, 0, 0, 0.85)');
 
       // 重置表单标签颜色
