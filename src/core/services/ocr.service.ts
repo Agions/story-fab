@@ -63,7 +63,7 @@ declare global {
 }
 
 export class OCRService extends BaseService {
-  private config: OCRProviderConfig | null = null;
+  private ocrConfig: OCRProviderConfig | null = null;
   private tesseractWorker: TesseractWorker | null = null;
   private isLoading = false;
 
@@ -75,27 +75,27 @@ export class OCRService extends BaseService {
    * 配置 OCR 服务
    */
   configure(config: OCRProviderConfig): void {
-    this.config = config;
-    logger.info('OCR 服务已配置:', { provider: config.provider });
+    this.ocrConfig = config;
+    logger.info('OCR 服务已配置', { provider: config.provider });
   }
 
   /**
    * 获取当前配置
    */
   getConfig(): OCRProviderConfig | null {
-    return this.config;
+    return this.ocrConfig;
   }
 
   /**
    * 检查是否已配置
    */
   isConfigured(): boolean {
-    if (!this.config) return false;
-    if (this.config.provider === 'browser') {
-      return typeof window !== 'undefined' && !!window.Tesseract;
+    if (!this.ocrConfig) return false;
+    if (this.ocrConfig.provider === 'browser') {
+      return typeof window !== 'undefined' && !!(window as any).Tesseract;
     }
-    if (this.config.provider === 'aliyun') {
-      return !!this.config.apiKey && !!this.config.apiSecret;
+    if (this.ocrConfig.provider === 'aliyun') {
+      return !!this.ocrConfig.apiKey && !!this.ocrConfig.apiSecret;
     }
     return false;
   }
@@ -126,7 +126,7 @@ export class OCRService extends BaseService {
       this.tesseractWorker = await window.Tesseract.createWorker(lang, {
         logger: (m: any) => {
           if (m.status === 'recognizing text') {
-            logger.debug('OCR 进度:', Math.round(m.progress * 100) + '%');
+            logger.debug('OCR 进度', { progress: Math.round(m.progress * 100) });
           }
         },
         ...options,
@@ -158,7 +158,7 @@ export class OCRService extends BaseService {
     image: string | Blob | File,
     options: OCROptions = {}
   ): Promise<OCRResponse> {
-    const provider = this.config?.provider || 'browser';
+    const provider = this.ocrConfig?.provider || 'browser';
 
     switch (provider) {
       case 'browser':
@@ -218,10 +218,10 @@ export class OCRService extends BaseService {
     image: string | Blob | File,
     options: OCROptions
   ): Promise<OCRResponse> {
-    const { apiKey, apiSecret } = this.config!;
+    const { apiKey, apiSecret } = this.ocrConfig!;
 
     // 将图像转换为 base64
-    const base64Image = await this.blobToBase64(image);
+    const base64Image = await this.blobToBase64(image as Blob);
 
     // 阿里云 OCR API
     const apiUrl = 'https://ocrapi.cn-hangzhou.aliyuncs.com/api/v2/ocr/character';

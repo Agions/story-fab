@@ -248,7 +248,7 @@ export class AutoMusicService {
     };
 
     this.userLibrary.push(track);
-    logger.info('音乐上传成功:', track.name);
+    logger.info('音乐上传成功', { trackName: track.name });
     
     return track;
   }

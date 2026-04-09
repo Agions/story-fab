@@ -45,14 +45,14 @@ const SegmentTable: React.FC<SegmentTableProps> = ({
           <List.Item.Meta
             title={
               <Space size={10} wrap>
-                <Tag>{getTypeLabel(record.type || '')}</Tag>
-                <Text>{formatDuration(record.start)} - {formatDuration(record.end)}</Text>
-                <Text type="secondary">时长 {formatDuration(record.end - record.start)}</Text>
+                <Tag>{getTypeLabel((record as any).type || '')}</Tag>
+                <Text>{formatDuration((record as any).start)} - {formatDuration((record as any).end)}</Text>
+                <Text type="secondary">时长 {formatDuration((record as any).end - (record as any).start)}</Text>
               </Space>
             }
             description={
               <div className={styles.contentCell}>
-                {record.content || <span className={styles.emptyContent}>（无内容）</span>}
+                {(record as any).content || <span className={styles.emptyContent}>（无内容）</span>}
               </div>
             }
           />

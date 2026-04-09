@@ -679,8 +679,7 @@ class ScriptTemplateService {
       metadata: {
         style: template.style.tone,
         template: templateId,
-        templateName: template.name
-      },
+      } as any,
       estimatedDuration: params.duration
     };
   }
@@ -714,8 +713,6 @@ ${section.tips.map((tip: string) => `- ${tip}`).join('\n')}`;
       id: config.id,
       name: config.name,
       description: config.description,
-      category: config.category,
-      tags: config.tags,
       structure: config.structure.sections.map(s => ({
         type: s.type,
         name: s.name,

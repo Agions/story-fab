@@ -73,8 +73,8 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
     const segment = segments[index];
 
     editForm.setFieldsValue({
-      start: (segment as any).start ?? segment.startTime,
-      end: (segment as any).end ?? segment.endTime,
+      start: (segment as any).start ?? (segment as any).startTime,
+      end: (segment as any).end ?? (segment as any).endTime,
       type: (segment as any).type || 'narration',
       content: (segment as any).content || '',
     });

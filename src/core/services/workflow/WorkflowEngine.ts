@@ -214,7 +214,7 @@ export class WorkflowEngine {
   pause(): void {
     if (this._state.status !== 'running') return;
     this.setState({ status: 'paused' });
-    logger.info('[WorkflowEngine] paused at step:', this._state.currentStep);
+    logger.info('[WorkflowEngine] paused at step', { step: this._state.currentStep });
   }
 
   resume(): void {

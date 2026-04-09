@@ -99,8 +99,7 @@ export async function executeScriptGenerateStep(
       generatedBy: model.id,
       generatedAt: new Date().toISOString(),
       template: selectedTemplate.id,
-      templateName: selectedTemplate.name,
-    },
+    } as any,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

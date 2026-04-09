@@ -159,7 +159,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     
     const newBatchItem: BatchItem = {
       id: Date.now().toString(),
-      segments: [...segments],
+      segments: [...(segments as any)],
       name: `批处理 ${batchItems.length + 1}`,
       completed: false
     };

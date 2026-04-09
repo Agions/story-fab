@@ -177,7 +177,7 @@ export class WorkflowErrorHandler {
    * 从异常创建错误
    */
   fromException(error: unknown, step: WorkflowStep): WorkflowError {
-    let code = ErrorCode.UNKNOWN_ERROR;
+    let code: any = ErrorCode.UNKNOWN_ERROR;
     let message = '发生未知错误';
     let details: string | undefined;
 

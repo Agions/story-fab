@@ -29,7 +29,7 @@ export class WorkflowPersistenceService {
       // 同时更新内存缓存
       const cache = workflowCacheManager.getCache(projectId) || workflowCacheManager.createCache(projectId);
       cache.currentStep = state.step;
-      cache.status = state.status;
+      (cache as any).status = state.status;
       cache.stepData = state.data;
       
       // 清理旧数据
@@ -161,11 +161,14 @@ export class WorkflowPersistenceService {
       'script-generate': 30,
       'script-dedup': 40,
       'script-edit': 50,
+      subtitle: 45,
       'ai-clip': 60,
+      repurposing: 65,
+      music: 55,
       'timeline-edit': 70,
       preview: 85,
       export: 95,
-    };
+    } as any;
     
     return {
       step: state.step,

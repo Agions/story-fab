@@ -304,7 +304,7 @@ const WaveformCanvas: React.FC<WaveformCanvasProps> = React.memo(
       <div
         ref={containerRef}
         className={styles.waveformContainer}
-        onClick={handleClick}
+        onClick={handleClick as unknown as React.MouseEventHandler<HTMLDivElement>}
         role="img"
         aria-label="波形图，点击跳转"
       >

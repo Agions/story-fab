@@ -45,7 +45,7 @@ export async function executeAnalyzeStep(
   // 保存分析结果
   const project = storageService.projects.getById(projectId);
   if (project) {
-    project.analysis = analysis;
+    (project as any).analysis = analysis;
     storageService.projects.save(project);
   }
 

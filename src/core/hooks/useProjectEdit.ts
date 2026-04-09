@@ -58,7 +58,7 @@ export function useProjectEdit(options: UseProjectEditOptions = {}): [ProjectEdi
       const project = await loadProjectWithRetry(projectId);
       setState(prev => ({
         ...prev,
-        project: normalizeProjectFile(project),
+        project: normalizeProjectFile(project as any),
         loading: false,
         projectId,
       }));
@@ -79,10 +79,11 @@ export function useProjectEdit(options: UseProjectEditOptions = {}): [ProjectEdi
     setState(prev => ({ ...prev, saving: true }));
 
     try {
-      const projectId = await saveProjectToFile(state.project);
+      const savedProjectId = state.projectId ?? await saveProjectToFile(state.project!.id, state.project);
+      const projectId = savedProjectId ?? state.projectId;
       setState(prev => ({
         ...prev,
-        projectId,
+        projectId: projectId as string,
         saving: false,
         hasChanges: false,
       }));

@@ -277,7 +277,7 @@ export class SubtitleService {
         updatedAt: new Date(),
       };
 
-      const asrResult = await asrService.recognizeSpeech(videoInfo, {
+      const asrResult = await asrService.recognizeSpeech(videoInfo as any, {
         language: langMap[language] || 'zh_cn',
         enableTimestamp: true,
         enablePunctuation: true,

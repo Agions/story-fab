@@ -178,7 +178,7 @@ export class ClipWorkflowService {
       // 创建片段
       const segment: ClipSegment = {
         id: crypto.randomUUID(),
-        startTime: currentTime,
+        _startTime: currentTime,
         endTime: currentTime + (end - start),
         sourceStart: start,
         sourceEnd: end,
@@ -255,11 +255,12 @@ export class ClipWorkflowService {
     const quality = qualityMap[this.config.outputQuality];
     
     return {
-      format: this.config.outputFormat,
+      format: this.config.outputFormat as any,
       resolution: quality.resolution,
       quality: quality.quality,
-      frameRate: quality.frameRate,
+      fps: quality.frameRate,
       includeSubtitles: true,
+      includeWatermark: false,
       burnSubtitles: true,
     };
   }

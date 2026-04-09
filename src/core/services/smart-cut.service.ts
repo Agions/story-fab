@@ -280,7 +280,7 @@ export class SmartCutService extends BaseService {
               audioLevel: 1 - (seg.silence_ratio ?? 0),
               peakEnergy: seg.peak_energy,
               silenceRatio: seg.silence_ratio,
-            },
+            } as any,
           });
         }
       }

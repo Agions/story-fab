@@ -375,7 +375,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
         setState(prev => ({ ...prev, exportProgress: i }));
       }
 
-      const blob = await editorService.exportTimeline(settings);
+      const blob = await editorService.exportTimeline(settings as any);
       return blob;
     } finally {
       setState(prev => ({ ...prev, isExporting: false, exportProgress: 100 }));
