@@ -713,12 +713,6 @@ ${section.tips.map((tip: string) => `- ${tip}`).join('\n')}`;
       id: config.id,
       name: config.name,
       description: config.description,
-      structure: config.structure.sections.map(s => ({
-        type: s.type,
-        name: s.name,
-        duration: s.duration,
-        description: s.content
-      })),
       style: {
         tone: config.style.tone,
         pace: config.style.pace,
@@ -726,7 +720,7 @@ ${section.tips.map((tip: string) => `- ${tip}`).join('\n')}`;
       },
       examples: config.examples,
       recommended: false
-    };
+    } as any;
   }
 }
 

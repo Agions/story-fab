@@ -304,13 +304,12 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
 
       <Card>
         <VideoPlayer
-          videoPath={videoPath}
+          src={videoPath}
           currentTime={currentTime}
           duration={duration}
-          isPlaying={isPlaying}
+          autoPlay={isPlaying}
           onTimeUpdate={handleTimeUpdate}
-          onDurationChange={handleDurationChange}
-          onPlayStateChange={handlePlayStateChange}
+          onEnded={() => {}}
         />
 
         <Timeline

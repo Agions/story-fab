@@ -28,8 +28,11 @@ export const useModelStore = create<AppState>()(
         zhipu: { enabled: false },
         iflytek: { enabled: false },
         deepseek: { enabled: false },
-        moonshot: { enabled: false }
-      },
+        moonshot: { enabled: false },
+        azure: { enabled: false },
+        local: { enabled: false },
+        custom: { enabled: false },
+      } as any,
 
       // 设置选中的 AI 模型
       setSelectedAIModel: (model: AIModelType) => set({ selectedAIModel: model }),

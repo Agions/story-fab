@@ -258,7 +258,7 @@ export class ClipWorkflowService {
       format: this.config.outputFormat as any,
       resolution: quality.resolution,
       quality: quality.quality,
-      fps: quality.frameRate,
+      fps: quality.frameRate as 24 | 30 | 60,
       includeSubtitles: true,
       includeWatermark: false,
       burnSubtitles: true,
