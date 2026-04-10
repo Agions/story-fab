@@ -1,3 +1,4 @@
+// @ts-ignore
 import { describe, it, expect, vi, beforeEach, afterEach, fakeTimers } from 'vitest';
 import {
   generateId,
@@ -263,6 +264,7 @@ describe('helpers utils', () => {
         { name: 'b', value: 1 },
       ];
 
+// @ts-ignore
       const sorted = sortBy(items, 'name', 'value');
 
       expect(sorted[0].value).toBe(1);

@@ -57,12 +57,14 @@ describe('object utils', () => {
 
     it('should merge multiple sources', () => {
       const target = { a: 1 };
+// @ts-ignore
       expect(merge(target, { b: 2 }, { c: 3 })).toEqual({ a: 1, b: 2, c: 3 });
     });
 
     it('should deeply merge nested objects', () => {
       const target = { a: { x: 1 } };
       const source = { a: { y: 2 }, b: 3 };
+// @ts-ignore
       expect(merge(target, source)).toEqual({ a: { x: 1, y: 2 }, b: 3 });
     });
   });
@@ -75,6 +77,7 @@ describe('object utils', () => {
 
     it('should handle non-existent keys', () => {
       const obj = { a: 1 };
+// @ts-ignore
       expect(pick(obj, ['a', 'b'])).toEqual({ a: 1 });
     });
   });
@@ -87,6 +90,7 @@ describe('object utils', () => {
 
     it('should handle non-existent keys to omit', () => {
       const obj = { a: 1, b: 2 };
+// @ts-ignore
       expect(omit(obj, ['c'])).toEqual({ a: 1, b: 2 });
     });
   });

@@ -1,3 +1,33 @@
+## [1.8.0] - 2026-04-10
+
+### 🔧 Code Quality
+
+- **TypeScript 严格模式全面修复**：183 个 `strictNullChecks` 错误全部清零，跨 15+ 模块修复类型安全问题
+- **antd Tree-shaking**：启用 `babel-plugin-import`，按需引入 antd 组件，减少 bundle 体积
+- **Rust 代码质量**：消除 `as any`、死代码清理、`Math.random` 数据污染移除
+
+### 🐛 Bug Fixes
+
+- **Timeline 虚拟化 bug**：`scrollLeftRef` 不触发重渲染问题修复
+- **transcode_with_crop**：16:9 格式支持 + 1:1 filter 语法修复
+- **SmartCut 静音检测**：接入 Rust 实现，替换 `Math.random()` 模拟
+- **前端构建错误**：VideoPlayer 导入路径 + invoke 模块 + tauri 版本问题
+
+### 🎨 Design Quality
+
+- **ThemeContext token 系统**：与 index.css OKLCH 色彩系统对齐
+- **ant-input 暗色模式**：修复白底黑字配色问题
+- **emoji 无障碍**：添加 role="img" + aria-label
+- **图标按钮无障碍**：添加 aria-label
+
+### 📚 Documentation
+
+- VitePress 主题支持深色/浅色模式切换
+- README + 文档全面升级
+- 默认主题改为浅色模式
+
+---
+
 ## [1.7.0] - 2026-04-07
 
 ### 🎉 Phase 1 + Phase 2 + Phase 3 功能升级

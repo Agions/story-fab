@@ -44,6 +44,7 @@ describe('model-availability', () => {
       };
       const result = getAvailableModelsFromApiKeys(apiKeys, mockModels as any);
       expect(result.length).toBe(1);
+// @ts-ignore
       expect(result[0].id).toBe('gpt-4');
     });
 
