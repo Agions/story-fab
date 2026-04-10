@@ -337,7 +337,7 @@
   border: 1.5px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
   text-align: center;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
     border-color: rgba(255, 255, 255, 0.14);
@@ -573,6 +573,19 @@
   color: @text-primary;
 }
 
+// Text overflow utility
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.infoValueTruncate {
+  .truncate();
+  font-size: 12px;
+  max-width: 140px;
+}
+
 .infoTag {
   padding: 3px 10px;
   background: rgba(255, 159, 67, 0.1);
@@ -673,7 +686,7 @@
 
     &::after {
       opacity: 1;
-      animation: shimmer 1.5s linear infinite;
+      animation: shimmer 1.5s ease-in-out infinite;
     }
   }
 }
@@ -791,7 +804,7 @@
   background: linear-gradient(90deg, @amber, #FFB06B, @amber);
   background-size: 200% 100%;
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: shimmer 2s linear infinite;
+  animation: shimmer 2s ease-in-out infinite;
 }
 
 .progressBarFill::after {
@@ -896,7 +909,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
   svg {
     width: 16px;
@@ -956,10 +969,23 @@
   font-family: 'Figtree', sans-serif;
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
     background: rgba(250, 173, 20, 0.15);
     border-color: rgba(250, 173, 20, 0.35);
+  }
+}
+
+// Respect prefers-reduced-motion
+@media (prefers-reduced-motion: reduce) {
+  .exportBtnPrimary {
+    animation: none;
+  }
+  .shimmerLine {
+    animation: none;
+  }
+  .exportProgress {
+    animation: none;
   }
 }

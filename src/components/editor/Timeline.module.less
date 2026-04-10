@@ -605,6 +605,16 @@
   }
 }
 
+// Respect prefers-reduced-motion — disable decorative animations
+@media (prefers-reduced-motion: reduce) {
+  .clipContent.selected {
+    animation: none;
+    box-shadow:
+      0 0 16px rgba(6, 182, 212, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
 .clipContent {
   flex: 1;
   padding: 4px 8px;

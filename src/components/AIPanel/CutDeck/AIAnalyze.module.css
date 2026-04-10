@@ -734,3 +734,33 @@
   font-family: 'Figtree', sans-serif;
   color: rgba(255, 255, 255, 0.6);
 }
+
+.noVideoWarning svg {
+  color: #ff4d4f;
+  margin-bottom: 12px;
+}
+
+/* Respect prefers-reduced-motion — disable all decorative animations */
+@media (prefers-reduced-motion: reduce) {
+  .neuralNode {
+    animation: none;
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+  .neuralLine {
+    animation: none;
+    opacity: 0.3;
+  }
+  .progressRing {
+    animation: none;
+  }
+  .pulseRing {
+    animation: none;
+  }
+  .loadingSpin {
+    animation: none;
+  }
+  .resultCard {
+    animation: none;
+  }
+}

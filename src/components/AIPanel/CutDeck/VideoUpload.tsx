@@ -284,7 +284,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
           <p>{uploadStatus === 'completed' ? '上传完成，正在准备视频...' : '正在上传视频，请稍候'}</p>
         </div>
 
-        <div className={styles.videoCard} style={{ padding: 24 }}>
+        <div className={styles.videoCard}>
           <div className={styles.progressSection}>
             <div className={styles.progressHeader}>
               <div className={styles.progressFileIcon}>
@@ -317,7 +317,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
         </div>
 
         {uploadStatus !== 'completed' && (
-          <div className={styles.videoActions} style={{ paddingTop: 16 }}>
+          <div className={styles.videoActions}>
             <button
               className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
               onClick={handlePauseResume}

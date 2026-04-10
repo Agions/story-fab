@@ -38,7 +38,7 @@
   text-align: center;
   cursor: pointer;
   background: rgba(12, 13, 20, 0.6);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   backdrop-filter: blur(20px);
 }
@@ -138,7 +138,7 @@
   width: 56px;
   height: 56px;
   color: rgba(255, 159, 67, 0.7);
-  transition: all 0.35s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   filter: drop-shadow(0 0 8px rgba(255, 159, 67, 0.3));
 }
 
@@ -276,7 +276,7 @@
   border-radius: 3px;
   background: linear-gradient(90deg, #FF9F43, #FFB86B, #FF9F43);
   background-size: 200% 100%;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   animation: shimmer 2s linear infinite;
 }
 
@@ -334,6 +334,7 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   overflow: hidden;
+  padding: 24px;
 }
 
 .videoPreview {
@@ -377,7 +378,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 0 30px rgba(255, 159, 67, 0.4);
 }
 
@@ -414,7 +415,7 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   text-align: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .detailItem:hover {
@@ -443,8 +444,7 @@
 .videoActions {
   display: flex;
   gap: 12px;
-  padding: 20px;
-  padding-top: 0;
+  padding: 16px 20px;
 }
 
 .actionBtn {
@@ -459,7 +459,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   border: none;
 }
 

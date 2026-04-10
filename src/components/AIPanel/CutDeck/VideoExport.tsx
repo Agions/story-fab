@@ -415,7 +415,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
             <div className={styles.infoList}>
               <div className={styles.infoRow}>
                 <span className={styles.infoKey}>原始视频</span>
-                <span className={styles.infoValue} style={{ fontSize: 12, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span className={styles.infoValueTruncate}>
                   {state.currentVideo?.name || '-'}
                 </span>
               </div>

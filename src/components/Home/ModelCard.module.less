@@ -176,20 +176,15 @@
   }
 }
 
-// 添加动画效果
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+// 未配置的模型添加高亮动画
+// 动画应尊重 prefers-reduced-motion
+.disabled .modelActions button {
+  animation: pulse 2s ease-in-out infinite;
 }
 
-// 未配置的模型添加高亮动画
-.disabled .modelActions button {
-  animation: pulse 2s infinite;
+@media (prefers-reduced-motion: reduce) {
+  .disabled .modelActions button {
+    animation: none;
+    box-shadow: 0 0 8px oklch(70% 0.16 85 / 0.4);
+  }
 } 

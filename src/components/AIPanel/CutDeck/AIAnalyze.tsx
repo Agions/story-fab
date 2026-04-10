@@ -321,7 +321,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
           <p>请先上传视频，再进行 AI 分析</p>
         </div>
         <div className={styles.noVideoWarning}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: '#ff4d4f', marginBottom: 12 }}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" >
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
