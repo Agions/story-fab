@@ -1551,3 +1551,639 @@ body {
   .VPHome { padding: 0 1rem 3rem !important; }
   .VPHomeHero { padding: 3.5rem 0 2.5rem !important; }
 }
+
+/* ============================================
+   HOMEPAGE — Pro Upgrade
+   ============================================ */
+
+/* ---- VPHome layout overrides ---- */
+.VPHome {
+  background: var(--vp-c-bg) !important;
+  padding: 0 !important;
+}
+
+.VPHero {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ambient background glow */
+.VPHero::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.08) 0%, rgba(59, 130, 246, 0.04) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid overlay */
+.VPHero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.VPHero .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo float animation */
+.VPHero .image-container {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.VPHero .image-container img {
+  width: 96px !important;
+  height: 96px !important;
+  filter: drop-shadow(0 8px 32px rgba(245, 158, 11, 0.28)) drop-shadow(0 0 0 1px rgba(245, 158, 11, 0.15));
+  border-radius: 22px !important;
+}
+
+/* Hero text gradient */
+.VPHero .name {
+  font-family: 'Syne', sans-serif !important;
+  font-size: 3.75rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  background: linear-gradient(135deg, #f8fafc 30%, #fcd34d 55%, #f59e0b 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  line-height: 1.05 !important;
+  margin-bottom: 1rem !important;
+}
+
+.VPHero .text {
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 1.15rem !important;
+  color: #e2e8f0 !important;
+  font-weight: 400 !important;
+  margin-bottom: 0.5rem !important;
+  letter-spacing: 0.01em !important;
+}
+
+.VPHero .tagline {
+  font-size: 0.925rem !important;
+  color: #64748b !important;
+  margin-bottom: 2.5rem !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Entrance animations */
+.VPHero .name,
+.VPHero .text,
+.VPHero .tagline,
+.VPHero .actions {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+.VPHero .name   { animation-delay: 0.05s; }
+.VPHero .text   { animation-delay: 0.12s; }
+.VPHero .tagline{ animation-delay: 0.19s; }
+.VPHero .actions{ animation-delay: 0.26s; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero CTA buttons */
+.VPHero .actions { gap: 0.875rem !important; }
+
+.VPHero .action .VPButton {
+  padding: 0.75rem 1.875rem !important;
+  border-radius: 10px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  transition: all 0.2s ease !important;
+  letter-spacing: 0.01em !important;
+}
+
+.VPHero .action .VPButton.brand {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  border: none !important;
+  color: #090910 !important;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35) !important;
+}
+
+.VPHero .action .VPButton.brand:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 28px rgba(245, 158, 11, 0.45) !important;
+  color: #090910 !important;
+}
+
+.VPHero .action .VPButton.alt {
+  background: transparent !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  color: #94a3b8 !important;
+  backdrop-filter: blur(8px);
+}
+
+.VPHero .action .VPButton.alt:hover {
+  border-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.06) !important;
+  color: #f8fafc !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ---- Stats Bar ---- */
+.VPHero .stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-top: 2.5rem;
+  padding: 1.25rem 2.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInUp 0.6s ease-out 0.32s both;
+}
+
+.VPHero .stats .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  flex: 1;
+  padding: 0 1.5rem;
+}
+
+.VPHero .stats .stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.VPHero .stats .stat-label {
+  font-size: 0.7rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.VPHero .stats .stat-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(245, 158, 11, 0.12);
+  flex-shrink: 0;
+}
+
+/* ---- Features ---- */
+.VPHomeFeatures {
+  padding: 5rem 1.5rem !important;
+  max-width: 960px !important;
+  margin: 0 auto !important;
+}
+
+.VPHomeFeatures .title {
+  display: none !important;
+}
+
+/* Section header */
+.VPHomeFeatures::before {
+  content: '核心能力';
+  display: block;
+  text-align: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f59e0b;
+  margin-bottom: 0.75rem;
+}
+
+.VPFeature {
+  background: rgba(19, 19, 31, 0.6) !important;
+  border: 1px solid rgba(245, 158, 11, 0.08) !important;
+  border-radius: 16px !important;
+  padding: 1.75rem 1.5rem !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.VPFeature::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  opacity: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.07) 0%, transparent 60%);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.VPFeature::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f59e0b 50%, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.VPFeature:hover {
+  border-color: rgba(245, 158, 11, 0.22) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(245, 158, 11, 0.06) !important;
+}
+
+.VPFeature:hover::before { opacity: 1; }
+.VPFeature:hover::after  { opacity: 1; }
+
+.VPFeature .icon {
+  font-size: 1.75rem !important;
+  margin-bottom: 0.875rem !important;
+  display: block !important;
+  line-height: 1 !important;
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.3));
+}
+
+.VPFeature .title {
+  font-family: 'Syne', sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  margin-bottom: 0.5rem !important;
+  border: none !important;
+  padding: 0 !important;
+  background: none !important;
+  -webkit-text-fill-color: #f8fafc !important;
+}
+
+.VPFeature .details {
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+  line-height: 1.7 !important;
+  margin: 0 !important;
+}
+
+/* Stagger animate feature cards */
+.VPFeature:nth-child(1) { animation: fadeInUp 0.5s ease-out 0.05s both; }
+.VPFeature:nth-child(2) { animation: fadeInUp 0.5s ease-out 0.10s both; }
+.VPFeature:nth-child(3) { animation: fadeInUp 0.5s ease-out 0.15s both; }
+.VPFeature:nth-child(4) { animation: fadeInUp 0.5s ease-out 0.20s both; }
+.VPFeature:nth-child(5) { animation: fadeInUp 0.5s ease-out 0.25s both; }
+.VPFeature:nth-child(6) { animation: fadeInUp 0.5s ease-out 0.30s both; }
+
+/* ============================================
+   Custom Homepage Sections
+   ============================================ */
+
+/* ---- Section Wrapper ---- */
+.cutdeck-section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.cutdeck-section--dark {
+  background: rgba(9, 9, 16, 0.6);
+  border-top: 1px solid rgba(245, 158, 11, 0.06);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.06);
+}
+
+.cutdeck-section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.cutdeck-section-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f59e0b;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.cutdeck-section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.5rem;
+  border: none;
+  padding: 0;
+  background: none;
+  -webkit-text-fill-color: #f8fafc;
+}
+
+.cutdeck-section-sub {
+  font-size: 0.9rem;
+  color: #475569;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ---- Architecture Diagram ---- */
+.architecture-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.architecture-card {
+  background: rgba(19, 19, 31, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.08);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.architecture-card:hover {
+  border-color: rgba(245, 158, 11, 0.18);
+  background: rgba(19, 19, 31, 0.8);
+}
+
+.architecture-card h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 0.5rem;
+  border: none;
+  padding: 0;
+  background: none;
+  -webkit-text-fill-color: #f8fafc;
+}
+
+.architecture-card p {
+  font-size: 0.775rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.architecture-card .tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15em 0.55em;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 0.5rem;
+}
+
+.architecture-card .tag-rust {
+  background: rgba(222, 165, 132, 0.12);
+  color: #dea584;
+  border: 1px solid rgba(222, 165, 132, 0.2);
+}
+
+.architecture-card .tag-ts {
+  background: rgba(96, 165, 250, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.architecture-card .tag-ff {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* ---- Quick Start Steps ---- */
+.steps-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.steps-grid::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 36px;
+  bottom: 24px;
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(245, 158, 11, 0.35), rgba(245, 158, 11, 0.05));
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+  position: relative;
+}
+
+.step-item:last-child { padding-bottom: 0; }
+
+.step-num {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #090910;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1), 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+.step-body h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0.4rem 0 0.5rem;
+  border: none;
+  padding: 0;
+  background: none;
+  -webkit-text-fill-color: #f8fafc;
+}
+
+.step-body p {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0 0 0.5rem;
+  line-height: 1.6;
+}
+
+.step-code {
+  background: rgba(9, 9, 16, 0.9);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: #fbbf24;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* ---- Tech Stack ---- */
+.tech-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.875rem;
+  border-radius: 8px;
+  background: rgba(19, 19, 31, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.tech-badge:hover {
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #f8fafc;
+  background: rgba(19, 19, 31, 0.9);
+}
+
+.tech-badge .badge-icon {
+  color: #f59e0b;
+  font-size: 0.9em;
+}
+
+/* ---- Footer CTA ---- */
+.footer-cta {
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.footer-cta-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.footer-cta-sub {
+  font-size: 0.875rem;
+  color: #475569;
+  margin: 0 0 2rem;
+}
+
+.footer-cta-actions {
+  display: flex;
+  gap: 0.875rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.footer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.footer-btn-primary {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #090910;
+  border: none;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+}
+
+.footer-btn-primary:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+  color: #090910;
+}
+
+.footer-btn-secondary {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.footer-btn-secondary:hover {
+  color: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.4);
+  background: rgba(148, 163, 184, 0.06);
+}
+
+/* ---- VitePress nav/footer polish ---- */
+.VPNav {
+  backdrop-filter: blur(20px) saturate(1.5) !important;
+}
+
+.VPFooter {
+  background: rgba(9, 9, 16, 0.9) !important;
+  border-top: 1px solid rgba(245, 158, 11, 0.06) !important;
+  padding: 2rem 1.5rem !important;
+}
+
+.VPFooter .message,
+.VPFooter .copyright {
+  color: #334155 !important;
+  font-size: 0.8rem !important;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 640px) {
+  .VPHero .name { font-size: 2.5rem !important; }
+  .architecture-grid { grid-template-columns: 1fr; }
+  .VPHero .stats { padding: 1rem 1.25rem; }
+  .VPHero .stats .stat { padding: 0 0.75rem; }
+  .cutdeck-section { padding: 3rem 1rem; }
+  .footer-cta { padding: 3rem 1rem 2rem; }
+}
