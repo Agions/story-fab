@@ -1,5 +1,5 @@
 /**
- * ClipForge — AI 视频剪辑工作台导出
+ * CutDeck — AI 视频剪辑工作台导出
  */
 export {
   CutDeckProvider,

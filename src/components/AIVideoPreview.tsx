@@ -14,7 +14,7 @@ import {
   CloudUploadOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import { useAIEditor } from './ClipForge/AIEditorContext';
+import { useAIEditor } from './CutDeck/AIEditorContext';
 import type { VideoInfo } from '@/core/types';
 import { notify } from '@/shared';
 import styles from './AIVideoPreview.module.less';
