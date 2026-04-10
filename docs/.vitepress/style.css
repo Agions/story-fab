@@ -202,13 +202,13 @@ body {
    Navigation Bar
    ============================================ */
 
-.VPNav {
+html.dark .VPNav {
   background: rgba(9, 9, 16, 0.88) !important;
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--vp-c-border) !important;
 }
 
-.VPNavBar { background: transparent !important; }
+html.dark .VPNavBar { background: transparent !important; }
 
 .VPNavBarTitle .title {
   font-family: 'Syne', sans-serif;
