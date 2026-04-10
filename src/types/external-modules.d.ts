@@ -1,3 +1,5 @@
+// CutDeck external module type declarations
+
 declare module 'jspdf' {
   export class jsPDF {
     constructor(...args: unknown[]);
@@ -18,10 +20,3 @@ declare module 'jspdf' {
 }
 
 declare module 'jspdf-autotable';
-
-declare module '@vanilla-extract/css' {
-  export function createGlobalTheme<T extends Record<string, unknown>>(
-    selector: string,
-    vars: T
-  ): T;
-}
