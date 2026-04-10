@@ -162,7 +162,7 @@ export class ClipScorer {
     const transcript = clip.transcript ?? '';
 
     const laughterScore = this.scoreLaughter(clip, transcript);
-    const emotionScore = this.scoreEmotion(transcript);
+    const emotionScore = this.scoreEmotion(clip, transcript);
     const completenessScore = this.scoreCompleteness(clip, transcript);
     const silenceScore = this.scoreSilenceRatio(clip);
     const paceScore = this.scorePace(transcript, duration);
@@ -207,17 +207,24 @@ export class ClipScorer {
   // Dimension Scorers
   // --------------------------------------------------------
 
-  private scoreLaughter(_clip: CandidateClip, transcript: string): number {
+  private scoreLaughter(clip: CandidateClip, transcript: string): number {
     const lc = transcript.toLowerCase();
-    const laughWords = ['笑', '哈哈', 'laughter', 'laughing', 'haha', 'lol', '掌声', 'applause'];
+    const laughWords = ['笑', '哈哈', 'laughter', 'laughing', 'haha', 'lol', '掌声', 'applause', '哈哈哈', '笑死', '太好笑'];
     const laughCount = laughWords.reduce((sum, kw) => sum + (lc.includes(kw) ? 1 : 0), 0);
-    const duration = _clip.endTime - _clip.startTime;
+    const duration = clip.endTime - clip.startTime;
     const density = laughCount / Math.max(duration / 60, 1);
     // 基准：每分钟 2 次笑声 = 60 分
-    return Math.min(100, (density / 2.0) * 60);
+    let baseScore = Math.min(100, (density / 2.0) * 60);
+
+    // 音频能量加权：高能量段（可能笑声/掌声）额外加分
+    if (clip.audioEnergy != null && clip.audioEnergy > 0.5) {
+      baseScore = Math.min(100, baseScore + clip.audioEnergy * 30);
+    }
+
+    return baseScore;
   }
 
-  private scoreEmotion(transcript: string): number {
+  private scoreEmotion(clip: CandidateClip, transcript: string): number {
     const emotionKeywords = [
       '震惊', '惊讶', '惊人', '不敢相信', 'wow', 'omg', 'shocking',
       '愤怒', '生气', '气死我了', 'angry', 'furious',
@@ -227,7 +234,14 @@ export class ClipScorer {
       '绝了', '太牛了', '厉害', '佩服', '震撼',
     ];
     const hits = emotionKeywords.reduce((sum, kw) => sum + (transcript.includes(kw) ? 1 : 0), 0);
-    return Math.min(100, hits * 20);
+    let baseScore = Math.min(100, hits * 20);
+
+    // 音频能量加权：高能量段通常是情感高潮，提升情感得分
+    if (clip.audioEnergy != null && clip.audioEnergy > 0.5) {
+      baseScore = Math.min(100, baseScore + clip.audioEnergy * 25);
+    }
+
+    return baseScore;
   }
 
   private scoreCompleteness(_clip: CandidateClip, transcript: string): number {

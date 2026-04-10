@@ -21,6 +21,7 @@ import type { AspectRatio } from './multiFormatExport';
 import { ClipScorer, clipScorer } from './clipScorer';
 import { SEOGenerator } from './seoGenerator';
 import { multiFormatExporter, type ExportTask } from './multiFormatExport';
+import { invoke } from '@tauri-apps/api/core';
 import { visionService } from '@/core/services/vision.service';
 
 // ============================================================
@@ -42,6 +43,8 @@ export interface RepurposingOptions {
   multiFormat?: boolean;
   /** 是否生成 SEO 元数据 */
   generateSEO?: boolean;
+  /** 导出目录（默认调用 Rust get_export_dir） */
+  outputDir?: string;
   /** 进度回调 */
   onProgress?: (stage: PipelineStage, progress: number, message?: string) => void;
 }
@@ -75,6 +78,7 @@ export const DEFAULT_REPURPOSING_OPTIONS: Required<RepurposingOptions> = {
   exportFormats: ['9:16'],
   multiFormat: false,
   generateSEO: true,
+  outputDir: '',
   onProgress: () => {},
 };
 
@@ -136,6 +140,9 @@ export class ClipRepurposingPipeline {
     const exportTasks: Map<string, ExportTask[]> = new Map();
     if (opts.multiFormat && opts.exportFormats.length > 0) {
       onProgress('exporting', 70, '准备导出任务...');
+      // 动态获取导出目录（优先用户指定，否则调用 Rust get_export_dir）
+      const exportDir = opts.outputDir
+        ?? await invoke<string>('get_export_dir').catch(() => '/tmp/CutDeck');
       for (const clip of scored) {
         const tasks = multiFormatExporter.prepareExportTasks({
           clipId: `clip_${clip.clip.startTime}_${clip.clip.endTime}`,
@@ -143,7 +150,7 @@ export class ClipRepurposingPipeline {
           startTime: clip.clip.startTime,
           endTime: clip.clip.endTime,
           formats: opts.exportFormats,
-          outputDir: '/tmp/cutdeck-exports',
+          outputDir: exportDir,
           quality: 'high',
         });
         exportTasks.set(clip.clip.startTime.toString(), tasks);

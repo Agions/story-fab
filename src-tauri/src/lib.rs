@@ -1177,6 +1177,20 @@ struct DetectSmartSegmentsInput {
     detect_transitions: Option<bool>,
 }
 
+/// Get the default export directory for the current platform
+#[tauri::command]
+fn get_export_dir() -> String {
+    // Try platform-specific download directory first
+    if let Some(download_dir) = dirs::download_dir() {
+        let export_dir = download_dir.join("CutDeck");
+        return export_dir.to_string_lossy().to_string();
+    }
+
+    // Fallback to temp directory
+    let temp_dir = std::env::temp_dir().join("CutDeck");
+    temp_dir.to_string_lossy().to_string()
+}
+
 #[tauri::command]
 fn detect_smart_segments(input: DetectSmartSegmentsInput) -> Result<Vec<VideoSegment>, String> {
     if input.video_path.trim().is_empty() {

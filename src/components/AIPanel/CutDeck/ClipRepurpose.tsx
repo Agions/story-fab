@@ -21,6 +21,7 @@ import {
   DownloadOutlined,
   PlayCircleOutlined,
 } from '@ant-design/icons';
+import { invoke } from '@tauri-apps/api/core';
 import { motion } from '@/components/common/motion-shim';
 import { ClipRepurposingPipeline } from '@/core/services/clipRepurposing/pipeline';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
@@ -143,12 +144,16 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
     const exported: string[] = [];
     const clipsToExport = results.filter(c => selectedClips.has(c.clip.id));
 
+    // 动态获取导出目录
+    const exportDir = await invoke<string>('get_export_dir').catch(() => '/tmp/CutDeck');
+
     try {
       for (const clip of clipsToExport) {
         for (const fmt of selectedFormats) {
+          const filename = `clip_${clip.clip.id}_${fmt.replace(':', 'x')}.mp4`;
           const outputPath = await transcodeWithCrop({
             inputPath: videoPath,
-            outputPath: `/tmp/CutDeck/clip_${clip.clip.id}_${fmt.replace(':', 'x')}.mp4`,
+            outputPath: `${exportDir}/${filename}`,
             aspect: fmt,
             startTime: clip.clip.startTime,
             endTime: clip.clip.endTime,
