@@ -10,7 +10,7 @@ import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/mod
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { notify } from '@/shared';
 import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
-import { orchestrateCommentaryAgents } from '@/core/services/workflow/agents';
+import { orchestrateCommentaryAgents } from '@/core/services/workflow/commentaryAgents';
 import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '@/core/workflow/alignmentGate';
 import {
   FEATURE_TO_FUNCTION,
