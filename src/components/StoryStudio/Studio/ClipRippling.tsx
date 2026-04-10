@@ -32,7 +32,7 @@ import type {
 } from '@/core/services/clipRepurposing/pipeline';
 import type { SocialPlatform } from '@/core/services/clipRepurposing/seoGenerator';
 import { transcodeWithCrop, type AspectRatio } from '@/services/tauri';
-import styles from './ClipRepurpose.module.css';
+import styles from './ClipRippling.module.css';
 
 const { Option } = Select;
 

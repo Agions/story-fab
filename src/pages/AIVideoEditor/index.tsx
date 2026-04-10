@@ -8,21 +8,21 @@ import {
   UserOutlined,
   ScissorOutlined,
 } from '@ant-design/icons';
-import { CutDeckProvider, useCutDeck } from '@/components/AIPanel/AIEditorContext';
+import { CutDeckProvider, useCutDeck } from '@/components/StoryStudio/AIEditorContext';
 import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '@/hooks/use-keyboard-shortcuts';
 import { useEditorStore } from '@/store/editorStore';
 import { message } from 'antd';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/AIPanel/CutDeck/functionModeMap';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryStudio/Studio/functionModeMap';
 import styles from './index.module.less';
 
-const CutDeckComponent = lazy(() => import('@/components/AIPanel/CutDeck/CutDeck'));
-const ProjectCreate = lazy(() => import('@/components/AIPanel/CutDeck/ProjectCreate'));
-const VideoUpload = lazy(() => import('@/components/AIPanel/CutDeck/VideoUpload'));
-const AIAnalyze = lazy(() => import('@/components/AIPanel/CutDeck/AIAnalyze'));
-const ScriptGenerate = lazy(() => import('@/components/AIPanel/CutDeck/ScriptGenerate'));
-const VideoSynthesize = lazy(() => import('@/components/AIPanel/CutDeck/VideoSynthesize'));
-const VideoExport = lazy(() => import('@/components/AIPanel/CutDeck/VideoExport'));
-const ClipRepurpose = lazy(() => import('@/components/AIPanel/CutDeck/ClipRepurpose'));
+const StudioComponent = lazy(() => import('@/components/StoryStudio/Studio/Studio'));
+const ProjectSetup = lazy(() => import('@/components/StoryStudio/Studio/ProjectSetup'));
+const VideoUpload = lazy(() => import('@/components/StoryStudio/Studio/VideoUpload'));
+const AIVisualizer = lazy(() => import('@/components/StoryStudio/Studio/AIVisualizer'));
+const ScriptWriting = lazy(() => import('@/components/StoryStudio/Studio/ScriptWriting'));
+const VideoComposing = lazy(() => import('@/components/StoryStudio/Studio/VideoComposing'));
+const VideoExport = lazy(() => import('@/components/StoryStudio/Studio/VideoExport'));
+const ClipRippling = lazy(() => import('@/components/StoryStudio/Studio/ClipRippling'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
@@ -131,21 +131,21 @@ const AIVideoEditorContent: React.FC = () => {
   const renderStepContent = () => {
     switch (state.currentStep) {
       case 'project-create':
-        return <ProjectCreate onNext={goToNextStep} />;
+        return <ProjectSetup onNext={goToNextStep} />;
       case 'video-upload':
         return <VideoUpload onNext={goToNextStep} />;
       case 'ai-analyze':
-        return <AIAnalyze onNext={goToNextStep} />;
+        return <AIVisualizer onNext={goToNextStep} />;
       case 'clip-repurpose':
-        return <ClipRepurpose onNext={goToNextStep} />;
+        return <ClipRippling onNext={goToNextStep} />;
       case 'script-generate':
-        return <ScriptGenerate onNext={goToNextStep} />;
+        return <ScriptWriting onNext={goToNextStep} />;
       case 'video-synthesize':
-        return <VideoSynthesize onNext={goToNextStep} />;
+        return <VideoComposing onNext={goToNextStep} />;
       case 'export':
         return <VideoExport onComplete={() => {}} />;
       default:
-        return <ProjectCreate onNext={goToNextStep} />;
+        return <ProjectSetup onNext={goToNextStep} />;
     }
   };
 
@@ -182,9 +182,9 @@ const AIVideoEditorContent: React.FC = () => {
             </div>
           }
         >
-          <CutDeckComponent>
+          <StudioComponent>
             {renderStepContent()}
-          </CutDeckComponent>
+          </StudioComponent>
         </Suspense>
       </div>
     </div>

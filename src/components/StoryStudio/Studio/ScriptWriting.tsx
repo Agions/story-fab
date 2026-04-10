@@ -18,7 +18,7 @@ import {
   FUNCTION_TO_MODE,
   type AIFunctionType,
 } from './functionModeMap';
-import styles from './ScriptGenerate.module.less';
+import styles from './ScriptWriting.module.less';
 
 // 功能配置
 const FUNCTION_CONFIG: Record<AIFunctionType, {

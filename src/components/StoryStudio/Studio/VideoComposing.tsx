@@ -13,7 +13,7 @@ import { orchestrateCommentaryAgents } from '@/core/services/workflow/commentary
 import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '@/core/workflow/alignmentGate';
 import { FEATURE_TO_FUNCTION, FUNCTION_TO_MODE } from './functionModeMap';
 import { notify } from '@/shared';
-import styles from './VideoSynthesize.module.less';
+import styles from './VideoComposing.module.less';
 
 interface VideoSynthesizeProps {
   onNext?: () => void;

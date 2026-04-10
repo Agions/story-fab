@@ -14,7 +14,7 @@ import {
   CloudUploadOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import { useAIEditor } from './AIPanel/AIEditorContext';
+import { useAIEditor } from './StoryStudio/AIEditorContext';
 import type { VideoInfo } from '@/core/types';
 import { notify } from '@/shared';
 import styles from './AIVideoPreview.module.less';

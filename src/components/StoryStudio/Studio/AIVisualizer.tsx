@@ -8,7 +8,7 @@ import { visionService } from '@/core/services/vision.service';
 import { notify } from '@/shared';
 import { logger } from '@/utils/logger';
 import type { AIAnalyzeProps, Scene } from '@/core/types';
-import styles from './AIAnalyze.module.css';
+import styles from './AIVisualizer.module.css';
 import HighlightList from './HighlightList';
 
 // 格式化时间

@@ -9,7 +9,7 @@ import type { ProjectData } from '@/core/types';
 import { saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
-import styles from './ProjectCreate.module.less';
+import styles from './ProjectSetup.module.less';
 
 interface ProjectCreateProps {
   onNext?: () => void;
