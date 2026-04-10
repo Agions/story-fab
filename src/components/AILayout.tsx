@@ -266,7 +266,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
             className={styles.logo} 
             onClick={() => navigate('/')}
           >
-            <span className={styles.logoIcon}>🎬</span>
+            <span className={styles.logoIcon} aria-hidden="true">🎬</span>
             <span className={styles.logoText}>CutDeck</span>
           </div>
           <Divider type="vertical" />
@@ -317,7 +317,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
           {/* 三大核心功能 */}
           <div className={styles.panelHeader}>
             <ThunderboltOutlined />
-            <span>🎯 核心功能</span>
+            <span aria-hidden="true">🎯 核心功能</span>
           </div>
           
           <div className={styles.functionList}>
@@ -342,7 +342,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
           
           {/* AI 工具 */}
           <div className={styles.panelHeader}>
-            <span>🛠️ AI 工具</span>
+            <span aria-hidden="true">🛠️ AI 工具</span>
           </div>
           
           <div className={styles.featureList}>

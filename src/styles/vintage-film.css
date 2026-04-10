@@ -88,7 +88,6 @@
      💫 动画系统
   ═══════════════════════════════════════════════════════ */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --duration-instant: 80ms;
   --duration-fast: 150ms;
   --duration-normal: 250ms;

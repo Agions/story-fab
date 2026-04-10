@@ -150,13 +150,13 @@
 
 .uploadZone.dragActive .uploadIconSvg {
   color: #FF9F43;
-  animation: bounceIcon 0.6s ease infinite;
+  animation: floatIcon 1.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
   filter: drop-shadow(0 0 20px rgba(255, 159, 67, 0.6));
 }
 
-@keyframes bounceIcon {
-  0%, 100% { transform: translateY(-3px); }
-  50% { transform: translateY(-8px); }
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 /* ==================== Upload Text ==================== */

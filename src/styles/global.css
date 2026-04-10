@@ -74,8 +74,8 @@
   --glow-card: 0 0 0 1px rgba(255, 255, 255, 0.05);
 
   /* Transitions */
-  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: 120ms;
   --transition-default: 200ms;
   --transition-slow: 350ms;
