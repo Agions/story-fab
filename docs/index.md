@@ -114,6 +114,7 @@ winget install cutdeck
 https://github.com/Agions/CutDeck/releases</div>
 </div>
 </div>
+</div>
 
 <div class="step-item">
 <div class="step-num">2</div>
@@ -141,7 +142,7 @@ cutdeck export --format mp4 --quality high</div>
 
 </div>
 </div>
-
+</div>
 <div class="cutdeck-section cutdeck-section--dark">
 
 <div class="cutdeck-section-header">
@@ -173,6 +174,7 @@ cutdeck export --format mp4 --quality high</div>
 <a href="/guide/quick-start" class="footer-btn footer-btn-secondary">
 阅读文档 →
 </a>
+</div>
 </div>
 </div>
 </div>
