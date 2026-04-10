@@ -1,244 +1,278 @@
-// ==============================================
-// ClipFlow 科技暗黑风格设计系统
-// ==============================================
+/**
+ * ClipFlow 设计系统变量 — LESS 语法
+ *
+ * ⚠️ 已迁移：主 token 已移至 src/styles/design-system.css（CSS custom properties）
+ * 本文件保留用于：
+ *   1. LESS 组件兼容（直接 @import 'variables.less' 的 .less 文件）
+ *   2. 旧版组件逐步迁移
+ *
+ * 迁移原则：
+ *   @xxx   ← 直接值（保留，仍被旧 .less 文件使用）
+ *   @use   ← 引用 design-system.css 中的 CSS var()
+ *
+ * 新增组件请使用 CSS custom properties（design-system.css）
+ */
 
-// ---------- 基础颜色 ----------
+// =============================================
+// 基础颜色（保留 — 旧 LESS 文件依赖）
+// =============================================
 @white: #fff;
 @black: #000;
 
-// ---------- 科技暗黑背景色系统 ----------
-@bg-primary: #0a0a0f;      // 主背景 - 深邃黑
-@bg-secondary: #12121a;     // 次背景 - 卡片背景
-@bg-tertiary: #1a1a24;     // 三级背景 - 面板背景
-@bg-elevated: #22222e;     // 悬浮背景
-@bg-hover: #2a2a3a;        // 悬停背景
+// =============================================
+// 科技暗黑背景色系统
+// ⚠️ 迁移至 CSS: --color-bg-*
+// =============================================
+@bg-primary:   #0a0a0f;
+@bg-secondary: #12121a;
+@bg-tertiary:  #1a1a24;
+@bg-elevated:  #22222e;
+@bg-hover:     #2a2a3a;
 
+// =============================================
 // 边框
-@border-primary: #2a2a3a;  // 主边框
-@border-secondary: #3a3a4a; // 次边框
-@border-active: #4a4a5a;   // 激活边框
+// =============================================
+@border-primary:   #2a2a3a;
+@border-secondary: #3a3a4a;
+@border-active:    #4a4a5a;
 
-// ---------- 主色调 (科技霓虹) ----------
-@primary-color: #6366f1;    // 靛蓝紫
-@primary-hover: #7c7ff7;   // 主色悬停
-@primary-active: #5558e3;  // 主色激活
+// =============================================
+// 主色调 (科技霓虹 — 旧版)
+// ⚠️ 新版主色已迁移至 design-system.css OKLCH 系统
+// =============================================
+@primary-color:   #6366f1;
+@primary-hover:   #7c7ff7;
+@primary-active:  #5558e3;
 
+// =============================================
 // 渐变色
-@gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-@gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a855f7 100%);
-@gradient-cyber: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+// =============================================
+@gradient-primary:   linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+@gradient-hero:      linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a855f7 100%);
+@gradient-cyber:     linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
 @gradient-neon-pink: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
 
+// =============================================
 // 辅助色
-@accent-cyan: #06b6d4;     // 青色/赛博朋克
-@accent-pink: #f43f5e;     // 霓虹粉
-@accent-blue: #3b82f6;     // 蓝色
+// =============================================
+@accent-cyan: #06b6d4;
+@accent-pink: #f43f5e;
+@accent-blue: #3b82f6;
 
-// ---------- 功能色 ----------
-@success-color: #10b981;   // 翠绿
-@success-bg: rgba(16, 185, 129, 0.15);
-@warning-color: #f59e0b;   // 琥珀
-@warning-bg: rgba(245, 158, 11, 0.15);
-@error-color: #ef4444;     // 红
-@error-bg: rgba(239, 68, 68, 0.15);
-@info-color: #3b82f6;      // 蓝
-@info-bg: rgba(59, 130, 246, 0.15);
+// =============================================
+// 功能色
+// =============================================
+@success-color: #10b981;
+@success-bg:    rgba(16, 185, 129, 0.15);
+@warning-color: #f59e0b;
+@warning-bg:    rgba(245, 158, 11, 0.15);
+@error-color:   #ef4444;
+@error-bg:      rgba(239, 68, 68, 0.15);
+@info-color:    #3b82f6;
+@info-bg:       rgba(59, 130, 246, 0.15);
 
-// ---------- 霓虹发光色 ----------
-@neon-blue: #00d2ff;
-@neon-purple: #a855f7;
-@neon-pink: #ec4899;
-@neon-green: #10b981;
-@neon-orange: #f97316;
+// =============================================
+// 霓虹发光色
+// =============================================
+@neon-blue:    #00d2ff;
+@neon-purple:  #a855f7;
+@neon-pink:    #ec4899;
+@neon-green:   #10b981;
+@neon-orange:  #f97316;
 
+// =============================================
 // 发光效果
-@glow-primary: 0 0 20px rgba(99, 102, 241, 0.5);
-@glow-cyan: 0 0 20px rgba(6, 182, 212, 0.5);
-@glow-pink: 0 0 20px rgba(244, 63, 94, 0.5);
-@glow-purple: 0 0 20px rgba(168, 85, 247, 0.5);
+// =============================================
+@glow-primary:   0 0 20px rgba(99, 102, 241, 0.5);
+@glow-cyan:      0 0 20px rgba(6, 182, 212, 0.5);
+@glow-pink:      0 0 20px rgba(244, 63, 94, 0.5);
+@glow-purple:    0 0 20px rgba(168, 85, 247, 0.5);
 
-// ---------- 文字颜色 ----------
-@text-primary: #f1f5f9;    // 主要文字
-@text-secondary: #94a3b8; // 次要文字
-@text-tertiary: #64748b;  // 辅助文字
-@text-disabled: #475569;  // 禁用文字
-@text-inverse: #0a0a0f;   // 反色文字
+// =============================================
+// 文字颜色
+// =============================================
+@text-primary:   #f1f5f9;
+@text-secondary: #94a3b8;
+@text-tertiary:  #64748b;
+@text-disabled:  #475569;
+@text-inverse:   #0a0a0f;
 
-// ---------- 字体系统 ----------
-@font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Noto Sans SC', Roboto, 'Helvetica Neue', Arial, sans-serif;
+// =============================================
+// 字体系统
+// =============================================
+@font-family:      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Noto Sans SC', Roboto, 'Helvetica Neue', Arial, sans-serif;
 @font-family-code: 'JetBrains Mono', 'Fira Code', monospace;
 
-@font-size-xs: 11px;
-@font-size-sm: 12px;
+@font-size-xs:   11px;
+@font-size-sm:   12px;
 @font-size-base: 14px;
-@font-size-md: 16px;
-@font-size-lg: 18px;
-@font-size-xl: 24px;
-@font-size-2xl: 32px;
-@font-size-3xl: 48px;
+@font-size-md:   16px;
+@font-size-lg:   18px;
+@font-size-xl:   24px;
+@font-size-2xl:  32px;
+@font-size-3xl:  48px;
 
-@font-weight-light: 300;
-@font-weight-normal: 400;
-@font-weight-medium: 500;
+@font-weight-light:    300;
+@font-weight-normal:   400;
+@font-weight-medium:   500;
 @font-weight-semibold: 600;
-@font-weight-bold: 700;
+@font-weight-bold:     700;
 
-@line-height-base: 1.6;
-@line-height-tight: 1.4;
+@line-height-base:   1.6;
+@line-height-tight:  1.4;
 
-// ---------- 间距系统 ----------
-@spacing-xs: 4px;
-@spacing-sm: 8px;
-@spacing-md: 12px;
-@spacing-base: 16px;
-@spacing-lg: 24px;
-@spacing-xl: 32px;
-@spacing-2xl: 48px;
-@spacing-3xl: 64px;
+// =============================================
+// 间距系统
+// =============================================
+@spacing-xs:     4px;
+@spacing-sm:     8px;
+@spacing-md:     12px;
+@spacing-base:   16px;
+@spacing-lg:     24px;
+@spacing-xl:     32px;
+@spacing-2xl:    48px;
+@spacing-3xl:    64px;
 
-// ---------- 圆角系统 ----------
-@radius-sm: 4px;
-@radius-md: 8px;
-@radius-lg: 12px;
-@radius-xl: 16px;
-@radius-2xl: 20px;
+// =============================================
+// 圆角系统
+// =============================================
+@radius-sm:   4px;
+@radius-md:   8px;
+@radius-lg:   12px;
+@radius-xl:   16px;
+@radius-2xl:  20px;
 @radius-full: 9999px;
 
-// ---------- 阴影系统 ----------
+// =============================================
+// 阴影系统
+// =============================================
 @shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
 @shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
 @shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3);
 @shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5), 0 8px 10px rgba(0, 0, 0, 0.3);
 
-// 霓虹发光阴影
-@shadow-neon-blue: 0 0 10px rgba(0, 210, 255, 0.3), 0 0 20px rgba(0, 210, 255, 0.2);
+@shadow-neon-blue:   0 0 10px rgba(0, 210, 255, 0.3), 0 0 20px rgba(0, 210, 255, 0.2);
 @shadow-neon-purple: 0 0 10px rgba(168, 85, 247, 0.3), 0 0 20px rgba(168, 85, 247, 0.2);
-@shadow-neon-pink: 0 0 10px rgba(236, 72, 153, 0.3), 0 0 20px rgba(236, 72, 153, 0.2);
+@shadow-neon-pink:   0 0 10px rgba(236, 72, 153, 0.3), 0 0 20px rgba(236, 72, 153, 0.2);
 @shadow-glow-primary: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 30px rgba(99, 102, 241, 0.2);
 
+// =============================================
 // 玻璃拟态
-@glass-bg: rgba(18, 18, 26, 0.8);
+// =============================================
+@glass-bg:     rgba(18, 18, 26, 0.8);
 @glass-border: rgba(255, 255, 255, 0.1);
-@glass-blur: blur(10px);
+@glass-blur:  blur(10px);
 
-// ---------- 动画 ----------
-@duration-fast: 0.15s;
-@duration-base: 0.3s;
-@duration-slow: 0.5s;
+// =============================================
+// 动画
+// =============================================
+@duration-fast:  0.15s;
+@duration-base:  0.3s;
+@duration-slow:  0.5s;
 
-@ease-base: cubic-bezier(0.4, 0, 0.2, 1);
-@ease-in: cubic-bezier(0.4, 0, 1, 1);
-@ease-out: cubic-bezier(0, 0, 0.2, 1);
-@ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+@ease-base:    cubic-bezier(0.4, 0, 0.2, 1);
+@ease-in:     cubic-bezier(0.4, 0, 1, 1);
+@ease-out:    cubic-bezier(0, 0, 0.2, 1);
+@ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);
 
-// ---------- 布局尺寸 ----------
-@layout-header-height: 56px;
-@layout-sider-width: 240px;
+// =============================================
+// 布局尺寸
+// =============================================
+@layout-header-height:         56px;
+@layout-sider-width:           240px;
 @layout-sider-collapsed-width: 80px;
-@content-max-width: 1400px;
-@container-padding: 24px;
+@content-max-width:           1400px;
+@container-padding:           24px;
 
 // 侧边栏
-@sidebar-bg: @bg-secondary;
-@sidebar-hover: @bg-hover;
-@sidebar-active: rgba(99, 102, 241, 0.15);
-@sidebar-text: @text-secondary;
+@sidebar-bg:          @bg-secondary;
+@sidebar-hover:       @bg-hover;
+@sidebar-active:      rgba(99, 102, 241, 0.15);
+@sidebar-text:         @text-secondary;
 @sidebar-text-active: @primary-color;
 
 // 顶部工具栏
-@toolbar-height: 56px;
-@toolbar-bg: @bg-secondary;
-@toolbar-border: @border-primary;
+@toolbar-height:  56px;
+@toolbar-bg:      @bg-secondary;
+@toolbar-border:  @border-primary;
 
 // 左侧面板
 @panel-left-width: 280px;
-@panel-left-bg: @bg-secondary;
+@panel-left-bg:    @bg-secondary;
 
 // 底部属性面板
-@panel-bottom-height: 48px;
-@panel-bottom-expanded: 200px;
+@panel-bottom-height:     48px;
+@panel-bottom-expanded:   200px;
 
 // 时间轴
-@timeline-height: 200px;
-@timeline-track-height: 40px;
+@timeline-height:       200px;
+@timeline-track-height:  40px;
 
 // 预览区
 @preview-aspect: 16 / 9;
 
-// ---------- 组件尺寸 ----------
-@btn-height-sm: 32px;
+// =============================================
+// 组件尺寸
+// =============================================
+@btn-height-sm:   32px;
 @btn-height-base: 40px;
-@btn-height-lg: 48px;
+@btn-height-lg:   48px;
 
-@input-height-sm: 32px;
+@input-height-sm:   32px;
 @input-height-base: 40px;
-@input-height-lg: 48px;
+@input-height-lg:   48px;
 
-// ---------- 兼容旧版变量 (过渡用) ----------
-// 亮色主题变量 (保留用于兼容性)
-@light-bg-primary: #ffffff;
-@light-bg-secondary: #f5f7fa;
-@light-text-primary: rgba(0, 0, 0, 0.87);
-@light-text-secondary: rgba(0, 0, 0, 0.65);
+// =============================================
+// 兼容旧版变量（别名 → 指向主变量）
+// =============================================
+@light-bg-primary:         #ffffff;
+@light-bg-secondary:        #f5f7fa;
+@light-text-primary:       rgba(0, 0, 0, 0.87);
+@light-text-secondary:     rgba(0, 0, 0, 0.65);
 
-// 旧版暗色变量 (保留用于兼容性)
-@dark-background: #121212;
+@dark-background:           #121212;
 @dark-component-background: #1f1f1f;
-@dark-text-color: rgba(255, 255, 255, 0.87);
-@dark-text-color-secondary: rgba(255, 255, 255, 0.45);
-@dark-border-color: #424242;
-@dark-card: #1f1f1f;
+@dark-text-color:           rgba(255, 255, 255, 0.87);
+@dark-text-color-secondary:  rgba(255, 255, 255, 0.45);
+@dark-border-color:         #424242;
+@dark-card:                 #1f1f1f;
 
-// 旧版颜色变量 (保留用于兼容性)
-@heading-color: @text-primary;
-@text-color: @text-secondary;
-@text-color-secondary: @text-tertiary;
-@disabled-color: @text-disabled;
-@border-color: @border-primary;
-@bg-light: @bg-secondary;
-@background-color-light: @bg-tertiary;
-@bg-white: @bg-primary;
+@heading-color:            @text-primary;
+@text-color:               @text-secondary;
+@text-color-secondary:     @text-tertiary;
+@disabled-color:           @text-disabled;
+@border-color:             @border-primary;
+@bg-light:                 @bg-secondary;
+@background-color-light:    @bg-tertiary;
+@bg-white:                 @bg-primary;
 
-@cyan-color: @accent-cyan;
+@cyan-color:   @accent-cyan;
 @purple-color: @primary-color;
 @orange-color: @warning-color;
 @accent-color: @accent-pink;
 
-// 间距变量 (兼容)
 @spacing-unit: @spacing-sm;
-@spacing-sm: 8px;
-@spacing-lg: 24px;
-@spacing-xl: 32px;
-@spacing-xxl: 48px;
+@spacing-xxl:   @spacing-2xl;
 
-// 圆角变量 (兼容)
-@radius-md: 8px;
-@border-radius-small: 4px;
-@radius-lg: 12px;
+@border-radius-small: @radius-sm;
 
-// 阴影变量 (兼容)
-@box-shadow-base: @shadow-md;
-@box-shadow-hover: @shadow-lg;
+@box-shadow-base:   @shadow-md;
+@box-shadow-hover:  @shadow-lg;
 @box-shadow-active: @shadow-xl;
 
-// 动画变量 (兼容)
-@animation-duration-base: 0.3s;
-@animation-duration-slow: 0.5s;
-@animation-duration-fast: 0.15s;
-@ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-@ease-out: cubic-bezier(0, 0, 0.2, 1);
-@ease-in: cubic-bezier(0.4, 0, 1, 1);
+@animation-duration-base: @duration-base;
+@animation-duration-slow: @duration-slow;
+@animation-duration-fast: @duration-fast;
+@ease-in-out:             cubic-bezier(0.4, 0, 0.2, 1);
+@ease-out:                cubic-bezier(0, 0, 0.2, 1);
+@ease-in:                 cubic-bezier(0.4, 0, 1, 1);
 
-// 布局变量 (兼容)
-@layout-header-height: 56px;
-@layout-sider-width: 240px;
-@content-max-width: 1400px;
-@container-padding: 24px;
-
+// =============================================
 // 媒体查询断点
-@screen-xs: 480px;
-@screen-sm: 576px;
-@screen-md: 768px;
-@screen-lg: 992px;
-@screen-xl: 1200px;
-@screen-xxl: 1600px;
+// =============================================
+@screen-xs:   480px;
+@screen-sm:   576px;
+@screen-md:   768px;
+@screen-lg:   992px;
+@screen-xl:   1200px;
+@screen-xxl:  1600px;
