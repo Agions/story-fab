@@ -177,7 +177,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     }
     
     try {
-      const { smartCutService } = await import('@/core/services/smart-cut.service');
+      // smartCutService unused - feature not implemented
       // Get current video from editor context if available
       // const videoInfo = editorState?.currentVideo;
       // const result = await smartCutService.smartCut(videoInfo, { style: 'normal' });
