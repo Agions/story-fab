@@ -21,7 +21,7 @@ import {
   EditOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useAIEditor, AIFeatureType } from './StoryStudio/AIEditorContext';
+import { useAIEditor, AIFeatureType } from './ClipForge/AIEditorContext';
 import { notify } from '@/shared';
 import styles from './AILayout.module.less';
 

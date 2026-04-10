@@ -1,5 +1,5 @@
 /**
- * Studio - AI 叙事工作室主容器组件
+ * * Workspace - AI 视频剪辑工作区主容器组件
  *
  * 设计系统：AI Cinema Studio
  * - 深炭底：#0C0D14
@@ -20,7 +20,7 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useCutDeck, CutDeckStep } from '../AIEditorContext';
-import styles from './Studio.module.less';
+import styles from './Workspace.module.less';
 
 // ============================================================================
 // 类型定义
@@ -34,7 +34,7 @@ interface StepConfig {
   icon: React.ReactNode;
 }
 
-interface StudioProps {
+interface WorkspaceProps {
   children?: React.ReactNode;
 }
 
@@ -186,7 +186,7 @@ const StepList: React.FC<StepListProps> = ({
 // 主组件
 // ============================================================================
 
-const Studio: React.FC<StudioProps> = memo(({ children }) => {
+const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
   const { state, setStep } = useCutDeck();
   const { currentStep, stepStatus } = state;
   const activeStepRef = useRef<HTMLDivElement | null>(null);
@@ -247,4 +247,4 @@ const Studio: React.FC<StudioProps> = memo(({ children }) => {
   );
 });
 
-export default Studio;
+export default Workspace;

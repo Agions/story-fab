@@ -1,5 +1,5 @@
 /**
- * StoryStudio — AI 创意工作室导出
+ * ClipForge — AI 视频剪辑工作台导出
  */
 export {
   CutDeckProvider,

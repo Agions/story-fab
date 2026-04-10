@@ -8,21 +8,21 @@ import {
   UserOutlined,
   ScissorOutlined,
 } from '@ant-design/icons';
-import { CutDeckProvider, useCutDeck } from '@/components/StoryStudio/AIEditorContext';
+import { CutDeckProvider, useCutDeck } from '@/components/ClipForge/AIEditorContext';
 import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '@/hooks/use-keyboard-shortcuts';
 import { useEditorStore } from '@/store/editorStore';
 import { message } from 'antd';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryStudio/Studio/functionModeMap';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/ClipForge/Workspace/functionModeMap';
 import styles from './index.module.less';
 
-const StudioComponent = lazy(() => import('@/components/StoryStudio/Studio/Studio'));
-const ProjectSetup = lazy(() => import('@/components/StoryStudio/Studio/ProjectSetup'));
-const VideoUpload = lazy(() => import('@/components/StoryStudio/Studio/VideoUpload'));
-const AIVisualizer = lazy(() => import('@/components/StoryStudio/Studio/AIVisualizer'));
-const ScriptWriting = lazy(() => import('@/components/StoryStudio/Studio/ScriptWriting'));
-const VideoComposing = lazy(() => import('@/components/StoryStudio/Studio/VideoComposing'));
-const VideoExport = lazy(() => import('@/components/StoryStudio/Studio/VideoExport'));
-const ClipRippling = lazy(() => import('@/components/StoryStudio/Studio/ClipRippling'));
+const Workspace = lazy(() => import('@/components/ClipForge/Workspace/Workspace'));
+const ProjectSetup = lazy(() => import('@/components/ClipForge/Workspace/ProjectSetup'));
+const VideoUpload = lazy(() => import('@/components/ClipForge/Workspace/VideoUpload'));
+const AIVisualizer = lazy(() => import('@/components/ClipForge/Workspace/AIVisualizer'));
+const ScriptWriting = lazy(() => import('@/components/ClipForge/Workspace/ScriptWriting'));
+const VideoComposing = lazy(() => import('@/components/ClipForge/Workspace/VideoComposing'));
+const VideoExport = lazy(() => import('@/components/ClipForge/Workspace/VideoExport'));
+const ClipRippling = lazy(() => import('@/components/ClipForge/Workspace/ClipRippling'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
@@ -182,9 +182,9 @@ const AIVideoEditorContent: React.FC = () => {
             </div>
           }
         >
-          <StudioComponent>
+          <Workspace>
             {renderStepContent()}
-          </StudioComponent>
+          </Workspace>
         </Suspense>
       </div>
     </div>
