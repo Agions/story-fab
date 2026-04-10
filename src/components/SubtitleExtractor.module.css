@@ -1,0 +1,274 @@
+/**
+ * SubtitleExtractor — Dark Theme (AI Cinema Studio)
+ * bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+  font-family: 'Outfit', 'Figtree', system-ui, sans-serif;
+}
+
+/* ── Video Player ─────────────────────────────────── */
+.playerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  max-height: 360px;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.video {
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  display: block;
+  object-fit: contain;
+}
+
+.noVideo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 200px;
+  background: #0C0D14;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.playerOverlay {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+}
+
+.playBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  backdrop-filter: blur(4px);
+}
+
+.playBtn:hover {
+  background: rgba(255, 159, 67, 0.6);
+  border-color: #FF9F43;
+}
+
+.currentSubtitleHint {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 16px;
+  background: rgba(12, 13, 20, 0.85);
+  color: #fff;
+  font-size: 13px;
+  text-align: center;
+  backdrop-filter: blur(4px);
+  border-top: 1px solid rgba(255, 159, 67, 0.2);
+}
+
+.timeDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  justify-content: flex-end;
+  padding: 0 4px;
+}
+
+.timeMain {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #FF9F43;
+}
+
+.timeTotal {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+/* ── Timeline ──────────────────────────────────────── */
+.timeline {
+  position: relative;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #FF9F43;
+  z-index: 10;
+  pointer-events: none;
+  transition: left 0.1s linear;
+}
+
+.playhead::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: #FF9F43;
+  border-radius: 50%;
+}
+
+.track {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  right: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+}
+
+.subBlock {
+  position: absolute;
+  height: 22px;
+  background: rgba(0, 212, 255, 0.35);
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  min-width: 4px;
+}
+
+.subBlock:hover {
+  background: rgba(0, 212, 255, 0.55);
+  border-color: #00D4FF;
+}
+
+.subBlockActive {
+  background: rgba(255, 159, 67, 0.45) !important;
+  border-color: #FF9F43 !important;
+}
+
+/* ── Control Bar ──────────────────────────────────── */
+.controlBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.translateToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Subtitle List ────────────────────────────────── */
+.subtitleList {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.subItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+.subItem:hover {
+  background: rgba(255, 159, 67, 0.05);
+}
+
+.subItemCurrent {
+  background: rgba(255, 159, 67, 0.08) !important;
+  border-left: 3px solid #FF9F43;
+}
+
+.subItemContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.subItemTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.timeStart { color: #FF9F43; font-weight: 600; }
+.timeSep   { color: rgba(255, 255, 255, 0.25); }
+.timeEnd   { color: rgba(255, 255, 255, 0.4); }
+
+.subItemText {
+  flex: 1;
+  min-width: 0;
+}
+
+.textContent {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.textCurrent {
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.editInput {
+  font-size: 13px;
+}
+
+.currentBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #FF9F43;
+  color: #0C0D14;
+  border-radius: 50%;
+  font-size: 11px;
+  flex-shrink: 0;
+}
