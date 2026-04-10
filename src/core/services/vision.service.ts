@@ -3,7 +3,28 @@
  * 优化画面识别准确性
  */
 
+import { invoke } from '@tauri-apps/api/core';
 import type { VideoInfo, Scene, Keyframe, VideoAnalysis, ObjectDetection, EmotionAnalysis } from '@/core/types';
+
+// Rust highlight_detector 返回的原生类型
+interface RustHighlightSegment {
+  start_ms: number;
+  end_ms: number;
+  score: number;
+  reason: string;
+  audio_score?: number;
+  scene_score?: number;
+  motion_score?: number;
+}
+
+interface HighlightDetectionOptions {
+  threshold?: number;
+  min_duration_ms?: number;
+  top_n?: number;
+  window_ms?: number;
+  detect_scene?: boolean;
+  scene_threshold?: number;
+}
 
 // 场景类型定义
 interface SceneType {
@@ -669,6 +690,59 @@ export class VisionService {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return mins > 0 ? `${mins}分${secs}秒` : `${secs}秒`;
+  }
+
+  /**
+   * Rust 高光检测 — 激活 highlight_detector.rs
+   *
+   * 使用 FFmpeg scdet 滤镜 + 音频短时能量分析，无需外部 AI 服务
+   * 识别高光片段（音频能量峰值 + 场景切换）
+   */
+  async detectHighlights(
+    videoInfo: VideoInfo,
+    options: HighlightDetectionOptions = {}
+  ): Promise<Array<{
+    startTime: number;
+    endTime: number;
+    score: number;
+    reason: string;
+    audioScore?: number;
+    sceneScore?: number;
+    motionScore?: number;
+  }>> {
+    const videoPath = videoInfo.path;
+
+    if (!videoPath) {
+      console.warn('[VisionService] detectHighlights: videoInfo.path is empty');
+      return [];
+    }
+
+    try {
+      const highlights = await invoke<RustHighlightSegment[]>('detect_highlights', {
+        input: {
+          videoPath,
+          threshold: options.threshold ?? 1.5,
+          minDurationMs: options.min_duration_ms ?? 500,
+          topN: options.top_n ?? 10,
+          windowMs: options.window_ms ?? 100,
+          detectScene: options.detect_scene ?? true,
+          sceneThreshold: options.scene_threshold ?? 0.3,
+        },
+      });
+
+      return highlights.map((h) => ({
+        startTime: h.start_ms / 1000, // ms → seconds
+        endTime: h.end_ms / 1000,
+        score: h.score,
+        reason: h.reason,
+        audioScore: h.audio_score,
+        sceneScore: h.scene_score,
+        motionScore: h.motion_score,
+      }));
+    } catch (error) {
+      console.warn('[VisionService] detectHighlights failed:', error);
+      return [];
+    }
   }
 }
 
