@@ -1,3 +1,24 @@
+## [1.9.0] - 2026-04-10
+
+### ✨ Features
+
+- **Rust highlight_detector.rs 已激活**：FFmpeg scdet + 音频能量分析，通过 visionService.detectHighlights() 为剪辑评分提供真实数据
+- **6维评分接入 pipeline**：clipScorer 新增 audioEnergy 加权，笑声/情感维度基于真实音频信号
+- **Timeline 快捷键真实回调**：Delete/I/O/⌘A/⌘Z/⇧⌘Z 均接入 editorStore
+- **SubtitleExtractor 重构**：集成视频播放器 + 字幕时间轴 + 行内编辑
+
+### 🐛 Bug Fixes
+
+- editorStore 新增 inPointMs/outPointMs/setInPoint/setOutPoint/selectAllClips
+- Rust 新增 get_export_dir 命令（平台下载目录）
+- clipRepurposing pipeline 接入 Rust 高光检测并去重
+
+### 🎨 P2: HighlightList 组件
+
+- 从 _DEAD/ 回收 HighlightPanel 设计 → AIAnalyze 完成视图
+
+---
+
 ## [1.8.0] - 2026-04-10
 
 ### 🔧 Code Quality
