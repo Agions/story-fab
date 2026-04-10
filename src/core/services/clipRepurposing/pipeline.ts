@@ -21,6 +21,7 @@ import type { AspectRatio } from './multiFormatExport';
 import { ClipScorer, clipScorer } from './clipScorer';
 import { SEOGenerator } from './seoGenerator';
 import { multiFormatExporter, type ExportTask } from './multiFormatExport';
+import { visionService } from '@/core/services/vision.service';
 
 // ============================================================
 // Types
@@ -110,9 +111,9 @@ export class ClipRepurposingPipeline {
       platform: opts.platform,
     });
 
-    // ── Stage 1: 构建候选片段 ──────────────────────────────
+    // ── Stage 1: 构建候选片段（含 Rust 高光检测）────────────
     onProgress('analyzing', 10, '识别高光候选片段...');
-    const candidates = this.buildCandidates(videoInfo, analysis);
+    const candidates = await this.buildCandidates(videoInfo, analysis);
     logger.info(`[ClipRepurposingPipeline] 生成 ${candidates.length} 个候选片段`);
 
     // ── Stage 2: 多维评分 ─────────────────────────────────
@@ -188,35 +189,62 @@ export class ClipRepurposingPipeline {
    * 2. 结合 ASR 情感峰值（如果有）
    * 3. 每个候选片段满足 min-max 时长约束
    */
-  private buildCandidates(videoInfo: VideoInfo, analysis: VideoAnalysis): CandidateClip[] {
+  private async buildCandidates(videoInfo: VideoInfo, analysis: VideoAnalysis): Promise<CandidateClip[]> {
     const { scenes = [] } = analysis;
     const candidates: CandidateClip[] = [];
 
-    if (scenes.length === 0) {
-      // 无场景数据时，按时间均匀切分
-      return this.buildUniformCandidates(videoInfo.duration, 30, 90);
+    // ── 接入 Rust 高光检测 ──────────────────────────────────
+    // 使用 FFmpeg scdet + 音频能量分析，识别高光片段
+    const highlights = await visionService.detectHighlights(videoInfo, {
+      top_n: 15,
+      min_duration_ms: 500,
+      detect_scene: true,
+      threshold: 1.5,
+    });
+
+    // 将高光片段作为高质量候选（优先级高于场景边界）
+    for (const h of highlights) {
+      candidates.push({
+        startTime: h.startTime,
+        endTime: h.endTime,
+        sceneType: 'highlight',
+        transcript: this.extractSceneTranscript(analysis, h.startTime, h.endTime),
+        audioEnergy: h.audioScore,
+      });
     }
 
-    // 以场景为候选片段
-    for (const scene of scenes) {
-      const duration = scene.endTime - scene.startTime;
+    // ── 场景边界候选（补充） ───────────────────────────────
+    if (scenes.length > 0) {
+      for (const scene of scenes) {
+        const duration = scene.endTime - scene.startTime;
 
-      // 时长过滤：太短的跳过
-      if (duration < 10) continue;
+        // 跳过太短或与现有高光高度重叠的
+        if (duration < 10) continue;
 
-      // 时长过长：拆分为多个候选
-      if (duration > 120) {
-        const subClips = this.splitLongScene(scene.startTime, scene.endTime, 60, 90);
-        candidates.push(...subClips);
-        continue;
+        const overlaps = highlights.some(
+          h => h.startTime < scene.endTime && h.endTime > scene.startTime
+        );
+        if (overlaps) continue; // 高光已覆盖，跳过重复场景
+
+        // 时长过长：拆分为多个候选
+        if (duration > 120) {
+          const subClips = this.splitLongScene(scene.startTime, scene.endTime, 60, 90);
+          candidates.push(...subClips);
+          continue;
+        }
+
+        candidates.push({
+          startTime: scene.startTime,
+          endTime: scene.endTime,
+          sceneType: scene.type ?? 'scene',
+          transcript: this.extractSceneTranscript(analysis, scene.startTime, scene.endTime),
+        });
       }
+    }
 
-      candidates.push({
-        startTime: scene.startTime,
-        endTime: scene.endTime,
-        sceneType: scene.type ?? 'default',
-        transcript: this.extractSceneTranscript(analysis, scene.startTime, scene.endTime),
-      });
+    // 无任何数据时：按时间均匀切分
+    if (candidates.length === 0) {
+      return this.buildUniformCandidates(videoInfo.duration, 30, 90);
     }
 
     return candidates;
