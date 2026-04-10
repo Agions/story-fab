@@ -50,16 +50,19 @@ CutDeck/
 │   │   │   ├── asr.service.ts        # Whisper ASR 集成
 │   │   │   ├── subtitle.service.ts   # 字幕处理
 │   │   │   ├── export.service.ts     # 导出服务
-│   │   │   ├── workflow.service.ts   # 工作流管理
-│   │   │   └── smart-cut.service.ts  # 智能裁切
-│   │   ├── workflow/             # 工作流引擎
-│   │   │   ├── WorkflowEngine.ts     # 状态机引擎
-│   │   │   ├── steps/               # 步骤执行器
-│   │   │   └── types.ts
+│   │   │   ├── clip-workflow.service.ts   # 剪辑工作流（活跃）
+│   │   │   ├── aiClip.service.ts          # AI 剪辑分析
+│   │   │   ├── asr.service.ts              # Whisper ASR 集成
+│   │   │   ├── subtitle.service.ts         # 字幕处理
+│   │   │   ├── export.service.ts           # 多格式导出
+│   │   │   └── clipRepurposing/            # AI 拆条管道（活跃）
+│   │   │       ├── pipeline.ts            # 完整拆条流程
+│   │   │       ├── clipScorer.ts           # 6维评分引擎
+│   │   │       └── seoGenerator.ts         # 多平台 SEO 元数据
 │   │   ├── hooks/                # React Hooks（CutDeck 专用）
-│   │   │   ├── useWorkflowEngine.ts  # 工作流 hook（v1.2.0 新增）
 │   │   │   ├── useVideo.ts
-│   │   │   └── useAIClip.ts
+│   │   │   ├── useModel.ts
+│   │   │   └── useEditorState.ts
 │   │   └── constants/            # 常量定义（含 AI 模型列表）
 │   │
 │   ├── store/                    # Zustand Stores（UI 状态）
@@ -111,19 +114,17 @@ class WebCodecsVideoProcessor extends BaseVideoProcessor {
 }
 ```
 
-### 工作流引擎
+### 剪辑工作流（ClipWorkflowService）
 
 ```
-WorkflowEngine（状态机）
-    ├── subscriber 模式（状态变更广播）
-    ├── RetryRequest / SkipRequest 信号
-    └── executeStep()（自动重试 + 步骤图执行）
-
-步骤注册 → createWorkflowEngine() → engine.run()
-React 连接 → useWorkflowEngine() hook
+ClipRepurposingPipeline
+    ├── buildCandidates() — 调用 visionService.detectHighlights()（Rust 高光检测）
+    ├── clipScorer.topClips() — 6维评分排序
+    ├── seoGenerator.generateBatch() — 多平台 SEO 元数据
+    └── multiFormatExporter.prepareExportTasks() — 多格式导出准备
 ```
 
-**已注册步骤**：`upload / analyze / template-select / script-generate / script-dedup / script-edit / subtitle / ai-clip / music / timeline-edit / preview / export`
+**6 维评分维度**：`laughterDensity / emotionPeak / speechCompleteness / silenceRatio / speakingPace / keywordBoost`
 
 ### Rust 后端命令
 
