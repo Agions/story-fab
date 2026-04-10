@@ -56,34 +56,147 @@ html.dark {
   background-clip: text;
 }
 
+
+/* ============================================
+   LIGHT MODE — Force Readable Colors
+   (must come before all other styles)
+   ============================================ */
+
+/* Body background — guaranteed white in light mode */
+body {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+/* VitePress layout — force white backgrounds */
+.VPNav,
+.VPNavBar,
+.VPNavBarTitle,
+.VPHome,
+.VPHero,
+.VPHomeHero,
+.VPFooter,
+.VPSidebar,
+.VPSidebarItem,
+.VPDoc,
+.VPDocFooter,
+.VPDocAside,
+.VPDocAsideOutline,
+.VPDocAsideCarbonAds {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+/* Navigation text */
+.VPNavBarMenu .VPNavBarMenuLink {
+  color: #374151 !important;
+}
+.VPNavBarMenu .VPNavBarMenuLink:hover {
+  color: #111827 !important;
+}
+.VPNavBarMenu .VPNavBarMenuLink.active {
+  color: #d97706 !important;
+}
+
+/* Sidebar text */
+.VPSidebarItem .text {
+  color: #374151 !important;
+}
+.VPSidebarItem.is-active > .item .text {
+  color: #d97706 !important;
+}
+.VPSidebarItem > .item:hover .text {
+  color: #111827 !important;
+}
+
+/* Hero text — readable on white */
+.VPHero .name {
+  color: #111827 !important;
+  background: none !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+.VPHero .text {
+  color: #374151 !important;
+}
+.VPHero .tagline {
+  color: #6b7280 !important;
+}
+
+/* Doc content text */
+.vp-doc h1 { color: #111827 !important; -webkit-text-fill-color: #111827 !important; }
+.vp-doc h2 { color: #1f2937 !important; -webkit-text-fill-color: #1f2937 !important; }
+.vp-doc h3 { color: #374151 !important; -webkit-text-fill-color: #374151 !important; }
+.vp-doc h4 { color: #1f2937 !important; }
+.vp-doc p  { color: #374151 !important; }
+.vp-doc li { color: #374151 !important; }
+.vp-doc a  { color: #d97706 !important; }
+.vp-doc strong { color: #111827 !important; }
+.vp-doc code { background: #fef3c7 !important; color: #92400e !important; }
+
+/* Feature cards — white background, dark text */
+.VPFeature {
+  background: #ffffff !important;
+  border-color: #e5e7eb !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+.VPFeature:hover {
+  border-color: #d97706 !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+}
+.VPFeature .title { color: #111827 !important; -webkit-text-fill-color: #111827 !important; }
+.VPFeature .details { color: #6b7280 !important; }
+
+/* Tables */
+.vp-doc table { background: #ffffff !important; }
+.vp-doc table th { color: #111827 !important; background: #f3f4f6 !important; }
+.vp-doc table td { color: #374151 !important; }
+.vp-doc table { border-color: #e5e7eb !important; }
+
+/* Custom homepage sections */
+.cutdeck-section {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+}
+.cutdeck-section--dark {
+  background: #f9fafb !important;
+  color: #1f2937 !important;
+}
+.cutdeck-section-title { color: #111827 !important; -webkit-text-fill-color: #111827 !important; }
+.cutdeck-section-sub { color: #6b7280 !important; }
+.cutdeck-section-label { color: #d97706 !important; }
+
+/* Architecture cards */
+.architecture-card {
+  background: #f9fafb !important;
+  border-color: #e5e7eb !important;
+  color: #374151 !important;
+}
+.architecture-card:hover {
+  background: #ffffff !important;
+  border-color: #d97706 !important;
+}
+.architecture-card h4 { color: #111827 !important; -webkit-text-fill-color: #111827 !important; }
+.architecture-card p { color: #6b7280 !important; }
+
+/* Stats bar */
+.VPHero .stats {
+  background: #f9fafb !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Footer */
+.VPFooter { background: #f9fafb !important; border-top-color: #e5e7eb !important; }
+.VPFooter .message, .VPFooter .copyright { color: #9ca3af !important; }
+
+/* Code blocks */
+.vp-doc div[class*='language-'] { background: #1e1e35 !important; }
+
+/* Custom containers */
+.vp-doc .custom-block { background: #f9fafb !important; }
+
 /* ============================================
    Global Resets & Base
    ============================================ */
-
-* { box-sizing: border-box; }
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 80px;
-}
-
-body {
-  font-family: var(--vp-font-family-base);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: var(--vp-c-bg);
-  color: var(--vp-c-text-2);
-}
-
-::selection {
-  background: rgba(245, 158, 11, 0.25);
-  color: #f8fafc;
-}
-
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--vp-c-bg-alt); }
-::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(245, 158, 11, 0.4); }
 
 /* ============================================
    Navigation Bar
