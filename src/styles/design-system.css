@@ -1,0 +1,184 @@
+/**
+ * CutDeck 统一设计系统 — OKLCH 色彩空间
+ * 融合 ClipFlow 科技暗黑 + 电影胶片质感
+ * 
+ * 使用方式：在组件中 import 此文件，或在 index.css 中 @import
+ */
+
+/* =============================================
+ * 🎨 色彩 — OKLCH 语义化分层
+ * ============================================= */
+
+:root {
+  /* --- 主色：琥珀色（电影胶片感）--- */
+  /* L=50% 时偏淡黄，L=25% 时沉稳 */
+  --color-primary: oklch(65% 0.18 70);
+  --color-primary-hover: oklch(72% 0.18 70);
+  --color-primary-active: oklch(58% 0.18 70);
+  --color-primary-muted: oklch(65% 0.10 70 / 0.15);
+
+  /* --- 功能色 --- */
+  --color-success: oklch(65% 0.20 145);
+  --color-success-bg: oklch(65% 0.20 145 / 0.12);
+  --color-warning: oklch(75% 0.16 85);
+  --color-warning-bg: oklch(75% 0.16 85 / 0.12);
+  --color-error: oklch(60% 0.22 25);
+  --color-error-bg: oklch(60% 0.22 25 / 0.12);
+  --color-info: oklch(70% 0.14 200);
+
+  /* --- 科技霓虹色（保留 ClipFlow 特色）--- */
+  --color-neon-blue: #00d2ff;
+  --color-neon-purple: #a855f7;
+  --color-neon-pink: #ec4899;
+  --color-neon-green: #10b981;
+  --color-neon-orange: #f97316;
+  --color-accent-cyan: #06b6d4;
+  --color-accent-pink: #f43f5e;
+
+  /* --- 文字色 --- */
+  --color-text-primary: oklch(95% 0.01 70);
+  --color-text-secondary: oklch(70% 0.02 70);
+  --color-text-tertiary: oklch(55% 0.02 70);
+  --color-text-disabled: oklch(45% 0.01 70);
+  --color-text-inverse: oklch(15% 0.02 70);
+
+  /* --- 背景色（科技暗黑）--- */
+  --color-bg-base: oklch(10% 0.02 70);
+  --color-bg-primary: oklch(8% 0.02 70);
+  --color-bg-secondary: oklch(14% 0.02 70);
+  --color-bg-tertiary: oklch(18% 0.02 70);
+  --color-bg-elevated: oklch(22% 0.02 70);
+  --color-bg-hover: oklch(26% 0.02 70);
+  --color-bg-overlay: oklch(5% 0.02 70 / 0.85);
+
+  /* --- 边框 --- */
+  --color-border-default: oklch(25% 0.02 70);
+  --color-border-secondary: oklch(30% 0.02 70);
+  --color-border-active: oklch(40% 0.02 70);
+  --color-border-focus: var(--color-primary);
+
+  /* --- 渐变 --- */
+  --gradient-primary: linear-gradient(135deg, oklch(65% 0.18 70) 0%, oklch(55% 0.22 280) 100%);
+  --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a855f7 100%);
+  --gradient-cyber: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+  --gradient-neon-pink: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+  --gradient-surface: linear-gradient(180deg, oklch(18% 0.02 70) 0%, oklch(14% 0.02 70) 100%);
+
+  /* --- 发光效果 --- */
+  --glow-primary: 0 0 20px oklch(65% 0.18 70 / 0.45);
+  --glow-cyan: 0 0 20px oklch(70% 0.14 200 / 0.4);
+  --glow-pink: 0 0 20px oklch(65% 0.22 25 / 0.4);
+  --glow-purple: 0 0 20px oklch(60% 0.22 280 / 0.4);
+
+  /* =============================================
+   * 🔤 字体系统
+   * ============================================= */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Noto Sans SC', Roboto, 'Helvetica Neue', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --font-size-xs:   0.6875rem;  /* 11px */
+  --font-size-sm:   0.75rem;    /* 12px */
+  --font-size-base: 0.875rem;   /* 14px */
+  --font-size-md:   1rem;       /* 16px */
+  --font-size-lg:   1.125rem;   /* 18px */
+  --font-size-xl:   1.5rem;    /* 24px */
+  --font-size-2xl:  2rem;       /* 32px */
+  --font-size-3xl:  3rem;       /* 48px */
+
+  --font-weight-light:   300;
+  --font-weight-normal:  400;
+  --font-weight-medium:  500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:    700;
+
+  --line-height-tight:  1.25;
+  --line-height-normal: 1.5;
+  --line-height-loose:  1.75;
+
+  /* =============================================
+   * 📐 间距系统（4px base）
+   * ============================================= */
+  --space-1:  0.25rem;  /* 4px */
+  --space-2:  0.5rem;   /* 8px */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.25rem; /* 20px */
+  --space-6:  1.5rem;  /* 24px */
+  --space-8:  2rem;    /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+
+  /* =============================================
+   * 🔲 圆角
+   * ============================================= */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* =============================================
+   * 🌫️ 阴影
+   * ============================================= */
+  --shadow-sm:  0 1px 2px oklch(0% 0 0 / 0.3);
+  --shadow-md:  0 4px 8px oklch(0% 0 0 / 0.4);
+  --shadow-lg:  0 8px 24px oklch(0% 0 0 / 0.5);
+  --shadow-xl:  0 16px 48px oklch(0% 0 0 / 0.6);
+  --shadow-glow: 0 0 24px oklch(65% 0.18 70 / 0.25);
+
+  /* =============================================
+   * ⏱️ 动画
+   * ============================================= */
+  --duration-instant: 50ms;
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    400ms;
+  --duration-slower:  600ms;
+
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:     cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring:  cubic-bezier(0.16, 1, 0.3, 1);   /* 专业弹性 */
+  --ease-bounce:  cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* =============================================
+   * 🧩 Z-Index 层级
+   * ============================================= */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+}
+
+/* =============================================
+ * 🔆 浅色模式覆盖
+ * ============================================= */
+:root[data-theme="light"],
+:root:not(.dark) {
+  --color-bg-base:      oklch(98% 0.005 70);
+  --color-bg-primary:   oklch(96% 0.005 70);
+  --color-bg-secondary: oklch(94% 0.005 70);
+  --color-bg-tertiary:  oklch(92% 0.005 70);
+  --color-bg-elevated:  oklch(100% 0.005 70);
+  --color-bg-hover:     oklch(92% 0.01 70);
+
+  --color-text-primary:   oklch(20% 0.02 70);
+  --color-text-secondary: oklch(40% 0.02 70);
+  --color-text-tertiary:  oklch(55% 0.02 70);
+  --color-text-disabled:  oklch(70% 0.01 70);
+  --color-text-inverse:   oklch(98% 0.01 70);
+
+  --color-border-default: oklch(88% 0.01 70);
+  --color-border-secondary: oklch(82% 0.01 70);
+  --color-border-active: oklch(70% 0.02 70);
+
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.08);
+  --shadow-md: 0 4px 8px oklch(0% 0 0 / 0.1);
+  --shadow-lg: 0 8px 24px oklch(0% 0 0 / 0.12);
+  --shadow-xl: 0 16px 48px oklch(0% 0 0 / 0.15);
+}

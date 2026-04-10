@@ -203,9 +203,9 @@ export class ClipRepurposingPipeline {
     // ── 接入 Rust 高光检测 ──────────────────────────────────
     // 使用 FFmpeg scdet + 音频能量分析，识别高光片段
     const highlights = await visionService.detectHighlights(videoInfo, {
-      top_n: 15,
-      min_duration_ms: 500,
-      detect_scene: true,
+      topN: 15,
+      minDurationMs: 500,
+      detectScene: true,
       threshold: 1.5,
     });
 

@@ -66,9 +66,9 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
     try {
       const result = await visionService.detectHighlights(videoInfo, {
         threshold,
-        top_n: topN,
-        min_duration_ms: 500,
-        detect_scene: true,
+        topN,
+        minDurationMs: 500,
+        detectScene: true,
       });
       setHighlights(result);
       setDetected(true);

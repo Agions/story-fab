@@ -3,28 +3,16 @@
  * 优化画面识别准确性
  */
 
-import { invoke } from '@tauri-apps/api/core';
-import type { VideoInfo, Scene, Keyframe, VideoAnalysis, ObjectDetection, EmotionAnalysis } from '@/core/types';
-
-// Rust highlight_detector 返回的原生类型
-interface RustHighlightSegment {
-  start_ms: number;
-  end_ms: number;
-  score: number;
-  reason: string;
-  audio_score?: number;
-  scene_score?: number;
-  motion_score?: number;
-}
-
-interface HighlightDetectionOptions {
-  threshold?: number;
-  min_duration_ms?: number;
-  top_n?: number;
-  window_ms?: number;
-  detect_scene?: boolean;
-  scene_threshold?: number;
-}
+import { tauri } from '@/core/tauri/TauriBridge';
+import type {
+  VideoInfo,
+  Scene,
+  Keyframe,
+  VideoAnalysis,
+  ObjectDetection,
+  EmotionAnalysis,
+} from '@/core/types';
+import type { HighlightSegment, DetectOptions, HighlightReason } from '@/core/interfaces';
 
 // 场景类型定义
 interface SceneType {
@@ -698,18 +686,18 @@ export class VisionService {
    * 使用 FFmpeg scdet 滤镜 + 音频短时能量分析，无需外部 AI 服务
    * 识别高光片段（音频能量峰值 + 场景切换）
    */
+  /**
+   * Rust 高光检测 — 激活 highlight_detector.rs
+   *
+   * 使用 FFmpeg scdet 滤镜 + 音频短时能量分析，无需外部 AI 服务
+   * 识别高光片段（音频能量峰值 + 场景切换）
+   *
+   * @deprecated 使用 @/core/interfaces DetectOptions 类型 + tauri.detectHighlights()
+   */
   async detectHighlights(
     videoInfo: VideoInfo,
-    options: HighlightDetectionOptions = {}
-  ): Promise<Array<{
-    startTime: number;
-    endTime: number;
-    score: number;
-    reason: string;
-    audioScore?: number;
-    sceneScore?: number;
-    motionScore?: number;
-  }>> {
+    options: Partial<DetectOptions> = {},
+  ): Promise<HighlightSegment[]> {
     const videoPath = videoInfo.path;
 
     if (!videoPath) {
@@ -718,23 +706,27 @@ export class VisionService {
     }
 
     try {
-      const highlights = await invoke<RustHighlightSegment[]>('detect_highlights', {
-        input: {
-          videoPath,
-          threshold: options.threshold ?? 1.5,
-          minDurationMs: options.min_duration_ms ?? 500,
-          topN: options.top_n ?? 10,
-          windowMs: options.window_ms ?? 100,
-          detectScene: options.detect_scene ?? true,
-          sceneThreshold: options.scene_threshold ?? 0.3,
-        },
+      // 使用 TauriBridge 类型化调用
+      const rawSegments = await tauri.detectHighlights(videoPath, {
+        threshold: options.threshold,
+        minDurationMs: options.minDurationMs ?? options.minDurationMs,
+        topN: options.topN,
+        windowMs: options.windowMs,
       });
 
-      return highlights.map((h) => ({
-        startTime: h.start_ms / 1000, // ms → seconds
+      return (rawSegments as Array<{
+        start_ms: number;
+        end_ms: number;
+        score: number;
+        reason: string;
+        audio_score?: number;
+        scene_score?: number;
+        motion_score?: number;
+      }>).map((h) => ({
+        startTime: h.start_ms / 1000,
         endTime: h.end_ms / 1000,
         score: h.score,
-        reason: h.reason,
+        reason: h.reason as HighlightReason,
         audioScore: h.audio_score,
         sceneScore: h.scene_score,
         motionScore: h.motion_score,

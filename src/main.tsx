@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import 'antd/dist/reset.css';
+// 统一设计系统（OKLCH 色彩空间，v2 架构）
+import './styles/design-system.css';
 import './styles/global.css';
 import './index.css';
 import './styles/vintage-film.css';
