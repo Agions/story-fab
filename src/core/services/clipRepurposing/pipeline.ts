@@ -58,20 +58,9 @@ export type PipelineStage =
   | 'generating_seo'
   | 'exporting';
 
-export interface RepurposingClip {
-  clip: CandidateClip;
-  score: ClipScore;
-  seo?: SEOMetadata;
-  exportTasks?: ExportTask[];
-}
-
-export interface RepurposingResult {
-  clips: RepurposingClip[];
-  totalInputDuration: number;
-  totalOutputDuration: number;
-  platform: SocialPlatform;
-  exportedFormats: AspectRatio[];
-}
+// Re-export for external consumers; also import for internal use
+import type { RepurposingClip, RepurposingResult } from './types';
+export type { RepurposingClip, RepurposingResult } from './types';
 
 export const DEFAULT_REPURPOSING_OPTIONS: Required<RepurposingOptions> = {
   targetClipCount: 5,

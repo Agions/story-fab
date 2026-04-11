@@ -12,3 +12,4 @@ export * from './clipScorer';
 export * from './seoGenerator';
 export * from './multiFormatExport';
 export * from './pipeline';
+export * from './types';

@@ -1,10 +1,20 @@
 /**
  * 智能剪辑工作流服务 (优化版)
  * 简化的完整剪辑流程
+ *
+ * 整合说明：
+ * - processVideo()          → 轻量路径：场景切换 + 静音检测（向后兼容）
+ * - processVideoWithPipeline() → 完整路径：委托 ClipRepurposingPipeline（多维评分 + SEO）
+ *
+ * 两者共享 VideoSegmentBase 字段（startTime/endTime/sourceId/duration），
+ * 类型定义见 clipRepurposing/types.ts
  */
 
 import { visionService } from './vision.service';
 import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
+import { ClipRepurposingPipeline } from './clipRepurposing/pipeline';
+import type { RepurposingOptions } from './clipRepurposing/pipeline';
+import { clipSegmentFromRepurposing } from './clipRepurposing/types';
 
 // 剪辑配置
 interface ClipConfig {
@@ -57,6 +67,7 @@ export interface ClipResult {
     config: ClipConfig;
     sceneChanges: number;
     silenceSections: number;
+    pipelineUsed?: boolean;
   };
 }
 
@@ -80,14 +91,28 @@ const DEFAULT_CONFIG: ClipConfig = {
 
 export class ClipWorkflowService {
   private config: ClipConfig;
+  /** Lazily-created pipeline instance (heavy, so defer until needed) */
+  private _pipeline?: ClipRepurposingPipeline;
 
   constructor(config: Partial<ClipConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
+  private get pipeline(): ClipRepurposingPipeline {
+    if (!this._pipeline) {
+      this._pipeline = new ClipRepurposingPipeline();
+    }
+    return this._pipeline;
+  }
+
   /**
-   * 完整剪辑流程
-   * 1. 视频分析 -> 2. 场景检测 -> 3. 静音检测 -> 4. 智能剪辑 -> 5. 生成时间轴
+   * 完整剪辑流程 — 轻量路径
+   * 
+   * 流程：视频分析 → 场景检测 → 静音检测 → 智能剪辑 → 生成时间轴
+   *
+   * 适用于：基础场景切换剪辑，无需多维评分 / SEO
+   *
+   * @see processVideoWithPipeline 完整路径（多维评分 + SEO）
    */
   async processVideo(
     videoInfo: VideoInfo,
@@ -130,6 +155,74 @@ export class ClipWorkflowService {
         config: this.config,
         sceneChanges: sceneChanges.length,
         silenceSections: silenceSections.length,
+        pipelineUsed: false,
+      },
+    };
+  }
+
+  /**
+   * 完整剪辑流程 — 委托 Pipeline 路径
+   * 
+   * 委托 ClipRepurposingPipeline 执行：
+   *   1. 分析视频（Rust 高光检测 + 场景边界）
+   *   2. 多维评分（笑声密度 / 情感峰值 / 语音完整度 / …）
+   *   3. SEO 元数据生成
+   *   4. 多格式导出准备
+   * 
+   * 结果转换为 ClipSegment[]（向后兼容 ClipResult）。
+   *
+   * 适用于：高质量短片段拆条，需要评分排序 / SEO 元数据
+   *
+   * @param videoInfo 视频信息
+   * @param analysis 已有视频分析结果（可避免重复分析）
+   * @param pipelineOptions Pipeline 专属选项
+   */
+  async processVideoWithPipeline(
+    videoInfo: VideoInfo,
+    analysis: VideoAnalysis | undefined,
+    pipelineOptions?: Partial<RepurposingOptions>,
+  ): Promise<ClipResult> {
+    // 若未传入 analysis， 先做一次轻量分析
+    const resolvedAnalysis = analysis ?? await this.analyzeVideo(videoInfo);
+
+    const pipelineResult = await this.pipeline.run(
+      videoInfo,
+      resolvedAnalysis,
+      {
+        targetClipCount: pipelineOptions?.targetClipCount ?? 5,
+        minClipDuration: pipelineOptions?.minClipDuration ?? 15,
+        maxClipDuration: pipelineOptions?.maxClipDuration ?? 120,
+        platform: pipelineOptions?.platform ?? 'youtube',
+        exportFormats: pipelineOptions?.exportFormats ?? ['9:16'],
+        multiFormat: pipelineOptions?.multiFormat ?? false,
+        generateSEO: pipelineOptions?.generateSEO ?? false,
+        onProgress: pipelineOptions?.onProgress,
+      },
+    );
+
+    // Pipeline 结果 → ClipSegment[]（向后兼容）
+    const sourceId = videoInfo.id || 'source';
+    const segments: ClipSegment[] = pipelineResult.clips.map((rep, index) =>
+      clipSegmentFromRepurposing(rep, index, sourceId),
+    );
+
+    // 应用当前服务的转换效果（向后兼容）
+    const finalSegments = this.applyTransitions(segments);
+
+    const totalDuration = finalSegments.reduce((sum, s) => sum + s.duration, 0);
+    const removedDuration = 0; // Pipeline 内部已过滤
+
+    return {
+      segments: finalSegments,
+      totalDuration,
+      removedDuration,
+      cutPoints: segments.length,
+      metadata: {
+        processedAt: new Date().toISOString(),
+        config: this.config,
+        sceneChanges: segments.length,
+        silenceSections: 0,
+        pipelineUsed: true,
       },
     };
   }
