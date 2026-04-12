@@ -14,14 +14,22 @@ export default defineConfig({
   cleanUrls: true,
 
   // 禁用自动主题切换，由 CSS 完全控制深色主题
-  appearance: true,  // 默认浅色，用户可手动切换深色
+  appearance: 'dark',  // 默认深色，用户可手动切换
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/CutDeck/logo.svg' }],
-    ['meta', { name: 'theme-color', content: '#1a1a2e' }],
+    ['meta', { name: 'theme-color', content: '#090910' }],
+    ['meta', { name: 'keywords', content: 'AI视频剪辑,智能拆条,短视频,Whisper字幕,Tauri,Rust,FFmpeg,CutDeck' }],
+    ['meta', { name: 'author', content: 'Agions' }],
     ['meta', { name: 'og:type', content: 'website' }],
     ['meta', { name: 'og:site_name', content: 'CutDeck' }],
-    ['meta', { name: 'description', content: 'AI 驱动的专业智能视频剪辑工具，支持智能混剪、剧情分析、字幕生成等全链路 AI 剪辑能力' }],
+    ['meta', { name: 'og:title', content: 'CutDeck — AI 智能视频剪辑工具' }],
+    ['meta', { name: 'og:description', content: '长视频自动拆条为爆款短片，AI 6维评分，Whisper 字幕，多格式导出，MIT 开源免费' }],
+    ['meta', { name: 'og:image', content: 'https://agions.github.io/CutDeck/og-image.png' }],
+    ['meta', { name: 'og:url', content: 'https://agions.github.io/CutDeck/' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'CutDeck — AI 智能视频剪辑工具' }],
+    ['meta', { name: 'twitter:description', content: '长视频自动拆条为爆款短片，AI 6维评分，Whisper 字幕' }],
   ],
 
   vite: {

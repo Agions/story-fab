@@ -2639,3 +2639,412 @@ html.dark .VPNavBar { background: transparent !important; }
   .cutdeck-section { padding: 3rem 1rem; }
   .footer-cta { padding: 3rem 1rem 2rem; }
 }
+
+/* ============================================
+   CutDeck Home — Pro Components
+   ============================================ */
+
+/* ---- Hero Tag Pill ---- */
+.cd-hero-tag {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.cd-hero-tag-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #F59E0B;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  position: relative;
+  overflow: hidden;
+}
+
+.cd-hero-tag-inner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.14), transparent);
+  animation: cd-shimmer 3.5s ease-in-out infinite;
+}
+
+@keyframes cd-shimmer {
+  0%   { left: -100%; }
+  60%, 100% { left: 150%; }
+}
+
+/* ---- Proof Bar ---- */
+.cd-proof-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 1rem;
+  margin: 0 auto 0;
+  background: rgba(245, 158, 11, 0.03);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #475569;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(8px);
+}
+
+.cd-proof-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cd-proof-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.cd-proof-sep {
+  color: rgba(245, 158, 11, 0.2);
+}
+
+/* ---- Comparison Table ---- */
+.cd-compare-table {
+  background: rgba(19, 19, 31, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.cd-compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.4fr;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.06);
+  font-size: 13px;
+  align-items: center;
+}
+
+.cd-compare-row:last-child {
+  border-bottom: none;
+}
+
+.cd-compare-header {
+  background: rgba(245, 158, 11, 0.04);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.1) !important;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #475569;
+  padding: 10px 20px;
+}
+
+.cd-compare-header > div {
+  color: #475569;
+}
+
+.cd-compare-row > div {
+  padding: 12px 20px;
+  line-height: 1.5;
+}
+
+.cd-compare-dim {
+  color: #475569;
+  font-weight: 500;
+}
+
+.cd-compare-old {
+  color: #334155;
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
+.cd-compare-new {
+  color: #64748b;
+}
+
+.cd-compare-highlight {
+  color: #10B981;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .cd-compare-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .cd-compare-header > div:first-child,
+  .cd-compare-row > div:first-child {
+    display: none;
+  }
+}
+
+/* ---- Workflow ---- */
+.cd-workflow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.cd-workflow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+  min-width: 150px;
+  background: rgba(19, 19, 31, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.cd-workflow-step:hover {
+  border-color: rgba(245, 158, 11, 0.2);
+  transform: translateY(-2px);
+}
+
+.cd-workflow-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #F59E0B;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+}
+
+.cd-workflow-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 4px;
+  font-family: 'Syne', sans-serif;
+}
+
+.cd-workflow-desc {
+  font-size: 11px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cd-workflow-arrow {
+  flex-shrink: 0;
+  padding-top: 14px;
+  line-height: 1;
+  color: rgba(245, 158, 11, 0.25);
+  opacity: 0.7;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  display: flex;
+  align-items: center;
+}
+
+.cd-workflow-arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cd-workflow-step:hover + .cd-workflow-arrow {
+  opacity: 1;
+  color: #F59E0B;
+  transform: translateX(2px);
+}
+
+/* ---- Stats Bar ---- */
+.cd-stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 1.25rem 2rem;
+  background: rgba(19, 19, 31, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.08);
+  border-radius: 14px;
+  max-width: 520px;
+  margin: 1.5rem auto 0;
+  backdrop-filter: blur(12px);
+}
+
+.cd-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 0.2rem;
+}
+
+.cd-stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #F59E0B;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.cd-stat-label {
+  font-size: 0.7rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cd-stat-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(245, 158, 11, 0.1);
+  flex-shrink: 0;
+}
+
+/* ---- Section Title ---- */
+.cd-section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  color: #f8fafc !important;
+  margin: 2.5rem 0 1.25rem !important;
+  padding-top: 0 !important;
+  background: linear-gradient(90deg, #f8fafc 0%, #94a3b8 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.cd-section {
+  margin-bottom: 0;
+}
+
+.cd-section + .cd-section {
+  margin-top: 2rem;
+}
+
+/* ---- Home Container ---- */
+.cd-home {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+}
+
+/* ---- Light Mode Overrides for New Components ---- */
+:root:not(.dark) .cd-compare-table {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+:root:not(.dark) .cd-compare-row {
+  border-color: #e5e7eb;
+}
+
+:root:not(.dark) .cd-compare-header {
+  background: #f9fafb;
+  border-color: #e5e7eb !important;
+}
+
+:root:not(.dark) .cd-compare-old {
+  color: #9ca3af;
+}
+
+:root:not(.dark) .cd-compare-highlight {
+  color: #059669;
+}
+
+:root:not(.dark) .cd-workflow-step {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+:root:not(.dark) .cd-workflow-num {
+  background: rgba(217, 119, 6, 0.08);
+  border-color: rgba(217, 119, 6, 0.2);
+  color: #d97706;
+}
+
+:root:not(.dark) .cd-workflow-arrow {
+  color: #d1d5db;
+}
+
+:root:not(.dark) .cd-workflow-step:hover + .cd-workflow-arrow {
+  color: #d97706;
+}
+
+:root:not(.dark) .cd-stats-bar {
+  background: #fffbeb;
+  border-color: rgba(217, 119, 6, 0.15);
+}
+
+:root:not(.dark) .cd-stat-value {
+  color: #d97706;
+}
+
+:root:not(.dark) .cd-stat-label {
+  color: #6b7280;
+}
+
+:root:not(.dark) .cd-stat-divider {
+  background: rgba(217, 119, 6, 0.15);
+}
+
+:root:not(.dark) .cd-proof-bar {
+  background: rgba(217, 119, 6, 0.03);
+  border-color: rgba(217, 119, 6, 0.1);
+  color: #6b7280;
+}
+
+:root:not(.dark) .cd-hero-tag-inner {
+  background: rgba(217, 119, 6, 0.06);
+  border-color: rgba(217, 119, 6, 0.2);
+  color: #d97706;
+}
+
+:root:not(.dark) .cd-section-title {
+  background: linear-gradient(90deg, #111827 0%, #374151 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+:root:not(.dark) .VPFeature .icon img,
+:root:not(.dark) .VPFeature .icon svg {
+  filter: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cd-workflow-step,
+  .cd-compare-row,
+  .VPFeature {
+    transition: none !important;
+    animation: none !important;
+  }
+  .cd-workflow-step,
+  .VPFeature {
+    transform: none !important;
+  }
+  .cd-hero-tag-inner::after {
+    animation: none !important;
+  }
+}
