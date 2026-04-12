@@ -47,14 +47,10 @@ CutDeck/
 │   │   ├── services/             # 业务服务
 │   │   │   ├── ai.service.ts        # AI 模型调用（769 行）
 │   │   │   ├── vision.service.ts     # 场景/情绪/对象检测
-│   │   │   ├── asr.service.ts        # Whisper ASR 集成
-│   │   │   ├── subtitle.service.ts   # 字幕处理
-│   │   │   ├── export.service.ts     # 导出服务
-│   │   │   ├── clip-workflow.service.ts   # 剪辑工作流（活跃）
-│   │   │   ├── aiClip.service.ts          # AI 剪辑分析
 │   │   │   ├── asr.service.ts              # Whisper ASR 集成
 │   │   │   ├── subtitle.service.ts         # 字幕处理
-│   │   │   ├── export.service.ts           # 多格式导出
+│   │   │   ├── export.service.ts           # 导出服务
+│   │   │   ├── aiClip.service.ts          # AI 剪辑分析
 │   │   │   └── clipRepurposing/            # AI 拆条管道（活跃）
 │   │   │       ├── pipeline.ts            # 完整拆条流程
 │   │   │       ├── clipScorer.ts           # 6维评分引擎
@@ -114,7 +110,7 @@ class WebCodecsVideoProcessor extends BaseVideoProcessor {
 }
 ```
 
-### 剪辑工作流（ClipWorkflowService）
+### 剪辑工作流（ClipRepurposingPipeline）
 
 ```
 ClipRepurposingPipeline
@@ -146,7 +142,7 @@ ClipRepurposingPipeline
 | 构建工具 | **Vite 6** |
 | 桌面框架 | **Tauri v2**（Rust 后端） |
 | 状态管理 | **Zustand v5**（持久化） |
-| 样式 | **Tailwind CSS** + CSS Variables |
+| 样式 | **CSS Variables** + SCSS Modules（OKLCH 色彩系统） |
 | AI 服务 | 多 Provider（OpenAI/Anthropic/Google/DeepSeek/阿里/智谱/Kimi） |
 | ASR | **faster-whisper**（本地） |
 | 文档 | VitePress |

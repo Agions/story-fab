@@ -290,8 +290,8 @@ html { scroll-behavior: smooth !important; }
 }
 
 
-/* LIGHT MODE — only active when dark mode is OFF */
-:root.light {
+/* LIGHT MODE — only active when dark mode is OFF (VitePress uses .dark class, no .light) */
+:root:not(.dark) {
 /* ============================================
    LIGHT MODE — Force Readable Colors
    (must come before all other styles)
@@ -538,6 +538,115 @@ html.dark .VPNavBar { background: transparent !important; }
   border-color: var(--sf-amber);
   background: rgba(245, 158, 11, 0.08);
   color: var(--sf-amber-light);
+}
+
+/* ============================================
+   Social Proof — Badges & Stats Bar
+   ============================================ */
+
+.home-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--sf-amber-light);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-version {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.08));
+  color: var(--sf-amber);
+  font-weight: 700;
+}
+
+.badge-sep {
+  color: var(--vp-c-border);
+  font-size: 0.8rem;
+}
+
+.home-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 1.75rem 0 0;
+  padding: 1.25rem 2rem;
+  background: rgba(245, 158, 11, 0.04);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  border-radius: 14px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 0.2rem;
+}
+
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--sf-amber);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.stat-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.7rem;
+  color: var(--vp-c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(245, 158, 11, 0.15);
+  flex-shrink: 0;
+}
+
+/* Light mode overrides for stats */
+:root:not(.dark) .badge {
+  background: rgba(217, 119, 6, 0.08);
+  color: #92400e;
+  border-color: rgba(217, 119, 6, 0.2);
+}
+:root:not(.dark) .badge-version { color: #d97706; }
+:root:not(.dark) .home-stats {
+  background: #fffbeb;
+  border-color: rgba(217, 119, 6, 0.15);
+}
+:root:not(.dark) .stat-value { color: #d97706; }
+:root:not(.dark) .stat-label { color: #6b7280; }
+:root:not(.dark) .stat-divider { background: rgba(217, 119, 6, 0.15); }
+:root:not(.dark) .VPButton.medium.alt {
+  border-color: rgba(217, 119, 6, 0.35);
+  color: #374151;
+}
+:root:not(.dark) .VPButton.medium.alt:hover {
+  border-color: #d97706;
+  color: #d97706;
 }
 
 /* ============================================

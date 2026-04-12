@@ -35,12 +35,46 @@ features:
   - icon: 📦
     title: Tauri 桌面端
     details: Tauri 2 + React 18，原生性能体验，轻量安装包
+
+footer: false
 ---
+
+<!-- Social Proof Bar -->
+<div class="home-badges">
+  <span class="badge badge-version">v1.9.1</span>
+  <span class="badge-sep">·</span>
+  <span class="badge">MIT License</span>
+  <span class="badge-sep">·</span>
+  <span class="badge">Rust + FFmpeg 渲染</span>
+  <span class="badge-sep">·</span>
+  <span class="badge">TypeScript Strict</span>
+</div>
+
+<div class="home-stats">
+  <div class="stat-item">
+    <span class="stat-value">6</span>
+    <span class="stat-label">AI 评分维度</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-value">3</span>
+    <span class="stat-label">导出格式</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-value">12+</span>
+    <span class="stat-label">视频特效</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-value">5</span>
+    <span class="stat-label">AI Provider</span>
+  </div>
+</div>
 
 <script setup>
 import { onMounted } from 'vue'
 
-// Add subtle entrance animation to feature cards
 onMounted(() => {
   const cards = document.querySelectorAll('.VPFeature')
   cards.forEach((card, i) => {
@@ -50,6 +84,18 @@ onMounted(() => {
     requestAnimationFrame(() => {
       card.style.opacity = '1'
       card.style.transform = 'translateY(0)'
+    })
+  })
+
+  // Stagger stats entrance
+  const stats = document.querySelectorAll('.stat-item')
+  stats.forEach((stat, i) => {
+    stat.style.opacity = '0'
+    stat.style.transform = 'translateY(10px)'
+    stat.style.transition = `opacity 0.4s ease ${0.3 + i * 0.08}s, transform 0.4s ease ${0.3 + i * 0.08}s`
+    requestAnimationFrame(() => {
+      stat.style.opacity = '1'
+      stat.style.transform = 'translateY(0)'
     })
   })
 })
