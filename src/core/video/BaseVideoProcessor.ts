@@ -10,6 +10,13 @@
  *   class TauriVideoProcessor extends BaseVideoProcessor implements IVideoProcessor { ... }
  */
 import { IVideoProcessor, type FFmpegStatus } from './IVideoProcessor';
+import type {
+  VideoMetadata,
+  VideoSegment,
+  KeyFrame,
+  ExtractKeyFramesOptions,
+  CutOptions,
+} from './types';
 import { logger } from '@/utils/logger';
 
 // ============================================
@@ -160,7 +167,7 @@ export abstract class BaseVideoProcessor implements IVideoProcessor {
 
   // ---------- Editing ----------
 
-  async cut(inputPath: string, outputPath: string, segments: any[], options = {}) {
+  async cut(inputPath: string, outputPath: string, segments: VideoSegment[], options: CutOptions = {}) {
     if (!inputPath?.trim() || !outputPath?.trim()) {
       throw new VideoProcessingError('剪辑', '输入或输出路径不能为空');
     }
@@ -177,7 +184,7 @@ export abstract class BaseVideoProcessor implements IVideoProcessor {
     }
   }
 
-  async preview(inputPath: string, segment: any) {
+  async preview(inputPath: string, segment: VideoSegment) {
     if (!inputPath?.trim()) throw new VideoProcessingError('生成预览', '视频路径不能为空');
     if (!(await this.ensureAvailable())) throw new VideoProcessingError('生成预览', '未安装FFmpeg');
     logger.debug('预览片段:', { segment });
@@ -200,17 +207,17 @@ export abstract class BaseVideoProcessor implements IVideoProcessor {
   protected abstract doGetHardwareAcceleration(): Promise<string | null>;
 
   /** 平台特定：分析视频 */
-  protected abstract doAnalyze(videoPath: string): Promise<any>;
+  protected abstract doAnalyze(videoPath: string): Promise<VideoMetadata>;
 
   /** 平台特定：提取关键帧 */
-  protected abstract doExtractKeyFrames(videoPath: string, options: any): Promise<any[]>;
+  protected abstract doExtractKeyFrames(videoPath: string, options: ExtractKeyFramesOptions): Promise<KeyFrame[]>;
 
   /** 平台特定：生成缩略图 */
   protected abstract doGenerateThumbnail(videoPath: string, time: number): Promise<string>;
 
   /** 平台特定：剪辑 */
-  protected abstract doCut(inputPath: string, outputPath: string, segments: any[], options: any): Promise<string>;
+  protected abstract doCut(inputPath: string, outputPath: string, segments: VideoSegment[], options: CutOptions): Promise<string>;
 
   /** 平台特定：预览 */
-  protected abstract doPreview(inputPath: string, segment: any): Promise<string>;
+  protected abstract doPreview(inputPath: string, segment: VideoSegment): Promise<string>;
 }

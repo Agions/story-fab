@@ -4,7 +4,7 @@
  */
 
 import { BaseService, ServiceError } from './base.service';
-import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis, VideoInfo } from '@/core/types';
+import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis, VideoInfo, Scene, Keyframe } from '@/core/types';
 import { LLM_MODELS, DEFAULT_LLM_MODEL, MODEL_RECOMMENDATIONS } from '@/core/constants';
 import { visionService } from './vision.service';
 
@@ -192,21 +192,23 @@ export class AIService extends BaseService {
       width: number;
       height: number;
       format: string;
+      id?: string;
+      path?: string;
     }
   ): Promise<Partial<VideoAnalysis>> {
     return this.executeRequest(
       async () => {
         const prompt = this.buildAnalysisPrompt(videoInfo);
         const response = await this.callAPI(model, settings, prompt);
-        
+
         // 并行调用视觉分析服务获取真实数据
         const [scenesResult, keyframesResult] = await Promise.allSettled([
-          visionService.detectScenesAdvanced(videoInfo as any, { minSceneDuration: 3, threshold: 0.3 }),
-          visionService.extractKeyframes(videoInfo as any, { maxFrames: 20 }),
+          visionService.detectScenesAdvanced(videoInfo as VideoInfo, { minSceneDuration: 3, threshold: 0.3 }),
+          visionService.extractKeyframes(videoInfo as VideoInfo, { maxFrames: 20 }),
         ]);
 
-        const scenes = scenesResult.status === 'fulfilled' && (scenesResult.value as any).scenes
-          ? (scenesResult.value as any).scenes.map((s: any) => ({
+        const scenes: Scene[] = scenesResult.status === 'fulfilled' && scenesResult.value.scenes
+          ? scenesResult.value.scenes.map((s: Scene) => ({
               id: s.id || crypto.randomUUID(),
               startTime: s.startTime,
               endTime: s.endTime,
@@ -215,8 +217,9 @@ export class AIService extends BaseService {
               tags: s.tags || [],
             }))
           : [];
-        const keyframes = keyframesResult.status === 'fulfilled' && Array.isArray(keyframesResult.value)
-          ? (keyframesResult.value as any[]).map((k: any, idx: number) => ({
+
+        const keyframes: Keyframe[] = keyframesResult.status === 'fulfilled'
+          ? keyframesResult.value.map((k, idx: number) => ({
               id: k.id || `kf_${idx}`,
               timestamp: k.timestamp || 0,
               thumbnail: k.thumbnail || '',

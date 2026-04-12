@@ -52,7 +52,9 @@ class ApiClient {
         // 添加认证 token
         const token = localStorage.getItem('reelforge_token');
         if (token && !config.skipAuth) {
-          config.headers = (config.headers ?? {}) as any;
+          const headers = (config.headers ?? {}) as Record<string, string>;
+          headers.Authorization = `Bearer ${token}`;
+          config.headers = headers;
           config.headers.Authorization = `Bearer ${token}`;
         }
 

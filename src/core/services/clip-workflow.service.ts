@@ -348,7 +348,7 @@ export class ClipWorkflowService {
     const quality = qualityMap[this.config.outputQuality];
     
     return {
-      format: this.config.outputFormat as any,
+      format: (this.config.outputFormat === 'mov' ? 'mp4' : this.config.outputFormat) as ExportSettings['format'],
       resolution: quality.resolution,
       quality: quality.quality,
       fps: quality.frameRate as 24 | 30 | 60,

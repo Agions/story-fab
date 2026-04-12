@@ -144,7 +144,7 @@ function extractSceneTranscript(
   endTime: number,
 ): string {
   // 从 analysis.transcript 中提取对应时间段的文本
-  const transcript = (analysis as any)?.transcript;
+  const transcript = analysis.transcript;
   if (!transcript) return '';
   if (typeof transcript !== 'string') return '';
 

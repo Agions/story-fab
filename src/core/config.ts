@@ -62,7 +62,7 @@ export function getConfig(): AppConfig {
     enableHardwareAcceleration: import.meta.env.VITE_ENABLE_HW_ACCEL !== 'false',
     workerThreads: parseInt(import.meta.env.VITE_WORKER_THREADS || '4'),
     
-    logLevel: (import.meta.env.VITE_LOG_LEVEL as any) || 'info',
+    logLevel: (import.meta.env.VITE_LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
     enableRemoteLogging: import.meta.env.VITE_ENABLE_REMOTE_LOGGING === 'true',
   };
 }

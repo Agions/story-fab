@@ -3,7 +3,7 @@
  * 提供多种专业解说模板
  */
 
-import type { ScriptTemplate, ScriptMetadata } from '@/core/types';
+import type { ScriptTemplate, ScriptMetadata, VideoInfo } from '@/core/types';
 
 // 基础模板接口
 export interface TemplateSection {
@@ -12,6 +12,18 @@ export interface TemplateSection {
   duration: number;
   content: string;
   tips: string[];
+}
+
+/** Output structure item returned by applyTemplate() */
+export interface TemplateStructureItem {
+  id: string;
+  type: TemplateSection['type'];
+  name: string;
+  duration: number;
+  targetWordCount: number;
+  content: string;
+  tips: string[];
+  prompt: string;
 }
 
 interface TemplateConfig {
@@ -601,7 +613,10 @@ class ScriptTemplateService {
   /**
    * 获取推荐模板
    */
-  getRecommendedTemplates(_videoInfo?: any, preferences?: any): ScriptTemplate[] {
+  getRecommendedTemplates(
+    _videoInfo?: VideoInfo | undefined,
+    preferences?: { category?: string; style?: string; pace?: string }
+  ): ScriptTemplate[] {
     // 基于视频信息和用户偏好推荐模板
     // 这里简化处理，返回前3个模板
     return TEMPLATES.slice(0, 3).map(t => ({
@@ -648,7 +663,7 @@ class ScriptTemplateService {
       customSections?: TemplateSection[];
     }
   ): {
-    structure: any[];
+    structure: TemplateStructureItem[];
     metadata: Partial<ScriptMetadata>;
     estimatedDuration: number;
   } {
@@ -678,8 +693,7 @@ class ScriptTemplateService {
       structure,
       metadata: {
         style: template.style.tone,
-        template: templateId,
-      } as any,
+      },
       estimatedDuration: params.duration
     };
   }
@@ -720,7 +734,7 @@ ${section.tips.map((tip: string) => `- ${tip}`).join('\n')}`;
       },
       examples: config.examples,
       recommended: false
-    } as any;
+    }
   }
 }
 

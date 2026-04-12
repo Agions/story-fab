@@ -86,7 +86,7 @@ async function detectKeyframes(
 ): Promise<Keyframe[]> {
   const count = Math.floor(videoInfo.duration / interval);
   const keyframes = await visionService.extractKeyframes(
-    videoInfo as any,
+    videoInfo,
     { maxFrames: Math.min(count, 20) }
   );
 

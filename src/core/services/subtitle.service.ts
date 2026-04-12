@@ -5,7 +5,7 @@
  */
 
 import { logger } from '@/utils/logger';
-import type { SubtitleEntry } from '@/core/types';
+import type { SubtitleEntry, VideoInfo } from '@/core/types';
 
 // ============================================
 // 类型定义
@@ -260,7 +260,7 @@ export class SubtitleService {
     };
 
     try {
-      const videoInfo = {
+      const videoInfo: VideoInfo = {
         id: crypto.randomUUID(),
         path: videoPath,
         name: videoPath.split('/').pop() || 'video',
@@ -270,14 +270,9 @@ export class SubtitleService {
         fps: 0,
         width: 0,
         height: 0,
-        bitrate: 0,
-        hasAudio: true,
-        hasVideo: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
-      const asrResult = await asrService.recognizeSpeech(videoInfo as any, {
+      const asrResult = await asrService.recognizeSpeech(videoInfo, {
         language: langMap[language] || 'zh_cn',
         enableTimestamp: true,
         enablePunctuation: true,

@@ -103,8 +103,7 @@ export class ClipRepurposingPipeline {
       meta: { videoId: videoInfo.id },
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const stepOptions = { onProgress: opts.onProgress } as any;
+    const stepOptions: StepOptions = { onProgress: opts.onProgress };
 
     logger.info('[ClipRepurposingPipeline] 开始执行', {
       videoDuration: videoInfo.duration,
