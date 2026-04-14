@@ -101,6 +101,20 @@ const BLOCKED_PATTERNS = [
 
 ---
 
+## Tauri 安全配置
+
+### 生产构建
+
+- **devtools feature 已移除**：生产构建不再包含 Tauri DevTools API（`Cargo.toml` 中 `features = []`）
+- **CSP 策略已启用**：`tauri.conf.json` 配置了严格 Content Security Policy，防止 XSS 攻击
+
+```json
+// tauri.conf.json security.csp
+"default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*;"
+```
+
+---
+
 ## 漏洞报告
 
 如果你发现安全漏洞，请通过以下方式私下报告：

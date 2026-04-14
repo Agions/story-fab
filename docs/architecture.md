@@ -75,12 +75,20 @@ CutDeck/
 ├── src-tauri/                    # Tauri 后端 (Rust)
 │   └── src/
 │       ├── main.rs                 # Tauri 入口
-│       ├── lib.rs                  # 命令注册
-│       ├── video_processor.rs      # 视频处理
-│       ├── smart_segmenter.rs       # 智能分段
-│       ├── highlight_detector.rs    # 高光检测
+│       ├── lib.rs                  # 命令注册（facade，10行）
+│       ├── types.rs                # 所有输入/输出结构体
+│       ├── binary.rs               # ffmpeg/ffprobe 路径解析
+│       ├── utils.rs                # 工具函数（parse_fraction 等）
+│       ├── commands/              # 命令模块（async 化）
+│       │   ├── mod.rs
+│       │   ├── ffprobe.rs           # check_ffmpeg, analyze_video
+│       │   ├── project.rs           # 8 个文件管理命令
+│       │   ├── ai.rs                # generate_thumbnail, extract_key_frames, run_ai_director_plan, detect_*
+│       │   └── render.rs            # transcode_with_crop, render_autonomous_cut + helpers
+│       ├── video_effects.rs        # FFmpeg 滤镜
 │       ├── subtitle.rs              # 字幕处理
-│       └── video_effects.rs        # FFmpeg 滤镜
+│       ├── smart_segmenter.rs       # 智能分段
+│       └── highlight_detector.rs    # 高光检测
 │
 ├── docs/                        # VitePress 文档
 ├── package.json
@@ -124,13 +132,31 @@ ClipRepurposingPipeline
 
 ### Rust 后端命令
 
+**12 commands 已 async 化**（主线程不再阻塞）：
+
 | 命令 | 说明 |
 |------|------|
-| `transcode_with_crop` | 多格式裁切（9:16/1:1/16:9） |
-| `detect_smart_segments` | 智能场景分段 |
-| `detect_highlights` | 高光时刻检测 |
-| `apply_filter_chain` | FFmpeg 滤镜链 |
-| `get_video_metadata` | 获取视频元数据 |
+| `check_ffmpeg` | 检查 FFmpeg 是否安装（async）|
+| `analyze_video` | 获取视频元数据（async ffprobe）|
+| `generate_thumbnail` | 生成缩略图（async ffmpeg）|
+| `extract_key_frames` | 提取关键帧（async）|
+| `check_app_data_directory` | 获取 AppData 目录（async）|
+| `save_project_file` | 保存项目文件（async）|
+| `load_project_file` | 加载项目文件（async）|
+| `delete_project_file` | 删除项目文件（async）|
+| `list_project_files` | 列出项目文件（async）|
+| `list_app_data_files` | 列出 AppData 文件（async）|
+| `delete_file` | 删除文件（async）|
+| `get_file_size` | 获取文件大小（async）|
+| `transcode_with_crop` | 多格式裁切（9:16/1:1/16:9）|
+| `render_autonomous_cut` | 自动出片（多段合并+转场）|
+| `run_ai_director_plan` | AI 导演方案生成|
+| `detect_highlights` | 高光时刻检测|
+| `detect_smart_segments` | 智能场景分段|
+| `get_export_dir` | 获取导出目录|
+| `apply_filter_chain` | FFmpeg 滤镜链|
+
+**安全修复**：devtools feature 已移除（生产构建不再包含 DevTools API），CSP 策略已启用。
 
 ---
 

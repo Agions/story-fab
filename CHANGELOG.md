@@ -1,3 +1,51 @@
+## [1.9.2] - 2026-04-14
+
+### 🔒 Security & Performance
+
+- **P0: Remove `devtools` from release builds** (`Cargo.toml`): The `devtools` Tauri feature was previously enabled for all builds, exposing DevTools API in production binaries. Fixed by removing from `features = []`.
+- **P0: Enable strict CSP policy** (`tauri.conf.json`): Previously `"csp": null` disabled Content Security Policy entirely. Replaced with strict policy: `default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*`
+
+### ⚡ Performance — Async I/O
+
+**12 Tauri commands converted from sync blocking to async** (主线程不再阻塞):
+
+| Command | Before | After |
+|---------|--------|-------|
+| `check_ffmpeg` | `std::process::Command` | `tokio::process::Command` + `.await` |
+| `analyze_video` | sync ffprobe | async ffprobe |
+| `generate_thumbnail` | sync ffmpeg | async ffmpeg |
+| `extract_key_frames` | `fs::read_dir` + sync ffmpeg | `tokio_fs::read_dir` + async |
+| `check_app_data_directory` | `fs::create_dir_all` | `tokio_fs::async` |
+| `save/load/delete_project_file` | `fs` sync | `tokio_fs` async |
+| `list_project_files` | `fs::read_dir` | `tokio_fs::read_dir` async |
+| `list_app_data_files` | `fs` sync | `tokio_fs::async` |
+| `delete_file / read_text_file / get_file_size` | `fs` sync | `tokio_fs` async |
+
+- `tokio`: added `fs` feature to `Cargo.toml`
+
+### 🏗️ Architecture — P2 Module Split
+
+**`lib.rs` 1314 lines → 10 lines** (thin facade):
+
+```
+src-tauri/src/
+├── lib.rs           10 lines (facade, re-exports)
+├── types.rs         all input/output structs
+├── binary.rs        ffmpeg/ffprobe path resolution
+├── utils.rs         parse_fraction, chrono_like_timestamp, format_srt_time
+└── commands/
+    ├── mod.rs       submodules
+    ├── ffprobe.rs   check_ffmpeg, analyze_video
+    ├── project.rs  8 project/file management commands
+    ├── ai.rs        generate_thumbnail, extract_key_frames,
+    │                run_ai_director_plan, detect_*, get_export_dir
+    └── render.rs    transcode_with_crop, render_autonomous_cut + helpers
+```
+
+- Net: `+1285 / -1312` lines, more precise responsibility boundaries
+
+---
+
 ## [1.9.1] - 2026-04-11
 
 ### 🔧 Code Quality
