@@ -16,13 +16,14 @@ pub use commands::{ai, ffprobe, project, render};
 pub use types::*;
 
 // Re-export all commands so generate_handler! can find them at crate root
-pub use commands::ffprobe::{analyze_video, check_ffmpeg, extract_key_frames, generate_thumbnail};
+pub use commands::ffprobe::{analyze_video, check_ffmpeg};
+pub use commands::ai::{
+    detect_highlights, detect_smart_segments, extract_key_frames, generate_thumbnail,
+    get_export_dir, run_ai_director_plan,
+};
 pub use commands::project::{
     check_app_data_directory, delete_file, delete_project_file, get_file_size,
     list_app_data_files, list_project_files, load_project_file, read_text_file, save_project_file,
-};
-pub use commands::ai::{
-    detect_highlights, detect_smart_segments, get_export_dir, run_ai_director_plan,
 };
 pub use commands::render::{render_autonomous_cut, transcode_with_crop};
 

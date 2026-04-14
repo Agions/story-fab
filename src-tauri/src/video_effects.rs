@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::process::Command;
 
-use crate::ffmpeg_binary;
+use crate::binary::ffmpeg_binary;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -235,7 +235,7 @@ pub fn apply_filter_chain(input: ApplyChainInput) -> Result<String, String> {
     let temp_root = std::env::temp_dir().join(format!(
         "cutdeck_effects_{}_{}",
         std::process::id(),
-        crate::chrono_like_timestamp()
+        crate::utils::chrono_like_timestamp()
     ));
     std::fs::create_dir_all(&temp_root)
         .map_err(|e| format!("Create temp dir for filter chain: {e}"))?;
@@ -280,7 +280,7 @@ pub fn generate_filter_preview(
     let preview_dir = std::env::temp_dir().join(format!(
         "cutdeck_preview_{}_{}",
         std::process::id(),
-        crate::chrono_like_timestamp()
+        crate::utils::chrono_like_timestamp()
     ));
     std::fs::create_dir_all(&preview_dir)
         .map_err(|e| format!("Create preview dir: {e}"))?;
@@ -325,7 +325,7 @@ pub fn generate_chain_preview(
     let preview_dir = std::env::temp_dir().join(format!(
         "cutdeck_preview_{}_{}",
         std::process::id(),
-        crate::chrono_like_timestamp()
+        crate::utils::chrono_like_timestamp()
     ));
     std::fs::create_dir_all(&preview_dir)
         .map_err(|e| format!("Create preview dir: {e}"))?;
@@ -356,7 +356,7 @@ pub fn generate_chain_preview(
 
 /// Probe a file's duration via ffprobe.
 fn probe_duration(path: &Path) -> Result<f64, String> {
-    let output = Command::new(crate::ffprobe_binary())
+    let output = Command::new(crate::binary::ffprobe_binary())
         .arg("-v")
         .arg("error")
         .arg("-show_entries")
@@ -409,7 +409,7 @@ fn apply_filtergraph(
         return Err("Input and output paths cannot be empty".to_string());
     }
 
-    let mut cmd = Command::new(ffmpeg_binary());
+    let mut cmd = Command::new(crate::binary::ffmpeg_binary());
     cmd.arg("-y"); // overwrite
 
     if let Some(ss) = start_time {
@@ -455,7 +455,7 @@ fn apply_single_filter(
         .to_ffmpeg_filter()
         .ok_or_else(|| "Filter produces no change".to_string())?;
 
-    let mut cmd = Command::new(ffmpeg_binary());
+    let mut cmd = Command::new(crate::binary::ffmpeg_binary());
     cmd.arg("-y");
 
     if let Some(ss) = start_time {
