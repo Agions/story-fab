@@ -247,4 +247,6 @@ const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
   );
 });
 
+Workspace.displayName = 'Workspace';
 export default Workspace;
+

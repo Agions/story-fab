@@ -283,4 +283,6 @@ const ProjectCreate: React.FC<ProjectCreateProps> = memo(({ onNext }) => {
   );
 });
 
+ProjectCreate.displayName = 'ProjectCreate';
 export default ProjectCreate;
+

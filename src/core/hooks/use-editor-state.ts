@@ -14,6 +14,7 @@ import {
   type VideoSegment,
   type TextItem,
   type AudioClip,
+  type EditorExportSettings,
 } from '@/core/services/editor.service';
 import type { ExportSettings, ScriptSegment } from '@/core/types';
 
@@ -376,7 +377,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
       }
 
       const timeline = editorService.getTimeline();
-      const blob = await editorService.exportTimeline(timeline, settings);
+      const blob = await editorService.exportTimeline(settings as Partial<EditorExportSettings>);
       return blob;
     } finally {
       setState(prev => ({ ...prev, isExporting: false, exportProgress: 100 }));

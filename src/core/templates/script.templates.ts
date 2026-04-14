@@ -727,13 +727,8 @@ ${section.tips.map((tip: string) => `- ${tip}`).join('\n')}`;
       id: config.id,
       name: config.name,
       description: config.description,
-      style: {
-        tone: config.style.tone,
-        pace: config.style.pace,
-        formality: config.style.formality
-      },
-      examples: config.examples,
-      recommended: false
+      type: config.style?.tone || 'default',
+      content: '',
     }
   }
 }

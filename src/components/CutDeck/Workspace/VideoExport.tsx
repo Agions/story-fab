@@ -477,4 +477,6 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
   );
 });
 
+VideoExport.displayName = 'VideoExport';
 export default VideoExport;
+

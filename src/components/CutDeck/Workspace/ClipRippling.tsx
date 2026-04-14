@@ -402,4 +402,5 @@ function dimLabel(dim: string): string {
   return map[dim] ?? dim;
 }
 
+ClipRepurpose.displayName = 'ClipRepurpose';
 export default ClipRepurpose;

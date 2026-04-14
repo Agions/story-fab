@@ -640,4 +640,6 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
   );
 });
 
+VideoSynthesize.displayName = 'VideoSynthesize';
 export default VideoSynthesize;
+

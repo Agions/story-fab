@@ -576,4 +576,5 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
   );
 });
 
+AIAnalyze.displayName = 'AIAnalyze';
 export default AIAnalyze;

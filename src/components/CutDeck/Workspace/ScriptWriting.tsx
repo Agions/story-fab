@@ -587,4 +587,6 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
   );
 });
 
+ScriptGenerate.displayName = 'ScriptGenerate';
 export default ScriptGenerate;
+

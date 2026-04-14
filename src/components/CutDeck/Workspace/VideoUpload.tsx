@@ -426,4 +426,6 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
   );
 });
 
+VideoUpload.displayName = 'VideoUpload';
 export default VideoUpload;
+

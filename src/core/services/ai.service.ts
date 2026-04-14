@@ -215,6 +215,8 @@ export class AIService extends BaseService {
               thumbnail: s.thumbnail || '',
               description: s.description || '',
               tags: s.tags || [],
+              type: (s as any).type || 'narrative',
+              score: (s as any).score || 0.8,
             }))
           : [];
 
