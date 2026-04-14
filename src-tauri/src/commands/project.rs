@@ -161,7 +161,7 @@ pub async fn list_app_data_files(
         .await
         .map_err(|e| format!("读取目录项失败: {e}"))?;
     while let Some(entry) = dir_entry {
-        if entry.path().is_file().await {
+        if entry.path().is_file() {
             files.push(entry.file_name().to_string_lossy().to_string());
         }
         dir_entry = entries

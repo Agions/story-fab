@@ -175,12 +175,12 @@ pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::high
     }
     let detector = HighlightDetector::new();
     let options = crate::highlight_detector::HighlightOptions {
-        threshold: input.threshold,
+        threshold: input.threshold.map(|v| v as f32),
         min_duration_ms: input.min_duration_ms,
         top_n: input.top_n,
         window_ms: input.window_ms,
         detect_scene: input.detect_scene,
-        scene_threshold: input.scene_threshold,
+        scene_threshold: input.scene_threshold.map(|v| v as f32),
     };
     let highlights = detector.get_highlights(&input.video_path, &options);
     Ok(highlights)
@@ -197,11 +197,11 @@ pub fn detect_smart_segments(
     let options = crate::smart_segmenter::SegmentOptions {
         min_duration_ms: input.min_duration_ms,
         max_duration_ms: input.max_duration_ms,
-        scene_threshold: input.scene_threshold,
+        scene_threshold: input.scene_threshold.map(|v| v as f32),
         silence_threshold_db: input.silence_threshold_db,
         detect_dialogue: input.detect_dialogue,
         detect_transitions: input.detect_transitions,
     };
-    let segments = segmenter.get_segments(&input.video_path, &options);
+    let segments = segmenter.smart_segment(&input.video_path, &options);
     Ok(segments)
 }

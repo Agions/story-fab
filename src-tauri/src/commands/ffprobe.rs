@@ -3,7 +3,7 @@ use crate::types::{FFmpegCheckResult, VideoMetadataResult};
 use crate::utils::parse_fraction;
 
 #[tauri::command]
-pub async fn check_ffmpeg() -> FFmpegCheckResult {
+pub async fn check_ffmpeg() -> Result<FFmpegCheckResult, String> {
     let ffmpeg = ffmpeg_binary();
     let output = tokio::process::Command::new(&ffmpeg)
         .arg("-version")
@@ -22,9 +22,9 @@ pub async fn check_ffmpeg() -> FFmpegCheckResult {
                     .next()
                     .map(|s| s.trim().to_string())
             });
-        FFmpegCheckResult { installed: true, version: line }
+        Ok(FFmpegCheckResult { installed: true, version: line })
     } else {
-        FFmpegCheckResult { installed: false, version: None }
+        Ok(FFmpegCheckResult { installed: false, version: None })
     }
 }
 
