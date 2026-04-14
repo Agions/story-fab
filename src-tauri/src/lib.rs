@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
+use tokio::fs as tokio_fs;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
@@ -176,41 +177,38 @@ fn parse_fraction(value: &str) -> f64 {
 }
 
 #[tauri::command]
-fn check_ffmpeg() -> FFmpegCheckResult {
+async fn check_ffmpeg() -> FFmpegCheckResult {
     let ffmpeg = ffmpeg_binary();
-    let output = Command::new(&ffmpeg).arg("-version").output();
+    let output = tokio::process::Command::new(&ffmpeg)
+        .arg("-version")
+        .output()
+        .await
+        .map_err(|e| e.to_string())?;
 
-    match output {
-        Ok(result) if result.status.success() => {
-            let line = String::from_utf8_lossy(&result.stdout)
-                .lines()
-                .next()
-                .map(|s| s.trim().to_string())
-                .or_else(|| {
-                    String::from_utf8_lossy(&result.stderr)
-                        .lines()
-                        .next()
-                        .map(|s| s.trim().to_string())
-                });
-            FFmpegCheckResult {
-                installed: true,
-                version: line,
-            }
-        }
-        _ => FFmpegCheckResult {
-            installed: false,
-            version: None,
-        },
+    if output.status.success() {
+        let line = String::from_utf8_lossy(&output.stdout)
+            .lines()
+            .next()
+            .map(|s| s.trim().to_string())
+            .or_else(|| {
+                String::from_utf8_lossy(&output.stderr)
+                    .lines()
+                    .next()
+                    .map(|s| s.trim().to_string())
+            });
+        FFmpegCheckResult { installed: true, version: line }
+    } else {
+        FFmpegCheckResult { installed: false, version: None }
     }
 }
 
 #[tauri::command]
-fn analyze_video(path: String) -> Result<VideoMetadataResult, String> {
+async fn analyze_video(path: String) -> Result<VideoMetadataResult, String> {
     if path.trim().is_empty() {
         return Err("路径不能为空".to_string());
     }
 
-    let output = Command::new(ffprobe_binary())
+    let output = tokio::process::Command::new(ffprobe_binary())
         .arg("-v")
         .arg("error")
         .arg("-select_streams")
@@ -223,6 +221,7 @@ fn analyze_video(path: String) -> Result<VideoMetadataResult, String> {
         .arg("json")
         .arg(&path)
         .output()
+        .await
         .map_err(|e| format!("运行ffprobe失败: {e}"))?;
 
     if !output.status.success() {
@@ -283,7 +282,7 @@ fn analyze_video(path: String) -> Result<VideoMetadataResult, String> {
 }
 
 #[tauri::command]
-fn generate_thumbnail(path: String) -> Result<String, String> {
+async fn generate_thumbnail(path: String) -> Result<String, String> {
     if path.trim().is_empty() {
         return Err("路径不能为空".to_string());
     }
@@ -294,7 +293,7 @@ fn generate_thumbnail(path: String) -> Result<String, String> {
         chrono_like_timestamp()
     ));
 
-    let output = Command::new(ffmpeg_binary())
+    let output = tokio::process::Command::new(ffmpeg_binary())
         .arg("-y")
         .arg("-ss")
         .arg("00:00:01")
@@ -306,6 +305,7 @@ fn generate_thumbnail(path: String) -> Result<String, String> {
         .arg("2")
         .arg(&output_path)
         .output()
+        .await
         .map_err(|e| format!("执行 ffmpeg 生成缩略图失败: {e}"))?;
 
     if !output.status.success() {
@@ -319,7 +319,7 @@ fn generate_thumbnail(path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-fn extract_key_frames(path: String, count: Option<u32>) -> Result<Vec<String>, String> {
+async fn extract_key_frames(path: String, count: Option<u32>) -> Result<Vec<String>, String> {
     if path.trim().is_empty() {
         return Err("路径不能为空".to_string());
     }
@@ -330,10 +330,10 @@ fn extract_key_frames(path: String, count: Option<u32>) -> Result<Vec<String>, S
         std::process::id(),
         chrono_like_timestamp()
     ));
-    fs::create_dir_all(&output_dir).map_err(|e| format!("创建关键帧目录失败: {e}"))?;
+    tokio_fs::create_dir_all(&output_dir).await.map_err(|e| format!("创建关键帧目录失败: {e}"))?;
 
     let pattern = output_dir.join("frame_%03d.jpg");
-    let output = Command::new(ffmpeg_binary())
+    let output = tokio::process::Command::new(ffmpeg_binary())
         .arg("-y")
         .arg("-i")
         .arg(&path)
@@ -345,6 +345,7 @@ fn extract_key_frames(path: String, count: Option<u32>) -> Result<Vec<String>, S
         .arg("2")
         .arg(&pattern)
         .output()
+        .await
         .map_err(|e| format!("执行 ffmpeg 提取关键帧失败: {e}"))?;
 
     if !output.status.success() {
@@ -354,18 +355,25 @@ fn extract_key_frames(path: String, count: Option<u32>) -> Result<Vec<String>, S
         ));
     }
 
-    let mut frames = fs::read_dir(&output_dir)
-        .map_err(|e| format!("读取关键帧目录失败: {e}"))?
-        .filter_map(|entry| entry.ok().map(|e| e.path()))
-        .filter(|p| p.extension().and_then(|e| e.to_str()) == Some("jpg"))
-        .collect::<Vec<_>>();
-    frames.sort();
+    let mut frames = tokio_fs::read_dir(&output_dir)
+        .await
+        .map_err(|e| format!("读取关键帧目录失败: {e}"))?;
+    let mut all_frames = Vec::new();
+    let mut dir_entry = frames.next_entry().await.map_err(|e| format!("读取关键帧目录失败: {e}"))?;
+    while let Some(entry) = dir_entry {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) == Some("jpg") {
+            all_frames.push(path);
+        }
+        dir_entry = frames.next_entry().await.map_err(|e| format!("读取关键帧目录失败: {e}"))?;
+    }
+    all_frames.sort();
 
-    Ok(frames
+    let result = all_frames
         .into_iter()
         .take(frame_count as usize)
         .map(|p| p.to_string_lossy().to_string())
-        .collect())
+        .collect();
 }
 
 #[tauri::command]
@@ -434,33 +442,33 @@ fn run_ai_director_plan(input: DirectorPlanInput) -> DirectorPlanOutput {
 }
 
 #[tauri::command]
-fn check_app_data_directory(app: tauri::AppHandle) -> Result<String, String> {
+async fn check_app_data_directory(app: tauri::AppHandle) -> Result<String, String> {
     let app_dir = app
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
     let cutdeck_dir = app_dir.join("CutDeck");
-    fs::create_dir_all(&cutdeck_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+    tokio_fs::create_dir_all(&cutdeck_dir).await.map_err(|e| format!("创建目录失败: {e}"))?;
     Ok(cutdeck_dir.to_string_lossy().to_string())
 }
 
 #[tauri::command]
-fn save_project_file(app: tauri::AppHandle, project_id: String, content: String) -> Result<(), String> {
+async fn save_project_file(app: tauri::AppHandle, project_id: String, content: String) -> Result<(), String> {
     let app_dir = app
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
     let cutdeck_dir = app_dir.join("CutDeck");
-    fs::create_dir_all(&cutdeck_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+    tokio_fs::create_dir_all(&cutdeck_dir).await.map_err(|e| format!("创建目录失败: {e}"))?;
 
     let mut target_path = PathBuf::from(&cutdeck_dir);
     target_path.push(format!("{project_id}.json"));
-    fs::write(&target_path, content).map_err(|e| format!("写入项目文件失败: {e}"))?;
+    tokio_fs::write(&target_path, content).await.map_err(|e| format!("写入项目文件失败: {e}"))?;
     Ok(())
 }
 
 #[tauri::command]
-fn load_project_file(app: tauri::AppHandle, project_id: String) -> Result<String, String> {
+async fn load_project_file(app: tauri::AppHandle, project_id: String) -> Result<String, String> {
     let app_dir = app
         .path()
         .app_data_dir()
@@ -468,11 +476,11 @@ fn load_project_file(app: tauri::AppHandle, project_id: String) -> Result<String
     let cutdeck_dir = app_dir.join("CutDeck");
     let target_path = cutdeck_dir.join(format!("{project_id}.json"));
 
-    fs::read_to_string(&target_path).map_err(|e| format!("读取项目文件失败: {e}"))
+    tokio_fs::read_to_string(&target_path).await.map_err(|e| format!("读取项目文件失败: {e}"))
 }
 
 #[tauri::command]
-fn delete_project_file(app: tauri::AppHandle, project_id: String) -> Result<(), String> {
+async fn delete_project_file(app: tauri::AppHandle, project_id: String) -> Result<(), String> {
     let app_dir = app
         .path()
         .app_data_dir()
@@ -481,26 +489,28 @@ fn delete_project_file(app: tauri::AppHandle, project_id: String) -> Result<(), 
     let target_path = cutdeck_dir.join(format!("{project_id}.json"));
 
     if target_path.exists() {
-        fs::remove_file(&target_path).map_err(|e| format!("删除项目文件失败: {e}"))?;
+        tokio_fs::remove_file(&target_path).await.map_err(|e| format!("删除项目文件失败: {e}"))?;
     }
 
     Ok(())
 }
 
 #[tauri::command]
-fn list_project_files(app: tauri::AppHandle) -> Result<Vec<serde_json::Value>, String> {
+async fn list_project_files(app: tauri::AppHandle) -> Result<Vec<serde_json::Value>, String> {
     let app_dir = app
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
     let cutdeck_dir = app_dir.join("CutDeck");
-    fs::create_dir_all(&cutdeck_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+    tokio_fs::create_dir_all(&cutdeck_dir).await.map_err(|e| format!("创建目录失败: {e}"))?;
 
     let mut result: Vec<serde_json::Value> = Vec::new();
-    let entries = fs::read_dir(&cutdeck_dir).map_err(|e| format!("读取项目目录失败: {e}"))?;
-    for entry in entries {
-        let path = entry.map_err(|e| format!("读取目录项失败: {e}"))?.path();
+    let mut entries = tokio_fs::read_dir(&cutdeck_dir).await.map_err(|e| format!("读取项目目录失败: {e}"))?;
+    let mut dir_entry = entries.next_entry().await.map_err(|e| format!("读取目录项失败: {e}"))?;
+    while let Some(entry) = dir_entry {
+        let path = entry.path();
         if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
+            dir_entry = entries.next_entry().await.map_err(|e| format!("读取目录项失败: {e}"))?;
             continue;
         }
         let file_stem = path
@@ -508,10 +518,9 @@ fn list_project_files(app: tauri::AppHandle) -> Result<Vec<serde_json::Value>, S
             .and_then(|name| name.to_str())
             .map(|value| value.to_string())
             .unwrap_or_default();
-        match fs::read_to_string(&path) {
+        match tokio_fs::read_to_string(&path).await {
             Ok(content) => match serde_json::from_str::<serde_json::Value>(&content) {
                 Ok(mut json) => {
-                    // 兼容历史项目：如果 id 缺失则使用文件名补齐，避免前端列表因脏数据被整体过滤。
                     if let Some(object) = json.as_object_mut() {
                         let has_id = object
                             .get("id")
@@ -524,88 +533,83 @@ fn list_project_files(app: tauri::AppHandle) -> Result<Vec<serde_json::Value>, S
                     }
                     result.push(json)
                 }
-                Err(_) => continue,
+                Err(_) => {}
             },
-            Err(_) => continue,
+            Err(_) => {}
         }
+        dir_entry = entries.next_entry().await.map_err(|e| format!("读取目录项失败: {e}"))?;
     }
 
     Ok(result)
 }
 
 #[tauri::command]
-fn list_app_data_files(app: tauri::AppHandle, directory: String) -> Result<Vec<String>, String> {
+async fn list_app_data_files(app: tauri::AppHandle, directory: String) -> Result<Vec<String>, String> {
     let app_dir = app
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
     let target_dir = app_dir.join(directory);
-    fs::create_dir_all(&target_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+    tokio_fs::create_dir_all(&target_dir).await.map_err(|e| format!("创建目录失败: {e}"))?;
 
     let mut files = Vec::new();
-    let entries = fs::read_dir(&target_dir).map_err(|e| format!("读取目录失败: {e}"))?;
-    for entry in entries {
-        let entry = entry.map_err(|e| format!("读取目录项失败: {e}"))?;
-        if entry.path().is_file() {
+    let mut entries = tokio_fs::read_dir(&target_dir).await.map_err(|e| format!("读取目录失败: {e}"))?;
+    let mut dir_entry = entries.next_entry().await.map_err(|e| format!("读取目录项失败: {e}"))?;
+    while let Some(entry) = dir_entry {
+        if entry.path().is_file().await {
             files.push(entry.file_name().to_string_lossy().to_string());
         }
+        dir_entry = entries.next_entry().await.map_err(|e| format!("读取目录项失败: {e}"))?;
     }
     Ok(files)
 }
 
 #[tauri::command]
-fn delete_file(path: String) -> Result<(), String> {
-    // 路径遍历防护：确保路径是安全的
+async fn delete_file(path: String) -> Result<(), String> {
     let target = PathBuf::from(&path);
     let canonical = target.canonicalize().map_err(|e| format!("路径无效: {e}"))?;
 
-    // 禁止删除系统关键路径
     let forbidden = ["/", "/home", "/root", "/tmp", "/var", "/etc", "/usr", "/opt"];
     for dir in forbidden {
         if canonical.starts_with(dir) && canonical != PathBuf::from(dir) {
-            // 允许在 /tmp 下删除，但不允许删除根目录等
-            if !canonical.starts_with("/tmp/cutdeck") {
+            if !canonical.starts_with("/tmp/cutdeck") && !canonical.starts_with("/tmp/CutDeck") {
                 return Err("禁止删除此路径".to_string());
             }
         }
     }
 
     if target.exists() {
-        fs::remove_file(&target).map_err(|e| format!("删除文件失败: {e}"))?;
+        tokio_fs::remove_file(&target).await.map_err(|e| format!("删除文件失败: {e}"))?;
     }
     Ok(())
 }
 
 #[tauri::command]
-fn read_text_file(path: String) -> Result<String, String> {
-    // 路径遍历防护
+async fn read_text_file(path: String) -> Result<String, String> {
     let target = PathBuf::from(&path);
     let canonical = target.canonicalize().map_err(|e| format!("路径无效: {e}"))?;
 
-    // 限制只能读取特定目录
-    let allowed_dirs = ["/tmp/cutdeck", ".cutdeck"];
+    let allowed_dirs = ["/tmp/cutdeck", "/tmp/CutDeck", ".cutdeck"];
     let is_allowed = allowed_dirs.iter().any(|dir| canonical.starts_with(dir));
     if !is_allowed && !path.starts_with("/tmp/") && !path.starts_with(".") {
         return Err("禁止读取此路径".to_string());
     }
 
-    fs::read_to_string(path).map_err(|e| format!("读取文件失败: {e}"))
+    tokio_fs::read_to_string(path).await.map_err(|e| format!("读取文件失败: {e}"))
 }
 
 #[tauri::command]
-fn get_file_size(path: String) -> Result<u64, String> {
-    // 路径遍历防护
+async fn get_file_size(path: String) -> Result<u64, String> {
     let target = PathBuf::from(&path);
     let canonical = target.canonicalize().map_err(|e| format!("路径无效: {e}"))?;
 
-    // 限制只能获取特定目录下的文件大小
     let allowed_prefixes = ["/tmp/cutdeck", "/tmp/CutDeck"];
     let is_allowed = allowed_prefixes.iter().any(|prefix| canonical.starts_with(prefix));
     if !is_allowed && !path.starts_with("/tmp/") && !path.contains("cutdeck") {
         return Err("禁止获取此文件的信息".to_string());
     }
 
-    let metadata = fs::metadata(&path).map_err(|e| format!("读取文件信息失败: {e}"))?;
+    let metadata = tokio_fs::metadata(&path).await.map_err(|e| format!("读取文件信息失败: {e}"))?;
     Ok(metadata.len())
 }
 
