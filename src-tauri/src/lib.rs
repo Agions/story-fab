@@ -5,6 +5,10 @@ mod binary;
 pub mod commands;
 mod types;
 mod utils;
+pub mod video_effects;
+pub mod subtitle;
+pub mod highlight_detector;
+pub mod smart_segmenter;
 
 pub use commands::{ai, ffprobe, project, render};
 pub use types::*;
