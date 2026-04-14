@@ -4,8 +4,8 @@ use crate::types::{
     DirectorPlanOutput, TranscodeCropInput,
 };
 use crate::utils::{chrono_like_timestamp, format_srt_time, parse_fraction};
-use highlight_detector::HighlightDetector;
-use smart_segmenter::SmartSegmenter;
+use crate::highlight_detector::HighlightDetector;
+use crate::smart_segmenter::SmartSegmenter;
 use std::path::PathBuf;
 use std::process::Command;
 use tokio::fs as tokio_fs;
@@ -169,12 +169,12 @@ pub fn get_export_dir() -> String {
 }
 
 #[tauri::command]
-pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<highlight_detector::HighlightSegment>, String> {
+pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::highlight_detector::HighlightSegment>, String> {
     if input.video_path.trim().is_empty() {
         return Err("视频路径不能为空".to_string());
     }
     let detector = HighlightDetector::new();
-    let options = highlight_detector::HighlightOptions {
+    let options = crate::highlight_detector::HighlightOptions {
         threshold: input.threshold,
         min_duration_ms: input.min_duration_ms,
         top_n: input.top_n,
@@ -189,12 +189,12 @@ pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<highlight_d
 #[tauri::command]
 pub fn detect_smart_segments(
     input: DetectSmartSegmentsInput,
-) -> Result<Vec<smart_segmenter::VideoSegment>, String> {
+) -> Result<Vec<crate::smart_segmenter::VideoSegment>, String> {
     if input.video_path.trim().is_empty() {
         return Err("视频路径不能为空".to_string());
     }
     let segmenter = SmartSegmenter::new();
-    let options = smart_segmenter::SegmentOptions {
+    let options = crate::smart_segmenter::SegmentOptions {
         min_duration_ms: input.min_duration_ms,
         max_duration_ms: input.max_duration_ms,
         scene_threshold: input.scene_threshold,
