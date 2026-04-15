@@ -50,7 +50,7 @@ const SegmentDetails: React.FC<SegmentDetailsProps> = ({
           </Col>
           <Col span={4}>
             <Text strong>类型: </Text>
-            <Text>{getTypeLabel(segment.type)}</Text>
+            <Text>{getTypeLabel(segment.type ?? 'text')}</Text>
           </Col>
           <Col span={12}>
             <Text strong>内容: </Text>

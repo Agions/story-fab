@@ -83,7 +83,7 @@ export function useModel(): UseModelReturn {
   // 获取可用模型（已配置的）
   const availableModels = useMemo(() => {
     return AI_MODELS.filter(model => {
-      const settings = store.aiModelsSettings[model.provider];
+      const settings = store.aiModelsSettings[model.provider ?? 'openai'];
       return model.isAvailable !== false && settings?.enabled && settings?.apiKey;
     });
   }, [store.aiModelsSettings]);
@@ -138,7 +138,7 @@ export function useModel(): UseModelReturn {
     const model = getModelById(modelId);
     if (model) {
       setDefaultModelId(model.id);
-      store.setSelectedAIModel(model.provider);
+      store.setSelectedAIModel(model.provider ?? 'openai');
       setError(null);
     }
   }, [setDefaultModelId, store]);
@@ -146,7 +146,7 @@ export function useModel(): UseModelReturn {
   // 更新设置
   const updateSettings = useCallback((settings: Partial<AIModelSettings>) => {
     if (selectedModel) {
-      store.updateAIModelSettings(selectedModel.provider, settings);
+      store.updateAIModelSettings(selectedModel.provider ?? 'openai', settings);
     }
   }, [selectedModel, store]);
   
@@ -212,7 +212,7 @@ export function useModel(): UseModelReturn {
   
   // 按分类过滤
   const filterByCategory = useCallback((category: ModelCategory): AIModel[] => {
-    return AI_MODELS.filter(model => model.category.includes(category));
+    return AI_MODELS.filter(model => (model.category ?? ['general']).includes(category));
   }, []);
   
   // 按提供商过滤

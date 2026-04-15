@@ -2,7 +2,7 @@
  * 步骤4: 生成文案 — AI Cinema Studio Redesign
  * 三大核心功能：AI视频解说 / AI第一人称 / AI混剪
  */
-import React, { useState, useCallback, useEffect, useMemo, memo } from 'react';
+import React, { useState, useCallback, useEffect, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
 import { aiService } from '@/core/services/ai.service';
 import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
@@ -178,7 +178,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
 
       const settings: AIModelSettings = {
         enabled: true,
-        apiKey: apiKeys[model.provider]?.key || '',
+        apiKey: apiKeys[model.provider ?? 'openai']?.key || '',
         temperature: 0.7,
         maxTokens: 2000,
       };

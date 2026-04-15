@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 import { CutDeckProvider, useCutDeck } from '@/components/CutDeck/AIEditorContext';
 import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '@/hooks/use-keyboard-shortcuts';
+import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useEditorStore } from '@/store/editorStore';
 import { message } from 'antd';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/CutDeck/Workspace/functionModeMap';
@@ -66,6 +67,7 @@ const AI_FUNCTIONS = [
 
 const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
+  const [shortcutsHelpVisible, setShortcutsHelpVisible] = useState(false);
   const { state, goToNextStep, setFeature } = useCutDeck();
   const editorStore = useEditorStore();
 
@@ -149,8 +151,31 @@ const AIVideoEditorContent: React.FC = () => {
     }
   };
 
+  // 快捷键：? 显示帮助面板
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) return;
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        setShortcutsHelpVisible(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   return (
     <div className={styles.editorContainer}>
+      {/* 快捷键帮助面板 */}
+      <KeyboardShortcutsHelp
+        visible={shortcutsHelpVisible}
+        onClose={() => setShortcutsHelpVisible(false)}
+      />
       {/* 顶部功能标签页 */}
       <div className={styles.tabHeader}>
         <div className={styles.functionCards}>

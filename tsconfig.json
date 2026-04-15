@@ -11,12 +11,14 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "strict": false,
-    "strictNullChecks": false,
+    "strict": true,
+    "strictNullChecks": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false,
     "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "rootDirs": ["."],
@@ -25,6 +27,6 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "src/_DEAD"],
+  "exclude": ["node_modules", "dist", "src/_DEAD", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

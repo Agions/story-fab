@@ -225,7 +225,7 @@ const TimelineTrack: React.FC<TimelineTrackProps> = memo(({
             clip={clip}
             scale={scale}
             isSelected={clip.id === selectedClipId}
-            isLocked={track.locked}
+            isLocked={track.locked ?? false}
             onSelect={handleClipSelect}
             onUpdate={handleClipUpdate}
           />

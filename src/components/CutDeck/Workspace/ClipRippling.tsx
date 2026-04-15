@@ -17,9 +17,7 @@ import { Button, Progress, Tag, Checkbox, Select, message } from 'antd';
 import {
   ThunderboltOutlined,
   CheckCircleOutlined,
-  WarningOutlined,
   DownloadOutlined,
-  PlayCircleOutlined,
 } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api/core';
 import { motion } from '@/components/common/motion-shim';
@@ -120,7 +118,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
 
       setResults(result.clips);
       // 默认全选
-      setSelectedClips(new Set(result.clips.map(c => c.clip.id)));
+      setSelectedClips(new Set(result.clips.map(c => c.clip.id).filter((id): id is string => id !== undefined)));
       message.success(`生成 ${result.clips.length} 个短片段`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -142,7 +140,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
 
     setExporting(true);
     const exported: string[] = [];
-    const clipsToExport = results.filter(c => selectedClips.has(c.clip.id));
+    const clipsToExport = results.filter(c => c.clip.id !== undefined && selectedClips.has(c.clip.id));
 
     // 动态获取导出目录
     const exportDir = await invoke<string>('get_export_dir').catch(() => '/tmp/CutDeck');
@@ -309,13 +307,14 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
               const startStr = formatTime(c.startTime);
               const endStr = formatTime(c.endTime);
               const duration = c.endTime - c.startTime;
-              const isSelected = selectedClips.has(c.id);
+              const clipId = c.id ?? '';
+              const isSelected = selectedClips.has(clipId);
 
               return (
                 <motion.div
-                  key={c.id}
+                  key={clipId}
                   className={`${styles.clipCard} ${isSelected ? styles.clipSelected : ''}`}
-                  onClick={() => toggleClip(c.id)}
+                  onClick={() => toggleClip(clipId)}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
@@ -335,7 +334,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
 
                   {/* 评分雷达 */}
                   <div className={styles.scoreDims}>
-                    {Object.entries(score.dimensions).map(([dim, val]) => (
+                    {Object.entries(score.dimensions ?? {}).map(([dim, val]) => (
                       <div key={dim} className={styles.dimBar}>
                         <span className={styles.dimLabel}>{dimLabel(dim)}</span>
                         <Progress

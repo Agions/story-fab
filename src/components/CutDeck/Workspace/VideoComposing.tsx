@@ -8,7 +8,6 @@ import { useCutDeck } from '../AIEditorContext';
 import { voiceSynthesisService } from '@/core/services/voice-synthesis.service';
 import { videoEffectService } from '@/core/services/video-effect.service';
 import { audioVideoSyncService } from '@/core/services/audio-sync.service';
-import { subtitleService } from '@/core/services/subtitle.service';
 import { orchestrateCommentaryAgents } from '@/core/services/workflow/commentaryAgents';
 import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '@/core/workflow/alignmentGate';
 import { FEATURE_TO_FUNCTION, FUNCTION_TO_MODE } from './functionModeMap';

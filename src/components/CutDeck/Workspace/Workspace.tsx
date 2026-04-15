@@ -145,7 +145,7 @@ const StepList: React.FC<StepListProps> = ({
                   onStepClick(step.key);
                 }
               }}
-              ref={active ? activeStepRef : null}
+              ref={(active ? activeStepRef : null) as React.RefObject<HTMLDivElement>}
             >
               {/* 状态图标 */}
               <div className={styles.stepIconWrapper}>

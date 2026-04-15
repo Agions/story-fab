@@ -22,7 +22,7 @@ export const getAvailableModelsFromApiKeys = <T extends { provider?: ModelProvid
 ): T[] => {
   const configuredProviders = getConfiguredProviders(apiKeys);
   return modelCatalog.filter(
-    (model) => model.isAvailable !== false && configuredProviders.has(model.provider)
+    (model) => model.isAvailable !== false && configuredProviders.has(model.provider ?? 'openai')
   );
 };
 

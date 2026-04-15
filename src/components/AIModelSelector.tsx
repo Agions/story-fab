@@ -42,14 +42,14 @@ interface AIModelSelectorProps {
 const toDisplayModel = (model: CoreAIModel): DisplayAIModel => ({
   id: model.id,
   name: model.name,
-  provider: model.provider,
+  provider: model.provider ?? 'openai',
   category: (Array.isArray(model.category) ? model.category : [model.category]).filter((item): item is Exclude<ModelCategory, 'all'> => item !== 'audio'),
-  description: model.description,
-  features: model.features,
-  tokenLimit: model.tokenLimit,
+  description: model.description ?? '',
+  features: model.features ?? [],
+  tokenLimit: model.tokenLimit ?? 4096,
   isPro: model.isPro,
   isAvailable: model.isAvailable !== false,
-  avatar: MODEL_PROVIDERS[model.provider]?.icon,
+  avatar: MODEL_PROVIDERS[model.provider ?? 'openai']?.icon,
 });
 
 const AIModelSelector: React.FC<AIModelSelectorProps> = ({

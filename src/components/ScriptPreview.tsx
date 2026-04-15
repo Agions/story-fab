@@ -124,7 +124,7 @@ const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport 
 
       <div className={styles.scriptContent}>
         {script.content.map((segment: ScriptSegment, index: number) => {
-          const typeInfo = getSegmentTypeInfo(segment.type);
+          const typeInfo = getSegmentTypeInfo(segment.type ?? 'text');
           return (
             <div 
               key={segment.id} 

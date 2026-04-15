@@ -74,7 +74,7 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = ({
                   <Text type="secondary">{selectedModel.description}</Text>
                   <Space>
                     <Tag icon={<ThunderboltOutlined />} color="green">
-                      最大 {selectedModel.tokenLimit.toLocaleString()} tokens
+                      最大 {(selectedModel.tokenLimit ?? 4096).toLocaleString()} tokens
                     </Tag>
                     <Tag icon={<DollarOutlined />} color="orange">
                       {PROVIDER_NAMES[selectedModel.provider as keyof typeof PROVIDER_NAMES]}

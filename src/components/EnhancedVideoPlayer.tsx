@@ -1,12 +1,12 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Button, Tooltip, Slider, Space, Row, Col, Radio, InputNumber, Statistic, Card } from 'antd';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Button, Slider, Space, Row, Col, Radio, InputNumber, Statistic, Card } from 'antd';
 import { logger } from '@/utils/logger';
 import { 
   PlayCircleOutlined, 
   PauseCircleOutlined, 
   StepBackwardOutlined, 
   StepForwardOutlined,
-  FullscreenOutlined,
+  
   SoundOutlined,
   SettingOutlined,
   ForwardOutlined,
@@ -14,7 +14,6 @@ import {
   ExpandOutlined,
   CompressOutlined,
   CameraOutlined,
-  ExpandAltOutlined
 } from '@ant-design/icons';
 import styles from './EnhancedVideoPlayer.module.less';
 
@@ -68,7 +67,8 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 初始化播放器
   useEffect(() => {
-    const video = videoRef.current;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
 
     // 设置初始时间
@@ -142,7 +142,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 播放/暂停切换
   const togglePlay = useCallback(() => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     
     if (isPlaying) {
@@ -156,7 +156,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 调整进度
   const handleSeek = useCallback((value: number) => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     
     video.currentTime = value;
@@ -169,7 +169,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 调整音量
   const handleVolumeChange = useCallback((value: number) => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     
     setVolume(value);
@@ -186,7 +186,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 静音切换
   const toggleMute = useCallback(() => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     
     const newMutedState = !isMuted;
@@ -196,7 +196,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 调整播放速度
   const handleRateChange = useCallback((value: number) => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     
     setPlaybackRate(value);
@@ -237,7 +237,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 帧级控制：前进一帧
   const stepForward = useCallback(() => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     
     // 暂停视频
@@ -253,7 +253,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 帧级控制：后退一帧
   const stepBackward = useCallback(() => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     
     // 暂停视频
@@ -269,21 +269,21 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // 快进5秒
   const fastForward = useCallback(() => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     video.currentTime = Math.min(video.duration, video.currentTime + 5);
   }, []);
 
   // 快退5秒
   const fastBackward = useCallback(() => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     video.currentTime = Math.max(0, video.currentTime - 5);
   }, []);
 
   // 截取当前帧
   const captureFrame = useCallback(() => {
-    const video = videoRef.current;
+    const video = videoRef.current; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (!video) return;
     
     // 创建一个canvas元素

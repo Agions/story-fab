@@ -101,7 +101,7 @@ interface BaiduChatResponse {
 }
 
 const isSupportedProvider = (provider: AIModel['provider']): provider is SupportedProvider =>
-  provider in MODEL_PROVIDERS;
+  provider !== undefined && provider in MODEL_PROVIDERS;
 
 export class AIService extends BaseService {
   private abortControllers: Map<string, AbortController> = new Map();

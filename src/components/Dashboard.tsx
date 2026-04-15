@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Card, Row, Col, Button, Typography, Tooltip, Dropdown, Input, Modal, Form, Select, Skeleton, Empty } from 'antd';
+import { Row, Col, Button, Typography, Tooltip, Dropdown, Input, Modal, Form, Select } from 'antd';
 import { logger } from '@/utils/logger';
 import {
   PlusOutlined,
@@ -31,7 +31,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDuration, formatDate } from '@/shared';
 import styles from './Dashboard.module.less';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { Option } = Select;
 
 interface ProjectType {

@@ -49,8 +49,10 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
   const [progressStage, setProgressStage] = useState('');
   const [etaSeconds, setEtaSeconds] = useState<number | null>(null);
   const [exported, setExported] = useState(false);
-  const [exportedFile, setExportedFile] = useState<string | null>(null);
-  const [exportError, setExportError] = useState<string | null>(null);
+  const [_exportedFile, setExportedFile] = useState<string | null>(null);
+  const [_exportError, setExportError] = useState<string | null>(null);
+  const [_startTime, _setStartTime] = useState<number>(Date.now());
+
 
   // 监听 Rust processing-progress 事件，驱动真实进度
   useEffect(() => {

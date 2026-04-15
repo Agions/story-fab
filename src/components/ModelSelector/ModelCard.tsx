@@ -38,15 +38,15 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   onSelect
 }) => {
   // 获取提供商图标
-  const getProviderIcon = (providerId: ModelProvider): string => {
-    const config = MODEL_PROVIDERS[providerId];
+  const getProviderIcon = (providerId: ModelProvider | undefined): string => {
+    const config = MODEL_PROVIDERS[providerId ?? 'custom'];
     return config?.icon || '';
   };
 
   // 获取提供商名称
-  const getProviderName = (providerId: ModelProvider): string => {
-    const config = MODEL_PROVIDERS[providerId];
-    return config?.name || providerId;
+  const getProviderName = (providerId: ModelProvider | undefined): string => {
+    const config = MODEL_PROVIDERS[providerId ?? 'custom'];
+    return config?.name || providerId || 'Unknown';
   };
 
   // 处理点击
@@ -124,9 +124,9 @@ export const ModelCard: React.FC<ModelCardProps> = ({
 
             <div className={styles.cardFooter}>
               <Space size="small">
-                <Tooltip title={`上下文: ${(model.contextWindow / 1000).toFixed(0)}K tokens`}>
+                <Tooltip title={`上下文: ${(model.contextWindow ?? 4096 / 1000).toFixed(0)}K tokens`}>
                   <Tag icon={<RobotOutlined />}>
-                    {(model.contextWindow / 1000).toFixed(0)}K
+                    {(model.contextWindow ?? 4096 / 1000).toFixed(0)}K
                   </Tag>
                 </Tooltip>
                 {showCost && estimatedCost && (

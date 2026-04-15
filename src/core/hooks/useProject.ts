@@ -106,7 +106,7 @@ export function useProject(projectId?: string): UseProjectReturn {
   // 最近项目
   const recentProjects = useMemo(() => {
     return [...projects]
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .sort((a, b) => new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime())
       .slice(0, 10);
   }, [projects]);
   
@@ -323,7 +323,7 @@ export function useProjectList() {
     
     // 状态过滤
     if (filter.status.length > 0) {
-      result = result.filter(p => filter.status.includes(p.status));
+      result = result.filter(p => (filter.status ?? []).includes(p.status ?? ''));
     }
     
     // 排序

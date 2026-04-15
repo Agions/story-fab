@@ -171,7 +171,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = memo(({ onNext }) => {
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>创建时间</span>
               <span className={styles.infoValue}>
-                {new Date(state.project.createdAt).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                {new Date(state.project.createdAt ?? Date.now()).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
             <div className={styles.infoItem}>

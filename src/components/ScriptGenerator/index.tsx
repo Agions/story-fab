@@ -431,13 +431,13 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
               <div className={styles.scriptMeta}>
                 <Space wrap>
                   <Tag icon={<FileTextOutlined />}>
-                    {generatedScript.metadata.wordCount} 字
+                    {generatedScript.metadata?.wordCount ?? 0} 字
                   </Tag>
                   <Tag icon={<ClockCircleOutlined />}>
-                    约 {generatedScript.metadata.estimatedDuration} 分钟
+                    约 {generatedScript.metadata?.estimatedDuration ?? 0} 分钟
                   </Tag>
                   <Tag icon={<UserOutlined />}>
-                    {AUDIENCE_OPTIONS.find(a => a.value === generatedScript.metadata.targetAudience)?.label}
+                    {AUDIENCE_OPTIONS.find(a => a.value === generatedScript.metadata?.targetAudience)?.label}
                   </Tag>
                   <Tag icon={<GlobalOutlined />}>
                     中文

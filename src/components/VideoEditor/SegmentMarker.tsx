@@ -55,7 +55,7 @@ const SegmentMarker: React.FC<SegmentMarkerProps> = ({
 
   return (
     <Tooltip
-      title={`${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}: ${segment.content.substring(0, 50)}${segment.content.length > 50 ? '...' : ''}`}
+      title={`${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}: ${(segment.content ?? '').substring(0, 50)}${(segment.content ?? '').length > 50 ? '...' : ''}`}
     >
       <div
         className={styles.segmentMarker}

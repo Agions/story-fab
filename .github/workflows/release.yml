@@ -27,9 +27,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Enable pnpm
-        run: corepack enable
+          cache: 'npm'
 
       - name: Install Linux build dependencies
         run: |
@@ -48,11 +46,11 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Install pnpm dependencies
-        run: pnpm install
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build Tauri app
-        run: pnpm tauri build
+        run: npm run tauri -- build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -80,15 +78,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Enable pnpm
-        run: corepack enable
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm ci
 
       - name: Build Docs
-        run: pnpm docs:build
+        run: npm run docs:build
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

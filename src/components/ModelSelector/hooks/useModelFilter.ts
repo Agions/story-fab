@@ -38,7 +38,7 @@ export function useModelFilter({ models }: UseModelFilterProps): UseModelFilterR
 
     // 按分类过滤
     if (category !== 'all') {
-      result = result.filter(m => m.category.includes(category));
+      result = result.filter(m => (m.category ?? ['general']).includes(category));
     }
 
     // 按提供商过滤
@@ -51,8 +51,8 @@ export function useModelFilter({ models }: UseModelFilterProps): UseModelFilterR
       const query = searchQuery.toLowerCase().trim();
       result = result.filter(m =>
         m.name.toLowerCase().includes(query) ||
-        m.description.toLowerCase().includes(query) ||
-        m.provider.toLowerCase().includes(query)
+        (m.description ?? '').toLowerCase().includes(query) ||
+        (m.provider ?? '').toLowerCase().includes(query)
       );
     }
 

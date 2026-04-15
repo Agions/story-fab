@@ -22,12 +22,12 @@ export function detectExactDuplicates(
         type: 'exact',
         source: {
           segmentId: existing.id,
-          content: existing.content,
+          content: existing.content ?? "",
           startTime: existing.startTime
         },
         target: {
           segmentId: segment.id,
-          content: segment.content,
+          content: segment.content ?? "",
           startTime: segment.startTime
         },
         similarity: 1.0,
@@ -51,7 +51,7 @@ export function detectSemanticDuplicates(
   for (let i = 0; i < segments.length; i++) {
     for (let j = i + 1; j < segments.length; j++) {
       if (segments[i].content == null || segments[j].content == null) continue;
-      const similarity = calculateSimilarity(segments[i].content, segments[j].content);
+      const similarity = calculateSimilarity(segments[i].content ?? "", segments[j].content ?? "");
 
       if (similarity >= threshold) {
         duplicates.push({
@@ -59,12 +59,12 @@ export function detectSemanticDuplicates(
           type: 'similar',
           source: {
             segmentId: segments[i].id,
-            content: segments[i].content,
+            content: segments[i].content ?? "",
             startTime: segments[i].startTime
           },
           target: {
             segmentId: segments[j].id,
-            content: segments[j].content,
+            content: segments[j].content ?? "",
             startTime: segments[j].startTime
           },
           similarity,
@@ -94,7 +94,7 @@ export function detectTemplateContent(segments: ScriptSegment[]): DuplicateResul
             },
             target: {
               segmentId: segment.id,
-              content: segment.content,
+              content: segment.content ?? "",
               startTime: segment.startTime
             },
             similarity: 0.5,
@@ -119,8 +119,8 @@ export function detectStructuralDuplicates(
     for (let j = i + 1; j < segments.length; j++) {
       if (segments[i].content == null || segments[j].content == null) continue;
       const structureSimilarity = calculateStructureSimilarity(
-        segments[i].content,
-        segments[j].content
+        segments[i].content ?? "",
+        segments[j].content ?? ""
       );
 
       if (structureSimilarity >= threshold) {
@@ -129,12 +129,12 @@ export function detectStructuralDuplicates(
           type: 'similar',
           source: {
             segmentId: segments[i].id,
-            content: segments[i].content,
+            content: segments[i].content ?? "",
             startTime: segments[i].startTime
           },
           target: {
             segmentId: segments[j].id,
-            content: segments[j].content,
+            content: segments[j].content ?? "",
             startTime: segments[j].startTime
           },
           similarity: structureSimilarity,

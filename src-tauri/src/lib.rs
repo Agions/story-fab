@@ -2,6 +2,7 @@
 //! Tauri 2.x backend entry point
 
 use tauri::Manager;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod binary;
 pub mod commands;
@@ -40,10 +41,25 @@ pub use subtitle::{
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // 初始化日志
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "cutdeck=info,warn".into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
+    tracing::info!("CutDeck 启动中...");
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_deep_link::init())
         .invoke_handler(tauri::generate_handler![
             run_ai_director_plan,
             check_app_data_directory,
@@ -79,32 +95,24 @@ pub fn run() {
             detect_smart_segments,
         ])
         .setup(|app| {
-            println!("[CutDeck] 启动应用...");
+            tracing::info!("[CutDeck] 应用初始化中...");
 
             let app_data_dir = app.path().app_data_dir().unwrap_or_default();
-            println!("[CutDeck] App数据目录: {:?}", app_data_dir);
+            tracing::info!("[CutDeck] App数据目录: {:?}", app_data_dir);
 
-            if let Ok(resource_path) = app.path().resource_dir() {
-                println!("[CutDeck] 资源目录: {:?}", resource_path);
+            // macOS / Windows / Linux 平台日志路径
+            if let Ok(log_dir) = app_data_dir.join("logs").canonicalize() {
+                tracing::info!("[CutDeck] 日志目录: {:?}", log_dir);
             }
 
             if let Some(window) = app.get_webview_window("main") {
-                println!("[CutDeck] 获取到主窗口");
+                tracing::info!("[CutDeck] 主窗口已获取");
 
-                if let Err(e) = window.set_title("CutDeck - AI 自主剪辑工作台") {
-                    println!("[CutDeck] 设置窗口标题失败: {:?}", e);
-                } else {
-                    println!("[CutDeck] 窗口标题设置成功");
-                }
-
-                if let Ok(url) = window.url() {
-                    println!("[CutDeck] 当前URL: {:?}", url);
-                }
-            } else {
-                println!("[CutDeck] 无法获取主窗口!");
+                // 确保窗口标题正确
+                let _ = window.set_title("CutDeck - AI 视频创作平台");
             }
 
-            println!("[CutDeck] 应用启动完成");
+            tracing::info!("[CutDeck] 启动完成");
             Ok(())
         })
         .run(tauri::generate_context!())

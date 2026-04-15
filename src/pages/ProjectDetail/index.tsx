@@ -365,6 +365,7 @@ const ProjectDetail: React.FC = () => {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const contentNode = useMemo((): React.ReactNode => {
+    if (!project) return null;
     switch (activeStep) {
       case 'analyze':
         return (
@@ -438,18 +439,7 @@ const ProjectDetail: React.FC = () => {
       default:
         return null;
     }
-  }, [
-    activeStep,
-    activeScript,
-    aiLoading,
-    handleAnalysisComplete,
-    handleCreateScript,
-    handleGenerateScript,
-    handleScriptSave,
-    handleSubtitleExtracted,
-    project.id,
-    project.videoUrl,
-  ]);
+  }, [activeStep, activeScript, project, handleAnalysisComplete, handleSubtitleExtracted]);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   if (!project) return null;

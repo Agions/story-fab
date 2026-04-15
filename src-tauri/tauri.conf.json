@@ -7,26 +7,35 @@
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
     "devUrl": "http://localhost:1430",
-    "frontendDist": "../dist"
+    "frontendDist": "../dist",
+    "devtools": true
   },
   "app": {
     "withGlobalTauri": true,
     "windows": [
       {
         "title": "CutDeck - AI 视频创作平台",
+        "label": "main",
         "width": 1200,
         "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
         "center": true,
-        "label": "main"
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "focus": true,
+        "visible": true
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*; font-src 'self' data:;"
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*; font-src 'self' data:; frame-src 'none'; object-src 'none';"
     }
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis", "msi", "dmg", "app", "deb", "rpm", "appimage"],
     "resources": {
       "../dist": "dist"
     },
@@ -36,6 +45,53 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "category": "Video",
+    "shortDescription": "AI-powered video editing tool",
+    "longDescription": "CutDeck is an AI-driven professional video editing tool with autonomous cutting, smart segmentation, highlight detection, and subtitle generation.",
+    "publisher": "CutDeck",
+    "copyright": "Copyright © 2024 CutDeck",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": true,
+        "languages": ["SimpChinese", "English"]
+      },
+      "wix": null
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": true
+      },
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0"]
+      },
+      "rpm": {
+        "depends": ["webkit2gtk4.1", "gtk3"]
+      }
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.15",
+      "signingIdentity": null,
+      "providerShortName": null,
+      "entitlements": null
+    }
+  },
+  "plugins": {
+    "notification": {
+      "all": true
+    },
+    "global-shortcut": {
+      "all": true
+    },
+    "clipboard-manager": {
+      "all": true
+    },
+    "deep-link": {
+      "desktop": {
+        "schemes": ["cutdeck"]
+      }
+    }
   }
 }

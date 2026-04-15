@@ -268,7 +268,7 @@ const ProjectEdit: React.FC = () => {
           resultSegments.push(currentSegment);
         } else if (currentSegment) {
           // Append to previous segment's duration (text-based parsing)
-          currentSegment.duration += 1;
+          currentSegment.duration = (currentSegment.duration ?? 0) + 1;
         }
       }
 

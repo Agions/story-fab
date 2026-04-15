@@ -2,7 +2,7 @@
  * 步骤3: AI 分析 — AI Cinema Studio Redesign
  * 神经网络可视化 + 进度大数字 + 逐项 stagger 动画
  */
-import React, { useState, useEffect, useRef, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
 import { visionService } from '@/core/services/vision.service';
 import { notify } from '@/shared';
@@ -150,12 +150,6 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
   useEffect(() => {
     if (analyzing) {
       ANALYSIS_TASKS.forEach((task) => {
-        const key = task.key === 'scene' ? 'scene'
-          : task.key === 'ocr' ? 'ocr'
-          : task.key === 'asr' ? 'asr'
-          : task.key === 'emotion' ? 'emotion'
-          : 'summary';
-
         setTimeout(() => {
           setVisibleTasks(prev => [...prev, task.key]);
         }, 100 + ANALYSIS_TASKS.findIndex(t => t.key === task.key) * 150);

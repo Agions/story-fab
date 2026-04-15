@@ -46,14 +46,13 @@ interface HighlightListProps {
   defaultExpanded?: boolean;
 }
 
-const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpanded = false }) => {
+const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpanded: _defaultExpanded = false }) => {
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [detected, setDetected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [threshold, setThreshold] = useState(1.5);
   const [topN, setTopN] = useState(10);
-  const [expanded, setExpanded] = useState(defaultExpanded);
   const editorStore = useEditorStore();
 
   const detect = useCallback(async () => {

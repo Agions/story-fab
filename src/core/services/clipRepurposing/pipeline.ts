@@ -103,7 +103,9 @@ export class ClipRepurposingPipeline {
       meta: { videoId: videoInfo.id },
     };
 
-    const stepOptions: StepOptions = { onProgress: opts.onProgress };
+    const stepOptions: StepOptions = {
+      onProgress: opts.onProgress as unknown as (stage: string, progress: number, message?: string) => void
+    };
 
     logger.info('[ClipRepurposingPipeline] 开始执行', {
       videoDuration: videoInfo.duration,

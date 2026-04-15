@@ -324,7 +324,7 @@ export const getModelsByProvider = (provider: ModelProvider): AIModel[] => {
 };
 
 export const getModelsByCategory = (category: ModelCategory): AIModel[] => {
-  return AI_MODELS.filter((model) => model.category.includes(category));
+  return AI_MODELS.filter((model) => (model.category ?? ['general']).includes(category));
 };
 
 export const getRecommendedModels = (task: keyof typeof MODEL_RECOMMENDATIONS): AIModel[] => {
