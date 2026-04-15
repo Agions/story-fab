@@ -19,11 +19,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies (including dev)
-        run: npm install
+          cache: 'pnpm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Install dependencies
+        run: pnpm install
       - name: TypeScript check
-        run: npm run type-check
+        run: pnpm run type-check
 
   lint:
     name: Lint
@@ -34,11 +36,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies (including dev)
-        run: npm install
+          cache: 'pnpm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Install dependencies
+        run: pnpm install
       - name: ESLint
-        run: npm run lint
+        run: pnpm run lint
 
   test:
     name: Unit Tests
@@ -49,11 +53,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies (including dev)
-        run: npm install
+          cache: 'pnpm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Install dependencies
+        run: pnpm install
       - name: Run tests
-        run: npm run test:run
+        run: pnpm run test:run
 
   build:
     name: Vite Build
@@ -64,11 +70,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies (including dev)
-        run: npm install
+          cache: 'pnpm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Install dependencies
+        run: pnpm install
       - name: Build
-        run: npm run build
+        run: pnpm run build
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
