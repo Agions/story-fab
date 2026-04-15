@@ -21,7 +21,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - name: Install dependencies (including dev)
-        run: npm ci --include=dev
+        run: npm install
       - name: TypeScript check
         run: npm run type-check
 
@@ -36,7 +36,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - name: Install dependencies (including dev)
-        run: npm ci --include=dev
+        run: npm install
       - name: ESLint
         run: npm run lint
 
@@ -51,7 +51,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - name: Install dependencies (including dev)
-        run: npm ci --include=dev
+        run: npm install
       - name: Run tests
         run: npm run test:run
 
@@ -66,7 +66,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - name: Install dependencies (including dev)
-        run: npm ci --include=dev
+        run: npm install
       - name: Build
         run: npm run build
       - name: Upload build artifact
