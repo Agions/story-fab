@@ -10,24 +10,18 @@ permissions:
   contents: read
 
 jobs:
-  # ─────────────────────────────────────────────────────────
-  # Code Quality
-  # ─────────────────────────────────────────────────────────
   typecheck:
     name: TypeScript Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+      - name: Install dependencies (including dev)
+        run: npm ci --include=dev
       - name: TypeScript check
         run: npm run type-check
 
@@ -36,61 +30,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+      - name: Install dependencies (including dev)
+        run: npm ci --include=dev
       - name: ESLint
         run: npm run lint
 
-  # ─────────────────────────────────────────────────────────
-  # Tests
-  # ─────────────────────────────────────────────────────────
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+      - name: Install dependencies (including dev)
+        run: npm ci --include=dev
       - name: Run tests
         run: npm run test:run
 
-  # ─────────────────────────────────────────────────────────
-  # Build
-  # ─────────────────────────────────────────────────────────
   build:
     name: Vite Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+      - name: Install dependencies (including dev)
+        run: npm ci --include=dev
       - name: Build
         run: npm run build
-
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
