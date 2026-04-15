@@ -155,7 +155,7 @@ export function useCountdown(initialSeconds: number): [
 ] {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [isActive, setIsActive] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<ReturnType<typeof setTimeout>>();
 
   const start = useCallback(() => setIsActive(true), []);
   const pause = useCallback(() => setIsActive(false), []);

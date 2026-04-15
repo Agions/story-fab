@@ -188,7 +188,7 @@ export function usePolling(
 ) {
   const { immediate = true } = options;
   const savedCallback = useRef(callback);
-  const timerRef = useRef<NodeJS.Timeout>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     savedCallback.current = callback;
