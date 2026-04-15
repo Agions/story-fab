@@ -1,7 +1,7 @@
 /**
  * 快捷操作组件
  */
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Card, Row, Col } from 'antd';
 import {
   VideoCameraOutlined,
@@ -17,10 +17,10 @@ import {
 } from '@/core/utils/route-preload';
 import styles from '../index.module.less';
 
-const QuickActions: React.FC = () => {
+const QuickActions: React.FC = React.memo(() => {
   const navigate = useNavigate();
 
-  const tools = [
+  const tools = useMemo(() => [
     {
       key: 'templates',
       icon: <VideoCameraOutlined className={styles.toolIcon} />,
@@ -53,21 +53,21 @@ const QuickActions: React.FC = () => {
       path: '/settings',
       preloadFn: preloadSettingsPage,
     },
-  ];
+  ], [navigate]);
 
-  const handleCardClick = (path: string, preloadFn?: () => void) => {
+  const handleCardClick = useCallback((path: string, preloadFn?: () => void) => {
     if (preloadFn) {
       void preloadFn();
     }
     navigate(path);
-  };
+  }, [navigate]);
 
-  const handleKeyDown = (e: React.KeyboardEvent, path: string, preloadFn?: () => void) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, path: string, preloadFn?: () => void) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleCardClick(path, preloadFn);
     }
-  };
+  }, [handleCardClick]);
 
   return (
     <Card className={styles.quickTools}>
@@ -96,6 +96,7 @@ const QuickActions: React.FC = () => {
       </Row>
     </Card>
   );
-};
+});
 
 export default QuickActions;
+QuickActions.displayName = 'QuickActions';

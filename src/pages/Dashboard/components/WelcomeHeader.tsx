@@ -2,18 +2,17 @@
  * 欢迎头部组件
  */
 import React from 'react';
-import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import { preloadProjectEditPage } from '@/core/utils/route-preload';
+import { useAppStore } from '@/store';
 import styles from '../index.module.less';
 
 interface WelcomeHeaderProps {
   onCreateProject: () => void;
 }
 
-const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({ onCreateProject }) => {
-  const navigate = useNavigate();
+const WelcomeHeader: React.FC<WelcomeHeaderProps> = React.memo(({ onCreateProject }) => {
+  const user = useAppStore((state) => state.user);
 
   const handleMouseEnter = () => {
     void preloadProjectEditPage();
@@ -38,6 +37,7 @@ const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({ onCreateProject }) => {
       </div>
     </div>
   );
-};
+});
 
 export default WelcomeHeader;
+WelcomeHeader.displayName = 'WelcomeHeader';

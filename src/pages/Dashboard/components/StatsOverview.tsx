@@ -11,7 +11,7 @@ interface StatsOverviewProps {
   stats: DashboardStats;
 }
 
-const StatsOverview: React.FC<StatsOverviewProps> = ({ stats }) => {
+const StatsOverview: React.FC<StatsOverviewProps> = React.memo(({ stats }) => {
   return (
     <Row gutter={16} className={styles.statsRow}>
       <Col xs={24} sm={8}>
@@ -52,6 +52,7 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({ stats }) => {
       </Col>
     </Row>
   );
-};
+});
 
 export default StatsOverview;
+StatsOverview.displayName = 'StatsOverview';

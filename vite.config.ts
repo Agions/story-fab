@@ -47,6 +47,9 @@ export default defineConfig({
     sourcemap: false,
     chunkSizeWarningLimit: 400,
     cssCodeSplit: true,
+    // 图片资源优化
+    assetsInlineLimit: 4096, // 4kb以下的图片内联为 base64
+    assetsDir: 'assets',
     rollupOptions: {
       output: {
         chunkFileNames: 'assets/[name]-[hash].js',
