@@ -253,7 +253,10 @@ export const useEditorStore = create<EditorState>()(
       
       // 多轨道时间线
       setPlayheadMs: (ms) => set({ playheadMs: Math.max(0, ms) }),
-      setTimelineTracks: (tracks) => set({ timelineTracks: tracks }),
+      setTimelineTracks: (tracks) => {
+        get().saveHistory();
+        set({ timelineTracks: tracks });
+      },
       
       addTimelineTrack: (type, name) => {
         const id = `track-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;

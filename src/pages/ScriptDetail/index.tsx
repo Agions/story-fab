@@ -9,7 +9,7 @@ import { exportScriptToFile, saveProjectToFile, loadProjectWithRetry, listProjec
 import { findProjectByScriptId, normalizeProjectFile } from '@/core/utils/project-file';
 import type { ProjectFileLike } from '@/core/utils/project-file';
 import type { Script } from '@/services/aiService';
-import type { VideoSegment } from '@/services/video';
+import type { ScriptSegment } from '@/core/types';
 import styles from './index.module.less';
 
 const { Title, Text } = Typography;
@@ -29,23 +29,6 @@ interface ProjectWithScripts extends ProjectFileLike<Script, { path?: string }> 
   videoUrl?: string;
 }
 
-const toVideoSegments = (script: Script | null): VideoSegment[] =>
-  script?.content.map((segment) => ({
-    start: segment.startTime,
-    end: segment.endTime,
-    type: segment.type,
-    content: segment.content
-  })) ?? [];
-
-const toScriptSegments = (segments: VideoSegment[]): Script['content'] =>
-  segments.map((segment: any, index: number) => ({
-    id: `segment_${index}_${Date.now()}`,
-    startTime: segment.start ?? segment.startTime,
-    endTime: segment.end ?? segment.endTime,
-    content: segment.content ?? '',
-    type: (segment.type as Script['content'][number]['type']) || 'narration'
-  }));
-
 const ScriptDetail: React.FC = () => {
   const { projectId, scriptId } = useParams<{ projectId: string; scriptId: string }>();
   const navigate = useNavigate();
@@ -53,7 +36,7 @@ const ScriptDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<ProjectWithScripts | null>(null);
   const [script, setScript] = useState<Script | null>(null);
-  const [segments, setSegments] = useState<VideoSegment[]>([]);
+  const [segments, setSegments] = useState<ScriptSegment[]>([]);
   const [loadError, setLoadError] = useState<string>('');
   const [reloadToken, setReloadToken] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
@@ -116,7 +99,7 @@ const ScriptDetail: React.FC = () => {
         if (isStale()) return;
         setProject(normalizedProject);
         setScript(currentScript);
-        setSegments(toVideoSegments(currentScript));
+        setSegments(currentScript?.content ?? []);
         addRecentProject(normalizedProject.id);
       } catch (error) {
         if (isStale()) return;
@@ -139,7 +122,7 @@ const ScriptDetail: React.FC = () => {
     }
   }, [loading, project, script]);
 
-  const handleSegmentsChange = (newSegments: VideoSegment[]) => {
+  const handleSegmentsChange = (newSegments: ScriptSegment[]) => {
     setSegments(newSegments);
   };
 
@@ -152,13 +135,13 @@ const ScriptDetail: React.FC = () => {
       // 更新脚本
       const updatedScript = {
         ...script,
-        content: toScriptSegments(segments),
-        fullText: segments.map((segment: any) => (segment.content ?? '')).join('\n\n'),
+        content: segments,
+        fullText: segments.map((segment) => (segment.content ?? '')).join('\n\n'),
         updatedAt: new Date().toISOString()
-      };
+      } as Script;
 
       // 更新项目中的脚本
-      const updatedScripts = (project.scripts ?? []).map((s) => 
+      const updatedScripts: Script[] = (project.scripts ?? []).map((s) => 
         s.id === script.id ? updatedScript : s
       );
 
@@ -194,7 +177,7 @@ const ScriptDetail: React.FC = () => {
         {
           projectName: project.name,
           createdAt: script.createdAt,
-          segments: toScriptSegments(segments)
+          segments: segments.map((s) => ({ startTime: s.startTime, endTime: s.endTime, content: s.content ?? '' })),
         },
         `${project.name}_脚本_${new Date().toISOString().slice(0, 10)}.txt`
       );
@@ -323,7 +306,7 @@ const ScriptDetail: React.FC = () => {
         <div className={styles.stats}>
           <Space>
             <Text>片段数量: {segments.length}</Text>
-            <Text>总时长: {segments.reduce((total, seg) => total + (seg.end - seg.start), 0)} 秒</Text>
+            <Text>总时长: {segments.reduce((total, seg) => total + (seg.endTime - seg.startTime), 0)} 秒</Text>
           </Space>
         </div>
       </Card>

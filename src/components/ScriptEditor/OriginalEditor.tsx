@@ -8,6 +8,7 @@ import {
   DownOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
+import type { ScriptSegment } from '@/core/types';
 import { VideoSegment, formatDuration, previewSegment } from '@/services/video';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { notify } from '@/shared';
@@ -19,8 +20,8 @@ import styles from './ScriptEditor.module.less';
 
 interface OriginalEditorProps {
   videoPath: string;
-  initialSegments?: VideoSegment[];
-  onSave: (segments: VideoSegment[]) => void;
+  initialSegments?: ScriptSegment[];
+  onSave: (segments: ScriptSegment[]) => void;
   onExport?: (format: string) => void;
 }
 
@@ -37,7 +38,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
   onSave,
   onExport,
 }) => {
-  const [segments, setSegments] = useState<VideoSegment[]>(initialSegments);
+  const [segments, setSegments] = useState<ScriptSegment[]>(initialSegments);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm] = Form.useForm<SegmentFormValues>();
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -48,14 +49,14 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
   const [totalDuration, setTotalDuration] = useState(0);
 
   useEffect(() => {
-    const duration = segments.reduce((sum, segment) => sum + (segment.end - segment.start), 0);
+    const duration = segments.reduce((sum, segment) => sum + (segment.endTime - segment.startTime), 0);
     setTotalDuration(duration);
   }, [segments]);
 
   // 添加新片段
   const handleAddSegment = useCallback(() => {
     const lastSegment = segments.length > 0 ? segments[segments.length - 1] : null;
-    const startTime = lastSegment ? lastSegment.end : 0;
+    const startTime = lastSegment ? lastSegment.endTime : 0;
     const endTime = startTime + 30;
 
     editForm.setFieldsValue({
@@ -73,10 +74,10 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
     const segment = segments[index];
 
     editForm.setFieldsValue({
-      start: (segment as any).start ?? (segment as any).startTime,
-      end: (segment as any).end ?? (segment as any).endTime,
-      type: (segment as any).type || 'narration',
-      content: (segment as any).content || '',
+      start: segment.startTime,
+      end: segment.endTime,
+      type: segment.type || 'narration',
+      content: segment.content || '',
     });
 
     setEditingIndex(index);
@@ -89,14 +90,13 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
       const end = Number(values.end);
 
       const newSegments = [...segments];
-      const segment: VideoSegment = {
+      const segment: ScriptSegment = {
+        id: `segment_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         startTime: start,
         endTime: end,
-        duration: end - start,
-        sourceIndex: 0,
-      } as any;
-      (segment as any).type = values.type;
-      (segment as any).content = values.content;
+        type: values.type as ScriptSegment['type'],
+        content: values.content,
+      };
 
       if (editingIndex !== null) {
         if (editingIndex < segments.length) {
@@ -136,7 +136,8 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
     try {
       setPreviewLoading(true);
       const segment = segments[index];
-      const previewPath = await previewSegment(videoPath, segment);
+      const videoSegment: VideoSegment = { start: segment.startTime, end: segment.endTime };
+      const previewPath = await previewSegment(videoPath, videoSegment);
       setPreviewSrc(convertFileSrc(previewPath));
       setPreviewVisible(true);
     } catch (error) {

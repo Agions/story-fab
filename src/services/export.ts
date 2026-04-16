@@ -169,7 +169,7 @@ const exportAsPdf = async (script: Script, filename: string): Promise<boolean> =
     // 创建表格数据
     const tableData = segments.map((segment) => [
       `${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}`,
-      segment.content
+      segment.content ?? ''
     ]);
     
     // 添加表格
@@ -281,7 +281,7 @@ const formatAsHtml = (script: Script): string => {
     content += `
     <div class="segment">
       <div class="time">[${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}]</div>
-      <div class="content">${escapeHtml(segment.content)}</div>
+      <div class="content">${escapeHtml(segment.content ?? '')}</div>
     </div>
 `;
   });

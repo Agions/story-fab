@@ -23,9 +23,8 @@ import { resolveLegacyModel } from '@/services/aiModelAdapter';
 import { normalizeProjectFile } from '@/core/utils/project-file';
 import type { ProjectFileLike } from '@/core/utils/project-file';
 import type { Script } from '@/services/aiService';
-import type { VideoSegment } from '@/services/video';
+import type { ScriptSegment } from '@/core/types';
 import type { VideoAnalysis } from '@/types';
-import type { ScriptEditorOriginalProps } from '@/components/ScriptEditor/types';
 import styles from './index.module.less';
 
 const { Title, Text } = Typography;
@@ -55,23 +54,6 @@ interface ProjectData extends ProjectFileLike<Script, { path?: string }> {
   analysis?: VideoAnalysis;
   extractedSubtitles?: unknown;
 }
-
-const toVideoSegments = (script: Script | null): VideoSegment[] =>
-  script?.content.map((segment) => ({
-    start: segment.startTime,
-    end: segment.endTime,
-    type: (segment as any).type,
-    content: (segment as any).content
-  })) ?? [];
-
-const toScriptSegments = (segments: VideoSegment[]) =>
-  segments.map((segment) => ({
-    id: uuidv4(),
-    startTime: segment.start,
-    endTime: segment.end,
-    content: (segment as any).content ?? '',
-    type: ((segment as any).type as Script['content'][number]['type']) || 'narration'
-  }));
 
 const StepFallback: React.FC = () => (
   <div className={styles.spinner}>
@@ -342,13 +324,12 @@ const ProjectDetail: React.FC = () => {
     void persistUpdatedProject(updated);
   }, [project]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const handleScriptSave = useCallback((updatedSegments: Parameters<ScriptEditorOriginalProps['onSave']>[0]) => {
+  const handleScriptSave = useCallback((updatedSegments: ScriptSegment[]) => {
     if (!project || !activeScript) return;
     const updatedScript: Script = {
       ...activeScript,
-      content: toScriptSegments(updatedSegments),
-      fullText: updatedSegments.map((segment) => (segment as any).content ?? '').join('\n\n'),
+      content: updatedSegments as Script['content'],
+      fullText: updatedSegments.map((segment) => segment.content ?? '').join('\n\n'),
       updatedAt: new Date().toISOString()
     };
     const updatedProject = {
@@ -405,7 +386,7 @@ const ProjectDetail: React.FC = () => {
               <Suspense fallback={<StepFallback />}>
                 <ScriptEditor
                   videoPath={project.videoUrl ?? ''}
-                  initialSegments={toVideoSegments(activeScript)}
+                  initialSegments={activeScript.content}
                   onSave={handleScriptSave}
                 />
               </Suspense>
@@ -426,12 +407,13 @@ const ProjectDetail: React.FC = () => {
           </div>
         );
       case 'edit':
+        if (!activeScript) return null;
         return (
           <div>
             <Suspense fallback={<StepFallback />}>
               <VideoProcessingController
                 videoPath={project.videoUrl ?? ''}
-                segments={toVideoSegments(activeScript)}
+                segments={activeScript.content.map(s => ({ start: s.startTime, end: s.endTime, type: s.type, content: s.content }))}
               />
             </Suspense>
           </div>

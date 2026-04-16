@@ -18,7 +18,9 @@ import {
 import { ArrowLeftOutlined, SaveOutlined, VideoCameraOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import VideoSelector from '@/components/VideoSelector';
 import ScriptEditor from '@/components/ScriptEditor';
-import { VideoMetadata, VideoSegment, analyzeVideo, extractKeyFrames } from '@/services/video';
+import { VideoMetadata, analyzeVideo, extractKeyFrames } from '@/services/video';
+import type { VideoSegment } from '@/services/video';
+import type { ScriptSegment } from '@/core/types';
 import { generateScriptWithAI, analyzeKeyFramesWithAI } from '@/services/aiService';
 import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { normalizeProjectFile } from '@/core/utils/project-file';
@@ -45,7 +47,7 @@ interface ProjectData extends ProjectFileLike<unknown, { path?: string }> {
   updatedAt: string;
   metadata?: VideoMetadata;
   keyFrames?: string[];
-  script?: VideoSegment[];
+  script?: ScriptSegment[];
 }
 
 interface ProjectEditHeaderProps {
@@ -174,7 +176,7 @@ const ProjectEdit: React.FC = () => {
   const [videoPath, setVideoPath] = useState<string>('');
   const [videoMetadata, setVideoMetadata] = useState<VideoMetadata | null>(null);
   const [keyFrames, setKeyFrames] = useState<string[]>([]);
-  const [scriptSegments, setScriptSegments] = useState<VideoSegment[]>([]);
+  const [scriptSegments, setScriptSegments] = useState<ScriptSegment[]>([]);
   const [isNewProject, setIsNewProject] = useState(true);
   const [initialLoading, setInitialLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -247,11 +249,11 @@ const ProjectEdit: React.FC = () => {
     return 0;
   };
 
-  const parseScriptText = (text: string): VideoSegment[] => {
+  const parseScriptText = (text: string): ScriptSegment[] => {
     try {
       const lines = text.split('\n').filter((line) => line.trim().length > 0);
-      const resultSegments: VideoSegment[] = [];
-      let currentSegment: VideoSegment | null = null;
+      const resultSegments: ScriptSegment[] = [];
+      let currentSegment: ScriptSegment | null = null;
 
       for (const line of lines) {
         const timeMatch = line.match(/\[(\d{1,2}:\d{2}(?::\d{2})?) - (\d{1,2}:\d{2}(?::\d{2})?)\]/);
@@ -259,16 +261,17 @@ const ProjectEdit: React.FC = () => {
         if (timeMatch) {
           const startTime = parseTimeString(timeMatch[1]);
           const endTime = parseTimeString(timeMatch[2]);
-          const content = line.substring(timeMatch[0].length).trim();
 
           currentSegment = {
-            start: startTime,
-            end: endTime,
+            id: `segment_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+            startTime,
+            endTime,
+            type: 'narration',
           };
           resultSegments.push(currentSegment);
         } else if (currentSegment) {
           // Append to previous segment's duration (text-based parsing)
-          currentSegment.duration = (currentSegment.duration ?? 0) + 1;
+          // No-op for ScriptSegment since we track endTime directly
         }
       }
 
@@ -557,8 +560,9 @@ const ProjectEdit: React.FC = () => {
       let script = parseScriptText(scriptText);
       if (script.length === 0) {
         script = [{
-          start: 0,
-          end: Math.max(10, Math.round(metadata?.duration || 10)),
+          id: `segment_${Date.now()}`,
+          startTime: 0,
+          endTime: Math.max(10, Math.round(metadata?.duration || 10)),
         }];
       }
 

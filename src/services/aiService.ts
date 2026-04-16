@@ -6,6 +6,7 @@ import axios from 'axios';
 import { getApiKey } from './tauri';
 import { VideoMetadata } from './video';
 import { logger } from '@/utils/logger';
+import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
 
 // ============================================
 // 类型定义
@@ -19,18 +20,15 @@ export interface ScriptGenerationSettings {
   aiModel?: AIModelConfig;
 }
 
-export interface ScriptSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
-  content: string;
-  type: 'narration' | 'dialogue' | 'description';
-}
-
+/**
+ * @deprecated Use ScriptSegment from '@/core/types' instead.
+ * This re-export exists for backward compatibility.
+ */
+export type ScriptSegment = CoreScriptSegment;
 export interface Script {
   id: string;
   projectId: string;
-  content: ScriptSegment[];
+  content: CoreScriptSegment[];
   fullText: string;
   createdAt: string;
   updatedAt: string;
