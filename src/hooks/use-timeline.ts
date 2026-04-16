@@ -15,21 +15,19 @@ import type { TimelineTrack, TimelineClip, Keyframe, DragType } from '@/componen
  * 时间线 Hook (单轨)
  */
 export function useTimeline() {
-  const {
-    segments,
-    selection,
-    zoom,
-    scrollPosition,
-    addSegment,
-    updateSegment,
-    deleteSegment,
-    reorderSegments,
-    clearSegments,
-    setSelection,
-    clearSelection,
-    setZoom,
-    setScrollPosition,
-  } = useEditorStore();
+  const segments = useEditorStore(state => state.segments);
+  const selection = useEditorStore(state => state.selection);
+  const zoom = useEditorStore(state => state.zoom);
+  const scrollPosition = useEditorStore(state => state.scrollPosition);
+  const addSegment = useEditorStore(state => state.addSegment);
+  const updateSegment = useEditorStore(state => state.updateSegment);
+  const deleteSegment = useEditorStore(state => state.deleteSegment);
+  const reorderSegments = useEditorStore(state => state.reorderSegments);
+  const clearSegments = useEditorStore(state => state.clearSegments);
+  const setSelection = useEditorStore(state => state.setSelection);
+  const clearSelection = useEditorStore(state => state.clearSelection);
+  const setZoom = useEditorStore(state => state.setZoom);
+  const setScrollPosition = useEditorStore(state => state.setScrollPosition);
 
   return {
     segments,
@@ -52,16 +50,14 @@ export function useTimeline() {
  * 播放控制 Hook
  */
 export function usePlayback() {
-  const {
-    previewPlaying,
-    currentTime,
-    volume,
-    muted,
-    setPreviewPlaying,
-    setCurrentTime,
-    setVolume,
-    setMuted,
-  } = useEditorStore();
+  const previewPlaying = useEditorStore(state => state.previewPlaying);
+  const currentTime = useEditorStore(state => state.currentTime);
+  const volume = useEditorStore(state => state.volume);
+  const muted = useEditorStore(state => state.muted);
+  const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
+  const setCurrentTime = useEditorStore(state => state.setCurrentTime);
+  const setVolume = useEditorStore(state => state.setVolume);
+  const setMuted = useEditorStore(state => state.setMuted);
 
   const play = useCallback(() => setPreviewPlaying(true), [setPreviewPlaying]);
   const pause = useCallback(() => setPreviewPlaying(false), [setPreviewPlaying]);
@@ -88,15 +84,22 @@ export function usePlayback() {
  * 撤销/重做 Hook
  */
 export function useHistory() {
-  const { undo, redo, canUndo, canRedo } = useEditorStore();
-  return { undo, redo, canUndo: canUndo(), canRedo: canRedo() };
+  const undo = useEditorStore(state => state.undo);
+  const redo = useEditorStore(state => state.redo);
+  const canUndoFn = useEditorStore(state => state.canUndo);
+  const canRedoFn = useEditorStore(state => state.canRedo);
+  const canUndo = useCallback(() => canUndoFn(), [canUndoFn]);
+  const canRedo = useCallback(() => canRedoFn(), [canRedoFn]);
+  return { undo, redo, canUndo, canRedo };
 }
 
 /**
  * 选中片段操作 Hook
  */
 export function useSelection() {
-  const { selection, setSelection, clearSelection } = useEditorStore();
+  const selection = useEditorStore(state => state.selection);
+  const setSelection = useEditorStore(state => state.setSelection);
+  const clearSelection = useEditorStore(state => state.clearSelection);
 
   const selectSegment = useCallback((segmentId: string) => {
     setSelection({ segmentId });
@@ -126,7 +129,8 @@ export function useSelection() {
  * 缩放控制 Hook
  */
 export function useZoom() {
-  const { zoom, setZoom } = useEditorStore();
+  const zoom = useEditorStore(state => state.zoom);
+  const setZoom = useEditorStore(state => state.setZoom);
 
   const zoomIn = useCallback(() => setZoom(Math.min(10, zoom * 1.2)), [zoom, setZoom]);
   const zoomOut = useCallback(() => setZoom(Math.max(0.1, zoom / 1.2)), [zoom, setZoom]);
@@ -149,17 +153,17 @@ function generateId(prefix = 'id'): string {
  * 提供多轨道时间线的完整状态管理
  */
 export function useMultiTrackTimeline() {
-  const {
-    zoom,
-    scrollPosition,
-    setZoom,
-    setScrollPosition,
-    saveHistory,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-  } = useEditorStore();
+  const zoom = useEditorStore(state => state.zoom);
+  const scrollPosition = useEditorStore(state => state.scrollPosition);
+  const setZoom = useEditorStore(state => state.setZoom);
+  const setScrollPosition = useEditorStore(state => state.setScrollPosition);
+  const saveHistory = useEditorStore(state => state.saveHistory);
+  const undo = useEditorStore(state => state.undo);
+  const redo = useEditorStore(state => state.redo);
+  const canUndoFn = useEditorStore(state => state.canUndo);
+  const canRedoFn = useEditorStore(state => state.canRedo);
+  const canUndo = useCallback(() => canUndoFn(), [canUndoFn]);
+  const canRedo = useCallback(() => canRedoFn(), [canRedoFn]);
 
   // 多轨状态
   const [tracks, setTracks] = useState<TimelineTrack[]>([
