@@ -32,7 +32,7 @@ jobs:
           version: '9'
 
       - name: Install dependencies
-        run: pnpm install --include=dev
+        run: pnpm install --ignore-scripts
 
       - name: Build VitePress
         run: pnpm run docs:build
