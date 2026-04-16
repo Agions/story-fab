@@ -80,7 +80,7 @@ interface VideoProcessingControllerProps {
 
 interface BatchItem {
   id: string;
-  segments: VideoSegment[];
+  segments: Array<{ start: number; end: number; type?: string; content?: string }>;
   name: string;
   completed: boolean;
 }
@@ -101,10 +101,9 @@ type SaveFilePicker = (options?: {
 }) => Promise<{ name: string }>;
 
 // 计算片段总时长
-const calculateTotalDuration = (segments: VideoSegment[]): number => {
+const calculateTotalDuration = (segments: Array<{ start: number; end: number }>): number => {
   return segments.reduce((total, segment) => {
-    const s = segment as any;
-    return total + ((s.end ?? s.endTime ?? 0) - (s.start ?? s.startTime ?? 0));
+    return total + (segment.end - segment.start);
   }, 0);
 };
 
@@ -159,7 +158,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     
     const newBatchItem: BatchItem = {
       id: Date.now().toString(),
-      segments: [...(segments as any)],
+      segments: [...segments],
       name: `批处理 ${batchItems.length + 1}`,
       completed: false
     };
@@ -260,7 +259,14 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       
       try {
         // 调用处理单个项目的函数
-        const outputPath = await processVideo(item.segments, item.name);
+        const segmentsToProcess: VideoSegment[] = item.segments.map((s, i) => ({
+          id: `batch-${item.id}-${i}`,
+          sourceIndex: i,
+          startTime: s.start,
+          endTime: s.end,
+          duration: s.end - s.start,
+        }));
+        const outputPath = await processVideo(segmentsToProcess, item.name);
         newOutputPaths.push(outputPath);
         
         // 更新批处理项状态
@@ -291,7 +297,14 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     }
     
     try {
-      await processVideo(segments as any);
+      const segmentsToProcess: VideoSegment[] = segments.map((s, i) => ({
+        id: `seg-${i}`,
+        sourceIndex: i,
+        startTime: s.start,
+        endTime: s.end,
+        duration: s.end - s.start,
+      }));
+      await processVideo(segmentsToProcess);
       notify.success('视频处理完成');
     } catch {
       // 错误已在processVideo内部处理
