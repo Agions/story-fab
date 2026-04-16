@@ -19,7 +19,7 @@ import {
   SyncOutlined, AimOutlined,
 } from '@ant-design/icons';
 import { notify } from '@/shared';
-import { subtitleService } from '@/core/services';
+import { subtitleService } from '@/core/services/subtitle.service';
 import { useEditorStore } from '@/store/editorStore';
 import type { SubtitleEntry } from '@/core/types';
 import styles from './SubtitleExtractor.module.css';
@@ -84,7 +84,10 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
   videoUrl,
   onExtracted,
 }) => {
-  const editorStore = useEditorStore();
+  const playheadMs = useEditorStore(state => state.playheadMs);
+  const previewPlaying = useEditorStore(state => state.previewPlaying);
+  const setPlayheadMs = useEditorStore(state => state.setPlayheadMs);
+  const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // ── State ──────────────────────────────────────────────
@@ -102,7 +105,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
   const totalDuration = videoDuration > 0 ? videoDuration : 1;
 
   // 当前播放头位置（秒）
-  const playheadSec = editorStore.playheadMs / 1000;
+  const playheadSec = playheadMs / 1000;
 
   // 当前播放的字幕（播放头在其时间范围内）
   const currentSub = extractedSubtitles.find(
@@ -113,12 +116,12 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
   const handleVideoTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    editorStore.setPlayheadMs(video.currentTime * 1000);
-  }, [editorStore]);
+    setPlayheadMs(video.currentTime * 1000);
+  }, []);
 
   const handleVideoEnded = useCallback(() => {
-    editorStore.setPreviewPlaying(false);
-  }, [editorStore]);
+    setPreviewPlaying(false);
+  }, []);
 
   const handleVideoMetadata = useCallback(() => {
     const video = videoRef.current;
@@ -129,26 +132,26 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (editorStore.previewPlaying) {
+    if (previewPlaying) {
       video.pause();
-      editorStore.setPreviewPlaying(false);
+      setPreviewPlaying(false);
     } else {
       video.play().catch(() => {});
-      editorStore.setPreviewPlaying(true);
+      setPreviewPlaying(true);
     }
-  }, [editorStore.previewPlaying, editorStore]);
+  }, [previewPlaying]);
 
   // ── Seek ───────────────────────────────────────────────
   const seekTo = useCallback((timeSec: number) => {
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = timeSec;
-    editorStore.setPlayheadMs(timeSec * 1000);
-    if (!editorStore.previewPlaying) {
-      editorStore.setPreviewPlaying(true);
+    setPlayheadMs(timeSec * 1000);
+    if (!previewPlaying) {
+      setPreviewPlaying(true);
       video.play().catch(() => {});
     }
-  }, [editorStore]);
+  }, [previewPlaying]);
 
   // ── Extract ────────────────────────────────────────────
   const handleExtract = useCallback(async () => {
@@ -275,9 +278,9 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
               <button
                 className={styles.playBtn}
                 onClick={togglePlay}
-                aria-label={editorStore.previewPlaying ? '暂停' : '播放'}
+                aria-label={previewPlaying ? '暂停' : '播放'}
               >
-                {editorStore.previewPlaying
+                {previewPlaying
                   ? <PauseCircleOutlined />
                   : <PlayCircleOutlined />
                 }

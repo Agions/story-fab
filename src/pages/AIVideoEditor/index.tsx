@@ -69,27 +69,38 @@ const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
   const [shortcutsHelpVisible, setShortcutsHelpVisible] = useState(false);
   const { state, goToNextStep, setFeature } = useCutDeck();
-  const editorStore = useEditorStore();
+  const playheadMs = useEditorStore(state => state.playheadMs);
+  const previewPlaying = useEditorStore(state => state.previewPlaying);
+  const selectedClipId = useEditorStore(state => state.selectedClipId);
+  const setPlayheadMs = useEditorStore(state => state.setPlayheadMs);
+  const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
+  const setInPoint = useEditorStore(state => state.setInPoint);
+  const setOutPoint = useEditorStore(state => state.setOutPoint);
+  const selectAllClips = useEditorStore(state => state.selectAllClips);
+  const undo = useEditorStore(state => state.undo);
+  const undoTrack = useEditorStore(state => state.undoTrack);
+  const redo = useEditorStore(state => state.redo);
+  const redoTrack = useEditorStore(state => state.redoTrack);
+  const removeClipFromTrack = useEditorStore(state => state.removeClipFromTrack);
 
   // ── 快捷键注册 ────────────────────────────────────────
   useKeyboardShortcuts({
     enabled: true,
     preventDefault: true,
     onPlayPause: () => {
-      editorStore.setPreviewPlaying(!editorStore.previewPlaying);
+      setPreviewPlaying(!previewPlaying);
     },
     onPause: () => {
-      editorStore.setPreviewPlaying(false);
+      setPreviewPlaying(false);
     },
     onSeek: (delta) => {
-      const newTime = Math.max(0, (editorStore.playheadMs / 1000) + delta);
-      editorStore.setPlayheadMs(newTime * 1000);
+      const newTime = Math.max(0, (playheadMs / 1000) + delta);
+      setPlayheadMs(newTime * 1000);
     },
     onSeekTo: (time) => {
-      editorStore.setPlayheadMs(time * 1000);
+      setPlayheadMs(time * 1000);
     },
     onDelete: () => {
-      const { selectedClipId, removeClipFromTrack } = editorStore;
       if (selectedClipId) {
         removeClipFromTrack(selectedClipId);
         message.success('片段已删除');
@@ -98,23 +109,23 @@ const AIVideoEditorContent: React.FC = () => {
       }
     },
     onInPoint: () => {
-      editorStore.setInPoint();
-      message.success(`入点: ${(editorStore.playheadMs / 1000).toFixed(1)}s`);
+      setInPoint();
+      message.success(`入点: ${(playheadMs / 1000).toFixed(1)}s`);
     },
     onOutPoint: () => {
-      editorStore.setOutPoint();
-      message.success(`出点: ${(editorStore.playheadMs / 1000).toFixed(1)}s`);
+      setOutPoint();
+      message.success(`出点: ${(playheadMs / 1000).toFixed(1)}s`);
     },
     onSelectAll: () => {
-      editorStore.selectAllClips();
+      selectAllClips();
     },
     onUndo: () => {
-      editorStore.undo();
-      editorStore.undoTrack();
+      undo();
+      undoTrack();
     },
     onRedo: () => {
-      editorStore.redo();
-      editorStore.redoTrack();
+      redo();
+      redoTrack();
     },
     onExport: () => {
       goToNextStep();
