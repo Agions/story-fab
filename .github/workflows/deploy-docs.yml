@@ -27,11 +27,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          rm -rf node_modules
-          npm install --include=dev
-        env:
-          NODE_ENV: development
+        run: npm ci --ignore-scripts
 
       - name: Build VitePress
         run: npm run docs:build
