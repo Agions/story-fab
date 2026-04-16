@@ -39,8 +39,7 @@ const formatTime = (seconds: number): string => {
 };
 
 const getSegmentKey = (segment: VideoSegment, index: number): string => {
-  const s = segment as any;
-  return `${index}-${s.start ?? s.startTime ?? 0}-${s.end ?? s.endTime ?? 0}-${s.type || ''}-${s.content || ''}`;
+  return `${index}-${segment.start}-${segment.end}`;
 };
 
 const SegmentItem: React.FC<SegmentItemProps> = memo(({
@@ -79,16 +78,16 @@ const SegmentItem: React.FC<SegmentItemProps> = memo(({
 
       <div className={styles.segmentTime}>
         <Tag color="blue">
-          {formatTime((segment as any).start ?? (segment as any).startTime ?? 0)} - {formatTime((segment as any).end ?? (segment as any).endTime ?? 0)}
+          {formatTime(segment.start)} - {formatTime(segment.end)}
         </Tag>
         <Text type="secondary">
-          时长: {formatTime(((segment as any).end ?? (segment as any).endTime ?? 0) - ((segment as any).start ?? (segment as any).startTime ?? 0))}
+          时长: {formatTime(segment.end - segment.start)}
         </Text>
       </div>
 
-      {(segment as any).content && (
+      {'content' in segment && (segment.content as string) && (
         <div className={styles.segmentContent}>
-          <Text ellipsis>{(segment as any).content}</Text>
+          <Text ellipsis>{segment.content as string}</Text>
         </div>
       )}
     </Card>

@@ -78,7 +78,7 @@ const ScriptDetail: React.FC = () => {
           currentProject = await loadProjectWithRetry(projectId, { retries: 2, retryDelayMs: 260 }) as ProjectWithScripts | undefined;
         } else {
           const allProjects = await listProjects();
-          currentProject = findProjectByScriptId(allProjects as any, scriptId) as ProjectWithScripts | undefined;
+          currentProject = findProjectByScriptId(allProjects as unknown as ProjectFileLike[], scriptId) as ProjectWithScripts | undefined;
         }
 
         if (!currentProject) {
