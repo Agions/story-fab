@@ -53,7 +53,7 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
   const [error, setError] = useState<string | null>(null);
   const [threshold, setThreshold] = useState(1.5);
   const [topN, setTopN] = useState(10);
-  const editorStore = useEditorStore();
+  const setPlayheadMs = useEditorStore((s) => s.setPlayheadMs);
 
   const detect = useCallback(async () => {
     if (!videoInfo?.path) {
@@ -82,8 +82,8 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
   }, [videoInfo, threshold, topN]);
 
   const handleSeek = useCallback((h: Highlight) => {
-    editorStore.setPlayheadMs(h.startTime * 1000);
-  }, [editorStore]);
+    setPlayheadMs(h.startTime * 1000);
+  }, [setPlayheadMs]);
 
   return (
     <div className={styles.container}>
