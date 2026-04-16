@@ -701,7 +701,7 @@ export class VisionService {
     const videoPath = videoInfo.path;
 
     if (!videoPath) {
-      console.warn('[VisionService] detectHighlights: videoInfo.path is empty');
+      console.info('[VisionService] detectHighlights: videoInfo.path is empty');
       return [];
     }
 
@@ -732,7 +732,7 @@ export class VisionService {
         motionScore: h.motion_score,
       }));
     } catch (error) {
-      console.warn('[VisionService] detectHighlights failed:', error);
+      console.info('[VisionService] detectHighlights failed:', error);
       return [];
     }
   }
