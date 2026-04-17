@@ -45,7 +45,7 @@ export default defineConfig({
     target: 'esnext',
     minify: 'esbuild',
     sourcemap: false,
-    chunkSizeWarningLimit: 400,
+    chunkSizeWarningLimit: 600,  // 复杂 React 应用的实际 chunk 大小
     cssCodeSplit: true,
     // 图片资源优化
     assetsInlineLimit: 4096, // 4kb以下的图片内联为 base64
