@@ -291,23 +291,6 @@ const ProjectDetail: React.FC = () => {
     }
   }, [aiModelsSettings, project, selectedAIModel]);
 
-  if (loading) return <div className={styles.spinner}><Spin size="large" /></div>;
-  if (loadError) {
-    return (
-      <Result
-        status="error"
-        title="加载项目失败"
-        subTitle={loadError}
-        extra={[
-          <Button key="retry" type="primary" onClick={() => setReloadToken((v) => v + 1)}>重试</Button>,
-          <Button key="back" onClick={() => navigate('/projects')}>返回项目列表</Button>,
-        ]}
-      />
-    );
-  }
-
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const handleAnalysisComplete = useCallback((analysis: VideoAnalysis) => {
     if (!project) return;
     const updated = { ...project, analysis };
@@ -316,7 +299,6 @@ const ProjectDetail: React.FC = () => {
     notify.success('画面识别已完成并保存');
   }, [project]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const handleSubtitleExtracted = useCallback((subtitles: unknown) => {
     if (!project) return;
     const updated = { ...project, extractedSubtitles: subtitles };
@@ -343,6 +325,21 @@ const ProjectDetail: React.FC = () => {
     setProject(updatedProject);
     schedulePersistUpdatedProject(updatedProject);
   }, [activeScript, project, schedulePersistUpdatedProject]);
+
+  if (loading) return <div className={styles.spinner}><Spin size="large" /></div>;
+  if (loadError) {
+    return (
+      <Result
+        status="error"
+        title="加载项目失败"
+        subTitle={loadError}
+        extra={[
+          <Button key="retry" type="primary" onClick={() => setReloadToken((v) => v + 1)}>重试</Button>,
+          <Button key="back" onClick={() => navigate('/projects')}>返回项目列表</Button>,
+        ]}
+      />
+    );
+  }
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const contentNode = useMemo((): React.ReactNode => {
