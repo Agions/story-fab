@@ -69,16 +69,18 @@ export default defineConfig({
           if (/node_modules\/@tauri-apps\//.test(id)) return 'vendor-tauri'
 
           // UI library
+          // UI library — antd icons share modules with rc-* packages, keep them together
           if (/node_modules\/antd\//.test(id)) return 'vendor-antd'
-          if (/node_modules\/@ant-design\//.test(id)) return 'vendor-antd-icons'
-          if (/node_modules\/rc-[a-z-]+\//.test(id)) return 'vendor-rc'
+          if (/node_modules\/@ant-design\//.test(id) || /node_modules\/rc-[a-z-]+\//.test(id)) return 'vendor-antd-icons'
 
           // Utilities
           if (/node_modules\/dayjs\//.test(id)) return 'vendor-dayjs'
           if (/node_modules\/axios\//.test(id)) return 'vendor-axios'
           if (/node_modules\/i18next\//.test(id) || /node_modules\/react-i18next\//.test(id)) return 'vendor-i18n'
 
-          return 'vendor'
+          // No catch-all — every node_modules module must have an explicit chunk above.
+          // If you hit this, add a new explicit rule before the fallback.
+          return null
         },
       },
     },
