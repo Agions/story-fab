@@ -176,7 +176,7 @@ export function useModel(): UseModelReturn {
       });
       
       return true;
-    } catch (err) {
+    } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '配置失败');
       return false;
     } finally {
@@ -202,7 +202,7 @@ export function useModel(): UseModelReturn {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       return true;
-    } catch (err) {
+    } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '连接测试失败');
       return false;
     } finally {

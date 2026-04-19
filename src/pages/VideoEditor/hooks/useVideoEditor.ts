@@ -98,7 +98,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
         setAnalyzing(false);
         setLoading(false);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error('选择文件失败:', err);
     } finally {
       loadVideoLockRef.current = false;

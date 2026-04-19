@@ -227,7 +227,7 @@ export class ChainPipeline<TStart, TEnd> {
         logger.debug(`[Pipeline] Running step ${i + 1}/${this.steps.length}: ${step.meta.name}`);
         current = await step.execute(current, context, options);
         context.completedSteps.push(step.meta.name);
-      } catch (err) {
+      } catch (err: unknown) {
         const error = new StepExecutionError(
           err instanceof Error ? err.message : String(err),
           step.meta.name,
@@ -304,7 +304,7 @@ export class ConcurrentPipeline<TInput, TBranchOutput, TFinal> {
         completedSteps: [...context.completedSteps],
         totalDurationMs: Date.now() - startTime,
       };
-    } catch (err) {
+    } catch (err: unknown) {
       return {
         success: false,
         completedSteps: [...context.completedSteps],

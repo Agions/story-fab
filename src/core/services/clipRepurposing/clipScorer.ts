@@ -130,7 +130,7 @@ export class ClipScorer {
     for (const clip of clips) {
       try {
         results.push(this.scoreSingle(clip));
-      } catch (err) {
+      } catch (err: unknown) {
         // 失败时给最低分
         results.push({
           clip,

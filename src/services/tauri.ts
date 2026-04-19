@@ -151,7 +151,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
       if (!projectData) {
         throw new Error('项目数据序列化为空');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error('序列化项目数据失败', { err });
       throw new Error('无法序列化项目数据');
     }

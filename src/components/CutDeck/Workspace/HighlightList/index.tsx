@@ -72,7 +72,7 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
       setHighlights(result);
       setDetected(true);
       message.success(`检测到 ${result.length} 个高光`);
-    } catch (err) {
+    } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);
       message.error(`高光检测失败: ${msg}`);
