@@ -10,6 +10,8 @@ export default defineConfig({
         plugins: [
           // antd component-level tree-shaking via babel
           ['import', { libraryName: 'antd', customName: (name: string) => `antd/es/${name}` }],
+          // @ant-design/icons tree-shaking via babel
+          ['import', { libraryName: '@ant-design/icons', customName: (name: string) => `@ant-design/icons/es/icons/${name}` }, 'ant-design-icons-shim'],
         ],
       },
     }),
@@ -86,8 +88,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'axios', 'dayjs', 'zustand', 'antd'],
-    exclude: ['@ant-design/icons'],
+    include: ['react', 'react-dom', 'react-router-dom', 'axios', 'dayjs', 'zustand', 'antd', '@ant-design/icons'],
   },
   esbuild: {
     legalComments: 'none',
