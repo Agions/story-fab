@@ -1,6 +1,9 @@
 /* CutDeck Global Styles — 深炭底 + 琥珀光 + 电青色 (2026)
  * Design System v2 — Single Source of Truth
  *
+ * Convergence: All amber values now unified to #d4a574 (OKLCH 65% 0.18 70)
+ * Previously used #FF9F43 in this file — now replaced.
+ *
  * Token naming convention:
  *   --bg-dark-*   深色背景层级
  *   --text-*      文字层级
@@ -19,11 +22,11 @@
   --bg-dark-2: #1C1D2E;
   --bg-panel: rgba(20, 21, 32, 0.65);
 
-  /* 品牌色 — 琥珀光（主色）*/
-  --brand-amber: #FF9F43;
-  --brand-amber-light: #FFBE76;
-  --brand-amber-dark: #E8891C;
-  --brand-amber-glow: rgba(255, 159, 67, 0.35);
+  /* 品牌色 — 琥珀光（主色）✅ unified to #d4a574 */
+  --brand-amber: #d4a574;
+  --brand-amber-light: #e8c9a8;
+  --brand-amber-dark: #c49660;
+  --brand-amber-glow: rgba(212, 165, 116, 0.35);
 
   /* 品牌色 — 电青色（辅助）*/
   --brand-cyan: #00D4FF;
@@ -125,7 +128,7 @@ body {
 .ant-btn-primary:hover {
   filter: brightness(1.1);
   transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(255, 159, 67, 0.45) !important;
+  box-shadow: 0 6px 20px var(--brand-amber-glow) !important;
 }
 
 .ant-btn-primary:active {
@@ -165,7 +168,7 @@ body {
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused {
   border-color: var(--brand-amber) !important;
-  box-shadow: 0 0 0 3px rgba(255, 159, 67, 0.2) !important;
+  box-shadow: 0 0 0 3px var(--brand-amber-glow) !important;
 }
 
 .ant-input,
@@ -198,7 +201,7 @@ body {
    选中文本 — 品牌 Amber
    ============================================================================ */
 ::selection {
-  background-color: rgba(255, 159, 67, 0.3);
+  background-color: rgba(212, 165, 116, 0.3);
   color: var(--bg-dark-0);
 }
 
