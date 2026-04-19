@@ -20,13 +20,11 @@ jobs:
         with:
           node-version: '22'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: '9'
       - name: Install dependencies
-        run: |
-          rm -f pnpm-lock.yaml
-          pnpm install
+        run: pnpm install
       - name: TypeScript check
         run: pnpm run type-check
 
@@ -40,13 +38,11 @@ jobs:
         with:
           node-version: '22'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: '9'
       - name: Install dependencies
-        run: |
-          rm -f pnpm-lock.yaml
-          pnpm install
+        run: pnpm install
       - name: ESLint
         run: pnpm run lint
 
@@ -60,13 +56,11 @@ jobs:
         with:
           node-version: '22'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: '9'
       - name: Install dependencies
-        run: |
-          rm -f pnpm-lock.yaml
-          pnpm install
+        run: pnpm install
       - name: Run tests
         run: pnpm run test:run
 
@@ -80,13 +74,11 @@ jobs:
         with:
           node-version: '22'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: '9'
       - name: Install dependencies
-        run: |
-          rm -f pnpm-lock.yaml
-          pnpm install
+        run: pnpm install
       - name: Build
         run: pnpm run build
       - name: Upload build artifact
