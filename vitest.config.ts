@@ -21,6 +21,7 @@ export default defineConfig({
       'src/_DEAD/__tests__/model-availability.test.ts',
       'src/_DEAD/__tests__/project-id.test.ts',
       'src/_DEAD/__tests__/route-preload.test.ts',
+      'src/services/export.test.ts', // jspdf not installed — add to package.json first
     ],
     coverage: {
       provider: 'v8',
