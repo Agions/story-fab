@@ -5,6 +5,7 @@
 // 功能组件
 export { default as ProcessingProgress } from './ProcessingProgress';
 export { default as PreviewModal } from './PreviewModal';
+export { default as AnimatedContainer } from './AnimatedContainer';
 
 // ErrorBoundary
 export { ErrorBoundary } from './ErrorBoundary';
