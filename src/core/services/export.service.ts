@@ -19,7 +19,7 @@ export type ExportResolution = '480p' | '720p' | '1080p' | '1440p' | '4k' | 'cus
 // 编码器
 export interface EncoderSettings {
   videoCodec: 'h264' | 'h265' | 'vp8' | 'vp9' | 'av1';
-  audioCodec: 'aac' | 'mp3' | 'opus' | 'flac';
+  audioCodec: 'aac' | 'mp3' | 'opus';
   bitrate?: string;
   crf?: number;
   preset?: 'ultrafast' | 'fast' | 'medium' | 'slow' | 'veryslow';

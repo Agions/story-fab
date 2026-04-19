@@ -85,13 +85,13 @@ const Dashboard: React.FC = () => {
       try {
         const { projectApi } = await import('@/services/api');
         const data = await projectApi.getAll();
-        const mapped: ProjectType[] = (data || []).map((p) => ({
-          id: p.id,
+        const mapped: ProjectType[] = (data || []).map((p: RawProject) => ({
+          id: p.id || `api_${Date.now()}`,
           title: p.name || p.title || '',
           thumbnail: p.thumbnail || '',
           description: p.description || '',
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt,
+          createdAt: p.createdAt ?? new Date().toISOString(),
+          updatedAt: p.updatedAt ?? new Date().toISOString(),
           duration: p.metadata?.duration || 0,
           resolution: p.metadata?.resolution || '1080p',
           starred: p.starred || false,

@@ -16,6 +16,7 @@ import {
   extractProjectMediaMetrics,
   notify,
   pickPreferredSizeMb,
+  RawProjectRecord,
   resolveProjectVideoPath,
 } from '@/shared';
 import { preloadProjectEditPage } from '@/core/utils/route-preload';

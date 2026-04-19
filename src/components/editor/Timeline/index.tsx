@@ -90,9 +90,9 @@ const Timeline: React.FC<TimelineProps> = ({
       id: track.id,
       name: track.name,
       type: track.type as TrackType,
-      clips: (track.clips || []).map((clip): TimelineClip => {
-        const clipStartMs = isTimelineClip(clip) ? clip.startMs : (clip.startTime ?? 0) * 1000;
-        const clipEndMs = isTimelineClip(clip) ? clip.endMs : (clip.endTime ?? 0) * 1000;
+      clips: (track.clips || []).map((clip: Clip | TimelineClip): TimelineClip => {
+        const clipStartMs = isTimelineClip(clip) ? clip.startMs : ((clip as Clip).startTime ?? 0) * 1000;
+        const clipEndMs = isTimelineClip(clip) ? clip.endMs : ((clip as Clip).endTime ?? 0) * 1000;
         const sourceStartVal = isTimelineClip(clip) ? clip.sourceStart : 0;
         const sourceEndVal = isTimelineClip(clip) ? clip.sourceEnd : 0;
         return {

@@ -376,7 +376,7 @@ export const getConfigDir = async (): Promise<string> => {
  */
 export const getApiKey = async (service: string): Promise<string> => {
   try {
-    const store = await load('api_keys.json', { autoSave: false });
+    const store = await load('api_keys.json', { defaults: {}, autoSave: false });
     const value = await store.get<string>(service);
     return value ?? '';
   } catch (error) {
@@ -392,7 +392,7 @@ export const getApiKey = async (service: string): Promise<string> => {
  */
 export const saveApiKey = async (service: string, apiKey: string): Promise<boolean> => {
   try {
-    const store = await load('api_keys.json', { autoSave: true });
+    const store = await load('api_keys.json', { defaults: {}, autoSave: true });
     await store.set(service, apiKey);
     await store.save();
     return true;
