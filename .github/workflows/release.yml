@@ -86,22 +86,21 @@ jobs:
       - name: Build DMG
         if: matrix.format == 'dmg'
         run: |
-          echo "=== Finding .app bundle ==="
-          find src-tauri/target/release/bundle -name "*.app" 2>/dev/null
-          APP_PATH=$(find src-tauri/target/release/bundle -name "*.app" | head -1)
-          echo "APP_PATH: $APP_PATH"
-          if [ -z "$APP_PATH" ]; then echo "ERROR: No .app bundle found"; exit 1; fi
-          
+          echo "=== Tauri bundle output ==="
+          find src-tauri/target/release/bundle -type f 2>/dev/null | head -30
+          echo "=== Looking for .app ==="
+          find src-tauri/target/release/bundle -name "*.app" -o -name "*.dmg" 2>/dev/null
+          APP_DIR=$(find src-tauri/target/release/bundle -type d -name "*.app" 2>/dev/null | head -1)
+          echo "APP_DIR: $APP_DIR"
+          if [ -z "$APP_DIR" ]; then
+            echo "ERROR: No .app found, listing bundle dir:"
+            ls -la src-tauri/target/release/bundle/
+            ls -la src-tauri/target/release/bundle/macos/ 2>/dev/null || true
+            exit 1
+          fi
           mkdir -p src-tauri/target/release/bundle/dmg
           DMG_PATH="src-tauri/target/release/bundle/dmg/CutDeck.dmg"
-          VOL_NAME="CutDeck"
-          
-          echo "=== Creating DMG ==="
-          hdiutil create -volname "$VOL_NAME" -srcfolder "$APP_PATH" -ov -format UDZO -resize 500M "$DMG_PATH" 2>&1 || {
-            echo "hdiutil failed, trying without resize..."
-            hdiutil create -volname "$VOL_NAME" -srcfolder "$APP_PATH" -ov -format UDZO "$DMG_PATH"
-          }
-          echo "=== DMG created: $DMG_PATH ==="
+          hdiutil create -volname "CutDeck" -srcfolder "$APP_DIR" -ov -format UDZO "$DMG_PATH"
           ls -lh "$DMG_PATH"
 
       - name: Upload dmg artifact
