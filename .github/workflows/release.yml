@@ -55,13 +55,33 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Setup Xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
       - name: Build Tauri
-        run: pnpm run tauri build
+        run: |
+          echo "=== macOS build info ==="
+          rustc --version && cargo --version
+          rustup target list --installed
+          echo "========================"
+          CODE_SIGN_IDENTITY="" AD_HOC_SIGNING=1 pnpm run tauri build 2>&1 | tee macos-build.log || true
+          echo "---LOG TAIL---"
+          tail -30 macos-build.log
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload macos build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build-log
+          path: macos-build.log
+          retention-days: 2
 
       - name: Build DMG
         if: matrix.format == 'dmg'
@@ -119,9 +139,24 @@ jobs:
         run: pnpm install --ignore-scripts
 
       - name: Build Tauri
-        run: pnpm run tauri build
+        run: |
+          echo "=== Windows build info ==="
+          rustc --version && cargo --version
+          rustup target list --installed
+          echo "=========================="
+          pnpm run tauri build 2>&1 | tee windows-build.log || true
+          echo "---LOG TAIL---"
+          tail -30 windows-build.log
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload windows build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-log
+          path: windows-build.log
+          retention-days: 2
 
       - name: Upload nsis artifact
         if: matrix.format == 'nsis'
