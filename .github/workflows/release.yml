@@ -146,9 +146,9 @@ jobs:
       matrix:
         include:
           - format: appimage
-            runner: ubuntu-24.04
+            runner: ubuntu-22.04
           - format: deb
-            runner: ubuntu-24.04
+            runner: ubuntu-22.04
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
