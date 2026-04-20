@@ -29,15 +29,7 @@ env:
 jobs:
   # ─── macOS ────────────────────────────────────────────────
   build-macos:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - format: dmg
-            runner: macos-14
-          - format: app
-            runner: macos-14
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-14
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,13 +57,13 @@ jobs:
 
       - name: Build Tauri
         run: |
-          echo "=== macOS build info ==="
+          echo "=== Rust version ==="
           rustc --version && cargo --version
           rustup target list --installed
-          echo "========================"
+          echo "===================="
           CODE_SIGN_IDENTITY="" AD_HOC_SIGNING=1 pnpm run tauri build 2>&1 | tee macos-build.log || true
-          echo "---LOG TAIL---"
-          tail -30 macos-build.log
+          echo "---BUILD LOG TAIL---"
+          tail -20 macos-build.log
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -83,31 +75,30 @@ jobs:
           path: macos-build.log
           retention-days: 2
 
-      - name: Package macOS app
-        if: matrix.format == 'dmg'
+      - name: Package macOS app as zip
         run: |
-          echo "=== Finding .app bundle ==="
-          APP_DIR=$(find src-tauri/target/release/bundle -type d -name "*.app" 2>/dev/null | head -1)
-          echo "APP_DIR: $APP_DIR"
-          if [ -z "$APP_DIR" ]; then echo "ERROR: .app bundle not found"; exit 1; fi
-          APP_NAME=$(basename "$APP_DIR")
-          
-          echo "=== Creating zip with ditto ==="
-          ditto -c -k --sequesterRsrc "$APP_DIR" src-tauri/target/release/bundle/CutDeck-macos.zip
-          echo "=== Verifying ==="
+          APP_BUNDLE="src-tauri/target/release/bundle/macos/CutDeck.app"
+          if [ ! -d "$APP_BUNDLE" ]; then
+            echo "ERROR: .app bundle not found at $APP_BUNDLE"
+            ls -la src-tauri/target/release/bundle/ 2>/dev/null || echo "bundle dir missing"
+            ls -la src-tauri/target/release/bundle/macos/ 2>/dev/null || echo "macos dir missing"
+            exit 1
+          fi
+          echo "Bundling $APP_BUNDLE..."
+          cd src-tauri/target/release/bundle/macos
+          ditto -c -k --sequesterRsrc CutDeck.app ../CutDeck-macos.zip
+          cd ../../../../..
+          echo "=== ZIP created ==="
           ls -lh src-tauri/target/release/bundle/CutDeck-macos.zip
-          unzip -l src-tauri/target/release/bundle/CutDeck-macos.zip | head -10
 
-      - name: Upload dmg artifact
-        if: matrix.format == 'dmg'
+      - name: Upload macOS zip artifact
         uses: actions/upload-artifact@v4
         with:
           name: CutDeck-macos-zip
           path: src-tauri/target/release/bundle/CutDeck-macos.zip
           retention-days: 5
 
-      - name: Upload app artifact
-        if: matrix.format == 'app'
+      - name: Upload macOS app artifact
         uses: actions/upload-artifact@v4
         with:
           name: CutDeck-macos-app
@@ -150,10 +141,10 @@ jobs:
           echo "=== Windows build info ==="
           rustc --version && cargo --version
           rustup target list --installed
-          echo "=========================="
+          echo "========================="
           pnpm run tauri build 2>&1 | tee windows-build.log || true
-          echo "---LOG TAIL---"
-          tail -30 windows-build.log
+          echo "---BUILD LOG TAIL---"
+          tail -20 windows-build.log
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -306,7 +297,7 @@ jobs:
           mkdir -p "$ARTIFACT_DIR"
           cd "$ARTIFACT_DIR"
 
-          # ── Detect OS / Arch ──────────────────────────────
+          # ── Detect OS ────────────────────────────────────
           detect_os() {
             case "$(uname -s)" in
               Linux*)     echo "linux" ;;
@@ -427,6 +418,7 @@ jobs:
             | 平台 | 格式 | 下载 |
             |------|------|------|
             | macOS | ZIP | `CutDeck-macos-zip/CutDeck-macos.zip` |
+            | macOS | APP | `CutDeck-macos-app/CutDeck.app` |
             | Windows | NSIS | `CutDeck-windows-nsis/*.exe` |
             | Windows | MSI | `CutDeck-windows-msi/*.msi` |
             | Linux | AppImage | `CutDeck-linux-appimage/*.AppImage` |
