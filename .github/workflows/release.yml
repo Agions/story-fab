@@ -76,26 +76,33 @@ jobs:
           retention-days: 2
 
       - name: Package macOS app as zip
-        env:
-          GITHUB_WORKSPACE: ${{ github.workspace }}
-        run: |
-          BUNDLE_DIR="${GITHUB_WORKSPACE}/src-tauri/target/release/bundle/macos"
-          APP_BUNDLE="${BUNDLE_DIR}/CutDeck.app"
-          
-          echo "=== Workspace: ${GITHUB_WORKSPACE} ==="
-          echo "=== Bundle dir ==="
-          ls -la "$BUNDLE_DIR" 2>/dev/null || echo "Bundle dir missing"
-          ls -la "$APP_BUNDLE" 2>/dev/null || echo ".app missing"
-          
-          if [ ! -d "$APP_BUNDLE" ]; then
-            echo "ERROR: .app not found"
-            exit 1
-          fi
-          
-          echo "=== Creating zip ==="
-          ditto -c -k "${APP_BUNDLE}" "${GITHUB_WORKSPACE}/src-tauri/target/release/bundle/CutDeck-macos.zip"
-          echo "Done. Size:"
-          ls -lh "${GITHUB_WORKSPACE}/src-tauri/target/release/bundle/CutDeck-macos.zip"
+        run: python3 << 'PYEOF'
+import os, zipfile, pathlib, shutil
+
+workspace = os.getcwd()
+print(f"Workspace: {workspace}")
+
+bundle_dir = pathlib.Path(workspace) / "src-tauri/target/release/bundle/macos"
+app_bundle = bundle_dir / "CutDeck.app"
+zip_path = pathlib.Path(workspace) / "src-tauri/target/release/bundle/CutDeck-macos.zip"
+
+print(f"Bundle dir exists: {bundle_dir.exists()}")
+print(f"Contents: {list(bundle_dir.iterdir()) if bundle_dir.exists() else 'N/A'}")
+
+if not app_bundle.exists():
+    print(f"ERROR: .app not found at {app_bundle}")
+    exit(1)
+
+print(f"Zipping {app_bundle} -> {zip_path}")
+with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+    for root, dirs, files in os.walk(app_bundle):
+        for file in files:
+            filepath = pathlib.Path(root) / file
+            arcname = filepath.relative_to(app_bundle.parent)
+            zf.write(filepath, arcname)
+            
+print(f"Done: {zip_path} ({zip_path.stat().st_size / 1024 / 1024:.1f} MB)")
+PYEOF
 
       - name: Upload macOS zip artifact
         uses: actions/upload-artifact@v4
