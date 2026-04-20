@@ -61,9 +61,14 @@ jobs:
           rustc --version && cargo --version
           rustup target list --installed
           echo "===================="
-          CODE_SIGN_IDENTITY="" AD_HOC_SIGNING=1 pnpm run tauri build 2>&1 | tee macos-build.log || true
+          CODE_SIGN_IDENTITY="" AD_HOC_SIGNING=1 pnpm run tauri build 2>&1 | tee macos-build.log
+          BUILD_STATUS=${PIPESTATUS[0]}
           echo "---BUILD LOG TAIL---"
           tail -20 macos-build.log
+          if [ $BUILD_STATUS -ne 0 ]; then
+            echo "BUILD FAILED with exit code $BUILD_STATUS"
+            exit $BUILD_STATUS
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -75,7 +80,25 @@ jobs:
           path: macos-build.log
           retention-days: 2
 
+      - name: Check if .app was created
+        id: check-app
+        run: |
+          APP_PATH="src-tauri/target/release/bundle/macos/CutDeck.app"
+          if [ -d "$APP_PATH" ]; then
+            echo "app_exists=true" >> $GITHUB_OUTPUT
+            echo "App bundle found at $APP_PATH"
+            ls -la "src-tauri/target/release/bundle/macos/"
+          else
+            echo "app_exists=false" >> $GITHUB_OUTPUT
+            echo "ERROR: App bundle NOT found at $APP_PATH"
+            echo "Available bundles:"
+            ls -la src-tauri/target/release/bundle/ 2>/dev/null || echo "No bundle directory"
+            ls -la src-tauri/target/release/ 2>/dev/null | head -20
+            exit 1
+          fi
+
       - name: Package macOS app as zip
+        if: steps.check-app.outputs.app_exists == 'true'
         run: python3 scripts/zip-macos-app.py
 
       - name: Upload macOS zip artifact
@@ -129,9 +152,14 @@ jobs:
           rustc --version && cargo --version
           rustup target list --installed
           echo "========================="
-          pnpm run tauri build 2>&1 | tee windows-build.log || true
+          pnpm run tauri build 2>&1 | tee windows-build.log
+          BUILD_STATUS=${PIPESTATUS[0]}
           echo "---BUILD LOG TAIL---"
           tail -20 windows-build.log
+          if [ $BUILD_STATUS -ne 0 ]; then
+            echo "BUILD FAILED with exit code $BUILD_STATUS"
+            exit $BUILD_STATUS
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -207,9 +235,14 @@ jobs:
           rustc --version
           cargo --version
           rustup show
-          pnpm run tauri build --debug 2>&1 | tee rust-build.log || true
+          pnpm run tauri build --debug 2>&1 | tee rust-build.log
+          BUILD_STATUS=${PIPESTATUS[0]}
           echo "---BUILD LOG TAIL---"
           tail -50 rust-build.log
+          if [ $BUILD_STATUS -ne 0 ]; then
+            echo "BUILD FAILED with exit code $BUILD_STATUS"
+            exit $BUILD_STATUS
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -258,7 +291,7 @@ jobs:
       - name: Generate Install Script
         run: |
           VERSION=${{ github.event.inputs.version || github.ref_name }}
-          cat > release/install.sh << 'SCRIPT'
+          cat > release/install.sh <<-'SCRIPT'
           #!/usr/bin/env bash
           # CutDeck One-Line Installer
           # Usage:
@@ -334,15 +367,14 @@ jobs:
           }
 
           install_linux_deb() {
-            local deb="${ARTIFACT_DIR}/cutdeck.deb"
-            DEB_FILE=$(find release -name "*.deb" 2>/dev/null | head -1)
-            if [ -z "$DEB_FILE" ]; then
+            local deb_subdir="${ARTIFACT_DIR}/CutDeck-linux-deb"
+            local deb_file=$(find "$deb_subdir" -name "*.deb" 2>/dev/null | head -1)
+            if [ -z "$deb_file" ]; then
               echo "❌ 未找到 deb 包，跳过..."
               return
             fi
-            cp "$DEB_FILE" "$deb"
-            sudo dpkg -i "$deb" || sudo apt-get -f install -y
-            rm -f "$deb"
+            echo "📦 安装 deb: $deb_file"
+            sudo dpkg -i "$deb_file" || sudo apt-get -f install -y
             echo "✅ 安装完成"
           }
 
