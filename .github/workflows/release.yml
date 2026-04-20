@@ -76,33 +76,7 @@ jobs:
           retention-days: 2
 
       - name: Package macOS app as zip
-        run: python3 << 'PYEOF'
-import os, zipfile, pathlib, shutil
-
-workspace = os.getcwd()
-print(f"Workspace: {workspace}")
-
-bundle_dir = pathlib.Path(workspace) / "src-tauri/target/release/bundle/macos"
-app_bundle = bundle_dir / "CutDeck.app"
-zip_path = pathlib.Path(workspace) / "src-tauri/target/release/bundle/CutDeck-macos.zip"
-
-print(f"Bundle dir exists: {bundle_dir.exists()}")
-print(f"Contents: {list(bundle_dir.iterdir()) if bundle_dir.exists() else 'N/A'}")
-
-if not app_bundle.exists():
-    print(f"ERROR: .app not found at {app_bundle}")
-    exit(1)
-
-print(f"Zipping {app_bundle} -> {zip_path}")
-with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-    for root, dirs, files in os.walk(app_bundle):
-        for file in files:
-            filepath = pathlib.Path(root) / file
-            arcname = filepath.relative_to(app_bundle.parent)
-            zf.write(filepath, arcname)
-            
-print(f"Done: {zip_path} ({zip_path.stat().st_size / 1024 / 1024:.1f} MB)")
-PYEOF
+        run: python3 scripts/zip-macos-app.py
 
       - name: Upload macOS zip artifact
         uses: actions/upload-artifact@v4
