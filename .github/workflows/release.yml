@@ -146,9 +146,9 @@ jobs:
       matrix:
         include:
           - format: appimage
-            runner: ubuntu-22.04
+            runner: ubuntu-24.04
           - format: deb
-            runner: ubuntu-22.04
+            runner: ubuntu-24.04
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
@@ -182,10 +182,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
-      - name: Build Tauri
-        run: pnpm run tauri build
+      - name: Rust version + Tauri info
+        run: |
+          rustc --version
+          cargo --version
+          rustup show
+          pnpm run tauri build --debug 2>&1 | tee rust-build.log || true
+          echo "---BUILD LOG TAIL---"
+          tail -50 rust-build.log
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload rust-build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-build-log
+          path: rust-build.log
+          retention-days: 2
 
       - name: Upload AppImage artifact
         if: matrix.format == 'appimage'
