@@ -12,8 +12,8 @@ import styles from './Timeline.module.less';
 // Types, Constants, Utils
 import type { TimelineProps, Track, Clip, TrackType, Keyframe, TimelineScale, Transition, ClipProperties, TimelineClip } from './types';
 import { isTimelineClip } from './types';
-import { TRACK_COLORS } from './constants';
-import { generateId } from './utils';
+import { TRACK_COLORS, generateId } from './constants';
+import { formatTime } from './utils';
 
 // 子组件
 import TimelineRuler from './TimelineRuler';
