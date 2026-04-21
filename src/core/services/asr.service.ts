@@ -8,6 +8,54 @@ import { logger } from '@/utils/logger';
 import type { VideoInfo } from '@/core/types';
 
 // ============================================
+// Web Speech API 类型（TypeScript lib.dom.d.ts 不完整）
+// ============================================
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionResult {
+  readonly length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+  isFinal: boolean;
+}
+
+interface SpeechRecognitionResultList {
+  readonly length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+  [Symbol.iterator](): Iterator<SpeechRecognitionResult>;
+}
+
+interface SpeechRecognitionEventMap {
+  'result': SpeechRecognitionEvent;
+}
+
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionCtor {
+  new (): SpeechRecognition;
+}
+
+interface SpeechRecognition extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+// ============================================
 // 类型定义
 // ============================================
 
@@ -280,9 +328,8 @@ export class ASRService extends BaseService {
     return new Promise((resolve) => {
       // 检查 Web Speech API 是否可用
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const SpeechRecognitionCtor = ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) as
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (new (...args: any[]) => any) | undefined;
+      const SpeechRecognitionCtor = ((window as unknown as { SpeechRecognition?: SpeechRecognitionCtor; webkitSpeechRecognition?: SpeechRecognitionCtor }).SpeechRecognition
+        ?? (window as unknown as { webkitSpeechRecognition?: SpeechRecognitionCtor }).webkitSpeechRecognition) as SpeechRecognitionCtor | undefined;
       if (!SpeechRecognitionCtor) {
         resolve(null);
         return;
@@ -298,8 +345,9 @@ export class ASRService extends BaseService {
         let startTime = 0;
         let currentText = '';
 
-        recognition.onresult = (event: any) => {
-          for (const result of event.results) {
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+          for (let i = 0; i < event.results.length; i++) {
+            const result = event.results[i];
             const transcript = result[0].transcript.trim();
             if (transcript) {
               const confidence = result[0].confidence ?? 0.85;

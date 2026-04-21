@@ -168,8 +168,8 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
     try {
       const topic = state.analysis?.summary || '视频内容解说';
 
-      const availableModels = getAvailableModelsFromApiKeys(apiKeys, CORE_AI_MODELS as any) as any[];
-      const resolvedModelId = resolveDefaultModelId(defaultModel, availableModels as any[]);
+      const availableModels = getAvailableModelsFromApiKeys(apiKeys, CORE_AI_MODELS);
+      const resolvedModelId = resolveDefaultModelId(defaultModel, availableModels);
       const model = (
         availableModels.find((item) => item.id === resolvedModelId) ||
         CORE_AI_MODELS.find((item) => item.id === DEFAULT_MODEL_ID) ||
