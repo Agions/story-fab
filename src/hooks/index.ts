@@ -7,5 +7,5 @@
  */
 
 // 时间线 & 编辑
-export { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from './use-keyboard-shortcuts';
-export { useVirtualTimeline } from './use-virtual-timeline';
+export { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from './useKeyboardShortcuts';
+export { useVirtualTimeline } from './useVirtualTimeline';
