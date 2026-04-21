@@ -8,4 +8,3 @@
 
 // 时间线 & 编辑
 export { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from './useKeyboardShortcuts';
-export { useVirtualTimeline } from './useVirtualTimeline';
