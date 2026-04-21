@@ -6,28 +6,14 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import {
-  Button,
-  Space,
-  Tooltip,
-  Dropdown,
-  Switch,
-  message,
-} from 'antd';
-import {
-  PlusOutlined,
-  DeleteOutlined,
-  PartitionOutlined,
-  CopyOutlined,
-} from '@ant-design/icons';
+import { message } from 'antd';
 import styles from './Timeline.module.less';
-import { notify } from '@/shared';
 
 // Types, Constants, Utils
 import type { TimelineProps, Track, Clip, TrackType, Keyframe, TimelineScale, Transition, ClipProperties, TimelineClip } from './types';
 import { isTimelineClip } from './types';
-import { TRACK_COLORS, TRANSITION_TYPES } from './constants';
-import { generateId, formatTime } from './utils';
+import { TRACK_COLORS } from './constants';
+import { generateId } from './utils';
 
 // 子组件
 import TimelineRuler from './TimelineRuler';
@@ -35,6 +21,9 @@ import TimelineTrack from './TimelineTrack';
 import TimelineControls, { TimelineTool } from './TimelineControls';
 import TimelinePlayhead from './TimelinePlayhead';
 import KeyframePanel from './KeyframePanel';
+import ClipActionsBar from './ClipActionsBar';
+import TimeDisplay from './TimeDisplay';
+import EmptyState from './EmptyState';
 
 // ==============================================
 // Re-export types for external use
@@ -452,107 +441,23 @@ const Timeline: React.FC<TimelineProps> = ({
 
           {/* 空白提示 */}
           {normalizedTracks.length === 0 && (
-            <div
-              style={{
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                textAlign: 'center',
-                color: 'var(--text-tertiary)',
-              }}
-            >
-              <p>暂无轨道</p>
-              <Space>
-                <Button icon={<PlusOutlined />} onClick={() => handleAddTrack('video')}>
-                  添加视频轨道
-                </Button>
-                <Button icon={<PlusOutlined />} onClick={() => handleAddTrack('audio')}>
-                  添加音频轨道
-                </Button>
-              </Space>
-            </div>
+            <EmptyState
+              onAddVideoTrack={() => handleAddTrack('video')}
+              onAddAudioTrack={() => handleAddTrack('audio')}
+            />
           )}
         </div>
       </div>
 
       {/* 选中 clip 的操作栏 */}
-      {selectedClip && (
-        <div
-          className={styles.clipActionsBar}
-          style={{
-            height: 48,
-            background: 'var(--bg-secondary)',
-            borderTop: '1px solid var(--border-color)',
-            padding: '0 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Space>
-            <span style={{ fontWeight: 500 }}>已选中:</span>
-            <span>{selectedClip.name}</span>
-            <span style={{ color: 'var(--text-tertiary)' }}>
-              {formatTime(selectedClip.startTime)} - {formatTime(selectedClip.endTime)}
-            </span>
-          </Space>
-
-          <Space>
-            <Button
-              size="small"
-              icon={<CopyOutlined />}
-              onClick={handleCopyClip}
-            >
-              复制
-            </Button>
-            <Button
-              size="small"
-              icon={<CopyOutlined />}
-              onClick={handlePasteClip}
-              disabled={!copiedClip}
-            >
-              粘贴
-            </Button>
-            <Dropdown
-              menu={{
-                items: TRANSITION_TYPES.map(t => ({
-                  key: t.value,
-                  label: t.label,
-                  onClick: () => {
-                    if (selectedClip) {
-                      handleClipUpdate(selectedClip.id, {
-                        transitions: {
-                          ...selectedClip.transitions,
-                          out: { type: t.value as Transition['type'], duration: 0.5 },
-                        },
-                      } as Partial<Clip>);
-                    }
-                  },
-                })),
-              }}
-            >
-              <Button size="small" icon={<PartitionOutlined />}>
-                转场
-              </Button>
-            </Dropdown>
-            <Button
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={handleDeleteClip}
-            >
-              删除
-            </Button>
-            <Button
-              size="small"
-              onClick={() => setShowKeyframePanel(true)}
-            >
-              关键帧
-            </Button>
-          </Space>
-        </div>
-      )}
+      <ClipActionsBar
+        selectedClip={selectedClip}
+        onCopyClip={handleCopyClip}
+        onPasteClip={handlePasteClip}
+        onDeleteClip={handleDeleteClip}
+        onKeyframeClick={() => setShowKeyframePanel(true)}
+        onClipUpdate={handleClipUpdate}
+      />
 
       {/* 关键帧面板 */}
       {showKeyframePanel && selectedClip && (
@@ -567,29 +472,11 @@ const Timeline: React.FC<TimelineProps> = ({
       )}
 
       {/* 时间显示 */}
-      <div
-        className={styles.timeDisplay}
-        style={{
-          height: 32,
-          background: 'var(--bg-secondary)',
-          borderTop: '1px solid var(--border-color)',
-          padding: '0 16px',
-          display: 'flex',
-          alignItems: 'center',
-          fontFamily: 'monospace',
-          fontSize: 12,
-        }}
-      >
-        <span style={{ color: 'var(--primary-color)' }}>
-          {formatTime(currentTime)}
-        </span>
-        <span style={{ color: 'var(--text-tertiary)', margin: '0 8px' }}>/</span>
-        <span>{formatTime(duration)}</span>
-        <div style={{ flex: 1 }} />
-        <span style={{ color: 'var(--text-tertiary)' }}>
-          {normalizedTracks.length} 轨道 | {normalizedTracks.reduce((sum, t) => sum + t.clips.length, 0)} 片段
-        </span>
-      </div>
+      <TimeDisplay
+        currentTime={currentTime}
+        duration={duration}
+        tracks={normalizedTracks}
+      />
     </div>
   );
 };
