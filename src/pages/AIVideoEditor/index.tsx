@@ -9,7 +9,7 @@ import {
   ScissorOutlined,
 } from '@ant-design/icons';
 import { CutDeckProvider, useCutDeck } from '@/components/CutDeck/AIEditorContext';
-import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '@/hooks/use-keyboard-shortcuts';
+import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '@/hooks/useKeyboardShortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useEditorStore } from '@/store/editorStore';
 import { message } from 'antd';
