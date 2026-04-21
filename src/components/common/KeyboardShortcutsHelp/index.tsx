@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Typography } from 'antd';
-import { KEYBOARD_SHORTCUTS_HELP } from '@/hooks/use-keyboard-shortcuts';
+import { KEYBOARD_SHORTCUTS_HELP } from '@/hooks/useKeyboardShortcuts';
 import styles from './KeyboardShortcutsHelp.module.css';
 
 const { Title, Text } = Typography;
