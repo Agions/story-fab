@@ -8,7 +8,7 @@
  */
 import { BaseService, ServiceError } from './base.service';
 import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis, VideoInfo, Scene, Keyframe } from '@/core/types';
-import { LLM_MODELS, DEFAULT_LLM_MODEL, MODEL_RECOMMENDATIONS } from '@/core/constants';
+import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_RECOMMENDATIONS } from '@/core/config/models.config';
 import { visionService } from './vision.service';
 
 import {
@@ -182,22 +182,21 @@ export class AIService extends BaseService {
   // ─── Model queries ─────────────────────────────────────────────────────────
 
   getRecommendedModels(task: keyof typeof MODEL_RECOMMENDATIONS) {
-    const modelId = MODEL_RECOMMENDATIONS[task] ?? DEFAULT_LLM_MODEL;
-    const model = LLM_MODELS.find((m) => m.id === modelId);
-    return model ? [model] : [];
+    const modelIds = MODEL_RECOMMENDATIONS[task] ?? [DEFAULT_MODEL_ID];
+    return AI_MODELS.filter((m) => modelIds.includes(m.id));
   }
 
   getModelInfo(modelId: string) {
-    return LLM_MODELS.find((m) => m.id === modelId) ?? null;
+    return AI_MODELS.find((m) => m.id === modelId) ?? null;
   }
 
   getAllModels() {
-    return Object.values(LLM_MODELS);
+    return Object.values(AI_MODELS);
   }
 
   getDomesticModels() {
-    return Object.values(LLM_MODELS).filter((m) =>
-      ['alibaba', 'moonshot', 'zhipu', 'deepseek', 'iflytek'].includes(m.provider)
+    return Object.values(AI_MODELS).filter((m) =>
+      m.provider != null && (['alibaba', 'moonshot', 'zhipu', 'deepseek', 'iflytek'] as string[]).includes(m.provider)
     );
   }
 
