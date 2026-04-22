@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Checkbox, Button, Select } from 'antd';
+import { Checkbox, Select } from 'antd';
+import { Button } from '@/components/ui/button';
 import styles from './ClipListView.module.less';
 
 interface ClipSegment {
@@ -63,7 +64,7 @@ export const ClipListView: React.FC<ClipListViewProps> = ({ segments, onExport }
           className={styles.platformSelect}
         />
         <Button
-          type="primary"
+          className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           disabled={selected.size === 0}
           onClick={handleExport}
         >
