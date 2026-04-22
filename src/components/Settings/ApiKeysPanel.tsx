@@ -2,7 +2,8 @@
  * API 密钥设置面板
  */
 import React, { useState, useCallback } from 'react';
-import { Card, Form, Input, Button, Space, Tag, Spin, Typography, Alert, Divider } from 'antd';
+import { Card, Form, Input, Space, Tag, Spin, Alert, Divider } from 'antd';
+import { Button } from '@/components/ui/button';
 import { KeyOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { validateApiKey } from '@/services/apiKey';
 import { notify } from '@/shared';
@@ -92,17 +93,20 @@ const ApiKeysPanel: React.FC<ApiKeysPanelProps> = ({ apiKeys, onUpdateKey, onDel
                   }
                 />
                 <Button
-                  icon={isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                  variant="ghost"
+                  size="icon-sm"
                   onClick={() => toggleKeyVisibility(provider)}
                   aria-label={isVisible ? "隐藏密钥" : "显示密钥"}
-                />
+                >
+                  {isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                </Button>
                 <Button
-                  type="primary"
-                  loading={isTesting}
+                  className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+                  disabled={isTesting}
                   onClick={() => handleTest(provider, config?.key || '')}
                   aria-label={`验证 ${PROVIDER_NAMES[provider]} 密钥`}
                 >
-                  验证
+                  {isTesting ? '验证中...' : '验证'}
                 </Button>
                 {config?.key && (
                   <Button

@@ -1,5 +1,6 @@
 import React, { useCallback, memo } from 'react';
-import { Card, Row, Col, Button, Typography } from 'antd';
+import { Card, Row, Col, Typography } from 'antd';
+import { Button } from '@/components/ui/button';
 import { EyeOutlined } from '@ant-design/icons';
 import { ScriptSegment } from '@/types';
 import styles from './VideoEditor.module.less';
@@ -58,11 +59,11 @@ const SegmentDetails: React.FC<SegmentDetailsProps> = ({
           </Col>
           <Col span={2}>
             <Button
-              type="primary"
-              icon={<EyeOutlined />}
-              size="small"
+              className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+              size="sm"
               onClick={handlePreview}
             >
+              <EyeOutlined className="mr-1" />
               预览
             </Button>
           </Col>

@@ -1,6 +1,7 @@
 import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Card, Button, Space, Dropdown, Modal, Form, type MenuProps } from 'antd';
+import { Card, Space, Dropdown, Modal, Form, type MenuProps } from 'antd';
+import { Button } from '@/components/ui/button';
 import {
   EditOutlined,
   SaveOutlined,
@@ -189,7 +190,8 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
             <Button icon={<EditOutlined />} onClick={() => setAiModalVisible(true)}>
               AI优化
             </Button>
-            <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>
+            <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={handleSave}>
+              <SaveOutlined className="mr-1" />
               保存
             </Button>
             {onExport && (

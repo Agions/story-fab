@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { List, Space, Button, Tooltip, Typography, Tag } from 'antd';
+import { List, Space, Tooltip, Tag } from 'antd';
+import { Button } from '@/components/ui/button';
 import { EditOutlined, PlayCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { formatDuration } from '@/core/video';
 import type { ScriptSegment } from '@/core/types';
@@ -33,13 +34,13 @@ const SegmentTable: React.FC<SegmentTableProps> = ({
           key={`${record.startTime}-${record.endTime}-${index}`}
           actions={[
             <Tooltip key="edit" title="编辑">
-              <Button type="text" icon={<EditOutlined />} onClick={() => onEdit(index)} />
+              <Button variant="ghost" size="icon-sm" onClick={() => onEdit(index)}><EditOutlined /></Button>
             </Tooltip>,
             <Tooltip key="preview" title="预览">
-              <Button type="text" icon={<PlayCircleOutlined />} onClick={() => onPreview(index)} />
+              <Button variant="ghost" size="icon-sm" onClick={() => onPreview(index)}><PlayCircleOutlined /></Button>
             </Tooltip>,
             <Tooltip key="delete" title="删除">
-              <Button type="text" danger icon={<DeleteOutlined />} onClick={() => onDelete(index)} />
+              <Button variant="ghost" size="icon-sm" onClick={() => onDelete(index)}><DeleteOutlined /></Button>
             </Tooltip>,
           ]}
         >

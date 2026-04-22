@@ -1,6 +1,5 @@
-/**
- * 设置组件导出
- */
-export { default as ApiKeysPanel } from './ApiKeysPanel';
-export { default as ModelSettingsPanel } from './ModelSettingsPanel';
-export { default as GeneralSettingsPanel } from './GeneralSettingsPanel';
+export { SettingsDialog } from './SettingsDialog';
+export { AISettings } from './AISettings';
+export { AppearanceSettings } from './AppearanceSettings';
+export { ShortcutSettings } from './ShortcutSettings';
+export { ExportSettings } from './ExportSettings';

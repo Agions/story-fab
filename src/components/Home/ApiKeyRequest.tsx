@@ -1,13 +1,23 @@
 import { logger } from '@/utils/logger';
 import React, { useState } from 'react';
-import { Modal, Form, Input, Button, Select, Radio, Alert, Checkbox, Space, Typography } from 'antd';
+import { Form, Input, Select, Radio, Alert, Checkbox, Space } from 'antd';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { KeyOutlined, UserOutlined, MailOutlined, BankOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { AI_MODEL_INFO, AIModelType } from '@/types';
 import styles from './ApiKeyRequest.module.less';
 
 const { Option } = Select;
 const { TextArea } = Input;
-const { Text, Link } = Typography;
+
+const Text = ({ strong, type, children }: { strong?: boolean; type?: string; children: React.ReactNode }) => {
+  const className = type === 'secondary' ? 'text-muted-foreground' : undefined;
+  return strong ? <strong className={className}>{children}</strong> : <span className={className}>{children}</span>;
+};
+
+const Link = ({ href, target, children }: { href?: string; target?: string; children: React.ReactNode }) => (
+  <a href={href} target={target} rel="noopener noreferrer">{children}</a>
+);
 
 interface ApiKeyRequestProps {
   visible: boolean;
@@ -25,16 +35,12 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
   const [submitted, setSubmitted] = useState(false);
   const [selectedType, setSelectedType] = useState<AIModelType>(modelType ?? 'openai');
   
-  // 获取当前选择的模型信息
   const modelInfo = AI_MODEL_INFO[selectedType];
   
-  // 处理提交
   const handleSubmit = async () => {
     try {
       await form.validateFields();
       setSubmitting(true);
-      
-      // 模拟提交处理
       setTimeout(() => {
         setSubmitting(false);
         setSubmitted(true);
@@ -44,24 +50,18 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
     }
   };
   
-  // 处理关闭
   const handleClose = () => {
     form.resetFields();
     setSubmitted(false);
     onClose();
   };
   
-  // 处理模型类型变更
   const handleModelTypeChange = (value: AIModelType) => {
     setSelectedType(value);
   };
   
   const renderApiRequestForm = () => (
-    <Form
-      form={form}
-      layout="vertical"
-      requiredMark="optional"
-    >
+    <Form form={form} layout="vertical" requiredMark="optional">
       <Form.Item
         name="modelType"
         label="选择模型提供商"
@@ -89,42 +89,23 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
         style={{ marginBottom: 16 }}
       />
       
-      <Form.Item
-        name="name"
-        label="姓名"
-        rules={[{ required: true, message: '请输入您的姓名' }]}
-      >
+      <Form.Item name="name" label="姓名" rules={[{ required: true, message: '请输入您的姓名' }]}>
         <Input prefix={<UserOutlined />} placeholder="请输入您的姓名" />
       </Form.Item>
       
-      <Form.Item
-        name="email"
-        label="邮箱"
-        rules={[
-          { required: true, message: '请输入您的邮箱' },
-          { type: 'email', message: '请输入有效的邮箱地址' }
-        ]}
-      >
+      <Form.Item name="email" label="邮箱" rules={[
+        { required: true, message: '请输入您的邮箱' },
+        { type: 'email', message: '请输入有效的邮箱地址' }
+      ]}>
         <Input prefix={<MailOutlined />} placeholder="请输入您的邮箱" />
       </Form.Item>
       
-      <Form.Item
-        name="organization"
-        label="公司/组织"
-      >
+      <Form.Item name="organization" label="公司/组织">
         <Input prefix={<BankOutlined />} placeholder="请输入您的公司或组织名称(选填)" />
       </Form.Item>
       
-      <Form.Item
-        name="region"
-        label="所在地区"
-        rules={[{ required: true, message: '请选择您的所在地区' }]}
-      >
-        <Select
-          placeholder="请选择所在地区"
-          showSearch
-          prefix={<EnvironmentOutlined />}
-        >
+      <Form.Item name="region" label="所在地区" rules={[{ required: true, message: '请选择您的所在地区' }]}>
+        <Select placeholder="请选择所在地区" showSearch prefix={<EnvironmentOutlined />}>
           <Option value="beijing">北京市</Option>
           <Option value="shanghai">上海市</Option>
           <Option value="guangdong">广东省</Option>
@@ -134,11 +115,7 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
         </Select>
       </Form.Item>
       
-      <Form.Item
-        name="usage"
-        label="使用场景"
-        rules={[{ required: true, message: '请选择您的使用场景' }]}
-      >
+      <Form.Item name="usage" label="使用场景" rules={[{ required: true, message: '请选择您的使用场景' }]}>
         <Radio.Group>
           <Space direction="vertical">
             <Radio value="personal">个人学习和研究</Radio>
@@ -149,26 +126,14 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
         </Radio.Group>
       </Form.Item>
       
-      <Form.Item
-        name="description"
-        label="使用说明"
-        rules={[{ required: true, message: '请简要描述您的使用需求' }]}
-      >
-        <TextArea
-          placeholder="请简要描述您打算如何使用API，包括预期的调用频率和用途等"
-          rows={4}
-        />
+      <Form.Item name="description" label="使用说明" rules={[{ required: true, message: '请简要描述您的使用需求' }]}>
+        <TextArea placeholder="请简要描述您打算如何使用API，包括预期的调用频率和用途等" rows={4} />
       </Form.Item>
       
       <Form.Item
         name="agreement"
         valuePropName="checked"
-        rules={[
-          { 
-            validator: (_, value) => 
-              value ? Promise.resolve() : Promise.reject(new Error('请阅读并同意服务条款')) 
-          }
-        ]}
+        rules={[{ validator: (_, value) => value ? Promise.resolve() : Promise.reject(new Error('请阅读并同意服务条款')) }]}
       >
         <Checkbox>
           我已阅读并同意{modelInfo.provider}的<Link href="#" target="_blank">服务条款</Link>和<Link href="#" target="_blank">隐私政策</Link>
@@ -205,32 +170,29 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
   );
   
   return (
-    <Modal
-      title={submitted ? "申请已提交" : `申请${modelInfo.name}API密钥`}
-      open={visible}
-      onCancel={handleClose}
-      footer={[
-        <Button key="cancel" onClick={handleClose}>
-          {submitted ? '关闭' : '取消'}
-        </Button>,
-        !submitted && (
-          <Button
-            key="submit"
-            type="primary"
-            loading={submitting}
-            onClick={handleSubmit}
-          >
-            提交申请
+    <Dialog open={visible} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className={styles.apiKeyRequestModal} style={{ width: 600 }}>
+        <DialogHeader>
+          <DialogTitle>{submitted ? "申请已提交" : `申请${modelInfo.name}API密钥`}</DialogTitle>
+        </DialogHeader>
+        {submitted ? renderSuccessContent() : renderApiRequestForm()}
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose} disabled={submitting}>
+            {submitted ? '关闭' : '取消'}
           </Button>
-        )
-      ]}
-      width={600}
-      destroyOnClose
-      className={styles.apiKeyRequestModal}
-    >
-      {submitted ? renderSuccessContent() : renderApiRequestForm()}
-    </Modal>
+          {!submitted && (
+            <Button
+              className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+              disabled={submitting}
+              onClick={handleSubmit}
+            >
+              {submitting ? '提交中...' : '提交申请'}
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default ApiKeyRequest; 
+export default ApiKeyRequest;

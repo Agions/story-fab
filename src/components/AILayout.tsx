@@ -4,7 +4,8 @@
  * 三大核心功能：视频解说 | 第一人称 | AI混剪
  */
 import React from 'react';
-import { Layout, Button, Tooltip, Space, Typography, Divider, Select, Slider } from 'antd';
+import { Layout, Tooltip, Space, Typography, Divider, Select } from 'antd';
+import { Button } from '@/components/ui/button';
 import {
   ScissorOutlined,
   AudioOutlined,
@@ -276,32 +277,33 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
         <div className={styles.headerCenter}>
           <Space>
             <Tooltip title="撤销">
-              <Button type="text" icon={<UndoOutlined />} />
+              <Button variant="ghost" size="icon-sm"><UndoOutlined /></Button>
             </Tooltip>
             <Tooltip title="重做">
-              <Button type="text" icon={<RedoOutlined />} />
+              <Button variant="ghost" size="icon-sm"><RedoOutlined /></Button>
             </Tooltip>
             <Divider type="vertical" />
             <Tooltip title={isPlaying ? '暂停预览' : '播放预览'}>
               <Button 
-                type="text" 
-                icon={isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
-                onClick={() => {
-                  setPlaying(!isPlaying);
-                }}
+                variant="ghost" 
+                size="icon-sm"
+                onClick={() => setPlaying(!isPlaying)}
                 className={styles.playBtn}
-              />
+              >
+                {isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+              </Button>
             </Tooltip>
           </Space>
         </div>
         
         <div className={styles.headerRight}>
           <Space>
-            <Button type="primary" icon={<ExportOutlined />} onClick={handleExport}>
+            <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={handleExport}>
+              <ExportOutlined className="mr-1" />
               导出视频
             </Button>
             <Tooltip title="设置">
-              <Button type="text" icon={<SettingOutlined />} />
+              <Button variant="ghost" size="icon-sm"><SettingOutlined /></Button>
             </Tooltip>
           </Space>
         </div>
@@ -388,9 +390,8 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
             {renderPropsPanel()}
             
             <Button 
-              type="primary" 
+              className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" 
               block 
-              className={styles.applyBtn}
               onClick={() => {
                 notify.success(`已切换到 ${aiFeatures.find(f => f.key === selectedFeature)?.label} 功能`);
               }}
