@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Button, Row, Col, Space, Typography, Divider, Slider, Switch, Radio, Select } from 'antd';
+import { Card, Row, Col, Space, Typography, Divider, Slider, Switch, Radio, Select } from 'antd';
+import { Button } from '@/components/ui/button';
 import {
   RobotOutlined,
   ExperimentOutlined,
@@ -174,20 +175,19 @@ const ConfigStep: React.FC<ConfigStepProps> = ({
       <div className={styles.actionButtons}>
         <Space>
           <Button
-            type="primary"
-            icon={<RobotOutlined />}
+            className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
             onClick={onAnalyze}
-            loading={analyzing}
-            size="large"
+            disabled={analyzing}
           >
-            开始分析
+            <RobotOutlined className="mr-1" />
+            {analyzing ? '分析中...' : '开始分析'}
           </Button>
           <Button
-            icon={<ExperimentOutlined />}
+            variant="outline"
             onClick={onSmartClip}
-            loading={analyzing}
-            size="large"
+            disabled={analyzing}
           >
+            <ExperimentOutlined className="mr-1" />
             一键智能剪辑
           </Button>
         </Space>

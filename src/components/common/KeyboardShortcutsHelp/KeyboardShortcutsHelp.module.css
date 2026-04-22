@@ -1,9 +1,10 @@
-/* KeyboardShortcutsHelp styles */
+/* KeyboardShortcutsHelp styles — dark theme */
 
 .content {
   padding: 8px 4px;
-  max-height: 60vh;
+  max-height: 55vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .section {
@@ -15,9 +16,9 @@
 }
 
 .sectionTitle {
-  font-size: 13px !important;
+  font-size: 11px !important;
   font-weight: 600 !important;
-  color: var(--color-text-secondary, #8c8c8c) !important;
+  color: var(--text-secondary, #71717a) !important;
   margin-bottom: 8px !important;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -26,15 +27,15 @@
 .items {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 0;
-  border-bottom: 1px solid var(--color-border-secondary, #f0f0f0);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border), rgba(255,255,255,0.06);
 }
 
 .item:last-child {
@@ -49,7 +50,7 @@
 }
 
 .plus {
-  color: var(--color-text-secondary, #8c8c8c);
+  color: var(--text-secondary, #71717a);
   font-size: 11px;
   line-height: 1;
 }
@@ -61,13 +62,13 @@
   min-width: 24px;
   height: 22px;
   padding: 0 6px;
-  font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   font-size: 12px;
   font-weight: 500;
   line-height: 1;
-  color: var(--color-text, #1f1f1f);
-  background: var(--color-bg-kbd, #f5f5f5);
-  border: 1px solid var(--color-border, #d9d9d9);
+  color: var(--text, #f4f4f5);
+  background: var(--bg-tertiary, #27272a);
+  border: 1px solid var(--border, #3f3f46);
   border-bottom-width: 2px;
   border-radius: 4px;
   box-sizing: border-box;
@@ -75,15 +76,8 @@
 
 .desc {
   font-size: 13px;
-  color: var(--color-text-secondary, #595959) !important;
+  color: var(--text-secondary, #a1a1aa) !important;
   margin-left: 12px;
   text-align: right;
   flex: 1;
-}
-
-.footer {
-  text-align: center;
-  padding-top: 12px;
-  border-top: 1px solid var(--color-border-secondary, #f0f0f0);
-  margin-top: 4px;
 }

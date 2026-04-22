@@ -177,7 +177,7 @@ CutDeck/
 |------|------|
 | 前端框架 Frontend | React 18 + TypeScript 5 |
 | 状态管理 State | Zustand |
-| UI 组件 UI | Ant Design 5 |
+| UI 组件 UI | shadcn/ui + Tailwind CSS |
 | 桌面运行时 Desktop | Tauri 2.x |
 | 后端语言 Backend | Rust |
 | 视频处理 Video | FFmpeg |
@@ -199,6 +199,31 @@ CutDeck/
 | [安装配置 Installation](https://agions.github.io/CutDeck/installation) | 详细安装与故障排查 Detailed installation & troubleshooting |
 | [常见问题 FAQ](https://agions.github.io/CutDeck/faq) | FAQ |
 | [贡献指南 Contributing](https://agions.github.io/CutDeck/contributing) | 如何参与贡献 How to contribute |
+
+---
+
+## 📦 Download Installers
+
+Pre-built installers for all platforms are available on the [GitHub Releases](https://github.com/Agions/CutDeck/releases) page:
+
+| Platform | File | Notes |
+|----------|------|-------|
+| Windows | CutDeck-{version}-windows-x64-setup.exe | NSIS installer |
+| Windows | CutDeck-{version}-windows-x64.msi | MSI installer |
+| macOS | CutDeck-{version}-macos-arm64.dmg | Apple Silicon |
+| macOS | CutDeck-{version}-macos-x64.dmg | Intel |
+| Linux | CutDeck-{version}-linux-x64.deb | Debian/Ubuntu |
+| Linux | CutDeck-{version}-linux-arm64.deb | ARM64 |
+| Linux | CutDeck-{version}-linux-x64.AppImage | Universal |
+
+### macOS Installation
+
+Because CutDeck is not signed with an Apple Developer certificate, macOS may block it. On first launch:
+1. Right-click CutDeck.app → **Open**
+2. Click **Open Anyway** in the warning dialog
+3. Or run: `sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"`
+
+For details, see [HOW-TO-RUN.txt](https://github.com/Agions/CutDeck/releases) in each release.
 
 ---
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Button, Space, Typography, List, Badge, Tag, Empty } from 'antd';
+import { Card, Space, Typography, List, Badge, Tag, Empty } from 'antd';
+import { Button } from '@/components/ui/button';
 import {
   ScissorOutlined,
   MergeCellsOutlined,
@@ -59,10 +60,10 @@ const SuggestionsStep: React.FC<SuggestionsStepProps> = ({
           共 {analysisResult.suggestions.length} 条建议，已选中 {selectedSuggestions.size} 条
         </Text>
         <Space>
-          <Button size="small" onClick={onDeselectAll}>
+          <Button variant="outline" size="sm" onClick={onDeselectAll}>
             取消全选
           </Button>
-          <Button size="small" onClick={onSelectAll}>
+          <Button variant="outline" size="sm" onClick={onSelectAll}>
             全选
           </Button>
         </Space>
@@ -116,12 +117,11 @@ const SuggestionsStep: React.FC<SuggestionsStepProps> = ({
 
       <div className={styles.actionButtons}>
         <Button
-          type="primary"
-          icon={<CheckCircleOutlined />}
+          className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           onClick={onApply}
           disabled={selectedSuggestions.size === 0}
-          size="large"
         >
+          <CheckCircleOutlined className="mr-1" />
           应用选中的建议 ({selectedSuggestions.size})
         </Button>
       </div>
