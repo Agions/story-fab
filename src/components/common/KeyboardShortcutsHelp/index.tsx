@@ -1,14 +1,19 @@
 /**
  * KeyboardShortcutsHelp - 键盘快捷键帮助面板
  * 按 ? 键呼出 / 关闭
+ * 使用 shadcn/ui Dialog + Tailwind CSS
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, Typography } from 'antd';
+import React, { useEffect, useCallback } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { KEYBOARD_SHORTCUTS_HELP } from '@/hooks/useKeyboardShortcuts';
 import styles from './KeyboardShortcutsHelp.module.css';
-
-const { Title, Text } = Typography;
 
 interface KeyboardShortcutsHelpProps {
   visible: boolean;
@@ -20,7 +25,7 @@ const KbdKey: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({ visible, onClose }) => {
-  // ? 键监听（全局）
+  // Escape key listener
   useEffect(() => {
     if (!visible) return;
     const handler = (e: KeyboardEvent) => {
@@ -33,51 +38,41 @@ const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({ visible, 
   }, [visible, onClose]);
 
   return (
-    <Modal
-      open={visible}
-      onCancel={onClose}
-      onOk={onClose}
-      okText="关闭"
-      cancelButtonProps={{ style: { display: 'none' } }}
-      title={
-        <span style={{ fontWeight: 600 }}>
-          ⌨️ 键盘快捷键
-        </span>
-      }
-      width={480}
-      centered
-      footer={null}
-      destroyOnClose
-    >
-      <div className={styles.content}>
-        {KEYBOARD_SHORTCUTS_HELP.map((section) => (
-          <div key={section.category} className={styles.section}>
-            <Title level={5} className={styles.sectionTitle}>{section.category}</Title>
-            <div className={styles.items}>
-              {section.items.map((item) => (
-                <div key={item.key} className={styles.item}>
-                  <div className={styles.keys}>
-                    {item.key.split('+').map((part, i) => (
-                      <React.Fragment key={i}>
-                        {i > 0 && <span className={styles.plus}>+</span>}
-                        <KbdKey>{part.trim()}</KbdKey>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                  <Text type="secondary" className={styles.desc}>{item.desc}</Text>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+    <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md border border-[var(--border)] bg-[var(--bg-secondary)] max-h-[70vh] flex flex-col">
+        <DialogHeader className="mb-2">
+          <DialogTitle className="text-[var(--text)] flex items-center gap-2 text-base">
+            ⌨️ 键盘快捷键 | Keyboard Shortcuts
+          </DialogTitle>
+          <DialogDescription className="text-[var(--text-secondary)] text-xs">
+            按 <KbdKey>?</KbdKey> 或 <KbdKey>Esc</KbdKey> 关闭 / Press to close
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className={styles.footer}>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            按 <KbdKey>?</KbdKey> 或 <KbdKey>Esc</KbdKey> 关闭
-          </Text>
+        <div className={styles.content}>
+          {KEYBOARD_SHORTCUTS_HELP.map((section) => (
+            <div key={section.category} className={styles.section}>
+              <div className={styles.sectionTitle}>{section.category}</div>
+              <div className={styles.items}>
+                {section.items.map((item) => (
+                  <div key={item.key} className={styles.item}>
+                    <div className={styles.keys}>
+                      {item.key.split('+').map((part, i) => (
+                        <React.Fragment key={i}>
+                          {i > 0 && <span className={styles.plus}>+</span>}
+                          <KbdKey>{part.trim()}</KbdKey>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                    <span className={styles.desc}>{item.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -85,7 +80,7 @@ const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({ visible, 
 export const useShortcutsHelpToggle = (onToggle: (visible: boolean) => void) => {
   const handler = useCallback((e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
-    // 输入框中不触发
+    // Skip if focused in input/textarea
     if (
       target.tagName === 'INPUT' ||
       target.tagName === 'TEXTAREA' ||

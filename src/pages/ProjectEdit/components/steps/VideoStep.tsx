@@ -4,7 +4,7 @@
 import React from 'react';
 import { Card, Typography } from 'antd';
 const { Title, Paragraph } = Typography;
-import { Button } from 'antd';
+import { Button } from '@/components/ui/button';
 import { VideoCameraOutlined } from '@ant-design/icons';
 import VideoSelector from '@/components/VideoSelector';
 import type { VideoMetadata } from '@/services/video';
@@ -37,7 +37,7 @@ export const VideoStep: React.FC<VideoStepProps> = ({
       loading={loading}
     />
     <div className={styles.stepActions}>
-      <Button type="primary" onClick={onNext} disabled={!videoSelected}>下一步</Button>
+      <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={onNext} disabled={!videoSelected}>下一步</Button>
     </div>
   </Card>
 );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Slider, Button } from 'antd';
+import { Slider } from 'antd';
+import { Button } from '@/components/ui/button';
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
@@ -209,12 +210,9 @@ function VideoPlayer({
         </div>
         <div className={styles.controlButtons}>
           <div>
-            <Button
-              type="text"
-              className={styles.controlButton}
-              onClick={togglePlay}
-              icon={isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
-            />
+            <Button variant="ghost" className={styles.controlButton} onClick={togglePlay}>
+              {isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+            </Button>
             <span className={styles.timeDisplay}>
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
@@ -225,11 +223,9 @@ function VideoPlayer({
               onMouseEnter={() => setShowVolumeSlider(true)}
               onMouseLeave={() => setShowVolumeSlider(false)}
             >
-              <Button
-                type="text"
-                className={styles.controlButton}
-                icon={<SoundOutlined />}
-              />
+              <Button variant="ghost" className={styles.controlButton}>
+                <SoundOutlined />
+              </Button>
               {showVolumeSlider && (
                 <div className={styles.volumeSlider}>
                   <Slider
@@ -244,12 +240,9 @@ function VideoPlayer({
                 </div>
               )}
             </div>
-            <Button
-              type="text"
-              className={styles.controlButton}
-              onClick={toggleFullscreen}
-              icon={<FullscreenOutlined />}
-            />
+            <Button variant="ghost" className={styles.controlButton} onClick={toggleFullscreen}>
+              <FullscreenOutlined />
+            </Button>
           </div>
         </div>
       </div>

@@ -1,3 +1,25 @@
+## v2.0.0 (2026-04-22)
+
+### 🎨 UI Overhaul
+- **shadcn/ui migration:** Replaced Ant Design 5 with shadcn/ui + Tailwind CSS for modern, lightweight components
+- **Professional tool aesthetic:** Dark-first design inspired by DaVinci Resolve / Premiere Pro
+- **Timeline rebuilt:** Completely rebuilt with shadcn components — TimelinePanel, TimelineRuler, TimelineClip, TimelineTrack, TimelineToolbar, TimelineScrubber
+- **Editor panels rebuilt:** Inspector, MediaBrowser, Preview, ExportBar, MenuBar, Settings — all with shadcn
+- **Color system:** Professional orange (#f97316) accent, deep charcoal backgrounds, JetBrains Mono for timecodes
+
+### 🔧 Technical
+- **Tailwind CSS:** Full design token system with CSS custom properties
+- **Bundle size reduction:** Lighter UI framework replaces Ant Design
+
+### 🤖 CI/CD
+- **Multi-platform CI/CD:** GitHub Actions `release.yml` triggers on git tag push
+- **5 parallel builds:** Windows x64, macOS (ARM64 + x64), Linux (x64 + ARM64)
+- **8 release artifacts:** .exe, .msi, .dmg (×2), .deb (×2), .AppImage (×2)
+- **macOS run guide:** HOW-TO-RUN.txt included with 3 methods to bypass unsigned app warning
+
+### 🐛 Bug Fixes
+- (list any bugs fixed in this release)
+
 ## [1.9.7] - 2026-04-19
 
 ### 🔒 Security

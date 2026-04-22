@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Row, Col, Button, Space, Typography, Tag, Divider, Empty } from 'antd';
+import { Card, Row, Col, Space, Typography, Tag, Divider, Empty } from 'antd';
+import { Button } from '@/components/ui/button';
 import { ReloadOutlined, DownloadOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import type { ClipSegment } from '@/core/services/aiClip.service';
 import type { VideoInfo } from '@/core/types';
@@ -101,10 +102,12 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
 
       <div className={styles.actionButtons}>
         <Space>
-          <Button icon={<ReloadOutlined />} onClick={onReset}>
+          <Button variant="outline" onClick={onReset}>
+            <ReloadOutlined className="mr-1" />
             重新配置
           </Button>
-          <Button type="primary" icon={<DownloadOutlined />}>
+          <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white">
+            <DownloadOutlined className="mr-1" />
             导出剪辑方案
           </Button>
         </Space>

@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { Button, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
+import { Button } from '@/components/ui/button';
 import {
   UploadOutlined,
   UndoOutlined,
@@ -48,76 +49,90 @@ const Toolbar: React.FC<ToolbarProps> = ({
     <div className={styles.toolbar} role="toolbar" aria-label="视频编辑器工具栏">
       <div className={styles.leftTools}>
         <Button
-          type="primary"
-          icon={<UploadOutlined />}
+          className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           onClick={onLoadVideo}
-          loading={loading}
+          disabled={loading}
           aria-label="加载视频"
         >
-          加载视频
+          <UploadOutlined className="mr-1" />
+          {loading ? '加载中...' : '加载视频'}
         </Button>
 
         <Tooltip title="撤销 (Ctrl+Z)">
           <Button
-            icon={<UndoOutlined />}
-            disabled={!canUndo}
+            variant="ghost"
             onClick={onUndo}
+            disabled={!canUndo}
             aria-label="撤销"
             aria-disabled={!canUndo}
-          />
+          >
+            <UndoOutlined />
+          </Button>
         </Tooltip>
 
         <Tooltip title="重做 (Ctrl+Y)">
           <Button
-            icon={<RedoOutlined />}
-            disabled={!canRedo}
+            variant="ghost"
             onClick={onRedo}
+            disabled={!canRedo}
             aria-label="重做"
             aria-disabled={!canRedo}
-          />
+          >
+            <RedoOutlined />
+          </Button>
         </Tooltip>
 
         <Tooltip title="添加片段">
           <Button
-            icon={<PlusOutlined />}
+            variant="outline"
             onClick={onAddSegment}
             disabled={!hasVideo}
             aria-label="添加片段"
-          />
+          >
+            <PlusOutlined className="mr-1" />
+            添加片段
+          </Button>
         </Tooltip>
 
         <Tooltip title="智能剪辑">
           <Button
-            icon={<RobotOutlined />}
+            variant="outline"
             onClick={onSmartClip}
             disabled={!hasVideo || analyzing}
-            loading={analyzing}
-            aria-label="智能剪辑"
           >
-            智能剪辑
+            {analyzing ? (
+              <>
+                <RobotOutlined className="mr-1" />
+                剪辑中...
+              </>
+            ) : (
+              <>
+                <RobotOutlined className="mr-1" />
+                智能剪辑
+              </>
+            )}
           </Button>
         </Tooltip>
       </div>
 
       <div className={styles.rightTools}>
         <Button
-          icon={<SaveOutlined />}
+          variant="ghost"
           onClick={onSave}
-          loading={isSaving}
           disabled={!hasVideo || loading || analyzing || isSaving || isExporting}
           aria-label="保存项目"
         >
+          <SaveOutlined className="mr-1" />
           保存
         </Button>
 
         <Button
-          type="primary"
-          icon={<DownloadOutlined />}
+          className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           onClick={onExport}
-          loading={isExporting}
           disabled={!hasVideo || loading || analyzing || isSaving || isExporting}
           aria-label="导出视频"
         >
+          <DownloadOutlined className="mr-1" />
           导出
         </Button>
       </div>

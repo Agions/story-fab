@@ -3,7 +3,8 @@
  * 简化的 AI 剪辑专用时间轴
  */
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Button, Slider, Typography, Space, Upload, type UploadProps } from 'antd';
+import { Slider, Space, Upload, type UploadProps } from 'antd';
+import { Button } from '@/components/ui/button';
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
@@ -19,7 +20,10 @@ import type { VideoInfo } from '@/core/types';
 import { notify } from '@/shared';
 import styles from './AIVideoPreview.module.less';
 
-const { Text } = Typography;
+const Text = ({ children, type, strong, style, title, className }: { children: React.ReactNode; type?: string; strong?: boolean; style?: React.CSSProperties; title?: string; className?: string }) => {
+  const classNames = [className, type === 'secondary' ? 'text-muted-foreground' : undefined].filter(Boolean).join(' ') || undefined;
+  return strong ? <strong className={classNames} style={style} title={title}>{children}</strong> : <span className={classNames} style={style} title={title}>{children}</span>;
+};
 
 interface ClipSuggestionCompat {
   id: string;
@@ -40,7 +44,6 @@ interface ClipResultCompat {
   segments: Array<{ id: string }>;
 }
 
-// 格式化时间
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
@@ -73,24 +76,20 @@ const AIVideoPreview: React.FC = () => {
     };
   }, [analysis]);
 
-  // 视频加载完成
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       dispatch({ type: 'SET_DURATION', payload: videoRef.current.duration });
     }
   };
 
-  // 播放进度更新
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
     }
   };
 
-  // 播放/暂停切换
   const togglePlay = useCallback(() => {
     if (!videoRef.current || !currentVideo) return;
-    
     if (isPlaying) {
       videoRef.current.pause();
     } else {
@@ -99,7 +98,6 @@ const AIVideoPreview: React.FC = () => {
     setPlaying(!isPlaying);
   }, [isPlaying, currentVideo, setPlaying]);
 
-  // 跳转到指定时间
   const seekTo = (time: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime = time;
@@ -107,7 +105,6 @@ const AIVideoPreview: React.FC = () => {
     }
   };
 
-  // 跳过前后 5 秒
   const skip = (seconds: number) => {
     if (videoRef.current) {
       const newTime = Math.max(0, Math.min(videoRef.current.currentTime + seconds, duration));
@@ -115,35 +112,26 @@ const AIVideoPreview: React.FC = () => {
     }
   };
 
-  // 进度条拖动
   const handleProgressChange = (value: number | number[]) => {
     seekTo(Array.isArray(value) ? value[0] : value);
   };
 
-  // 文件上传
   const handleUploadFile = (file: File) => {
-    // 验证文件类型
     if (!file.type.startsWith('video/')) {
       notify.error(null, '请上传视频文件');
       return false;
     }
-
-    // 验证文件大小 (最大 500MB)
     if (file.size > 500 * 1024 * 1024) {
       notify.error(null, '视频文件不能超过 500MB');
       return false;
     }
-
-    // 创建视频 URL
     const url = URL.createObjectURL(file);
     setVideoUrl(url);
-
-    // 创建视频信息
     const videoInfo: VideoInfo = {
       id: `video-${Date.now()}`,
       path: url,
       name: file.name,
-      duration: 0, // 等待加载后更新
+      duration: 0,
       width: 0,
       height: 0,
       fps: 30,
@@ -151,18 +139,15 @@ const AIVideoPreview: React.FC = () => {
       size: file.size,
       createdAt: new Date().toISOString(),
     };
-
     setVideo(videoInfo);
     notify.success(`已加载视频: ${file.name}`);
-
-    return false; // 阻止默认上传
+    return false;
   };
 
   const handleUpload: UploadProps['beforeUpload'] = (file) => {
     return handleUploadFile(file);
   };
 
-  // 视频元数据加载
   const handleVideoLoaded = () => {
     if (videoRef.current && currentVideo) {
       const videoInfo: VideoInfo = {
@@ -175,7 +160,6 @@ const AIVideoPreview: React.FC = () => {
     }
   };
 
-  // 清除视频
   const handleClearVideo = useCallback(() => {
     if (videoUrl) {
       URL.revokeObjectURL(videoUrl);
@@ -194,11 +178,9 @@ const AIVideoPreview: React.FC = () => {
     };
   }, [videoUrl]);
 
-  // 键盘快捷键
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!currentVideo) return;
-      
       switch (e.key) {
         case ' ':
           e.preventDefault();
@@ -218,12 +200,10 @@ const AIVideoPreview: React.FC = () => {
           break;
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentVideo, duration, togglePlay]);
 
-  // 渲染 AI 建议
   const renderAISuggestions = () => {
     if (!currentVideo) {
       return (
@@ -234,7 +214,6 @@ const AIVideoPreview: React.FC = () => {
         </div>
       );
     }
-
     if (clipResult.suggestions.length > 0) {
       return (
         <div className={styles.suggestionsList}>
@@ -251,7 +230,6 @@ const AIVideoPreview: React.FC = () => {
         </div>
       );
     }
-
     return (
       <div className={styles.suggestionsList}>
         <Text type="secondary" style={{ fontSize: 12 }}>
@@ -263,7 +241,6 @@ const AIVideoPreview: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      {/* 视频预览区 */}
       <div className={styles.preview}>
         <div className={styles.videoArea}>
           {currentVideo ? (
@@ -301,36 +278,26 @@ const AIVideoPreview: React.FC = () => {
                 showUploadList={false}
                 beforeUpload={handleUpload}
               >
-                <Button type="link" icon={<CloudUploadOutlined />}>
+                <Button variant="link">
+                  <CloudUploadOutlined className="mr-1" />
                   选择文件
                 </Button>
               </Upload>
             </div>
           )}
           
-          {/* 视频控制栏 */}
           {currentVideo && (
             <div className={styles.videoControls}>
               <Space>
-                <Button 
-                  type="text" 
-                  icon={<StepBackwardOutlined />} 
-                  size="small"
-                  onClick={() => skip(-5)}
-                />
-                <Button 
-                  type="text" 
-                  icon={isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />} 
-                  onClick={togglePlay}
-                  className={styles.playBtn}
-                  size="large"
-                />
-                <Button 
-                  type="text" 
-                  icon={<StepForwardOutlined />} 
-                  size="small"
-                  onClick={() => skip(5)}
-                />
+                <Button variant="ghost" size="icon-sm" onClick={() => skip(-5)}>
+                  <StepBackwardOutlined />
+                </Button>
+                <Button variant="ghost" size="icon-sm" onClick={togglePlay} className={styles.playBtn}>
+                  {isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+                </Button>
+                <Button variant="ghost" size="icon-sm" onClick={() => skip(5)}>
+                  <StepForwardOutlined />
+                </Button>
               </Space>
               
               <div className={styles.progress}>
@@ -351,21 +318,13 @@ const AIVideoPreview: React.FC = () => {
               </div>
               
               <Space>
-                <Button 
-                  type="text" 
-                  icon={<ExpandOutlined />} 
-                  size="small"
-                  title="全屏"
-                />
+                <Button variant="ghost" size="icon-sm" title="全屏">
+                  <ExpandOutlined />
+                </Button>
                 {currentVideo && (
-                  <Button 
-                    type="text" 
-                    icon={<DeleteOutlined />} 
-                    size="small"
-                    title="清除视频"
-                    onClick={handleClearVideo}
-                    danger
-                  />
+                  <Button variant="ghost" size="icon-sm" title="清除视频" onClick={handleClearVideo}>
+                    <DeleteOutlined />
+                  </Button>
                 )}
               </Space>
             </div>
@@ -373,7 +332,6 @@ const AIVideoPreview: React.FC = () => {
         </div>
       </div>
       
-      {/* 时间轴 */}
       <div className={styles.timeline}>
         <div className={styles.timelineHeader}>
           <Text strong style={{ color: '#ccc' }}>时间轴</Text>
@@ -387,20 +345,15 @@ const AIVideoPreview: React.FC = () => {
         <div className={styles.timelineContent}>
           {currentVideo ? (
             <div className={styles.timelineTracks}>
-              {/* 视频轨道 */}
               <div className={styles.track}>
                 <Text type="secondary" style={{ fontSize: 11 }}>视频</Text>
                 <div className={styles.trackBar}>
-                  <div 
-                    className={styles.clipSegment}
-                    style={{ width: '100%' }}
-                  >
+                  <div className={styles.clipSegment} style={{ width: '100%' }}>
                     <Text style={{ fontSize: 10, color: '#666' }}>{currentVideo.name}</Text>
                   </div>
                 </div>
               </div>
               
-              {/* AI 剪辑点轨道 */}
               {clipResult.cutPoints.length > 0 && (
                 <div className={styles.track}>
                   <Text type="secondary" style={{ fontSize: 11 }}>AI 剪辑点</Text>
@@ -421,11 +374,7 @@ const AIVideoPreview: React.FC = () => {
                 </div>
               )}
               
-              {/* 播放头 */}
-              <div 
-                className={styles.playhead}
-                style={{ left: `${(currentTime / (duration || 1)) * 100}%` }}
-              />
+              <div className={styles.playhead} style={{ left: `${(currentTime / (duration || 1)) * 100}%` }} />
             </div>
           ) : (
             <div className={styles.emptyTimeline}>
@@ -434,7 +383,6 @@ const AIVideoPreview: React.FC = () => {
           )}
         </div>
         
-        {/* AI 建议区 */}
         <div className={styles.aiSuggestions}>
           <Text strong style={{ color: '#1890ff' }}>🤖 AI 剪辑建议</Text>
           {renderAISuggestions()}

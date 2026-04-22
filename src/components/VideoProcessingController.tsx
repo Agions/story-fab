@@ -551,20 +551,18 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
             <div className={styles.batchContainer}>
               <div className={styles.batchHeader}>
                 <Button 
-                  type="primary" 
-                  icon={<PlusOutlined />}
+                  className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" 
                   onClick={addBatchItem}
                 >
+                  <PlusOutlined className="mr-1" />
                   添加当前视频到批处理
                 </Button>
                 
                 <Tooltip title="开始处理所有批次项">
                   <Button 
-                    type="primary"
-                    icon={<PlayCircleOutlined />}
+                    className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
                     onClick={startBatchProcessing}
                     disabled={processingBatch || batchItems.length === 0}
-                    loading={processingBatch}
                   >
                     {processingBatch ? '处理中...' : '开始批量处理'}
                   </Button>
@@ -613,12 +611,12 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                               disabled={processingBatch}
                             >
                               <Button 
-                                type="text" 
-                                danger
-                                icon={<DeleteOutlined />}
-                                size="small"
+                                variant="ghost" 
+                                size="icon-sm"
                                 disabled={processingBatch}
-                              />
+                              >
+                                <DeleteOutlined />
+                              </Button>
                             </Popconfirm>
                           </div>
                         </div>
@@ -637,11 +635,10 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         
         <div className={styles.actionButtons}>
           <Button 
-            type="primary" 
-            icon={<ScissorOutlined />}
+            className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" 
             onClick={handleProcessCurrentVideo}
-            size="large"
           >
+            <ScissorOutlined className="mr-1" />
             处理当前视频
           </Button>
         </div>

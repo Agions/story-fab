@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, memo } from 'react';
-import { Card, Button, Typography, Space, Tag, Empty } from 'antd';
+import { Card, Typography, Space, Tag, Empty } from 'antd';
+import { Button } from '@/components/ui/button';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { VideoSegment } from '@/services/video';
 import styles from '../index.module.less';
@@ -67,12 +68,12 @@ const SegmentItem: React.FC<SegmentItemProps> = memo(({
         <Text strong>片段 {index + 1}</Text>
         <Space>
           <Button
-            type="text"
-            size="small"
-            danger
-            icon={<DeleteOutlined />}
+            variant="ghost"
+            size="icon-sm"
             onClick={handleDelete}
-          />
+          >
+            <DeleteOutlined />
+          </Button>
         </Space>
       </div>
 

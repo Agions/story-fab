@@ -1,6 +1,8 @@
 import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Card, Tabs, List, Button, Space, Input, Tag, Typography, Modal, type TabsProps } from 'antd';
+import { Card, List, Space, Input, Tag, Typography, type TabsProps } from 'antd';
+import { Tabs } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import {
   EditOutlined,
   SaveOutlined,
@@ -169,7 +171,8 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
             <Button icon={<EditOutlined />} onClick={() => setAiModalVisible(true)}>
               AI优化
             </Button>
-            <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>
+            <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={handleSave}>
+              <SaveOutlined className="mr-1" />
               保存
             </Button>
           </Space>
