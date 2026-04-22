@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { Space, Button, Divider } from 'antd';
+import { Space, Divider } from 'antd';
+import { Button } from '@/components/ui/button';
 import {
   SettingOutlined,
   ThunderboltOutlined,
@@ -39,19 +40,18 @@ export const ModelFooter: React.FC<ModelFooterProps> = ({
       <Space>
         {!isConfigured ? (
           <Button
-            type="primary"
-            icon={<SettingOutlined />}
+            className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
             onClick={onConfigure}
           >
+            <SettingOutlined className="mr-1" />
             配置 {providerName} API
           </Button>
         ) : (
           <Button
-            icon={isTesting ? <LoadingOutlined /> : <ThunderboltOutlined />}
             onClick={onTest}
-            loading={isTesting}
+            disabled={isTesting}
           >
-            测试连接
+            {isTesting ? '测试中...' : '测试连接'}
           </Button>
         )}
       </Space>

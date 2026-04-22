@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
-import { Button, Space } from 'antd';
+import { Button } from '@/components/ui/button';
 import { FullscreenOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import styles from './Preview.module.less';
 
@@ -46,24 +46,28 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ playing = false, onT
       </div>
 
       <div className={styles.previewControls}>
-        <Space>
+        <div className="flex items-center gap-2">
           <Button
-            type="text"
-            size="small"
-            icon={<ZoomOutOutlined />}
-            onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.1))}
+            variant="ghost"
+            size="icon-sm"
             aria-label="缩小"
-          />
+            onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.1))}
+          >
+            <ZoomOutOutlined />
+          </Button>
           <span className={styles.zoomLevel}>{zoomPercent}</span>
           <Button
-            type="text"
-            size="small"
-            icon={<ZoomInOutlined />}
-            onClick={() => setZoom((prev) => Math.min(2, prev + 0.1))}
+            variant="ghost"
+            size="icon-sm"
             aria-label="放大"
-          />
-          <Button type="text" size="small" icon={<FullscreenOutlined />} aria-label="全屏" />
-        </Space>
+            onClick={() => setZoom((prev) => Math.min(2, prev + 0.1))}
+          >
+            <ZoomInOutlined />
+          </Button>
+          <Button variant="ghost" size="icon-sm" aria-label="全屏">
+            <FullscreenOutlined />
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { logger } from '@/utils/logger';
 import React, { useState } from 'react';
-import { Card, Typography, Divider, Button, Tag, Tooltip, Space } from 'antd';
+import { Card, Divider, Tag, Tooltip, Space } from 'antd';
+import { Button } from '@/components/ui/button';
 import { 
   FilePdfOutlined, 
   CopyOutlined, 
@@ -110,11 +111,10 @@ const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport 
             导出 PDF
           </Button>
           <Button 
-            type="primary" 
-            icon={<FileTextOutlined />} 
+            className={`bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white ${styles.actionButton} ${styles.editButton}`}
             onClick={onEdit}
-            className={`${styles.actionButton} ${styles.editButton}`}
           >
+            <FileTextOutlined className="mr-1" />
             编辑脚本
           </Button>
         </div>

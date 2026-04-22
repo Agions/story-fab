@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input } from 'antd';
+import { Button } from '@/components/ui/button';
 import type { Project } from '@/types';
 import { notify } from '@/shared';
 import styles from './ProjectForm.module.less';
@@ -65,8 +66,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       </Form.Item>
 
       <Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          保存
+        <Button type="submit" disabled={loading} className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white">
+          {loading ? '保存中...' : '保存'}
         </Button>
       </Form.Item>
     </Form>

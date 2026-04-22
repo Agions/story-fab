@@ -1,6 +1,8 @@
 import { logger } from '@/utils/logger';
 import React, { useState } from 'react';
-import { Card, Button, Progress, Alert, Typography, Spin } from 'antd';
+import { Card, Alert, Spin } from 'antd';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { VideoCameraOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api/core';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +11,11 @@ import VideoSelector from './VideoSelector';
 import { notify } from '@/shared';
 import styles from './VideoAnalyzer.module.less';
 
-const { Title, Paragraph } = Typography;
+const Title = ({ level = 4, children }: { level?: number; children: React.ReactNode }) => {
+  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+  return <Tag>{children}</Tag>;
+};
+const Paragraph = ({ children }: { children: React.ReactNode }) => <p>{children}</p>;
 
 interface VideoAnalyzerProps {
   projectId: string;
@@ -47,7 +53,6 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       
       setProgress(10);
       
-      // 调用Tauri后端分析视频
       const videoMetadata = await invoke<AnalyzeVideoResult>('analyze_video', { 
         path: selectedVideoUrl 
       }).catch(err => {
@@ -57,7 +62,6 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       
       setProgress(40);
       
-      // 提取关键帧
       const keyFrameCount = Math.min(5, Math.ceil(videoMetadata.duration / 60));
       const keyFrames = await invoke<string[]>('extract_key_frames', {
         path: selectedVideoUrl,
@@ -69,7 +73,6 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       
       setProgress(70);
       
-      // 生成缩略图
       const thumbnail = await invoke<string>('generate_thumbnail', {
         path: selectedVideoUrl
       }).catch(err => {
@@ -77,8 +80,6 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
         return '';
       });
       
-      // TODO: 实际关键时刻和情感分析应由 AI 模型完成
-      // 临时使用均匀分布生成关键帧
       const keyMoments: KeyMoment[] = [];
       const emotions: Emotion[] = [];
       
@@ -90,13 +91,12 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
         keyMoments.push({
           timestamp,
           description: `关键时刻 ${i}`,
-          importance: 7 // 默认重要性
+          importance: 7
         });
       }
       
       setProgress(90);
       
-      // 构建分析结果
       const analysis: VideoAnalysis = {
         id: uuidv4(),
         title: videoMetadata.title || `项目_${projectId}`,
@@ -151,19 +151,17 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
       {loading && (
         <div className={styles.progress}>
-          <Progress percent={progress} status="active" />
+          <Progress value={progress} />
           <Spin tip="分析中..." />
         </div>
       )}
 
       <Button
-        type="primary"
+        className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
         onClick={handleAnalyze}
-        loading={loading}
         disabled={!selectedVideoUrl || loading}
-        className={styles.button}
       >
-        开始分析
+        {loading ? '分析中...' : '开始分析'}
       </Button>
     </Card>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Card, Row, Col, Typography, Tag, Avatar, Radio, Space, Tooltip, Button, Input, Segmented, Spin } from 'antd';
+import { Card, Row, Col, Typography, Tag, Avatar, Radio, Space, Tooltip, Input, Segmented, Spin } from 'antd';
+import { Button } from '@/components/ui/button';
 import { CheckCircleFilled, RobotOutlined, QuestionCircleOutlined, CodeOutlined, VideoCameraOutlined, EditOutlined, FireOutlined, StarOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { motion } from '@/components/common/motion-shim';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS } from '@/core/config/models.config';
@@ -422,10 +423,10 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
           transition={{ duration: 0.3, delay: 0.3 }}
         >
             <Button 
-            type="link" 
+            variant="link" 
             onClick={() => onConfigureAPI(allModels.find(m => m.id === selectedModelId)?.provider || 'openai')}
-            icon={<ThunderboltOutlined />}
           >
+            <ThunderboltOutlined className="mr-1" />
             配置API密钥
           </Button>
         </motion.div>

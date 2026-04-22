@@ -1,5 +1,6 @@
 import React from 'react';
-import { Drawer, List, Typography, Button, Empty } from 'antd';
+import { Drawer, List, Empty } from 'antd';
+import { Button } from '@/components/ui/button';
 import { BellOutlined } from '@ant-design/icons';
 import { useAppStore } from '@/store';
 import styles from './NotificationCenter.module.less';
@@ -13,7 +14,11 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ open, onClose }
   const { notifications, clearNotifications } = useAppStore();
 
   // 通知数据 (从store获取)
-  const notificationList = Array.from({ length: notifications }, (_, idx) => ({
+  const Typography = {
+  Text: ({ strong, type, className, children }: { strong?: boolean; type?: string; className?: string; children: React.ReactNode }) =>
+    strong ? <strong className={className}>{children}</strong> : <span className={className}>{children}</span>
+};
+const notificationList = Array.from({ length: notifications }, (_, idx) => ({
     key: `notification-${idx + 1}`,
     title: `系统通知 ${idx + 1}`,
     time: '刚刚',
@@ -28,7 +33,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ open, onClose }
       open={open}
       width={320}
       extra={
-        <Button type="link" onClick={clearNotifications} disabled={notifications <= 0}>
+        <Button variant="link" onClick={clearNotifications} disabled={notifications <= 0}>
           清除全部
         </Button>
       }

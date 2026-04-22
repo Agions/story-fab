@@ -1,5 +1,6 @@
 import React, { memo, useState, useEffect } from 'react';
-import { Button, Space, InputNumber, Slider } from 'antd';
+import { Space, InputNumber } from 'antd';
+import { Button } from '@/components/ui/button';
 import type { TimelineClip } from './types';
 import { formatTime } from './utils';
 import { MIN_CLIP_DURATION } from './constants';
@@ -35,7 +36,7 @@ export const ClipPropertiesPanel = memo<ClipPropertiesPanelProps>(({ clip, onUpd
     <div className={styles.propertiesPanel}>
       <div className={styles.propertiesHeader}>
         <span>片段属性</span>
-        <Button size="small" type="text" onClick={onClose}>×</Button>
+        <Button size="sm" variant="ghost" onClick={onClose}>×</Button>
       </div>
       <div className={styles.propertiesBody}>
         <div className={styles.propRow}>
@@ -65,7 +66,7 @@ export const ClipPropertiesPanel = memo<ClipPropertiesPanelProps>(({ clip, onUpd
         </Button>
         <Space>
           <Button size="small" onClick={onClose}>取消</Button>
-          <Button size="small" type="primary" onClick={handleApply}>应用</Button>
+          <Button size="sm" className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={handleApply}>应用</Button>
         </Space>
       </div>
     </div>
