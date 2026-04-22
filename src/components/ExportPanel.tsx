@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Radio, Button, Input, Space, Tooltip } from 'antd';
+import { Card, Radio, Input, Space, Tooltip } from 'antd';
+import { Button } from '@/components/ui/button';
 import type { RadioChangeEvent } from 'antd/es/radio';
 import { ExportOutlined, FileTextOutlined, FilePdfOutlined, GlobalOutlined } from '@ant-design/icons';
 import { ExportFormat, exportScript } from '@/services/export';
@@ -88,12 +89,12 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
       extra={
         <Tooltip title="导出后的文件将保存到您选择的位置">
           <Button 
-            type="primary" 
-            icon={<ExportOutlined />} 
+            className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" 
             onClick={handleExport}
-            loading={exporting}
+            disabled={exporting}
           >
-            导出
+            <ExportOutlined className="mr-1" />
+            {exporting ? '导出中...' : '导出'}
           </Button>
         </Tooltip>
       }

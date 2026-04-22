@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Button, Slider, Space, Row, Col, Radio, InputNumber, Statistic, Card } from 'antd';
+import { Slider, Space, Row, Col, Radio, InputNumber, Statistic, Card } from 'antd';
+import { Button } from '@/components/ui/button';
 import { logger } from '@/utils/logger';
 import { 
   PlayCircleOutlined, 
@@ -367,11 +368,13 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
             <div className={styles.controlButtons}>
               <div className={styles.leftControls}>
                 <Button 
-                  type="text" 
-                  icon={isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />} 
+                  variant="ghost" 
+                  size="icon-sm" 
                   onClick={togglePlay}
                   className={styles.controlButton}
-                />
+                >
+                  {isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+                </Button>
                 
                 <div 
                   className={styles.volumeControl}
@@ -379,11 +382,13 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
                   onMouseLeave={() => setShowVolumeSlider(false)}
                 >
                   <Button 
-                    type="text" 
-                    icon={<SoundOutlined />} 
+                    variant="ghost" 
+                    size="icon-sm" 
                     onClick={toggleMute}
                     className={styles.controlButton}
-                  />
+                  >
+                    <SoundOutlined />
+                  </Button>
                   {showVolumeSlider && (
                     <div className={styles.volumeSlider}>
                       <Slider
@@ -405,18 +410,22 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
               
               <div className={styles.rightControls}>
                 <Button 
-                  type="text" 
-                  icon={<SettingOutlined />} 
+                  variant="ghost" 
+                  size="icon-sm" 
                   onClick={() => setShowAdvancedControls(!showAdvancedControls)}
                   className={styles.controlButton}
-                />
+                >
+                  <SettingOutlined />
+                </Button>
                 
                 <Button 
-                  type="text" 
-                  icon={isFullscreen ? <CompressOutlined /> : <ExpandOutlined />} 
+                  variant="ghost" 
+                  size="icon-sm" 
                   onClick={toggleFullscreen}
                   className={styles.controlButton}
-                />
+                >
+                  {isFullscreen ? <CompressOutlined /> : <ExpandOutlined />}
+                </Button>
               </div>
             </div>
             

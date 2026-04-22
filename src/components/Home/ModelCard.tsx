@@ -1,10 +1,21 @@
 import React from 'react';
-import { Card, Button, Tag, Space, Typography, Tooltip, Badge, Modal } from 'antd';
-import { RobotOutlined, CheckCircleFilled, WarningOutlined, ApiOutlined, SettingOutlined, ExportOutlined, LinkOutlined } from '@ant-design/icons';
+import { Card, Tag, Tooltip, Badge } from 'antd';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { RobotOutlined, CheckCircleFilled, WarningOutlined, ApiOutlined, SettingOutlined, LinkOutlined } from '@ant-design/icons';
 import { AIModelType, AI_MODEL_INFO } from '@/types';
 import { useModelStore } from '@/store';
 import { useNavigate } from 'react-router-dom';
 import styles from './ModelCard.module.less';
+
+const Text = ({ children, type, className }: { children: React.ReactNode; type?: string; className?: string }) => (
+  <span className={className || (type ? `text-${type}` : undefined)}>{children}</span>
+);
+
+const Title = ({ level = 4, children, className }: { level?: number; children: React.ReactNode; className?: string }) => {
+  const Tag = level === 4 ? 'h4' : 'h3';
+  return <Tag className={className}>{children}</Tag>;
+};
 
 // API密钥申请链接
 const API_LINKS: Partial<Record<AIModelType, string>> = {
@@ -17,8 +28,6 @@ const API_LINKS: Partial<Record<AIModelType, string>> = {
   deepseek: 'https://platform.deepseek.com/api',
   moonshot: 'https://platform.moonshot.cn/docs'
 };
-
-const { Text, Title } = Typography;
 
 interface ModelCardProps {
   modelType: AIModelType;
@@ -57,7 +66,6 @@ const ModelCard: React.FC<ModelCardProps> = ({
   const handleRequestApiKey = (e: React.MouseEvent) => {
     e.stopPropagation();
     onRequestApiKey?.(modelType);
-    // 显示申请选项模态框
     setIsModalVisible(true);
   };
 
@@ -68,47 +76,6 @@ const ModelCard: React.FC<ModelCardProps> = ({
     setIsModalVisible(false);
   };
 
-  // 渲染申请选项模态框
-  const renderApplyModal = () => (
-    <Modal
-      title={`申请${modelInfo.name} API密钥`}
-      open={isModalVisible}
-      onCancel={() => setIsModalVisible(false)}
-      footer={null}
-      width={400}
-      centered
-      className={styles.applyModal}
-    >
-      <div className={styles.applyOptions}>
-        <Button 
-          type="primary" 
-          icon={<LinkOutlined />} 
-          block 
-          size="large"
-          onClick={handleGoToApiPage}
-          className={styles.applyButton}
-        >
-          前往{modelInfo.provider}官网申请API密钥
-        </Button>
-        
-        <div className={styles.dividerText}>或者</div>
-        
-        <Button
-          block
-          size="large"
-          icon={<SettingOutlined />}
-          onClick={() => {
-            setIsModalVisible(false);
-            navigate('/settings', { state: { activeModel: modelType, showKeyConfig: true } });
-          }}
-          className={styles.applyButton}
-        >
-          直接配置API密钥
-        </Button>
-      </div>
-    </Modal>
-  );
-  
   return (
     <>
       <Card 
@@ -151,51 +118,77 @@ const ModelCard: React.FC<ModelCardProps> = ({
           
           <div className={styles.modelActions}>
             {isEnabled ? (
-              <Space>
+              <div className="flex items-center gap-2">
                 <Button 
-                  type={isSelected ? "primary" : "default"}
-                  size="small"
+                  className={isSelected ? "bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" : ""}
+                  size="sm"
                   onClick={handleSelect}
                 >
                   {isSelected ? '当前默认' : '设为默认'}
                 </Button>
                 <Tooltip title="管理模型设置">
                   <Button
-                    type="text"
-                    size="small"
-                    icon={<SettingOutlined />}
+                    variant="ghost"
+                    size="icon-sm"
                     onClick={handleGoToSettings}
                     aria-label="管理模型设置"
-                  />
+                  >
+                    <SettingOutlined />
+                  </Button>
                 </Tooltip>
-              </Space>
+              </div>
             ) : (
-              <Space>
+              <div className="flex items-center gap-2">
                 <Button 
-                  type="primary" 
-                  size="small"
-                  icon={<SettingOutlined />}
+                  className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+                  size="sm"
                   onClick={handleGoToSettings}
                 >
                   去配置
                 </Button>
                 <Button 
-                  type="link" 
-                  size="small"
-                  icon={<ApiOutlined />}
+                  variant="link"
+                  size="sm"
                   onClick={handleRequestApiKey}
                   className={styles.applyKeyButton}
                 >
                   申请密钥
                 </Button>
-              </Space>
+              </div>
             )}
           </div>
         </div>
       </Card>
-      {renderApplyModal()}
+      
+      <Dialog open={isModalVisible} onOpenChange={setIsModalVisible}>
+        <DialogContent className={styles.applyModal} style={{ width: 400 }}>
+          <h3 className="mb-4 text-lg font-semibold">申请{modelInfo.name} API密钥</h3>
+          <div className={styles.applyOptions}>
+            <Button 
+              className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white h-12"
+              onClick={handleGoToApiPage}
+            >
+              <LinkOutlined className="mr-2" />
+              前往{modelInfo.provider}官网申请API密钥
+            </Button>
+            
+            <div className={styles.dividerText}>或者</div>
+            
+            <Button
+              className="h-12"
+              onClick={() => {
+                setIsModalVisible(false);
+                navigate('/settings', { state: { activeModel: modelType, showKeyConfig: true } });
+              }}
+            >
+              <SettingOutlined className="mr-2" />
+              直接配置API密钥
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
 
-export default ModelCard; 
+export default ModelCard;

@@ -1,6 +1,7 @@
 import { logger } from '@/utils/logger';
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Button, Space, Card, Spin } from 'antd';
+import { Card, Spin } from 'antd';
+import { Button } from '@/components/ui/button';
 import { UploadOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { open } from '@tauri-apps/plugin-dialog';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
@@ -273,22 +274,22 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
             )}
 
             <div className={styles.videoActions}>
-              <Space>
+              <div className="flex items-center gap-2">
                 <Button
-                  icon={<DeleteOutlined />}
+                  variant="destructive"
                   onClick={handleRemoveVideo}
-                  danger
                 >
+                  <DeleteOutlined className="mr-1" />
                   移除
                 </Button>
                 <Button
-                  icon={<PlayCircleOutlined />}
+                  className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
                   onClick={handlePlayVideo}
-                  type="primary"
                 >
+                  <PlayCircleOutlined className="mr-1" />
                   {isTauri() ? '在播放器中打开' : '新窗口播放'}
                 </Button>
-              </Space>
+              </div>
             </div>
           </div>
         )}

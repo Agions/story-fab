@@ -1,9 +1,7 @@
 import React, { memo } from 'react';
-import { Button, Space, Progress, Typography } from 'antd';
+import { Space, Progress } from 'antd';
+import { Button } from '@/components/ui/button';
 import { ScissorOutlined, SettingOutlined, SaveOutlined } from '@ant-design/icons';
-import styles from './VideoEditor.module.less';
-
-const { Text } = Typography;
 
 interface EditorControlsProps {
   processing: boolean;
@@ -33,27 +31,27 @@ const EditorControls: React.FC<EditorControlsProps> = ({
     <div className={styles.editorControls}>
       <Space>
         <Button
-          type="primary"
-          icon={<ScissorOutlined />}
+          className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           onClick={onExport}
           disabled={processing || !hasSegments}
         >
+          <ScissorOutlined className="mr-1" />
           生成混剪视频
         </Button>
 
         <Button
-          icon={<SettingOutlined />}
           onClick={onSettings}
           disabled={processing}
         >
+          <SettingOutlined className="mr-1" />
           导出设置
         </Button>
 
         <Button
-          icon={<SaveOutlined />}
           onClick={onSave}
           disabled={processing}
         >
+          <SaveOutlined className="mr-1" />
           保存片段时间
         </Button>
       </Space>
