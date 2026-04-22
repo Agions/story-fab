@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { Typography, Space, Button } from 'antd';
+import { Typography, Space } from 'antd';
+import { Button } from '@/components/ui/button';
 import { StarOutlined } from '@ant-design/icons';
 import type { AIModel } from '@/core/types';
 import styles from './index.module.less';
@@ -33,11 +34,10 @@ export const ModelRecommendations: React.FC<ModelRecommendationsProps> = ({
         {models.map((model, idx) => (
           <Button
             key={model.id}
-            type={currentModelId === model.id ? 'primary' : 'default'}
-            size="small"
+            variant={currentModelId === model.id ? 'default' : 'outline'}
             onClick={() => onSelect(idx)}
           >
-            {idx === 0 && <StarOutlined />}
+            {idx === 0 && <StarOutlined className="mr-1" />}
             {model.name}
           </Button>
         ))}

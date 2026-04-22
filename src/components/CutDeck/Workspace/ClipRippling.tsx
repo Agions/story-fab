@@ -13,7 +13,9 @@
 
 import React, { useState, useCallback, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
-import { Button, Progress, Tag, Checkbox, Select, message } from 'antd';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Tag, Checkbox, Select, message } from 'antd';
 import {
   ThunderboltOutlined,
   CheckCircleOutlined,
@@ -252,13 +254,11 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
       <div className={styles.runSection}>
         {!running && results.length === 0 && (
           <Button
-            type="primary"
-            size="large"
-            icon={<ThunderboltOutlined />}
             onClick={handleRun}
-            className={styles.runButton}
+            className={`${styles.runButton} bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white`}
             block
           >
+            <ThunderboltOutlined className="mr-1" />
             开始 AI 拆条分析
           </Button>
         )}
@@ -291,12 +291,11 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
               </Tag>
             </span>
             <Button
-              type="primary"
-              icon={<DownloadOutlined />}
+              className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
               onClick={handleExport}
-              loading={exporting}
-              disabled={selectedClips.size === 0}
+              disabled={selectedClips.size === 0 || exporting}
             >
+              <DownloadOutlined className="mr-1" />
               导出选中片段
             </Button>
           </div>
@@ -338,11 +337,8 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
                       <div key={dim} className={styles.dimBar}>
                         <span className={styles.dimLabel}>{dimLabel(dim)}</span>
                         <Progress
-                          percent={Math.round(val)}
-                          size="small"
-                          strokeColor={scoreColor(val)}
-                          showInfo={false}
-                          style={{ flex: 1, minWidth: 60 }}
+                          value={Math.round(val)}
+                          className="flex-1 min-w-[60px]"
                         />
                         <span className={styles.dimScore}>{Math.round(val)}</span>
                       </div>

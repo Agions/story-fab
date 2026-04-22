@@ -3,7 +3,9 @@
  * Part of VideoProcessingController - handles batch video processing
  */
 import React from 'react';
-import { Button, Tooltip, Progress, Popconfirm, Tag } from 'antd';
+import { Tooltip, Popconfirm, Tag } from 'antd';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { PlusOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import type { BatchItem } from '../types';
 import type { VideoSegment } from '@/core/types';
@@ -33,20 +35,18 @@ export const BatchProcessing: React.FC<BatchProcessingProps> = ({
     <div className="batchContainer">
       <div className="batchHeader">
         <Button
-          type="primary"
-          icon={<PlusOutlined />}
+          className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           onClick={onAddBatchItem}
         >
+          <PlusOutlined className="mr-1" />
           添加当前视频到批处理
         </Button>
 
         <Tooltip title="开始处理所有批次项">
           <Button
-            type="primary"
-            icon={<PlayCircleOutlined />}
+            className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
             onClick={onStartBatchProcessing}
             disabled={processingBatch || batchItems.length === 0}
-            loading={processingBatch}
           >
             {processingBatch ? '处理中...' : '开始批量处理'}
           </Button>
@@ -95,12 +95,12 @@ export const BatchProcessing: React.FC<BatchProcessingProps> = ({
                       disabled={processingBatch}
                     >
                       <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        size="small"
+                        variant="ghost"
+                        size="icon-sm"
                         disabled={processingBatch}
-                      />
+                      >
+                        <DeleteOutlined />
+                      </Button>
                     </Popconfirm>
                   </div>
                 </div>

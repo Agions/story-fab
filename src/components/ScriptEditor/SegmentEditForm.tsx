@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { Card, Form, Input, Select, Button, Space } from 'antd';
+import { Card, Form, Input, Select, Space } from 'antd';
+import { Button } from '@/components/ui/button';
 import type { FormInstance } from 'antd';
 import { segmentTypeOptions } from './types';
 import styles from './ScriptEditor.module.less';
@@ -75,8 +76,8 @@ const SegmentEditForm: React.FC<SegmentEditFormProps> = ({
 
           <div className={styles.formActions}>
             <Space>
-              <Button onClick={onCancel}>取消</Button>
-              <Button type="primary" onClick={onSave}>保存</Button>
+              <Button variant="outline" onClick={onCancel}>取消</Button>
+              <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={onSave}>保存</Button>
             </Space>
           </div>
         </Form>

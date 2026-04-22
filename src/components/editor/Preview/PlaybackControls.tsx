@@ -49,49 +49,24 @@ export const PlaybackControls = memo<PlaybackControlsProps>(({
       {/* Left: playback buttons */}
       <div className="flex items-center gap-1">
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-sm" onClick={onStop} className="text-text-secondary">
-              <Square className="size-3.5" />
-            </Button>
-          </TooltipTrigger>
+          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onStop} className="text-text-secondary" />} />
           <TooltipContent side="top"><p>停止</p></TooltipContent>
         </Tooltip>
 
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-sm" onClick={onStepBack} className="text-text-secondary">
-              <SkipBack className="size-3.5" />
-            </Button>
-          </TooltipTrigger>
+          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onStepBack} className="text-text-secondary" />} />
           <TooltipContent side="top"><p>上一帧</p></TooltipContent>
         </Tooltip>
 
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={onPlayPause}
-              className="text-text-primary"
-            >
-              {isPlaying ? (
-                <Pause className="size-3.5" />
-              ) : (
-                <Play className="size-3.5 ml-0.5" />
-              )}
-            </Button>
-          </TooltipTrigger>
+          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onPlayPause} className="text-text-primary" />} />
           <TooltipContent side="top">
             <p>{isPlaying ? '暂停 (Space)' : '播放 (Space)'}</p>
           </TooltipContent>
         </Tooltip>
 
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-sm" onClick={onStepForward} className="text-text-secondary">
-              <SkipForward className="size-3.5" />
-            </Button>
-          </TooltipTrigger>
+          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onStepForward} className="text-text-secondary" />} />
           <TooltipContent side="top"><p>下一帧</p></TooltipContent>
         </Tooltip>
       </div>
@@ -109,11 +84,7 @@ export const PlaybackControls = memo<PlaybackControlsProps>(({
       {/* Right: fullscreen */}
       <div className="flex items-center gap-1">
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-sm" onClick={onFullscreen} className="text-text-secondary">
-              <Maximize className="size-3.5" />
-            </Button>
-          </TooltipTrigger>
+          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onFullscreen} className="text-text-secondary" />} />
           <TooltipContent side="top"><p>全屏</p></TooltipContent>
         </Tooltip>
       </div>
