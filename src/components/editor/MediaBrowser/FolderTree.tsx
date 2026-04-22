@@ -126,3 +126,4 @@ const FolderNode = memo<{
 });
 
 FolderNode.displayName = 'FolderNode';
+FolderTree.displayName = 'FolderTree';
