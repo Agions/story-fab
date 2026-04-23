@@ -10,15 +10,15 @@
  */
 import React, { useRef, useEffect, memo } from 'react';
 import {
-  PlusOutlined,
-  VideoCameraOutlined,
-  CloudSyncOutlined,
-  FileTextOutlined,
-  EditOutlined,
-  ExportOutlined,
-  CheckOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons';
+  Plus,
+  Video,
+  Cloud,
+  FileText,
+  Edit,
+  Download,
+  Check,
+  Bolt,
+} from 'lucide-react';
 import { useCutDeck, CutDeckStep } from '../AIEditorContext';
 import styles from './Workspace.module.less';
 
@@ -43,13 +43,13 @@ interface WorkspaceProps {
 // ============================================================================
 
 const STEPS: StepConfig[] = [
-  { key: 'project-create', title: '上传视频', icon: <PlusOutlined /> },
-  { key: 'video-upload', title: '视频上传', icon: <VideoCameraOutlined /> },
-  { key: 'ai-analyze', title: 'AI 分析', icon: <CloudSyncOutlined /> },
-  { key: 'clip-repurpose', title: 'AI 拆条', icon: <ThunderboltOutlined /> },
-  { key: 'script-generate', title: '生成片段', icon: <FileTextOutlined /> },
-  { key: 'video-synthesize', title: '文案生成', icon: <EditOutlined /> },
-  { key: 'export', title: '视频合成', icon: <ExportOutlined /> },
+  { key: 'project-create', title: '上传视频', icon: <Plus /> },
+  { key: 'video-upload', title: '视频上传', icon: <Video /> },
+  { key: 'ai-analyze', title: 'AI 分析', icon: <Cloud /> },
+  { key: 'clip-repurpose', title: 'AI 拆条', icon: <Bolt /> },
+  { key: 'script-generate', title: '生成片段', icon: <FileText /> },
+  { key: 'video-synthesize', title: '文案生成', icon: <Edit /> },
+  { key: 'export', title: '视频合成', icon: <Download /> },
 ];
 
 // 正确的顺序映射（按照任务描述的视觉顺序）
@@ -151,11 +151,11 @@ const StepList: React.FC<StepListProps> = ({
               <div className={styles.stepIconWrapper}>
                 {completed ? (
                   <span className={`${styles.stepIcon} ${styles.iconCompleted}`}>
-                    <CheckOutlined />
+                    <Check />
                   </span>
                 ) : inProgress ? (
                   <span className={`${styles.stepIcon} ${styles.iconInProgress}`}>
-                    <ThunderboltOutlined />
+                    <Bolt />
                   </span>
                 ) : (
                   <span className={`${styles.stepIcon} ${styles.iconPending}`}>
