@@ -115,7 +115,7 @@ git push origin feature/your-feature-name
 ### 技术栈约定
 
 ```
-React 18 + TypeScript + Vite 6 + Tauri 2.x + Ant Design 5
+React 18 + TypeScript + Vite 6 + Tauri 2.x + shadcn/ui + Tailwind CSS
 ```
 
 ### 组件开发规范

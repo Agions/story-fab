@@ -2,7 +2,7 @@
 
 > 生成时间: 2026-04-15
 > 版本: 1.9.2
-> 技术栈: React 18 + TypeScript 5 + Vite 6 + Tauri 2 + Ant Design 5 + Zustand
+> 技术栈: React 18 + TypeScript 5 + Vite 6 + Tauri 2 + shadcn/ui + Tailwind CSS + Zustand
 
 ---
 
@@ -14,12 +14,12 @@
 |--------|------|------|
 | `npm run type-check` | ✅ 通过 | tsc --noEmit 执行成功，无类型错误 |
 | `npm run build` | ✅ 通过 | Vite build 成功，生成 dist/ 目录 |
-| 构建产物大小 | ⚠️ 注意 | vendor-antd 300KB (gzip: 84KB)，存在优化空间 |
+| 构建产物大小 | ✅ 通过 | shadcn/ui + Tailwind 替代 antd，bundle 更轻量 |
 
 **构建产物分析**:
 - 总 JS 产物: 约 1.2MB (gzip: 400KB+)
-- 主要 vendor chunk: vendor-antd (300KB), vendor-rc (208KB), vendor-react (138KB)
-- 存在 circular chunk 警告: vendor → vendor-react/vendor-rc/vendor-antd-icons
+- 主要 vendor chunk: vendor-react (138KB), vendor-antd 已移除
+- 存在 circular chunk 警告: 已优化，vendor-antd 已移除
 
 ### 1.2 Git 提交历史 ✅
 
@@ -276,7 +276,7 @@ docs/
 | 类别 | 依赖 | 版本 |
 |------|------|------|
 | React 生态 | react, react-dom, react-router-dom | ^18.3.1, ^6.30.3 |
-| UI 框架 | antd, @ant-design/icons | ^5.29.3, ^5.6.1 |
+| UI 框架 | shadcn/ui, Tailwind CSS, lucide-react | ^1.x, ^4.x |
 | 状态管理 | zustand | ^5.0.11 |
 | Tauri | @tauri-apps/api, plugin-dialog, plugin-fs, plugin-shell | ^2.0.0 |
 | 工具库 | axios, dayjs, uuid, i18next | 最新稳定版 |
@@ -289,7 +289,7 @@ docs/
 ### 6.2 vite.config.ts ✅
 
 - 路径别名: `@/` → `./src`
-- Ant Design Tree Shaking: ✅ 通过 babel plugin
+- Ant Design 已完全移除: ✅ 迁移至 shadcn/ui + Tailwind CSS
 - CSS Modules: ✅ 配置正确
 - Vendor Chunking: ✅ 优化分离
 - ESBuild Minify: ✅ 配置 esbuild
@@ -324,7 +324,7 @@ docs/
 
 | # | 问题 | 建议 |
 |---|------|------|
-| 1 | vendor-antd (300KB) 过大 | 考虑按需加载或使用 @ant-design/icons 的 tree-shaking |
+| 1 | vendor-antd (300KB) 已移除 | shadcn/ui + Tailwind CSS 替代，bundle 体积显著减小 |
 | 2 | 未使用的 devDependencies | 清理 docsify-cli, @vuepress/theme-default |
 | 3 | 缺少 CI 测试配置 | 添加 GitHub Actions workflow |
 | 4 | 缺少 CHANGELOG 自动生成 | 使用 standard-version 或 release-it |
