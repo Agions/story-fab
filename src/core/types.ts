@@ -131,6 +131,7 @@ export interface ScriptMetadata {
   template?: string;
   createdAt?: string;
   updatedAt?: string;
+  style?: string;
 }
 
 export interface ScriptTemplate {
@@ -426,14 +427,7 @@ export interface ScriptData {
   updatedAt?: string;
 }
 
-export interface ScriptMetadata {
-  title?: string;
-  author?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  wordCount?: number;
-  style?: string;
-}
+// ScriptMetadata 已在上方定义（第120行）
 
 export interface ExportSettings {
   format: 'mp4' | 'webm' | 'gif';
