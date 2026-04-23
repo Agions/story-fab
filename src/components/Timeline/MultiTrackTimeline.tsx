@@ -19,6 +19,8 @@ import React, {
   useMemo,
 } from 'react';
 import { Button } from '@/components/ui/button';
+import { Tooltip } from '@/components/ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import {
   PlayCircle,
   PauseCircle,
@@ -29,7 +31,6 @@ import {
   Send,
   Rewind,
 } from 'lucide-react';
-import type { MenuProps } from '@/components/ui/dropdown-menu';
 import type { TimelineTrack, TimelineClip, DragType } from './types';
 
 import { TrackHeader } from './TrackHeader';
@@ -370,7 +371,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
   }, [localZoom, localScrollX, onZoomChange, onScrollXChange]);
 
   // 添加轨道菜单
-  const addTrackMenuItems: MenuProps['items'] = [
+  const trackMenuItems = [
     { key: 'video', label: '视频轨道', onClick: () => handleAddTrack('video') },
     { key: 'audio', label: '音频轨道', onClick: () => handleAddTrack('audio') },
     { key: 'subtitle', label: '字幕轨道', onClick: () => handleAddTrack('subtitle') },
@@ -385,7 +386,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     <div className={styles.multiTrackTimeline} ref={containerRef}>
       {/* 工具栏 */}
       <div className={styles.toolbar}>
-        <Space>
+        <div className="flex gap-2 items-center">
           <Tooltip title={isPlaying ? '暂停 (Space)' : '播放 (Space)'}>
             <Button icon={isPlaying ? <PauseCircle /> : <PlayCircle />}>
               {isPlaying ? '暂停' : '播放'}
@@ -395,9 +396,18 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
             <Button icon={<Rewind />} onClick={() => { setLocalPlayhead(0); onPlayheadChange?.(0); }} />
           </Tooltip>
           <Divider type="vertical" />
-          <Dropdown menu={{ items: addTrackMenuItems }} trigger={['click']}>
-            <Button icon={<Plus />}>添加轨道</Button>
-          </Dropdown>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button icon={<Plus />}>添加轨道</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {trackMenuItems.map(item => (
+                <DropdownMenuItem key={item.key} onClick={item.onClick}>
+                  {item.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Tooltip title={selectedClipId ? '删除片段 (Delete)' : '请先选择片段'}>
             <Button icon={<Trash2 />} danger disabled={!selectedClipId} onClick={() => selectedClipId && handleClipDelete(selectedClipId)} />
           </Tooltip>
@@ -409,7 +419,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
             <Button icon={<Send />} disabled={!canRedo} onClick={onRedo} />
           </Tooltip>
           <Divider type="vertical" />
-          <Space>
+          <div className="flex gap-2 items-center">
             <Tooltip title="缩小">
               <Button icon={<ZoomOut />} onClick={() => {
                 const newZoom = clamp(localZoom / 1.2, MIN_ZOOM, MAX_ZOOM);
@@ -425,8 +435,8 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
                 onZoomChange?.(newZoom);
               }} />
             </Tooltip>
-          </Space>
-        </Space>
+          </div>
+        </div>
       </div>
 
       {/* 时间显示 */}

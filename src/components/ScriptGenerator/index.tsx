@@ -17,22 +17,19 @@ import {
   Tag,
   Progress,
   Alert,
-  Divider,
-  Tooltip,
-  Badge,
-} from 'antd';
+} from '@/components/ui/alert';
 import {
-  EditOutlined,
-  ThunderboltOutlined,
-  ClockCircleOutlined,
-  FileTextOutlined,
-  UserOutlined,
-  GlobalOutlined,
-  CheckCircleOutlined,
-  LoadingOutlined,
-  SettingOutlined,
-  DollarOutlined,
-} from '@ant-design/icons';
+  Edit,
+  Zap,
+  Clock,
+  FileText,
+  User,
+  Globe,
+  CheckCircle,
+  Loader,
+  Settings,
+  CreditCard,
+} from 'lucide-react';
 import { motion, AnimatePresence } from '@/components/common/motion-shim';
 import { useModel, useModelCost } from '@/hooks/useModel';
 import { useProject } from '@/hooks/useProject';

@@ -9,27 +9,11 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import {
-  Card,
-  Form,
-  Input,
-  Button,
-  Steps,
-  Typography,
-  Space,
-  Spin,
-  Result,
-  Select,
-  Switch,
-  Tag,
-} from 'antd';
-import {
-  ArrowLeftOutlined,
-  SaveOutlined,
-  VideoCameraOutlined,
-  EditOutlined,
-  CheckCircleOutlined,
-} from '@ant-design/icons';
+import { Card, Spin } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Steps, StepsItem, StepsContent } from '@/components/ui/steps';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ArrowLeft, Save, Video, Edit, CheckCircle } from 'lucide-react';
 
 import { VideoMetadata, analyzeVideo, extractKeyFrames } from '@/services/video';
 import type { ScriptSegment } from '@/core/types';
@@ -86,7 +70,7 @@ const ProjectEditHeader = React.memo<ProjectEditHeaderProps>(({
   autoSaveEnabled, onBack, onSave, onSaveBehaviorChange, onAutoSaveToggle,
 }) => (
   <div className={styles.header}>
-    <Button type="text" icon={<ArrowLeftOutlined />} onClick={onBack}>返回</Button>
+    <Button type="text" icon={<ArrowLeft />} onClick={onBack}>返回</Button>
     <Title level={3}>{isNewProject ? '创建新项目' : '编辑项目'}</Title>
     <Space size="middle">
       <div className={styles.saveBehaviorControl}>
@@ -104,7 +88,7 @@ const ProjectEditHeader = React.memo<ProjectEditHeaderProps>(({
         <Switch size="small" checked={autoSaveEnabled} onChange={onAutoSaveToggle} />
       </div>
       <Button
-        type="primary" icon={<SaveOutlined />} onClick={onSave}
+        type="primary" icon={<Save />} onClick={onSave}
         loading={saving} disabled={loading || initialLoading}
       >
         保存项目

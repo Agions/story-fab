@@ -8,37 +8,41 @@
  *
  * 设计风格：AI Cinema Studio Dark (#0C0D14)
  */
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Card, Typography, Button, Space, Select, Progress, List,
-  Input, Switch, Slider, Tooltip, Empty,
-} from 'antd';
-import {
-  AudioOutlined, FileTextOutlined, EditOutlined,
-  DownloadOutlined, PlayCircleOutlined, PauseCircleOutlined,
-  SyncOutlined, AimOutlined,
-} from '@ant-design/icons';
+  FileText,
+  Edit,
+  Download,
+  Play,
+  Pause,
+  RefreshCw,
+  Target,
+  Mic,
+} from 'lucide-react';
 import { notify } from '@/shared';
 import { subtitleService } from '@/core/services/subtitle.service';
 import { useEditorStore } from '@/store/editorStore';
 import type { SubtitleEntry } from '@/core/types';
 import styles from './SubtitleExtractor.module.css';
 
-const { Text } = Typography;
-const { Option } = Select;
-
-// ── Types ────────────────────────────────────────────────
-
 interface SubtitleSegment {
   id: string;
-  startTime: number;  // 秒（数值，方便计算）
+  startTime: number;
   endTime: number;
-  start: string;      // 格式化字符串 SRT 格式
+  start: string;
   end: string;
   text: string;
 }
-
-// ── Utils ─────────────────────────────────────────────────
 
 function formatSRTTime(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -46,19 +50,6 @@ function formatSRTTime(seconds: number): string {
   const s = Math.floor(seconds % 60);
   const ms = Math.floor((seconds % 1) * 1000);
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
-}
-
-function parseSRTTime(timeStr: string): number {
-  // Handles "HH:MM:SS,mmm" or "HH:MM:SS.mmm" or "MM:SS,mmm"
-  const parts = timeStr.replace(',', '.').split(':');
-  if (parts.length === 3) {
-    const [h, m, sec] = parts;
-    return parseInt(h) * 3600 + parseInt(m) * 60 + parseFloat(sec);
-  } else if (parts.length === 2) {
-    const [m, sec] = parts;
-    return parseInt(m) * 60 + parseFloat(sec);
-  }
-  return 0;
 }
 
 function formatDisplayTime(seconds: number): string {
@@ -69,28 +60,19 @@ function formatDisplayTime(seconds: number): string {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${cs.toString().padStart(2, '0')}`;
 }
 
-// ── Props ────────────────────────────────────────────────
-
 interface SubtitleExtractorProps {
   projectId: string;
   videoUrl?: string;
   onExtracted?: (subtitles: SubtitleSegment[]) => void;
 }
 
-// ── Component ────────────────────────────────────────────
-
-const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
-  projectId,
-  videoUrl,
-  onExtracted,
-}) => {
+const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoUrl, onExtracted }) => {
   const playheadMs = useEditorStore(state => state.playheadMs);
   const previewPlaying = useEditorStore(state => state.previewPlaying);
   const setPlayheadMs = useEditorStore(state => state.setPlayheadMs);
   const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // ── State ──────────────────────────────────────────────
   const [format, setFormat] = useState<'srt' | 'vtt' | 'txt'>('srt');
   const [translate, setTranslate] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -98,30 +80,20 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
   const [extractedSubtitles, setExtractedSubtitles] = useState<SubtitleSegment[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
-  const [activeSubId, setActiveSubId] = useState<string | null>(null); // 当前播放到的字幕
+  const [activeSubId, setActiveSubId] = useState<string | null>(null);
   const [videoDuration, setVideoDuration] = useState(0);
 
-  // ── Derived ────────────────────────────────────────────
   const totalDuration = videoDuration > 0 ? videoDuration : 1;
-
-  // 当前播放头位置（秒）
   const playheadSec = playheadMs / 1000;
+  const currentSub = extractedSubtitles.find(s => playheadSec >= s.startTime && playheadSec <= s.endTime);
 
-  // 当前播放的字幕（播放头在其时间范围内）
-  const currentSub = extractedSubtitles.find(
-    s => playheadSec >= s.startTime && playheadSec <= s.endTime
-  );
-
-  // ── Video handlers ─────────────────────────────────────
   const handleVideoTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     setPlayheadMs(video.currentTime * 1000);
   }, []);
 
-  const handleVideoEnded = useCallback(() => {
-    setPreviewPlaying(false);
-  }, []);
+  const handleVideoEnded = useCallback(() => { setPreviewPlaying(false); }, []);
 
   const handleVideoMetadata = useCallback(() => {
     const video = videoRef.current;
@@ -141,7 +113,6 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
     }
   }, [previewPlaying]);
 
-  // ── Seek ───────────────────────────────────────────────
   const seekTo = useCallback((timeSec: number) => {
     const video = videoRef.current;
     if (!video) return;
@@ -153,91 +124,43 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
     }
   }, [previewPlaying]);
 
-  // ── Extract ────────────────────────────────────────────
   const handleExtract = useCallback(async () => {
-    if (!videoUrl) {
-      notify.error(null, '未检测到视频源');
-      return;
-    }
-
+    if (!videoUrl) { notify.error(null, '未检测到视频源'); return; }
     setIsExtracting(true);
     setProgress(0);
     setExtractedSubtitles([]);
     setActiveSubId(null);
-
     try {
-      const interval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 8, 88));
-      }, 250);
-
-      const result = await subtitleService.extractSubtitles(videoUrl, {
-        language: 'zh-CN',
-      });
-
+      const interval = setInterval(() => { setProgress(prev => Math.min(prev + 8, 88)); }, 250);
+      const result = await subtitleService.extractSubtitles(videoUrl, { language: 'zh-CN' });
       clearInterval(interval);
       setProgress(100);
-
       const subs: SubtitleSegment[] = result.entries.map((entry: SubtitleEntry) => ({
-        id: entry.id ?? crypto.randomUUID(),
-        startTime: entry.startTime,
-        endTime: entry.endTime,
-        start: formatSRTTime(entry.startTime),
-        end: formatSRTTime(entry.endTime),
-        text: entry.text,
+        id: entry.id ?? crypto.randomUUID(), startTime: entry.startTime, endTime: entry.endTime,
+        start: formatSRTTime(entry.startTime), end: formatSRTTime(entry.endTime), text: entry.text,
       }));
-
       setExtractedSubtitles(subs);
       if (onExtracted) onExtracted(subs);
       notify.success(`成功提取 ${subs.length} 条字幕`);
-    } catch (error) {
-      notify.error(error as Parameters<typeof notify.error>[0], '字幕提取失败');
-    } finally {
-      setIsExtracting(false);
-    }
+    } catch (error) { notify.error(error as Parameters<typeof notify.error>[0], '字幕提取失败'); }
+    finally { setIsExtracting(false); }
   }, [videoUrl, onExtracted]);
 
-  // ── Edit ───────────────────────────────────────────────
-  const startEdit = useCallback((sub: SubtitleSegment) => {
-    setEditingId(sub.id);
-    setEditingText(sub.text);
-  }, []);
-
+  const startEdit = useCallback((sub: SubtitleSegment) => { setEditingId(sub.id); setEditingText(sub.text); }, []);
   const saveEdit = useCallback(() => {
     if (!editingId) return;
-    setExtractedSubtitles(prev =>
-      prev.map(s => s.id === editingId ? { ...s, text: editingText } : s)
-    );
+    setExtractedSubtitles(prev => prev.map(s => s.id === editingId ? { ...s, text: editingText } : s));
     setEditingId(null);
     notify.success('字幕已保存');
   }, [editingId, editingText]);
+  const cancelEdit = useCallback(() => { setEditingId(null); setEditingText(''); }, []);
 
-  const cancelEdit = useCallback(() => {
-    setEditingId(null);
-    setEditingText('');
-  }, []);
-
-  // ── Export ────────────────────────────────────────────
   const exportSubtitle = useCallback(() => {
-    if (extractedSubtitles.length === 0) {
-      notify.warning('无字幕可导出');
-      return;
-    }
-
+    if (extractedSubtitles.length === 0) { notify.warning('无字幕可导出'); return; }
     let content = '';
-    if (format === 'srt') {
-      content = extractedSubtitles
-        .map((sub, i) => `${i + 1}\n${sub.start} --> ${sub.end}\n${sub.text}\n`)
-        .join('\n');
-    } else if (format === 'vtt') {
-      content = 'WEBVTT\n\n' + extractedSubtitles
-        .map((sub, i) => `${i + 1}\n${sub.start.replace(',', '.')} --> ${sub.end.replace(',', '.')}\n${sub.text}\n`)
-        .join('\n');
-    } else {
-      content = extractedSubtitles
-        .map(sub => `[${sub.start} - ${sub.end}] ${sub.text}`)
-        .join('\n');
-    }
-
+    if (format === 'srt') content = extractedSubtitles.map((sub, i) => `${i + 1}\n${sub.start} --> ${sub.end}\n${sub.text}\n`).join('\n');
+    else if (format === 'vtt') content = 'WEBVTT\n\n' + extractedSubtitles.map((sub, i) => `${i + 1}\n${sub.start.replace(',', '.')} --> ${sub.end.replace(',', '.')}\n${sub.text}\n`).join('\n');
+    else content = extractedSubtitles.map(sub => `[${sub.start} - ${sub.end}] ${sub.text}`).join('\n');
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -248,219 +171,129 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({
     notify.success(`已导出为 ${format.toUpperCase()} 格式`);
   }, [extractedSubtitles, format, projectId]);
 
-  // ── Render ─────────────────────────────────────────────
-
   return (
-    <div className={styles.container} role="region" aria-label="字幕编辑器">
-      {/* ── 顶部：视频预览 ─────────────────────────────── */}
-      <div className={styles.playerSection}>
-        <div className={styles.videoWrapper}>
-          {videoUrl ? (
-            <video
-              ref={videoRef}
-              src={videoUrl}
-              className={styles.video}
-              onTimeUpdate={handleVideoTimeUpdate}
-              onEnded={handleVideoEnded}
-              onLoadedMetadata={handleVideoMetadata}
-              aria-label="视频预览"
-            />
-          ) : (
-            <div className={styles.noVideo}>
-              <FileTextOutlined style={{ fontSize: 40, color: 'rgba(255,255,255,0.2)' }} />
-              <Text type="secondary">暂无视频</Text>
-            </div>
-          )}
-
-          {/* 播放控制覆盖层 */}
-          {videoUrl && (
-            <div className={styles.playerOverlay}>
-              <button
-                className={styles.playBtn}
-                onClick={togglePlay}
-                aria-label={previewPlaying ? '暂停' : '播放'}
-              >
-                {previewPlaying
-                  ? <PauseCircleOutlined />
-                  : <PlayCircleOutlined />
-                }
-              </button>
-            </div>
-          )}
-
-          {/* 当前字幕提示 */}
-          {currentSub && (
-            <div className={styles.currentSubtitleHint} aria-live="polite">
-              {currentSub.text}
-            </div>
-          )}
-        </div>
-
-        {/* 时间显示 */}
-        <div className={styles.timeDisplay} aria-label={`当前时间 ${formatDisplayTime(playheadSec)}`}>
-          <span className={styles.timeMain}>{formatDisplayTime(playheadSec)}</span>
-          {videoDuration > 0 && (
-            <span className={styles.timeTotal}> / {formatDisplayTime(videoDuration)}</span>
-          )}
-        </div>
-      </div>
-
-      {/* ── 中部：字幕时间轴 ──────────────────────────── */}
-      {extractedSubtitles.length > 0 && (
-        <div className={styles.timeline} role="slider" aria-label="字幕时间轴">
-          {/* 播放头 */}
-          <div
-            className={styles.playhead}
-            style={{ left: `${Math.min((playheadSec / totalDuration) * 100, 100)}%` }}
-          />
-
-          {/* 字幕块 */}
-          <div className={styles.track}>
-            {extractedSubtitles.map(sub => {
-              const left = (sub.startTime / totalDuration) * 100;
-              const width = Math.max(((sub.endTime - sub.startTime) / totalDuration) * 100, 0.5);
-              const isActive = activeSubId === sub.id || (playheadSec >= sub.startTime && playheadSec <= sub.endTime);
-
-              return (
-                <Tooltip
-                  key={sub.id}
-                  title={`${formatDisplayTime(sub.startTime)} - ${sub.text.slice(0, 20)}${sub.text.length > 20 ? '…' : ''}`}
-                >
-                  <div
-                    className={`${styles.subBlock} ${isActive ? styles.subBlockActive : ''}`}
-                    style={{ left: `${left}%`, width: `${width}%` }}
-                    onClick={() => { seekTo(sub.startTime); setActiveSubId(sub.id); }}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`字幕: ${sub.text.slice(0, 15)}`}
-                    onKeyDown={e => e.key === 'Enter' && seekTo(sub.startTime)}
-                  />
-                </Tooltip>
-              );
-            })}
+    <TooltipProvider>
+      <div className={styles.container} role="region" aria-label="字幕编辑器">
+        {/* 视频预览 */}
+        <div className={styles.playerSection}>
+          <div className={styles.videoWrapper}>
+            {videoUrl ? (
+              <video ref={videoRef} src={videoUrl} className={styles.video}
+                onTimeUpdate={handleVideoTimeUpdate} onEnded={handleVideoEnded} onLoadedMetadata={handleVideoMetadata} />
+            ) : (
+              <div className={styles.noVideo}>
+                <FileText size={40} className="text-white/20" />
+                <p className="text-muted-foreground text-sm">暂无视频</p>
+              </div>
+            )}
+            {videoUrl && (
+              <div className={styles.playerOverlay}>
+                <button className={styles.playBtn} onClick={togglePlay} aria-label={previewPlaying ? '暂停' : '播放'}>
+                  {previewPlaying ? <Pause size={40} /> : <Play size={40} />}
+                </button>
+              </div>
+            )}
+            {currentSub && <div className={styles.currentSubtitleHint}>{currentSub.text}</div>}
+          </div>
+          <div className={styles.timeDisplay}>
+            <span className={styles.timeMain}>{formatDisplayTime(playheadSec)}</span>
+            {videoDuration > 0 && <span className={styles.timeTotal}> / {formatDisplayTime(videoDuration)}</span>}
           </div>
         </div>
-      )}
 
-      {/* ── 控制栏 ────────────────────────────────────── */}
-      <div className={styles.controlBar}>
-        <Space size="middle" wrap>
-          <Button
-            type="primary"
-            icon={<AudioOutlined />}
-            onClick={handleExtract}
-            loading={isExtracting}
-            disabled={!videoUrl}
-          >
-            {isExtracting ? '识别中…' : '提取字幕'}
-          </Button>
-
-          {isExtracting && (
-            <Progress
-              percent={progress}
-              size="small"
-              style={{ width: 140 }}
-              aria-label={`提取进度 ${progress}%`}
-            />
-          )}
-
-          <Select value={format} onChange={setFormat} style={{ width: 100 }} aria-label="导出格式">
-            <Option value="srt">SRT</Option>
-            <Option value="vtt">VTT</Option>
-            <Option value="txt">TXT</Option>
-          </Select>
-
-          <Button icon={<DownloadOutlined />} onClick={exportSubtitle} disabled={extractedSubtitles.length === 0}>
-            导出字幕
-          </Button>
-
-          <div className={styles.translateToggle}>
-            <Text type="secondary" style={{ fontSize: 12 }}>翻译</Text>
-            <Switch
-              size="small"
-              checked={translate}
-              onChange={setTranslate}
-              checkedChildren="开"
-              unCheckedChildren="关"
-              aria-label="同步翻译开关"
-            />
-          </div>
-        </Space>
-
+        {/* 字幕时间轴 */}
         {extractedSubtitles.length > 0 && (
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            共 {extractedSubtitles.length} 条字幕
-          </Text>
+          <div className={styles.timeline} role="slider" aria-label="字幕时间轴">
+            <div className={styles.playhead} style={{ left: `${Math.min((playheadSec / totalDuration) * 100, 100)}%` }} />
+            <div className={styles.track}>
+              {extractedSubtitles.map(sub => {
+                const left = (sub.startTime / totalDuration) * 100;
+                const width = Math.max(((sub.endTime - sub.startTime) / totalDuration) * 100, 0.5);
+                const isActive = activeSubId === sub.id || (playheadSec >= sub.startTime && playheadSec <= sub.endTime);
+                return (
+                  <Tooltip key={sub.id} title={`${formatDisplayTime(sub.startTime)} - ${sub.text.slice(0, 20)}${sub.text.length > 20 ? '…' : ''}`}>
+                    <div className={`${styles.subBlock} ${isActive ? styles.subBlockActive : ''}`}
+                      style={{ left: `${left}%`, width: `${width}%` }}
+                      onClick={() => { seekTo(sub.startTime); setActiveSubId(sub.id); }} />
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </div>
         )}
+
+        {/* 控制栏 */}
+        <div className={styles.controlBar}>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button onClick={handleExtract} disabled={!videoUrl || isExtracting}>
+              <Mic size={14} className="mr-1" />
+              {isExtracting ? '识别中…' : '提取字幕'}
+            </Button>
+            {isExtracting && <Progress value={progress} className="w-32" aria-label={`提取进度 ${progress}%`} />}
+            <Select value={format} onValueChange={setFormat}>
+              <SelectTrigger className="w-24"><span>{format.toUpperCase()}</span></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="srt">SRT</SelectItem>
+                <SelectItem value="vtt">VTT</SelectItem>
+                <SelectItem value="txt">TXT</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={exportSubtitle} disabled={extractedSubtitles.length === 0}>
+              <Download size={14} className="mr-1" />导出字幕
+            </Button>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">翻译</span>
+              <Switch checked={translate} onCheckedChange={setTranslate} />
+            </div>
+          </div>
+          {extractedSubtitles.length > 0 && (
+            <span className="text-xs text-muted-foreground">共 {extractedSubtitles.length} 条字幕</span>
+          )}
+        </div>
+
+        {/* 字幕列表 */}
+        <div className={styles.subtitleList}>
+          {extractedSubtitles.length === 0 && !isExtracting ? (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <Target size={40} className="mb-3 opacity-30" />
+              <p className="text-sm">点击「提取字幕」开始识别视频语音</p>
+            </div>
+          ) : (
+            <ScrollArea className="h-[300px]">
+              <div className="flex flex-col gap-1 p-1">
+                {extractedSubtitles.map(sub => {
+                  const isEditing = editingId === sub.id;
+                  const isCurrent = playheadSec >= sub.startTime && playheadSec <= sub.endTime;
+                  return (
+                    <div key={sub.id} className={`flex items-center gap-3 p-3 rounded-md border border-border hover:bg-muted/50 cursor-pointer ${isCurrent ? 'bg-primary/5 border-primary/30' : ''}`}
+                      onClick={() => seekTo(sub.startTime)}>
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <span className="text-xs font-mono text-muted-foreground">{formatDisplayTime(sub.startTime)}</span>
+                        <span className="text-xs text-muted-foreground">→</span>
+                        <span className="text-xs font-mono text-muted-foreground">{formatDisplayTime(sub.endTime)}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        {isEditing ? (
+                          <Input value={editingText} onChange={e => setEditingText(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                            onBlur={saveEdit} autoFocus onClick={e => e.stopPropagation()} />
+                        ) : (
+                          <span className={`text-sm truncate ${isCurrent ? 'text-primary font-medium' : ''}`}>{sub.text}</span>
+                        )}
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={e => { e.stopPropagation(); startEdit(sub); }} aria-label="编辑字幕">
+                        <Edit size={14} />
+                      </Button>
+                      {isCurrent && <Badge variant="default" className="shrink-0"><Target size={10} /></Badge>}
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          )}
+        </div>
       </div>
-
-      {/* ── 字幕列表 ──────────────────────────────────── */}
-      <div className={styles.subtitleList}>
-        {extractedSubtitles.length === 0 && !isExtracting ? (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="点击「提取字幕」开始识别视频语音"
-          />
-        ) : (
-          <List
-            dataSource={extractedSubtitles}
-            renderItem={(sub) => {
-              const isEditing = editingId === sub.id;
-              const isCurrent = playheadSec >= sub.startTime && playheadSec <= sub.endTime;
-
-              return (
-                <List.Item
-                  className={`${styles.subItem} ${isCurrent ? styles.subItemCurrent : ''}`}
-                  onClick={() => seekTo(sub.startTime)}
-                  actions={[
-                    <Button
-                      key="edit"
-                      type="text"
-                      size="small"
-                      icon={<EditOutlined />}
-                      onClick={e => { e.stopPropagation(); startEdit(sub); }}
-                      aria-label="编辑字幕"
-                    />,
-                  ]}
-                >
-                  <div className={styles.subItemContent}>
-                    <div className={styles.subItemTime}>
-                      <span className={styles.timeStart}>{formatDisplayTime(sub.startTime)}</span>
-                      <span className={styles.timeSep}>→</span>
-                      <span className={styles.timeEnd}>{formatDisplayTime(sub.endTime)}</span>
-                    </div>
-
-                    <div className={styles.subItemText}>
-                      {isEditing ? (
-                        <Input
-                          value={editingText}
-                          onChange={e => setEditingText(e.target.value)}
-                          onPressEnter={saveEdit}
-                          onBlur={saveEdit}
-                          autoFocus
-                          onClick={e => e.stopPropagation()}
-                          className={styles.editInput}
-                        />
-                      ) : (
-                        <span className={`${styles.textContent} ${isCurrent ? styles.textCurrent : ''}`}>
-                          {sub.text}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {isCurrent && (
-                    <div className={styles.currentBadge} aria-label="当前播放">
-                      <AimOutlined />
-                    </div>
-                  )}
-                </List.Item>
-              );
-            }}
-          />
-        )}
-      </div>
-    </div>
+    </TooltipProvider>
   );
 };
 

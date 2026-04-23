@@ -8,7 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { PlusOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { Plus, Trash2, Play } from 'lucide-react';
 import type { BatchItem } from '../types';
 import type { VideoSegment } from '@/core/types';
 
@@ -40,7 +40,7 @@ export const BatchProcessing: React.FC<BatchProcessingProps> = ({
           className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           onClick={onAddBatchItem}
         >
-          <PlusOutlined className="mr-1" />
+          <Plus className="mr-1" size={16} />
           添加当前视频到批处理
         </Button>
 
@@ -97,7 +97,7 @@ export const BatchProcessing: React.FC<BatchProcessingProps> = ({
                         size="icon-sm"
                         disabled={processingBatch}
                       >
-                        <DeleteOutlined />
+                        <Trash2 size={16} />
                       </Button>
                     </Popconfirm>
                   </div>
