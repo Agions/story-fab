@@ -8,13 +8,17 @@
  *   index.tsx           — 主组件（状态编排）
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Spin } from '@/components/ui/spin';
 import { Button } from '@/components/ui/button';
 import { Steps, StepsItem, StepsContent } from '@/components/ui/steps';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { ArrowLeft, Save, Video, Edit, CheckCircle } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { VideoMetadata, analyzeVideo, extractKeyFrames } from '@/services/video';
 import type { ScriptSegment } from '@/core/types';
@@ -42,12 +46,12 @@ import {
 
 import styles from './index.module.less';
 
-const { Title } = Typography;
+
 
 const STEP_ITEMS = [
-  { title: '选择视频', icon: <VideoCameraOutlined />, description: '上传视频文件' },
-  { title: '分析内容', icon: <EditOutlined />, description: '分析视频生成脚本' },
-  { title: '编辑脚本', icon: <CheckCircleOutlined />, description: '编辑和优化脚本' },
+  { title: '选择视频', icon: <Video size={18} />, description: '上传视频文件' },
+  { title: '分析内容', icon: <Edit size={18} />, description: '分析视频生成脚本' },
+  { title: '编辑脚本', icon: <CheckCircle size={18} />, description: '编辑和优化脚本' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -72,21 +76,23 @@ const ProjectEditHeader = React.memo<ProjectEditHeaderProps>(({
 }) => (
   <div className={styles.header}>
     <Button type="text" icon={<ArrowLeft />} onClick={onBack}>返回</Button>
-    <Title level={3}>{isNewProject ? '创建新项目' : '编辑项目'}</Title>
-    <Space size="middle">
+    <h3 className="text-base font-semibold">{isNewProject ? '创建新项目' : '编辑项目'}</h3>
+    <div className="flex items-center gap-4">
       <div className={styles.saveBehaviorControl}>
         <span className={styles.saveBehaviorLabel}>保存后：</span>
-        <Select<ProjectSaveBehavior>
-          size="small" value={saveBehavior} onChange={onSaveBehaviorChange}
-          options={[
-            { value: 'stay', label: '留在编辑页' },
-            { value: 'detail', label: '跳转项目详情' },
-          ]}
-        />
+        <Select value={saveBehavior} onValueChange={onSaveBehaviorChange}>
+          <SelectTrigger size="sm" className="w-36">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="stay">留在编辑页</SelectItem>
+            <SelectItem value="detail">跳转项目详情</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div className={styles.saveBehaviorControl}>
         <span className={styles.saveBehaviorLabel}>自动保存：</span>
-        <Switch size="small" checked={autoSaveEnabled} onChange={onAutoSaveToggle} />
+        <Switch size="sm" checked={autoSaveEnabled} onCheckedChange={onAutoSaveToggle} />
       </div>
       <Button
         type="primary" icon={<Save />} onClick={onSave}
@@ -94,7 +100,7 @@ const ProjectEditHeader = React.memo<ProjectEditHeaderProps>(({
       >
         保存项目
       </Button>
-    </Space>
+    </div>
   </div>
 ));
 
@@ -109,12 +115,12 @@ const AutoSaveBadge = React.memo<{
   state: 'idle' | 'saving' | 'saved' | 'error';
   lastAt: string;
 }>(({ enabled, videoPath, state, lastAt }) => {
-  if (!enabled) return <Tag color="default">自动保存已关闭</Tag>;
-  if (!videoPath) return <Tag color="default">未开始自动保存</Tag>;
-  if (state === 'saving') return <Tag color="processing">草稿自动保存中...</Tag>;
-  if (state === 'saved') return <Tag color="success">{lastAt ? `草稿已保存 ${lastAt}` : '草稿已保存'}</Tag>;
-  if (state === 'error') return <Tag color="error">草稿保存失败</Tag>;
-  return <Tag color="default">自动保存待触发</Tag>;
+  if (!enabled) return <Badge variant="secondary">自动保存已关闭</Badge>;
+  if (!videoPath) return <Badge variant="secondary">未开始自动保存</Badge>;
+  if (state === 'saving') return <Badge variant="default">草稿自动保存中...</Badge>;
+  if (state === 'saved') return <Badge variant="default">{lastAt ? `草稿已保存 ${lastAt}` : '草稿已保存'}</Badge>;
+  if (state === 'error') return <Badge variant="destructive">草稿保存失败</Badge>;
+  return <Badge variant="secondary">自动保存待触发</Badge>;
 });
 
 AutoSaveBadge.displayName = 'AutoSaveBadge';
@@ -127,7 +133,8 @@ const ProjectEdit: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { addRecentProject } = useSettings();
-  const [form] = Form.useForm();
+  const [formName, setFormName] = useState('');
+  const [formDescription, setFormDescription] = useState('');
 
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -166,7 +173,8 @@ const ProjectEdit: React.FC = () => {
 
   // ─── Auto-save ────────────────────────────────────────────────────────────
   const getProjectData = useCallback((): ProjectData => {
-    const { name, description } = form.getFieldsValue();
+    const name = formName;
+    const description = formDescription;
     const now = new Date().toISOString();
     return {
       id: project?.id || draftProjectIdRef.current || uuid(),
@@ -181,7 +189,7 @@ const ProjectEdit: React.FC = () => {
       keyFrames: keyFrames.length > 0 ? keyFrames : undefined,
       script: scriptSegments.length > 0 ? scriptSegments : undefined,
     };
-  }, [form, project, videoPath, videoMetadata, keyFrames, scriptSegments, defaultProjectName]);
+  }, [project, videoPath, videoMetadata, keyFrames, scriptSegments, defaultProjectName, formName, formDescription]);
 
   const persistProject = useCallback(async (opts = { silent: false, requireVideo: true, requireValidName: true }) => {
     const { silent, requireVideo, requireValidName } = opts;
@@ -190,7 +198,7 @@ const ProjectEdit: React.FC = () => {
       if (!silent) notify.error(null, '请先选择视频文件');
       return null;
     }
-    const nameVal = (form.getFieldValue('name') || '').trim();
+    const nameVal = (formName || '').trim();
     if (requireValidName && nameVal && nameVal.length < 2) {
       if (!silent) notify.error(null, '项目名称至少2个字符');
       return null;
@@ -238,7 +246,8 @@ const ProjectEdit: React.FC = () => {
       setVideoSelected(false); setVideoPath(''); setVideoMetadata(null);
       setKeyFrames([]); setScriptSegments([]);
       draftProjectIdRef.current = '';
-      form.setFieldsValue({ name: defaultProjectName, description: '' });
+      setFormName(defaultProjectName);
+      setFormDescription('');
       return;
     }
 
@@ -251,7 +260,8 @@ const ProjectEdit: React.FC = () => {
         const p = normalizeProjectData(data);
         draftProjectIdRef.current = p.id;
         setProject(p);
-        form.setFieldsValue({ name: p.name, description: p.description });
+        setFormName(p.name);
+        setFormDescription(p.description || '');
         if (p.videoPath) { setVideoPath(p.videoPath); setVideoSelected(true); }
         if (p.metadata) setVideoMetadata(p.metadata);
         if (p.keyFrames?.length) setKeyFrames(p.keyFrames);
@@ -368,8 +378,12 @@ const ProjectEdit: React.FC = () => {
   // ─── Save ─────────────────────────────────────────────────────────────────
   const handleSaveProject = useCallback(async () => {
     if (saving) return;
+    const nameVal = (formName || '').trim();
+    if (nameVal && nameVal.length < 2) {
+      notify.error(null, '项目名称至少2个字符');
+      return;
+    }
     try {
-      await form.validateFields();
       setSaving(true);
       const data = await persistProject({ silent: false, requireVideo: true, requireValidName: true });
       if (!data) return;
@@ -388,7 +402,7 @@ const ProjectEdit: React.FC = () => {
     } finally {
       setSaving(false);
     }
-  }, [form, isNewProject, location.pathname, navigate, persistProject, projectId, saveBehavior, saving]);
+  }, [formName, isNewProject, location.pathname, navigate, persistProject, projectId, saveBehavior, saving]);
 
   const handleBack = () => {
     if (window.history.length > 1) { navigate(-1); return; }
@@ -416,7 +430,16 @@ const ProjectEdit: React.FC = () => {
     if (projectId) actions.unshift(
       <Button key="retry" type="primary" onClick={() => setReloadToken((v) => v + 1)}>重试</Button>
     );
-    return <Result status="error" title="加载失败" subTitle={error} extra={actions} />;
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="text-center">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h3 className="text-lg font-semibold mb-2">加载失败</h3>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <div className="flex gap-2 justify-center">{actions}</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -434,27 +457,28 @@ const ProjectEdit: React.FC = () => {
         </div>
 
         <Card className={styles.card}>
-          <Form
-            form={form} layout="vertical"
-            initialValues={{ name: defaultProjectName, description: '' }}
-            onValuesChange={handleFormValuesChange}
-          >
-            <Form.Item
-              name="name" label="项目名称"
-              rules={[{
-                validator: (_, value: string) => {
-                  const v = (value || '').trim();
-                  if (v && v.length < 2) return Promise.reject(new Error('项目名称至少2个字符'));
-                  return Promise.resolve();
-                },
-              }]}
-            >
-              <Input placeholder="请输入项目名称" maxLength={100} />
-            </Form.Item>
-            <Form.Item name="description" label="项目描述">
-              <Input.TextArea placeholder="请输入项目描述（选填）" rows={2} maxLength={500} />
-            </Form.Item>
-          </Form>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">项目名称</label>
+              <Input
+                placeholder="请输入项目名称"
+                maxLength={100}
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">项目描述</label>
+              <textarea
+                className="flex min-h-[60px] w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20"
+                placeholder="请输入项目描述（选填）"
+                rows={2}
+                maxLength={500}
+                value={formDescription}
+                onChange={(e) => setFormDescription(e.target.value)}
+              />
+            </div>
+          </div>
         </Card>
 
         <div className={styles.stepsContainer}>

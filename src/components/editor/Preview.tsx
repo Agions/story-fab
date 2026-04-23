@@ -53,7 +53,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ playing = false, onT
             aria-label="缩小"
             onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.1))}
           >
-            <ZoomOutOutlined />
+            <ZoomOut />
           </Button>
           <span className={styles.zoomLevel}>{zoomPercent}</span>
           <Button
@@ -62,10 +62,10 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ playing = false, onT
             aria-label="放大"
             onClick={() => setZoom((prev) => Math.min(2, prev + 0.1))}
           >
-            <ZoomInOutlined />
+            <ZoomIn />
           </Button>
           <Button variant="ghost" size="icon-sm" aria-label="全屏">
-            <FullscreenOutlined />
+            <Maximize />
           </Button>
         </div>
       </div>
