@@ -7,17 +7,7 @@ export default defineConfig({
   base: './',
   plugins: [
     tailwindcss(),
-    react({
-      babel: {
-        plugins: [
-          // antd component-level tree-shaking via babel
-          ['import', { libraryName: 'antd', customName: (name: string) => `antd/es/${name}` }],
-          // @ant-design/icons tree-shaking via babel
-          ['import', { libraryName: '@ant-design/icons', customName: (name: string) => `@ant-design/icons/es/icons/${name}` }, 'ant-design-icons-shim'],
-        ],
-      },
-    }),
-  ],
+    react(),
   clearScreen: false,
   server: {
     port: 1430,

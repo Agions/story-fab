@@ -101,10 +101,10 @@ export class AIServiceError extends Error {
 const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
   openai: {
     url: 'https://api.openai.com/v1/chat/completions',
-    model: 'gpt-5.4',
+    model: 'gpt-4o',
     headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
     transformRequest: prompt => ({
-      model: 'gpt-5.4',
+      model: 'gpt-4o',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: 4000,
@@ -114,14 +114,14 @@ const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
   },
   anthropic: {
     url: 'https://api.anthropic.com/v1/messages',
-    model: 'claude-sonnet-4.6',
+    model: 'claude-3-5-sonnet-latest',
     headers: apiKey => ({
       'Content-Type': 'application/json',
       'x-api-key': apiKey,
       'anthropic-version': '2023-06-01',
     }),
     transformRequest: prompt => ({
-      model: 'claude-sonnet-4.6',
+      model: 'claude-3-5-sonnet-latest',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: 4000,
@@ -171,10 +171,10 @@ const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
   },
   chatglm: {
     url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
-    model: 'glm-5',
+    model: 'glm-4-flash',
     headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
     transformRequest: prompt => ({
-      model: 'glm-5',
+      model: 'glm-4-flash',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: 4096,
@@ -183,10 +183,10 @@ const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
   },
   deepseek: {
     url: 'https://api.deepseek.com/v1/chat/completions',
-    model: 'deepseek-v3.2',
+    model: 'deepseek-chat',
     headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
     transformRequest: prompt => ({
-      model: 'deepseek-v3.2',
+      model: 'deepseek-chat',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: 4000,
@@ -196,10 +196,10 @@ const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
   },
   moonshot: {
     url: 'https://api.moonshot.cn/v1/chat/completions',
-    model: 'kimi-k2.5',
+    model: 'moonshot-v1-8k',
     headers: apiKey => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }),
     transformRequest: prompt => ({
-      model: 'kimi-k2.5',
+      model: 'moonshot-v1-8k',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: 4000,
