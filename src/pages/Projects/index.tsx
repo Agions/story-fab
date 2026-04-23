@@ -9,7 +9,7 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/comp
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Edit3, Trash2, Play, MoreHorizontal, Grid3X3, List, Search, Video, FolderOpen, Export } from 'lucide-react';
+import { Plus, Edit3, Trash2, Play, MoreHorizontal, Grid3X3, List, Search, Video, FolderOpen, Export, Download } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
 import { notify } from '@/shared';
 import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '@/services/tauri';

@@ -217,20 +217,6 @@ const ProjectDetail: React.FC = () => {
     schedulePersistUpdatedProject(updatedProject);
   }, [activeScript, project, schedulePersistUpdatedProject]);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="animate-spin text-2xl text-muted-foreground" /></div>;
-  if (loadError) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="text-destructive text-lg font-medium">加载项目失败</div>
-        <div className="text-muted-foreground text-sm">{loadError}</div>
-        <div className="flex gap-2">
-          <Button onClick={() => setReloadToken((v) => v + 1)}>重试</Button>
-          <Button variant="outline" onClick={() => navigate('/projects')}>返回项目列表</Button>
-        </div>
-      </div>
-    );
-  }
-
   const contentNode = useMemo((): React.ReactNode => {
     if (!project) return null;
     switch (activeStep) {

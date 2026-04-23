@@ -83,23 +83,20 @@ export const BatchProcessing: React.FC<BatchProcessingProps> = ({
                   </div>
                   <div className="batchItemActions">
                     {item.completed && (
-                      <Tag color="success">已完成</Tag>
+                      <Badge variant="default" className="bg-green-500/20 text-green-400 border-green-500/30">已完成</Badge>
                     )}
-                    <Popconfirm
-                      title="确定要移除此项目吗？"
-                      onConfirm={() => onRemoveBatchItem(item.id)}
-                      okText="确定"
-                      cancelText="取消"
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => {
+                        if (window.confirm('确定要移除此项目吗？')) {
+                          onRemoveBatchItem(item.id);
+                        }
+                      }}
                       disabled={processingBatch}
                     >
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        disabled={processingBatch}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </Popconfirm>
+                      <Trash2 size={16} />
+                    </Button>
                   </div>
                 </div>
                 <div className="batchItemInfo">

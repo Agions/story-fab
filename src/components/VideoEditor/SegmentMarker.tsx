@@ -1,4 +1,5 @@
 import React, { useCallback, memo } from 'react';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 import { ScriptSegment } from '@/types';
 import styles from './VideoEditor.module.less';
