@@ -4,10 +4,10 @@
  */
 import React, { useState, lazy, Suspense, useEffect } from 'react';
 import {
-  AudioOutlined,
-  UserOutlined,
-  ScissorOutlined,
-} from '@ant-design/icons';
+  Mic,
+  User,
+  Scissors,
+} from 'lucide-react';
 import { CutDeckProvider, useCutDeck } from '@/components/CutDeck/AIEditorContext';
 import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '@/hooks/useKeyboardShortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
@@ -31,37 +31,37 @@ const AI_FUNCTIONS = [
     key: 'commentary-first',
     label: (
       <span className={styles.tabLabel}>
-        <UserOutlined />
+        <User />
         AI第一人称解说
       </span>
     ),
     description: '以第一人称视角讲述，像主播一样与观众互动',
     color: '#52c41a',
-    icon: <UserOutlined />,
+    icon: <User />,
   },
   {
     key: 'commentary',
     label: (
       <span className={styles.tabLabel}>
-        <AudioOutlined />
+        <Mic />
         AI解说
       </span>
     ),
     description: '专业解说，适合教程、评测类内容',
     color: '#1890ff',
-    icon: <AudioOutlined />,
+    icon: <Mic />,
   },
   {
     key: 'mix',
     label: (
       <span className={styles.tabLabel}>
-        <ScissorOutlined />
+        <Scissors />
         AI混剪
       </span>
     ),
     description: '自动识别精彩片段，生成节奏感强的混剪',
     color: '#fa8c16',
-    icon: <ScissorOutlined />,
+    icon: <Scissors />,
   },
 ];
 
