@@ -4,13 +4,10 @@
  */
 
 import React from 'react';
-import { Typography, Space } from 'antd';
 import { Button } from '@/components/ui/button';
-import { StarOutlined } from '@ant-design/icons';
+import { Star } from 'lucide-react';
 import type { AIModel } from '@/core/types';
 import styles from './index.module.less';
-
-const { Text } = Typography;
 
 interface ModelRecommendationsProps {
   models: AIModel[];
@@ -27,21 +24,22 @@ export const ModelRecommendations: React.FC<ModelRecommendationsProps> = ({
 
   return (
     <div className={styles.recommendations}>
-      <Text type="secondary" className={styles.sectionTitle}>
-        <StarOutlined /> 推荐模型
-      </Text>
-      <Space wrap>
+      <span className={`${styles.sectionTitle} text-xs text-muted-foreground flex items-center gap-1 mb-2`}>
+        <Star size={12} className="inline" /> 推荐模型
+      </span>
+      <div className="flex flex-wrap gap-2">
         {models.map((model, idx) => (
           <Button
             key={model.id}
             variant={currentModelId === model.id ? 'default' : 'outline'}
+            size="sm"
             onClick={() => onSelect(idx)}
           >
-            {idx === 0 && <StarOutlined className="mr-1" />}
+            {idx === 0 && <Star size={12} className="mr-1" />}
             {model.name}
           </Button>
         ))}
-      </Space>
+      </div>
     </div>
   );
 };

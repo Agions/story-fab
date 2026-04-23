@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Checkbox, Select } from 'antd';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import styles from './ClipListView.module.less';
 
 interface ClipSegment {
@@ -47,7 +48,7 @@ export const ClipListView: React.FC<ClipListViewProps> = ({ segments, onExport }
           <div key={seg.id} className={`${styles.clipCard} ${selected.has(seg.id) ? styles.selected : ''}`}>
             <Checkbox
               checked={selected.has(seg.id)}
-              onChange={() => toggle(seg.id)}
+              onCheckedChange={() => toggle(seg.id)}
             />
             <span className={styles.index}>{seg.name ?? `片段 ${i + 1}`}</span>
             <span className={styles.duration}>{(seg.duration / 1000).toFixed(1)}s</span>
@@ -57,12 +58,14 @@ export const ClipListView: React.FC<ClipListViewProps> = ({ segments, onExport }
       </div>
 
       <div className={styles.footer}>
-        <Select
-          value={platform}
-          onChange={setPlatform}
-          options={PlatformOptions}
-          className={styles.platformSelect}
-        />
+        <Select value={platform ?? undefined} onValueChange={(val) => { if (val) setPlatform(val); }} className={styles.platformSelect}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PlatformOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
         <Button
           className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           disabled={selected.size === 0}

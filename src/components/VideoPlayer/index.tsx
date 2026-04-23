@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Slider } from 'antd';
+import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import {
   PlayCircleOutlined,
@@ -146,20 +146,20 @@ function VideoPlayer({
     setIsPlaying(!isPlaying);
   };
 
-  const handleSliderChange = (value: number) => {
+  const handleSliderChange = (value: number | readonly number[]) => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
-
-    videoElement.currentTime = value;
-    setCurrentTime(value);
+    const val = Array.isArray(value) ? value[0] : value;
+    videoElement.currentTime = val;
+    setCurrentTime(val);
   };
 
-  const handleVolumeChange = (value: number) => {
+  const handleVolumeChange = (value: number | readonly number[]) => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
-
-    videoElement.volume = value;
-    setVolume(value);
+    const val = Array.isArray(value) ? value[0] : value;
+    videoElement.volume = val;
+    setVolume(val);
   };
 
   const toggleFullscreen = () => {
@@ -204,8 +204,7 @@ function VideoPlayer({
             min={0}
             max={duration}
             value={currentTime}
-            onChange={handleSliderChange}
-            tooltip={{ visible: false }}
+            onValueChange={handleSliderChange}
           />
         </div>
         <div className={styles.controlButtons}>
@@ -229,13 +228,12 @@ function VideoPlayer({
               {showVolumeSlider && (
                 <div className={styles.volumeSlider}>
                   <Slider
-                    vertical
+                    className="vertical-slider"
                     min={0}
                     max={1}
                     step={0.01}
                     value={volume}
-                    onChange={handleVolumeChange}
-                    tooltip={{ visible: false }}
+                    onValueChange={handleVolumeChange}
                   />
                 </div>
               )}

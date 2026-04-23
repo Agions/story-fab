@@ -1,6 +1,9 @@
 import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Row, Col, Select, Slider, InputNumber, Switch, Button, Tooltip, Space, Collapse, Tag, Progress, Popconfirm } from 'antd';
+import { Card, Row, Col, Select, InputNumber, Switch, Tooltip, Space, Collapse, Tag, Popconfirm } from 'antd';
+import { Slider } from '@/components/ui/slider';
+import { Progress, ProgressTrack, ProgressIndicator, ProgressValue } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { PlusOutlined, DeleteOutlined, PlayCircleOutlined, ScissorOutlined, SoundOutlined, SettingOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api/core';
 import { notify } from '@/shared';
@@ -124,6 +127,11 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
   const [audioProcess, setAudioProcess] = useState(defaultAudioProcess);
   const [audioVolume, setAudioVolume] = useState(100);
   const [useSubtitles, setUseSubtitles] = useState(true);
+
+  const handleAudioVolumeChange = (value: number | readonly number[]) => {
+    const val = Array.isArray(value) ? value[0] : value;
+    setAudioVolume(val);
+  };
   
   // 批量处理状态
   const [processingBatch, setProcessingBatch] = useState(false);
@@ -401,7 +409,10 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                             max={20000}
                             step={500}
                             value={customSettings.bitrate}
-                            onChange={(bitrate: number) => updateCustomSettings({ bitrate })}
+                            onValueChange={(bitrate) => {
+                              const val = Array.isArray(bitrate) ? bitrate[0] : bitrate;
+                              updateCustomSettings({ bitrate: val });
+                            }}
                           />
                         </Col>
                         <Col span={6}>
@@ -522,7 +533,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                     max={200}
                     step={5}
                     value={audioVolume}
-                    onChange={setAudioVolume}
+                    onValueChange={handleAudioVolumeChange}
                     disabled={audioProcess === 'none'}
                   />
                 </div>
@@ -550,8 +561,8 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
           >
             <div className={styles.batchContainer}>
               <div className={styles.batchHeader}>
-                <Button 
-                  className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" 
+                <Button
+                  variant="primary"
                   onClick={addBatchItem}
                 >
                   <PlusOutlined className="mr-1" />
@@ -559,8 +570,8 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                 </Button>
                 
                 <Tooltip title="开始处理所有批次项">
-                  <Button 
-                    className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+                  <Button
+                    variant="primary"
                     onClick={startBatchProcessing}
                     disabled={processingBatch || batchItems.length === 0}
                   >
@@ -571,11 +582,12 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
               
               {processingBatch && (
                 <div className={styles.batchProgress}>
-                  <Progress 
-                    percent={batchProgress} 
-                    status="active" 
-                    format={() => `${Math.round(batchProgress)}%`}
-                  />
+                  <Progress value={batchProgress}>
+                    <ProgressTrack>
+                      <ProgressIndicator />
+                    </ProgressTrack>
+                    <span>{`${Math.round(batchProgress)}%`}</span>
+                  </Progress>
                   <div className={styles.batchStatus}>
                     处理中: {currentBatchItem + 1}/{batchItems.length} - {batchItems[currentBatchItem]?.name}
                   </div>
@@ -610,9 +622,9 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
                               cancelText="取消"
                               disabled={processingBatch}
                             >
-                              <Button 
-                                type="text" 
-                                size="small"
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 disabled={processingBatch}
                               >
                                 <DeleteOutlined />
@@ -634,8 +646,8 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         </Collapse>
         
         <div className={styles.actionButtons}>
-          <Button 
-            className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" 
+          <Button
+            variant="primary"
             onClick={handleProcessCurrentVideo}
           >
             <ScissorOutlined className="mr-1" />

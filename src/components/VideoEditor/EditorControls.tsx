@@ -1,10 +1,8 @@
 import React, { memo } from 'react';
-import { Space, Progress, Typography } from 'antd';
+import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { ScissorOutlined, SettingOutlined, SaveOutlined } from '@ant-design/icons';
+import { Scissors, Settings, Save } from 'lucide-react';
 import styles from './VideoEditor.module.less';
-
-const { Text } = Typography;
 
 interface EditorControlsProps {
   processing: boolean;
@@ -32,13 +30,13 @@ const EditorControls: React.FC<EditorControlsProps> = ({
 
   return (
     <div className={styles.editorControls}>
-      <Space>
+      <div className="flex items-center gap-2">
         <Button
           className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
           onClick={onExport}
           disabled={processing || !hasSegments}
         >
-          <ScissorOutlined className="mr-1" />
+          <Scissors size={14} className="mr-1" />
           生成混剪视频
         </Button>
 
@@ -46,7 +44,7 @@ const EditorControls: React.FC<EditorControlsProps> = ({
           onClick={onSettings}
           disabled={processing}
         >
-          <SettingOutlined className="mr-1" />
+          <Settings size={14} className="mr-1" />
           导出设置
         </Button>
 
@@ -54,17 +52,21 @@ const EditorControls: React.FC<EditorControlsProps> = ({
           onClick={onSave}
           disabled={processing}
         >
-          <SaveOutlined className="mr-1" />
+          <Save size={14} className="mr-1" />
           保存片段时间
         </Button>
-      </Space>
+      </div>
 
       {processing && (
         <div className={styles.progressContainer}>
-          <Progress percent={processProgress} status="active" style={{ width: 200 }} />
-          <Text className={styles.progressText}>
+          <Progress value={processProgress}>
+              <ProgressTrack>
+                <ProgressIndicator />
+              </ProgressTrack>
+            </Progress>
+          <span className={styles.progressText}>
             {getProgressText(processProgress)}
-          </Text>
+          </span>
         </div>
       )}
     </div>

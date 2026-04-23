@@ -4,19 +4,15 @@
  */
 
 import React, { useMemo } from 'react';
-import { Card, Typography, Tag, Space, Tooltip, Avatar } from 'antd';
-import {
-  CheckCircleFilled,
-  StarOutlined,
-  RobotOutlined,
-  DollarOutlined
-} from '@ant-design/icons';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { CheckCircle, Star, Bot, DollarSign } from 'lucide-react';
 import { motion } from '@/components/common/motion-shim';
 import { MODEL_PROVIDERS } from '@/core/config/models.config';
 import type { AIModel, ModelProvider } from '@/core/types';
 import styles from './index.module.less';
-
-const { Text, Paragraph } = Typography;
 
 interface ModelCardProps {
   model: AIModel;
@@ -37,26 +33,20 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   estimatedCost,
   onSelect
 }) => {
-  // 获取提供商图标
-  const getProviderIcon = (providerId: ModelProvider | undefined): string => {
-    const config = MODEL_PROVIDERS[providerId ?? 'custom'];
-    return config?.icon || '';
-  };
-
-  // 获取提供商名称
   const getProviderName = (providerId: ModelProvider | undefined): string => {
     const config = MODEL_PROVIDERS[providerId ?? 'custom'];
     return config?.name || providerId || 'Unknown';
   };
 
-  // 处理点击
-  const handleClick = () => {
-    if (isAvailable) {
-      onSelect(model);
-    }
+  const getProviderIcon = (providerId: ModelProvider | undefined): string => {
+    const config = MODEL_PROVIDERS[providerId ?? 'custom'];
+    return config?.icon || '';
   };
 
-  // 卡片类名
+  const handleClick = () => {
+    if (isAvailable) onSelect(model);
+  };
+
   const cardClassName = useMemo(() => {
     const classes = [styles.modelCard];
     if (isSelected) classes.push(styles.selected);
@@ -76,67 +66,78 @@ export const ModelCard: React.FC<ModelCardProps> = ({
       <Card
         className={cardClassName}
         onClick={handleClick}
-        size="small"
-        hoverable={isAvailable}
+        size="sm"
       >
         <div className={styles.cardHeader}>
           <div className={styles.modelInfo}>
-            <Avatar
-              src={getProviderIcon(model.provider)}
-              size={isCompact ? 32 : 40}
-              className={styles.providerAvatar}
-            />
+            <Avatar className={styles.providerAvatar}>
+              <AvatarImage src={getProviderIcon(model.provider)} alt={getProviderName(model.provider)} />
+              <AvatarFallback>{getProviderName(model.provider).charAt(0)}</AvatarFallback>
+            </Avatar>
             <div className={styles.modelMeta}>
-              <Text strong className={styles.modelName}>
+              <span className={`${styles.modelName} font-medium text-sm`}>
                 {model.name}
-                {isSelected && <CheckCircleFilled className={styles.checkIcon} />}
-              </Text>
-              <Text type="secondary" className={styles.providerName}>
+                {isSelected && <CheckCircle size={14} className="ml-1 text-green-500 inline" />}
+              </span>
+              <span className={`${styles.providerName} text-xs text-muted-foreground`}>
                 {getProviderName(model.provider)}
-              </Text>
+              </span>
             </div>
           </div>
-          <Space>
+          <div className="flex items-center gap-1">
             {model.isPro && (
-              <Tooltip title="专业版模型">
-                <StarOutlined className={styles.proIcon} />
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger render={<span className="inline-flex cursor-default" />}>
+                    <Star size={14} className={styles.proIcon} />
+                  </TooltipTrigger>
+                  <TooltipContent>专业版模型</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
             {!isAvailable && (
-              <Tag color="default">未配置</Tag>
+              <Badge variant="secondary">未配置</Badge>
             )}
-          </Space>
+          </div>
         </div>
 
         {!isCompact && (
           <>
-            <Paragraph className={styles.description} ellipsis={{ rows: 2 }}>
+            <p className={`${styles.description} text-xs text-muted-foreground line-clamp-2`}>
               {model.description}
-            </Paragraph>
+            </p>
 
             <div className={styles.features}>
               {model.features?.slice(0, 3).map((feature, idx) => (
-                <Tag key={idx} className={styles.featureTag}>
+                <Badge key={idx} variant="secondary" className="text-xs">
                   {feature}
-                </Tag>
+                </Badge>
               ))}
             </div>
 
             <div className={styles.cardFooter}>
-              <Space size="small">
-                <Tooltip title={`上下文: ${(model.contextWindow ?? 4096 / 1000).toFixed(0)}K tokens`}>
-                  <Tag icon={<RobotOutlined />}>
-                    {(model.contextWindow ?? 4096 / 1000).toFixed(0)}K
-                  </Tag>
-                </Tooltip>
-                {showCost && estimatedCost && (
-                  <Tooltip title="预估成本（500字脚本）">
-                    <Tag icon={<DollarOutlined />} color="green">
-                      {estimatedCost}
-                    </Tag>
+              <div className="flex gap-1 flex-wrap">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger render={<Badge variant="outline" className="text-xs cursor-default" />}>
+                      <Bot size={10} className="mr-1" />
+                      {(model.contextWindow ?? 4096 / 1000).toFixed(0)}K
+                    </TooltipTrigger>
+                    <TooltipContent>上下文: {(model.contextWindow ?? 4096 / 1000).toFixed(0)}K tokens</TooltipContent>
                   </Tooltip>
+                </TooltipProvider>
+                {showCost && estimatedCost && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger render={<Badge variant="outline" className="text-xs text-green-600 border-green-600 cursor-default" />}>
+                        <DollarSign size={10} className="mr-1" />
+                        {estimatedCost}
+                      </TooltipTrigger>
+                      <TooltipContent>预估成本（500字脚本）</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
-              </Space>
+              </div>
             </div>
           </>
         )}

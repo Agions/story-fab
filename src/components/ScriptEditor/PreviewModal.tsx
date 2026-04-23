@@ -1,44 +1,47 @@
 import React, { memo } from 'react';
-import { Modal } from 'antd';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import styles from './ScriptEditor.module.less';
 
 interface PreviewModalProps {
-  visible: boolean;
+  open: boolean;
   loading: boolean;
   previewSrc: string;
   onClose: () => void;
 }
 
 const PreviewModal: React.FC<PreviewModalProps> = ({
-  visible,
+  open,
   loading,
   previewSrc,
   onClose,
 }) => {
   return (
-    <Modal
-      title="预览片段"
-      open={visible}
-      onCancel={onClose}
-      footer={null}
-      width={700}
-      destroyOnClose
-    >
-      <div className={styles.previewContainer}>
-        {loading ? (
-          <div className={styles.previewLoading}>
-            <p>正在生成预览...</p>
-          </div>
-        ) : (
-          <video
-            src={previewSrc}
-            controls
-            autoPlay
-            className={styles.previewVideo}
-          />
-        )}
-      </div>
-    </Modal>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>预览片段</DialogTitle>
+        </DialogHeader>
+        <div className={styles.previewContainer}>
+          {loading ? (
+            <div className={styles.previewLoading}>
+              <p>正在生成预览...</p>
+            </div>
+          ) : (
+            <video
+              src={previewSrc}
+              controls
+              autoPlay
+              className={styles.previewVideo}
+            />
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

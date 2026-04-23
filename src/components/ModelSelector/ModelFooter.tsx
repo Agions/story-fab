@@ -4,13 +4,9 @@
  */
 
 import React from 'react';
-import { Space, Divider } from 'antd';
 import { Button } from '@/components/ui/button';
-import {
-  SettingOutlined,
-  ThunderboltOutlined,
-  LoadingOutlined
-} from '@ant-design/icons';
+import { Separator } from '@/components/ui/separator';
+import { Settings, Zap, Loader2 } from 'lucide-react';
 import { MODEL_PROVIDERS } from '@/core/config/models.config';
 import type { ModelProvider } from '@/core/types';
 import styles from './index.module.less';
@@ -36,14 +32,14 @@ export const ModelFooter: React.FC<ModelFooterProps> = ({
 
   return (
     <div className={styles.footer}>
-      <Divider />
-      <Space>
+      <Separator className="my-3" />
+      <div className="flex items-center gap-2">
         {!isConfigured ? (
           <Button
             className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
             onClick={onConfigure}
           >
-            <SettingOutlined className="mr-1" />
+            <Settings size={14} className="mr-1" />
             配置 {providerName} API
           </Button>
         ) : (
@@ -51,10 +47,14 @@ export const ModelFooter: React.FC<ModelFooterProps> = ({
             onClick={onTest}
             disabled={isTesting}
           >
-            {isTesting ? '测试中...' : '测试连接'}
+            {isTesting ? (
+              <><Loader2 size={14} className="mr-1 animate-spin" />测试中...</>
+            ) : (
+              <><Zap size={14} className="mr-1" />测试连接</>
+            )}
           </Button>
         )}
-      </Space>
+      </div>
     </div>
   );
 };

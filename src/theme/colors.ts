@@ -15,7 +15,11 @@
  * - dashboardTokens / videoEditorTokens — 已废弃（0 usage），已移除
  */
 
-import type { ThemeConfig } from 'antd';
+// ThemeConfig type — previously from antd, now minimal for token shape compatibility
+type ThemeConfig = {
+  token?: Record<string, unknown>;
+  components?: Record<string, Record<string, unknown>>;
+};
 
 // =============================================
 // 🎨 色彩 Token（OKLCH 语义化分层）

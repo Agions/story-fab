@@ -6,14 +6,16 @@
  * @version 1.2.0
  */
 import React, { useState, useEffect, useContext } from 'react';
-import { Tabs, Card, Skeleton, Typography } from 'antd';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from 'antd';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
-  KeyOutlined,
-  RobotOutlined,
-  SettingOutlined,
-  InfoCircleOutlined,
-  LockOutlined,
-} from '@ant-design/icons';
+  Key,
+  Bot,
+  Settings,
+  Info,
+  Lock,
+} from 'lucide-react';
 import ThemeContext from '@/context/ThemeContext';
 import useTranslation from '@/utils/i18n';
 import useLocalStorage from '@/hooks/useLocalStorage';
@@ -31,8 +33,6 @@ import { notify } from '@/shared';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '@/shared/constants/settings';
 import packageJson from '../../../package.json';
 import styles from './index.module.less';
-
-const { Title, Paragraph } = Typography;
 
 interface ApiKeyConfig {
   key: string;
@@ -141,55 +141,49 @@ const Settings: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <Title level={2}>{t('settings.title')}</Title>
-        <Paragraph type="secondary">{t('settings.subtitle')}</Paragraph>
+        <h2 className="text-2xl font-bold mb-1">{t('settings.title')}</h2>
+        <p className="text-muted-foreground text-sm">{t('settings.subtitle')}</p>
       </div>
 
       <Card className={`${styles.settingsCard} ${isDarkMode ? styles.darkCard : ''}`}>
         <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          tabPosition="left"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          orientation="vertical"
           className={styles.tabs}
         >
-          <Tabs.TabPane
-            tab={
-              <span>
-                <RobotOutlined /> {t('settings.models')}
-              </span>
-            }
-            key="models"
-          >
+          <TabsList>
+            <TabsTrigger value="models">
+              <Bot size={14} /> {t('settings.models')}
+            </TabsTrigger>
+            <TabsTrigger value="api">
+              <Key size={14} /> API 密钥
+            </TabsTrigger>
+            <TabsTrigger value="general">
+              <Settings size={14} /> {t('settings.general')}
+            </TabsTrigger>
+            <TabsTrigger value="about">
+              <Info size={14} /> {t('settings.about')}
+            </TabsTrigger>
+            <TabsTrigger value="privacy">
+              <Lock size={14} /> 隐私
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="models">
             <ModelSettingsPanel
               defaultModel={defaultModel}
               availableModels={availableModels}
               onModelChange={handleModelChange}
             />
-          </Tabs.TabPane>
-
-          <Tabs.TabPane
-            tab={
-              <span>
-                <KeyOutlined /> API 密钥
-              </span>
-            }
-            key="api"
-          >
+          </TabsContent>
+          <TabsContent value="api">
             <ApiKeysPanel
               apiKeys={apiKeys}
               onUpdateKey={handleUpdateApiKey}
               onDeleteKey={handleDeleteApiKey}
             />
-          </Tabs.TabPane>
-
-          <Tabs.TabPane
-            tab={
-              <span>
-                <SettingOutlined /> {t('settings.general')}
-              </span>
-            }
-            key="general"
-          >
+          </TabsContent>
+          <TabsContent value="general">
             <GeneralSettingsPanel
               autoSave={autoSave}
               compactMode={compactMode}
@@ -201,40 +195,34 @@ const Settings: React.FC = () => {
               onProjectSaveBehaviorChange={setProjectSaveBehavior}
               onReset={handleReset}
             />
-          </Tabs.TabPane>
-
-          <Tabs.TabPane
-            tab={
-              <span>
-                <InfoCircleOutlined /> {t('settings.about')}
-              </span>
-            }
-            key="about"
-          >
-            <Card title={t('app.name')}>
-              <Paragraph>
-                {t('app.name')}{' '}
-                是一款专业的短视频剪辑工具，集成了AI技术，帮助创作者更高效地创建优质内容。
-              </Paragraph>
-              <Paragraph>版本: {packageJson.version} | 作者: Agions</Paragraph>
+          </TabsContent>
+          <TabsContent value="about">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('app.name')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-2">
+                  {t('app.name')}{' '}
+                  是一款专业的短视频剪辑工具，集成了AI技术，帮助创作者更高效地创建优质内容。
+                </p>
+                <p>版本: {packageJson.version} | 作者: Agions</p>
+              </CardContent>
             </Card>
-          </Tabs.TabPane>
-
-          <Tabs.TabPane
-            tab={
-              <span>
-                <LockOutlined /> 隐私
-              </span>
-            }
-            key="privacy"
-          >
-            <Card title="隐私与数据">
-              <Paragraph>
-                CutDeck
-                高度重视您的隐私。所有API密钥和个人设置仅存储在您的本地设备上，没有任何数据会传输到我们的服务器。
-              </Paragraph>
+          </TabsContent>
+          <TabsContent value="privacy">
+            <Card>
+              <CardHeader>
+                <CardTitle>隐私与数据</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  CutDeck
+                  高度重视您的隐私。所有API密钥和个人设置仅存储在您的本地设备上，没有任何数据会传输到我们的服务器。
+                </p>
+              </CardContent>
             </Card>
-          </Tabs.TabPane>
+          </TabsContent>
         </Tabs>
       </Card>
     </div>

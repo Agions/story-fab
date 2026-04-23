@@ -4,42 +4,26 @@
  * 圆形进度条 + 状态文本
  */
 import React from 'react';
-import { Progress, Typography, Space } from 'antd';
-import { LoadingOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import styles from './ProcessingProgress.module.less';
-
-const { Text } = Typography;
 
 export type ProgressStatus = 'active' | 'success' | 'exception' | 'normal';
 
 export interface ProcessingProgressProps {
-  /** 当前进度 (0-100) */
   percent: number;
-  /** 状态文本 */
   statusText?: string;
-  /** 进度条状态 */
   status?: ProgressStatus;
-  /** 是否显示状态图标 */
   showIcon?: boolean;
-  /** 是否显示百分比文字 */
   showInfo?: boolean;
-  /** 进度条尺寸 */
   size?: 'small' | 'default' | 'large';
-  /** 是否为圆形进度条 (默认true) */
   type?: 'circle' | 'line';
-  /** 附加样式类名 */
   className?: string;
-  /** 自定义样式 */
   style?: React.CSSProperties;
-  /** 进度颜色渐变配置 */
-  strokeColor?: string | { '0%': string; '100%': string };
-  /** 额外的内容渲染 */
+  strokeColor?: string;
   extra?: React.ReactNode;
 }
 
-/**
- * 圆形进度条 + 状态文本
- */
 const ProcessingProgress: React.FC<ProcessingProgressProps> = ({
   percent,
   statusText,
@@ -53,22 +37,20 @@ const ProcessingProgress: React.FC<ProcessingProgressProps> = ({
   strokeColor,
   extra,
 }) => {
-  // 根据状态获取图标
   const getStatusIcon = () => {
     if (!showIcon) return null;
-    
+
     switch (status) {
       case 'success':
-        return <CheckCircleOutlined className={styles.successIcon} />;
+        return <CheckCircle size={16} className={styles.successIcon} />;
       case 'exception':
-        return <CloseCircleOutlined className={styles.errorIcon} />;
+        return <XCircle size={16} className={styles.errorIcon} />;
       case 'active':
       default:
-        return <LoadingOutlined spin className={styles.loadingIcon} />;
+        return <Loader2 size={16} className={`${styles.loadingIcon} animate-spin`} />;
     }
   };
 
-  // 获取状态文字颜色
   const getStatusColor = () => {
     switch (status) {
       case 'success':
@@ -80,62 +62,99 @@ const ProcessingProgress: React.FC<ProcessingProgressProps> = ({
     }
   };
 
-  // 圆形进度条配置
-  const circleProps = {
-    percent,
-    status: status === 'active' ? undefined : status,
-    strokeColor: strokeColor || {
-      '0%': '#108ee9',
-      '100%': '#87d068',
-    },
-    trailColor: '#f0f0f0',
-    strokeWidth: size === 'small' ? 4 : size === 'large' ? 8 : 6,
-    width: size === 'small' ? 60 : size === 'large' ? 120 : 80,
-    format: (pct?: number) => (
-      <span style={{ fontSize: size === 'small' ? 12 : size === 'large' ? 20 : 14 }}>
-        {Math.round(pct || 0)}%
-      </span>
-    ),
+  const sizeMap = {
+    small: { circle: 60, stroke: 4, font: 12 },
+    default: { circle: 80, stroke: 6, font: 14 },
+    large: { circle: 120, stroke: 8, font: 20 },
   };
 
-  // 线性进度条配置
-  const lineProps = {
-    percent,
-    status: status === 'active' ? undefined : status,
-    strokeColor: strokeColor || {
-      '0%': '#108ee9',
-      '100%': '#87d068',
-    },
-    trailColor: '#f0f0f0',
-    showInfo,
-    size: size as 'small' | 'default',
-  };
+  const s = sizeMap[size] || sizeMap.default;
+
+  if (type === 'circle') {
+    return (
+      <div className={`${styles.container} ${className}`} style={style}>
+        <div
+          className="relative inline-flex items-center justify-center"
+          style={{ width: s.circle, height: s.circle }}
+        >
+          {/* Circle progress using conic-gradient */}
+          <svg
+            width={s.circle}
+            height={s.circle}
+            viewBox={`0 0 ${s.circle} ${s.circle}`}
+            className="absolute inset-0"
+            style={{ transform: 'rotate(-90deg)' }}
+          >
+            <circle
+              cx={s.circle / 2}
+              cy={s.circle / 2}
+              r={(s.circle - s.stroke) / 2}
+              fill="none"
+              stroke="#f0f0f0"
+              strokeWidth={s.stroke}
+            />
+            <circle
+              cx={s.circle / 2}
+              cy={s.circle / 2}
+              r={(s.circle - s.stroke) / 2}
+              fill="none"
+              stroke={strokeColor || (status === 'success' ? '#52c41a' : status === 'exception' ? '#ff4d4f' : 'url(#progressGradient)')}
+              strokeWidth={s.stroke}
+              strokeLinecap="round"
+              strokeDasharray={`${(percent / 100) * Math.PI * (s.circle - s.stroke)} ${Math.PI * (s.circle - s.stroke)}`}
+            />
+            <defs>
+              <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#108ee9" />
+                <stop offset="100%" stopColor="#87d068" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span style={{ fontSize: s.font }} className="relative z-10 font-medium">
+            {Math.round(percent)}%
+          </span>
+        </div>
+
+        {statusText && (
+          <div className="flex items-center gap-1 mt-2">
+            {getStatusIcon()}
+            <span style={{ color: getStatusColor(), fontSize: size === 'small' ? 12 : 14 }}>
+              {statusText}
+            </span>
+          </div>
+        )}
+
+        {extra}
+      </div>
+    );
+  }
 
   return (
     <div className={`${styles.container} ${className}`} style={style}>
-      <Space direction="vertical" align="center" size="middle">
-        {type === 'circle' ? (
-          <Progress {...circleProps} />
-        ) : (
-          <Progress {...lineProps} />
+      <div className="flex flex-col items-center gap-2">
+        <Progress value={percent} className="w-full">
+          <ProgressTrack className="h-2">
+            <ProgressIndicator
+              className={status === 'success' ? 'bg-green-500' : status === 'exception' ? 'bg-red-500' : 'bg-orange-500'}
+            />
+          </ProgressTrack>
+        </Progress>
+
+        {showInfo && (
+          <span className="text-sm text-muted-foreground">{Math.round(percent)}%</span>
         )}
-        
+
         {statusText && (
-          <Space size="small">
+          <div className="flex items-center gap-1">
             {getStatusIcon()}
-            <Text 
-              style={{ 
-                color: getStatusColor(),
-                fontSize: size === 'small' ? 12 : 14 
-              }}
-            >
+            <span style={{ color: getStatusColor(), fontSize: size === 'small' ? 12 : 14 }}>
               {statusText}
-            </Text>
-          </Space>
+            </span>
+          </div>
         )}
-        
+
         {extra}
-      </Space>
+      </div>
     </div>
   );
 };

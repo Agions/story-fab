@@ -4,25 +4,18 @@
  */
 
 import React from 'react';
-import { Input, Segmented, Row, Col } from 'antd';
-import {
-  RobotOutlined,
-  EditOutlined,
-  CodeOutlined,
-  ExperimentOutlined,
-  VideoCameraOutlined
-} from '@ant-design/icons';
+import { Input } from '@/components/ui/input';
+import { Bot, Edit3, Code2, FlaskConical, Video } from 'lucide-react';
 import { MODEL_PROVIDERS } from '@/core/config/models.config';
 import type { ModelCategory, ModelProvider } from '@/core/types';
 import styles from './index.module.less';
 
-// 分类选项
 const CATEGORY_OPTIONS = [
-  { label: '全部', value: 'all', icon: <RobotOutlined /> },
-  { label: '文本', value: 'text', icon: <EditOutlined /> },
-  { label: '代码', value: 'code', icon: <CodeOutlined /> },
-  { label: '图像', value: 'image', icon: <ExperimentOutlined /> },
-  { label: '视频', value: 'video', icon: <VideoCameraOutlined /> }
+  { label: '全部', value: 'all', icon: <Bot size={14} /> },
+  { label: '文本', value: 'text', icon: <Edit3 size={14} /> },
+  { label: '代码', value: 'code', icon: <Code2 size={14} /> },
+  { label: '图像', value: 'image', icon: <FlaskConical size={14} /> },
+  { label: '视频', value: 'video', icon: <Video size={14} /> },
 ];
 
 interface ModelFilterProps {
@@ -42,48 +35,59 @@ export const ModelFilter: React.FC<ModelFilterProps> = ({
   onProviderChange,
   onSearchChange
 }) => {
-  // 提供商选项
   const providerOptions = [
     { label: '全部', value: 'all' },
     ...Object.entries(MODEL_PROVIDERS).map(([key, config]) => ({
       label: config.name,
-      value: key
-    }))
+      value: key,
+    })),
   ];
 
   return (
     <div className={styles.filters}>
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Input.Search
-            placeholder="搜索模型..."
-            value={searchQuery}
-            onChange={e => onSearchChange(e.target.value)}
-            allowClear
-            className={styles.searchInput}
-          />
-        </Col>
-        <Col span={12}>
-          <Segmented
-            options={CATEGORY_OPTIONS.map(opt => ({
-              label: opt.label,
-              value: opt.value,
-              icon: opt.icon
-            }))}
-            value={category}
-            onChange={val => onCategoryChange(val as ModelCategory)}
-            block
-          />
-        </Col>
-        <Col span={12}>
-          <Segmented
-            options={providerOptions}
-            value={provider}
-            onChange={val => onProviderChange(val as ModelProvider)}
-            block
-          />
-        </Col>
-      </Row>
+      <div className="mb-3">
+        <Input
+          placeholder="搜索模型..."
+          value={searchQuery}
+          onChange={e => onSearchChange(e.target.value)}
+          className={styles.searchInput}
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        {/* Category Segmented */}
+        <div className="flex overflow-x-auto gap-1 p-1 bg-muted rounded-lg">
+          {CATEGORY_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => onCategoryChange(opt.value as ModelCategory)}
+              className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-md text-xs font-medium transition-colors ${
+                category === opt.value
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {opt.icon}
+              <span className="hidden sm:inline">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+        {/* Provider Segmented */}
+        <div className="flex overflow-x-auto gap-1 p-1 bg-muted rounded-lg">
+          {providerOptions.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => onProviderChange(opt.value as ModelProvider)}
+              className={`flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
+                provider === opt.value
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

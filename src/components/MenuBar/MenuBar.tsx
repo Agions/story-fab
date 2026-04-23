@@ -123,12 +123,9 @@ export const MenuBar = memo<MenuBarProps>(({ onAction }) => {
                 <DropdownMenuItem
                   key={item.label}
                   disabled={item.disabled}
-                  data-variant={item.danger ? 'destructive' : 'default'}
+                  variant={item.danger ? 'destructive' : 'default'}
                   onClick={item.onClick}
-                  className={`
-                    flex justify-between gap-8
-                    ${item.danger ? 'text-accent-danger' : 'text-text-primary'}
-                  `}
+                  className={`flex justify-between gap-8 ${item.danger ? 'text-accent-danger' : 'text-text-primary'}`}
                 >
                   <span className="text-xs">{item.label}</span>
                   {item.shortcut && (
