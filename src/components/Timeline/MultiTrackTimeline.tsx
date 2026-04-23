@@ -395,7 +395,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
           <Tooltip title="跳转开头">
             <Button icon={<Rewind />} onClick={() => { setLocalPlayhead(0); onPlayheadChange?.(0); }} />
           </Tooltip>
-          <Divider type="vertical" />
+          <span className="w-px h-4 bg-zinc-700" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button icon={<Plus />}>添加轨道</Button>
@@ -411,14 +411,14 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
           <Tooltip title={selectedClipId ? '删除片段 (Delete)' : '请先选择片段'}>
             <Button icon={<Trash2 />} danger disabled={!selectedClipId} onClick={() => selectedClipId && handleClipDelete(selectedClipId)} />
           </Tooltip>
-          <Divider type="vertical" />
+          <span className="w-px h-4 bg-zinc-700" />
           <Tooltip title="撤销 (Ctrl+Z)">
             <Button icon={<Send style={{ transform: 'rotate(180deg)' }} />} disabled={!canUndo} onClick={onUndo} />
           </Tooltip>
           <Tooltip title="重做 (Ctrl+Y)">
             <Button icon={<Send />} disabled={!canRedo} onClick={onRedo} />
           </Tooltip>
-          <Divider type="vertical" />
+          <span className="w-px h-4 bg-zinc-700" />
           <div className="flex gap-2 items-center">
             <Tooltip title="缩小">
               <Button icon={<ZoomOut />} onClick={() => {

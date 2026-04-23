@@ -1,7 +1,8 @@
 import { logger } from '@/utils/logger';
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Divider } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -79,24 +80,24 @@ const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport 
     <Card className={styles.container} bordered={false}>
       <div className={styles.header}>
         <div>
-          <Title level={3} className={styles.title}>脚本预览</Title>
-          <Space size="middle" className={styles.meta}>
+          <h3 className={styles.title}>脚本预览</h3>
+          <div className="flex gap-4 items-center">
             <Tooltip title="总时长">
-              <Tag icon={<ClockCircleOutlined />} color="blue" className={styles.metaTag}>
+              <Badge variant="default" className={styles.metaTag}>
                 {Math.round(totalDuration / 60)} 分钟
-              </Tag>
+              </Badge>
             </Tooltip>
             <Tooltip title="段落数">
-              <Tag icon={<OrderedListOutlined />} color="green" className={styles.metaTag}>
+              <Badge variant="default" className={styles.metaTag}>
                 {script.content.length} 段
-              </Tag>
+              </Badge>
             </Tooltip>
             <Tooltip title="创建时间">
-              <Tag icon={<CalendarOutlined />} className={styles.metaTag}>
+              <Badge variant="outline" className={styles.metaTag}>
                 {new Date(script.createdAt).toLocaleDateString()}
-              </Tag>
+              </Badge>
             </Tooltip>
-          </Space>
+          </div>
         </div>
         <div className={styles.actions}>
           <Button 
@@ -104,7 +105,7 @@ const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport 
             onClick={copyToClipboard}
             className={styles.actionButton}
           >
-            <CopyOutlined className="mr-1" />
+            <Copy size={14} className="mr-1" />
             {copying ? '复制中...' : '复制全文'}
           </Button>
           <Button 
@@ -112,20 +113,20 @@ const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport 
             onClick={onExport}
             className={styles.actionButton}
           >
-            <FilePdfOutlined className="mr-1" />
+            <FileText size={14} className="mr-1" />
             导出 PDF
           </Button>
           <Button 
             className={`bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white ${styles.actionButton} ${styles.editButton}`}
             onClick={onEdit}
           >
-            <FileTextOutlined className="mr-1" />
+            <FileText size={14} className="mr-1" />
             编辑脚本
           </Button>
         </div>
       </div>
 
-      <Divider className={styles.mainDivider} />
+      <hr className={styles.mainDivider} />
 
       <div className={styles.scriptContent}>
         {script.content.map((segment: ScriptSegment, index: number) => {
@@ -137,17 +138,17 @@ const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport 
               style={{ borderLeft: `3px solid ${typeInfo.color}` }}
             >
               <div className={styles.segmentHeader}>
-                <Text strong className={styles.timeCode}>
+                <strong className={styles.timeCode}>
                   {formatTime(segment.startTime)} - {formatTime(segment.endTime)}
-                </Text>
-                <Tag color={typeInfo.color} className={styles.typeTag}>
+                </strong>
+                <Badge className={styles.typeTag}>
                   {typeInfo.text}
-                </Tag>
+                </Badge>
               </div>
-              <Paragraph className={styles.content}>
+              <p className={styles.content}>
                 {segment.content}
-              </Paragraph>
-              {index < script.content.length - 1 && <Divider dashed className={styles.divider} />}
+              </p>
+              {index < script.content.length - 1 && <hr className={styles.divider} />}
             </div>
           );
         })}

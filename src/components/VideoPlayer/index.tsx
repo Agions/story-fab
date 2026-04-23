@@ -194,7 +194,7 @@ function VideoPlayer({
         />
         {!isPlaying && (
           <div className={styles.centerPlayButton} onClick={togglePlay}>
-            <PlayCircle />
+            <Play />
           </div>
         )}
       </div>
@@ -210,7 +210,7 @@ function VideoPlayer({
         <div className={styles.controlButtons}>
           <div>
             <Button variant="ghost" className={styles.controlButton} onClick={togglePlay}>
-              {isPlaying ? <PauseCircle /> : <PlayCircle />}
+              {isPlaying ? <Pause /> : <Play />}
             </Button>
             <span className={styles.timeDisplay}>
               {formatTime(currentTime)} / {formatTime(duration)}
