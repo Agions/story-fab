@@ -20,6 +20,7 @@ describe('PlatformPresets', () => {
   });
 
   it('should throw for unknown platform', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(() => getPreset('unknown' as any)).toThrow();
   });
 
