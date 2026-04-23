@@ -6,13 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { 
-  FilePdfOutlined, 
-  CopyOutlined, 
-  FileTextOutlined, 
-  ClockCircleOutlined,
-  OrderedListOutlined,
-  CalendarOutlined
-} from '@ant-design/icons';
+  FileText, 
+  Copy, 
+  Clock, 
+  List, 
+  Calendar
+} from 'lucide-react';
 import type { Script, ScriptSegment } from '@/types';
 import { notify } from '@/shared';
 import styles from './ScriptPreview.module.less';

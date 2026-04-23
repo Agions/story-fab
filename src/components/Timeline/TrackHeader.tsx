@@ -58,7 +58,7 @@ export const TrackHeader = memo<TrackHeaderProps>(({
     document.addEventListener('mouseup', handleMouseUp);
   }, [track.id, onResizeTrack]);
 
-  const trackMenuItems: MenuProps['items'] = [
+  const trackMenuItems = [
     { key: 'add', label: '添加片段', icon: <Plus size={16} />, onClick: () => onAddClip(track.id) },
     { type: 'divider' },
     { key: 'delete', label: '删除轨道', icon: <Trash2 size={16} />, danger: true, onClick: () => onDeleteTrack(track.id) },

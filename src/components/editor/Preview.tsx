@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FullscreenOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
+import { Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 import styles from './Preview.module.less';
 
 interface PreviewProps {

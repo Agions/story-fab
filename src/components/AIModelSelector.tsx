@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { CheckCircleFilled, RobotOutlined, QuestionCircleOutlined, CodeOutlined, VideoCameraOutlined, EditOutlined, FireOutlined, StarOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { CheckCircle, Bot, HelpCircle, Code, Video, Edit, Flame, Star, Zap } from 'lucide-react';
 import { motion } from '@/components/common/motion-shim';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS } from '@/core/config/models.config';
 import type { AIModel as CoreAIModel, ModelProvider } from '@/core/types';
