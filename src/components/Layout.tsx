@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { ShortcutOverlay } from '@/components/ShortcutOverlay';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   HomeOutlined,
@@ -44,6 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [shortcutOverlayOpen, setShortcutOverlayOpen] = useState(false);
   const reducedMotion = useRef(
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
@@ -133,7 +135,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <h1 className={styles.pageTitle}>{pageTitle}</h1>
         </div>
         <div className={styles.topbarRight}>
-          <button className={styles.iconBtn} title="帮助" aria-label="帮助">
+          <button
+            className={styles.iconBtn}
+            title="键盘快捷键"
+            aria-label="键盘快捷键"
+            onClick={() => setShortcutOverlayOpen(true)}
+          >
             <QuestionCircleOutlined />
           </button>
           <button className={styles.iconBtn} title="通知" aria-label="通知">
@@ -150,6 +157,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main className={`${styles.content} ${sidebarCollapsed ? styles.contentExpanded : ''}`} id="main-content">
         {children}
       </main>
+
+      {/* Global keyboard shortcut overlay */}
+      <ShortcutOverlay
+        open={shortcutOverlayOpen}
+        onOpenChange={setShortcutOverlayOpen}
+      />
     </div>
   );
 };
