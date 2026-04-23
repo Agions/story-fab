@@ -1,12 +1,17 @@
-import React, { useEffect, memo } from 'react';
-import { Modal, Button, Spin, Typography } from 'antd';
+import React, { memo } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { ScriptSegment } from '@/types';
 import styles from './VideoEditor.module.less';
 
-const { Text, Paragraph } = Typography;
-
 interface PreviewModalProps {
-  visible: boolean;
+  open: boolean;
   loading: boolean;
   previewUrl: string;
   previewSegment: ScriptSegment | null;
@@ -21,55 +26,54 @@ const formatTime = (time: number) => {
 };
 
 const PreviewModal: React.FC<PreviewModalProps> = ({
-  visible,
+  open,
   loading,
   previewUrl,
   previewSegment,
   onClose,
 }) => {
   return (
-    <Modal
-      title="片段预览"
-      open={visible}
-      onCancel={onClose}
-      footer={[
-        <Button key="close" onClick={onClose}>
-          关闭
-        </Button>,
-      ]}
-      width={800}
-    >
-      {loading ? (
-        <div className={styles.previewLoading}>
-          <Spin tip="生成预览中..." />
-        </div>
-      ) : previewUrl ? (
-        <div className={styles.previewContainer}>
-          <video
-            controls
-            autoPlay
-            src={previewUrl}
-            className={styles.previewVideo}
-          />
-          {previewSegment && (
-            <div className={styles.previewInfo}>
-              <Paragraph>
-                <Text strong>时间段: </Text>
-                <Text>{formatTime(previewSegment.startTime)} - {formatTime(previewSegment.endTime)}</Text>
-              </Paragraph>
-              <Paragraph>
-                <Text strong>内容: </Text>
-                <Text>{previewSegment.content}</Text>
-              </Paragraph>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className={styles.previewError}>
-          <Text type="danger">无法生成预览，请重试</Text>
-        </div>
-      )}
-    </Modal>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>片段预览</DialogTitle>
+        </DialogHeader>
+        {loading ? (
+          <div className={styles.previewLoading}>
+            <div className="animate-spin">⟳</div>
+            <span className="ml-2">生成预览中...</span>
+          </div>
+        ) : previewUrl ? (
+          <div className={styles.previewContainer}>
+            <video
+              controls
+              autoPlay
+              src={previewUrl}
+              className={styles.previewVideo}
+            />
+            {previewSegment && (
+              <div className={styles.previewInfo}>
+                <p className="mb-1">
+                  <span className="font-semibold">时间段: </span>
+                  <span>{formatTime(previewSegment.startTime)} - {formatTime(previewSegment.endTime)}</span>
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold">内容: </span>
+                  <span>{previewSegment.content}</span>
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className={styles.previewError}>
+            <span className="text-red-500">无法生成预览，请重试</span>
+          </div>
+        )}
+        <DialogFooter>
+          <Button onClick={onClose}>关闭</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

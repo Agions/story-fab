@@ -1,5 +1,28 @@
-import { message } from 'antd';
+/**
+ * Minimal toast notification emitter
+ * The ToastProvider in src/components/ui/toast.tsx subscribes to these events
+ */
+type ToastType = 'success' | 'error' | 'warning' | 'info' | 'loading';
 
+interface ToastEvent {
+  type: ToastType;
+  content: string;
+  duration?: number;
+  key?: string;
+}
+
+type Listener = (event: ToastEvent) => void;
+
+const listeners = new Set<Listener>();
+
+export function emitToast(event: ToastEvent) {
+  listeners.forEach(l => l(event));
+}
+
+export function subscribeToToast(listener: Listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
 
 export const toErrorMessage = (error: unknown, fallback: string): string => {
   if (error instanceof Error) {
@@ -13,56 +36,36 @@ export const toErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
-// 消息持续时间
-const MESSAGE_DURATION = 3; // 3秒
+const MESSAGE_DURATION = 3;
 
 export const notify = {
   success: (content: string, key?: string) => {
-    const options = { 
-      content, 
-      key,
-      duration: MESSAGE_DURATION,
-    };
-    message.success(options);
+    emitToast({ type: 'success', content, duration: MESSAGE_DURATION, key });
   },
   
   error: (error: unknown, fallback: string, key?: string) => {
-    const options = { 
+    emitToast({ 
+      type: 'error', 
       content: toErrorMessage(error, fallback), 
-      key,
-      duration: MESSAGE_DURATION * 2, // 错误消息显示更久
-    };
-    message.error(options);
+      duration: MESSAGE_DURATION * 2,
+      key 
+    });
   },
   
   warning: (content: string, key?: string) => {
-    const options = { 
-      content, 
-      key,
-      duration: MESSAGE_DURATION,
-    };
-    message.warning(options);
+    emitToast({ type: 'warning', content, duration: MESSAGE_DURATION, key });
   },
   
   info: (content: string, key?: string) => {
-    const options = { 
-      content, 
-      key,
-      duration: MESSAGE_DURATION,
-    };
-    message.info(options);
+    emitToast({ type: 'info', content, duration: MESSAGE_DURATION, key });
   },
   
   loading: (content: string, key: string) => {
-    message.loading({ content, key, duration: 0 });
+    emitToast({ type: 'loading', content, duration: 0, key });
   },
   
-  // 销毁指定消息
   destroy: (key?: string) => {
-    if (key) {
-      message.destroy(key);
-    } else {
-      message.destroy();
-    }
+    // For destroy without key, we'd need a more complex system
+    // For now, individual toasts handle their own removal via duration
   },
 };

@@ -1,9 +1,9 @@
 import React, { memo } from 'react';
-import { Card, Typography, Dropdown, Button } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { Card, CardContent } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 import styles from '../index.module.less';
-
-const { Text, Title } = Typography;
 
 interface ExportSettingsPanelProps {
   outputFormat: string;
@@ -45,36 +45,46 @@ const ExportSettingsPanel: React.FC<ExportSettingsPanelProps> = ({
 }) => {
   return (
     <div className={styles.settingsPanel}>
-      <Title level={5} className={styles.sectionTitle}>导出设置</Title>
+      <h5 className={styles.sectionTitle}>导出设置</h5>
 
       <Card className={styles.settingCard}>
-        <div className={styles.settingItem}>
-          <Text strong>输出格式</Text>
-          <Dropdown
-            menu={{
-              items: formatOptions,
-              onClick: ({ key }) => onFormatChange(key),
-            }}
-          >
-            <Button>
-              {outputFormat.toUpperCase()} <DownloadOutlined />
-            </Button>
-          </Dropdown>
-        </div>
+        <CardContent className="flex flex-col gap-4">
+          <div className={styles.settingItem}>
+            <span className="font-semibold">输出格式</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  {outputFormat.toUpperCase()} <Download size={14} className="ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {formatOptions.map(opt => (
+                  <DropdownMenuItem key={opt.key} onClick={() => onFormatChange(opt.key)}>
+                    {opt.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
-        <div className={styles.settingItem}>
-          <Text strong>视频质量</Text>
-          <Dropdown
-            menu={{
-              items: qualityOptions,
-              onClick: ({ key }) => onQualityChange(key),
-            }}
-          >
-            <Button>
-              {getQualityLabel(videoQuality)} <DownloadOutlined />
-            </Button>
-          </Dropdown>
-        </div>
+          <div className={styles.settingItem}>
+            <span className="font-semibold">视频质量</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  {getQualityLabel(videoQuality)} <Download size={14} className="ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {qualityOptions.map(opt => (
+                  <DropdownMenuItem key={opt.key} onClick={() => onQualityChange(opt.key)}>
+                    {opt.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

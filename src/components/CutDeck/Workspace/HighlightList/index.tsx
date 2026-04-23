@@ -8,7 +8,8 @@
  * - bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
  */
 import React, { useState, useCallback } from 'react';
-import { Slider, Spin, message } from 'antd';
+import { Spin, message } from 'antd';
+import { Slider } from '@/components/ui/slider';
 import { ThunderboltOutlined, AimOutlined, BulbOutlined } from '@ant-design/icons';
 import { visionService } from '@/core/services/vision.service';
 import { useEditorStore } from '@/store/editorStore';
@@ -54,6 +55,16 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
   const [threshold, setThreshold] = useState(1.5);
   const [topN, setTopN] = useState(10);
   const setPlayheadMs = useEditorStore((s) => s.setPlayheadMs);
+
+  const handleThresholdChange = (value: number | readonly number[]) => {
+    const val = Array.isArray(value) ? value[0] : value;
+    setThreshold(val);
+  };
+
+  const handleTopNChange = (value: number | readonly number[]) => {
+    const val = Array.isArray(value) ? value[0] : value;
+    setTopN(val);
+  };
 
   const detect = useCallback(async () => {
     if (!videoInfo?.path) {
@@ -102,7 +113,7 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
             <span className={styles.controlLabel}>阈值</span>
             <Slider
               min={1.0} max={3.0} step={0.1} value={threshold}
-              onChange={setThreshold} tooltip={{ formatter: (v) => `${v?.toFixed(1)}x` }}
+              onValueChange={handleThresholdChange}
               className={styles.slider}
               disabled={loading}
             />
@@ -111,7 +122,7 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
             <span className={styles.controlLabel}>Top</span>
             <Slider
               min={3} max={30} step={1} value={topN}
-              onChange={setTopN} tooltip={{ formatter: (v) => `${v}` }}
+              onValueChange={handleTopNChange}
               className={styles.slider}
               disabled={loading}
             />

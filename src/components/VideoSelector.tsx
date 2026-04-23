@@ -1,8 +1,8 @@
 import { logger } from '@/utils/logger';
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Card, Spin } from 'antd';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UploadOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { Upload, Trash2, PlayCircle, Play } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { analyzeVideo, VideoMetadata, formatDuration, formatResolution } from '@/services/video';
@@ -235,8 +235,15 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
         onChange={handleSelectVideoWeb}
       />
 
-      <Spin spinning={loading || isAnalyzing} tip={isAnalyzing ? "分析视频中..." : "加载中..."}>
-        {!videoPath ? (
+      <div className={`relative ${loading || isAnalyzing ? 'opacity-60 pointer-events-none' : ''}`}>
+        {loading || isAnalyzing ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="h-6 w-6 rounded-full border-2 border-orange-500/30 border-t-orange-500 animate-spin" />
+            <span className="ml-2 text-sm text-muted-foreground">
+              {isAnalyzing ? '分析视频中...' : '加载中...'}
+            </span>
+          </div>
+        ) : !videoPath ? (
           <div
             className={`${styles.uploadArea} ${isDragging ? styles.dragging : ''}`}
             onClick={handleSelectVideo}
@@ -244,7 +251,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <UploadOutlined className={styles.uploadIcon} />
+            <Upload className={styles.uploadIcon} />
             <p>点击选择视频文件</p>
             <p className={styles.uploadTip}>
               支持 {VIDEO_EXTENSIONS.map(e => e.slice(1).toUpperCase()).join(', ')} 格式
@@ -264,12 +271,17 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
             </div>
 
             {metadata && (
-              <Card className={styles.metadataCard} size="small" title="视频信息">
-                <p><strong>文件名:</strong> {getFileName(videoPath)}</p>
-                <p><strong>时长:</strong> {formatDuration(metadata.duration)}</p>
-                <p><strong>分辨率:</strong> {formatResolution(metadata.width, metadata.height)}</p>
-                <p><strong>帧率:</strong> {metadata.fps} fps</p>
-                <p><strong>编码:</strong> {metadata.codec}</p>
+              <Card className="mt-3">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">视频信息</CardTitle>
+                </CardHeader>
+                <CardContent className="text-xs space-y-1">
+                  <p><strong>文件名:</strong> {getFileName(videoPath)}</p>
+                  <p><strong>时长:</strong> {formatDuration(metadata.duration)}</p>
+                  <p><strong>分辨率:</strong> {formatResolution(metadata.width, metadata.height)}</p>
+                  <p><strong>帧率:</strong> {metadata.fps} fps</p>
+                  <p><strong>编码:</strong> {metadata.codec}</p>
+                </CardContent>
               </Card>
             )}
 
@@ -279,21 +291,21 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
                   variant="destructive"
                   onClick={handleRemoveVideo}
                 >
-                  <DeleteOutlined className="mr-1" />
+                  <Trash2 className="mr-1 size-4" />
                   移除
                 </Button>
                 <Button
                   className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
                   onClick={handlePlayVideo}
                 >
-                  <PlayCircleOutlined className="mr-1" />
+                  <PlayCircle className="mr-1 size-4" />
                   {isTauri() ? '在播放器中打开' : '新窗口播放'}
                 </Button>
               </div>
             </div>
           </div>
         )}
-      </Spin>
+      </div>
     </div>
   );
 };

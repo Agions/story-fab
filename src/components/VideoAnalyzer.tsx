@@ -1,9 +1,9 @@
 import { logger } from '@/utils/logger';
 import React, { useState } from 'react';
-import { Card, Alert, Spin } from 'antd';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { VideoCameraOutlined } from '@ant-design/icons';
+import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
+import { Video } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoAnalysis, KeyMoment, Emotion } from '../types';
@@ -50,18 +50,18 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
     try {
       setLoading(true);
       setError(null);
-      
+
       setProgress(10);
-      
-      const videoMetadata = await invoke<AnalyzeVideoResult>('analyze_video', { 
-        path: selectedVideoUrl 
+
+      const videoMetadata = await invoke<AnalyzeVideoResult>('analyze_video', {
+        path: selectedVideoUrl
       }).catch(err => {
         logger.error('视频分析失败:', { error: err });
         throw new Error(`视频分析失败: ${err}`);
       });
-      
+
       setProgress(40);
-      
+
       const keyFrameCount = Math.min(5, Math.ceil(videoMetadata.duration / 60));
       const keyFrames = await invoke<string[]>('extract_key_frames', {
         path: selectedVideoUrl,
@@ -70,22 +70,22 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
         logger.error('提取关键帧失败:', { error: err });
         return [] as string[];
       });
-      
+
       setProgress(70);
-      
+
       const thumbnail = await invoke<string>('generate_thumbnail', {
         path: selectedVideoUrl
       }).catch(err => {
         logger.error('生成缩略图失败:', { error: err });
         return '';
       });
-      
+
       const keyMoments: KeyMoment[] = [];
       const emotions: Emotion[] = [];
-      
+
       const numKeyMoments = Math.min(8, Math.ceil(videoMetadata.duration / 30));
       const interval = videoMetadata.duration / (numKeyMoments + 1);
-      
+
       for (let i = 1; i <= numKeyMoments; i++) {
         const timestamp = Math.round(interval * i);
         keyMoments.push({
@@ -94,9 +94,9 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
           importance: 7
         });
       }
-      
+
       setProgress(90);
-      
+
       const analysis: VideoAnalysis = {
         id: uuidv4(),
         title: videoMetadata.title || `项目_${projectId}`,
@@ -105,9 +105,9 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
         emotions: emotions.map((e, i) => ({ timestamp: i * 5, type: e.type, intensity: 0.8 })),
         summary: `视频时长: ${Math.round(videoMetadata.duration)}秒，分辨率: ${videoMetadata.width}x${videoMetadata.height}，帧率: ${videoMetadata.fps}帧/秒。关键帧数量: ${keyFrames.length}。${thumbnail ? '已生成缩略图。' : ''}`
       };
-      
+
       setProgress(100);
-      
+
       notify.success('视频分析完成');
       onAnalysisComplete(analysis);
     } catch (error) {
@@ -119,50 +119,58 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
   };
 
   return (
-    <Card className={styles.container}>
-      <Title level={4}>视频分析</Title>
-      <Paragraph>
-        我们将使用先进的AI技术分析您的视频内容，识别关键时刻、情感变化和重要信息，为生成高质量解说脚本提供基础。
-      </Paragraph>
+    <Card>
+      <CardHeader>
+        <CardTitle><Title level={4}>视频分析</Title></CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Paragraph>
+          我们将使用先进的AI技术分析您的视频内容，识别关键时刻、情感变化和重要信息，为生成高质量解说脚本提供基础。
+        </Paragraph>
 
-      {error && (
-        <Alert
-          message="分析错误"
-          description={error}
-          type="error"
-          showIcon
-          className={styles.alert}
-        />
-      )}
-
-      <div className={styles.videoSection}>
-        {selectedVideoUrl && typeof selectedVideoUrl === 'string' && selectedVideoUrl.startsWith('http') ? (
-          <div className={styles.videoInfo}>
-            <VideoCameraOutlined className={styles.icon} />
-            <span className={styles.url}>{selectedVideoUrl}</span>
+        {error && (
+          <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm">
+            <p className="font-medium text-destructive mb-1">分析错误</p>
+            <p className="text-muted-foreground">{error}</p>
           </div>
-        ) : (
-          <VideoSelector
-            initialVideoPath={selectedVideoUrl}
-            onVideoSelect={(filePath) => setSelectedVideoUrl(filePath)}
-          />
         )}
-      </div>
 
-      {loading && (
-        <div className={styles.progress}>
-          <Progress value={progress} />
-          <Spin tip="分析中..." />
+        <div className={styles.videoSection}>
+          {selectedVideoUrl && typeof selectedVideoUrl === 'string' && selectedVideoUrl.startsWith('http') ? (
+            <div className="flex items-center gap-2 p-3 rounded-md bg-accent/50">
+              <Video size={16} className="text-muted-foreground shrink-0" />
+              <span className="text-sm truncate">{selectedVideoUrl}</span>
+            </div>
+          ) : (
+            <VideoSelector
+              initialVideoPath={selectedVideoUrl}
+              onVideoSelect={(filePath) => setSelectedVideoUrl(filePath)}
+            />
+          )}
         </div>
-      )}
 
-      <Button
-        className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
-        onClick={handleAnalyze}
-        disabled={!selectedVideoUrl || loading}
-      >
-        {loading ? '分析中...' : '开始分析'}
-      </Button>
+        {loading && (
+          <div className={styles.progress + ' space-y-2'}>
+            <Progress value={progress} className="w-full">
+              <ProgressTrack className="h-1">
+                <ProgressIndicator className="bg-orange-500" />
+              </ProgressTrack>
+            </Progress>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="h-4 w-4 rounded-full border-2 border-orange-500/30 border-t-orange-500 animate-spin" />
+              <span>分析中...</span>
+            </div>
+          </div>
+        )}
+
+        <Button
+          className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+          onClick={handleAnalyze}
+          disabled={!selectedVideoUrl || loading}
+        >
+          {loading ? '分析中...' : '开始分析'}
+        </Button>
+      </CardContent>
     </Card>
   );
 };

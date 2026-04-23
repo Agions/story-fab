@@ -2,15 +2,15 @@
  * API 密钥设置面板
  */
 import React, { useState, useCallback } from 'react';
-import { Card, Form, Input, Space, Tag, Spin, Alert, Divider } from 'antd';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { KeyOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { validateApiKey } from '@/services/apiKey';
 import { notify } from '@/shared';
 import { ModelProvider, PROVIDER_NAMES } from '@/constants/models';
 import { MODEL_PROVIDERS } from '@/core/config/models.config';
-
-const Text = ({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) => <span style={style}>{children}</span>;
+import { Key, Eye, EyeOff, Trash2, Check, X, Loader2 } from 'lucide-react';
 
 interface ApiKeyConfig {
   key: string;
@@ -63,65 +63,78 @@ const ApiKeysPanel: React.FC<ApiKeysPanelProps> = ({ apiKeys, onUpdateKey, onDel
   const providers: ModelProvider[] = Object.keys(MODEL_PROVIDERS) as ModelProvider[];
 
   return (
-    <Card title="API 密钥管理" extra={<Tag color="blue">安全存储</Tag>}>
-      <Alert
-        message="API 密钥仅存储在本地，不会上传到服务器"
-        type="info"
-        showIcon
-        style={{ marginBottom: 16 }}
-      />
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <Key size={16} />
+          API 密钥管理
+        </CardTitle>
+        <Badge variant="secondary">安全存储</Badge>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="rounded-md border border-accent-primary/30 bg-accent-primary/10 px-4 py-3 text-sm">
+          <p className="text-accent-primary font-medium">API 密钥仅存储在本地，不会上传到服务器</p>
+        </div>
 
-      <Form layout="vertical">
-        {providers.map(provider => {
-          const config = apiKeys[provider];
-          const isVisible = visibleKeys.has(provider);
-          const isTesting = testingProvider === provider;
+        <div className="space-y-4">
+          {providers.map(provider => {
+            const config = apiKeys[provider];
+            const isVisible = visibleKeys.has(provider);
+            const isTesting = testingProvider === provider;
 
-          return (
-            <Form.Item key={provider} label={PROVIDER_NAMES[provider]}>
-              <Space.Compact style={{ width: '100%' }}>
-                <Input
-                  type={isVisible ? 'text' : 'password'}
-                  placeholder={`输入 ${PROVIDER_NAMES[provider]} API 密钥`}
-                  value={config?.key || ''}
-                  onChange={(e) => onUpdateKey(provider, e.target.value)}
-                  aria-label={`${PROVIDER_NAMES[provider]} API 密钥输入框`}
-                  suffix={
-                    config?.isValid === true ? <CheckCircleOutlined style={{ color: '#52c41a' }} /> :
-                    config?.isValid === false ? <CloseCircleOutlined style={{ color: '#ff4d4f' }} /> :
-                    null
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => toggleKeyVisibility(provider)}
-                  aria-label={isVisible ? "隐藏密钥" : "显示密钥"}
-                >
-                  {isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-                </Button>
-                <Button
-                  className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
-                  disabled={isTesting}
-                  onClick={() => handleTest(provider, config?.key || '')}
-                  aria-label={`验证 ${PROVIDER_NAMES[provider]} 密钥`}
-                >
-                  {isTesting ? '验证中...' : '验证'}
-                </Button>
-                {config?.key && (
+            return (
+              <div key={provider} className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">{PROVIDER_NAMES[provider]}</label>
+                <div className="flex gap-1">
+                  <div className="relative flex-1">
+                    <Input
+                      type={isVisible ? 'text' : 'password'}
+                      placeholder={`输入 ${PROVIDER_NAMES[provider]} API 密钥`}
+                      value={config?.key || ''}
+                      onChange={e => onUpdateKey(provider, e.target.value)}
+                      aria-label={`${PROVIDER_NAMES[provider]} API 密钥输入框`}
+                      className="pr-8"
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                      {config?.isValid === true && <Check size={14} className="text-green-500" />}
+                      {config?.isValid === false && <X size={14} className="text-red-500" />}
+                    </div>
+                  </div>
                   <Button
-                    variant="destructive"
-                    onClick={() => onDeleteKey(provider)}
-                    aria-label={`删除 ${PROVIDER_NAMES[provider]} 密钥`}
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => toggleKeyVisibility(provider)}
+                    aria-label={isVisible ? "隐藏密钥" : "显示密钥"}
                   >
-                    <DeleteOutlined />
+                    {isVisible ? <EyeOff size={14} /> : <Eye size={14} />}
                   </Button>
-                )}
-              </Space.Compact>
-            </Form.Item>
-          );
-        })}
-      </Form>
+                  <Button
+                    className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+                    disabled={isTesting}
+                    onClick={() => handleTest(provider, config?.key || '')}
+                    aria-label={`验证 ${PROVIDER_NAMES[provider]} 密钥`}
+                  >
+                    {isTesting ? (
+                      <><Loader2 size={14} className="mr-1 animate-spin" />验证中...</>
+                    ) : (
+                      '验证'
+                    )}
+                  </Button>
+                  {config?.key && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => onDeleteKey(provider)}
+                      aria-label={`删除 ${PROVIDER_NAMES[provider]} 密钥`}
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
     </Card>
   );
 };

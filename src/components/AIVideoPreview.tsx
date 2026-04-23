@@ -3,18 +3,19 @@
  * 简化的 AI 剪辑专用时间轴
  */
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Slider, Space, Upload, type UploadProps } from 'antd';
+import { Upload } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import {
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-  StepBackwardOutlined,
-  StepForwardOutlined,
-  ExpandOutlined,
-  UploadOutlined,
-  CloudUploadOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons';
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Maximize2,
+  Upload as UploadIcon,
+  CloudUpload,
+  Trash2,
+} from 'lucide-react';
 import { useAIEditor } from './CutDeck/AIEditorContext';
 import type { VideoInfo } from '@/core/types';
 import { notify } from '@/shared';
@@ -112,8 +113,9 @@ const AIVideoPreview: React.FC = () => {
     }
   };
 
-  const handleProgressChange = (value: number | number[]) => {
-    seekTo(Array.isArray(value) ? value[0] : value);
+  const handleProgressChange = (value: number | readonly number[]) => {
+    const val = Array.isArray(value) ? value[0] : value;
+    seekTo(val);
   };
 
   const handleUploadFile = (file: File) => {
@@ -144,8 +146,8 @@ const AIVideoPreview: React.FC = () => {
     return false;
   };
 
-  const handleUpload: UploadProps['beforeUpload'] = (file) => {
-    return handleUploadFile(file);
+  const handleUpload = (file: File) => {
+    void handleUploadFile(file);
   };
 
   const handleVideoLoaded = () => {
@@ -271,45 +273,50 @@ const AIVideoPreview: React.FC = () => {
                 }
               }}
             >
-              <UploadOutlined className={styles.uploadIcon} />
+              <UploadIcon className={styles.uploadIcon} />
               <Text>拖拽视频文件到此处或点击上传</Text>
-              <Upload
-                accept="video/*"
-                showUploadList={false}
-                beforeUpload={handleUpload}
+              <Button
+                variant="link"
+                onClick={() => {
+                  const input = window.document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'video/*';
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) void handleUploadFile(file);
+                  };
+                  input.click();
+                }}
               >
-                <Button variant="link">
-                  <CloudUploadOutlined className="mr-1" />
-                  选择文件
-                </Button>
-              </Upload>
+                <CloudUpload className="mr-1" size={14} />
+                选择文件
+              </Button>
             </div>
           )}
           
           {currentVideo && (
             <div className={styles.videoControls}>
-              <Space>
+              <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon-sm" onClick={() => skip(-5)}>
-                  <StepBackwardOutlined />
+                  <SkipBack size={14} />
                 </Button>
                 <Button variant="ghost" size="icon-sm" onClick={togglePlay} className={styles.playBtn}>
-                  {isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+                  {isPlaying ? <Pause size={14} /> : <Play size={14} />}
                 </Button>
                 <Button variant="ghost" size="icon-sm" onClick={() => skip(5)}>
-                  <StepForwardOutlined />
+                  <SkipForward size={14} />
                 </Button>
-              </Space>
+              </div>
               
               <div className={styles.progress}>
                 <Text type="secondary" style={{ fontSize: 12, minWidth: 45 }}>
                   {formatTime(currentTime)}
                 </Text>
-                <Slider 
+                <Slider
                   value={currentTime}
                   min={0}
                   max={duration || 100}
-                  onChange={handleProgressChange}
-                  tooltip={{ formatter: (value) => formatTime(value || 0) }}
+                  onValueChange={handleProgressChange}
                   style={{ width: '80%', margin: '0 12px' }}
                 />
                 <Text type="secondary" style={{ fontSize: 12, minWidth: 45 }}>
@@ -317,16 +324,16 @@ const AIVideoPreview: React.FC = () => {
                 </Text>
               </div>
               
-              <Space>
+              <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon-sm" title="全屏">
-                  <ExpandOutlined />
+                  <Maximize2 size={14} />
                 </Button>
                 {currentVideo && (
                   <Button variant="ghost" size="icon-sm" title="清除视频" onClick={handleClearVideo}>
-                    <DeleteOutlined />
+                    <Trash2 size={14} />
                   </Button>
                 )}
-              </Space>
+              </div>
             </div>
           )}
         </div>

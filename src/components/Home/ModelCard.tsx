@@ -1,23 +1,15 @@
 import React from 'react';
-import { Card, Tag, Tooltip, Badge } from 'antd';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { RobotOutlined, CheckCircleFilled, WarningOutlined, ApiOutlined, SettingOutlined, LinkOutlined } from '@ant-design/icons';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Bot, CheckCircle, AlertTriangle, Settings, ExternalLink } from 'lucide-react';
 import { AIModelType, AI_MODEL_INFO } from '@/types';
 import { useModelStore } from '@/store';
 import { useNavigate } from 'react-router-dom';
 import styles from './ModelCard.module.less';
 
-const Text = ({ children, type, className }: { children: React.ReactNode; type?: string; className?: string }) => (
-  <span className={className || (type ? `text-${type}` : undefined)}>{children}</span>
-);
-
-const Title = ({ level = 4, children, className }: { level?: number; children: React.ReactNode; className?: string }) => {
-  const Tag = level === 4 ? 'h4' : 'h3';
-  return <Tag className={className}>{children}</Tag>;
-};
-
-// API密钥申请链接
 const API_LINKS: Partial<Record<AIModelType, string>> = {
   openai: 'https://platform.openai.com/docs/quickstart',
   anthropic: 'https://docs.anthropic.com/en/api/getting-started',
@@ -35,8 +27,8 @@ interface ModelCardProps {
   onRequestApiKey?: (modelType: AIModelType) => void;
 }
 
-const ModelCard: React.FC<ModelCardProps> = ({ 
-  modelType, 
+const ModelCard: React.FC<ModelCardProps> = ({
+  modelType,
   onSelect,
   onRequestApiKey
 }) => {
@@ -47,7 +39,6 @@ const ModelCard: React.FC<ModelCardProps> = ({
   const isSelected = selectedAIModel === modelType;
   const [isModalVisible, setIsModalVisible] = React.useState(false);
 
-  // 处理选择模型
   const handleSelect = () => {
     if (isEnabled) {
       onSelect(modelType);
@@ -55,21 +46,18 @@ const ModelCard: React.FC<ModelCardProps> = ({
       navigate('/settings', { state: { activeModel: modelType, showKeyConfig: true } });
     }
   };
-  
-  // 处理跳转到设置页面
+
   const handleGoToSettings = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigate('/settings', { state: { activeModel: modelType, showKeyConfig: true } });
   };
-  
-  // 处理申请API密钥
+
   const handleRequestApiKey = (e: React.MouseEvent) => {
     e.stopPropagation();
     onRequestApiKey?.(modelType);
     setIsModalVisible(true);
   };
 
-  // 处理直接跳转到API密钥申请页面
   const handleGoToApiPage = () => {
     const link = API_LINKS[modelType] ?? '/settings';
     window.open(link, '_blank');
@@ -78,78 +66,81 @@ const ModelCard: React.FC<ModelCardProps> = ({
 
   return (
     <>
-      <Card 
-        className={`${styles.modelCard} ${isSelected ? styles.selected : ''} ${isEnabled ? '' : styles.disabled}`}
-        hoverable
+      <Card
+        className={`${styles.modelCard} ${isSelected ? styles.selected : ''} ${isEnabled ? '' : styles.disabled} cursor-pointer`}
         onClick={handleSelect}
       >
         <div className={styles.modelIcon}>
-          <Badge 
-            dot 
-            color={isEnabled ? (isSelected ? "blue" : "green") : "red"}
-            offset={[-5, 5]}
-          >
-            <RobotOutlined style={{ fontSize: 28 }} />
-          </Badge>
+          <div className="relative inline-block">
+            <Bot size={28} />
+            <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-background ${
+              isEnabled ? (isSelected ? 'bg-blue-500' : 'bg-green-500') : 'bg-red-500'
+            }`} />
+          </div>
         </div>
-        
+
         <div className={styles.modelInfo}>
-          <Title level={4} className={styles.modelName}>
+          <h4 className={styles.modelName}>
             {modelInfo.name}
             {isEnabled && isSelected && (
-              <CheckCircleFilled className={styles.selectedIcon} />
+              <CheckCircle size={14} className={`${styles.selectedIcon} ml-1 text-blue-500`} />
             )}
-          </Title>
-          
-          <Text type="secondary" className={styles.modelProvider}>
+          </h4>
+
+          <span className={`${styles.modelProvider} text-xs text-muted-foreground`}>
             {modelInfo.provider}
-          </Text>
-          
+          </span>
+
           <div className={styles.modelStatus}>
             {isEnabled ? (
-              <Tag color="success" icon={<CheckCircleFilled />}>已配置</Tag>
+              <Badge variant="default" className="text-xs bg-green-600/20 text-green-600 border-green-600/40">
+                <CheckCircle size={10} className="mr-1" />已配置
+              </Badge>
             ) : (
-              <Tag color="warning" icon={<WarningOutlined />}>未配置</Tag>
+              <Badge variant="secondary" className="text-xs">
+                <AlertTriangle size={10} className="mr-1" />未配置
+              </Badge>
             )}
             {isSelected && (
-              <Tag color="processing">当前默认</Tag>
+              <Badge variant="default" className="text-xs bg-blue-500/20 text-blue-500 border-blue-500/40">当前默认</Badge>
             )}
           </div>
-          
+
           <div className={styles.modelActions}>
             {isEnabled ? (
               <div className="flex items-center gap-2">
-                <Button 
-                  className={isSelected ? "bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" : ""}
+                <Button
                   size="sm"
-                  onClick={handleSelect}
+                  onClick={(e) => { e.stopPropagation(); handleSelect(); }}
+                  className={isSelected ? 'bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white' : ''}
                 >
                   {isSelected ? '当前默认' : '设为默认'}
                 </Button>
-                <Tooltip title="管理模型设置">
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={handleGoToSettings}
-                    aria-label="管理模型设置"
-                  >
-                    <SettingOutlined />
-                  </Button>
-                </Tooltip>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                      onClick={(e) => { e.stopPropagation(); handleGoToSettings(e); }}
+                    >
+                      <Settings size={14} />
+                    </TooltipTrigger>
+                    <TooltipContent>管理模型设置</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Button 
-                  className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+                <Button
                   size="sm"
-                  onClick={handleGoToSettings}
+                  className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white"
+                  onClick={(e) => { e.stopPropagation(); handleGoToSettings(e as unknown as React.MouseEvent); }}
                 >
                   去配置
                 </Button>
-                <Button 
+                <Button
                   variant="link"
                   size="sm"
-                  onClick={handleRequestApiKey}
+                  onClick={(e) => { e.stopPropagation(); handleRequestApiKey(e as unknown as React.MouseEvent); }}
                   className={styles.applyKeyButton}
                 >
                   申请密钥
@@ -159,21 +150,23 @@ const ModelCard: React.FC<ModelCardProps> = ({
           </div>
         </div>
       </Card>
-      
+
       <Dialog open={isModalVisible} onOpenChange={setIsModalVisible}>
         <DialogContent className={styles.applyModal} style={{ width: 400 }}>
-          <h3 className="mb-4 text-lg font-semibold">申请{modelInfo.name} API密钥</h3>
+          <DialogHeader>
+            <DialogTitle>申请{modelInfo.name} API密钥</DialogTitle>
+          </DialogHeader>
           <div className={styles.applyOptions}>
-            <Button 
+            <Button
               className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white h-12"
               onClick={handleGoToApiPage}
             >
-              <LinkOutlined className="mr-2" />
+              <ExternalLink size={14} className="mr-2" />
               前往{modelInfo.provider}官网申请API密钥
             </Button>
-            
+
             <div className={styles.dividerText}>或者</div>
-            
+
             <Button
               className="h-12"
               onClick={() => {
@@ -181,7 +174,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
                 navigate('/settings', { state: { activeModel: modelType, showKeyConfig: true } });
               }}
             >
-              <SettingOutlined className="mr-2" />
+              <Settings size={14} className="mr-2" />
               直接配置API密钥
             </Button>
           </div>

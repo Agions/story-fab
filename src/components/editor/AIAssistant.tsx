@@ -1,46 +1,43 @@
 import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  Tabs, 
-  Button, 
-  Input, 
-  Select, 
-  Space, 
-  Card, 
-  List, 
-  Avatar,
-  Typography,
-  Tag,
-  Tooltip,
-  Slider,
-  Progress,
-  Collapse,
-  Divider,
-  Switch,
-  message,
-} from 'antd';
 import {
-  RobotOutlined,
-  SendOutlined,
-  ScissorOutlined,
-  AudioOutlined,
-  BulbOutlined,
-  TranslationOutlined,
-  ThunderboltOutlined,
-  ExperimentOutlined,
-  QuestionCircleOutlined,
-  CloseCircleOutlined
-} from '@ant-design/icons';
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Slider } from '@/components/ui/slider';
+import { Progress, ProgressIndicator } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import {
+  Bot,
+  Send,
+  Scissors,
+  Volume2,
+  Lightbulb,
+  Languages,
+  Zap,
+  Flask,
+  HelpCircle,
+  XCircle,
+} from 'lucide-react';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
 import type { ModelProvider, AIModel } from '@/core/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
 import styles from './AIAssistant.module.less';
-
-const { TabPane } = Tabs;
-const { Text, Title, Paragraph } = Typography;
-const { TextArea } = Input;
-const { Option } = Select;
-const { Panel } = Collapse;
 
 interface AIAssistantProps {}
 
@@ -58,11 +55,9 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   const [progress, setProgress] = useState(0);
   const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_MODEL_ID);
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
-  
-  // Store interval IDs for cleanup
+
   const progressIntervalRef = useRef<number | null>(null);
-  
-  // Cleanup intervals on unmount
+
   useEffect(() => {
     return () => {
       if (progressIntervalRef.current) {
@@ -71,7 +66,6 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     };
   }, []);
 
-  // AI model options
   const models = useMemo(() => {
     const configuredModels = getAvailableModelsFromApiKeys(apiKeys, CORE_AI_MODELS);
     return configuredModels.map((model: AIModel) => ({
@@ -89,11 +83,10 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     provider: model.provider,
   }));
   const selectableModels = models.length > 0 ? models : allModels;
-  
-  // Send message
+
   const sendMessage = useCallback(async () => {
     if (!prompt.trim()) return;
-    
+
     const userMessage: AssistantMessage = {
       role: 'user',
       content: prompt,
@@ -103,16 +96,16 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     const currentPrompt = prompt;
     setPrompt('');
     setProcessing(true);
-    
+
     try {
       const { aiService } = await import('@/core/services/ai.service');
-      
+
       const model = CORE_AI_MODELS.find(m => m.id === selectedModelId) || CORE_AI_MODELS[0];
       const providerKey = (apiKeys || {})[model.provider as ModelProvider];
       const settings = { enabled: true, apiKey: (providerKey?.key) || '', temperature: 0.7, maxTokens: 2000 };
-      
+
       const response = await aiService.generateText(model, currentPrompt, settings);
-      
+
       const aiMessage: AssistantMessage = {
         role: 'ai',
         content: response,
@@ -131,387 +124,367 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
       setProcessing(false);
     }
   }, [prompt]);
-  
-  // Handle enter key
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   };
-  
-  // Generate subtitles - calls actual subtitle service
+
   const generateSubtitles = useCallback(async () => {
     setProcessing(true);
     setProgress(0);
     throw new Error('Not implemented');
   }, []);
-  
-  // Smart cut - calls actual smart cut service
+
   const smartCut = useCallback(async () => {
     setProcessing(true);
     setProgress(0);
     throw new Error('Not implemented');
   }, []);
-  
-  // Render chat messages
+
   const renderMessages = () => {
-    return messages.map((message, index) => (
-      <div 
-        key={index} 
-        className={`${styles.message} ${message.role === 'ai' ? styles.aiMessage : styles.userMessage}`}
+    return messages.map((msg, index) => (
+      <div
+        key={index}
+        className={`${styles.message} ${msg.role === 'ai' ? styles.aiMessage : styles.userMessage}`}
       >
         <div className={styles.messageAvatar}>
-          {message.role === 'ai' ? (
-            <Avatar icon={<RobotOutlined />} className={styles.aiAvatar} />
+          {msg.role === 'ai' ? (
+            <Avatar className={styles.aiAvatar}>
+              <AvatarFallback><Bot size={16} /></AvatarFallback>
+            </Avatar>
           ) : (
-            <Avatar 
-              className={styles.userAvatar}
-              style={{ 
-                backgroundColor: '#1890ff',
-                color: '#fff'
-              }}
-            >
-              U
+            <Avatar className={styles.userAvatar} style={{ backgroundColor: '#1890ff', color: '#fff' }}>
+              <AvatarFallback>U</AvatarFallback>
             </Avatar>
           )}
         </div>
         <div className={styles.messageContent}>
-          <div className={styles.messageText}>
-            {message.content}
-          </div>
+          <div className={styles.messageText}>{msg.content}</div>
           <div className={styles.messageTime}>
-            {new Date(message.time).toLocaleTimeString()}
+            {new Date(msg.time).toLocaleTimeString()}
           </div>
         </div>
       </div>
     ));
   };
-  
+
   return (
     <div className={styles.aiAssistantContainer}>
       <div className={styles.aiHeader}>
-        <Title level={4} className={styles.aiTitle}>
-          <RobotOutlined className={styles.aiIcon} /> AI助手
-        </Title>
+        <h4 className={styles.aiTitle}>
+          <Bot size={18} className={styles.aiIcon} /> AI助手
+        </h4>
       </div>
-      
-      <Tabs 
-        activeKey={activeTab} 
-        onChange={setActiveTab}
-        className={styles.aiTabs}
-      >
-        <TabPane tab="智能对话" key="chat" />
-        <TabPane tab={<span>字幕生成 <Tag color="orange" style={{ marginLeft: 6, fontSize: 10 }}>即将推出</Tag></span>} key="subtitles" />
-        <TabPane tab={<span>智能剪辑 <Tag color="orange" style={{ marginLeft: 6, fontSize: 10 }}>即将推出</Tag></span>} key="smartcut" />
-        <TabPane tab="视频增强" key="enhance" />
-      </Tabs>
-      
-      <div className={styles.aiContent}>
-        {activeTab === 'chat' && (
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className={styles.aiTabs}>
+        <TabsList>
+          <TabsTrigger value="chat">智能对话</TabsTrigger>
+          <TabsTrigger value="subtitles">
+            字幕生成 <Badge variant="secondary" style={{ marginLeft: 6, fontSize: 10 }}>即将推出</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="smartcut">
+            智能剪辑 <Badge variant="secondary" style={{ marginLeft: 6, fontSize: 10 }}>即将推出</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="enhance">视频增强</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="chat" className="mt-4">
           <div className={styles.chatContainer}>
             <div className={styles.chatMessages}>
               {renderMessages()}
             </div>
-            
+
             <div className={styles.chatInput}>
               <div className={styles.modelSelector}>
-                <Select
-                  value={resolveDefaultModelId(resolvedModelId, selectableModels)}
-                  style={{ width: '100%' }}
-                  size="small"
-                  onChange={setSelectedModelId}
-                >
-                  {selectableModels.map(model => (
-                    <Option key={model.id} value={model.id}>
-                      {model.name}
-                    </Option>
-                  ))}
+                <Select value={resolveDefaultModelId(resolvedModelId, selectableModels)} onValueChange={setSelectedModelId}>
+                  <SelectTrigger className="w-full">
+                    <SelectContent>
+                      {selectableModels.map(model => (
+                        <SelectItem key={model.id} value={model.id}>{model.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </SelectTrigger>
                 </Select>
               </div>
-              <TextArea
+              <textarea
+                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[60px]"
                 placeholder="请描述您需要的帮助..."
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                onKeyPress={handleKeyPress}
-                autoSize={{ minRows: 1, maxRows: 3 }}
+                onKeyDown={handleKeyPress}
+                rows={1}
                 disabled={processing}
               />
               <Button
-                type="primary"
-                icon={<SendOutlined />}
+                variant="default"
                 onClick={sendMessage}
                 disabled={!prompt.trim() || processing}
                 className={styles.sendButton}
-              />
+              >
+                <Send size={16} />
+              </Button>
             </div>
           </div>
-        )}
-        
-        {activeTab === 'subtitles' && (
+        </TabsContent>
+
+        <TabsContent value="subtitles" className="mt-4">
           <div className={styles.toolContainer}>
             <Card className={styles.toolCard}>
-              <Title level={5}>自动生成字幕</Title>
-              <Paragraph className={styles.toolDescription}>
-                使用AI识别视频中的语音内容，自动生成字幕并添加到时间轴
-              </Paragraph>
-              
-              <div className={styles.toolOptions}>
-                <div className={styles.optionItem}>
-                  <Text>识别语言</Text>
-                  <Input value="中文（固定）" disabled />
-                </div>
-                
-                <div className={styles.optionItem}>
-                  <Text>字幕格式</Text>
-                  <Select
-                    defaultValue="srt"
-                    style={{ width: '100%' }}
-                  >
-                    <Option value="srt">SRT</Option>
-                    <Option value="vtt">VTT</Option>
-                    <Option value="ass">ASS</Option>
-                  </Select>
-                </div>
-                
-                <div className={styles.optionItem}>
-                  <Space className={styles.switchOption}>
-                    <Switch defaultChecked />
-                    <Text>自动分段</Text>
-                    <Tooltip title="根据语义自动将字幕分成多个段落">
-                      <QuestionCircleOutlined />
-                    </Tooltip>
-                  </Space>
-                </div>
-                
-                <div className={styles.optionItem}>
-                  <Space className={styles.switchOption}>
-                    <Switch defaultChecked />
-                    <Text>过滤语气词</Text>
-                    <Tooltip title="移除'嗯'、'啊'等语气词，使字幕更加清晰">
-                      <QuestionCircleOutlined />
-                    </Tooltip>
-                  </Space>
-                </div>
-              </div>
-              
-              <Button
-                type="primary"
-                icon={<TranslationOutlined />}
-                onClick={generateSubtitles}
-                disabled={processing}
-                loading={processing && activeTab === 'subtitles'}
-                block
-              >
-                开始生成字幕
-              </Button>
-              
-              {processing && activeTab === 'subtitles' && (
-                <div className={styles.progressContainer}>
-                  <Progress percent={progress} status="active" />
-                  <div className={styles.progressStatus}>
-                    {progress < 30 && '正在分析音频...'}
-                    {progress >= 30 && progress < 60 && '识别语音内容...'}
-                    {progress >= 60 && progress < 90 && '生成字幕文件...'}
-                    {progress >= 90 && '完成中...'}
-                  </div>
-                </div>
-              )}
-            </Card>
-            
-            <Collapse ghost className={styles.extraOptions}>
-              <Panel header="高级选项" key="1">
-                <div className={styles.advancedOptions}>
+              <CardHeader>
+                <CardTitle>自动生成字幕</CardTitle>
+                <CardDescription className={styles.toolDescription}>
+                  使用AI识别视频中的语音内容，自动生成字幕并添加到时间轴
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <div className={styles.toolOptions}>
                   <div className={styles.optionItem}>
-                    <Text>识别精度</Text>
-                    <Slider
-                      defaultValue={80}
-                      marks={{
-                        40: '快速',
-                        80: '标准',
-                        95: '高精度'
-                      }}
-                    />
+                    <span className="text-sm">识别语言</span>
+                    <Input value="中文（固定）" disabled />
                   </div>
-                  
+
                   <div className={styles.optionItem}>
-                    <Text>翻译字幕</Text>
-                    <Select
-                      placeholder="当前版本固定中文"
-                      style={{ width: '100%' }}
-                      disabled
-                    >
-                      <Option value="zh-CN">简体中文</Option>
+                    <span className="text-sm">字幕格式</span>
+                    <Select defaultValue="srt">
+                      <SelectTrigger><SelectContent>
+                        <SelectItem value="srt">SRT</SelectItem>
+                        <SelectItem value="vtt">VTT</SelectItem>
+                        <SelectItem value="ass">ASS</SelectItem>
+                      </SelectContent></SelectTrigger>
                     </Select>
                   </div>
+
+                  <div className={styles.optionItem}>
+                    <div className="flex items-center gap-2">
+                      <Switch defaultChecked />
+                      <span className="text-sm">自动分段</span>
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle size={14} /></TooltipTrigger>
+                        <TooltipContent>根据语义自动将字幕分成多个段落</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  <div className={styles.optionItem}>
+                    <div className="flex items-center gap-2">
+                      <Switch defaultChecked />
+                      <span className="text-sm">过滤语气词</span>
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle size={14} /></TooltipTrigger>
+                        <TooltipContent>移除'嗯'、'啊'等语气词，使字幕更加清晰</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
                 </div>
-              </Panel>
-            </Collapse>
-          </div>
-        )}
-        
-        {activeTab === 'smartcut' && (
-          <div className={styles.toolContainer}>
-            <Card className={styles.toolCard}>
-              <Title level={5}>智能剪辑</Title>
-              <Paragraph className={styles.toolDescription}>
-                AI分析视频内容，自动移除不需要的部分，保留精华片段
-              </Paragraph>
-              
-              <div className={styles.toolOptions}>
+
+                <Button
+                  variant="default"
+                  onClick={generateSubtitles}
+                  disabled={processing}
+                  block
+                >
+                  <Languages size={16} style={{ marginRight: 8 }} />
+                  开始生成字幕
+                </Button>
+
+                {processing && (
+                  <div className={styles.progressContainer}>
+                    <Progress value={progress} className="w-full">
+                      <ProgressIndicator />
+                    </Progress>
+                    <div className={styles.progressStatus}>
+                      {progress < 30 && '正在分析音频...'}
+                      {progress >= 30 && progress < 60 && '识别语音内容...'}
+                      {progress >= 60 && progress < 90 && '生成字幕文件...'}
+                      {progress >= 90 && '完成中...'}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <details className={styles.extraOptions}>
+              <summary className="cursor-pointer p-2 text-sm text-muted-foreground hover:text-foreground">
+                高级选项
+              </summary>
+              <div className={styles.advancedOptions}>
                 <div className={styles.optionItem}>
-                  <Text>剪辑模式</Text>
-                  <Select
-                    defaultValue="content"
-                    style={{ width: '100%' }}
-                  >
-                    <Option value="content">内容优先</Option>
-                    <Option value="pace">节奏优先</Option>
-                    <Option value="compact">精简模式</Option>
-                    <Option value="highlight">亮点提取</Option>
+                  <span className="text-sm">识别精度</span>
+                  <Slider defaultValue={[80]} min={40} max={95} step={1}
+                    marks={[
+                      { value: 40, label: '快速' },
+                      { value: 80, label: '标准' },
+                      { value: 95, label: '高精度' },
+                    ]}
+                  />
+                </div>
+
+                <div className={styles.optionItem}>
+                  <span className="text-sm">翻译字幕</span>
+                  <Select placeholder="当前版本固定中文" disabled>
+                    <SelectTrigger><SelectContent>
+                      <SelectItem value="zh-CN">简体中文</SelectItem>
+                    </SelectContent></SelectTrigger>
                   </Select>
                 </div>
-                
-                <div className={styles.optionItem}>
-                  <Text>目标时长</Text>
-                  <Select
-                    defaultValue="auto"
-                    style={{ width: '100%' }}
-                  >
-                    <Option value="auto">自动优化</Option>
-                    <Option value="30">30秒</Option>
-                    <Option value="60">1分钟</Option>
-                    <Option value="120">2分钟</Option>
-                    <Option value="custom">自定义</Option>
-                  </Select>
-                </div>
-                
-                <div className={styles.optionItem}>
-                  <Space className={styles.switchOption}>
-                    <Switch defaultChecked />
-                    <Text>移除沉默</Text>
-                    <Tooltip title="自动检测并移除视频中的沉默部分">
-                      <QuestionCircleOutlined />
-                    </Tooltip>
-                  </Space>
-                </div>
-                
-                <div className={styles.optionItem}>
-                  <Space className={styles.switchOption}>
-                    <Switch defaultChecked />
-                    <Text>优化转场</Text>
-                    <Tooltip title="在剪辑点添加平滑转场效果">
-                      <QuestionCircleOutlined />
-                    </Tooltip>
-                  </Space>
-                </div>
               </div>
-              
-              <Button
-                type="primary"
-                icon={<ScissorOutlined />}
-                onClick={smartCut}
-                disabled={processing}
-                loading={processing && activeTab === 'smartcut'}
-                block
-              >
-                开始智能剪辑
-              </Button>
-              
-              {processing && activeTab === 'smartcut' && (
-                <div className={styles.progressContainer}>
-                  <Progress percent={progress} status="active" />
-                  <div className={styles.progressStatus}>
-                    {progress < 30 && '分析视频内容...'}
-                    {progress >= 30 && progress < 60 && '识别关键片段...'}
-                    {progress >= 60 && progress < 90 && '优化剪辑点...'}
-                    {progress >= 90 && '完成中...'}
-                  </div>
-                </div>
-              )}
-            </Card>
-            
-            <Collapse ghost className={styles.extraOptions}>
-              <Panel header="高级选项" key="1">
-                <div className={styles.advancedOptions}>
-                  <div className={styles.optionItem}>
-                    <Text>关键内容优先级</Text>
-                    <Slider
-                      defaultValue={70}
-                      marks={{
-                        30: '低',
-                        70: '中',
-                        95: '高'
-                      }}
-                    />
-                  </div>
-                  
-                  <div className={styles.optionItem}>
-                    <Text>场景检测灵敏度</Text>
-                    <Slider
-                      defaultValue={50}
-                      marks={{
-                        20: '低',
-                        50: '中',
-                        80: '高'
-                      }}
-                    />
-                  </div>
-                </div>
-              </Panel>
-            </Collapse>
+            </details>
           </div>
-        )}
-        
-        {activeTab === 'enhance' && (
+        </TabsContent>
+
+        <TabsContent value="smartcut" className="mt-4">
           <div className={styles.toolContainer}>
             <Card className={styles.toolCard}>
-              <Title level={5}>视频增强</Title>
-              <Paragraph className={styles.toolDescription}>
-                AI提升视频质量，修复问题并应用智能效果
-              </Paragraph>
-              
-              <div className={styles.enhanceOptions}>
-                <div className={styles.enhanceOption}>
-                  <Card className={styles.enhanceCard}>
-                    <ThunderboltOutlined className={styles.enhanceIcon} />
-                    <div className={styles.enhanceTitle}>画质提升</div>
-                    <div className={styles.enhanceDesc}>提升清晰度和细节</div>
-                    <Button size="small" className={styles.enhanceButton}>应用</Button>
-                  </Card>
+              <CardHeader>
+                <CardTitle>智能剪辑</CardTitle>
+                <CardDescription className={styles.toolDescription}>
+                  AI分析视频内容，自动移除不需要的部分，保留精华片段
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <div className={styles.toolOptions}>
+                  <div className={styles.optionItem}>
+                    <span className="text-sm">剪辑模式</span>
+                    <Select defaultValue="content">
+                      <SelectTrigger><SelectContent>
+                        <SelectItem value="content">内容优先</SelectItem>
+                        <SelectItem value="pace">节奏优先</SelectItem>
+                        <SelectItem value="compact">精简模式</SelectItem>
+                        <SelectItem value="highlight">亮点提取</SelectItem>
+                      </SelectContent></SelectTrigger>
+                    </Select>
+                  </div>
+
+                  <div className={styles.optionItem}>
+                    <span className="text-sm">目标时长</span>
+                    <Select defaultValue="auto">
+                      <SelectTrigger><SelectContent>
+                        <SelectItem value="auto">自动优化</SelectItem>
+                        <SelectItem value="30">30秒</SelectItem>
+                        <SelectItem value="60">1分钟</SelectItem>
+                        <SelectItem value="120">2分钟</SelectItem>
+                        <SelectItem value="custom">自定义</SelectItem>
+                      </SelectContent></SelectTrigger>
+                    </Select>
+                  </div>
+
+                  <div className={styles.optionItem}>
+                    <div className="flex items-center gap-2">
+                      <Switch defaultChecked />
+                      <span className="text-sm">移除沉默</span>
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle size={14} /></TooltipTrigger>
+                        <TooltipContent>自动检测并移除视频中的沉默部分</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  <div className={styles.optionItem}>
+                    <div className="flex items-center gap-2">
+                      <Switch defaultChecked />
+                      <span className="text-sm">优化转场</span>
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle size={14} /></TooltipTrigger>
+                        <TooltipContent>在剪辑点添加平滑转场效果</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className={styles.enhanceOption}>
-                  <Card className={styles.enhanceCard}>
-                    <BulbOutlined className={styles.enhanceIcon} />
-                    <div className={styles.enhanceTitle}>色彩优化</div>
-                    <div className={styles.enhanceDesc}>改善对比度和饱和度</div>
-                    <Button size="small" className={styles.enhanceButton}>应用</Button>
-                  </Card>
+
+                <Button
+                  variant="default"
+                  onClick={smartCut}
+                  disabled={processing}
+                  block
+                >
+                  <Scissors size={16} style={{ marginRight: 8 }} />
+                  开始智能剪辑
+                </Button>
+
+                {processing && (
+                  <div className={styles.progressContainer}>
+                    <Progress value={progress} className="w-full">
+                      <ProgressIndicator />
+                    </Progress>
+                    <div className={styles.progressStatus}>
+                      {progress < 30 && '分析视频内容...'}
+                      {progress >= 30 && progress < 60 && '识别关键片段...'}
+                      {progress >= 60 && progress < 90 && '优化剪辑点...'}
+                      {progress >= 90 && '完成中...'}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <details className={styles.extraOptions}>
+              <summary className="cursor-pointer p-2 text-sm text-muted-foreground hover:text-foreground">
+                高级选项
+              </summary>
+              <div className={styles.advancedOptions}>
+                <div className={styles.optionItem}>
+                  <span className="text-sm">关键内容优先级</span>
+                  <Slider defaultValue={[70]} min={30} max={95}
+                    marks={[
+                      { value: 30, label: '低' },
+                      { value: 70, label: '中' },
+                      { value: 95, label: '高' },
+                    ]}
+                  />
                 </div>
-                
-                <div className={styles.enhanceOption}>
-                  <Card className={styles.enhanceCard}>
-                    <AudioOutlined className={styles.enhanceIcon} />
-                    <div className={styles.enhanceTitle}>音频降噪</div>
-                    <div className={styles.enhanceDesc}>移除背景噪音</div>
-                    <Button size="small" className={styles.enhanceButton}>应用</Button>
-                  </Card>
-                </div>
-                
-                <div className={styles.enhanceOption}>
-                  <Card className={styles.enhanceCard}>
-                    <ExperimentOutlined className={styles.enhanceIcon} />
-                    <div className={styles.enhanceTitle}>智能特效</div>
-                    <div className={styles.enhanceDesc}>应用AI生成的特效</div>
-                    <Button size="small" className={styles.enhanceButton}>应用</Button>
-                  </Card>
+
+                <div className={styles.optionItem}>
+                  <span className="text-sm">场景检测灵敏度</span>
+                  <Slider defaultValue={[50]} min={20} max={80}
+                    marks={[
+                      { value: 20, label: '低' },
+                      { value: 50, label: '中' },
+                      { value: 80, label: '高' },
+                    ]}
+                  />
                 </div>
               </div>
+            </details>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="enhance" className="mt-4">
+          <div className={styles.toolContainer}>
+            <Card className={styles.toolCard}>
+              <CardHeader>
+                <CardTitle>视频增强</CardTitle>
+                <CardDescription className={styles.toolDescription}>
+                  AI提升视频质量，修复问题并应用智能效果
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className={styles.enhanceOptions}>
+                  {[
+                    { icon: <Zap size={20} />, title: '画质提升', desc: '提升清晰度和细节', key: 'quality' },
+                    { icon: <Lightbulb size={20} />, title: '色彩优化', desc: '改善对比度和饱和度', key: 'color' },
+                    { icon: <Volume2 size={20} />, title: '音频降噪', desc: '移除背景噪音', key: 'audio' },
+                    { icon: <Flask size={20} />, title: '智能特效', desc: '应用AI生成的特效', key: 'effects' },
+                  ].map(item => (
+                    <div key={item.key} className={styles.enhanceOption}>
+                      <Card className={styles.enhanceCard}>
+                        <CardContent className="flex flex-col items-center gap-2 p-4">
+                          <div className={styles.enhanceIcon}>{item.icon}</div>
+                          <div className={styles.enhanceTitle}>{item.title}</div>
+                          <div className={styles.enhanceDesc}>{item.desc}</div>
+                          <Button size="sm" variant="outline">应用</Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
             </Card>
           </div>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

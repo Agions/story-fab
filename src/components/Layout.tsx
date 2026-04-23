@@ -13,16 +13,16 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { ShortcutOverlay } from '@/components/ShortcutOverlay';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  HomeOutlined,
-  VideoCameraOutlined,
-  SettingOutlined,
-  BellOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  PlusOutlined,
-  QuestionCircleOutlined,
-} from '@ant-design/icons';
-import { Tooltip, App } from 'antd';
+  Home,
+  Video,
+  Settings,
+  Bell,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Plus,
+  CircleHelp,
+} from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import styles from './Layout.module.less';
 
 interface LayoutProps {
@@ -63,9 +63,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, []);
 
   const navItems = [
-    { key: '/', icon: <HomeOutlined />, label: '首页', onClick: () => navigate('/') },
-    { key: '/projects', icon: <VideoCameraOutlined />, label: '我的项目', onClick: () => navigate('/projects') },
-    { key: '/settings', icon: <SettingOutlined />, label: '设置', onClick: () => navigate('/settings') },
+    { key: '/', icon: <Home size={18} />, label: '首页', onClick: () => navigate('/') },
+    { key: '/projects', icon: <Video size={18} />, label: '我的项目', onClick: () => navigate('/projects') },
+    { key: '/settings', icon: <Settings size={18} />, label: '设置', onClick: () => navigate('/settings') },
   ];
 
   return (
@@ -87,16 +87,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* New Project Button */}
         {!sidebarCollapsed && (
           <button className={styles.newProjectBtn} onClick={() => navigate('/editor/new')}>
-            <PlusOutlined />
+            <Plus size={16} />
             <span>新建项目</span>
           </button>
         )}
         {sidebarCollapsed && (
-          <Tooltip title="新建项目" placement="right">
-            <button className={styles.newProjectBtnIcon} onClick={() => navigate('/editor/new')}>
-              <PlusOutlined />
-            </button>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                render={<button className={styles.newProjectBtnIcon} />}
+                onClick={() => navigate('/editor/new')}
+              >
+                <Plus size={16} />
+              </TooltipTrigger>
+              <TooltipContent side="right">新建项目</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
 
         {/* Nav */}
@@ -124,7 +130,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             title={sidebarCollapsed ? '展开' : '收起'}
             aria-label={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
           >
-            {sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
         </div>
       </aside>
@@ -135,17 +141,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <h1 className={styles.pageTitle}>{pageTitle}</h1>
         </div>
         <div className={styles.topbarRight}>
-          <button
-            className={styles.iconBtn}
-            title="键盘快捷键"
-            aria-label="键盘快捷键"
-            onClick={() => setShortcutOverlayOpen(true)}
-          >
-            <QuestionCircleOutlined />
-          </button>
-          <button className={styles.iconBtn} title="通知" aria-label="通知">
-            <BellOutlined />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger render={<button className={styles.iconBtn} />} onClick={() => setShortcutOverlayOpen(true)}>
+                <CircleHelp size={18} />
+              </TooltipTrigger>
+              <TooltipContent>键盘快捷键</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger render={<button className={styles.iconBtn} />}>
+                <Bell size={18} />
+              </TooltipTrigger>
+              <TooltipContent>通知</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <button className={styles.userBtn} aria-label="用户菜单">
             <div className={styles.avatar} aria-hidden="true">A</div>
             <span className={styles.userName}>Agions</span>

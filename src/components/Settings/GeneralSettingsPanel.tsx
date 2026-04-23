@@ -2,12 +2,12 @@
  * 通用设置面板
  */
 import React from 'react';
-import { Card, Form, Switch, Select, Button, Space, Divider } from 'antd';
-import { SettingOutlined, UndoOutlined } from '@ant-design/icons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Settings, RotateCcw } from 'lucide-react';
 import { notify } from '@/shared';
 import type { ProjectSaveBehavior } from '@/shared/constants/settings';
-
-const { Option } = Select;
 
 interface GeneralSettingsPanelProps {
   autoSave: boolean;
@@ -38,58 +38,72 @@ const GeneralSettingsPanel: React.FC<GeneralSettingsPanelProps> = ({
   };
 
   return (
-    <Card title="通用设置" extra={<SettingOutlined />}>
-      <Form layout="vertical" aria-label="通用设置表单">
-        <Form.Item label="自动保存">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <Settings size={16} />
+          通用设置
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">自动保存</span>
+            <span className="text-xs text-muted-foreground">自动保存项目更改</span>
+          </div>
           <Switch
             checked={autoSave}
-            onChange={onAutoSaveChange}
-            checkedChildren="开启"
-            unCheckedChildren="关闭"
+            onCheckedChange={onAutoSaveChange}
             aria-label="自动保存开关"
           />
-        </Form.Item>
+        </div>
 
-        <Form.Item label="紧凑模式">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">紧凑模式</span>
+            <span className="text-xs text-muted-foreground">使用更紧凑的界面布局</span>
+          </div>
           <Switch
             checked={compactMode}
-            onChange={onCompactModeChange}
-            checkedChildren="开启"
-            unCheckedChildren="关闭"
+            onCheckedChange={onCompactModeChange}
             aria-label="紧凑模式开关"
           />
-        </Form.Item>
+        </div>
 
-        <Form.Item label="主题">
-          <Select value={theme} onChange={onThemeChange} style={{ width: 200 }} aria-label="主题选择">
-            <Option value="light">浅色</Option>
-            <Option value="dark">深色</Option>
-            <Option value="auto">跟随系统</Option>
-          </Select>
-        </Form.Item>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">主题</span>
+          <select
+            value={theme}
+            onChange={e => onThemeChange(e.target.value)}
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm w-40"
+            aria-label="主题选择"
+          >
+            <option value="light">浅色</option>
+            <option value="dark">深色</option>
+            <option value="auto">跟随系统</option>
+          </select>
+        </div>
 
-        <Form.Item label="项目保存后跳转">
-          <Select<ProjectSaveBehavior>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">项目保存后跳转</span>
+          <select
             value={projectSaveBehavior}
-            onChange={onProjectSaveBehaviorChange}
-            style={{ width: 220 }}
+            onChange={e => onProjectSaveBehaviorChange(e.target.value as ProjectSaveBehavior)}
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm w-44"
             aria-label="保存后跳转行为"
           >
-            <Option value="stay">留在编辑页</Option>
-            <Option value="detail">跳转项目详情</Option>
-          </Select>
-        </Form.Item>
+            <option value="stay">留在编辑页</option>
+            <option value="detail">跳转项目详情</option>
+          </select>
+        </div>
 
-        <Divider />
+        <div className="h-px bg-border my-2" />
 
-        <Form.Item>
-          <Space>
-            <Button icon={<UndoOutlined />} onClick={handleReset} aria-label="重置设置">
-              重置为默认
-            </Button>
-          </Space>
-        </Form.Item>
-      </Form>
+        <Button onClick={handleReset} aria-label="重置设置">
+          <RotateCcw size={14} className="mr-1" />
+          重置为默认
+        </Button>
+      </CardContent>
     </Card>
   );
 };
