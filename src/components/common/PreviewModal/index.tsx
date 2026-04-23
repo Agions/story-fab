@@ -1,27 +1,34 @@
 /**
  * 结果预览组件
  * 支持文案预览 (Text) 和 语音预览 (Audio player)
- * Modal 形式展示
+ * Dialog 形式展示
  */
 import React, { useState } from 'react';
-import { 
-  Modal, Tabs, Card, Typography, Space, Button, 
-  List, Tag, Divider, Empty, Spin
-} from 'antd';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import {
-  FileTextOutlined,
-  AudioOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-  CopyOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  DownloadOutlined,
-} from '@ant-design/icons';
+  FileText,
+  Mic,
+  Play,
+  Pause,
+  Copy,
+  Check,
+  X,
+  Download,
+  File,
+} from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { formatDuration, notify } from '@/shared';
 import styles from './PreviewModal.module.less';
-
-const { Text, Title, Paragraph } = Typography;
 
 // 文案数据类型
 export interface ScriptPreview {
@@ -45,36 +52,25 @@ export interface AudioPreview {
 }
 
 export interface PreviewModalProps {
-  /** 是否显示 Modal */
-  visible: boolean;
-  /** 关闭 Modal 的回调 */
+  open: boolean;
   onClose: () => void;
-  /** 文案预览数据 */
   scriptPreview?: ScriptPreview | null;
-  /** 语音预览数据 */
   audioPreview?: AudioPreview | null;
-  /** 视频预览 URL (可选) */
   videoPreview?: string | null;
-  /** Modal 标题 */
   title?: string;
-  /** Modal 宽度 */
   width?: number | string;
-  /** 确认按钮文字 */
   okText?: string;
-  /** 取消按钮文字 */
   cancelText?: string;
-  /** 确认回调 */
   onOk?: () => void;
 }
 
 const PreviewModal: React.FC<PreviewModalProps> = ({
-  visible,
+  open,
   onClose,
   scriptPreview,
   audioPreview,
   videoPreview,
   title = '预览结果',
-  width = 720,
   okText = '确定',
   cancelText = '关闭',
   onOk,
@@ -84,7 +80,6 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // 复制文案到剪贴板
   const handleCopyScript = async () => {
     if (scriptPreview?.content) {
       try {
@@ -98,16 +93,15 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
     }
   };
 
-  // 播放/暂停音频
   const handleTogglePlay = () => {
     if (!audioPreview?.audioUrl) return;
-    
+
     if (!audioRef) {
       const audio = new Audio(audioPreview.audioUrl);
       audio.onended = () => setIsPlaying(false);
       setAudioRef(audio);
     }
-    
+
     if (isPlaying) {
       audioRef?.pause();
     } else {
@@ -116,208 +110,200 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
     setIsPlaying(!isPlaying);
   };
 
-
-  // 获取 Tab 项
-  const getTabItems = () => {
-    const items = [];
-
-    // 文案预览 Tab
-    if (scriptPreview) {
-      items.push({
-        key: 'script',
-        label: (
-          <Space>
-            <FileTextOutlined />
-            文案预览
-            {scriptPreview.metadata?.wordCount && (
-              <Tag color="blue">{scriptPreview.metadata.wordCount} 字</Tag>
-            )}
-          </Space>
-        ),
-        children: (
-          <div className={styles.tabContent}>
-            {/* 文案信息 */}
-            <Card size="small" className={styles.infoCard}>
-              <Space split={<Divider type="vertical" />}>
-                {scriptPreview.metadata?.wordCount && (
-                  <Text type="secondary">字数: {scriptPreview.metadata.wordCount}</Text>
-                )}
-                {scriptPreview.metadata?.estimatedDuration && (
-                  <Text type="secondary">
-                    预计时长: {Math.ceil(scriptPreview.metadata.estimatedDuration)}秒
-                  </Text>
-                )}
-                {scriptPreview.metadata?.style && (
-                  <Tag>风格: {scriptPreview.metadata.style}</Tag>
-                )}
-                {scriptPreview.metadata?.tone && (
-                  <Tag color="purple">语气: {scriptPreview.metadata.tone}</Tag>
-                )}
-              </Space>
-            </Card>
-
-            {/* 文案内容 */}
-            <div className={styles.scriptContent}>
-              <div className={styles.scriptHeader}>
-                <Title level={5} style={{ margin: 0 }}>
-                  {scriptPreview.title}
-                </Title>
-                <Button 
-                  icon={copied ? <CheckOutlined /> : <CopyOutlined />}
-                  onClick={handleCopyScript}
-                  size="small"
-                >
-                  {copied ? '已复制' : '复制'}
-                </Button>
-              </div>
-              <div className={styles.scriptText}>
-                {scriptPreview.content}
-              </div>
-            </div>
-          </div>
-        ),
-      });
-    }
-
-    // 语音预览 Tab
-    if (audioPreview) {
-      items.push({
-        key: 'audio',
-        label: (
-          <Space>
-            <AudioOutlined />
-            语音预览
-          </Space>
-        ),
-        children: (
-          <div className={styles.tabContent}>
-            <Card className={styles.audioCard}>
-              <div className={styles.audioPlayer}>
-                <Button
-                  type="primary"
-                  shape="circle"
-                  size="large"
-                  icon={isPlaying ? (
-                    <PauseCircleOutlined style={{ fontSize: 32 }} />
-                  ) : (
-                    <PlayCircleOutlined style={{ fontSize: 32 }} />
-                  )}
-                  onClick={handleTogglePlay}
-                  className={styles.playButton}
-                />
-                <div className={styles.audioInfo}>
-                  <Text strong>配音预览</Text>
-                  {audioPreview.voiceName && (
-                    <Text type="secondary"> - {audioPreview.voiceName}</Text>
-                  )}
-                  {audioPreview.duration && (
-                    <div className={styles.audioDuration}>
-                      <Text type="secondary">
-                        {formatDuration(audioPreview.duration)}
-                      </Text>
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {/* 音频波形占位 */}
-              <div className={styles.waveform}>
-                {[...Array(40)].map((_, i) => (
-                  <div 
-                    key={i}
-                    className={styles.waveBar}
-                    style={{
-                      height: `${20 + Math.random() * 60}%`,
-                      opacity: isPlaying ? 1 : 0.3,
-                    }}
-                  />
-                ))}
-              </div>
-            </Card>
-
-            {/* 下载按钮 */}
-            <div className={styles.audioActions}>
-              <Button 
-                icon={<DownloadOutlined />}
-                href={audioPreview.audioUrl}
-                download
-              >
-                下载音频
-              </Button>
-            </div>
-          </div>
-        ),
-      });
-    }
-
-    // 视频预览 Tab
-    if (videoPreview) {
-      items.push({
-        key: 'video',
-        label: (
-          <Space>
-            <PlayCircleOutlined />
-            视频预览
-          </Space>
-        ),
-        children: (
-          <div className={styles.tabContent}>
-            <Card className={styles.videoCard}>
-              <video
-                src={videoPreview}
-                controls
-                style={{ maxWidth: '100%', maxHeight: 400 }}
-              />
-            </Card>
-          </div>
-        ),
-      });
-    }
-
-    return items;
-  };
-
-  // 检查是否有可预览的内容
   const hasContent = scriptPreview || audioPreview || videoPreview;
 
+  const tabItems: { key: string; label: React.ReactNode; content: React.ReactNode }[] = [];
+
+  if (scriptPreview) {
+    tabItems.push({
+      key: 'script',
+      label: (
+        <div className="flex items-center gap-1">
+          <FileText size={16} />
+          文案预览
+          {scriptPreview.metadata?.wordCount && (
+            <Badge variant="secondary">{scriptPreview.metadata.wordCount} 字</Badge>
+          )}
+        </div>
+      ),
+      content: (
+        <div className={styles.tabContent}>
+          <Card className={styles.infoCard}>
+            <CardContent className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              {scriptPreview.metadata?.wordCount && (
+                <span>字数: {scriptPreview.metadata.wordCount}</span>
+              )}
+              {scriptPreview.metadata?.estimatedDuration && (
+                <span>
+                  预计时长: {Math.ceil(scriptPreview.metadata.estimatedDuration)}秒
+                </span>
+              )}
+              {scriptPreview.metadata?.style && (
+                <Badge variant="outline">风格: {scriptPreview.metadata.style}</Badge>
+              )}
+              {scriptPreview.metadata?.tone && (
+                <Badge variant="secondary">语气: {scriptPreview.metadata.tone}</Badge>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className={styles.scriptContent}>
+            <div className={styles.scriptHeader}>
+              <h5 className="m-0 font-medium">{scriptPreview.title}</h5>
+              <Button
+                variant={copied ? "outline" : "ghost"}
+                size="sm"
+                onClick={handleCopyScript}
+              >
+                {copied ? <Check size={14} className="mr-1" /> : <Copy size={14} className="mr-1" />}
+                {copied ? '已复制' : '复制'}
+              </Button>
+            </div>
+            <div className={styles.scriptText}>
+              {scriptPreview.content}
+            </div>
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  if (audioPreview) {
+    tabItems.push({
+      key: 'audio',
+      label: (
+        <div className="flex items-center gap-1">
+          <Mic size={16} />
+          语音预览
+        </div>
+      ),
+      content: (
+        <div className={styles.tabContent}>
+          <Card className={styles.audioCard}>
+            <div className={styles.audioPlayer}>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={handleTogglePlay}
+                className={styles.playButton}
+              >
+                {isPlaying ? (
+                  <Pause size={24} />
+                ) : (
+                  <Play size={24} />
+                )}
+              </Button>
+              <div className={styles.audioInfo}>
+                <span className="font-semibold">配音预览</span>
+                {audioPreview.voiceName && (
+                  <span className="text-muted-foreground"> - {audioPreview.voiceName}</span>
+                )}
+                {audioPreview.duration && (
+                  <div className={styles.audioDuration}>
+                    <span className="text-muted-foreground text-sm">
+                      {formatDuration(audioPreview.duration)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.waveform}>
+              {[...Array(40)].map((_, i) => (
+                <div
+                  key={i}
+                  className={styles.waveBar}
+                  style={{
+                    height: `${20 + Math.random() * 60}%`,
+                    opacity: isPlaying ? 1 : 0.3,
+                  }}
+                />
+              ))}
+            </div>
+          </Card>
+
+          <div className={styles.audioActions}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = audioPreview.audioUrl;
+                link.download = '';
+                link.click();
+              }}
+            >
+              <Download size={14} className="mr-1" />
+              下载音频
+            </Button>
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  if (videoPreview) {
+    tabItems.push({
+      key: 'video',
+      label: (
+        <div className="flex items-center gap-1">
+          <Play size={16} />
+          视频预览
+        </div>
+      ),
+      content: (
+        <div className={styles.tabContent}>
+          <Card className={styles.videoCard}>
+            <video
+              src={videoPreview}
+              controls
+              style={{ maxWidth: '100%', maxHeight: 400 }}
+            />
+          </Card>
+        </div>
+      ),
+    });
+  }
+
   return (
-    <Modal
-      title={title}
-      open={visible}
-      onCancel={onClose}
-      width={width}
-      footer={
-        hasContent ? [
-          <Button key="close" onClick={onClose}>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        {!hasContent ? (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <File size={48} className="mb-3 opacity-30" />
+            <p className="text-sm">暂无预览内容</p>
+          </div>
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              {tabItems.map((tab) => (
+                <TabsTrigger key={tab.key} value={tab.key}>
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {tabItems.map((tab) => (
+              <TabsContent key={tab.key} value={tab.key}>
+                {tab.content}
+              </TabsContent>
+            ))}
+          </Tabs>
+        )}
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
             {cancelText}
-          </Button>,
-          onOk && (
-            <Button key="ok" type="primary" onClick={onOk}>
+          </Button>
+          {onOk && (
+            <Button variant="default" onClick={onOk}>
               {okText}
             </Button>
-          ),
-        ] : [
-          <Button key="close" type="primary" onClick={onClose}>
-            {cancelText}
-          </Button>,
-        ]
-      }
-      className={styles.previewModal}
-      destroyOnClose
-    >
-      {!hasContent ? (
-        <Empty 
-          description="暂无预览内容" 
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
-      ) : (
-        <Tabs 
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          items={getTabItems()}
-        />
-      )}
-    </Modal>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

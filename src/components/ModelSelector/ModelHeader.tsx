@@ -4,12 +4,10 @@
  */
 
 import React from 'react';
-import { Typography, Space, Badge } from 'antd';
-import { RobotOutlined } from '@ant-design/icons';
+import { Badge } from '@/components/ui/badge';
+import { Bot } from 'lucide-react';
 import type { AIModel } from '@/core/types';
 import styles from './index.module.less';
-
-const { Title, Text } = Typography;
 
 interface ModelHeaderProps {
   selectedModel?: AIModel;
@@ -22,20 +20,20 @@ export const ModelHeader: React.FC<ModelHeaderProps> = ({
 }) => {
   return (
     <div className={styles.header}>
-      <Title level={4} className={styles.title}>
-        <RobotOutlined /> 选择 AI 模型
-      </Title>
+      <h4 className={styles.title}>
+        <Bot size={16} className="inline mr-1" /> 选择 AI 模型
+      </h4>
       {selectedModel && (
-        <Space>
-          <Text type="secondary">
-            当前: <Text strong>{selectedModel.name}</Text>
-          </Text>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">
+            当前: <span className="font-medium text-foreground">{selectedModel.name}</span>
+          </span>
           {isConfigured ? (
-            <Badge status="success" text="已配置" />
+            <Badge variant="default" className="text-xs bg-green-600/20 text-green-600 border-green-600/40">已配置</Badge>
           ) : (
-            <Badge status="warning" text="未配置" />
+            <Badge variant="secondary" className="text-xs">未配置</Badge>
           )}
-        </Space>
+        </div>
       )}
     </div>
   );

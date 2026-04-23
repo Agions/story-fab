@@ -1,21 +1,16 @@
 import React, { memo } from 'react';
 import {
-  Modal,
-  Tabs,
-  Space,
-  Typography,
-  Select,
-  Radio,
-  InputNumber,
-  Slider,
-  Row,
-  Col,
-  Alert,
-} from 'antd';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const { Text } = Typography;
-const { TabPane } = Tabs;
-const { Option } = Select;
 
 export type TransitionType = 'none' | 'fade' | 'dissolve' | 'wipe' | 'slide';
 
@@ -29,7 +24,7 @@ export interface ExportSettingsState {
 }
 
 interface ExportSettingsProps {
-  visible: boolean;
+  open: boolean;
   settings: ExportSettingsState;
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -47,7 +42,7 @@ const transitionOptions = [
 ];
 
 const ExportSettings: React.FC<ExportSettingsProps> = ({
-  visible,
+  open,
   settings,
   activeTab,
   onTabChange,
@@ -65,119 +60,154 @@ const ExportSettings: React.FC<ExportSettingsProps> = ({
   } = settings;
 
   return (
-    <Modal
-      title="视频导出设置"
-      open={visible}
-      onOk={onOk}
-      onCancel={onCancel}
-      okText="开始导出"
-      cancelText="取消"
-      width={600}
-    >
-      <Tabs activeKey={activeTab} onChange={onTabChange}>
-        <TabPane tab="基本设置" key="general">
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>视频质量:</Text>
-              <Select
-                value={videoQuality}
-                onChange={(value) => onSettingsChange({ videoQuality: value })}
-                style={{ width: 200, marginLeft: 10 }}
-              >
-                <Option value="low">低质量 (720p)</Option>
-                <Option value="medium">中等质量 (1080p)</Option>
-                <Option value="high">高质量 (原始分辨率)</Option>
-              </Select>
-            </div>
+    <Dialog open={open} onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>视频导出设置</DialogTitle>
+        </DialogHeader>
+        <Tabs value={activeTab} onValueChange={onTabChange}>
+          <TabsList>
+            <TabsTrigger value="general">基本设置</TabsTrigger>
+            <TabsTrigger value="advanced">高级设置</TabsTrigger>
+          </TabsList>
+          <TabsContent value="general">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold w-24">视频质量:</span>
+                <Select
+                  value={videoQuality ?? undefined}
+                  onValueChange={(value) => value && onSettingsChange({ videoQuality: value })}
+                  className="w-[200px]"
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">低质量 (720p)</SelectItem>
+                    <SelectItem value="medium">中等质量 (1080p)</SelectItem>
+                    <SelectItem value="high">高质量 (原始分辨率)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>导出格式:</Text>
-              <Select
-                value={exportFormat}
-                onChange={(value) => onSettingsChange({ exportFormat: value })}
-                style={{ width: 200, marginLeft: 10 }}
-              >
-                <Option value="mp4">MP4 格式</Option>
-                <Option value="mov">MOV 格式</Option>
-                <Option value="mkv">MKV 格式</Option>
-              </Select>
-            </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold w-24">导出格式:</span>
+                <Select
+                  value={exportFormat ?? undefined}
+                  onValueChange={(value) => value && onSettingsChange({ exportFormat: value })}
+                  className="w-[200px]"
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mp4">MP4 格式</SelectItem>
+                    <SelectItem value="mov">MOV 格式</SelectItem>
+                    <SelectItem value="mkv">MKV 格式</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>添加字幕:</Text>
-              <Radio.Group
-                value={useSubtitles}
-                onChange={(e) => onSettingsChange({ useSubtitles: e.target.value })}
-                style={{ marginLeft: 10 }}
-              >
-                <Radio value={true}>是</Radio>
-                <Radio value={false}>否</Radio>
-              </Radio.Group>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold w-24">添加字幕:</span>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={useSubtitles === true}
+                      onChange={() => onSettingsChange({ useSubtitles: true })}
+                    />
+                    是
+                  </label>
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={useSubtitles === false}
+                      onChange={() => onSettingsChange({ useSubtitles: false })}
+                    />
+                    否
+                  </label>
+                </div>
+              </div>
             </div>
-          </Space>
-        </TabPane>
+          </TabsContent>
+          <TabsContent value="advanced">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold w-24">转场效果:</span>
+                <Select
+                  value={transitionType}
+                  onValueChange={(value) => value && onSettingsChange({ transitionType: value as TransitionType })}
+                  className="w-[200px]"
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {transitionOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
 
-        <TabPane tab="高级设置" key="advanced">
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>转场效果:</Text>
-              <Select
-                value={transitionType}
-                onChange={(value: TransitionType) => onSettingsChange({ transitionType: value })}
-                style={{ width: 200, marginLeft: 10 }}
-                options={transitionOptions}
-              />
-            </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold w-24">转场时长(秒):</span>
+                <input
+                  type="number"
+                  value={transitionDuration}
+                  onChange={(e) => onSettingsChange({ transitionDuration: parseFloat(e.target.value) || 0 })}
+                  min={0.2}
+                  max={3}
+                  step={0.1}
+                  className="border rounded px-2 py-1 w-[200px]"
+                />
+              </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>转场时长(秒):</Text>
-              <InputNumber
-                value={transitionDuration}
-                onChange={(value) => value !== null && onSettingsChange({ transitionDuration: value })}
-                min={0.2}
-                max={3}
-                step={0.1}
-                style={{ width: 200, marginLeft: 10 }}
-              />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>音频音量:</Text>
-              <Row style={{ width: 300, marginLeft: 10, display: 'flex', alignItems: 'center' }}>
-                <Col span={16}>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold w-24">音频音量:</span>
+                <div className="flex items-center gap-2 w-[300px]">
                   <Slider
                     value={audioVolume}
-                    onChange={(value: number) => onSettingsChange({ audioVolume: value })}
+                    onValueChange={(val) => {
+                      const v = Array.isArray(val) ? val[0] : val;
+                      onSettingsChange({ audioVolume: v });
+                    }}
                     min={0}
                     max={150}
                     step={5}
+                    className="flex-1"
                   />
-                </Col>
-                <Col span={8} style={{ textAlign: 'right' }}>
-                  <InputNumber
-                    value={audioVolume}
-                    onChange={(value) => value !== null && onSettingsChange({ audioVolume: value })}
-                    min={0}
-                    max={150}
-                    step={5}
-                    style={{ marginLeft: 8, width: 70 }}
-                    addonAfter="%"
-                  />
-                </Col>
-              </Row>
+                  <div className="flex items-center">
+                    <input
+                      type="number"
+                      value={audioVolume}
+                      onChange={(e) => onSettingsChange({ audioVolume: parseInt(e.target.value) || 0 })}
+                      min={0}
+                      max={150}
+                      step={5}
+                      className="border rounded px-2 py-1 w-[70px]"
+                    />
+                    <span className="ml-1">%</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </Space>
 
-          <Alert
-            message="高级设置说明"
-            description="转场效果会在片段之间添加流畅过渡，可能会稍微增加处理时间。音频音量调整可以让您控制整个视频的音量大小，100%表示保持原音量不变。"
-            type="info"
-            showIcon
-            style={{ marginTop: 16 }}
-          />
-        </TabPane>
-      </Tabs>
-    </Modal>
+            <div className="mt-4 rounded-md border border-accent-primary/30 bg-accent-primary/5 px-4 py-3 text-sm">
+              <p className="font-medium text-accent-primary mb-1">高级设置说明</p>
+              <p className="text-muted-foreground text-xs">转场效果会在片段之间添加流畅过渡，可能会稍微增加处理时间。音频音量调整可以让您控制整个视频的音量大小，100%表示保持原音量不变。</p>
+            </div>
+          </TabsContent>
+        </Tabs>
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel}>
+            取消
+          </Button>
+          <Button variant="primary" onClick={onOk}>
+            开始导出
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

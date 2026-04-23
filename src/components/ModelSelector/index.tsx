@@ -4,7 +4,6 @@
  */
 
 import React, { useMemo, useCallback } from 'react';
-import { Alert } from 'antd';
 import {
   useModel,
   useModelCost,
@@ -116,13 +115,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
       {/* 错误提示 */}
       {error && (
-        <Alert
-          message={error}
-          type="error"
-          showIcon
-          closable
-          className={styles.alert}
-        />
+        <div className={`${styles.alert} flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm`} role="alert">
+          <span>{error}</span>
+        </div>
       )}
 
       {/* 任务推荐 */}

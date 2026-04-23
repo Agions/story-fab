@@ -5,7 +5,7 @@
  */
 import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import {
   Play,
   Pause,
@@ -45,50 +45,64 @@ export const PlaybackControls = memo<PlaybackControlsProps>(({
   onFullscreen,
 }) => {
   return (
-    <div className="flex items-center justify-between px-4 h-10 bg-bg-secondary border-t border-border-subtle shrink-0">
-      {/* Left: playback buttons */}
-      <div className="flex items-center gap-1">
-        <Tooltip>
-          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onStop} className="text-text-secondary" />} />
-          <TooltipContent side="top"><p>停止</p></TooltipContent>
-        </Tooltip>
+    <TooltipProvider>
+      <div className="flex items-center justify-between px-4 h-10 bg-bg-secondary border-t border-border-subtle shrink-0">
+        {/* Left: playback buttons */}
+        <div className="flex items-center gap-1">
+          <Tooltip>
+            <TooltipTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md text-text-secondary hover:text-text-primary hover:bg-accent transition-colors" onClick={onStop}>
+              <Square className="size-3.5" />
+            </TooltipTrigger>
+            <TooltipContent side="top">停止</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onStepBack} className="text-text-secondary" />} />
-          <TooltipContent side="top"><p>上一帧</p></TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md text-text-secondary hover:text-text-primary hover:bg-accent transition-colors" onClick={onStepBack}>
+              <SkipBack className="size-3.5" />
+            </TooltipTrigger>
+            <TooltipContent side="top">上一帧</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onPlayPause} className="text-text-primary" />} />
-          <TooltipContent side="top">
-            <p>{isPlaying ? '暂停 (Space)' : '播放 (Space)'}</p>
-          </TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md text-text-primary hover:bg-accent transition-colors" onClick={onPlayPause}>
+              {isPlaying ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              {isPlaying ? '暂停 (Space)' : '播放 (Space)'}
+            </TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onStepForward} className="text-text-secondary" />} />
-          <TooltipContent side="top"><p>下一帧</p></TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md text-text-secondary hover:text-text-primary hover:bg-accent transition-colors" onClick={onStepForward}>
+              <SkipForward className="size-3.5" />
+            </TooltipTrigger>
+            <TooltipContent side="top">下一帧</TooltipContent>
+          </Tooltip>
+        </div>
+
+        {/* Center: timecode */}
+        <div
+          className="text-xs text-text-secondary"
+          style={{ fontFamily: 'JetBrains Mono, monospace' }}
+        >
+          <span className="text-accent-primary">{formatTimecode(currentTime)}</span>
+          <span className="mx-1 text-text-disabled">/</span>
+          <span>{formatTimecode(duration)}</span>
+        </div>
+
+        {/* Right: fullscreen */}
+        <div className="flex items-center gap-1">
+          {onFullscreen && (
+            <Tooltip>
+              <TooltipTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md text-text-secondary hover:text-text-primary hover:bg-accent transition-colors" onClick={onFullscreen}>
+                <Maximize className="size-3.5" />
+              </TooltipTrigger>
+              <TooltipContent side="top">全屏</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       </div>
-
-      {/* Center: timecode */}
-      <div
-        className="text-xs text-text-secondary"
-        style={{ fontFamily: 'JetBrains Mono, monospace' }}
-      >
-        <span className="text-accent-primary">{formatTimecode(currentTime)}</span>
-        <span className="mx-1 text-text-disabled">/</span>
-        <span>{formatTimecode(duration)}</span>
-      </div>
-
-      {/* Right: fullscreen */}
-      <div className="flex items-center gap-1">
-        <Tooltip>
-          <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={onFullscreen} className="text-text-secondary" />} />
-          <TooltipContent side="top"><p>全屏</p></TooltipContent>
-        </Tooltip>
-      </div>
-    </div>
+    </TooltipProvider>
   );
 });
 

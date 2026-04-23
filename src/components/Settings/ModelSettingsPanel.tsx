@@ -2,14 +2,13 @@
  * 模型设置面板
  */
 import React from 'react';
-import { Card, Select, Typography, Space, Tag, Divider, Alert } from 'antd';
-import { RobotOutlined, ThunderboltOutlined, DollarOutlined } from '@ant-design/icons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Bot, Zap, DollarSign } from 'lucide-react';
 import { AI_MODELS, MODEL_VERIFICATION, MODEL_CATALOG_VERIFIED_AT } from '@/core/config/models.config';
 import { PROVIDER_NAMES } from '@/constants/models';
 import type { AIModel } from '@/core/types';
-
-const { Text, Title } = Typography;
-const { Option } = Select;
 
 interface ModelSettingsPanelProps {
   defaultModel: string;
@@ -26,69 +25,75 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = ({
   const isModelSelectable = availableModels.length > 0;
 
   return (
-    <Card title="AI 模型设置" extra={<RobotOutlined />}>
-      <Space direction="vertical" style={{ width: '100%' }} size="large">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <Bot size={16} />
+          AI 模型设置
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         {!isModelSelectable && (
-          <Alert
-            type="warning"
-            showIcon
-            message="暂无可选模型"
-            description="请先在 API 密钥管理中配置至少一个提供商的 API 密钥，模型列表将自动同步。"
-          />
+          <div className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm">
+            <p className="font-medium text-yellow-500 mb-1">暂无可选模型</p>
+            <p className="text-muted-foreground text-xs">请先在 API 密钥管理中配置至少一个提供商的 API 密钥，模型列表将自动同步。</p>
+          </div>
         )}
-        <div>
-          <Text type="secondary">默认模型（核验日期：{MODEL_CATALOG_VERIFIED_AT}）</Text>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm text-muted-foreground">默认模型（核验日期：{MODEL_CATALOG_VERIFIED_AT}）</span>
           <Select
-            style={{ width: '100%', marginTop: 8 }}
             value={selectedModel?.id}
-            onChange={onModelChange}
-            placeholder="选择默认 AI 模型"
-            showSearch
-            optionFilterProp="children"
+            onValueChange={(val) => val && onModelChange(val)}
             disabled={!isModelSelectable}
           >
-            {availableModels.map(model => (
-              <Option key={model.id} value={model.id}>
-                <Space>
-                  <span>{model.name}</span>
-                  <Tag color="blue">{PROVIDER_NAMES[model.provider as keyof typeof PROVIDER_NAMES]}</Tag>
-                  {MODEL_VERIFICATION[model.id]?.verified ? (
-                    <Tag color="green">已核验</Tag>
-                  ) : (
-                    <Tag color="gold">需手动确认</Tag>
-                  )}
-                </Space>
-              </Option>
-            ))}
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="选择默认 AI 模型" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableModels.map(model => (
+                <SelectItem key={model.id} value={model.id}>
+                  <div className="flex items-center gap-2">
+                    <span>{model.name}</span>
+                    <Badge variant="secondary" className="text-xs">{PROVIDER_NAMES[model.provider as keyof typeof PROVIDER_NAMES]}</Badge>
+                    {MODEL_VERIFICATION[model.id]?.verified ? (
+                      <Badge className="bg-green-500/20 text-green-500 border-green-500/40 text-xs">已核验</Badge>
+                    ) : (
+                      <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/40 text-xs">需手动确认</Badge>
+                    )}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
         {selectedModel && (
           <>
-            <Divider />
-            <Alert
-              type="info"
-              message={
-                <Space direction="vertical" size="small">
-                  <Text strong>{selectedModel.name}</Text>
-                  <Text type="secondary">{selectedModel.description}</Text>
-                  <Space>
-                    <Tag icon={<ThunderboltOutlined />} color="green">
-                      最大 {(selectedModel.tokenLimit ?? 4096).toLocaleString()} tokens
-                    </Tag>
-                    <Tag icon={<DollarOutlined />} color="orange">
-                      {PROVIDER_NAMES[selectedModel.provider as keyof typeof PROVIDER_NAMES]}
-                    </Tag>
-                    <Tag color={MODEL_VERIFICATION[selectedModel.id]?.verified ? 'green' : 'gold'}>
-                      核验日期 {MODEL_VERIFICATION[selectedModel.id]?.checkedAt || '待确认'}
-                    </Tag>
-                  </Space>
-                </Space>
-              }
-            />
+            <div className="h-px bg-border" />
+            <div className="rounded-md border border-accent-primary/30 bg-accent-primary/5 px-4 py-3 text-sm space-y-2">
+              <p className="font-medium text-text-primary">{selectedModel.name}</p>
+              <p className="text-muted-foreground text-xs">{selectedModel.description}</p>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+                  <Zap size={10} />
+                  最大 {(selectedModel.tokenLimit ?? 4096).toLocaleString()} tokens
+                </Badge>
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+                  <DollarSign size={10} />
+                  {PROVIDER_NAMES[selectedModel.provider as keyof typeof PROVIDER_NAMES]}
+                </Badge>
+                <Badge
+                  variant="secondary"
+                  className={`text-xs ${MODEL_VERIFICATION[selectedModel.id]?.verified ? 'bg-green-500/20 text-green-500 border-green-500/40' : 'bg-yellow-500/20 text-yellow-500 border-yellow-500/40'}`}
+                >
+                  核验日期 {MODEL_VERIFICATION[selectedModel.id]?.checkedAt || '待确认'}
+                </Badge>
+              </div>
+            </div>
           </>
         )}
-      </Space>
+      </CardContent>
     </Card>
   );
 };

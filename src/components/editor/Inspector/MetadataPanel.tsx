@@ -25,8 +25,7 @@ export const MetadataPanel = memo<MetadataPanelProps>(({ clip }) => {
         {rows.map((row, i) => (
           <div
             key={row.label}
-            className={`flex items-center justify-between px-3 py-2 ${i < rows.length - 1 ? 'border-b border-border-subtle' : ''}`}
-            style={{ backgroundColor: 'var(--bg-tertiary, #1a1a1f)' }}
+            className={`flex items-center justify-between px-3 py-2 bg-bg-tertiary ${i < rows.length - 1 ? 'border-b border-border-subtle' : ''}`}
           >
             <span className="text-[11px] text-text-secondary">{row.label}</span>
             <span

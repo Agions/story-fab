@@ -1,7 +1,7 @@
 import React, { useState, useCallback, lazy, Suspense, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Layout, Tabs, Row, Col, Spin, message } from 'antd';
-import { RobotOutlined } from '@ant-design/icons';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Bot } from 'lucide-react';
 
 import { saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
@@ -17,8 +17,6 @@ import SegmentList from './components/SegmentList';
 
 import styles from './index.module.less';
 
-const { Content } = Layout;
-const { TabPane } = Tabs;
 const loadKeyframePanel = () => import('./components/KeyframePanel');
 const loadAIClipPanel = () => import('./components/AIClipPanel');
 const loadExportSettingsPanel = () => import('./components/ExportSettingsPanel');
@@ -28,7 +26,7 @@ const ExportSettingsPanel = lazy(loadExportSettingsPanel);
 
 const PanelLoading: React.FC = () => (
   <div style={{ padding: '20px 0', textAlign: 'center' }}>
-    <Spin size="small" />
+    <div className="animate-spin text-lg">⟳</div>
   </div>
 );
 
@@ -160,8 +158,8 @@ const VideoEditorPage: React.FC = () => {
   }, [logger, notify]);
 
   return (
-    <Layout className={styles.editorLayout}>
-      <Content className={styles.editorContent}>
+    <div className={styles.editorLayout}>
+      <div className={styles.editorContent}>
         <Toolbar
           loading={loading}
           analyzing={analyzing}
@@ -179,9 +177,8 @@ const VideoEditorPage: React.FC = () => {
           onExport={handleExportVideo}
         />
 
-        <Row gutter={[24, 24]}>
-          {/* 视频预览区 */}
-          <Col span={16}>
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+          <div>
             <VideoPlayer
               src={videoSrc}
               onTimeUpdate={setCurrentTime}
@@ -195,19 +192,23 @@ const VideoEditorPage: React.FC = () => {
               selectedIndex={selectedSegmentIndex}
               onSelectSegment={handleSelectSegment}
             />
-          </Col>
+          </div>
 
-          {/* 右侧工具面板 */}
-          <Col span={8}>
+          <div>
             <Tabs
-              defaultActiveKey="trim"
-              activeKey={activeTab}
-              onChange={setActiveTab}
-              destroyInactiveTabPane
-              animated={false}
+              defaultValue="trim"
+              value={activeTab}
+              onValueChange={setActiveTab}
               className={styles.editorTabs}
             >
-              <TabPane tab="片段" key="trim">
+              <TabsList>
+                <TabsTrigger value="trim">片段</TabsTrigger>
+                <TabsTrigger value="keyframes" onMouseEnter={() => { void loadKeyframePanel(); }}>关键帧</TabsTrigger>
+                <TabsTrigger value="ai-clip" onMouseEnter={() => { void loadAIClipPanel(); }}><Bot size={14} /> AI 剪辑</TabsTrigger>
+                <TabsTrigger value="effects">效果</TabsTrigger>
+                <TabsTrigger value="settings" onMouseEnter={() => { void loadExportSettingsPanel(); }}>设置</TabsTrigger>
+              </TabsList>
+              <TabsContent value="trim">
                 <SegmentList
                   segments={segments}
                   selectedIndex={selectedSegmentIndex}
@@ -216,15 +217,13 @@ const VideoEditorPage: React.FC = () => {
                   onDeleteSegment={handleDeleteSegment}
                   onAddSegment={handleAddSegment}
                 />
-              </TabPane>
-
-              <TabPane tab={<span onMouseEnter={() => { void loadKeyframePanel(); }}>关键帧</span>} key="keyframes">
+              </TabsContent>
+              <TabsContent value="keyframes">
                 <Suspense fallback={<PanelLoading />}>
                   <KeyframePanel keyframes={keyframes} />
                 </Suspense>
-              </TabPane>
-
-              <TabPane tab={<span onMouseEnter={() => { void loadAIClipPanel(); }}><RobotOutlined /> AI 剪辑</span>} key="ai-clip">
+              </TabsContent>
+              <TabsContent value="ai-clip">
                 <Suspense fallback={<PanelLoading />}>
                   <AIClipPanel
                     projectId={projectId}
@@ -234,15 +233,13 @@ const VideoEditorPage: React.FC = () => {
                     onApplySuggestions={handleApplyAISuggestions}
                   />
                 </Suspense>
-              </TabPane>
-
-              <TabPane tab="效果" key="effects">
+              </TabsContent>
+              <TabsContent value="effects">
                 <div className={styles.effectsPanel}>
                   视频效果功能正在开发中
                 </div>
-              </TabPane>
-
-              <TabPane tab={<span onMouseEnter={() => { void loadExportSettingsPanel(); }}>设置</span>} key="settings">
+              </TabsContent>
+              <TabsContent value="settings">
                 <Suspense fallback={<PanelLoading />}>
                   <ExportSettingsPanel
                     outputFormat={outputFormat}
@@ -251,12 +248,12 @@ const VideoEditorPage: React.FC = () => {
                     onQualityChange={setVideoQuality}
                   />
                 </Suspense>
-              </TabPane>
+              </TabsContent>
             </Tabs>
-          </Col>
-        </Row>
-      </Content>
-    </Layout>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

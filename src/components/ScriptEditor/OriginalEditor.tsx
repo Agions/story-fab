@@ -1,14 +1,17 @@
 import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Card, Space, Dropdown, Modal, Form, type MenuProps } from 'antd';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Form } from 'antd';
 import { Button } from '@/components/ui/button';
 import {
-  EditOutlined,
-  SaveOutlined,
-  ExportOutlined,
-  DownOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+  Edit3,
+  Save,
+  Download,
+  ChevronDown,
+  Plus,
+} from 'lucide-react';
 import type { ScriptSegment } from '@/core/types';
 import { VideoSegment, formatDuration, previewSegment } from '@/services/video';
 import { convertFileSrc } from '@tauri-apps/api/core';
@@ -46,7 +49,9 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
   const [previewSrc, setPreviewSrc] = useState('');
   const [previewLoading, setPreviewLoading] = useState(false);
   const [aiModalVisible, setAiModalVisible] = useState(false);
-  const [exportMenuVisible, setExportMenuVisible] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteTargetIndex, setDeleteTargetIndex] = useState<number | null>(null);
   const [totalDuration, setTotalDuration] = useState(0);
 
   useEffect(() => {
@@ -121,16 +126,19 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
 
   // 删除片段
   const handleDeleteSegment = useCallback((index: number) => {
-    Modal.confirm({
-      title: '确认删除',
-      content: '确定要删除这个片段吗？',
-      onOk: () => {
-        const newSegments = [...segments];
-        newSegments.splice(index, 1);
-        setSegments(newSegments);
-      },
-    });
-  }, [segments]);
+    setDeleteTargetIndex(index);
+    setDeleteConfirmOpen(true);
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (deleteTargetIndex !== null) {
+      const newSegments = [...segments];
+      newSegments.splice(deleteTargetIndex, 1);
+      setSegments(newSegments);
+    }
+    setDeleteConfirmOpen(false);
+    setDeleteTargetIndex(null);
+  }, [deleteTargetIndex, segments]);
 
   // 预览片段
   const handlePreviewSegment = useCallback(async (index: number) => {
@@ -169,46 +177,49 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
     }
   }, []);
 
-  const exportMenuItems = useMemo<MenuProps['items']>(() => ([
+  const exportMenuItems = useMemo(() => ([
     { key: 'txt', label: '文本文件 (.txt)' },
     { key: 'srt', label: '字幕文件 (.srt)' },
     { key: 'doc', label: 'Word文档 (.docx)' },
   ]), []);
 
-  const handleExportClick = useCallback<NonNullable<MenuProps['onClick']>>(({ key }) => {
+  const handleExportClick = useCallback(({ key }: { key: string }) => {
     onExport?.(String(key));
-    setExportMenuVisible(false);
+    setExportMenuOpen(false);
   }, [onExport]);
 
   return (
     <div className={styles.scriptEditor}>
-      <Card
-        title="脚本编辑"
-        className={styles.editorCard}
-        extra={
-          <Space>
+      <Card className={styles.editorCard}>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle>脚本编辑</CardTitle>
+          <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setAiModalVisible(true)}>
-              <EditOutlined className="mr-1" />
+              <Edit3 size={14} className="mr-1" />
               AI优化
             </Button>
             <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={handleSave}>
-              <SaveOutlined className="mr-1" />
+              <Save size={14} className="mr-1" />
               保存
             </Button>
             {onExport && (
-              <Dropdown
-                menu={{ items: exportMenuItems, onClick: handleExportClick }}
-                open={exportMenuVisible}
-                onOpenChange={setExportMenuVisible}
-              >
-                <Button variant="outline">
-                  导出 <DownOutlined />
-                </Button>
-              </Dropdown>
+              <DropdownMenu open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    导出 <ChevronDown size={14} className="ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {exportMenuItems.map(item => (
+                    <DropdownMenuItem key={item.key} onClick={() => handleExportClick({ key: item.key })}>
+                      {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-          </Space>
-        }
-      >
+          </div>
+        </CardHeader>
         <div className={styles.statsBar}>
           <div>总片段: {segments.length}</div>
           <div>总时长: {formatDuration(totalDuration)}</div>
@@ -228,7 +239,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
           onClick={handleAddSegment}
           style={{ marginTop: 16 }}
         >
-          <PlusOutlined className="mr-1" />
+          <Plus size={14} className="mr-1" />
           添加片段
         </Button>
 
@@ -243,14 +254,27 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
       </Card>
 
       <PreviewModal
-        visible={previewVisible}
+        open={previewVisible}
         loading={previewLoading}
-        previewSrc={previewSrc}
+        previewUrl={previewSrc}
         onClose={() => setPreviewVisible(false)}
       />
 
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>确认删除</DialogTitle>
+          </DialogHeader>
+          <p>确定要删除这个片段吗？</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>取消</Button>
+            <Button onClick={confirmDelete}>确定</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <AIModal
-        visible={aiModalVisible}
+        open={aiModalVisible}
         onClose={() => setAiModalVisible(false)}
         onConfirm={handleAIImprove}
       />

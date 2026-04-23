@@ -1,6 +1,6 @@
 import { logger } from '@/utils/logger';
 import React, { useState, useCallback, useEffect, memo } from 'react';
-import { Card, Typography } from 'antd';
+import { Card } from '@/components/ui/card';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { save } from '@tauri-apps/plugin-dialog';
@@ -15,8 +15,6 @@ import ExportSettings, { ExportSettingsState } from './ExportSettings';
 import PreviewModal from './PreviewModal';
 
 import styles from './VideoEditor.module.less';
-
-const { Title } = Typography;
 
 // 全局变量存储视频时长，用于拖拽边界计算
 let globalVideoDuration = 0;
@@ -300,7 +298,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
 
   return (
     <div className={styles.editorContainer}>
-      <Title level={4}>视频混剪编辑器</Title>
+      <h2 className="text-lg font-semibold mb-4">视频混剪编辑器</h2>
 
       <Card>
         <VideoPlayer
@@ -335,7 +333,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       </Card>
 
       <ExportSettings
-        visible={showSettingsModal}
+        open={showSettingsModal}
         settings={exportSettings}
         activeTab={settingsTab}
         onTabChange={setSettingsTab}
@@ -345,7 +343,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
       />
 
       <PreviewModal
-        visible={showPreviewModal}
+        open={showPreviewModal}
         loading={previewLoading}
         previewUrl={previewUrl}
         previewSegment={previewSegment}
