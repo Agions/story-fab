@@ -108,7 +108,54 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* shadcn dark theme — inherits from :root override above, no duplication needed */
+/* ─── Light theme ─────────────────────────────────────────── */
+.light {
+  /* CutDeck design tokens — light professional tool theme */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f4f5;
+  --bg-tertiary: #fafafa;
+  --bg-hover: #e4e4e7;
+  --border-subtle: #e4e4e7;
+  --border-default: #d4d4d8;
+  --text-primary: #09090b;
+  --text-secondary: #71717a;
+  --text-disabled: #a1a1aa;
+  --accent-primary: #f97316;
+  --accent-primary-hover: #fb923c;
+  --accent-secondary: #3b82f6;
+  --accent-success: #22c55e;
+  --accent-warning: #eab308;
+  --accent-danger: #ef4444;
+  --timeline-video: #8b5cf6;
+  --timeline-audio: #06b6d4;
+  --timeline-subtitle: #f59e0b;
+
+  /* shadcn mapped vars — light theme */
+  --background: #ffffff;
+  --foreground: #09090b;
+  --card: #f4f4f5;
+  --card-foreground: #09090b;
+  --popover: #f4f4f5;
+  --popover-foreground: #09090b;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #09090b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #e4e4e7;
+  --accent-foreground: #09090b;
+  --destructive: #ef4444;
+  --border: #e4e4e7;
+  --input: #f4f4f5;
+  --ring: #f97316;
+
+  --radius: 0.5rem;
+
+  color-scheme: light;
+}
+
+/* ─── Dark theme (legacy support) ──────────────────────────── */
 .dark {
-  /* Inherits all :root values via CSS custom property cascade */
+  color-scheme: dark;
 }
