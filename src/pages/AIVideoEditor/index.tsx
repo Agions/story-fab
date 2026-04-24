@@ -8,22 +8,22 @@ import {
   User,
   Scissors,
 } from 'lucide-react';
-import { CutDeckProvider, useCutDeck } from '@/components/CutDeck/AIEditorContext';
-import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '@/hooks/useKeyboardShortcuts';
-import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
-import { useEditorStore } from '@/store/editorStore';
-import { notify } from '@/shared';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/CutDeck/Workspace/functionModeMap';
+import { CutDeckProvider, useCutDeck } from '../../components/CutDeck/AIEditorContext';
+import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '../../hooks/useKeyboardShortcuts';
+import KeyboardShortcutsHelp from '../../components/common/KeyboardShortcutsHelp';
+import { useEditorStore } from '../../store/editorStore';
+import { notify } from '../../shared';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '../../components/CutDeck/Workspace/functionModeMap';
 import styles from './index.module.less';
 
-const Workspace = lazy(() => import('@/components/CutDeck/Workspace/Workspace'));
-const ProjectSetup = lazy(() => import('@/components/CutDeck/Workspace/ProjectSetup'));
-const VideoUpload = lazy(() => import('@/components/CutDeck/Workspace/VideoUpload'));
-const AIVisualizer = lazy(() => import('@/components/CutDeck/Workspace/AIVisualizer'));
-const ScriptWriting = lazy(() => import('@/components/CutDeck/Workspace/ScriptWriting'));
-const VideoComposing = lazy(() => import('@/components/CutDeck/Workspace/VideoComposing'));
-const VideoExport = lazy(() => import('@/components/CutDeck/Workspace/VideoExport'));
-const ClipRippling = lazy(() => import('@/components/CutDeck/Workspace/ClipRippling'));
+const Workspace = lazy(() => import('../../components/CutDeck/Workspace/Workspace'));
+const ProjectSetup = lazy(() => import('../../components/CutDeck/Workspace/ProjectSetup'));
+const VideoUpload = lazy(() => import('../../components/CutDeck/Workspace/VideoUpload'));
+const AIVisualizer = lazy(() => import('../../components/CutDeck/Workspace/AIVisualizer'));
+const ScriptWriting = lazy(() => import('../../components/CutDeck/Workspace/ScriptWriting'));
+const VideoComposing = lazy(() => import('../../components/CutDeck/Workspace/VideoComposing'));
+const VideoExport = lazy(() => import('../../components/CutDeck/Workspace/VideoExport'));
+const ClipRippling = lazy(() => import('../../components/CutDeck/Workspace/ClipRippling'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [

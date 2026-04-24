@@ -4,9 +4,9 @@
  */
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import { Star } from 'lucide-react';
-import type { AIModel } from '@/core/types';
+import type { AIModel } from '../../core/types';
 import styles from './index.module.less';
 
 interface ModelRecommendationsProps {

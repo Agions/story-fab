@@ -1,8 +1,8 @@
 import React, { useCallback, memo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
 import { Eye } from 'lucide-react';
-import { ScriptSegment } from '@/types';
+import { ScriptSegment } from '../../types';
 import styles from './VideoEditor.module.less';
 
 const formatTime = (time: number) => {

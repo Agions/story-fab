@@ -5,10 +5,10 @@
  */
 import React, { useState, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
-import type { ProjectData } from '@/core/types';
-import { saveProjectToFile } from '@/services/tauri';
-import { notify } from '@/shared';
-import { useSettings } from '@/context/SettingsContext';
+import type { ProjectData } from '../../../core/types';
+import { saveProjectToFile } from '../../../services/tauri';
+import { notify } from '../../../shared';
+import { useSettings } from '../../../context/SettingsContext';
 import styles from './ProjectSetup.module.less';
 
 interface ProjectCreateProps {

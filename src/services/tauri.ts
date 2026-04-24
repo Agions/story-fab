@@ -4,8 +4,8 @@ import { readTextFile, writeTextFile, BaseDirectory, mkdir, exists } from '@taur
 import { load } from '@tauri-apps/plugin-store';
 import { appConfigDir } from '@tauri-apps/api/path';
 import { open as openExternal } from '@tauri-apps/plugin-shell';
-import { normalizeProjectId, buildProjectIdCandidates } from '@/core/utils/project-id';
-import { logger } from '@/utils/logger';
+import { normalizeProjectId, buildProjectIdCandidates } from '../core/utils/project-id';
+import { logger } from '../utils/logger';
 
 type ProjectFileData = {
   aiModel?: {

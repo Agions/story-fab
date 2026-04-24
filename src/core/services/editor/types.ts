@@ -1,5 +1,5 @@
 // Re-export canonical types from core/types
-export type { VideoSegment, ScriptSegment } from '@/core/types';
+export type { VideoSegment, ScriptSegment } from '../../types';
 
 export interface VideoClip {
   id: string;

@@ -3,7 +3,7 @@
  * Theme toggle: shadcn Switch — "Dark" / "Light"
  */
 import React, { memo } from 'react';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '../ui/switch';
 
 interface AppearanceSettingsProps {
   theme?: 'light' | 'dark' | 'auto';

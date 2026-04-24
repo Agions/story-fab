@@ -2,14 +2,14 @@
  * API 密钥设置面板
  */
 import React, { useState, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { validateApiKey } from '@/services/apiKey';
-import { notify } from '@/shared';
-import { ModelProvider, PROVIDER_NAMES } from '@/constants/models';
-import { MODEL_PROVIDERS } from '@/core/config/models.config';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Badge } from '../ui/badge';
+import { validateApiKey } from '../../services/apiKey';
+import { notify } from '../../shared';
+import { ModelProvider, PROVIDER_NAMES } from '../../constants/models';
+import { MODEL_PROVIDERS } from '../../core/config/models.config';
 import { Key, Eye, EyeOff, Trash2, Check, X, Loader2 } from 'lucide-react';
 
 interface ApiKeyConfig {

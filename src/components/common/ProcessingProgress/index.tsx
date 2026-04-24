@@ -4,7 +4,7 @@
  * 圆形进度条 + 状态文本
  */
 import React from 'react';
-import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
+import { Progress, ProgressTrack, ProgressIndicator } from '../../ui/progress';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import styles from './ProcessingProgress.module.less';
 

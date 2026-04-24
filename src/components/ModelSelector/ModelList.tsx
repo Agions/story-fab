@@ -4,10 +4,10 @@
  */
 
 import React from 'react';
-import { AnimatePresence } from '@/components/common/motion-shim';
+import { AnimatePresence } from '../common/motion-shim';
 import { ModelCard } from './ModelCard';
 import { Loader2 } from 'lucide-react';
-import type { AIModel } from '@/core/types';
+import type { AIModel } from '../../core/types';
 import styles from './index.module.less';
 
 interface ModelListProps {

@@ -3,8 +3,8 @@
  * 将 ClipSegment[] 转换为剪映可读的 draft_content.json
  */
 
-import { JIANYING_DRAFT_VERSION } from '@/core/types/jianying';
-import type { JianYingDraft, JianYingTrack, JianYingClip } from '@/core/types/jianying';
+import { JIANYING_DRAFT_VERSION } from '../../types/jianying';
+import type { JianYingDraft, JianYingTrack, JianYingClip } from '../../types/jianying';
 
 export interface JianYingExportOptions {
   videoId: string;

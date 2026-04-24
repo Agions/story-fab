@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '../ui/dialog';
 import { AISettings } from './AISettings';
 import { AppearanceSettings } from './AppearanceSettings';
 import { ShortcutSettings } from './ShortcutSettings';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
+import { Slider } from '../ui/slider';
+import { Button } from '../ui/button';
 import {
   Play,
   Pause,

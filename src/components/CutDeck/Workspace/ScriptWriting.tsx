@@ -4,14 +4,14 @@
  */
 import React, { useState, useCallback, useEffect, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
-import { aiService } from '@/core/services/ai.service';
-import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
-import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { notify } from '@/shared';
-import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
-import { orchestrateCommentaryAgents } from '@/core/services/workflow/commentaryAgents';
-import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '@/core/workflow/alignmentGate';
+import { aiService } from '../../../core/services/ai.service';
+import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '../../../core/types';
+import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '../../../core/config/models.config';
+import useLocalStorage from '../../../hooks/useLocalStorage';
+import { notify } from '../../../shared';
+import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '../../../core/utils/model-availability';
+import { orchestrateCommentaryAgents } from '../../../core/services/workflow/commentaryAgents';
+import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '../../../core/workflow/alignmentGate';
 import {
   FEATURE_TO_FUNCTION,
   FUNCTION_TO_FEATURE,

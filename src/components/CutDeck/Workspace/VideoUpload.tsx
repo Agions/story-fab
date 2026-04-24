@@ -6,9 +6,9 @@
  */
 import React, { useState, useCallback, useRef, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
-import { logger } from '@/utils/logger';
-import { formatDuration, formatFileSize, notify } from '@/shared';
-import type { VideoInfo } from '@/core/types';
+import { logger } from '../../../utils/logger';
+import { formatDuration, formatFileSize, notify } from '../../../shared';
+import type { VideoInfo } from '../../../core/types';
 import styles from './VideoUpload.module.css';
 
 // 支持的视频格式

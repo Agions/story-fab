@@ -1,4 +1,4 @@
-import type { ModelProvider } from '@/core/types';
+import type { ModelProvider } from '../core/types';
 import type { LegacyAIModelType } from './aiService';
 
 const PROVIDER_TO_LEGACY_MODEL: Record<ModelProvider, LegacyAIModelType> = {

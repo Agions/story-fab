@@ -9,16 +9,16 @@
  * 设计风格：AI Cinema Studio Dark (#0C0D14)
  */
 import React, { useState, useCallback, useRef } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card } from './ui/card';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Switch } from './ui/switch';
+import { Slider } from './ui/slider';
+import { Progress } from './ui/progress';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
+import { Badge } from './ui/badge';
+import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
+import { ScrollArea } from './ui/scroll-area';
 import {
   FileText,
   Edit,
@@ -29,10 +29,10 @@ import {
   Target,
   Mic,
 } from 'lucide-react';
-import { notify } from '@/shared';
-import { subtitleService } from '@/core/services/subtitle.service';
-import { useEditorStore } from '@/store/editorStore';
-import type { SubtitleEntry } from '@/core/types';
+import { notify } from '../shared';
+import { subtitleService } from '../core/services/subtitle.service';
+import { useEditorStore } from '../store/editorStore';
+import type { SubtitleEntry } from '../core/types';
 import styles from './SubtitleExtractor.module.css';
 
 interface SubtitleSegment {

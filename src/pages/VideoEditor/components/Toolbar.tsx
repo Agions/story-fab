@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Button } from '../../../components/ui/button';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../../components/ui/tooltip';
 import {
   Upload,
   Undo2,

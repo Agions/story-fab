@@ -11,7 +11,7 @@
  */
 
 import { visionService } from './vision.service';
-import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '../types';
 import { ClipRepurposingPipeline } from './clipRepurposing/pipeline';
 import type { RepurposingOptions } from './clipRepurposing/pipeline';
 import { clipSegmentFromRepurposing } from './clipRepurposing/types';

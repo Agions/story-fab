@@ -8,10 +8,10 @@
  */
 
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
-import type { ClipScore } from '@/core/services/clipRepurposing/clipScorer';
-import { SEOGenerator } from '@/core/services/clipRepurposing/seoGenerator';
-import type { SEOMetadata, SocialPlatform } from '@/core/services/clipRepurposing/seoGenerator';
-import { logger } from '@/utils/logger';
+import type { ClipScore } from '../../services/clipRepurposing/clipScorer';
+import { SEOGenerator } from '../../services/clipRepurposing/seoGenerator';
+import type { SEOMetadata, SocialPlatform } from '../../services/clipRepurposing/seoGenerator';
+import { logger } from '../../../utils/logger';
 
 // ============================================================
 // Metadata

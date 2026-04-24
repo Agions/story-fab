@@ -4,9 +4,9 @@
  */
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '../ui/badge';
 import { Bot } from 'lucide-react';
-import type { AIModel } from '@/core/types';
+import type { AIModel } from '../../core/types';
 import styles from './index.module.less';
 
 interface ModelHeaderProps {

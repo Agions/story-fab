@@ -1,10 +1,10 @@
 import React, { memo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
 import { Edit3, Play, Trash2 } from 'lucide-react';
-import { formatDuration } from '@/core/video';
-import type { ScriptSegment } from '@/core/types';
+import { formatDuration } from '../../core/video';
+import type { ScriptSegment } from '../../core/types';
 import { getTypeLabel } from './types';
 import styles from './ScriptEditor.module.less';
 

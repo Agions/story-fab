@@ -1,6 +1,6 @@
 import { visionService } from '../vision.service';
 import { invoke } from '@tauri-apps/api/core';
-import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
+import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '../../types';
 import { DEFAULT_CLIP_CONFIG } from './types';
 import type {
   AIClipConfig,

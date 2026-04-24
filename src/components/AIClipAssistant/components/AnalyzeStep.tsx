@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
-import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
+import { Card, CardContent } from '../../ui/card';
+import { Separator } from '../../ui/separator';
+import { Tooltip, TooltipTrigger, TooltipContent } from '../../ui/tooltip';
+import { Progress, ProgressTrack, ProgressIndicator } from '../../ui/progress';
+import type { ClipAnalysisResult } from '../../../core/services/aiClip.service';
 import styles from '../index.module.less';
 
 interface AnalyzeStepProps {

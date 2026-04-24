@@ -4,7 +4,7 @@
  * shadcn Card 样式
  */
 import React, { memo, useState } from 'react';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '../../ui/switch';
 
 interface Effect {
   id: string;

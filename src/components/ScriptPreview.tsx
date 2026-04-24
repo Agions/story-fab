@@ -1,11 +1,11 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Card } from './ui/card';
+import { Input } from './ui/input';
 
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
+import { Badge } from './ui/badge';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
+import { Button } from './ui/button';
 import { 
   FileText, 
   Copy, 
@@ -13,8 +13,8 @@ import {
   List, 
   Calendar
 } from 'lucide-react';
-import type { Script, ScriptSegment } from '@/types';
-import { notify } from '@/shared';
+import type { Script, ScriptSegment } from '../types';
+import { notify } from '../shared';
 import styles from './ScriptPreview.module.less';
 
 const Title = ({ children, level, className }: { children: React.ReactNode; level?: number; className?: string }) => <h3 className={className} style={{ fontSize: level === 3 ? '1.25rem' : '1rem', fontWeight: level ? 600 : 400 }}>{children}</h3>;

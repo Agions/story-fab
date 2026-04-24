@@ -1,5 +1,5 @@
 import type { Timeline } from './types';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 
 const STORAGE_KEY = 'reelforge_timeline';
 

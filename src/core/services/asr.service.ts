@@ -4,8 +4,8 @@
  */
 
 import { BaseService, ServiceError } from './base.service';
-import { logger } from '@/utils/logger';
-import type { VideoInfo } from '@/core/types';
+import { logger } from '../../utils/logger';
+import type { VideoInfo } from '../types';
 
 // ============================================
 // Web Speech API 类型（TypeScript lib.dom.d.ts 不完整）

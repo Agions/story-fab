@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import type { VideoInfo, VideoAnalysis, Scene } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, Scene } from '../types';
 
 interface TaskStatusInfo {
   id?: string;

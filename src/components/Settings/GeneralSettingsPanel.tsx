@@ -2,12 +2,12 @@
  * 通用设置面板
  */
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Switch } from '../ui/switch';
 import { Settings, RotateCcw } from 'lucide-react';
-import { notify } from '@/shared';
-import type { ProjectSaveBehavior } from '@/shared/constants/settings';
+import { notify } from '../../shared';
+import type { ProjectSaveBehavior } from '../../shared/constants/settings';
 
 interface GeneralSettingsPanelProps {
   autoSave: boolean;

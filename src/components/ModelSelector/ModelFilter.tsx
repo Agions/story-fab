@@ -4,10 +4,10 @@
  */
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
+import { Input } from '../ui/input';
 import { Bot, Edit3, Code2, FlaskConical, Video } from 'lucide-react';
-import { MODEL_PROVIDERS } from '@/core/config/models.config';
-import type { ModelCategory, ModelProvider } from '@/core/types';
+import { MODEL_PROVIDERS } from '../../core/config/models.config';
+import type { ModelCategory, ModelProvider } from '../../core/types';
 import styles from './index.module.less';
 
 const CATEGORY_OPTIONS = [

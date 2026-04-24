@@ -6,7 +6,7 @@
  * Unselected: --text-secondary
  */
 import React, { memo } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../ui/button';
 
 export type AspectRatio = '9:16' | '1:1' | '16:9';
 

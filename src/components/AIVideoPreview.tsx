@@ -4,8 +4,8 @@
  */
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Upload } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
+import { Slider } from './ui/slider';
+import { Button } from './ui/button';
 import {
   Play,
   Pause,
@@ -17,8 +17,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useAIEditor } from './CutDeck/AIEditorContext';
-import type { VideoInfo } from '@/core/types';
-import { notify } from '@/shared';
+import type { VideoInfo } from '../core/types';
+import { notify } from '../shared';
 import styles from './AIVideoPreview.module.less';
 
 const Text = ({ children, type, strong, style, title, className }: { children: React.ReactNode; type?: string; strong?: boolean; style?: React.CSSProperties; title?: string; className?: string }) => {

@@ -1,24 +1,24 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Row, Col } from '@/components/ui/grid';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Row, Col } from '../../components/ui/grid';
+import { Badge } from '../../components/ui/badge';
+import { Skeleton } from '../../components/ui/skeleton';
 import {
   Video, Plus, Play, Rocket, Zap, FileText, Clock, CheckCircle, ArrowRight,
   FlaskConical, Scissors, VolumeX, Download, Folder, TrendingUp, Loader2,
 } from 'lucide-react';
-import { useTheme } from '@/context/ThemeContext';
-import { useSettings } from '@/context/SettingsContext';
-import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '@/services/tauri';
-import { preloadProjectEditPage, preloadProjectsPage } from '@/core/utils/route-preload';
+import { useTheme } from '../../context/ThemeContext';
+import { useSettings } from '../../context/SettingsContext';
+import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '../../services/tauri';
+import { preloadProjectEditPage, preloadProjectsPage } from '../../core/utils/route-preload';
 import {
   extractProjectMediaMetrics,
   pickPreferredSizeMb,
   resolveProjectVideoPath,
-} from '@/shared';
+} from '../../shared';
 import styles from './index.module.less';
 
 const AMBER = '#d4a574';

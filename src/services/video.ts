@@ -2,7 +2,7 @@
  * Video Service (Facade)
  *
  * 兼容层：将所有导出代理到新的 @core/video 模块。
- * 新代码请直接 import { videoProcessor } from '@/core/video';
+ * 新代码请直接 import { videoProcessor } from '../core/video';
  *
  * 本文件保留以下导出以兼容已有调用点：
  *   - 类型（VideoMetadata, KeyFrame, VideoSegment, TranscodeOptions…）
@@ -22,7 +22,7 @@ export type {
   ExtractKeyFramesOptions,
   CutOptions,
   ProgressCallback,
-} from '@/core/video';
+} from '../core/video';
 
 // ---- Re-export formatters ----
 export {
@@ -30,11 +30,11 @@ export {
   formatResolution,
   formatBitrate,
   formatFileSize,
-} from '@/core/video';
+} from '../core/video';
 
 // ---- Delegate convenience functions to the processor instance ----
-import { videoProcessor } from '@/core/video';
-import type { VideoSegment, ExtractKeyFramesOptions, CutOptions } from '@/core/video';
+import { videoProcessor } from '../core/video';
+import type { VideoSegment, ExtractKeyFramesOptions, CutOptions } from '../core/video';
 
 export const checkFFmpegInstallation = () => videoProcessor.checkStatus();
 

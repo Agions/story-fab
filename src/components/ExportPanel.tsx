@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { ExportFormat, exportScript } from '@/services/export';
-import { Script } from '@/services/aiService';
-import { notify } from '@/shared';
-import { logger } from '@/utils/logger';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from './ui/tooltip';
+import { ExportFormat, exportScript } from '../services/export';
+import { Script } from '../services/aiService';
+import { notify } from '../shared';
+import { logger } from '../utils/logger';
 import { Download, FileText, File, Globe } from 'lucide-react';
 import styles from './ExportPanel.module.less';
 

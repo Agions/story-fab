@@ -18,9 +18,9 @@ import React, {
   memo,
   useMemo,
 } from 'react';
-import { Button } from '@/components/ui/button';
-import { Tooltip } from '@/components/ui/tooltip';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '../ui/button';
+import { Tooltip } from '../ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import {
   PlayCircle,
   PauseCircle,

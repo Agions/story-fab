@@ -86,7 +86,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   // Subscribe to notify events
   useEffect(() => {
     let cleanup: (() => void) | undefined;
-    import("@/shared/utils/notify").then(({ subscribeToToast }) => {
+    import('../../shared/utils/notify').then(({ subscribeToToast }) => {
       cleanup = subscribeToToast((event) => {
         addToast(event);
       });

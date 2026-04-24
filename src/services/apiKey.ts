@@ -2,7 +2,7 @@
  * API 密钥验证服务
  */
 import axios from 'axios';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 export interface ApiKeyValidationResult {
   isValid: boolean;

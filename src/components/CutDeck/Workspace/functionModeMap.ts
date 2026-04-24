@@ -1,4 +1,4 @@
-import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
+import type { WorkflowMode } from '../../../core/workflow/featureBlueprint';
 import type { AIFeatureType } from '../AIEditorContext';
 
 export type AIFunctionType = 'video-narration' | 'first-person' | 'remix';

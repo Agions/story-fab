@@ -1,13 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { logger } from '@/utils/logger';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { logger } from '../../utils/logger';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Badge } from '../ui/badge';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '../ui/tooltip';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '../ui/dropdown-menu';
 import { Upload, Video, Music, Image, FileText, MoreHorizontal, Search, X, Plus } from 'lucide-react';
-import { formatDuration, formatFileSize } from '@/shared';
+import { formatDuration, formatFileSize } from '../../shared';
 import styles from './AssetPanel.module.less';
 
 const TABS_CONFIG = [

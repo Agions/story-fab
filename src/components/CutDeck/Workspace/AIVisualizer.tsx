@@ -4,10 +4,10 @@
  */
 import React, { useState, useEffect, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
-import { visionService } from '@/core/services/vision.service';
-import { notify } from '@/shared';
-import { logger } from '@/utils/logger';
-import type { AIAnalyzeProps, Scene } from '@/core/types';
+import { visionService } from '../../../core/services/vision.service';
+import { notify } from '../../../shared';
+import { logger } from '../../../utils/logger';
+import type { AIAnalyzeProps, Scene } from '../../../core/types';
 import styles from './AIVisualizer.module.css';
 import HighlightList from './HighlightList';
 
@@ -263,7 +263,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         setCurrentTaskKey('asr');
         setTimeout(() => setVisibleTasks(prev => [...prev, 'asr']), 100);
         try {
-          const { asrService } = await import('@/core/services/asr.service');
+          const { asrService } = await import('../../../core/services/asr.service');
           const asrResult = await asrService.recognizeSpeech(state.currentVideo, { language: 'zh_cn' });
           if (asrResult && asrResult.text) {
             setCompletedTasks(prev => [...prev, 'asr_done']);

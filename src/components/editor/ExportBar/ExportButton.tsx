@@ -5,7 +5,7 @@
  * Disabled during export
  */
 import React, { memo } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../ui/button';
 import { Download, Loader2, CheckCircle2 } from 'lucide-react';
 
 interface ExportButtonProps {

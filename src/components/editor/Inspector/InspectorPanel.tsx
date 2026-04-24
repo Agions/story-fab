@@ -4,7 +4,7 @@
  * 包含: ClipProperties, Effects, Metadata
  */
 import React, { memo } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '../../ui/scroll-area';
 import { ClipProperties } from './ClipProperties';
 import { EffectsPanel } from './EffectsPanel';
 import { MetadataPanel } from './MetadataPanel';

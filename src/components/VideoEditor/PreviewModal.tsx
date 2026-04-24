@@ -5,9 +5,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ScriptSegment } from '@/types';
+} from '../ui/dialog';
+import { Button } from '../ui/button';
+import { ScriptSegment } from '../../types';
 import styles from './VideoEditor.module.less';
 
 interface PreviewModalProps {

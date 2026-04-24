@@ -1,11 +1,11 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import React, { useState, useCallback, useEffect, memo } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card } from '../ui/card';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { save } from '@tauri-apps/plugin-dialog';
-import { ScriptSegment } from '@/types';
-import { notify } from '@/shared';
+import { ScriptSegment } from '../../types';
+import { notify } from '../../shared';
 
 import VideoPlayer from './VideoPlayer';
 import Timeline from './Timeline';

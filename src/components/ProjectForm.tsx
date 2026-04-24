@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import type { Project } from '@/types';
-import { notify } from '@/shared';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import type { Project } from '../types';
+import { notify } from '../shared';
 import styles from './ProjectForm.module.less';
 
 interface ProjectFormProps {

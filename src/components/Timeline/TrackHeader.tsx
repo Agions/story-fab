@@ -1,6 +1,6 @@
 import React, { memo, useState, useRef, useCallback } from 'react';
-import { Tooltip } from '@/components/ui/tooltip';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Tooltip } from '../ui/tooltip';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '../ui/dropdown-menu';
 import {
   Plus,
   Trash2,

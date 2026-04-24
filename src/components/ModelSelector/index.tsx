@@ -8,8 +8,8 @@ import {
   useModel,
   useModelCost,
   useRecommendedModel
-} from '@/hooks/useModel';
-import type { AIModel, ModelProvider } from '@/core/types';
+} from '../../hooks/useModel';
+import type { AIModel, ModelProvider } from '../../core/types';
 import { useModelFilter } from './hooks/useModelFilter';
 import { useModelSelection } from './hooks/useModelSelection';
 import { ModelHeader } from './ModelHeader';

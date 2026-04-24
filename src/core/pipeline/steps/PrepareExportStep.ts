@@ -9,13 +9,13 @@
  */
 
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
-import type { ClipScore } from '@/core/services/clipRepurposing/clipScorer';
-import type { AspectRatio } from '@/core/services/clipRepurposing/multiFormatExport';
-import type { ExportTask } from '@/core/services/clipRepurposing/multiFormatExport';
-import { multiFormatExporter } from '@/core/services/clipRepurposing/multiFormatExport';
-import { tauri } from '@/core/tauri/TauriBridge';
-import type { VideoInfo } from '@/core/types';
-import { logger } from '@/utils/logger';
+import type { ClipScore } from '../../services/clipRepurposing/clipScorer';
+import type { AspectRatio } from '../../services/clipRepurposing/multiFormatExport';
+import type { ExportTask } from '../../services/clipRepurposing/multiFormatExport';
+import { multiFormatExporter } from '../../services/clipRepurposing/multiFormatExport';
+import { tauri } from '../../tauri/TauriBridge';
+import type { VideoInfo } from '../../types';
+import { logger } from '../../../utils/logger';
 
 // ============================================================
 // Metadata

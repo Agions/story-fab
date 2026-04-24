@@ -1,14 +1,14 @@
 import React from 'react';
-import { Card, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader } from '../../ui/card';
+import { Button } from '../../ui/button';
+import { Badge } from '../../ui/badge';
 import {
   RotateCcw,
   Download,
   Clock,
 } from 'lucide-react';
-import type { ClipSegment } from '@/core/services/aiClip.service';
-import type { VideoInfo } from '@/core/types';
+import type { ClipSegment } from '../../../core/services/aiClip.service';
+import type { VideoInfo } from '../../../core/types';
 import styles from '../index.module.less';
 
 interface PreviewStepProps {

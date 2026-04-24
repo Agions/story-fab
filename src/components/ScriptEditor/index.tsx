@@ -1,5 +1,5 @@
 import React, { memo, lazy, Suspense } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '../ui/card';
 import { FileText } from 'lucide-react';
 import { ScriptEditorProps, isWorkflowProps } from './types';
 import styles from './ScriptEditor.module.less';

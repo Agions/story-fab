@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import type { ProjectData, VideoInfo, ScriptData, ProjectSettings, TaskStatus } from '@/core/types';
+import type { ProjectData, VideoInfo, ScriptData, ProjectSettings, TaskStatus } from '../core/types';
 
 export interface UseProjectReturn {
   // 当前项目
