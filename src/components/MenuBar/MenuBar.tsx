@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuShortcut,
-} from '@/components/ui/dropdown-menu';
+} from '../ui/dropdown-menu';
 
 interface MenuItemDef {
   label: string;
