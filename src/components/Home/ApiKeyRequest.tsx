@@ -1,12 +1,12 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { Badge } from '../ui/badge';
 import { Key, Mail, Building2, MapPin, User } from 'lucide-react';
-import { AI_MODEL_INFO, AIModelType } from '@/types';
+import { AI_MODEL_INFO, AIModelType } from '../../types';
 import styles from './ApiKeyRequest.module.less';
 
 interface ApiKeyRequestProps {

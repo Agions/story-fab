@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Card } from '@/components/ui/card';
-import { cn } from "@/lib/utils";
+import { Card } from './ui/card';
+import { cn } from '../lib/utils';
 
 // Simple grid replacement for Row/Col
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio';
+import { Badge } from './ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
+import { RadioGroup, RadioGroupItem } from './ui/radio';
 import { CheckCircle, Bot, HelpCircle, Code, Video, Edit, Flame, Star, Zap } from 'lucide-react';
-import { motion } from '@/components/common/motion-shim';
-import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS } from '@/core/config/models.config';
-import type { AIModel as CoreAIModel, ModelProvider } from '@/core/types';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
+import { motion } from './common/motion-shim';
+import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS } from '../core/config/models.config';
+import type { AIModel as CoreAIModel, ModelProvider } from '../core/types';
+import useLocalStorage from '../hooks/useLocalStorage';
+import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '../core/utils/model-availability';
 import styles from './AIModelSelector.module.less';
 
 export type ModelCategory = 'text' | 'code' | 'image' | 'video' | 'all';

@@ -2,7 +2,7 @@
  * Pipeline Steps — 统一导出
  *
  * 使用方式：
- *   import { buildCandidatesStep, scoreClipsStep, generateSEOStep, prepareExportStep } from '@/core/pipeline/steps';
+ *   import { buildCandidatesStep, scoreClipsStep, generateSEOStep, prepareExportStep } from './';
  */
 
 export { buildCandidatesStep } from './BuildCandidatesStep';

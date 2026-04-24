@@ -1,18 +1,18 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 /**
  * 脚本生成器组件
  * 专业的 AI 脚本生成界面
  */
 
 import React, { useState, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { Separator } from '@/components/ui/separator';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../ui/select';
+import { Badge } from '../ui/badge';
+import { Progress } from '../ui/progress';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
+import { Separator } from '../ui/separator';
 import {
   Edit,
   Zap,
@@ -25,12 +25,12 @@ import {
   Settings,
   CreditCard,
 } from 'lucide-react';
-import { motion, AnimatePresence } from '@/components/common/motion-shim';
-import { useModel, useModelCost } from '@/hooks/useModel';
-import { useProject } from '@/hooks/useProject';
-import ModelSelector from '@/components/ModelSelector';
-import { notify } from '@/shared';
-import type { ScriptData, ScriptSegment } from '@/core/types';
+import { motion, AnimatePresence } from '../common/motion-shim';
+import { useModel, useModelCost } from '../../hooks/useModel';
+import { useProject } from '../../hooks/useProject';
+import ModelSelector from '../ModelSelector';
+import { notify } from '../../shared';
+import type { ScriptData, ScriptSegment } from '../../core/types';
 import styles from './index.module.less';
 
 const LENGTH_OPTIONS = [
@@ -126,7 +126,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({
     setProgress(0);
 
     try {
-      const { aiService } = await import('@/core/services');
+      const { aiService } = await import('../../core/services');
 
       const modelSettings = selectedModel || {
         id: 'gpt-4o',

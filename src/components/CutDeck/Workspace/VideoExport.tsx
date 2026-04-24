@@ -5,8 +5,8 @@ import React, { useState, useEffect, memo } from 'react';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import { useCutDeck } from '../AIEditorContext';
-import { notify } from '@/shared';
-import type { ExportSettings } from '@/core/types';
+import { notify } from '../../../shared';
+import type { ExportSettings } from '../../../core/types';
 import styles from './VideoExport.module.less';
 
 interface VideoExportProps {

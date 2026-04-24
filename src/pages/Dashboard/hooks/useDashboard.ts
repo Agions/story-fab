@@ -3,24 +3,24 @@
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { logger } from '@/utils/logger';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';
+import { Button } from '../../../components/ui/button';
+import { logger } from '../../../utils/logger';
 import {
   listProjects,
   deleteProject as deleteProjectFile,
   getFileSizeMb,
   PROJECTS_CHANGED_EVENT,
-} from '@/services/tauri';
-import { useSettings } from '@/context/SettingsContext';
+} from '../../../services/tauri';
+import { useSettings } from '../../../context/SettingsContext';
 import {
   extractProjectMediaMetrics,
   notify,
   pickPreferredSizeMb,
   RawProjectRecord,
   resolveProjectVideoPath,
-} from '@/shared';
-import { preloadProjectEditPage } from '@/core/utils/route-preload';
+} from '../../../shared';
+import { preloadProjectEditPage } from '../../../core/utils/route-preload';
 import { Project, DashboardStats } from '../types';
 
 const concurrentMap = async <T, R>(

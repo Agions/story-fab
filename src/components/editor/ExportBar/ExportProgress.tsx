@@ -5,7 +5,7 @@
  * States: idle (hidden), processing (visible), complete (green)
  */
 import React, { memo } from 'react';
-import { Progress, ProgressIndicator } from '@/components/ui/progress';
+import { Progress, ProgressIndicator } from '../../ui/progress';
 import { CheckCircle2 } from 'lucide-react';
 
 interface ExportProgressProps {

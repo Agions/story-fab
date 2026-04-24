@@ -4,8 +4,8 @@
  * Header: "Media" + import button (primary orange)
  */
 import React, { memo, useState, useCallback } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
+import { ScrollArea } from '../../ui/scroll-area';
+import { Button } from '../../ui/button';
 import { MediaItem } from './MediaItem';
 import { FolderTree } from './FolderTree';
 import { FolderPlus, Upload } from 'lucide-react';

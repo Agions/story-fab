@@ -3,10 +3,10 @@
  * Part of VideoProcessingController - handles quality and format settings
  */
 import React from 'react';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '../../ui/select';
+import { Slider } from '../../ui/slider';
+import { Switch } from '../../ui/switch';
+import { Input } from '../../ui/input';
 import { QUALITY_OPTIONS, FORMAT_OPTIONS, DEFAULT_CUSTOM_SETTINGS } from '../constants';
 import type { QualityValue, FormatValue } from '../constants';
 import type { CustomQualitySettings } from '../types';

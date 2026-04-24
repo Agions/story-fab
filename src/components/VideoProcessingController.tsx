@@ -1,15 +1,15 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
+import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
+import { Input } from './ui/input';
+import { Switch } from './ui/switch';
+import { Slider } from './ui/slider';
+import { Button } from './ui/button';
+import { Progress, ProgressTrack, ProgressIndicator } from './ui/progress';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
+import { Badge } from './ui/badge';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 import {
   Settings,
   Plus,
@@ -21,8 +21,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
-import { notify } from '@/shared';
-import type { VideoSegment } from '@/core/types';
+import { notify } from '../shared';
+import type { VideoSegment } from '../core/types';
 import { BasicSettings, EffectsSettings, BatchProcessing } from './VideoProcessingController/modules';
 import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from './VideoProcessingController/constants';
 import styles from './VideoProcessingController.module.less';

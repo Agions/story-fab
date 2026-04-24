@@ -8,26 +8,26 @@
  *   index.tsx           — 主组件（状态编排）
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Spin } from '@/components/ui/spin';
-import { Button } from '@/components/ui/button';
-import { Steps } from '@/components/ui/steps';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Card } from '../../components/ui/card';
+import { Spin } from '../../components/ui/spin';
+import { Button } from '../../components/ui/button';
+import { Steps } from '../../components/ui/steps';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../../components/ui/select';
+import { Switch } from '../../components/ui/switch';
+import { Badge } from '../../components/ui/badge';
+import { Input } from '../../components/ui/input';
 import { ArrowLeft, Save, Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
-import { VideoMetadata, analyzeVideo, extractKeyFrames } from '@/services/video';
-import type { ScriptSegment } from '@/core/types';
-import { generateScriptWithAI, analyzeKeyFramesWithAI } from '@/services/aiService';
-import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
-import { notify } from '@/shared';
-import { useSettings } from '@/context/SettingsContext';
+import { VideoMetadata, analyzeVideo, extractKeyFrames } from '../../services/video';
+import type { ScriptSegment } from '../../core/types';
+import { generateScriptWithAI, analyzeKeyFramesWithAI } from '../../services/aiService';
+import { loadProjectWithRetry, saveProjectToFile } from '../../services/tauri';
+import { notify } from '../../shared';
+import { useSettings } from '../../context/SettingsContext';
 import { v4 as uuid } from 'uuid';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 import { VideoStep } from './components/steps/VideoStep';
 import { AnalyzeStep } from './components/steps/AnalyzeStep';

@@ -4,8 +4,8 @@
  * 集成 Whisper AI 转录 (Rust faster-whisper 后端)
  */
 
-import { logger } from '@/utils/logger';
-import type { SubtitleEntry, VideoInfo } from '@/core/types';
+import { logger } from '../../utils/logger';
+import type { SubtitleEntry, VideoInfo } from '../types';
 
 // ============================================
 // 类型定义

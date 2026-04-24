@@ -2,13 +2,13 @@
  * 模型设置面板
  */
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Badge } from '../ui/badge';
 import { Bot, Zap, DollarSign } from 'lucide-react';
-import { AI_MODELS, MODEL_VERIFICATION, MODEL_CATALOG_VERIFIED_AT } from '@/core/config/models.config';
-import { PROVIDER_NAMES } from '@/constants/models';
-import type { AIModel } from '@/core/types';
+import { AI_MODELS, MODEL_VERIFICATION, MODEL_CATALOG_VERIFIED_AT } from '../../core/config/models.config';
+import { PROVIDER_NAMES } from '../../constants/models';
+import type { AIModel } from '../../core/types';
 
 interface ModelSettingsPanelProps {
   defaultModel: string;

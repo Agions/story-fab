@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { resolveLegacyModel, getLegacyModelCompatMap } from './aiModelAdapter';
-import type { ModelProvider } from '@/core/types';
+import type { ModelProvider } from '../core/types';
 
 describe('aiModelAdapter', () => {
   describe('resolveLegacyModel', () => {

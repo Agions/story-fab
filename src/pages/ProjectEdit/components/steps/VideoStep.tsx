@@ -2,12 +2,12 @@
  * VideoStep — 选择视频步骤
  */
 import React from 'react';
-import { Card } from '@/components/ui/card';
+import { Card } from '../../../../components/ui/card';
 import { Video, FileVideo } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import VideoSelector from '@/components/VideoSelector';
-import type { VideoMetadata } from '@/services/video';
+import { Button } from '../../../../components/ui/button';
+import { cn } from '../../../../lib/utils';
+import VideoSelector from '../../../../components/VideoSelector';
+import type { VideoMetadata } from '../../../../services/video';
 import styles from '../../index.module.less';
 
 interface VideoStepProps {

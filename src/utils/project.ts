@@ -2,7 +2,7 @@
  * 项目工具函数
  */
 
-import type { Project, ProjectStatus } from '@/core/types';
+import type { Project, ProjectStatus } from '../core/types';
 
 /**
  * 创建新项目

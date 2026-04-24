@@ -4,11 +4,11 @@
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useModelStore } from '@/store';
-import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS, getModelById, getModelsByProvider, getRecommendedModels } from '@/core/config/models.config';
-import type { AIModel, ModelProvider, ModelCategory, AIModelSettings } from '@/core/types';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { resolveDefaultModelId } from '@/core/utils/model-availability';
+import { useModelStore } from '../store';
+import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS, getModelById, getModelsByProvider, getRecommendedModels } from '../core/config/models.config';
+import type { AIModel, ModelProvider, ModelCategory, AIModelSettings } from '../core/types';
+import useLocalStorage from './useLocalStorage';
+import { resolveDefaultModelId } from '../core/utils/model-availability';
 
 export interface UseModelReturn {
   // 模型列表

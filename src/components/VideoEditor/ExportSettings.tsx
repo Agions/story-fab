@@ -5,11 +5,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+} from '../ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
+import { Slider } from '../ui/slider';
+import { Button } from '../ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 
 export type TransitionType = 'none' | 'fade' | 'dissolve' | 'wipe' | 'slide';

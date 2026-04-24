@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import { Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 import styles from './Preview.module.less';
 

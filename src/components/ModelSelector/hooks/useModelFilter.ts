@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
-import type { AIModel, ModelProvider, ModelCategory } from '@/core/types';
+import type { AIModel, ModelProvider, ModelCategory } from '../../../core/types';
 
 interface UseModelFilterProps {
   models: AIModel[];

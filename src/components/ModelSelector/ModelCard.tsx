@@ -4,14 +4,14 @@
  */
 
 import React, { useMemo } from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Card } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
 import { CheckCircle, Star, Bot, DollarSign } from 'lucide-react';
-import { motion } from '@/components/common/motion-shim';
-import { MODEL_PROVIDERS } from '@/core/config/models.config';
-import type { AIModel, ModelProvider } from '@/core/types';
+import { motion } from '../common/motion-shim';
+import { MODEL_PROVIDERS } from '../../core/config/models.config';
+import type { AIModel, ModelProvider } from '../../core/types';
 import styles from './index.module.less';
 
 interface ModelCardProps {

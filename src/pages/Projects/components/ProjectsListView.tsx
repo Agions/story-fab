@@ -1,11 +1,11 @@
 import React from 'react';
 import { PlayCircle, MoreHorizontal, Video, FolderOpen } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Card } from '../../../components/ui/card';
+import { Badge } from '../../../components/ui/badge';
+import { Progress, ProgressTrack, ProgressIndicator } from '../../../components/ui/progress';
+import { Button } from '../../../components/ui/button';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../../components/ui/dropdown-menu';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../../components/ui/tooltip';
 interface MenuItem {
   key?: string;
   label?: React.ReactNode;

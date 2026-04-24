@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent, CardHeader } from '../../ui/card';
+import { Button } from '../../ui/button';
+import { Badge } from '../../ui/badge';
+import { Checkbox } from '../../ui/checkbox';
+import { ScrollArea } from '../../ui/scroll-area';
 import {
   Scissors,
   GitMerge,
@@ -11,7 +11,7 @@ import {
   TestTube,
   CheckCircle,
 } from 'lucide-react';
-import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
+import type { ClipAnalysisResult } from '../../../core/services/aiClip.service';
 import styles from '../index.module.less';
 
 interface SuggestionsStepProps {

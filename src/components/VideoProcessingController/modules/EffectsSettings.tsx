@@ -3,10 +3,10 @@
  * Part of VideoProcessingController - handles transition and audio effects
  */
 import React from 'react';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '../../ui/select';
+import { Slider } from '../../ui/slider';
+import { Switch } from '../../ui/switch';
+import { Input } from '../../ui/input';
 import { Volume2 } from 'lucide-react';
 import { TRANSITION_OPTIONS, AUDIO_PROCESS_OPTIONS } from '../constants';
 import type { TransitionValue, AudioProcessValue } from '../constants';

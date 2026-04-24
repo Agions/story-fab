@@ -3,7 +3,7 @@
  * 将通用 SubtitleSegment[] 转换为剪映草稿可用的字幕轨道
  */
 
-import type { JianYingTrack, JianYingClip } from '@/core/types/jianying';
+import type { JianYingTrack, JianYingClip } from '../../types/jianying';
 
 export interface SubtitleSegment {
   startMs: number;

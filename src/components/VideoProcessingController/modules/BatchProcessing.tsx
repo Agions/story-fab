@@ -3,14 +3,14 @@
  * Part of VideoProcessingController - handles batch video processing
  */
 import React from 'react';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../ui/tooltip';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog';
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
+import { Progress } from '../../ui/progress';
 import { Plus, Trash2, Play } from 'lucide-react';
 import type { BatchItem } from '../types';
-import type { VideoSegment } from '@/core/types';
+import type { VideoSegment } from '../../../core/types';
 
 interface BatchProcessingProps {
   batchItems: BatchItem[];

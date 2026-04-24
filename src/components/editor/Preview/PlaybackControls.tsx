@@ -4,8 +4,8 @@
  * Timecode display: "00:00:00:00" in JetBrains Mono
  */
 import React, { memo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { Button } from '../../ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../../ui/tooltip';
 import {
   Play,
   Pause,

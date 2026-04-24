@@ -5,7 +5,7 @@
  */
 
 import { invoke } from '@tauri-apps/api/core';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 // 导出格式
 export type ExportFormat = 'mp4' | 'webm' | 'mov' | 'mkv';

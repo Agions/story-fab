@@ -13,28 +13,28 @@
 
 import React, { useState, useCallback, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { notify } from '@/shared';
+import { Button } from '../../ui/button';
+import { Progress } from '../../ui/progress';
+import { Badge } from '../../ui/badge';
+import { Checkbox } from '../../ui/checkbox';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '../../ui/select';
+import { notify } from '../../../shared';
 import {
   Zap,
   CheckCircle,
   Download,
 } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
-import { motion } from '@/components/common/motion-shim';
-import { ClipRepurposingPipeline } from '@/core/services/clipRepurposing/pipeline';
-import type { VideoInfo, VideoAnalysis } from '@/core/types';
+import { motion } from '../../common/motion-shim';
+import { ClipRepurposingPipeline } from '../../../core/services/clipRepurposing/pipeline';
+import type { VideoInfo, VideoAnalysis } from '../../../core/types';
 import type {
   RepurposingClip,
   PipelineStage,
   RepurposingOptions,
-} from '@/core/services/clipRepurposing/pipeline';
-import type { SocialPlatform } from '@/core/services/clipRepurposing/seoGenerator';
-import { transcodeWithCrop, type AspectRatio } from '@/services/tauri';
+} from '../../../core/services/clipRepurposing/pipeline';
+import type { SocialPlatform } from '../../../core/services/clipRepurposing/seoGenerator';
+import { transcodeWithCrop, type AspectRatio } from '../../../services/tauri';
 import styles from './ClipRippling.module.css';
 
 

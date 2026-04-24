@@ -1,22 +1,22 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Badge } from '../../components/ui/badge';
+import { Separator } from '../../components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { ArrowLeft, Save, Trash2, Download, Bot, Loader2 } from 'lucide-react';
-import { useSettings } from '@/context/SettingsContext';
-import { notify } from '@/shared';
-import { exportScriptToFile, saveProjectToFile, loadProjectWithRetry, listProjects } from '@/services/tauri';
-import { findProjectByScriptId, normalizeProjectFile } from '@/core/utils/project-file';
-import type { ProjectFileLike } from '@/core/utils/project-file';
-import type { Script } from '@/services/aiService';
-import type { ScriptSegment } from '@/core/types';
+import { useSettings } from '../../context/SettingsContext';
+import { notify } from '../../shared';
+import { exportScriptToFile, saveProjectToFile, loadProjectWithRetry, listProjects } from '../../services/tauri';
+import { findProjectByScriptId, normalizeProjectFile } from '../../core/utils/project-file';
+import type { ProjectFileLike } from '../../core/utils/project-file';
+import type { Script } from '../../services/aiService';
+import type { ScriptSegment } from '../../core/types';
 import styles from './index.module.less';
 
-const loadScriptEditor = () => import('@/components/ScriptEditor');
+const loadScriptEditor = () => import('../../components/ScriptEditor');
 const ScriptEditor = lazy(loadScriptEditor);
 
 interface ProjectWithScripts extends ProjectFileLike<Script, { path?: string }> {

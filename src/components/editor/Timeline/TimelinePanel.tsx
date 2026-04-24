@@ -10,7 +10,7 @@ import React, {
   useMemo,
   useEffect,
 } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '../../ui/scroll-area';
 import { TimelineToolbar } from './TimelineToolbar';
 import { TimelineRuler } from './TimelineRuler';
 import { TimelineTrack } from './TimelineTrack';

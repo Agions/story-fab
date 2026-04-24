@@ -13,8 +13,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 import type { EditorStore, EditorState, VideoData, ScriptData, VoiceData, TimelineSelection } from './editorTypes';
-import type { VideoSegment, EditorPanel } from '@/core/types';
-import type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '@/components/Timeline/types';
+import type { VideoSegment, EditorPanel } from '../core/types';
+import type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '../components/Timeline/types';
 import {
   MAX_HISTORY_SIZE,
   DEFAULT_SNAP_THRESHOLD_MS,

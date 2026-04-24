@@ -1,14 +1,14 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Progress, ProgressTrack, ProgressIndicator } from './ui/progress';
 import { Video } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoAnalysis, KeyMoment, Emotion } from '../types';
 import VideoSelector from './VideoSelector';
-import { notify } from '@/shared';
+import { notify } from '../shared';
 import styles from './VideoAnalyzer.module.less';
 
 const Title = ({ level = 4, children }: { level?: number; children: React.ReactNode }) => {

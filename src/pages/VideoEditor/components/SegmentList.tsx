@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, memo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
 import { Plus, Trash2 } from 'lucide-react';
-import { VideoSegment } from '@/services/video';
+import { VideoSegment } from '../../../services/video';
 import styles from '../index.module.less';
 
 const formatTime = (seconds: number): string => {

@@ -3,8 +3,8 @@
  * 重新导出 core/config/models.config.ts 中的 PROVIDER_NAMES
  * 仅用于 Settings 等页面组件的展示目的
  */
-import { MODEL_PROVIDERS } from '@/core/config/models.config';
-import type { ModelProvider } from '@/core/types';
+import { MODEL_PROVIDERS } from '../core/config/models.config';
+import type { ModelProvider } from '../core/types';
 
 export type { ModelProvider };
 

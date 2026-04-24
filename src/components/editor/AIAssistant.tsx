@@ -4,23 +4,23 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-} from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from '../ui/tabs';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { Slider } from '@/components/ui/slider';
-import { Progress, ProgressIndicator } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
+} from '../ui/select';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
+import { Slider } from '../ui/slider';
+import { Progress, ProgressIndicator } from '../ui/progress';
+import { Separator } from '../ui/separator';
+import { Switch } from '../ui/switch';
 import {
   Bot,
   Send,
@@ -33,10 +33,10 @@ import {
   HelpCircle,
   XCircle,
 } from 'lucide-react';
-import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
-import type { ModelProvider, AIModel } from '@/core/types';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '@/core/utils/model-availability';
+import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '../../core/config/models.config';
+import type { ModelProvider, AIModel } from '../../core/types';
+import useLocalStorage from '../../hooks/useLocalStorage';
+import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '../../core/utils/model-availability';
 import styles from './AIAssistant.module.less';
 
 interface AIAssistantProps {}
@@ -98,7 +98,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     setProcessing(true);
 
     try {
-      const { aiService } = await import('@/core/services/ai.service');
+      const { aiService } = await import('../../core/services/ai.service');
 
       const model = CORE_AI_MODELS.find(m => m.id === selectedModelId) || CORE_AI_MODELS[0];
       const providerKey = (apiKeys || {})[model.provider as ModelProvider];

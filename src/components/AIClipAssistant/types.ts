@@ -1,11 +1,11 @@
-import type { VideoInfo } from '@/core/types';
+import type { VideoInfo } from '../../core/types';
 import type {
   CutPoint,
   ClipSuggestion,
   ClipSegment,
   AIClipConfig,
   ClipAnalysisResult
-} from '@/core/services/aiClip.service';
+} from '../../core/services/aiClip.service';
 
 export interface AIClipAssistantProps {
   videoInfo: VideoInfo;
