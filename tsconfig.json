@@ -19,9 +19,8 @@
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "ignoreDeprecations": "6",
-    "baseUrl": ".",
     "rootDirs": ["."],
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@/scripts/*": ["./scripts/*"]
