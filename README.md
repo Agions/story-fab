@@ -15,8 +15,8 @@
 ">CutDeck</h1>
 
 <p style="font-size: 1.15rem; color: #94a3b8; margin: 0 0 2rem;">
-  AI 驱动的专业视频剪辑工具 · 长视频一键自动拆条 · 多平台分发<br>
-  <span style="font-size: 0.95rem;">AI-Powered Professional Video Editor · One-Click Long Video Splitting · Multi-Platform Distribution</span>
+  AI 驱动的专业视频剪辑工具 · 长视频一键智能剪辑 · 多平台分发
+  <span style="font-size: 0.95rem;">AI-Powered Professional Video Editor · One-Click Long Video Editing · Multi-Platform Distribution</span>
 </p>
 
 <p>
@@ -38,14 +38,14 @@
 
 ## 🎯 解决的问题
 
-传统视频剪辑的最大痛点：**一个长视频，想拆成多个短片段分发到不同平台，需要人工反复观看、逐个标记、手动导出。**
+传统视频剪辑的最大痛点：**一个长视频，想剪成多个精彩短片段分发到不同平台，需要人工反复观看、逐个标记、手动导出。**
 
 CutDeck 用 AI 把这个过程自动化：
 
 ```
 长视频（直播回放 / 会议录像 / 讲座）
-    → AI 自动分析
-    → 多个精彩短片段
+    → AI 智能分析
+    → 精彩短片段
     → 多格式导出
     → 一键发布
 ```
@@ -60,7 +60,7 @@ CutDeck 用 AI 把这个过程自动化：
 
 ## ✨ 核心功能
 
-### 🎬 AI 智能拆条
+### 🎬 AI 智能剪辑
 
 - **6 维 AI 评分**：笑声密度 / 情感峰值 / 内容完整度 / 静默比 / 节奏感 / 关键词权重
 - **SEO 元数据**：自动生成标题 / 描述 / Hashtags，平台原生适配
@@ -157,7 +157,7 @@ CutDeck/
 |------|------|
 | [快速开始](https://agions.github.io/CutDeck/guide/quick-start) | 5 分钟上手 |
 | [功能介绍](https://agions.github.io/CutDeck/features) | 全部核心功能 |
-| [AI 拆条指南](https://agions.github.io/CutDeck/guide/clip-repurpose) | ClipRepurposing Pipeline 完整说明 |
+| [AI 剪辑指南](https://agions.github.io/CutDeck/guide/clip-repurpose) | ClipRepurposing Pipeline 完整说明 |
 | [Whisper 字幕](https://agions.github.io/CutDeck/guide/subtitle) | ASR 字幕生成 |
 | [多格式导出](https://agions.github.io/CutDeck/guide/export) | 9:16 / 1:1 / 16:9 导出说明 |
 | [安装配置](https://agions.github.io/CutDeck/installation) | 详细安装与故障排查 |
