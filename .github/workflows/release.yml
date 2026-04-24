@@ -43,11 +43,11 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - { runner: windows-latest, target: 'x86_64-pc-windows-msvc', label: 'Windows x64' }
-          - { runner: macos-latest, target: 'aarch64-apple-darwin', label: 'macOS ARM64' }
-          - { runner: macos-latest, target: 'x86_64-apple-darwin', label: 'macOS x64' }
-          - { runner: ubuntu-22.04, target: 'x86_64-unknown-linux-gnu', label: 'Linux x64' }
-          - { runner: ubuntu-22.04, target: 'aarch64-unknown-linux-gnu', label: 'Linux ARM64' }
+          - { runner: windows-latest,  target: 'x86_64-pc-windows-msvc',   label: 'Windows x64'   }
+          - { runner: macos-latest,     target: 'aarch64-apple-darwin',      label: 'macOS ARM64'   }
+          - { runner: macos-latest,     target: 'x86_64-apple-darwin',        label: 'macOS x64'     }
+          - { runner: ubuntu-22.04,     target: 'x86_64-unknown-linux-gnu',  label: 'Linux x64'     }
+          - { runner: ubuntu-22.04,     target: 'aarch64-unknown-linux-gnu', label: 'Linux ARM64'   }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,7 +71,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # macOS: generate run instructions
       - name: Create macOS run instructions
         if: matrix.platform.label == 'macOS ARM64' || matrix.platform.label == 'macOS x64'
         run: |
@@ -113,23 +112,57 @@ jobs:
           tag: ${{ github.ref_name }}
           args: --target ${{ matrix.platform.target }}
 
-      # macOS: copy run instructions into bundle directory
       - name: Copy run instructions to bundle
         if: matrix.platform.label == 'macOS ARM64' || matrix.platform.label == 'macOS x64'
         run: |
-          # Find the bundle path and copy HOW-TO-RUN.txt into it
           find src-tauri/target/${{ matrix.platform.target }}/release/bundle -name "*.app" -type d | while read app_path; do
             parent_dir=$(dirname "$app_path")
             cp HOW-TO-RUN.txt "$parent_dir/HOW-TO-RUN.txt"
             echo "Copied HOW-TO-RUN.txt to $parent_dir"
           done
 
+      - name: Package macOS app bundle
+        if: matrix.platform.label == 'macOS ARM64' || matrix.platform.label == 'macOS x64'
+        run: |
+          # Find .app bundle
+          APP_PATH=$(find src-tauri/target/${{ matrix.platform.target }}/release/bundle -name "*.app" -type d | head -1)
+          echo "Found app: $APP_PATH"
+          # Zip the .app bundle (GitHub release requires flat files, not directories)
+          7z a -tzip "CutDeck-${{ matrix.platform.label }}.zip" "$APP_PATH"
+          echo "Packaged: CutDeck-${{ matrix.platform.label }}.zip"
+          ls -lh "CutDeck-${{ matrix.platform.label }}.zip"
+
+      - name: Package Linux AppImage
+        if: matrix.platform.label == 'Linux x64' || matrix.platform.label == 'Linux ARM64'
+        run: |
+          # Find .AppImage
+          APPIMAGE=$(find src-tauri/target/${{ matrix.platform.target }}/release/bundle -name "*.AppImage" | head -1)
+          echo "Found: $APPIMAGE"
+          SIZE=$(stat -c %s "$APPIMAGE" 2>/dev/null || stat -f %z "$APPIMAGE")
+          echo "Size: $SIZE bytes ($(echo "scale=1; $SIZE/1024/1024" | bc) MB)"
+          # Compress if larger than 1.5 GB (to stay safely under 2 GB GitHub limit)
+          if [ "$SIZE" -gt 1610612736 ]; then
+            echo "Large AppImage detected — compressing..."
+            7z a -t7z "CutDeck-${{ matrix.platform.label }}.7z" "$APPIMAGE" -mx9
+            echo "Compressed: CutDeck-${{ matrix.platform.label }}.7z"
+            ls -lh "CutDeck-${{ matrix.platform.label }}.7z"
+          else
+            echo "AppImage within size limit, using as-is"
+            mv "$APPIMAGE" "CutDeck-${{ matrix.platform.label }}.AppImage"
+          fi
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: cutdeck-${{ matrix.platform.label }}
           path: |
-            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.exe
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.msi
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.deb
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.rpm
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.AppImage
+            CutDeck-${{ matrix.platform.label }}.zip
+            CutDeck-${{ matrix.platform.label }}.7z
             HOW-TO-RUN.txt
           retention-days: 7
 
@@ -144,16 +177,15 @@ jobs:
           path: artifacts
 
       - name: List artifacts
-        run: find artifacts -type f | head -20
+        run: find artifacts -type f | head -30
 
       - name: Upload to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # For each artifact, extract filename and upload
-          for artifact in $(find artifacts -type f \( -name "*.exe" -o -name "*.msi" -o -name "*.dmg" -o -name "*.app" -o -name "*.deb" -o -name "*.rpm" -o -name "*.AppImage" -o -name "HOW-TO-RUN.txt" \) 2>/dev/null); do
-            echo "Uploading $artifact..."
-            # Upload using GitHub CLI
+          for artifact in $(find artifacts -type f \( -name "*.exe" -o -name "*.msi" -o -name "*.zip" -o -name "*.7z" -o -name "*.dmg" -o -name "*.deb" -o -name "*.AppImage" -o -name "HOW-TO-RUN.txt" \) 2>/dev/null); do
+            size_mb=$(du -h "$artifact" | cut -f1)
+            echo "Uploading $artifact ($size_mb)..."
             gh release upload ${{ github.ref_name }} "$artifact" --repo ${{ github.repository }}
           done
 
