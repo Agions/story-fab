@@ -2,7 +2,7 @@
   "name": "cutdeck",
   "private": true,
   "version": "2.0.0",
-  "description": "\u5f00\u6e90AI\u89c6\u9891\u526a\u8f91\u5de5\u5177\u3002\u957f\u89c6\u9891\u81ea\u52a8\u62c6\u6761\u4e3a\u7206\u6b3e\u77ed\u7247\u6bb5 \u00b7 9:16/1:1/16:9\u591a\u683c\u5f0f\u5bfc\u51fa \u00b7 \u672c\u5730Whisper\u5b57\u5e55 \u00b7 Rust\u6e32\u67d3\u7ba1\u7ebf \u00b7 \u65e0\u9700\u4e0a\u4f20",
+  "description": "开源自研AI视频剪辑工具。长视频一键智能剪辑为爆款短片段 · 9:16/1:1/16:9多格式导出 · 本地Whisper字幕 · Rust渲染管线 · 无需上传",
   "author": "Agions <agions@qq.com>",
   "license": "MIT",
   "type": "module",
