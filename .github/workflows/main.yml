@@ -29,14 +29,13 @@ jobs:
         run: pnpm run type-check
       - name: Create reports directory
         run: mkdir -p reports
-      - name: TypeScript JSON report
-        run: tsc --noEmit --pretty false > reports/tsc-report.txt 2>&1 || true
-        continue-on-error: true
+      - name: TypeScript check
+        run: tsc --noEmit --pretty false 2>&1 | tee reports/tsc-report.txt; exit ${PIPESTATUS[0]}
       - name: Upload TypeScript report
         uses: actions/upload-artifact@v4
         with:
           name: tsc-report
-          path: reports/tsc-report.json
+          path: reports/tsc-report.txt
           retention-days: 7
 
   lint:
@@ -118,17 +117,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download all reports
-        uses: actions/download-artifact@v4
-        with:
-          pattern: '*-report'
-          path: reports/
-          merge-multiple: true
       - name: Download coverage report
         uses: actions/download-artifact@v4
         with:
           name: coverage-report
           path: coverage/
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '!(coverage-report)'
+          path: reports/
+          merge-multiple: true
       - name: ESLint warnings check
         run: |
           ESLINT_COUNT=$(cat reports/eslint-report.json 2>/dev/null | grep -c '"severity":\s*1' || echo "0")
@@ -155,15 +154,10 @@ jobs:
           fi
       - name: TypeScript errors check
         run: |
-          if [ -f reports/tsc-report.json ]; then
-            TSC_OUTPUT=$(cat reports/tsc-report.json)
-            if echo "$TSC_OUTPUT" | grep -q '"transitiveDiagnostics"'; then
-              echo "TypeScript report format valid"
-            fi
-            ERRORS=$(echo "$TSC_OUTPUT" | grep -o '"errorCount":[0-9]*' | grep -o '[0-9]*' | head -1 || echo "0")
-            echo "TypeScript errors: $ERRORS"
-            if [ "$ERRORS" -gt 0 ]; then
-              echo "TypeScript has errors ($ERRORS)"
+          if [ -f reports/tsc-report.txt ]; then
+            if grep -q "error TS" reports/tsc-report.txt; then
+              echo "TypeScript has errors"
+              grep "error TS" reports/tsc-report.txt | head -5
               exit 1
             fi
             echo "TypeScript check passed"
