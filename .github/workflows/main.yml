@@ -117,6 +117,7 @@ jobs:
     needs: [lint, typecheck, coverage]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Download all reports
         uses: actions/download-artifact@v4
         with:
@@ -205,6 +206,17 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: '9'
+      - name: Install dependencies
+        run: pnpm install
       - name: Download all reports
         uses: actions/download-artifact@v4
         with:
