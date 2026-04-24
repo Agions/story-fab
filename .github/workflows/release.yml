@@ -12,32 +12,8 @@ env:
   CARGO_INCREMENTAL: 0
 
 jobs:
-  create-release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.tag.outputs.version }}
-      release_id: ${{ steps.create.outputs.id }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Extract version from tag
-        id: tag
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-      - name: Create Release Draft
-        id: create
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: CutDeck v${{ steps.tag.outputs.version }}
-          draft: true
-          prerelease: false
-
   build-tauri:
     name: Build Tauri (${{ matrix.platform.label }})
-    needs: create-release
     runs-on: ${{ matrix.platform.runner }}
     strategy:
       fail-fast: false
@@ -48,6 +24,7 @@ jobs:
           - { runner: macos-latest,     target: 'x86_64-apple-darwin',        label: 'macOS x64'     }
           - { runner: ubuntu-22.04,     target: 'x86_64-unknown-linux-gnu',  label: 'Linux x64'     }
           - { runner: ubuntu-22.04,     target: 'aarch64-unknown-linux-gnu', label: 'Linux ARM64'   }
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,6 +47,19 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      # Only one job creates the GitHub Release (macOS ARM64 runs first by alphabet)
+      - name: Create GitHub Release
+        if: matrix.platform.label == 'macOS ARM64'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          gh release create "${{ github.ref_name }}" \
+            --title "CutDeck v$VERSION" \
+            --draft \
+            --repo ${{ github.repository }}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create macOS run instructions
         if: matrix.platform.label == 'macOS ARM64' || matrix.platform.label == 'macOS x64'
@@ -124,10 +114,8 @@ jobs:
       - name: Package macOS app bundle
         if: matrix.platform.label == 'macOS ARM64' || matrix.platform.label == 'macOS x64'
         run: |
-          # Find .app bundle
           APP_PATH=$(find src-tauri/target/${{ matrix.platform.target }}/release/bundle -name "*.app" -type d | head -1)
           echo "Found app: $APP_PATH"
-          # Zip the .app bundle (GitHub release requires flat files, not directories)
           7z a -tzip "CutDeck-${{ matrix.platform.label }}.zip" "$APP_PATH"
           echo "Packaged: CutDeck-${{ matrix.platform.label }}.zip"
           ls -lh "CutDeck-${{ matrix.platform.label }}.zip"
@@ -135,20 +123,18 @@ jobs:
       - name: Package Linux AppImage
         if: matrix.platform.label == 'Linux x64' || matrix.platform.label == 'Linux ARM64'
         run: |
-          # Find .AppImage
           APPIMAGE=$(find src-tauri/target/${{ matrix.platform.target }}/release/bundle -name "*.AppImage" | head -1)
           echo "Found: $APPIMAGE"
           SIZE=$(stat -c %s "$APPIMAGE" 2>/dev/null || stat -f %z "$APPIMAGE")
-          echo "Size: $SIZE bytes ($(echo "scale=1; $SIZE/1024/1024" | bc) MB)"
-          # Compress if larger than 1.5 GB (to stay safely under 2 GB GitHub limit)
+          echo "Original size: $(echo "scale=1; $SIZE/1024/1024/1024" | bc) GB"
+          # Compress if larger than 1.5 GB (stay safely under 2 GB GitHub limit)
           if [ "$SIZE" -gt 1610612736 ]; then
-            echo "Large AppImage detected — compressing..."
+            echo "Large AppImage — compressing with 7z..."
             7z a -t7z "CutDeck-${{ matrix.platform.label }}.7z" "$APPIMAGE" -mx9
-            echo "Compressed: CutDeck-${{ matrix.platform.label }}.7z"
             ls -lh "CutDeck-${{ matrix.platform.label }}.7z"
           else
-            echo "AppImage within size limit, using as-is"
             mv "$APPIMAGE" "CutDeck-${{ matrix.platform.label }}.AppImage"
+            ls -lh "CutDeck-${{ matrix.platform.label }}.AppImage"
           fi
 
       - name: Upload artifact
@@ -168,7 +154,7 @@ jobs:
 
   upload-assets:
     name: Upload Release Assets
-    needs: [create-release, build-tauri]
+    needs: [build-tauri]
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
@@ -177,20 +163,22 @@ jobs:
           path: artifacts
 
       - name: List artifacts
-        run: find artifacts -type f | head -30
+        run: |
+          echo "=== All artifacts ==="
+          find artifacts -type f | while read f; do echo "$f ($(du -h "$f" | cut -f1))"; done
 
       - name: Upload to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for artifact in $(find artifacts -type f \( -name "*.exe" -o -name "*.msi" -o -name "*.zip" -o -name "*.7z" -o -name "*.dmg" -o -name "*.deb" -o -name "*.AppImage" -o -name "HOW-TO-RUN.txt" \) 2>/dev/null); do
-            size_mb=$(du -h "$artifact" | cut -f1)
-            echo "Uploading $artifact ($size_mb)..."
-            gh release upload ${{ github.ref_name }} "$artifact" --repo ${{ github.repository }}
+            echo "Uploading $artifact..."
+            gh release upload "${{ github.ref_name }}" "$artifact" --repo ${{ github.repository }}
           done
 
       - name: Publish Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release edit ${{ github.ref_name }} --draft=false --repo ${{ github.repository }}
+          gh release view "${{ github.ref_name }}" --repo ${{ github.repository }} --json uploadUrl --jq .uploadUrl
+          gh release edit "${{ github.ref_name }}" --draft=false --repo ${{ github.repository }}
