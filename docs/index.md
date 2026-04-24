@@ -7,7 +7,7 @@ titleTemplate: false
 hero:
   name: CutDeck
   text: AI 智能视频剪辑工具
-  tagline: 长视频自动拆条为爆款短片 · 多格式导出 · 本地 Whisper 字幕
+  tagline: 长视频一键智能剪辑为爆款短片 · 多格式导出 · 本地 Whisper 字幕
   image:
     src: /logo.svg
     alt: CutDeck
