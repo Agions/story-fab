@@ -3,7 +3,7 @@
  * 提供多种专业解说模板
  */
 
-import type { ScriptTemplate, ScriptMetadata, VideoInfo } from '@/core/types';
+import type { ScriptTemplate, ScriptMetadata, VideoInfo } from '../types';
 
 // 基础模板接口
 export interface TemplateSection {

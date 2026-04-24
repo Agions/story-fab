@@ -1,20 +1,20 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Card } from '../ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Badge } from '../ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import {
   Edit,
   Save,
   FileText,
   Clock,
 } from 'lucide-react';
-import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
-import { formatDuration } from '@/services/video';
-import { notify } from '@/shared';
+import type { ScriptData, Scene, ScriptSegment } from '../../core/types';
+import { formatDuration } from '../../services/video';
+import { notify } from '../../shared';
 import styles from './ScriptEditor.module.less';
 
 interface WorkflowEditorProps {

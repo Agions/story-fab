@@ -1,12 +1,12 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '../ui/tooltip';
 import { Bot, CheckCircle, AlertTriangle, Settings, ExternalLink } from 'lucide-react';
-import { AIModelType, AI_MODEL_INFO } from '@/types';
-import { useModelStore } from '@/store';
+import { AIModelType, AI_MODEL_INFO } from '../../types';
+import { useModelStore } from '../../store';
 import { useNavigate } from 'react-router-dom';
 import styles from './ModelCard.module.less';
 

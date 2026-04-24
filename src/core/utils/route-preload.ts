@@ -12,19 +12,19 @@ const runOnce = (key: string, loader: () => Promise<unknown>): Promise<unknown> 
 };
 
 export const preloadProjectsPage = (): Promise<unknown> =>
-  runOnce('page:projects', () => import('@/pages/Projects/index'));
+  runOnce('page:projects', () => import('../../pages/Projects/index'));
 
 export const preloadProjectEditPage = (): Promise<unknown> =>
-  runOnce('page:project-edit', () => import('@/pages/ProjectEdit/index'));
+  runOnce('page:project-edit', () => import('../../pages/ProjectEdit/index'));
 
 export const preloadProjectDetailPage = (): Promise<unknown> =>
-  runOnce('page:project-detail', () => import('@/pages/ProjectDetail/index'));
+  runOnce('page:project-detail', () => import('../../pages/ProjectDetail/index'));
 
 export const preloadVideoEditorPage = (): Promise<unknown> =>
-  runOnce('page:video-editor', () => import('@/pages/VideoEditor/index'));
+  runOnce('page:video-editor', () => import('../../pages/VideoEditor/index'));
 
 export const preloadAIVideoEditorPage = (): Promise<unknown> =>
-  runOnce('page:ai-video-editor', () => import('@/pages/AIVideoEditor/index'));
+  runOnce('page:ai-video-editor', () => import('../../pages/AIVideoEditor/index'));
 
 export const preloadSettingsPage = (): Promise<unknown> =>
-  runOnce('page:settings', () => import('@/pages/Settings/index'));
+  runOnce('page:settings', () => import('../../pages/Settings/index'));

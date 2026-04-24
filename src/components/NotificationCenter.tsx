@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from './ui/button';
 import { Bell } from 'lucide-react';
-import { useAppStore } from '@/store';
+import { useAppStore } from '../store';
 import styles from './NotificationCenter.module.less';
 
 interface NotificationCenterProps {

@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import {
   editorService,
   saveToStorage,
@@ -15,8 +15,8 @@ import {
   type TextItem,
   type AudioClip,
   type EditorExportSettings,
-} from '@/core/services/editor.service';
-import type { ExportSettings, ScriptSegment } from '@/core/types';
+} from '../services/editor.service';
+import type { ExportSettings, ScriptSegment } from '../types';
 
 // 剪辑状态
 export interface EditorState {

@@ -1,8 +1,8 @@
 import React, { memo, useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import { Button } from '../ui/button';
+import { Slider } from '../ui/slider';
+import { Input } from '../ui/input';
+import { cn } from '../../lib/utils';
 import type { TimelineClip } from './types';
 import { formatTime } from './utils';
 import { MIN_CLIP_DURATION } from './constants';

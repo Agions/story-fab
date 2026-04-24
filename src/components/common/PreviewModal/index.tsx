@@ -4,9 +4,9 @@
  * Dialog 形式展示
  */
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent } from '../../ui/card';
+import { Badge } from '../../ui/badge';
+import { Separator } from '../../ui/separator';
 import {
   FileText,
   Mic,
@@ -24,10 +24,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { formatDuration, notify } from '@/shared';
+} from '../../ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
+import { Button } from '../../ui/button';
+import { formatDuration, notify } from '../../../shared';
 import styles from './PreviewModal.module.less';
 
 // 文案数据类型

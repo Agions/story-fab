@@ -11,8 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { KEYBOARD_SHORTCUTS_HELP } from '@/hooks/useKeyboardShortcuts';
+} from '../../ui/dialog';
+import { KEYBOARD_SHORTCUTS_HELP } from '../../../hooks/useKeyboardShortcuts';
 import styles from './KeyboardShortcutsHelp.module.css';
 
 interface KeyboardShortcutsHelpProps {

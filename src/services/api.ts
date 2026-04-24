@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Project, VideoAnalysis, Script } from '@/types';
+import { Project, VideoAnalysis, Script } from '../types';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',

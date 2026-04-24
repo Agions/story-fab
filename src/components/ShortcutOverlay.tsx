@@ -12,8 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { useTheme } from '@/context/ThemeContext';
+} from './ui/dialog';
+import { useTheme } from '../context/ThemeContext';
 
 export interface ShortcutOverlayProps {
   open: boolean;

@@ -1,5 +1,5 @@
-import { AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/models.config';
-import type { ModelProvider } from '@/core/types';
+import { AI_MODELS, DEFAULT_MODEL_ID } from '../config/models.config';
+import type { ModelProvider } from '../types';
 
 export interface ApiKeyConfig {
   key?: string;

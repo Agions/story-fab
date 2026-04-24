@@ -8,7 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
   TooltipProvider,
-} from '@/components/ui/tooltip';
+} from '../../ui/tooltip';
 import {
   Play,
   Pause,

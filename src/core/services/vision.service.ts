@@ -3,8 +3,8 @@
  * 优化画面识别准确性
  */
 
-import { tauri } from '@/core/tauri/TauriBridge';
-import { logger } from '@/utils/logger';
+import { tauri } from '../tauri/TauriBridge';
+import { logger } from '../../utils/logger';
 import type {
   VideoInfo,
   Scene,
@@ -12,8 +12,8 @@ import type {
   VideoAnalysis,
   ObjectDetection,
   EmotionAnalysis,
-} from '@/core/types';
-import type { HighlightSegment, DetectOptions, HighlightReason } from '@/core/interfaces';
+} from '../types';
+import type { HighlightSegment, DetectOptions, HighlightReason } from '../interfaces';
 
 // 场景类型定义
 interface SceneType {

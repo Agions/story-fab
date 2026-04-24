@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { ShortcutOverlay } from '@/components/ShortcutOverlay';
+import { ShortcutOverlay } from './ShortcutOverlay';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
@@ -22,7 +22,7 @@ import {
   Plus,
   CircleHelp,
 } from 'lucide-react';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
 import styles from './Layout.module.less';
 
 interface LayoutProps {

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { Card } from '../../ui/card';
+import { Button } from '../../ui/button';
+import { Switch } from '../../ui/switch';
+import { Slider } from '../../ui/slider';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '../../ui/select';
+import { Badge } from '../../ui/badge';
 import {
   Bot,
   FlaskConical,
@@ -12,8 +12,8 @@ import {
   Clock,
   Video,
 } from 'lucide-react';
-import type { AIClipConfig } from '@/core/services/aiClip.service';
-import type { VideoInfo } from '@/core/types';
+import type { AIClipConfig } from '../../../core/services/aiClip.service';
+import type { VideoInfo } from '../../../core/types';
 import styles from '../index.module.less';
 
 interface ConfigStepProps {

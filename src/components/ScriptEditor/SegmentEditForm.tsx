@@ -1,8 +1,8 @@
 import React, { memo } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '../ui/select';
 import { segmentTypeOptions } from './types';
 import styles from './ScriptEditor.module.less';
 

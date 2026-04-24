@@ -4,11 +4,11 @@
  */
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '../ui/button';
+import { Separator } from '../ui/separator';
 import { Settings, Zap, Loader2 } from 'lucide-react';
-import { MODEL_PROVIDERS } from '@/core/config/models.config';
-import type { ModelProvider } from '@/core/types';
+import { MODEL_PROVIDERS } from '../../core/config/models.config';
+import type { ModelProvider } from '../../core/types';
 import styles from './index.module.less';
 
 interface ModelFooterProps {

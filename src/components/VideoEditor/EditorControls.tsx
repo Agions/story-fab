@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
-import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { Progress, ProgressTrack, ProgressIndicator } from '../ui/progress';
+import { Button } from '../ui/button';
 import { Scissors, Settings, Save } from 'lucide-react';
 import styles from './VideoEditor.module.less';
 

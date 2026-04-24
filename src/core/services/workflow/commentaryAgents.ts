@@ -1,6 +1,6 @@
-import type { Scene, ScriptSegment, VideoAnalysis } from '@/core/types';
-import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
-import { sceneCommentaryAlignmentService } from '@/core/services/scene-commentary-alignment.service';
+import type { Scene, ScriptSegment, VideoAnalysis } from '../../types';
+import type { WorkflowMode } from '../../workflow/featureBlueprint';
+import { sceneCommentaryAlignmentService } from '../scene-commentary-alignment.service';
 
 export type CommentaryAgentRole =
   | 'director-agent'

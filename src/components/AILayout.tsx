@@ -4,9 +4,9 @@
  * 三大核心功能：视频解说 | 第一人称 | AI混剪
  */
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { Button } from './ui/button';
+import { Slider } from './ui/slider';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from './ui/tooltip';
 import {
   Scissors,
   Volume2,
@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAIEditor, AIFeatureType } from './CutDeck/AIEditorContext';
-import { notify } from '@/shared';
+import { notify } from '../shared';
 import styles from './AILayout.module.less';
 
 const coreFunctions = [

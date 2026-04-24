@@ -4,8 +4,8 @@
  * 20+ shortcuts with editable bindings
  */
 import React, { memo, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
 
 interface Shortcut {
   action: string;

@@ -11,7 +11,7 @@ import {
   getModelsByCategory,
   DEFAULT_MODEL_ID,
 } from './models.config';
-import type { ModelProvider, ModelCategory } from '@/core/types';
+import type { ModelProvider, ModelCategory } from '../types';
 
 describe('AI_MODELS', () => {
   it('should have at least one model', () => {

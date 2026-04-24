@@ -1,17 +1,17 @@
 import React, { useState, useCallback, lazy, Suspense, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs';
 import { Bot } from 'lucide-react';
 
-import { saveProjectToFile } from '@/services/tauri';
-import { notify } from '@/shared';
-import type { ClipAnalysisResult } from '@/core/services/aiClip.service';
-import { logger } from '@/utils/logger';
+import { saveProjectToFile } from '../../services/tauri';
+import { notify } from '../../shared';
+import type { ClipAnalysisResult } from '../../core/services/aiClip.service';
+import { logger } from '../../utils/logger';
 import { useVideoEditor } from './hooks/useVideoEditor';
-import { exportService } from '@/core/services/export.service';
+import { exportService } from '../../core/services/export.service';
 
 import Toolbar from './components/Toolbar';
-import VideoPlayer from '@/components/VideoPlayer';
+import VideoPlayer from '../../components/VideoPlayer';
 import Timeline from './components/Timeline';
 import SegmentList from './components/SegmentList';
 

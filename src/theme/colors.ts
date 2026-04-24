@@ -5,7 +5,7 @@
  * 提供 Ant Design 5 兼容的 Design Token
  *
  * 使用方式：
- *   import { colors, antdTokens } from '@/theme/colors';
+ *   import { colors, antdTokens } from './colors';
  *   // 或在 ConfigProvider 中使用 antdTokens
  *
  * 收敛说明：

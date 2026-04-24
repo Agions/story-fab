@@ -1,5 +1,5 @@
 import { analyzeVideo } from './analyzer';
-import type { VideoInfo } from '@/core/types';
+import type { VideoInfo } from '../../types';
 import type { AIClipConfig, BatchClipTask, ClipAnalysisResult, ClipSegment, ClipSuggestion } from './types';
 
 const tasks = new Map<string, BatchClipTask>();

@@ -10,11 +10,11 @@
  * 3. 过长的场景自动拆分
  */
 
-import { visionService } from '@/core/services/vision.service';
-import type { VideoInfo, VideoAnalysis } from '@/core/types';
-import type { CandidateClip } from '@/core/services/clipRepurposing/clipScorer';
+import { visionService } from '../../services/vision.service';
+import type { VideoInfo, VideoAnalysis } from '../../types';
+import type { CandidateClip } from '../../services/clipRepurposing/clipScorer';
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 
 // ============================================================
 // Step Metadata

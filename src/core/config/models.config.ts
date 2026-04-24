@@ -6,7 +6,7 @@
  * - 统一在此维护推荐策略，业务层禁止硬编码模型名
  */
 
-import type { AIModel, ModelProvider, ModelCategory } from '@/core/types';
+import type { AIModel, ModelProvider, ModelCategory } from '../types';
 
 export interface ModelVerificationMeta {
   checkedAt: string;

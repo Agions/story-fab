@@ -3,7 +3,7 @@
  * 格式、质量、编码器预设
  */
 
-import type { ExportFormat, ExportQuality, ExportConfig, EncoderSettings } from '@/core/services/export.service';
+import type { ExportFormat, ExportQuality, ExportConfig, EncoderSettings } from '../services/export.service';
 
 // 导出质量预设
 export const EXPORT_QUALITY_PRESETS: Record<ExportQuality, Partial<ExportConfig>> = {

@@ -4,7 +4,7 @@
  * 使用 shadcn Input，JetBrains Mono 字体
  */
 import React, { memo, useState, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
+import { Input } from '../../ui/input';
 import type { ClipInfo } from './InspectorPanel';
 
 interface ClipPropertiesProps {

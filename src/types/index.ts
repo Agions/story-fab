@@ -2,8 +2,8 @@ import {
   AI_MODELS as CORE_AI_MODELS,
   MODEL_PROVIDERS,
   getModelsByProvider,
-} from '@/core/config/models.config';
-import type { ModelProvider, VideoSegment as CoreVideoSegment, ScriptSegment as CoreScriptSegment } from '@/core/types';
+} from '../core/config/models.config';
+import type { ModelProvider, VideoSegment as CoreVideoSegment, ScriptSegment as CoreScriptSegment } from '../core/types';
 
 // Re-export canonical types from core/types
 export type VideoSegment = CoreVideoSegment;

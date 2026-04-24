@@ -1,8 +1,8 @@
 /**
  * Editor Store 类型定义
  */
-import type { VideoSegment, EditorPanel } from '@/core/types';
-import type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '@/components/Timeline/types';
+import type { VideoSegment, EditorPanel } from '../core/types';
+import type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '../components/Timeline/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants

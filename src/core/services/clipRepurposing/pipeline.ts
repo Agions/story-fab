@@ -12,8 +12,8 @@
  *   const result = await pipeline.run(videoInfo, analysis, options);
  */
 
-import { logger } from '@/utils/logger';
-import type { VideoInfo, VideoAnalysis } from '@/core/types';
+import { logger } from '../../../utils/logger';
+import type { VideoInfo, VideoAnalysis } from '../../types';
 import type { CandidateClip, ClipScore } from './clipScorer';
 import type { SEOMetadata, SocialPlatform } from './seoGenerator';
 import type { AspectRatio, ExportTask } from './multiFormatExport';
@@ -24,8 +24,8 @@ import {
   scoreClipsStep,
   generateSEOStep,
   prepareExportStep,
-} from '@/core/pipeline/steps';
-import type { PipelineContext, StepOptions } from '@/core/pipeline/Step';
+} from '../../pipeline/steps';
+import type { PipelineContext, StepOptions } from '../../pipeline/Step';
 
 // ============================================================
 // Types

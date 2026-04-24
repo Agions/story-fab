@@ -14,9 +14,9 @@
  */
 
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
-import type { CandidateClip, ClipScore } from '@/core/services/clipRepurposing/clipScorer';
-import { ClipScorer } from '@/core/services/clipRepurposing/clipScorer';
-import { logger } from '@/utils/logger';
+import type { CandidateClip, ClipScore } from '../../services/clipRepurposing/clipScorer';
+import { ClipScorer } from '../../services/clipRepurposing/clipScorer';
+import { logger } from '../../../utils/logger';
 
 // ============================================================
 // Metadata

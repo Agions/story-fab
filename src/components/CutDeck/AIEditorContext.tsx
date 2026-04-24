@@ -4,7 +4,7 @@
  * 支持完整流程：创建项目 -> 上传视频 -> AI分析 -> 生成文案 -> 合成视频 -> 导出
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo } from 'react';
-import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '../../core/types';
 
 // AI 功能类型
 export type AIFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';

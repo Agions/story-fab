@@ -2,7 +2,7 @@
  * 快捷操作组件
  */
 import React, { useMemo, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card } from '../../../components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import {
   Video,
@@ -14,7 +14,7 @@ import {
   preloadAIVideoEditorPage,
   preloadProjectsPage,
   preloadSettingsPage,
-} from '@/core/utils/route-preload';
+} from '../../../core/utils/route-preload';
 import styles from '../index.module.less';
 
 const QuickActions: React.FC = React.memo(() => {

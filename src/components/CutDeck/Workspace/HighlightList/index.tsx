@@ -8,12 +8,12 @@
  * - bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
  */
 import React, { useState, useCallback } from 'react';
-import { Slider } from '@/components/ui/slider';
+import { Slider } from '../../../ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
-import { visionService } from '@/core/services/vision.service';
-import { useEditorStore } from '@/store/editorStore';
-import { notify } from '@/shared/utils/notify';
-import type { VideoInfo } from '@/core/types';
+import { visionService } from '../../../../core/services/vision.service';
+import { useEditorStore } from '../../../../store/editorStore';
+import { notify } from '../../../../shared/utils/notify';
+import type { VideoInfo } from '../../../../core/types';
 import styles from './HighlightList.module.css';
 
 interface Highlight {

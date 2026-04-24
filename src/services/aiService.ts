@@ -5,8 +5,8 @@
 import axios from 'axios';
 import { getApiKey } from './tauri';
 import { VideoMetadata } from './video';
-import { logger } from '@/utils/logger';
-import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
+import { logger } from '../utils/logger';
+import type { ScriptSegment as CoreScriptSegment } from '../core/types';
 
 // ============================================
 // 类型定义
@@ -21,7 +21,7 @@ export interface ScriptGenerationSettings {
 }
 
 /**
- * @deprecated Use ScriptSegment from '@/core/types' instead.
+ * @deprecated Use ScriptSegment from '../core/types' instead.
  * This re-export exists for backward compatibility.
  */
 export type ScriptSegment = CoreScriptSegment;

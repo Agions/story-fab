@@ -9,7 +9,7 @@
  * - formatters.ts         → 纯格式化函数
  *
  * 使用方式：
- *   import { videoProcessor } from '@/core/video';
+ *   import { videoProcessor } from './';
  *   const metadata = await videoProcessor.analyze('/path/to/video.mp4');
  *
  * 实现新驱动（以 WebCodecs 为例）：

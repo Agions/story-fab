@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
-import type { AIModel } from '@/core/types';
+import type { AIModel } from '../../../core/types';
 
 export type SortField = 'name' | 'contextWindow' | 'pricing' | 'recommended';
 export type SortOrder = 'asc' | 'desc';

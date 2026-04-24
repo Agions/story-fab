@@ -1,9 +1,9 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { Button } from '../ui/button';
 import {
   Edit3,
   Save,
@@ -11,10 +11,10 @@ import {
   ChevronDown,
   Plus,
 } from 'lucide-react';
-import type { ScriptSegment } from '@/core/types';
-import { VideoSegment, formatDuration, previewSegment } from '@/services/video';
+import type { ScriptSegment } from '../../core/types';
+import { VideoSegment, formatDuration, previewSegment } from '../../services/video';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import { notify } from '@/shared';
+import { notify } from '../../shared';
 import SegmentTable from './SegmentTable';
 import SegmentEditForm from './SegmentEditForm';
 import PreviewModal from './PreviewModal';
