@@ -135,10 +135,10 @@ export const MODEL_VERIFICATION: Record<string, ModelVerificationMeta> = {
   'gemini-3.1-pro': { checkedAt: '2026-04-25', source: 'ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview', verified: true },
   'qwen-max-latest': { checkedAt: '2026-04-25', source: 'alibabacloud.com/help/zh/model-studio/models', verified: true },
   'qwen3-max': { checkedAt: '2026-04-25', source: 'portkey.ai/models/dashscope/qwen3-max', verified: true },
-  'deepseek-v4-flash': { checkedAt: '2026-04-25', source: 'api-docs.deepseek.com', verified: true },
-  'deepseek-v4-pro': { checkedAt: '2026-04-25', source: 'api-docs.deepseek.com', verified: true },
+  'deepseek-v4-flash': { checkedAt: '2026-04-25', source: 'platform.deepseek.com, api-docs.deepseek.com', verified: true },
+  'deepseek-v4-pro': { checkedAt: '2026-04-25', source: 'platform.deepseek.com, api-docs.deepseek.com', verified: true },
   'glm-5': { checkedAt: '2026-04-25', source: 'docs.bigmodel.cn/cn/guide/models/text/glm-5', verified: true },
-  'kimi-k2.6': { checkedAt: '2026-04-25', source: 'moonshot.ai (2026-04-20 announcement)', verified: true, note: 'API model ID 待确认，可能为 kimi-k2.6 或 moonshot-k2.6' },
+  'kimi-k2-turbo-preview': { checkedAt: '2026-04-25', source: 'platform.moonshot.cn/docs/guide/kimi-k2-quickstart', verified: true },
   'spark-custom': {
     checkedAt: '2026-04-25',
     source: 'provider-portal-manual-check-required',
