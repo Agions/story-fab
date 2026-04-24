@@ -97,8 +97,8 @@ VITE_DEFAULT_PROVIDER=deepseek
 
 | 模型 ID | 名称 | 特点 |
 |---------|------|------|
-| `deepseek-v4-flash` | DeepSeek-V4-Flash (推荐) | 🏆 最新非思考模式（已替代 deepseek-chat），中文能力强，性价比最高 |
-| `deepseek-v4-pro` | DeepSeek-V4-Pro | 最新思考模式（已替代 deepseek-reasoner），复杂推理 |
+| `deepseek-v4-flash` | DeepSeek-V4-Flash | 🚀 2026-04-24，100万上下文，替代 deepseek-chat |
+| `deepseek-v4-pro` | DeepSeek-V4-Pro | 2026-04-24，100万上下文，替代 deepseek-reasoner |
 
 获取 API 密钥：[platform.deepseek.com](https://platform.deepseek.com/)
 
@@ -147,7 +147,7 @@ VITE_DEFAULT_PROVIDER=moonshot
 
 | 模型 ID | 名称 | 特点 |
 |---------|------|------|
-| `kimi-k2.6` | Kimi K2.6 | 🏆 最新旗舰（2026-04-20），原生多模态，API ID 待确认 |
+| `kimi-k2-turbo-preview` | Kimi K2 Turbo | 🚀 高速版（60-100 Tokens/s），256K 上下文，代码与 Agent |
 | `moonshot-v1-8k` | Kimi 8K | 快速对话模型（已上线 API） |
 
 获取 API 密钥：[Moonshot Console](https://platform.moonshot.cn/)
