@@ -6,7 +6,39 @@
  * trivially testable with plain Vitest assertions — no mocking needed.
  */
 
-import type { EslintSummary, TscReport, CoverageSummary, TscIssue } from '../scripts/code-review-dashboard';
+// ─── Shared types (duplicated from scripts/code-review-dashboard.ts to avoid import issues) ───
+interface EslintSummary {
+  totalFiles: number;
+  totalErrors: number;
+  totalWarnings: number;
+  bySeverity: { error: number; warning: number };
+  topFiles: { file: string; count: number }[];
+}
+
+interface TscIssue {
+  file: string;
+  line: number;
+  char: number;
+  code: number;
+  severity: 'error' | 'warning';
+  message: string;
+}
+
+interface TscReport {
+  errors: TscIssue[];
+  errorCount: number;
+}
+
+interface CoverageFile {
+  file: string;
+  linePercent: number;
+}
+
+interface CoverageSummary {
+  totalLines:    { total: number; covered: number; percent: number };
+  totalBranches: { total: number; covered: number; percent: number };
+  byFile: CoverageFile[];
+}
 
 // ─── ESLint JSON parsing ─────────────────────────────────────────────────────
 
