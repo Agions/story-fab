@@ -1,4 +1,5 @@
 ---
+layout: doc
 title: 功能介绍
 description: CutDeck 核心功能详解，涵盖 AI 智能剪辑、多格式导出、Whisper 字幕生成等。
 ---
