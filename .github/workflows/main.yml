@@ -19,6 +19,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
       - name: Install pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -29,13 +36,12 @@ jobs:
         run: pnpm run type-check
       - name: Create reports directory
         run: mkdir -p reports
-      - name: TypeScript check
-        run: tsc --noEmit --pretty false 2>&1 | tee reports/tsc-report.txt; exit ${PIPESTATUS[0]}
       - name: Upload TypeScript report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tsc-report
-          path: reports/tsc-report.txt
+          path: reports/
           retention-days: 7
 
   lint:
@@ -47,6 +53,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
       - name: Install pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -61,29 +74,12 @@ jobs:
         run: pnpm exec eslint src --format json --output-file reports/eslint-report.json
         continue-on-error: true
       - name: Upload ESLint report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: eslint-report
-          path: reports/eslint-report.json
+          path: reports/
           retention-days: 7
-
-  test:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Install pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: '9'
-      - name: Install dependencies
-        run: pnpm install
-      - name: Run tests
-        run: pnpm run test:run
 
   coverage:
     name: Coverage Check
@@ -94,6 +90,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
       - name: Install pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -105,10 +108,11 @@ jobs:
       - name: Coverage with JSON reporter
         run: pnpm run test:ci
       - name: Upload coverage report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/coverage-final.json
+          path: coverage/
           retention-days: 7
 
   quality-gate:
@@ -168,7 +172,7 @@ jobs:
 
   build:
     name: Vite Build
-    needs: [typecheck, lint, test, coverage, quality-gate]
+    needs: [typecheck, lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -176,6 +180,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
       - name: Install pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -205,6 +216,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
       - name: Install pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -222,34 +240,9 @@ jobs:
       - name: Run code quality dashboard
         run: pnpm exec ts-node scripts/code-review-dashboard.ts --json
       - name: Upload all reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: quality-reports
           path: reports/
           retention-days: 7
-      - name: Comment on PR
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "## 📊 Quality Reports" > comment.md
-          echo "" >> comment.md
-          echo "### Artifacts" >> comment.md
-          echo "- [Download Quality Reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> comment.md
-          echo "" >> comment.md
-          if [ -f reports/eslint-report.json ]; then
-            echo "### ESLint Report" >> comment.md
-            echo "ESLint JSON report available in artifacts" >> comment.md
-          fi
-          cat comment.md
-      - name: Post PR comment
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const comment = fs.readFileSync('comment.md', 'utf8');
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: comment
-            });
