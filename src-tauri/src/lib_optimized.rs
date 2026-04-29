@@ -1,29 +1,28 @@
-// Video processing module - optimized implementation
-// This module provides efficient video processing with:
-// - Hardware acceleration support (NVENC, QSV, VideoToolbox)
-// - Scene detection for intelligent keyframe extraction
-// - Progress reporting via Tauri events
-// - RAII-based temp file management
+// Video processor module — hardware-accelerated video processing.
+// All commands create a fresh VideoProcessor instance per call to avoid
+// shared-state issues in a single-threaded Tauri handler environment.
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use std::sync::Mutex;
-use tauri::{AppHandle, Emitter, Manager, State};
-use once_cell::sync::Lazy;
 
-// Global state for video processor
-static VIDEO_PROCESSOR: Lazy<Mutex<Option<Arc<VideoProcessor>>>> = Lazy::new(|| Mutex::new(None));
+/// Typed segment for cut_video command — replaces raw serde_json::Value.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CutSegment {
+    pub start: f64,
+    pub end: f64,
+    #[serde(default)]
+    pub source_start_ms: Option<f64>,
+    #[serde(default)]
+    pub source_end_ms: Option<f64>,
+}
 
 pub struct VideoProcessor {
     ffmpeg_path: String,
     ffprobe_path: String,
-}
-
-pub struct VideoProcessorState {
-    pub processor: Arc<Mutex<Option<VideoProcessor>>>,
 }
 
 impl VideoProcessor {
@@ -237,9 +236,9 @@ impl VideoProcessor {
             return Ok(());
         }
 
-        // Create concat file
+        // Create concat file — use random suffix to avoid same-ms collisions
         let concat_file = std::env::temp_dir()
-            .join(format!("concat_{}.txt", chrono_now()));
+            .join(format!("concat_{}_{}.txt", chrono_now(), rand_suffix()));
 
         let concat_content = inputs
             .iter()
@@ -352,6 +351,15 @@ fn chrono_now() -> u128 {
         .unwrap_or(0)
 }
 
+/// Short random hex suffix — avoids same-ms path collisions.
+fn rand_suffix() -> String {
+    use std::time::Instant;
+    static INSTANT: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
+    let start = INSTANT.get_or_init(Instant::now);
+    let elapsed = start.elapsed().as_nanos();
+    format!("{:08x}", (elapsed ^ 0x5de66e6c0u128) & 0xffffffff_u128)
+}
+
 // Tauri commands
 
 #[tauri::command]
@@ -382,12 +390,12 @@ pub fn generate_thumbnail(path: String, time: Option<f64>) -> Result<String, Str
 pub fn cut_video(
     input_path: String,
     output_path: String,
-    segments: Vec<serde_json::Value>,
+    segments: Vec<CutSegment>,
     use_hw_accel: Option<bool>,
 ) -> Result<String, String> {
     let processor = VideoProcessor::new();
     let temp_dir = std::env::temp_dir()
-        .join(format!("cutdeck_cut_{}", chrono_now()));
+        .join(format!("cutdeck_cut_{}_{}", chrono_now(), rand_suffix()));
 
     fs::create_dir_all(&temp_dir)
         .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -396,12 +404,8 @@ pub fn cut_video(
     let mut temp_files: Vec<PathBuf> = Vec::new();
 
     for (i, seg) in segments.iter().enumerate() {
-        let start = seg["start"].as_f64().ok_or("缺少 start")?;
-        let end = seg["end"].as_f64().ok_or("缺少 end")?;
         let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
-
-        processor.cut_video_segment(&input_path, &temp_file.to_string_lossy(), start, end, use_hw_accel)?;
-
+        processor.cut_video_segment(&input_path, &temp_file.to_string_lossy(), seg.start, seg.end, use_hw_accel)?;
         temp_files.push(temp_file);
     }
 
@@ -434,7 +438,7 @@ pub fn render_autonomous_cut_optimized(input: serde_json::Value) -> Result<Strin
         .ok_or("缺少 segments")?;
 
     let temp_dir = std::env::temp_dir()
-        .join(format!("cutdeck_render_{}", chrono_now()));
+        .join(format!("cutdeck_render_{}_{}", chrono_now(), rand_suffix()));
 
     fs::create_dir_all(&temp_dir)
         .map_err(|e| format!("创建临时目录失败: {}", e))?;

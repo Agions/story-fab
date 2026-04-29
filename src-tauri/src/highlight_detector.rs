@@ -312,8 +312,11 @@ impl HighlightDetector {
         // Cleanup
         let _ = std::fs::remove_dir_all(&temp_dir);
 
-        segments.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
-        segments
+        // Sort segments by score descending (most important first)
+        sort_segments_by_score_desc(&mut segments);
+
+        // Return top N highlights
+        segments.into_iter().take(top_n).collect()
     }
 
     /// Get combined highlights from both audio and scene analysis
@@ -356,10 +359,10 @@ impl HighlightDetector {
                     last.score = (last.score + seg.score) / 2.0;
                     last.reason = "combined".to_string();
                     last.audio_score = Some(
-                        last.audio_score.unwrap_or(seg.score) + seg.audio_score.unwrap_or(0.0) / 2.0
+                        (last.audio_score.unwrap_or(seg.score) + seg.audio_score.unwrap_or(0.0)) / 2.0
                     );
                     last.scene_score = Some(
-                        last.scene_score.unwrap_or(seg.score) + seg.scene_score.unwrap_or(0.0) / 2.0
+                        (last.scene_score.unwrap_or(seg.score) + seg.scene_score.unwrap_or(0.0)) / 2.0
                     );
                     continue;
                 }
@@ -379,12 +382,8 @@ impl HighlightDetector {
             .collect();
 
         // Sort by score and take top N
-        merged
-            .into_iter()
-            .sorted_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal))
-            .into_iter()
-            .take(top_n)
-            .collect()
+        merged.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
+        merged.into_iter().take(top_n).collect()
     }
 
     fn extract_audio_pcm(&self, audio_path: &str) -> Result<Vec<f32>, String> {
@@ -488,28 +487,20 @@ fn resolve_binary_path(binary_name: &str) -> String {
     binary_name.to_string()
 }
 
-fn chrono_like_timestamp() -> u128 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
+fn chrono_like_timestamp() -> String {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let ms = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
         .map(|d| d.as_millis())
-        .unwrap_or(0)
+        .unwrap_or(0);
+    // Add a short random suffix to avoid same-ms collisions
+    let rand = (ms ^ 0x5de66e6c0_u128) & 0xffffff_u128;
+    format!("{:x}_{:06x}", ms, rand)
 }
 
-// Extension trait for sorting
-trait Sorted {
-    fn sorted_by<F>(self, cmp: F) -> Vec<Self::Item>
-    where
-        F: FnMut(&Self::Item, &Self::Item) -> std::cmp::Ordering,
-        Self: Iterator;
-}
 
-impl<T: Iterator> Sorted for T {
-    fn sorted_by<F>(self, cmp: F) -> Vec<T::Item>
-    where
-        F: FnMut(&T::Item, &T::Item) -> std::cmp::Ordering
-    {
-        let mut v: Vec<_> = self.collect();
-        v.sort_by(cmp);
-        v
-    }
+// ──────────────────────────────────────────────────────────────────
+// highlight_detector.rs — get_highlights helper: sort segments by score (descending)
+fn sort_segments_by_score_desc(segments: &mut Vec<HighlightSegment>) {
+    segments.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
 }
