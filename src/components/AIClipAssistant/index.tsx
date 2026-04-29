@@ -36,6 +36,7 @@ export const AIClipAssistant: React.FC<AIClipAssistantProps> = ({
     analyzing,
     analysisProgress,
     analysisResult,
+    progressLabel,
     error,
     selectedSuggestions,
     previewSegments,
@@ -68,6 +69,7 @@ export const AIClipAssistant: React.FC<AIClipAssistantProps> = ({
             analyzing={analyzing}
             analysisProgress={analysisProgress}
             analysisResult={analysisResult}
+            progressLabel={progressLabel}
           />
         );
       case 2:
