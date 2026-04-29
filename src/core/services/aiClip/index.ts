@@ -17,8 +17,13 @@ import {
 import type { VideoInfo } from '../../types';
 
 export class AIClipService {
-  async analyzeVideo(videoInfo: VideoInfo, config?: Partial<AIClipConfig>): Promise<ClipAnalysisResult> {
-    return analyzeVideo(videoInfo, config);
+  async analyzeVideo(
+    videoInfo: VideoInfo,
+    config?: Partial<AIClipConfig>,
+    signal?: AbortSignal,
+    onProgress?: (pct: number, label: string) => void
+  ): Promise<ClipAnalysisResult> {
+    return analyzeVideo(videoInfo, config, signal, onProgress);
   }
 
   async batchProcess(
