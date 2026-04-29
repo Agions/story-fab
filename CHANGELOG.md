@@ -1,3 +1,29 @@
+## [Unreleased]
+
+### 🐛 Bug Fixes (from code review)
+
+- **lib_optimized.rs:**
+  - Remove dead `VIDEO_PROCESSOR` global static (type mismatch + unused)
+  - Add `CutSegment` struct replacing raw `serde_json::Value` for `cut_video` command
+  - Add random suffix to concat file and temp dir paths to prevent same-ms race conditions
+- **highlight_detector.rs:**
+  - Fix `audio_score`/`scene_score` merge parentheses priority bug (average was computed on second operand only)
+  - Remove broken `Sorted` trait (replaced with `Vec::sort_by`)
+  - Add random suffix to `chrono_like_timestamp()` to avoid same-ms collisions
+- **aiService.ts:**
+  - Fix `normalizeStyle`/`normalizeTone` returning `"undefined"` string when key not found (add `in STYLE_GUIDANCE` guard)
+  - Fix `analyzeKeyFramesWithAI` stub throwing raw `Error` instead of `AIServiceError`
+  - Add `GeneratedScript` aliasing `Script` to avoid conflict with `core/types.ts`
+  - Fix Google model `headers` function ignoring unused `__apiKey` parameter
+- **editorStore.ts:**
+  - Fix `undo()` returning unchanged state when history empty (was `return s` — no-op already, explicit `return {}` for clarity)
+  - Fix `moveClip` not updating `sourceEndMs` when clip is resized
+  - Replace 4× `Date.now() + Math.random()` ID generation with `crypto.randomUUID()`
+- **export.ts:** Update import to use `GeneratedScript as Script` alias
+- **Timeline/utils.ts:** Replace `generateId` implementation with `crypto.randomUUID()`
+
+---
+
 ## v2.0.0 (2026-04-22)
 
 ### 🎨 UI Overhaul
