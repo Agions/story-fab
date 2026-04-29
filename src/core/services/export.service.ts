@@ -104,33 +104,37 @@ export class ExportService {
   private currentExportId: string | null = null;
   private config: ExportConfig | null = null;
 
-  setConfig(config: Partial<ExportConfig>): void {
-    // Merge with preset defaults for missing fields
-    const quality = config.quality ?? 'medium';
+  /** Shared config merging logic: partial + instance + preset defaults */
+  private _buildConfig(overrides: Partial<ExportConfig>, useInstance = true): ExportConfig {
+    const quality = overrides.quality ?? (useInstance ? this.config?.quality : undefined) ?? 'medium';
     const preset = EXPORT_PRESETS[quality];
-    this.config = {
-      format: config.format ?? 'mp4',
+    return {
+      format: overrides.format ?? (useInstance ? this.config?.format : undefined) ?? 'mp4',
       quality,
-      resolution: config.resolution ?? preset.resolution ?? '1080p',
-      frameRate: config.frameRate ?? preset.frameRate ?? 30,
-      aspectRatio: config.aspectRatio ?? '16:9',
-      audioCodec: config.audioCodec ?? preset.encoder?.audioCodec ?? 'aac',
-      audioBitrate: config.audioBitrate ?? preset.audioBitrate ?? '192k',
-      sampleRate: config.sampleRate ?? 48000,
-      channels: config.channels ?? 2,
-      encoder: config.encoder ?? preset.encoder ?? { videoCodec: 'h264', audioCodec: 'aac', crf: 23, preset: 'medium' },
-      subtitleEnabled: config.subtitleEnabled ?? false,
-      subtitlePath: config.subtitlePath,
-      burnSubtitles: config.burnSubtitles ?? false,
-      watermarkEnabled: config.watermarkEnabled ?? false,
-      watermarkText: config.watermarkText,
-      watermarkImage: config.watermarkImage,
-      watermarkPosition: config.watermarkPosition ?? 'bottom-right',
-      watermarkOpacity: config.watermarkOpacity ?? 0.8,
-      title: config.title,
-      author: config.author,
-      copyright: config.copyright,
+      resolution: overrides.resolution ?? (useInstance ? this.config?.resolution : undefined) ?? preset.resolution ?? '1080p',
+      frameRate: overrides.frameRate ?? (useInstance ? this.config?.frameRate : undefined) ?? preset.frameRate ?? 30,
+      aspectRatio: overrides.aspectRatio ?? (useInstance ? this.config?.aspectRatio : undefined) ?? '16:9',
+      audioCodec: overrides.audioCodec ?? (useInstance ? this.config?.audioCodec : undefined) ?? preset.encoder?.audioCodec ?? 'aac',
+      audioBitrate: overrides.audioBitrate ?? (useInstance ? this.config?.audioBitrate : undefined) ?? preset.audioBitrate ?? '192k',
+      sampleRate: overrides.sampleRate ?? (useInstance ? this.config?.sampleRate : undefined) ?? 48000,
+      channels: overrides.channels ?? (useInstance ? this.config?.channels : undefined) ?? 2,
+      encoder: overrides.encoder ?? (useInstance ? this.config?.encoder : undefined) ?? preset.encoder ?? { videoCodec: 'h264', audioCodec: 'aac', crf: 23, preset: 'medium' },
+      subtitleEnabled: overrides.subtitleEnabled ?? (useInstance ? this.config?.subtitleEnabled : undefined) ?? false,
+      subtitlePath: overrides.subtitlePath ?? (useInstance ? this.config?.subtitlePath : undefined),
+      burnSubtitles: overrides.burnSubtitles ?? (useInstance ? this.config?.burnSubtitles : undefined) ?? false,
+      watermarkEnabled: overrides.watermarkEnabled ?? (useInstance ? this.config?.watermarkEnabled : undefined) ?? false,
+      watermarkText: overrides.watermarkText ?? (useInstance ? this.config?.watermarkText : undefined),
+      watermarkImage: overrides.watermarkImage ?? (useInstance ? this.config?.watermarkImage : undefined),
+      watermarkPosition: overrides.watermarkPosition ?? (useInstance ? this.config?.watermarkPosition : undefined) ?? 'bottom-right',
+      watermarkOpacity: overrides.watermarkOpacity ?? (useInstance ? this.config?.watermarkOpacity : undefined) ?? 0.8,
+      title: overrides.title ?? (useInstance ? this.config?.title : undefined),
+      author: overrides.author ?? (useInstance ? this.config?.author : undefined),
+      copyright: overrides.copyright ?? (useInstance ? this.config?.copyright : undefined),
     };
+  }
+
+  setConfig(config: Partial<ExportConfig>): void {
+    this.config = this._buildConfig(config, false);
   }
 
   getConfig(): ExportConfig | null {
@@ -143,32 +147,7 @@ export class ExportService {
     config: Partial<ExportConfig>,
     onProgress?: (percent: number) => void
   ): Promise<ExportResult> {
-    // Always merge with current config + preset defaults
-    const quality = config.quality ?? this.config?.quality ?? 'medium';
-    const preset = EXPORT_PRESETS[quality];
-    const fullConfig: ExportConfig = {
-      format: config.format ?? this.config?.format ?? 'mp4',
-      quality,
-      resolution: config.resolution ?? this.config?.resolution ?? preset.resolution ?? '1080p',
-      frameRate: config.frameRate ?? this.config?.frameRate ?? preset.frameRate ?? 30,
-      aspectRatio: config.aspectRatio ?? this.config?.aspectRatio ?? '16:9',
-      audioCodec: config.audioCodec ?? this.config?.audioCodec ?? preset.encoder?.audioCodec ?? 'aac',
-      audioBitrate: config.audioBitrate ?? this.config?.audioBitrate ?? preset.audioBitrate ?? '192k',
-      sampleRate: config.sampleRate ?? this.config?.sampleRate ?? 48000,
-      channels: config.channels ?? this.config?.channels ?? 2,
-      encoder: config.encoder ?? this.config?.encoder ?? preset.encoder ?? { videoCodec: 'h264', audioCodec: 'aac', crf: 23, preset: 'medium' },
-      subtitleEnabled: config.subtitleEnabled ?? this.config?.subtitleEnabled ?? false,
-      subtitlePath: config.subtitlePath ?? this.config?.subtitlePath,
-      burnSubtitles: config.burnSubtitles ?? this.config?.burnSubtitles ?? false,
-      watermarkEnabled: config.watermarkEnabled ?? this.config?.watermarkEnabled ?? false,
-      watermarkText: config.watermarkText ?? this.config?.watermarkText,
-      watermarkImage: config.watermarkImage ?? this.config?.watermarkImage,
-      watermarkPosition: config.watermarkPosition ?? this.config?.watermarkPosition ?? 'bottom-right',
-      watermarkOpacity: config.watermarkOpacity ?? this.config?.watermarkOpacity ?? 0.8,
-      title: config.title ?? this.config?.title,
-      author: config.author ?? this.config?.author,
-      copyright: config.copyright ?? this.config?.copyright,
-    };
+    const fullConfig = this._buildConfig(config, true);
 
     const exportId = crypto.randomUUID();
     this.currentExportId = exportId;

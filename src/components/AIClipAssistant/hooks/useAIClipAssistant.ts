@@ -13,6 +13,7 @@ export const useAIClipAssistant = (
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisResult, setAnalysisResult] = useState<ClipAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [progressLabel, setProgressLabel] = useState<string>('');
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
   const [previewSegments, setPreviewSegments] = useState<ClipSegment[]>([]);
 
@@ -44,19 +45,16 @@ export const useAIClipAssistant = (
     setAnalysisProgress(0);
 
     try {
-      const progressInterval = setInterval(() => {
-        setAnalysisProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + Math.random() * 15;
-        });
-      }, 500);
+      const result = await aiClipService.analyzeVideo(
+        videoInfo,
+        config,
+        undefined,
+        (pct, label) => {
+          setAnalysisProgress(pct);
+          setProgressLabel(label);
+        }
+      );
 
-      const result = await aiClipService.analyzeVideo(videoInfo, config);
-
-      clearInterval(progressInterval);
       setAnalysisProgress(100);
       setAnalysisResult(result);
 
@@ -147,6 +145,7 @@ export const useAIClipAssistant = (
     setCurrentStep,
     analyzing,
     analysisProgress,
+    progressLabel,
     analysisResult,
     error,
     selectedSuggestions,

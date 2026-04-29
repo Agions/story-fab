@@ -15,12 +15,14 @@ import type {
 export async function analyzeVideo(
   videoInfo: VideoInfo,
   config: Partial<AIClipConfig> = {},
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  onProgress?: (pct: number, label: string) => void
 ): Promise<ClipAnalysisResult> {
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
   const fullConfig = { ...DEFAULT_CLIP_CONFIG, ...config };
 
   // 1. 高级场景检测
+  onProgress?.(10, '检测场景切换');
   const { scenes, emotions } = await Promise.all([
     visionService.detectScenesAdvanced(
       videoInfo,
@@ -31,6 +33,7 @@ export async function analyzeVideo(
   ]).then(([r]) => r).catch(() => ({ scenes: [] as Scene[], objects: [], emotions: [] as EmotionAnalysis[] }));
 
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+  onProgress?.(30, '提取关键帧');
 
   // 2. 提取关键帧
   const keyframes = fullConfig.detectKeyframes
@@ -38,11 +41,14 @@ export async function analyzeVideo(
     : [];
 
   // 3. 检测静音片段
+  onProgress?.(50, '分析音频特征');
+
   const silenceSegments = fullConfig.detectSilence
     ? await detectSilenceSegments(videoInfo, fullConfig)
     : [];
 
   // 4. 检测情感峰值（ZCR 增强）— 必须在 generateCutPoints 之前
+  onProgress?.(65, '检测情感峰值');
   const { peaks: rawPeaks }: { peaks: EmoPeak[] } = await detectEmotionPeaks(videoInfo.path, {
     threshold: 1.5,
     minDurationMs: 300,
@@ -54,6 +60,7 @@ export async function analyzeVideo(
   }));
 
   // 5. 生成剪辑点
+  onProgress?.(75, '生成剪辑点');
   const cutPoints = generateCutPoints(
     videoInfo,
     scenes,
@@ -68,6 +75,7 @@ export async function analyzeVideo(
   const segments = generateSegments(videoInfo, cutPoints, scenes);
 
   // 6. 生成AI剪辑建议
+  onProgress?.(88, '生成剪辑建议');
   const suggestions = fullConfig.aiOptimize
     ? await generateSuggestions(videoInfo, segments, scenes, fullConfig)
     : [];

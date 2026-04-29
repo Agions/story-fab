@@ -10,14 +10,17 @@ interface AnalyzeStepProps {
   analyzing: boolean;
   analysisProgress: number;
   analysisResult: ClipAnalysisResult | null;
+  progressLabel?: string;
 }
 
 const AnalyzeStep: React.FC<AnalyzeStepProps> = ({
   analyzing,
   analysisProgress,
-  analysisResult
+  analysisResult,
+  progressLabel,
 }) => {
   const getProgressText = () => {
+    if (progressLabel) return progressLabel;
     if (analysisProgress < 30) return '正在检测场景切换...';
     if (analysisProgress < 60) return '正在分析音频和静音片段...';
     if (analysisProgress < 90) return '正在提取关键帧...';

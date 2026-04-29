@@ -337,20 +337,20 @@ export const useEditorStore = create<EditorStore>()(
 
       redo: () =>
         set((s) => {
-          if (s.history.future.length === 0) return s;
+          if (s.history.future.length === 0) return {};
           const next = s.history.future[0];
           return {
-            segments: next,
+            segments: next ?? s.segments,
             history: { past: [...s.history.past, s.segments], future: s.history.future.slice(1) },
           };
         }),
 
       undoTrack: () =>
         set((s) => {
-          if (s.trackHistory.past.length === 0) return s;
+          if (s.trackHistory.past.length === 0) return {};
           const previous = s.trackHistory.past[s.trackHistory.past.length - 1];
           return {
-            timelineTracks: previous,
+            timelineTracks: previous ?? s.timelineTracks,
             trackHistory: {
               past: s.trackHistory.past.slice(0, -1),
               future: [s.timelineTracks, ...s.trackHistory.future],
