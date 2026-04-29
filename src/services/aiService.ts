@@ -251,10 +251,12 @@ const buildPrompt = (analysis: AnalysisInput, options?: ScriptGenerationSettings
     )
     .join('\n');
 
-  const styleGuidance = options?.style
+  const styleGuidance = (options?.style && options.style in STYLE_GUIDANCE)
     ? STYLE_GUIDANCE[options.style]
     : '请生成一个专业、信息丰富的解说脚本';
-  const toneGuidance = options?.tone ? TONE_GUIDANCE[options.tone] : '使用中立、专业的语气';
+  const toneGuidance = (options?.tone && options.tone in TONE_GUIDANCE)
+    ? TONE_GUIDANCE[options.tone]
+    : '使用中立、专业的语气';
 
   return `请根据以下视频分析信息，为我创建一个视频解说脚本。
 
@@ -477,7 +479,7 @@ export const generateScriptWithAI = async (
 };
 
 export const analyzeKeyFramesWithAI = async (_framePaths: string[]): Promise<string[]> => {
-  throw new Error('analyzeKeyFramesWithAI: not implemented — connect to AI model endpoint');
+  throw new AIServiceError('analyzeKeyFramesWithAI: not implemented — connect to AI model endpoint');
 };
 
 export const improveScriptWithAI = async (
