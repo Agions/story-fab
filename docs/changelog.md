@@ -5,6 +5,20 @@ description: CutDeck 版本更新历史，记录每次版本的主要变更。
 
 # 更新日志
 
+## [Unreleased]
+
+### 🐛 Bug Fixes (from code review)
+
+- **lib_optimized.rs:** Remove dead `VIDEO_PROCESSOR` global; add typed `CutSegment` struct; add random suffixes on temp paths
+- **highlight_detector.rs:** Fix audio/score merge parentheses bug; remove broken `Sorted` trait; add random suffix on timestamps
+- **aiService.ts:** Fix `normalizeStyle/Tone` `"undefined"` string bug; fix stub throwing raw `Error`; fix `Script` type conflict; clean up unused param
+- **editorStore.ts:** Fix `undo()` empty-history guard; fix `moveClip` `sourceEndMs` sync; replace 4× ID gen with `crypto.randomUUID()`
+- **Timeline/utils.ts:** Replace `generateId` with `crypto.randomUUID()`
+
+---
+
+# 更新日志
+
 本文档记录 CutDeck 的所有重要版本更新。
 
 ---
