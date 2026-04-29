@@ -137,7 +137,7 @@ const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
   google: {
     url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro:generateContent',
     model: 'gemini-3.1-pro',
-    headers: (__apiKey: string) => ({ 'Content-Type': 'application/json' }),
+    headers: () => ({ 'Content-Type': 'application/json' }),
     transformRequest: prompt => ({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: { temperature: 0.7, maxOutputTokens: 4000 },
