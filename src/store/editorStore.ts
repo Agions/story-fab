@@ -124,7 +124,7 @@ export const useEditorStore = create<EditorStore>()(
       },
 
       addTimelineTrack: (type, name) => {
-        const id = `track-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        const id = crypto.randomUUID();
         const typeNames: Record<string, string> = {
           video: '视频', audio: '音频', subtitle: '字幕', effect: '效果',
         };
@@ -156,7 +156,7 @@ export const useEditorStore = create<EditorStore>()(
         })),
 
       addClipToTrack: (trackId, clipData) => {
-        const id = `clip-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        const id = crypto.randomUUID();
         const clip: TimelineClip = { ...clipData, id, trackId };
         get().saveTrackHistory();
         set((s) => ({
@@ -233,7 +233,7 @@ export const useEditorStore = create<EditorStore>()(
             const leftClip: TimelineClip = { ...clip, endMs: splitMs, sourceEndMs: sourceSplit };
             const rightClip: TimelineClip = {
               ...clip,
-              id: `clip-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              id: crypto.randomUUID(),
               startMs: splitMs,
               endMs: clip.endMs,
               sourceStartMs: sourceSplit,
@@ -246,7 +246,7 @@ export const useEditorStore = create<EditorStore>()(
       },
 
       addKeyframe: (clipId, kfData) => {
-        const id = `kf-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        const id = crypto.randomUUID();
         const keyframe: Keyframe = { ...kfData, id };
         set((s) => ({
           timelineTracks: s.timelineTracks.map((t) => ({

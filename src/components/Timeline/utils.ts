@@ -13,5 +13,6 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 export function generateId(prefix = 'clip'): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  // crypto.randomUUID is collision-free; prefix is only for debugging readability
+  return `${prefix}-${crypto.randomUUID()}`;
 }
