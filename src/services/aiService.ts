@@ -290,10 +290,10 @@ const buildPrompt = (analysis: AnalysisInput, options?: ScriptGenerationSettings
     .join('\n');
 
   // 类型安全的 style/tone 检查
-  const styleGuidance = (options?.style && Object.hasOwn(STYLE_GUIDANCE, options.style))
+  const styleGuidance = (options?.style && Object.prototype.hasOwnProperty.call(STYLE_GUIDANCE, options.style))
     ? STYLE_GUIDANCE[options.style as keyof typeof STYLE_GUIDANCE]
     : '请生成一个专业、信息丰富的解说脚本';
-  const toneGuidance = (options?.tone && Object.hasOwn(TONE_GUIDANCE, options.tone))
+  const toneGuidance = (options?.tone && Object.prototype.hasOwnProperty.call(TONE_GUIDANCE, options.tone))
     ? TONE_GUIDANCE[options.tone as keyof typeof TONE_GUIDANCE]
     : '使用中立、专业的语气';
 
@@ -362,7 +362,7 @@ export const aiService = {
     options?: ScriptGenerationSettings
   ): Promise<string> => {
     const prompt = buildPrompt(analysis, options);
-    return callAI(modelType, apiKey, prompt, options);
+    return callAI(modelType, apiKey, prompt, options as CallAIOptions | undefined);
   },
 
   // 构建提示词
