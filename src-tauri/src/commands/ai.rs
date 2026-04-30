@@ -169,7 +169,7 @@ pub fn get_export_dir() -> String {
 }
 
 /// Parameters for detect_zcr_bursts command
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DetectZCRBurstsInput {
     pub audio_path: String,
