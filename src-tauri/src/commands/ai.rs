@@ -113,7 +113,7 @@ pub fn detect_zcr_bursts(input: DetectZCRBurstsInput) -> Result<Vec<ZCRBurstResu
 }
 
 /// Parameters for detect_zcr_bursts command
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DetectZCRBurstsInput {
     pub audio_path: String,
