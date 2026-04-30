@@ -382,6 +382,7 @@ impl HighlightDetector {
             .collect();
 
         // Sort by score and take top N
+        let mut merged: Vec<HighlightSegment> = merged;
         merged.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
         merged.into_iter().take(top_n).collect()
     }
