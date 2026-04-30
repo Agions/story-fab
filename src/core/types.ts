@@ -436,7 +436,6 @@ export interface ExportSettings {
   fps: 24 | 30 | 60;
   includeSubtitles: boolean;
   includeWatermark: boolean;
-  frameRate?: number;
   burnSubtitles?: boolean;
 }
 

@@ -43,7 +43,7 @@ const FPS_OPTIONS = [
 ] as const;
 
 const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
-  const { state, setExportSettings, dispatch } = useCutDeck();
+  const { state, setExportSettings, setStep } = useCutDeck();
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressStage, setProgressStage] = useState('');
@@ -79,7 +79,6 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     quality: state.exportSettings?.quality || 'high',
     resolution: state.exportSettings?.resolution || '1080p',
     fps: state.exportSettings?.fps || 30,
-    frameRate: state.exportSettings?.frameRate || 30,
     includeSubtitles: state.exportSettings?.includeSubtitles ?? true,
     burnSubtitles: state.exportSettings?.burnSubtitles ?? true,
     includeWatermark: state.exportSettings?.includeWatermark ?? false,
@@ -154,7 +153,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
           ⚠️ 请先完成视频合成
           <button
             className={styles.warningAlertBtn}
-            onClick={() => dispatch({ type: 'SET_STEP', payload: 'video-synthesize' })}
+            onClick={() => setStep('video-synthesize')}
           >
             去合成
           </button>
@@ -176,7 +175,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
           <div className={styles.completeMeta}>
             <span className={styles.completeMetaTag}>{config.format.toUpperCase()}</span>
             <span className={styles.completeMetaTag}>{config.resolution}</span>
-            <span className={styles.completeMetaTag}>{config.frameRate}fps</span>
+            <span className={styles.completeMetaTag}>{config.fps}fps</span>
           </div>
           <div className={styles.completeSub}>预估大小：{estimateFileSize()}</div>
           <div className={styles.completeActions}>
@@ -270,7 +269,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
           <div className={styles.tagGroup}>
             <span className={styles.tag}>{config.format.toUpperCase()}</span>
             <span className={styles.tag}>{config.resolution}</span>
-            <span className={styles.tag}>{config.frameRate}fps</span>
+            <span className={styles.tag}>{config.fps}fps</span>
           </div>
         </div>
       </div>
@@ -357,8 +356,8 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                   <select
                     id="fpsSelect"
                     className={styles.optionSelect}
-                    value={config.frameRate}
-                    onChange={(e) => setConfig({ ...config, frameRate: Number(e.target.value) as ExportSettings['frameRate'] })}
+                    value={config.fps}
+                    onChange={(e) => setConfig({ ...config, fps: Number(e.target.value) as ExportSettings['fps'] })}
                   >
                     {FPS_OPTIONS.map(f => (
                       <option key={f.value} value={f.value}>{f.label}</option>
@@ -435,7 +434,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
               </div>
               <div className={styles.infoRow}>
                 <span className={styles.infoKey}>帧率</span>
-                <span className={styles.infoValue}>{config.frameRate} fps</span>
+                <span className={styles.infoValue}>{config.fps} fps</span>
               </div>
             </div>
 

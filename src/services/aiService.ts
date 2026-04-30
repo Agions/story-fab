@@ -12,6 +12,11 @@ import type { ScriptSegment as CoreScriptSegment } from '../core/types';
 // 类型定义
 // ============================================
 
+interface CallAIOptions {
+  appId?: string;
+  [key: string]: unknown;
+}
+
 export interface ScriptGenerationSettings {
   style?: 'informative' | 'entertaining' | 'dramatic' | 'casual';
   tone?: 'neutral' | 'enthusiastic' | 'serious' | 'humorous' | 'inspirational';
@@ -95,6 +100,36 @@ export class AIServiceError extends Error {
     super(message);
     this.name = 'AIServiceError';
   }
+}
+
+// Axios 错误类型
+interface AxiosErrorResponse {
+  data?: {
+    error?: { message?: string };
+    error_msg?: string;
+    header?: { message?: string };
+  };
+  status?: number;
+}
+
+function parseAIError(error: unknown, modelType: string): AIServiceError {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const axiosError = error as { response?: AxiosErrorResponse };
+    const data = axiosError.response?.data;
+    if (data?.error?.message) {
+      return new AIServiceError(data.error.message, axiosError.response?.status);
+    }
+    if (typeof data?.error_msg === 'string') {
+      return new AIServiceError(data.error_msg, axiosError.response?.status);
+    }
+    if (data?.header?.message) {
+      return new AIServiceError(data.header.message, axiosError.response?.status);
+    }
+  }
+  if (error instanceof Error) {
+    return new AIServiceError(error.message);
+  }
+  return new AIServiceError(`${modelType} API调用失败`);
 }
 
 // ============================================
@@ -254,11 +289,12 @@ const buildPrompt = (analysis: AnalysisInput, options?: ScriptGenerationSettings
     )
     .join('\n');
 
-  const styleGuidance = (options?.style && options.style in STYLE_GUIDANCE)
-    ? STYLE_GUIDANCE[options.style]
+  // 类型安全的 style/tone 检查
+  const styleGuidance = (options?.style && Object.hasOwn(STYLE_GUIDANCE, options.style))
+    ? STYLE_GUIDANCE[options.style as keyof typeof STYLE_GUIDANCE]
     : '请生成一个专业、信息丰富的解说脚本';
-  const toneGuidance = (options?.tone && options.tone in TONE_GUIDANCE)
-    ? TONE_GUIDANCE[options.tone]
+  const toneGuidance = (options?.tone && Object.hasOwn(TONE_GUIDANCE, options.tone))
+    ? TONE_GUIDANCE[options.tone as keyof typeof TONE_GUIDANCE]
     : '使用中立、专业的语气';
 
   return `请根据以下视频分析信息，为我创建一个视频解说脚本。
@@ -293,7 +329,7 @@ const callAI = async (
   modelType: LegacyAIModelType,
   apiKey: string,
   prompt: string,
-  options?: unknown
+  options?: CallAIOptions
 ): Promise<string> => {
   const config = MODEL_CONFIGS[modelType];
   if (!config) throw new AIServiceError(`不支持的模型类型: ${modelType}`);
@@ -309,16 +345,7 @@ const callAI = async (
     });
     return config.transformResponse(response.data);
   } catch (error: unknown) {
-    const axiosError = error as { response?: { data?: Record<string, unknown>; status?: number } };
-    const data = axiosError.response?.data || {};
-    const dataError = data.error as { message?: string } | undefined;
-    const header = data.header as { message?: string } | undefined;
-    const errMsg =
-      dataError?.message ||
-      (typeof data.error_msg === 'string' ? data.error_msg : undefined) ||
-      header?.message ||
-      `${modelType} API调用失败`;
-    throw new AIServiceError(errMsg, axiosError.response?.status);
+    throw parseAIError(error, modelType);
   }
 };
 
@@ -482,7 +509,8 @@ export const generateScriptWithAI = async (
 };
 
 export const analyzeKeyFramesWithAI = async (_framePaths: string[]): Promise<string[]> => {
-  throw new AIServiceError('analyzeKeyFramesWithAI: not implemented — connect to AI model endpoint');
+  logger.warn('analyzeKeyFramesWithAI is not yet implemented — returning empty array');
+  return [];
 };
 
 export const improveScriptWithAI = async (

@@ -37,6 +37,20 @@ import type { SocialPlatform } from '../../../core/services/clipRepurposing/seoG
 import { transcodeWithCrop, type AspectRatio } from '../../../services/tauri';
 import styles from './ClipRippling.module.css';
 
+// Clip duration constraints (seconds)
+const MIN_CLIP_DURATION_SECONDS = 15;
+const MAX_CLIP_DURATION_SECONDS = 120;
+
+// Magic numbers constants
+const SCORE_THRESHOLD_HIGH = 80;
+const SCORE_THRESHOLD_MEDIUM = 60;
+const TARGET_CLIP_COUNTS = [3, 5, 8, 10, 15] as const;
+const SEO_DESCRIPTION_MAX_LENGTH = 80;
+const HASHTAGS_MAX_COUNT = 5;
+const MOTION_SCALE_HOVER = 1.01;
+const MOTION_SCALE_TAP = 0.99;
+const DEFAULT_FPS = 30;
+
 
 
 // 平台选项
@@ -72,10 +86,10 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
         width: currentVideo.width ?? 1920,
         height: currentVideo.height ?? 1080,
         size: currentVideo.size || 0,
-        fps: 30,
+        fps: DEFAULT_FPS,
         format: 'mp4',
       }
-    : { id: '', name: '', path: '', duration: 0, width: 1920, height: 1080, size: 0, fps: 30, format: 'mp4' };
+    : { id: '', name: '', path: '', duration: 0, width: 1920, height: 1080, size: 0, fps: DEFAULT_FPS, format: 'mp4' };
   const [platform, setPlatform] = useState<SocialPlatform>('douyin');
   const [selectedFormats, setSelectedFormats] = useState<AspectRatio[]>(['9:16', '1:1']);
   const [targetCount, setTargetCount] = useState(5);
@@ -102,8 +116,8 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
       const pipeline = new ClipRepurposingPipeline();
       const options: RepurposingOptions = {
         targetClipCount: targetCount,
-        minClipDuration: 15,
-        maxClipDuration: 120,
+        minClipDuration: MIN_CLIP_DURATION_SECONDS,
+        maxClipDuration: MAX_CLIP_DURATION_SECONDS,
         platform,
         exportFormats: selectedFormats,
         multiFormat: false, // 前端自行调用 transcodeWithCrop
@@ -186,8 +200,8 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
   };
 
   const scoreColor = (score: number) => {
-    if (score >= 80) return '#52c41a';
-    if (score >= 60) return '#faad14';
+    if (score >= SCORE_THRESHOLD_HIGH) return '#52c41a';
+    if (score >= SCORE_THRESHOLD_MEDIUM) return '#faad14';
     return '#ff4d4f';
   };
 
@@ -224,7 +238,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
             className={styles.select}
            
           >
-            {[3, 5, 8, 10, 15].map(n => (
+            {TARGET_CLIP_COUNTS.map(n => (
               <SelectItem key={n} value={String(n)}>{n} 个</SelectItem>
             ))}
           </Select>
@@ -315,8 +329,8 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
                   key={clipId}
                   className={`${styles.clipCard} ${isSelected ? styles.clipSelected : ''}`}
                   onClick={() => toggleClip(clipId)}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
+                  whileHover={{ scale: MOTION_SCALE_HOVER }}
+                  whileTap={{ scale: MOTION_SCALE_TAP }}
                 >
                   <div className={styles.clipHeader}>
                     <Checkbox checked={isSelected} />
@@ -350,9 +364,9 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
                   {seo && (
                     <div className={styles.seoSection}>
                       <p className={styles.seoTitle}>📝 {seo.title}</p>
-                      <p className={styles.seoDesc}>{seo.description?.slice(0, 80)}...</p>
+                      <p className={styles.seoDesc}>{seo.description?.slice(0, SEO_DESCRIPTION_MAX_LENGTH)}...</p>
                       <div className={styles.hashtags}>
-                        {seo.hashtags?.slice(0, 5).map(tag => (
+                        {seo.hashtags?.slice(0, HASHTAGS_MAX_COUNT).map(tag => (
                           <Badge key={tag} variant="default" className="bg-blue-100 text-blue-700" style={{ fontSize: 11 }}>
                             #{tag}
                           </Badge>

@@ -20,7 +20,9 @@ import {
   Bolt,
 } from 'lucide-react';
 import { useCutDeck, CutDeckStep } from '../AIEditorContext';
+import { CUT_DECK_STEPS } from '../constants';
 import styles from './Workspace.module.less';
+import StepList from './StepList';
 
 // ============================================================================
 // 类型定义
@@ -43,25 +45,17 @@ interface WorkspaceProps {
 // ============================================================================
 
 const STEPS: StepConfig[] = [
-  { key: 'project-create', title: '上传视频', icon: <Plus /> },
-  { key: 'video-upload', title: '视频上传', icon: <Video /> },
+  { key: 'project-create', title: '创建项目', icon: <Plus /> },
+  { key: 'video-upload', title: '上传视频', icon: <Video /> },
   { key: 'ai-analyze', title: 'AI 分析', icon: <Cloud /> },
   { key: 'clip-repurpose', title: 'AI 拆条', icon: <Bolt /> },
-  { key: 'script-generate', title: '生成片段', icon: <FileText /> },
-  { key: 'video-synthesize', title: '文案生成', icon: <Edit /> },
-  { key: 'export', title: '视频合成', icon: <Download /> },
+  { key: 'script-generate', title: '生成文案', icon: <FileText /> },
+  { key: 'video-synthesize', title: '视频合成', icon: <Edit /> },
+  { key: 'export', title: '导出', icon: <Download /> },
 ];
 
 // 正确的顺序映射（按照任务描述的视觉顺序）
-const STEP_ORDER: CutDeckStep[] = [
-  'project-create',
-  'video-upload',
-  'ai-analyze',
-  'clip-repurpose',
-  'script-generate',
-  'video-synthesize',
-  'export',
-];
+const STEP_ORDER: readonly CutDeckStep[] = CUT_DECK_STEPS;
 
 // ============================================================================
 // 辅助函数
@@ -87,99 +81,6 @@ const isStepAccessible = (
   const currentIndex = getStepIndex(currentStep);
   const targetIndex = getStepIndex(step);
   return targetIndex === currentIndex + 1;
-};
-
-// ============================================================================
-// 子组件：步骤列表
-// ============================================================================
-
-interface StepListProps {
-  currentStep: CutDeckStep;
-  stepStatus: Record<CutDeckStep, boolean>;
-  onStepClick: (step: CutDeckStep) => void;
-  activeStepRef: React.RefObject<HTMLDivElement | null>;
-}
-
-const StepList: React.FC<StepListProps> = ({
-  currentStep,
-  stepStatus,
-  onStepClick,
-  activeStepRef,
-}) => {
-  return (
-    <div className={styles.stepList}>
-      {STEPS.map((step, index) => {
-        const completed = isStepCompleted(step.key, stepStatus);
-        const active = step.key === currentStep;
-        const accessible = isStepAccessible(step.key, currentStep, stepStatus);
-
-        // 判断进行中：当前步骤且未完成
-        const inProgress = active && !completed;
-
-        let statusClass = styles.stepItemPending;
-        if (completed) statusClass = styles.stepItemCompleted;
-        else if (active) statusClass = styles.stepItemActive;
-        else if (inProgress) statusClass = styles.stepItemInProgress;
-
-        return (
-          <div key={step.key} className={styles.stepWrapper}>
-            {/* 连接线（除最后一个） */}
-            {index < STEPS.length - 1 && (
-              <div
-                className={`${styles.stepConnector} ${
-                  completed ? styles.connectorCompleted : ''
-                }`}
-              />
-            )}
-
-            {/* 步骤项 */}
-            <div
-              className={`${styles.stepItem} ${statusClass} ${
-                accessible ? styles.stepItemAccessible : ''
-              }`}
-              onClick={() => accessible && onStepClick(step.key)}
-              role="button"
-              tabIndex={accessible ? 0 : -1}
-              onKeyDown={(e) => {
-                if ((e.key === 'Enter' || e.key === ' ') && accessible) {
-                  onStepClick(step.key);
-                }
-              }}
-              ref={(active ? activeStepRef : null) as React.RefObject<HTMLDivElement>}
-            >
-              {/* 状态图标 */}
-              <div className={styles.stepIconWrapper}>
-                {completed ? (
-                  <span className={`${styles.stepIcon} ${styles.iconCompleted}`}>
-                    <Check />
-                  </span>
-                ) : inProgress ? (
-                  <span className={`${styles.stepIcon} ${styles.iconInProgress}`}>
-                    <Bolt />
-                  </span>
-                ) : (
-                  <span className={`${styles.stepIcon} ${styles.iconPending}`}>
-                    {step.icon}
-                  </span>
-                )}
-              </div>
-
-              {/* 步骤文字 */}
-              <div className={styles.stepText}>
-                <span className={styles.stepTitle}>{step.title}</span>
-                {completed && (
-                  <span className={styles.stepStatus}>已完成</span>
-                )}
-                {inProgress && (
-                  <span className={styles.stepStatusInProgress}>进行中</span>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
 };
 
 // ============================================================================

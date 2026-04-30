@@ -4,7 +4,7 @@
  * 数据输出: video (VideoInfo) + duration/width/height
  * 流转到: AIAnalyze
  */
-import React, { useState, useCallback, useRef, memo } from 'react';
+import React, { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
 import { logger } from '../../../utils/logger';
 import { formatDuration, formatFileSize, notify } from '../../../shared';
@@ -44,6 +44,16 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const uploadStatusRef = useRef<string>('idle');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 使用 ref 存储不变的回调引用，避免 handleUpload 依赖项过多导致的不必要重渲染
+  const goToNextStepRef = useRef(goToNextStep);
+  const onNextRef = useRef(onNext);
+
+  // 当 goToNextStep 或 onNext 变化时更新 ref（但不触发 handleUpload 重创建）
+  useEffect(() => {
+    goToNextStepRef.current = goToNextStep;
+    onNextRef.current = onNext;
+  }, [goToNextStep, onNext]);
 
   // 验证文件
   const validateFile = (file: File): { valid: boolean; error?: string } => {
@@ -133,10 +143,10 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
       setVideo(videoInfo);
       notify.success('视频上传成功');
 
-      if (onNext) {
-        onNext();
+      if (onNextRef.current) {
+        onNextRef.current();
       } else {
-        setTimeout(() => goToNextStep(), 500);
+        setTimeout(() => goToNextStepRef.current(), 500);
       }
     } catch (error) {
       notify.error(error, '视频处理失败，请重试');
@@ -144,7 +154,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
     } finally {
       setUploading(false);
     }
-  }, [setVideo, goToNextStep, onNext]);
+  }, [setVideo]);
 
   // 暂停/继续
   const handlePauseResume = () => {

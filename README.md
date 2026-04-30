@@ -22,11 +22,13 @@
 <p>
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green?style=flat-square&logo=opensourceinitiative)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vite.dev)
 [![Tauri](https://img.shields.io/badge/Tauri-2.x-FFC131?style=flat-square&logo=tauri&logoColor=black)](https://tauri.app)
 [![Rust](https://img.shields.io/badge/Rust-1.75+-DEA584?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
+[![Zustand](https://img.shields.io/badge/Zustand-5-3F2E1E?style=flat-square&logo=zustand)](https://zustand-demo.pmnd.rs)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/Agions/CutDeck/main.yml?style=flat-square&logo=github)](https://github.com/Agions/CutDeck/actions)
 [![Stars](https://img.shields.io/github/stars/Agions/CutDeck?style=flat-square&logo=github&color=f59e0b)](https://github.com/Agions/CutDeck/stargazers)
 
@@ -60,20 +62,23 @@ CutDeck 用 AI 把这个过程自动化：
 
 ## ✨ 核心功能
 
-### 🎬 AI 智能剪辑
+### 🤖 AI 智能拆条（7 步管道）
+
+```
+① 导入视频 → ② AI 分析 → ③ 高光检测 → ④ 候选构建 → ⑤ 多维评分 → ⑥ SEO 生成 → ⑦ 多格式导出
+```
 
 - **6 维 AI 评分**：笑声密度 / 情感峰值 / 内容完整度 / 静默比 / 节奏感 / 关键词权重
-- **SEO 元数据**：自动生成标题 / 描述 / Hashtags，平台原生适配
-- **多格式导出**：9:16 竖屏 / 1:1 方屏 / 16:9 横屏
-- **平台适配**：抖音 · 小红书 · B站 · YouTube Shorts · TikTok
+- **Rust 高光检测**：音频能量峰值 + 场景切换联合识别
+- **多平台 SEO 元数据**：自动生成标题 / 描述 / Hashtags，平台原生适配
 
-### 🎙️ Whisper 字幕
+### 🎬 多格式导出
 
-本地 Whisper ASR 驱动，精准语音识别 + 毫秒级时间轴对齐，支持多语言。
+9:16 竖屏（抖音）· 1:1 方屏（Instagram）· 16:9 横屏（YouTube）· 一键导出
 
-### 🎞️ Rust 渲染引擎
+### 🎙️ 本地 Whisper 字幕
 
-Tauri 2 + FFmpeg 原生渲染管线，无质量损失，跨平台桌面应用。
+faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，断网可用
 
 ### ⌨️ 专业剪辑体验
 
@@ -89,13 +94,12 @@ Tauri 2 + FFmpeg 原生渲染管线，无质量损失，跨平台桌面应用。
 git clone https://github.com/Agions/CutDeck.git
 cd CutDeck
 npm install
-cp .env.example .env   # 填入 API Key，推荐 DeepSeek
-
 npm run dev
+
 # 访问 http://localhost:1430
 ```
 
-详细文档：https://agions.github.io/CutDeck
+完整文档：https://agions.github.io/CutDeck
 
 ---
 
@@ -116,38 +120,52 @@ npm run dev
 ## 🏗️ 技术架构
 
 ```
+┌──────────────────────────────────────────────────────────────┐
+│                        UI 层 (React 18)                     │
+│     Landing · Dashboard · 编辑器 · AI 控制台                  │
+├──────────────────────────────────────────────────────────────┤
+│                      核心层 (core/)                           │
+│   services/ · pipeline/ · hooks/ · video/ · types/           │
+├──────────────────────────────────────────────────────────────┤
+│                      状态层 (store/)                         │
+│   Zustand v5 持久化 stores                                   │
+├──────────────────────────────────────────────────────────────┤
+│                      外部依赖层                               │
+│        FFmpeg · Tauri IPC (Rust) · AI APIs                   │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### 目录结构
+
+```
 CutDeck/
-├── src/
-│   ├── components/          # UI 组件
-│   │   ├── AIPanel/
-│   │   ├── editor/           # 视频编辑器
-│   │   ├── CutDeck/          # 主剪辑界面（Workspace / SimpleMode）
-│   │   └── common/           # 通用组件（ErrorBoundary / PreviewModal 等）
-│   ├── core/
-│   │   ├── services/         # AI · 视频 · 剪辑 · 字幕服务
-│   │   ├── hooks/            # 自定义 Hooks
-│   │   ├── types/            # 类型定义
-│   │   └── config/           # AI 模型配置、平台预设
-│   ├── pages/                # 页面路由
-│   ├── store/                # Zustand 状态管理
-│   ├── shared/               # 共享工具（format / logger）
-│   ├── services/             # API 调用层
-│   └── test/                 # 工具测试（code-review dashboard 等）
-├── src-tauri/               # Tauri 2.x 桌面应用（Rust）
-└── docs/                    # VitePress 在线文档
+├── src/                          # React 前端
+│   ├── core/                     # 核心业务模块（域驱动）
+│   │   ├── types.ts              # 全局类型定义
+│   │   ├── video/                # 视频处理管道
+│   │   ├── services/             # 业务服务（AI · Vision · ASR · 字幕 · 导出）
+│   │   ├── pipeline/             # AI 剪辑工作流（Step 架构）
+│   │   │   └── steps/            # BuildCandidates · ScoreClips · GenerateSEO · PrepareExport
+│   │   └── hooks/                # React Hooks
+│   ├── store/                    # Zustand Stores（app · project · editor）
+│   ├── components/               # React UI 组件
+│   └── pages/                    # 页面组件
+├── src-tauri/                    # Tauri 后端 (Rust)
+│   └── src/
+│       ├── commands/             # FFmpeg · 高光检测 · 智能分段 · 渲染
+│       └── lib.rs               # 命令注册
+└── docs/                        # VitePress 文档
 ```
 
 | 层级 | 技术 |
 |------|------|
-| 前端框架 | React 18 + TypeScript 5 |
-| 状态管理 | Zustand |
-| UI 组件 | shadcn/ui + Tailwind CSS |
-| 桌面运行时 | Tauri 2.x |
+| 前端框架 | React 18 + TypeScript 5 + Vite 6 |
+| 状态管理 | Zustand v5（持久化） |
+| UI 组件 | shadcn/ui + Tailwind CSS 4 |
+| 桌面运行时 | Tauri v2 |
 | 后端语言 | Rust |
 | 视频处理 | FFmpeg |
 | 语音识别 | faster-whisper |
-| 构建工具 | Vite 6 |
-| 测试 | Vitest + Testing Library |
 
 ---
 
