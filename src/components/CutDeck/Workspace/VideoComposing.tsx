@@ -197,7 +197,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
 
   // ==== 辅助函数：同步音视频 ====
   const syncAudioVideoIfNeeded = async (onProgress: (p: number) => void): Promise<void> => {
-    if (config.syncAudioVideo) {
+    if (config.syncAudioVideo && state.currentVideo) {
       onProgress(80);
       await audioVideoSyncService.autoSync(state.currentVideo.path, state.voiceData.audioUrl || undefined);
     }
@@ -216,6 +216,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
       applyVideoEffect(setProgress);
       await syncAudioVideoIfNeeded(setProgress);
 
+      if (!state.currentVideo) return;
       setProgress(100);
       setSynthesis(`${state.currentVideo.path}?synthesized=${Date.now()}`, {
         syncAudioVideo: config.syncAudioVideo,
