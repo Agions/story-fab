@@ -9,6 +9,7 @@ export { default as ScriptWriting } from './ScriptWriting';
 export { default as VideoComposing } from './VideoComposing';
 export { default as ClipRippling } from './ClipRippling';
 export { default as VideoExport } from './VideoExport';
+export { default as StepList } from './StepList';
 
 // 导出类型
 export type { AIFunctionType } from './functionModeMap';

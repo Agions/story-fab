@@ -338,11 +338,11 @@ export class ClipWorkflowService {
    * 获取导出质量配置
    */
   getExportSettings(): ExportSettings {
-    const qualityMap: Record<ClipConfig['outputQuality'], { resolution: ExportSettings['resolution']; frameRate: ExportSettings['frameRate']; quality: ExportSettings['quality'] }> = {
-      low: { resolution: '720p', frameRate: 24, quality: 'low' },
-      medium: { resolution: '1080p', frameRate: 30, quality: 'medium' },
-      high: { resolution: '1080p', frameRate: 30, quality: 'high' },
-      ultra: { resolution: '4k', frameRate: 60, quality: 'ultra' },
+    const qualityMap: Record<ClipConfig['outputQuality'], { resolution: ExportSettings['resolution']; fps: ExportSettings['fps']; quality: ExportSettings['quality'] }> = {
+      low: { resolution: '720p', fps: 24, quality: 'low' },
+      medium: { resolution: '1080p', fps: 30, quality: 'medium' },
+      high: { resolution: '1080p', fps: 30, quality: 'high' },
+      ultra: { resolution: '4k', fps: 60, quality: 'ultra' },
     };
     
     const quality = qualityMap[this.config.outputQuality];
@@ -351,7 +351,7 @@ export class ClipWorkflowService {
       format: (this.config.outputFormat === 'mov' ? 'mp4' : this.config.outputFormat) as ExportSettings['format'],
       resolution: quality.resolution,
       quality: quality.quality,
-      fps: quality.frameRate as 24 | 30 | 60,
+      fps: quality.fps,
       includeSubtitles: true,
       includeWatermark: false,
       burnSubtitles: true,

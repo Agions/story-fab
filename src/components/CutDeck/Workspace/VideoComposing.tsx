@@ -56,6 +56,13 @@ const EFFECT_STYLES = [
   { value: 'warm', label: '暖色调', desc: '橙色系' },
 ];
 
+// 语音设置默认值
+const DEFAULT_VOICE_SPEED = 100;
+const DEFAULT_VOICE_VOLUME = 80;
+const VOICE_SPEED_MIN = 50;
+const VOICE_SPEED_MAX = 150;
+const VOICE_SPEED_RANGE = VOICE_SPEED_MAX - VOICE_SPEED_MIN;
+
 // 字幕位置
 const SUBTITLE_POSITIONS = [
   { value: 'bottom', label: '底部' },
@@ -81,8 +88,8 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
 
   const [config, setConfig] = useState<SynthesizeConfig>({
     voiceId: 'female_zh',
-    voiceSpeed: 100,
-    voiceVolume: 80,
+    voiceSpeed: DEFAULT_VOICE_SPEED,
+    voiceVolume: DEFAULT_VOICE_VOLUME,
     enableVoice: true,
     enableSubtitle: true,
     subtitlePosition: 'bottom',
@@ -153,52 +160,67 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
     }
   }, [config.voiceId, config.voiceSpeed, config.voiceVolume, setVoice]);
 
-  const handleSynthesize = async () => {
+  // ==== 辅助函数：校验合成输入 ====
+  const validateSynthesizeInput = (): boolean => {
     if (!state.currentVideo) {
       notify.warning('请先上传视频');
-      return;
+      return false;
     }
-
     const scriptContent = getCurrentScriptContent();
     if (!scriptContent && config.enableVoice) {
       notify.warning('请先生成文案');
-      return;
+      return false;
     }
+    return true;
+  };
+
+  // ==== 辅助函数：确保语音已生成 ====
+  const ensureVoiceGenerated = async (onProgress: (p: number) => void): Promise<void> => {
+    if (config.enableVoice && !state.voiceData.audioUrl) {
+      onProgress(20);
+      await handleGenerateVoice();
+    }
+  };
+
+  // ==== 辅助函数：应用视频特效 ====
+  const applyVideoEffect = (onProgress: (p: number) => void): void => {
+    if (config.enableEffect) {
+      onProgress(60);
+      const presetId = EFFECT_PRESET_MAP[config.effectStyle];
+      if (presetId) {
+        videoEffectService.applyPreset(presetId);
+      } else {
+        videoEffectService.reset();
+      }
+    }
+  };
+
+  // ==== 辅助函数：同步音视频 ====
+  const syncAudioVideoIfNeeded = async (onProgress: (p: number) => void): Promise<void> => {
+    if (config.syncAudioVideo) {
+      onProgress(80);
+      await audioVideoSyncService.autoSync(state.currentVideo.path, state.voiceData.audioUrl || undefined);
+    }
+  };
+
+  // ==== 主合成函数 ====
+  const handleSynthesize = async () => {
+    if (!validateSynthesizeInput()) return;
 
     setSynthesizing(true);
     setProgress(0);
 
     try {
-      if (config.enableVoice && !state.voiceData.audioUrl) {
-        setProgress(20);
-        await handleGenerateVoice();
-      }
-
-      if (config.enableSubtitle) {
-        setProgress(40);
-        // Subtitle generation from audio not yet implemented
-      }
-
-      if (config.enableEffect) {
-        setProgress(60);
-        const presetId = EFFECT_PRESET_MAP[config.effectStyle];
-        if (presetId) {
-          videoEffectService.applyPreset(presetId);
-        } else {
-          videoEffectService.reset();
-        }
-      }
-
-      if (config.syncAudioVideo) {
-        setProgress(80);
-        await audioVideoSyncService.autoSync(state.currentVideo.path, state.voiceData.audioUrl || undefined);
-      }
+      await ensureVoiceGenerated(setProgress);
+      if (config.enableSubtitle) setProgress(40);
+      applyVideoEffect(setProgress);
+      await syncAudioVideoIfNeeded(setProgress);
 
       setProgress(100);
       setSynthesis(`${state.currentVideo.path}?synthesized=${Date.now()}`, {
         syncAudioVideo: config.syncAudioVideo,
         addSubtitles: config.enableSubtitle,
-        addWatermark: false
+        addWatermark: false,
       });
 
       notify.success('视频合成完成！');
@@ -486,14 +508,14 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
                   <div className={styles.sliderTrack}>
                     <div
                       className={styles.sliderFill}
-                      style={{ width: `${((config.voiceSpeed - 50) / 100) * 100}%` }}
+                      style={{ width: `${((config.voiceSpeed - VOICE_SPEED_MIN) / VOICE_SPEED_RANGE) * 100}%` }}
                     />
-                    <div className={styles.sliderThumb} style={{ left: `${((config.voiceSpeed - 50) / 100) * 100}%` }} />
+                    <div className={styles.sliderThumb} style={{ left: `${((config.voiceSpeed - VOICE_SPEED_MIN) / VOICE_SPEED_RANGE) * 100}%` }} />
                     <input
                       type="range"
                       className={styles.sliderInput}
-                      min={50}
-                      max={150}
+                      min={VOICE_SPEED_MIN}
+                      max={VOICE_SPEED_MAX}
                       value={config.voiceSpeed}
                       onChange={(e) => setConfig({ ...config, voiceSpeed: Number(e.target.value) })}
                       aria-label="语速"

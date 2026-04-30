@@ -1,10 +1,6 @@
 /**
- * AI 编辑器上下文
- * 管理 AI 剪辑编辑器全局状态
- * 支持完整流程：创建项目 -> 上传视频 -> AI分析 -> 生成文案 -> 合成视频 -> 导出
- * 
- * 注意: CutDeckState, CutDeckAction, initialState, clipFlowReducer, getNextStep, getPrevStep
- * 已提取到单独的文件中，避免代码重复
+ * AI Editor Provider
+ * 从 AIEditorContext.tsx 提取的 Provider 组件
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
 import type { CutDeckState, CutDeckStep, AIFeatureType, CutDeckAction } from './types';
@@ -12,6 +8,7 @@ import { initialState } from './initialState';
 import { clipFlowReducer } from './reducer';
 import { getNextStep, getPrevStep } from './types';
 import { CUT_DECK_STEPS } from './constants';
+import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '../../core/types';
 
 // 上下文类型
 interface CutDeckContextType {
@@ -20,18 +17,18 @@ interface CutDeckContextType {
   // 便捷方法
   setStep: (step: CutDeckStep) => void;
   setFeature: (feature: AIFeatureType) => void;
-  setProject: (project: import('../../core/types').ProjectData | null) => void;
-  setVideo: (video: import('../../core/types').VideoInfo | null) => void;
+  setProject: (project: ProjectData | null) => void;
+  setVideo: (video: VideoInfo | null) => void;
   setPlaying: (playing: boolean) => void;
   setCurrentTime: (time: number) => void;
-  setAnalysis: (analysis: import('../../core/types').VideoAnalysis | null) => void;
+  setAnalysis: (analysis: VideoAnalysis | null) => void;
   setOcrSubtitle: (data: Array<{ startTime: number; endTime: number; text: string }> | null) => void;
   setAsrSubtitle: (data: Array<{ startTime: number; endTime: number; text: string; speaker?: string }> | null) => void;
-  setNarrationScript: (script: import('../../core/types').ScriptData | null) => void;
-  setRemixScript: (script: import('../../core/types').ScriptData | null) => void;
+  setNarrationScript: (script: ScriptData | null) => void;
+  setRemixScript: (script: ScriptData | null) => void;
   setVoice: (audioUrl: string | null, settings?: { voiceId?: string; speed?: number; volume?: number }) => void;
   setSynthesis: (videoUrl: string | null, settings?: { syncAudioVideo?: boolean; addSubtitles?: boolean; addWatermark?: boolean }) => void;
-  setExportSettings: (settings: import('../../core/types').ExportSettings | null) => void;
+  setExportSettings: (settings: ExportSettings | null) => void;
   // 流程控制
   goToNextStep: () => void;
   goToPrevStep: () => void;
@@ -44,7 +41,7 @@ interface CutDeckContextType {
 }
 
 // 创建上下文
-const CutDeckContext = createContext<CutDeckContextType | undefined>(undefined);
+export const CutDeckContext = createContext<CutDeckContextType | undefined>(undefined);
 
 // Provider 组件
 interface CutDeckProviderProps {
@@ -63,11 +60,11 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     dispatch({ type: 'SET_FEATURE', payload: feature });
   }, []);
 
-  const setProject = useCallback((project: import('../../core/types').ProjectData | null) => {
+  const setProject = useCallback((project: ProjectData | null) => {
     dispatch({ type: 'SET_PROJECT', payload: project });
   }, []);
 
-  const setVideo = useCallback((video: import('../../core/types').VideoInfo | null) => {
+  const setVideo = useCallback((video: VideoInfo | null) => {
     dispatch({ type: 'SET_VIDEO', payload: video });
   }, []);
 
@@ -79,7 +76,7 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     dispatch({ type: 'SET_CURRENT_TIME', payload: time });
   }, []);
 
-  const setAnalysis = useCallback((analysis: import('../../core/types').VideoAnalysis | null) => {
+  const setAnalysis = useCallback((analysis: VideoAnalysis | null) => {
     dispatch({ type: 'SET_ANALYSIS', payload: analysis });
   }, []);
 
@@ -91,11 +88,11 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     dispatch({ type: 'SET_ASR_SUBTITLE', payload: data });
   }, []);
 
-  const setNarrationScript = useCallback((script: import('../../core/types').ScriptData | null) => {
+  const setNarrationScript = useCallback((script: ScriptData | null) => {
     dispatch({ type: 'SET_NARRATION_SCRIPT', payload: script });
   }, []);
 
-  const setRemixScript = useCallback((script: import('../../core/types').ScriptData | null) => {
+  const setRemixScript = useCallback((script: ScriptData | null) => {
     dispatch({ type: 'SET_REMIX_SCRIPT', payload: script });
   }, []);
 
@@ -107,7 +104,7 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     dispatch({ type: 'SET_SYNTHESIS', payload: { finalVideoUrl: videoUrl, settings } });
   }, []);
 
-  const setExportSettings = useCallback((settings: import('../../core/types').ExportSettings | null) => {
+  const setExportSettings = useCallback((settings: ExportSettings | null) => {
     dispatch({ type: 'SET_EXPORT_SETTINGS', payload: settings });
   }, []);
 
@@ -213,5 +210,3 @@ export const useAIEditor = useCutDeck;
 
 // 导出上下文类型
 export type { CutDeckContextType };
-export { CutDeckContext };
-export type { CutDeckAction, CutDeckState, CutDeckStep, AIFeatureType };

@@ -2,7 +2,7 @@
  * 步骤4: 生成文案 — AI Cinema Studio Redesign
  * 三大核心功能：AI视频解说 / AI第一人称 / AI混剪
  */
-import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
+import React, { useState, useCallback, useEffect, useRef, memo, useMemo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
 import { aiService } from '../../../core/services/ai.service';
 import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '../../../core/types';
@@ -116,6 +116,22 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
     length: 'medium',
   });
 
+  // Extract style and length to separate useMemo to prevent handleGenerate recreation
+  const configStyle = useMemo(() => config.style, [config.style]);
+  const configLength = useMemo(() => config.length, [config.length]);
+
+  // Use ref for stable values that don't need to trigger re-renders in handleGenerate
+  const defaultModelRef = useRef(defaultModel);
+  const apiKeysRef = useRef(apiKeys);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    defaultModelRef.current = defaultModel;
+  }, [defaultModel]);
+  useEffect(() => {
+    apiKeysRef.current = apiKeys;
+  }, [apiKeys]);
+
   const [alignmentGate, setAlignmentGate] = useState<{
     averageConfidence: number;
     maxDriftSeconds: number;
@@ -187,8 +203,8 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
     try {
       const topic = state.analysis?.summary || '视频内容解说';
 
-      const availableModels = getAvailableModelsFromApiKeys(apiKeys, CORE_AI_MODELS);
-      const resolvedModelId = resolveDefaultModelId(defaultModel, availableModels);
+      const availableModels = getAvailableModelsFromApiKeys(apiKeysRef.current, CORE_AI_MODELS);
+      const resolvedModelId = resolveDefaultModelId(defaultModelRef.current, availableModels);
       const model = (
         availableModels.find((item) => item.id === resolvedModelId) ||
         CORE_AI_MODELS.find((item) => item.id === DEFAULT_MODEL_ID) ||
@@ -197,13 +213,13 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
 
       const settings: AIModelSettings = {
         enabled: true,
-        apiKey: apiKeys[model.provider ?? 'openai']?.key || '',
+        apiKey: apiKeysRef.current[model.provider ?? 'openai']?.key || '',
         temperature: 0.7,
         maxTokens: 2000,
       };
 
       const styleMap: Record<AIFunctionType, string> = {
-        'video-narration': config.style,
+        'video-narration': configStyle,
         'first-person': 'casual',
         'remix': 'humor',
       };
@@ -216,8 +232,8 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
         {
           topic,
           style: styleMap[functionType],
-          tone: config.style,
-          length: config.length,
+          tone: configStyle,
+          length: configLength,
           audience: '通用',
           language: 'zh-CN',
           keywords: state.analysis?.scenes?.map(s => s.type as string).filter((type): type is string => Boolean(type)) || [],
@@ -250,7 +266,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
         setProgress(0);
       }, 500);
     }
-  }, [config.style, config.length, state.analysis, state.currentVideo, setNarrationScript, setRemixScript, setFeature, applyCommentaryOrchestration, goToNextStep, onNext]);
+  }, [state.analysis, state.currentVideo, setNarrationScript, setRemixScript, setFeature, applyCommentaryOrchestration, goToNextStep, onNext, configStyle, configLength]);
 
   const handleEditScript = useCallback((newContent: string): void => {
     const script = config.functionType === 'remix' ? state.scriptData.remix : state.scriptData.narration;

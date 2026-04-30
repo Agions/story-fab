@@ -61,13 +61,15 @@ CutDeck/
 │   │   │   └── useEditorState.ts
 │   │   └── constants/            # 常量定义（含 AI 模型列表）
 │   │
+│   ├── components/               # React UI 组件
+│   │   └── CutDeck/              # CutDeck 组件（见下节详述）
+│   │
 │   ├── store/                    # Zustand Stores（UI 状态）
 │   │   ├── appStore.ts             # App 级（主题、侧边栏、通知）
 │   │   ├── projectStore.ts          # 项目列表/筛选/排序
 │   │   ├── editorStore.ts           # 编辑器状态（时间线、轨道）
 │   │   └── mainStore.ts             # AI 模型设置（→ useModelStore）
 │   │
-│   ├── components/               # React UI 组件
 │   ├── pages/                    # 页面组件
 │   ├── hooks/                    # 通用 Hooks（跨项目可用）
 │   └── services/                 # 兼容层 Facade
@@ -95,6 +97,77 @@ CutDeck/
 ├── vite.config.ts
 └── tsconfig.json
 ```
+
+### CutDeck 组件结构 (components/CutDeck/)
+
+```
+CutDeck/
+├── index.ts                      # 主入口，导出 CutDeck 组件
+├── CutDeckProvider.tsx           # Context Provider（含 reducer 状态管理）
+├── AIEditorContext.tsx           # AI 编辑器 Context（场景检测/高光分析）
+├── types.ts                      # 类型定义（含 getNextStep/getPrevStep 工具函数）
+├── reducer.ts                    # 统一 reducer（clipFlowReducer）
+├── initialState.ts               # 初始状态
+├── constants.ts                  # 常量（CUT_DECK_STEPS 等）
+│
+├── Workspace/                    # 工作区子组件
+│   ├── Workspace.tsx             # 主容器（含 StepList 内联组件）
+│   ├── VideoUpload.tsx           # 视频上传
+│   ├── ProjectSetup.tsx          # 项目设置
+│   ├── AIVisualizer.tsx          # AI 可视化分析
+│   ├── ScriptWriting.tsx         # 脚本撰写
+│   ├── VideoComposing.tsx        # 视频合成
+│   ├── ClipRippling.tsx          # AI 拆条
+│   ├── VideoExport.tsx           # 导出设置
+│   ├── functionModeMap.ts        # 功能模式映射
+│   ├── HighlightList/            # 高光列表
+│   └── index.ts
+│
+├── ModeSelector/                 # 模式选择器
+│   ├── ModeSelector.tsx
+│   ├── ModeSelector.test.tsx
+│   └── index.ts
+│
+└── SimpleMode/                   # 简易模式
+    ├── ClipListView.tsx
+    ├── ClipListView.test.tsx
+    └── index.ts
+```
+
+---
+
+## Context Provider 架构
+
+CutDeck 使用双 Context 架构管理状态：
+
+### CutDeckProvider（主状态管理）
+
+负责管理 CutDeck 工作流的核心状态（步骤流转、视频信息、脚本数据等）：
+
+```
+CutDeckProvider
+├── state: CutDeckState          # 状态对象（当前步骤、视频、分析结果等）
+├── dispatch: React.Dispatch      # reducer 分发
+├── setStep(step)                 # 跳转到指定步骤
+├── setFeature(feature)          # 设置功能特性
+├── setProject(project)           # 设置项目配置
+└── goToNextStep() / goToPrevStep()  # 步骤导航
+```
+
+**关键实现要点**：
+- Context value 必须使用 `useMemo` 包裹，避免不必要的重渲染（P0 优化项）
+- 所有方法必须使用 `useCallback` 包装，确保引用稳定
+
+### AIEditorContext（AI 分析状态）
+
+负责管理 AI 分析相关状态（场景检测、高光检测、智能分段）：
+
+```typescript
+// 使用方式
+const { analysis, setAnalysis, detectHighlights, detectScenes } = useAIEditor();
+```
+
+**注意**：此 Context 同样存在 Context value 未使用 `useMemo` 的 P0 性能问题。
 
 ---
 
@@ -154,7 +227,7 @@ ClipRepurposingPipeline
 | `detect_highlights` | 高光时刻检测|
 | `detect_smart_segments` | 智能场景分段|
 | `get_export_dir` | 获取导出目录|
-| `apply_filter_chain` | FFmpeg 滤镜链|
+| `apply_filter_chain` | FFmpeg 滤镜链 |
 
 **安全修复**：devtools feature 已移除（生产构建不再包含 DevTools API），CSP 策略已启用。
 
@@ -168,10 +241,54 @@ ClipRepurposingPipeline
 | 构建工具 | **Vite 6** |
 | 桌面框架 | **Tauri v2**（Rust 后端） |
 | 状态管理 | **Zustand v5**（持久化） |
-| 样式 | **CSS Variables** + SCSS Modules（OKLCH 色彩系统） |
+| 样式 | **Tailwind CSS v4** + CSS Variables（OKLCH 色彩系统） |
+| UI 组件库 | **Ant Design 5** + **shadcn/ui** |
 | AI 服务 | 多 Provider（OpenAI/Anthropic/Google/DeepSeek/Qwen/Kimi/智谱/Moonshot） |
 | ASR | **faster-whisper**（本地） |
+| 国际化 | **i18next** + react-i18next |
 | 文档 | VitePress |
+
+---
+
+## 性能优化要点
+
+### P0 - 关键性能问题（需立即修复）
+
+**1. Context Value 不稳定**
+
+`CutDeckProvider.tsx` 和 `AIEditorContext.tsx` 的 context value 对象在每次渲染时重新创建，导致所有消费组件不必要地重新渲染。
+
+```typescript
+// 错误写法
+const value = { state, dispatch, setStep, ... };
+
+// 正确写法
+const setStep = useCallback((step: CutDeckStep) => {
+  dispatch({ type: 'SET_STEP', payload: step });
+}, []);
+
+const value = useMemo(() => ({
+  state, dispatch, setStep, ...
+}), [state, dispatch, setStep, ...]);
+```
+
+### P1 - 高优先级优化
+
+| 问题 | 文件 | 建议 |
+|------|------|------|
+| Reducer 逻辑重复 | `AIEditorContext.tsx` | 直接导入 `clipFlowReducer` from `./reducer` |
+| StepList 未使用 memo | `Workspace.tsx` | 使用 `React.memo` 包装 |
+| 辅助函数未记忆化 | `Workspace.tsx` | `isStepAccessible/isStepCompleted` 移到组件外部 |
+| handleUpload 依赖不稳定 | `VideoUpload.tsx` | 确保 `goToNextStep` 在 Provider 中用 `useCallback` 包装 |
+| handleGenerate 依赖项过多 | `ScriptWriting.tsx` | 重构依赖管理 |
+
+### P2 - 中优先级优化
+
+| 问题 | 文件 | 建议 |
+|------|------|------|
+| setTimeout 无清理机制 | `AIVisualizer.tsx` | 使用 `useRef` 管理 timeout ID |
+| uploadStatusRef 泄露风险 | `VideoUpload.tsx` | 添加清理逻辑 |
+| Magic numbers | `ClipRippling.tsx` | 定义为命名常量 |
 
 ---
 

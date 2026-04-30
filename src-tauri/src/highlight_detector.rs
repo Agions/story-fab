@@ -310,8 +310,10 @@ impl HighlightDetector {
             }
         }
 
-        // Cleanup
-        let _ = std::fs::remove_dir_all(&temp_dir);
+        // Cleanup - warn if temp dir removal fails
+        if let Err(e) = std::fs::remove_dir_all(&temp_dir) {
+            log::warn!("Failed to remove temp dir '{}': {}", temp_dir.display(), e);
+        }
 
         // Sort segments by score descending (most important first)
         sort_segments_by_score_desc(&mut segments);
@@ -403,7 +405,7 @@ impl HighlightDetector {
                 &temp_wav.to_string_lossy(),
             ])
             .output()
-            .map_err(|e| format!("FFmpeg failed: {}", e))?;
+            .map_err(|e| format!("FFmpeg failed to extract audio from '{}': {}", audio_path, e))?;
 
         if !output.status.success() {
             return Err(String::from_utf8_lossy(&output.stderr).to_string());
@@ -411,9 +413,11 @@ impl HighlightDetector {
 
         // Read PCM data
         let pcm_data = std::fs::read(&temp_wav)
-            .map_err(|e| format!("Read PCM failed: {}", e))?;
+            .map_err(|e| format!("Failed to read PCM from '{}': {}", temp_wav.display(), e))?;
 
-        let _ = std::fs::remove_file(&temp_wav);
+        if let Err(e) = std::fs::remove_file(&temp_wav) {
+            log::warn!("Failed to remove temp PCM file '{}': {}", temp_wav.display(), e);
+        }
 
         // Convert s16le to f32 normalized
         let samples: Vec<f32> = pcm_data
