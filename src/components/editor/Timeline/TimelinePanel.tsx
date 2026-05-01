@@ -15,6 +15,7 @@ import { TimelineToolbar } from './TimelineToolbar';
 import { TimelineRuler } from './TimelineRuler';
 import { TimelineTrack } from './TimelineTrack';
 import { TimelineScrubber } from './TimelineScrubber';
+import { useInterval } from '../../../hooks';
 import type { ClipData } from './TimelineClip';
 
 export interface TimelineTrackData {
@@ -65,7 +66,7 @@ export const TimelinePanel: React.FC<TimelinePanelProps> = ({
   const [selectedClipId, setSelectedClipId] = useState<string | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const playIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const interval = useInterval();
 
   const duration = initialDuration;
   const totalWidth = duration * pixelsPerSecond;
@@ -73,7 +74,7 @@ export const TimelinePanel: React.FC<TimelinePanelProps> = ({
   // 播放头计时
   useEffect(() => {
     if (isPlaying) {
-      playIntervalRef.current = setInterval(() => {
+      const id = interval.set(() => {
         setCurrentTime((prev) => {
           const next = prev + 1 / 30;
           if (next >= duration) {
@@ -83,15 +84,9 @@ export const TimelinePanel: React.FC<TimelinePanelProps> = ({
           return next;
         });
       }, 33);
-    } else {
-      if (playIntervalRef.current) {
-        clearInterval(playIntervalRef.current);
-        playIntervalRef.current = null;
-      }
+      return () => interval.clear(id);
     }
-    return () => {
-      if (playIntervalRef.current) clearInterval(playIntervalRef.current);
-    };
+    return undefined;
   }, [isPlaying, duration]);
 
   // Sync playhead to parent
