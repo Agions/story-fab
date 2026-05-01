@@ -13,7 +13,7 @@ export const APP = {
 
 // 支持的视频格式
 export const VIDEO_FORMATS = {
-  input: ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv'],
+  input: ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv'],
   output: ['mp4', 'mov', 'webm', 'avi'],
 };
 
@@ -133,7 +133,24 @@ export const STORAGE_KEYS = {
   theme: 'cutdeck_theme',
   language: 'cutdeck_language',
   recentFiles: 'cutdeck_recent_files',
+  // 认证相关
+  authToken: 'cutdeck_auth_token',
+  // 时间线
+  timeline: 'cutdeck_timeline',
+  // 项目设置
+  projectSaveBehavior: 'cutdeck-project-save-behavior',
+  projectAutoSave: 'cutdeck-project-auto-save-enabled',
+  // 兼容旧版存储键名
+  legacy: {
+    token: 'cutdeck_token_v1',
+    projects: 'cutdeck_projects_v1',
+  },
 };
+
+// 项目保存行为
+export type ProjectSaveBehavior = 'stay' | 'detail';
+export const PROJECT_SAVE_BEHAVIOR_KEY = 'cutdeck-project-save-behavior' as const;
+export const PROJECT_AUTO_SAVE_KEY = 'cutdeck-project-auto-save-enabled';
 
 // API 端点
 export const API_ENDPOINTS = {

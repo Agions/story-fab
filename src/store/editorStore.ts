@@ -13,7 +13,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 import type { EditorStore, EditorState, VideoData, ScriptData, VoiceData, TimelineSelection } from './editorTypes';
-import type { VideoSegment, EditorPanel } from '../core/types';
 import type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '../components/Timeline/types';
 import {
   MAX_HISTORY_SIZE,
@@ -24,6 +23,78 @@ import {
   VOLUME_MIN,
   VOLUME_MAX,
 } from './editorTypes';
+
+// =========================================
+// Helper functions
+// =========================================
+
+/**
+ * 在 timelineTracks 中更新指定 clip 的属性
+ */
+const updateClipInTracks = (
+  tracks: TimelineTrack[],
+  clipId: string,
+  clipUpdates: Partial<TimelineClip>
+): TimelineTrack[] =>
+  tracks.map((t) => ({
+    ...t,
+    clips: t.clips.map((c) => (c.id === clipId ? { ...c, ...clipUpdates } : c)),
+  }));
+
+/**
+ * 在 timelineTracks 中为指定 clip 添加 keyframe
+ */
+const addKeyframeToClip = (
+  tracks: TimelineTrack[],
+  clipId: string,
+  keyframe: Keyframe
+): TimelineTrack[] =>
+  tracks.map((t) => ({
+    ...t,
+    clips: t.clips.map((c) =>
+      c.id === clipId ? { ...c, keyframes: [...(c.keyframes || []), keyframe] } : c
+    ),
+  }));
+
+/**
+ * 在 timelineTracks 中移除指定 clip 的 keyframe
+ */
+const removeKeyframeFromClip = (
+  tracks: TimelineTrack[],
+  clipId: string,
+  keyframeId: string
+): TimelineTrack[] =>
+  tracks.map((t) => ({
+    ...t,
+    clips: t.clips.map((c) =>
+      c.id === clipId
+        ? { ...c, keyframes: (c.keyframes || []).filter((kf) => kf.id !== keyframeId) }
+        : c
+    ),
+  }));
+
+/**
+ * 在 timelineTracks 中更新指定 clip 的 keyframe
+ */
+const updateKeyframeInClip = (
+  tracks: TimelineTrack[],
+  clipId: string,
+  keyframeId: string,
+  keyframeUpdates: Partial<Keyframe>
+): TimelineTrack[] =>
+  tracks.map((t) => ({
+    ...t,
+    clips: t.clips.map((c) =>
+      c.id === clipId
+        ? {
+            ...c,
+            keyframes: (c.keyframes || []).map((kf) =>
+              kf.id === keyframeId ? { ...kf, ...keyframeUpdates } : kf
+            ),
+          }
+        : c
+    ),
+  }));
 
 // =========================================
 // Initial state
@@ -183,10 +254,7 @@ export const useEditorStore = create<EditorStore>()(
 
       updateClip: (clipId, updates) =>
         set((s) => ({
-          timelineTracks: s.timelineTracks.map((t) => ({
-            ...t,
-            clips: t.clips.map((c) => (c.id === clipId ? { ...c, ...updates } : c)),
-          })),
+          timelineTracks: updateClipInTracks(s.timelineTracks, clipId, updates),
         })),
 
       moveClip: (clipId, targetTrackId, newStartMs, newEndMs) => {
@@ -249,43 +317,19 @@ export const useEditorStore = create<EditorStore>()(
         const id = crypto.randomUUID();
         const keyframe: Keyframe = { ...kfData, id };
         set((s) => ({
-          timelineTracks: s.timelineTracks.map((t) => ({
-            ...t,
-            clips: t.clips.map((c) =>
-              c.id === clipId ? { ...c, keyframes: [...(c.keyframes || []), keyframe] } : c
-            ),
-          })),
+          timelineTracks: addKeyframeToClip(s.timelineTracks, clipId, keyframe),
         }));
         return id;
       },
 
       removeKeyframe: (clipId, keyframeId) =>
         set((s) => ({
-          timelineTracks: s.timelineTracks.map((t) => ({
-            ...t,
-            clips: t.clips.map((c) =>
-              c.id === clipId
-                ? { ...c, keyframes: (c.keyframes || []).filter((kf) => kf.id !== keyframeId) }
-                : c
-            ),
-          })),
+          timelineTracks: removeKeyframeFromClip(s.timelineTracks, clipId, keyframeId),
         })),
 
       updateKeyframe: (clipId, keyframeId, updates) =>
         set((s) => ({
-          timelineTracks: s.timelineTracks.map((t) => ({
-            ...t,
-            clips: t.clips.map((c) =>
-              c.id === clipId
-                ? {
-                    ...c,
-                    keyframes: (c.keyframes || []).map((kf) =>
-                      kf.id === keyframeId ? { ...kf, ...updates } : kf
-                    ),
-                  }
-                : c
-            ),
-          })),
+          timelineTracks: updateKeyframeInClip(s.timelineTracks, clipId, keyframeId, updates),
         })),
 
       setTimelineSelection: (clipId, trackId) =>

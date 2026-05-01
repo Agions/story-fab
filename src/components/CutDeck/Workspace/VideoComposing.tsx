@@ -3,7 +3,7 @@
  * 数据输入: video, script, voice
  * 数据输出: synthesis (最终合成视频)
  */
-import React, { useState, useCallback, useMemo, memo, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, memo, useEffect } from 'react';
 import { useCutDeck } from '../AIEditorContext';
 import { voiceSynthesisService } from '../../../core/services/voice-synthesis.service';
 import { videoEffectService } from '../../../core/services/video-effect.service';
@@ -12,6 +12,7 @@ import { orchestrateCommentaryAgents } from '../../../core/services/workflow/com
 import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '../../../core/workflow/alignmentGate';
 import { FEATURE_TO_FUNCTION, FUNCTION_TO_MODE } from './functionModeMap';
 import { notify } from '../../../shared';
+import { useTimeout } from '../../../hooks/useTimeout';
 import styles from './VideoComposing.module.less';
 
 interface VideoSynthesizeProps {
@@ -72,19 +73,10 @@ const SUBTITLE_POSITIONS = [
 
 const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
   const { state, setVoice, setSynthesis, goToNextStep, dispatch } = useCutDeck();
+  const timeout = useTimeout();
   const [synthesizing, setSynthesizing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeTab, setActiveTab] = useState<'voice' | 'subtitle' | 'effect'>('voice');
-  const synthesizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Cleanup setTimeout on unmount
-  useEffect(() => {
-    return () => {
-      if (synthesizeTimerRef.current) {
-        clearTimeout(synthesizeTimerRef.current);
-      }
-    };
-  }, []);
 
   const [config, setConfig] = useState<SynthesizeConfig>({
     voiceId: 'female_zh',
@@ -226,7 +218,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
 
       notify.success('视频合成完成！');
 
-      synthesizeTimerRef.current = setTimeout(() => {
+      timeout.set(() => {
         if (onNext) onNext();
         else goToNextStep();
       }, 500);

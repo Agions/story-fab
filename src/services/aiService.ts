@@ -6,6 +6,7 @@ import axios from 'axios';
 import { getApiKey } from './tauri';
 import { VideoMetadata } from './video';
 import { logger } from '../utils/logger';
+import { formatTimestamp } from '../utils';
 import type { ScriptSegment as CoreScriptSegment } from '../core/types';
 
 // ============================================
@@ -250,12 +251,6 @@ const MODEL_CONFIGS: Record<LegacyAIModelType, ModelConfig> = {
 // ============================================
 // 提示词构建
 // ============================================
-
-const _formatTimestamp = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
 
 const STYLE_GUIDANCE: Record<string, string> = {
   informative: '请生成一个客观、教育性、详细的信息型解说脚本',

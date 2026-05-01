@@ -14,7 +14,7 @@ import {
   Calendar
 } from 'lucide-react';
 import type { Script, ScriptSegment } from '../types';
-import { notify } from '../shared';
+import { notify, formatTime } from '../shared';
 import styles from './ScriptPreview.module.less';
 
 const Title = ({ children, level, className }: { children: React.ReactNode; level?: number; className?: string }) => <h3 className={className} style={{ fontSize: level === 3 ? '1.25rem' : '1rem', fontWeight: level ? 600 : 400 }}>{children}</h3>;
@@ -29,12 +29,6 @@ interface ScriptPreviewProps {
 
 const ScriptPreview: React.FC<ScriptPreviewProps> = ({ script, onEdit, onExport }) => {
   const [copying, setCopying] = useState(false);
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
 
   const copyToClipboard = () => {
     setCopying(true);

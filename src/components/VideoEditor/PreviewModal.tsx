@@ -8,6 +8,7 @@ import {
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { ScriptSegment } from '../../types';
+import { formatTime } from '../../shared';
 import styles from './VideoEditor.module.less';
 
 interface PreviewModalProps {
@@ -17,13 +18,6 @@ interface PreviewModalProps {
   previewSegment: ScriptSegment | null;
   onClose: () => void;
 }
-
-// 格式化时间
-const formatTime = (time: number) => {
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time % 60);
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-};
 
 const PreviewModal: React.FC<PreviewModalProps> = ({
   open,

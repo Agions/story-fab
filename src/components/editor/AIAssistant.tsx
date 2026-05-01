@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import {
   Tabs,
   TabsList,
@@ -55,16 +55,6 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   const [progress, setProgress] = useState(0);
   const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_MODEL_ID);
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
-
-  const progressIntervalRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-    };
-  }, []);
 
   const models = useMemo(() => {
     const configuredModels = getAvailableModelsFromApiKeys(apiKeys, CORE_AI_MODELS);

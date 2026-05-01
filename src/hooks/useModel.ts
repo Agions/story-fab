@@ -9,6 +9,7 @@ import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS, getModelById, getModelsBy
 import type { AIModel, ModelProvider, ModelCategory, AIModelSettings } from '../core/types';
 import useLocalStorage from './useLocalStorage';
 import { resolveDefaultModelId } from '../core/utils/model-availability';
+import { delay } from '../shared';
 
 export interface UseModelReturn {
   // 模型列表
@@ -199,7 +200,7 @@ export function useModel(): UseModelReturn {
       // const response = await testModelAPI(selectedModel.provider, modelSettings);
       
       // 模拟测试
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await delay(1000);
       
       return true;
     } catch (err: unknown) {

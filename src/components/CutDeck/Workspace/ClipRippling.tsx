@@ -19,6 +19,7 @@ import { Badge } from '../../ui/badge';
 import { Checkbox } from '../../ui/checkbox';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '../../ui/select';
 import { notify } from '../../../shared';
+import { formatTime } from '../../../utils';
 import {
   Zap,
   CheckCircle,
@@ -391,13 +392,6 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
     </div>
   );
 });
-
-// Helper: 时间格式化
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
 
 // Helper: 维度中文名
 function dimLabel(dim: string): string {

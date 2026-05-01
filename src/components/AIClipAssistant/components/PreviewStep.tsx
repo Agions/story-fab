@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { ClipSegment } from '../../../core/services/aiClip.service';
 import type { VideoInfo } from '../../../core/types';
+import { formatTime } from '../../../utils';
 import styles from '../index.module.less';
 
 interface PreviewStepProps {
@@ -26,12 +27,7 @@ const Statistic: React.FC<{ title: string; value: string | number }> = ({
     <div className={styles.statisticTitle}>{title}</div>
   </div>
 );
-
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
+Statistic.displayName = 'Statistic';
 
 const PreviewStep: React.FC<PreviewStepProps> = ({
   videoInfo,

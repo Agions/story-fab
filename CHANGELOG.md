@@ -2,26 +2,22 @@
 
 ### 🐛 Bug Fixes (from code review)
 
-- **lib_optimized.rs:**
-  - Remove dead `VIDEO_PROCESSOR` global static (type mismatch + unused)
-  - Add `CutSegment` struct replacing raw `serde_json::Value` for `cut_video` command
-  - Add random suffix to concat file and temp dir paths to prevent same-ms race conditions
-- **highlight_detector.rs:**
-  - Fix `audio_score`/`scene_score` merge parentheses priority bug (average was computed on second operand only)
-  - Remove broken `Sorted` trait (replaced with `Vec::sort_by`)
-  - Add random suffix to `chrono_like_timestamp()` to avoid same-ms collisions
-- **aiService.ts:**
-  - Fix `normalizeStyle`/`normalizeTone` returning `"undefined"` string when key not found (add `in STYLE_GUIDANCE` guard)
-  - Fix `analyzeKeyFramesWithAI` stub throwing raw `Error` instead of `AIServiceError`
-  - Add `GeneratedScript` aliasing `Script` to avoid conflict with `core/types.ts`
-  - Fix Google model `headers` function ignoring unused `__apiKey` parameter
-- **editorStore.ts:**
-  - Fix `undo()` returning unchanged state when history empty (was `return s` — no-op already, explicit `return {}` for clarity)
-  - Fix `moveClip` not updating `sourceEndMs` when clip is resized
-  - Replace 4× `Date.now() + Math.random()` ID generation with `crypto.randomUUID()`
-- **export.ts:** Update import to use `GeneratedScript as Script` alias
-- **Timeline/utils.ts:** Replace `generateId` implementation with `crypto.randomUUID()`
-
+- **src/constants/index.ts:**
+  - Add missing `legacy.token` and `legacy.projects` to `STORAGE_KEYS` for backward compatibility
+- **src/components/CutDeck/Workspace/ScriptWriting.tsx:**
+  - Add missing `useRef` to React import list
+  - Add null checks for `Timeout | null` before calling `timeout.clear()`
+- **src/components/editor/Timeline/TimelinePanel.tsx:**
+  - Add `return undefined` in useEffect for non-isPlaying code path (TS7030)
+- **src/core/services/base.service.ts:**
+  - Rename `delay` parameter to `delayMs` to avoid shadowing imported `delay()` function
+- **src/shared/utils/pipeline-checkpoint.ts:**
+  - Replace `new Promise(resolve => setTimeout(resolve, 1000))` with `delay(1000)`
+- **src/test/code-review.test.ts:**
+  - Add `EslintJsonOutput` type to replace 7× `any` type assertions
+  - Replace inline `any[]` with properly typed `EslintJsonOutput['results'][number][]`
+  - Replace `any` in coverage data mapping with `{ s?: Record<string, number> }`
+  - Replace `any` in diagnostic messageText with `{ messageText?: string }`
 ---
 
 ## v2.0.0 (2026-04-22)

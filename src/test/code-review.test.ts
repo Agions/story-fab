@@ -1,5 +1,32 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// ESLint JSON 输出的类型（对应 ESLint flat config 格式）
+type EslintJsonOutput = {
+  version: string;
+  results: Array<{
+    filePath: string;
+    messages: Array<{
+      ruleId: string;
+      severity: number;
+      message: string;
+      line: number;
+      column: number;
+      nodeType: string;
+      messageId: string;
+    }>;
+    suppressedMessages: unknown[];
+    errorCount: number;
+    warningCount: number;
+    fatalErrorCount: number;
+    fixableErrorCount: number;
+    fixableWarningCount: number;
+  }>;
+  errorCount: number;
+  warningCount: number;
+  fatalErrorCount: number;
+  suppressions: Record<string, unknown>;
+};
+
 const mockState = vi.hoisted(() => ({
   eslintResult: {
     version: '9',
@@ -44,7 +71,7 @@ vi.mock('../../scripts/code-review-dashboard', () => ({
     if (mockState.execSyncShouldThrow) {
       return { totalFiles: 0, totalErrors: 0, totalWarnings: 0, bySeverity: { error: 0, warning: 0 }, topFiles: [] };
     }
-    const results: any[] = Array.isArray(mockState.eslintResult) ? mockState.eslintResult : (mockState.eslintResult as any)?.results || [];
+    const results: EslintJsonOutput['results'][number][] = Array.isArray(mockState.eslintResult) ? mockState.eslintResult : (mockState.eslintResult as EslintJsonOutput)?.results || [];
     let totalErrors = 0, totalWarnings = 0;
     for (const rep of results) {
       totalErrors += rep.errorCount ?? 0;
@@ -63,7 +90,7 @@ vi.mock('../../scripts/code-review-dashboard', () => ({
       char: 0,
       code: d.code,
       severity: d.severity === 2 ? 'error' : 'warning',
-      message: typeof d.messageText === 'string' ? d.messageText : (d.messageText as any)?.messageText ?? String(d.messageText),
+      message: typeof d.messageText === 'string' ? d.messageText : (d.messageText as { messageText?: string })?.messageText ?? String(d.messageText),
     }));
     return { errors, errorCount: errors.length };
   }),
@@ -77,7 +104,7 @@ vi.mock('../../scripts/code-review-dashboard', () => ({
     try {
       const data = JSON.parse(mockState.coverageContent);
       const files = Object.entries(data).filter(([k]) => k.includes('.'));
-      const byFile = files.map(([path, cd]: [string, any]) => {
+      const byFile = files.map(([path, cd]: [string, { s?: Record<string, number> }]) => {
         const stmts = Object.values(cd.s || {}) as number[];
         const total = stmts.length;
         const covered = stmts.filter((n: number) => n > 0).length;
@@ -156,19 +183,19 @@ describe('ESLint JSON parsing', () => {
   });
 
   it('should return zeros for empty ESLint output', () => {
-    mockState.eslintResult = { version: '9', results: [], errorCount: 0, warningCount: 0, fatalErrorCount: 0, suppressions: {} } as any;
+    mockState.eslintResult = { version: '9', results: [], errorCount: 0, warningCount: 0, fatalErrorCount: 0, suppressions: {} } as EslintJsonOutput;
     const r = runEslint();
     expect(r.totalErrors).toBe(0);
     expect(r.totalWarnings).toBe(0);
   });
 
   it('should handle malformed ESLint JSON gracefully without throwing', () => {
-    mockState.eslintResult = null as any;
+    mockState.eslintResult = null as unknown as EslintJsonOutput;
     expect(() => runEslint()).not.toThrow();
   });
 
   it('should handle empty eslint stdout gracefully without throwing', () => {
-    mockState.eslintResult = { version: '9', results: [] } as any;
+    mockState.eslintResult = { version: '9', results: [] } as EslintJsonOutput;
     expect(() => runEslint()).not.toThrow();
   });
 });

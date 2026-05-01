@@ -2,6 +2,7 @@ import React, { useCallback, memo } from 'react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
 
 import { ScriptSegment } from '../../types';
+import { formatTime } from '../../shared';
 import styles from './VideoEditor.module.less';
 
 interface SegmentStyleProps {
@@ -18,13 +19,6 @@ interface SegmentMarkerProps {
   onClick: (segment: ScriptSegment) => void;
   onDragStart: (segmentId: string, type: 'move' | 'start' | 'end', e: React.MouseEvent) => void;
 }
-
-// 格式化时间
-const formatTime = (time: number) => {
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time % 60);
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-};
 
 const SegmentMarker: React.FC<SegmentMarkerProps> = ({
   segment,

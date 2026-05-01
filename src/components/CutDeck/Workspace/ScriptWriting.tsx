@@ -2,7 +2,7 @@
  * 步骤4: 生成文案 — AI Cinema Studio Redesign
  * 三大核心功能：AI视频解说 / AI第一人称 / AI混剪
  */
-import React, { useState, useCallback, useEffect, useRef, memo, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, memo, useMemo, useRef } from 'react';
 import { useCutDeck } from '../AIEditorContext';
 import { aiService } from '../../../core/services/ai.service';
 import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '../../../core/types';
@@ -12,6 +12,7 @@ import { notify } from '../../../shared';
 import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '../../../core/utils/model-availability';
 import { orchestrateCommentaryAgents } from '../../../core/services/workflow/commentaryAgents';
 import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '../../../core/workflow/alignmentGate';
+import { useTimeout } from '../../../hooks/useTimeout';
 import {
   FEATURE_TO_FUNCTION,
   FUNCTION_TO_FEATURE,
@@ -138,8 +139,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
     passed: boolean;
   } | null>(null);
 
-  // 用于跟踪 setTimeout 的 ref，避免内存泄漏
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeout = useTimeout();
 
   const currentFunction = FUNCTION_CONFIG[config.functionType];
   const currentMode = FUNCTION_TO_MODE[config.functionType];
@@ -151,15 +151,16 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
     setConfig((prev) => ({ ...prev, functionType: mapped }));
   }, [config.functionType, state.selectedFeature]);
 
-  // 组件卸载时清理 timeout，避免内存泄漏
+  // 组件卸载时清理 timeout（由 useTimeout hook 自动处理）
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
+      if (lastTimeoutIdRef.current) {
+        timeout.clear(lastTimeoutIdRef.current);
       }
     };
   }, []);
+
+  const lastTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const applyCommentaryOrchestration = useCallback((scriptData: ScriptData): ScriptData => {
     if (!state.analysis?.scenes?.length || !scriptData.segments?.length) {
@@ -191,9 +192,8 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
 
   const handleGenerate = useCallback(async (functionType: AIFunctionType) => {
     // 清理之前的 timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+    if (lastTimeoutIdRef.current) {
+      timeout.clear(lastTimeoutIdRef.current);
     }
 
     setGenerating(true);
@@ -254,14 +254,14 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
       setProgress(100);
       notify.success(`${FUNCTION_CONFIG[functionType].title}生成成功！`);
 
-      timeoutRef.current = setTimeout(() => {
+      lastTimeoutIdRef.current = timeout.set(() => {
         if (onNext) onNext();
         else goToNextStep();
       }, 2000);  // 增加到2秒，让用户有时间查看生成结果
     } catch (error) {
       notify.error(error, '文案生成失败，请重试');
     } finally {
-      timeoutRef.current = setTimeout(() => {
+      lastTimeoutIdRef.current = timeout.set(() => {
         setGenerating(false);
         setProgress(0);
       }, 500);

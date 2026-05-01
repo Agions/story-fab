@@ -3,6 +3,7 @@
  * 提供统一的错误处理、请求拦截和日志记录
  */
 import { logger } from '../../utils/logger';
+import { delay } from '../../shared';
 
 /**
  * 服务错误类型
@@ -149,11 +150,11 @@ export abstract class BaseService {
   protected async retryRequest<T>(
     requestFn: () => Promise<T>,
     retries?: number,
-    delay?: number,
+    delayMs?: number,
     retryOn?: (error: ServiceError) => boolean
   ): Promise<T> {
     const maxRetries = retries ?? this.config.retries ?? 3;
-    const retryDelay = delay ?? this.config.retryDelay ?? 1000;
+    const retryDelay = delayMs ?? this.config.retryDelay ?? 1000;
     const shouldRetry = retryOn ?? this.config.retryOn ?? defaultRetryOn;
     
     let lastError: ServiceError | undefined;
@@ -171,7 +172,7 @@ export abstract class BaseService {
         if (shouldRetryAttempt) {
           const backoffMs = retryDelay * Math.pow(2, attempt); // 指数退避
           this.log('warn', `请求失败 (尝试 ${attempt + 1}/${maxRetries + 1}), ${backoffMs}ms 后重试...`, serviceError.message);
-          await this.delay(backoffMs);
+          await delay(backoffMs);
         } else if (attempt < maxRetries) {
           // 即使不重试，也记录错误
           this.log('error', `请求失败:`, serviceError.message);
@@ -232,13 +233,6 @@ export abstract class BaseService {
    */
   private generateRequestId(): string {
     return `${this.name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * 延迟函数
-   */
-  protected delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**

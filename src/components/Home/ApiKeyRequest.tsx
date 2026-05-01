@@ -1,5 +1,6 @@
 import { logger } from '../../utils/logger';
 import React, { useState, useEffect } from 'react';
+import { delay } from '../../shared';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -82,7 +83,7 @@ const ApiKeyRequest: React.FC<ApiKeyRequestProps> = ({
     setSubmitting(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await delay(1000);
       setSubmitting(false);
       setSubmitted(true);
     } catch (error) {
