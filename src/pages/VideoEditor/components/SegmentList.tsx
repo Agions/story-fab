@@ -4,21 +4,8 @@ import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { Plus, Trash2 } from 'lucide-react';
 import { VideoSegment } from '../../../services/video';
+import { formatDuration } from '../../../utils';
 import styles from '../index.module.less';
-
-const formatTime = (seconds: number): string => {
-  const hrs = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
-  const parts = [
-    hrs > 0 ? String(hrs).padStart(2, '0') : null,
-    String(mins).padStart(2, '0'),
-    String(secs).padStart(2, '0'),
-  ].filter(Boolean);
-
-  return parts.join(':');
-};
 
 const getSegmentKey = (segment: VideoSegment, index: number): string => {
   return `${index}-${segment.start}-${segment.end}`;
@@ -67,10 +54,10 @@ const SegmentItem: React.FC<SegmentItemProps> = memo(({
 
         <div className="flex items-center gap-2 mb-1">
           <Badge variant="secondary">
-            {formatTime(segment.start)} - {formatTime(segment.end)}
+            {formatDuration(segment.start)} - {formatDuration(segment.end)}
           </Badge>
           <span className="text-xs text-muted-foreground">
-            时长: {formatTime(segment.end - segment.start)}
+            时长: {formatDuration(segment.end - segment.start)}
           </span>
         </div>
 

@@ -7,6 +7,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { ProjectData, VideoInfo, ScriptData, ProjectSettings, TaskStatus } from '../core/types';
 import { logger } from '../utils/logger';
+import { STORAGE_KEYS } from '../constants';
 
 export interface UseProjectReturn {
   // 当前项目
@@ -66,10 +67,14 @@ const DEFAULT_SETTINGS: ProjectSettings = {
   }
 };
 
-// 模拟本地存储
+// 模拟本地存储 - 使用统一的键名，兼容旧数据
+const CURRENT_KEY = STORAGE_KEYS.projects;
+const LEGACY_KEY = STORAGE_KEYS.legacy.projects;
+
 const storage = {
   getProjects: (): ProjectData[] => {
-    const data = localStorage.getItem('reelforge_projects');
+    // 优先读取新键名，兼容旧键名
+    const data = localStorage.getItem(CURRENT_KEY) || localStorage.getItem(LEGACY_KEY);
     if (!data) return [];
     try {
       return JSON.parse(data);
@@ -79,7 +84,9 @@ const storage = {
     }
   },
   saveProjects: (projects: ProjectData[]) => {
-    localStorage.setItem('reelforge_projects', JSON.stringify(projects));
+    // 同时保存到新旧键名
+    localStorage.setItem(CURRENT_KEY, JSON.stringify(projects));
+    localStorage.setItem(LEGACY_KEY, JSON.stringify(projects));
   },
   getProject: (id: string): ProjectData | null => {
     const projects = storage.getProjects();

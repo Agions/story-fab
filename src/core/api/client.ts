@@ -1,4 +1,5 @@
 import { logger } from '../../utils/logger';
+import { STORAGE_KEYS } from '../../constants';
 /**
  * API 客户端
  * 统一的 HTTP 请求管理
@@ -50,7 +51,7 @@ class ApiClient {
     this.client.interceptors.request.use(
       (config: InternalAxiosRequestConfig & RequestConfig) => {
         // 添加认证 token
-        const token = localStorage.getItem('reelforge_token');
+        const token = this.getToken();
         if (token && !config.skipAuth) {
           const headers = config.headers;
           headers.set('Authorization', `Bearer ${token}`);
@@ -214,21 +215,26 @@ class ApiClient {
    * 设置 Token
    */
   setToken(token: string): void {
-    localStorage.setItem('reelforge_token', token);
+    // 优先使用新键名，同时兼容旧键名
+    localStorage.setItem(STORAGE_KEYS.authToken, token);
+    localStorage.setItem(STORAGE_KEYS.legacy.token, token);
   }
 
   /**
    * 清除 Token
    */
   clearToken(): void {
-    localStorage.removeItem('reelforge_token');
+    localStorage.removeItem(STORAGE_KEYS.authToken);
+    localStorage.removeItem(STORAGE_KEYS.legacy.token);
   }
 
   /**
    * 获取 Token
    */
   getToken(): string | null {
-    return localStorage.getItem('reelforge_token');
+    // 优先读取新键名，兼容旧键名
+    return localStorage.getItem(STORAGE_KEYS.authToken)
+      || localStorage.getItem(STORAGE_KEYS.legacy.token);
   }
 }
 

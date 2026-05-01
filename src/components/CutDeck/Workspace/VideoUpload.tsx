@@ -11,8 +11,10 @@ import { formatDuration, formatFileSize, notify } from '../../../shared';
 import type { VideoInfo } from '../../../core/types';
 import styles from './VideoUpload.module.css';
 
+import { VIDEO_FORMATS } from '../../../constants';
+
 // 支持的视频格式
-const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv'];
+const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map(f => `.${f}`);
 
 // 模拟断点续传存储
 const createChunkStore = () => {

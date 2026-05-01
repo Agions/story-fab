@@ -5,6 +5,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { logger } from '../../utils/logger';
+import { delay } from '../../shared';
 import {
   editorService,
   saveToStorage,
@@ -372,7 +373,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
     try {
       // 模拟导出进度
       for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await delay(200);
         setState(prev => ({ ...prev, exportProgress: i }));
       }
 

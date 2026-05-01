@@ -5,6 +5,10 @@ import { logger } from '../utils/logger';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+/** 按 startTime 升序排列脚本段落 */
+const sortSegmentsByTime = (script: Script) =>
+  [...script.content].sort((a, b) => a.startTime - b.startTime);
+
 /**
  * HTML 转义函数，防止 XSS 攻击
  */
@@ -94,7 +98,7 @@ export const exportScript = async (
  * 格式化为纯文本格式
  */
 const formatAsTxt = (script: Script): string => {
-  const segments = [...script.content].sort((a, b) => a.startTime - b.startTime);
+  const segments = sortSegmentsByTime(script);
   
   let content = `标题: ${script.id || '未命名脚本'}\n`;
   content += `创建时间: ${formatDate(script.createdAt)}\n`;
@@ -113,7 +117,7 @@ const formatAsTxt = (script: Script): string => {
  * 格式化为SRT字幕格式
  */
 const formatAsSrt = (script: Script): string => {
-  const segments = [...script.content].sort((a, b) => a.startTime - b.startTime);
+  const segments = sortSegmentsByTime(script);
   
   let content = '';
   
@@ -152,7 +156,7 @@ const formatSrtTime = (seconds: number): string => {
  */
 const exportAsPdf = async (script: Script, filename: string): Promise<boolean> => {
   try {
-    const segments = [...script.content].sort((a, b) => a.startTime - b.startTime);
+    const segments = sortSegmentsByTime(script);
     
     // 创建PDF文档
     const doc = new jsPDF();
@@ -216,7 +220,7 @@ const exportAsPdf = async (script: Script, filename: string): Promise<boolean> =
  * 格式化为HTML格式
  */
 const formatAsHtml = (script: Script): string => {
-  const segments = [...script.content].sort((a, b) => a.startTime - b.startTime);
+  const segments = sortSegmentsByTime(script);
   
   let content = `
 <!DOCTYPE html>

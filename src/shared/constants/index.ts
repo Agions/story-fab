@@ -1,18 +1,31 @@
 /**
  * 共享常量定义
+ * 
+ * 注意：此文件从 src/constants 重新导出所有共享常量
+ * 以保持常量定义的单一来源
  */
 
-// 存储键名
-export const STORAGE_KEYS = {
-  PROJECTS: 'cutdeck_projects',
-  APP_STATE: 'cutdeck_app_state',
-  USER_PREFERENCES: 'cutdeck_preferences',
-  RECENT_FILES: 'cutdeck_recent_files',
-  MODEL_SETTINGS: 'cutdeck_model_settings',
-  EXPORT_HISTORY: 'cutdeck_export_history'
-} as const;
+export {
+  APP,
+  VIDEO_FORMATS,
+  IMAGE_FORMATS,
+  AUDIO_FORMATS,
+  FILE_LIMITS,
+  VIDEO_PARAMS,
+  AI_FEATURES,
+  VOICE_OPTIONS,
+  SCRIPT_STYLES,
+  SCRIPT_LENGTHS,
+  EFFECT_STYLES,
+  PROJECT_TEMPLATES,
+  HOTKEYS,
+  STORAGE_KEYS,
+  API_ENDPOINTS,
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
+} from '../../constants';
 
-// 路由路径
+// 路由路径（仅在 shared 中定义）
 export const ROUTES = {
   HOME: '/',
   DASHBOARD: '/dashboard',
@@ -39,24 +52,6 @@ export const DEFAULTS = {
   PAGE_SIZE_OPTIONS: [10, 20, 50, 100]
 } as const;
 
-// 视频格式
-export const VIDEO_FORMATS = {
-  MP4: 'mp4',
-  MOV: 'mov',
-  WEBM: 'webm',
-  MKV: 'mkv',
-  AVI: 'avi'
-} as const;
-
-// 音频格式
-export const AUDIO_FORMATS = {
-  MP3: 'mp3',
-  WAV: 'wav',
-  FLAC: 'flac',
-  AAC: 'aac',
-  OGG: 'ogg'
-} as const;
-
 // 质量选项
 export const QUALITY_OPTIONS = [
   { value: 'low', label: '低 (480p)', desc: '文件小，加载快' },
@@ -76,16 +71,6 @@ export const RESOLUTION_OPTIONS = [
 // 帧率选项
 export const FRAME_RATE_OPTIONS = [24, 30, 60] as const;
 
-// 脚本风格
-export const SCRIPT_STYLES = [
-  { value: 'professional', label: '专业正式', desc: '适合商业、教育类视频' },
-  { value: 'casual', label: '轻松随意', desc: '适合生活、娱乐类视频' },
-  { value: 'humorous', label: '幽默风趣', desc: '适合搞笑、娱乐类视频' },
-  { value: 'emotional', label: '情感共鸣', desc: '适合故事、情感类视频' },
-  { value: 'technical', label: '技术讲解', desc: '适合教程、科普类视频' },
-  { value: 'promotional', label: '营销推广', desc: '适合产品、广告类视频' }
-] as const;
-
 // 语气选项
 export const TONE_OPTIONS = [
   { value: 'friendly', label: '友好亲切' },
@@ -93,13 +78,6 @@ export const TONE_OPTIONS = [
   { value: 'enthusiastic', label: '热情激昂' },
   { value: 'calm', label: '平静沉稳' },
   { value: 'humorous', label: '幽默诙谐' }
-] as const;
-
-// 脚本长度
-export const SCRIPT_LENGTHS = [
-  { value: 'short', label: '简短', desc: '1-3分钟', words: '300-500字' },
-  { value: 'medium', label: '适中', desc: '3-5分钟', words: '500-800字' },
-  { value: 'long', label: '详细', desc: '5-10分钟', words: '800-1500字' }
 ] as const;
 
 // 目标受众
@@ -112,25 +90,12 @@ export const TARGET_AUDIENCES = [
   { value: 'elderly', label: '中老年群体' }
 ] as const;
 
-// 语言选项
-export const LANGUAGE_OPTIONS = [
-  { value: 'zh', label: '中文' }
-] as const;
-
 // 主题模式
 export const THEME_MODES = [
   { value: 'light', label: '亮色' },
   { value: 'dark', label: '暗色' },
   { value: 'auto', label: '自动' }
 ] as const;
-
-// 文件大小限制 (字节)
-export const FILE_LIMITS = {
-  VIDEO: 2 * 1024 * 1024 * 1024, // 2GB
-  AUDIO: 100 * 1024 * 1024, // 100MB
-  IMAGE: 10 * 1024 * 1024, // 10MB
-  DOCUMENT: 50 * 1024 * 1024 // 50MB
-} as const;
 
 // 允许的文件扩展名
 export const ALLOWED_EXTENSIONS = {

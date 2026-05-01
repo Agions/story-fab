@@ -10,6 +10,9 @@
  * - ClipRenderer      片段渲染器
  * - ClipPropertiesPanel 片段属性面板
  */
+
+// 播放头更新间隔 (ms)，约30fps
+const PLAYHEAD_INTERVAL_MS = 33;
 import React, {
   useState,
   useRef,
@@ -118,11 +121,11 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     if (!isPlaying) return;
     const interval = setInterval(() => {
       setLocalPlayhead((prev) => {
-        const next = prev + 33;
+        const next = prev + PLAYHEAD_INTERVAL_MS;
         if (next >= duration) { clearInterval(interval); return duration; }
         return next;
       });
-    }, 33);
+    }, PLAYHEAD_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [isPlaying, duration]);
 

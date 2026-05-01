@@ -3,8 +3,9 @@
  * 统一的视频上传、分析和处理
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { VideoInfo, VideoAnalysis, Scene } from '../types';
+import { delay } from '../../shared';
 
 interface TaskStatusInfo {
   id?: string;
@@ -49,6 +50,22 @@ export interface UseVideoReturn {
 // 支持的格式
 const SUPPORTED_FORMATS = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv'];
 const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
+const UPLOAD_PROGRESS_INTERVAL_MS = 200;
+const UPLOAD_MAX_PROGRESS_BEFORE_COMPLETE = 90;
+const UPLOAD_PROGRESS_STEP = 10;
+const DEFAULT_FPS = 30;
+
+// 模拟数据生成常量
+const SCENE_DURATION_SECONDS = 30;
+const KEYFRAME_INTERVAL_SECONDS = 5;
+const DEFAULT_SCENE_SCORE = 0.8;
+const ANALYSIS_STEPS: ReadonlyArray<{ progress: number; message: string; delay: number }> = [
+  { progress: 10, message: '提取关键帧...', delay: 1000 },
+  { progress: 30, message: '场景检测...', delay: 2000 },
+  { progress: 50, message: '对象识别...', delay: 2000 },
+  { progress: 70, message: '情感分析...', delay: 1500 },
+  { progress: 90, message: '生成摘要...', delay: 1000 },
+];
 
 // 获取视频信息
 const getVideoInfo = (file: File): Promise<VideoInfo> => {
@@ -66,7 +83,7 @@ const getVideoInfo = (file: File): Promise<VideoInfo> => {
         duration: video.duration,
         width: video.videoWidth,
         height: video.videoHeight,
-        fps: 30, // 默认
+        fps: DEFAULT_FPS, // 默认
         format: file.name.split('.').pop()?.toLowerCase() || 'mp4',
         size: file.size,
         createdAt: new Date().toISOString()
@@ -130,7 +147,16 @@ export function useVideo(): UseVideoReturn {
   const [isLoading, setIsLoading] = useState(false);
   
   const abortControllerRef = useRef<AbortController | null>(null);
-  
+
+  // 组件卸载时清理 AbortController
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
   // 上传视频
   const uploadVideo = useCallback(async (file: File): Promise<VideoInfo | null> => {
     setError(null);
@@ -152,13 +178,13 @@ export function useVideo(): UseVideoReturn {
       // 模拟上传进度
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => {
-          if (prev >= 90) {
+          if (prev >= UPLOAD_MAX_PROGRESS_BEFORE_COMPLETE) {
             clearInterval(progressInterval);
-            return 90;
+            return UPLOAD_MAX_PROGRESS_BEFORE_COMPLETE;
           }
-          return prev + 10;
+          return prev + UPLOAD_PROGRESS_STEP;
         });
-      }, 200);
+      }, UPLOAD_PROGRESS_INTERVAL_MS);
       
       // 获取视频信息
       const info = await getVideoInfo(file);
@@ -202,16 +228,8 @@ export function useVideo(): UseVideoReturn {
     
     try {
       // 模拟分析过程
-      const steps = [
-        { progress: 10, message: '提取关键帧...', delay: 1000 },
-        { progress: 30, message: '场景检测...', delay: 2000 },
-        { progress: 50, message: '对象识别...', delay: 2000 },
-        { progress: 70, message: '情感分析...', delay: 1500 },
-        { progress: 90, message: '生成摘要...', delay: 1000 }
-      ];
-      
-      for (const step of steps) {
-        await new Promise(resolve => setTimeout(resolve, step.delay));
+      for (const step of ANALYSIS_STEPS) {
+        await delay(step.delay);
         setAnalysisProgress(step.progress);
         setTaskStatus((prev) => prev ? {
           ...prev,
@@ -285,19 +303,18 @@ export function useVideo(): UseVideoReturn {
   // 提取关键帧
   const extractKeyframes = useCallback(async (interval: number = 5): Promise<string[]> => {
     if (!video) return [];
-    
-    const keyframes: string[] = [];
+
     const count = Math.floor(video.duration / interval);
-    
-    for (let i = 0; i < count; i++) {
-      const timestamp = i * interval;
-      const thumbnail = await extractThumbnail(timestamp);
-      if (thumbnail) {
-        keyframes.push(thumbnail);
-      }
-    }
-    
-    return keyframes;
+
+    // 并发提取所有关键帧
+    const thumbnails = await Promise.all(
+      Array.from({ length: count }, async (_, i) => {
+        const timestamp = i * interval;
+        return extractThumbnail(timestamp);
+      })
+    );
+
+    return thumbnails.filter((t): t is string => t !== null);
   }, [video, extractThumbnail]);
   
   return {
@@ -327,15 +344,15 @@ function formatDuration(seconds: number): string {
 
 function generateMockScenes(duration: number): Scene[] {
   const scenes: Scene[] = [];
-  const sceneCount = Math.floor(duration / 30);
+  const sceneCount = Math.floor(duration / SCENE_DURATION_SECONDS);
 
   for (let i = 0; i < sceneCount; i++) {
     scenes.push({
       id: crypto.randomUUID(),
-      startTime: i * 30,
-      endTime: Math.min((i + 1) * 30, duration),
+      startTime: i * SCENE_DURATION_SECONDS,
+      endTime: Math.min((i + 1) * SCENE_DURATION_SECONDS, duration),
       type: 'action',
-      score: 0.8,
+      score: DEFAULT_SCENE_SCORE,
       thumbnail: '',
       description: `场景 ${i + 1}`,
       tags: ['场景', `片段${i + 1}`]
@@ -347,16 +364,16 @@ function generateMockScenes(duration: number): Scene[] {
 
 function generateMockKeyframes(duration: number) {
   const keyframes = [];
-  const count = Math.floor(duration / 5);
-  
+  const count = Math.floor(duration / KEYFRAME_INTERVAL_SECONDS);
+
   for (let i = 0; i < count; i++) {
     keyframes.push({
       id: crypto.randomUUID(),
-      timestamp: i * 5,
+      timestamp: i * KEYFRAME_INTERVAL_SECONDS,
       thumbnail: '',
       description: `关键帧 ${i + 1}`
     });
   }
-  
+
   return keyframes;
 }

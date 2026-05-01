@@ -7,6 +7,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { analyzeVideo, VideoMetadata, formatDuration, formatResolution } from '../services/video';
 import { notify } from '../shared';
+import { VIDEO_FORMATS } from '../constants';
 import styles from './VideoSelector.module.less';
 
 interface VideoSelectorProps {
@@ -22,7 +23,7 @@ const isTauri = (): boolean => {
 };
 
 // 支持的视频格式
-const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv'];
+const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map(f => `.${f}`);
 
 /**
  * 视频选择器组件

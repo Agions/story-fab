@@ -1,13 +1,36 @@
+/**
+ * CutDeck 类型统一出口
+ * 
+ * 注意：core/types.ts 是 canonical 类型定义来源
+ * 此文件主要用于：
+ * 1. 重新导出核心类型供外部使用
+ * 2. 定义视频处理特定类型（VideoProject、VideoAnalysis 等）
+ */
+
 import {
   AI_MODELS as CORE_AI_MODELS,
   MODEL_PROVIDERS,
   getModelsByProvider,
 } from '../core/config/models.config';
-import type { ModelProvider, VideoSegment as CoreVideoSegment, ScriptSegment as CoreScriptSegment } from '../core/types';
+import type { 
+  ModelProvider, 
+  VideoSegment as CoreVideoSegment, 
+  ScriptSegment as CoreScriptSegment,
+  ProjectData as CoreProjectData,
+  ProjectSettings as CoreProjectSettings,
+  VideoInfo as CoreVideoInfo,
+  ScriptData as CoreScriptData,
+  TaskStatus as CoreTaskStatus,
+} from '../core/types';
 
-// Re-export canonical types from core/types
+// Re-export canonical types from core/types (这些是编辑器/项目使用的类型)
 export type VideoSegment = CoreVideoSegment;
 export type ScriptSegment = CoreScriptSegment;
+export type ProjectData = CoreProjectData;  // 统一使用 core/types 的定义
+export type ProjectSettings = CoreProjectSettings;
+export type VideoInfo = CoreVideoInfo;
+export type ScriptData = CoreScriptData;
+export type TaskStatus = CoreTaskStatus;
 
 export interface VideoAnalysis {
   id: string;
@@ -150,20 +173,3 @@ export interface AppSettings {
   aiModelsSettings: Partial<Record<AIModelType, AIModelSettings>>;
   theme?: 'light' | 'dark' | 'system';
 }
-
-/**
- * 项目数据（简化版）
- */
-export interface ProjectData {
-  id: string;
-  name: string;
-  templateId?: string;
-  templateName?: string;
-  description: string;
-  videoPath: string;
-  createdAt: string;
-  updatedAt: string;
-  metadata?: Record<string, unknown>;
-  keyFrames?: string[];
-  script?: CoreScriptSegment[];
-} 

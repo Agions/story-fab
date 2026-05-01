@@ -141,6 +141,27 @@ export function formatDateCustom(
 }
 
 /**
+ * 格式化相对时间（今天、昨天、N天前）
+ */
+export function formatRelativeTime(date: Date | string): string {
+  const targetDate = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const diffMs = now.getTime() - targetDate.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
+    return '今天 ' + targetDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+  }
+  if (diffDays === 1) {
+    return '昨天 ' + targetDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+  }
+  if (diffDays < 7) {
+    return `${diffDays} 天前`;
+  }
+  return targetDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+}
+
+/**
  * 格式化数字（千分位）
  */
 export function formatNumber(num: number): string {

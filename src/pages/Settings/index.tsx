@@ -17,7 +17,6 @@ import {
   Lock,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import useTranslation from '../../utils/i18n';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import ApiKeysPanel from '../../components/Settings/ApiKeysPanel';
 import ModelSettingsPanel from '../../components/Settings/ModelSettingsPanel';
@@ -41,7 +40,6 @@ interface ApiKeyConfig {
 
 const Settings: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
-  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState('models');
   const [isLoading, setIsLoading] = useState(true);
@@ -140,8 +138,8 @@ const Settings: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className="text-2xl font-bold mb-1">{t('settings.title')}</h2>
-        <p className="text-muted-foreground text-sm">{t('settings.subtitle')}</p>
+        <h2 className="text-2xl font-bold mb-1">设置</h2>
+        <p className="text-muted-foreground text-sm">自定义您的应用程序设置和AI模型配置</p>
       </div>
 
       <Card className={`${styles.settingsCard} ${isDarkMode ? styles.darkCard : ''}`}>
@@ -153,16 +151,16 @@ const Settings: React.FC = () => {
         >
           <TabsList>
             <TabsTrigger value="models">
-              <Bot size={14} /> {t('settings.models')}
+              <Bot size={14} /> AI模型
             </TabsTrigger>
             <TabsTrigger value="api">
               <Key size={14} /> API 密钥
             </TabsTrigger>
             <TabsTrigger value="general">
-              <SettingsIcon size={14} /> {t('settings.general')}
+              <SettingsIcon size={14} /> 通用设置
             </TabsTrigger>
             <TabsTrigger value="about">
-              <Info size={14} /> {t('settings.about')}
+              <Info size={14} /> 关于
             </TabsTrigger>
             <TabsTrigger value="privacy">
               <Lock size={14} /> 隐私
@@ -198,11 +196,11 @@ const Settings: React.FC = () => {
           <TabsContent value="about">
             <Card>
               <CardHeader>
-                <CardTitle>{t('app.name')}</CardTitle>
+                <CardTitle>CutDeck</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="mb-2">
-                  {t('app.name')}{' '}
+                  CutDeck{' '}
                   是一款专业的短视频剪辑工具，集成了AI技术，帮助创作者更高效地创建优质内容。
                 </p>
                 <p>版本: {packageJson.version} | 作者: Agions</p>

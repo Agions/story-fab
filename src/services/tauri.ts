@@ -6,6 +6,7 @@ import { appConfigDir } from '@tauri-apps/api/path';
 import { open as openExternal } from '@tauri-apps/plugin-shell';
 import { normalizeProjectId, buildProjectIdCandidates } from '../core/utils/project-id';
 import { logger } from '../utils/logger';
+import { formatTime } from '../utils';
 
 type ProjectFileData = {
   aiModel?: {
@@ -343,13 +344,6 @@ export const exportScriptToFile = async (script: ExportScriptData, filename: str
     logger.error('导出脚本失败:', error);
     throw error;
   }
-};
-
-// 格式化时间
-const formatTime = (seconds: number): string => {
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
-  return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 };
 
 /**

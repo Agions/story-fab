@@ -27,6 +27,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { Project, ProjectStatus } from '../types';
+import { formatRelativeTime, formatDuration } from '../../../shared';
 import styles from '../index.module.less';
 
 const STATUS_CONFIG: Record<ProjectStatus, { label: string; className: string; icon: React.ReactNode }> = {
@@ -47,23 +48,6 @@ const StatusBadge: React.FC<{ status: ProjectStatus }> = React.memo(({ status })
   );
 });
 StatusBadge.displayName = 'StatusBadge';
-
-const formatTime = (date: Date | string): string => {
-  const targetDate = typeof date === 'string' ? new Date(date) : date;
-  const now = new Date();
-  const diffMs = now.getTime() - targetDate.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays === 0) return '今天 ' + targetDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-  if (diffDays === 1) return '昨天 ' + targetDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-  if (diffDays < 7) return `${diffDays} 天前`;
-  return targetDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
-};
-
-const formatDuration = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
 
 interface ProjectCardProps {
   project: Project;
@@ -117,7 +101,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project, onOpenPro
           <div className={styles.projectInfo}>
             <div className={styles.projectTitle}>{project.title}</div>
             <div className={styles.projectMeta}>
-              <span className={styles.projectTime}><Clock size={12} />{formatTime(project.updatedAt)}</span>
+              <span className={styles.projectTime}><Clock size={12} />{formatRelativeTime(project.updatedAt)}</span>
               <span className={styles.projectSize}>{project.size.toFixed(1)} MB</span>
             </div>
           </div>
@@ -189,7 +173,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = React.memo(({
         <div className="flex-1 min-w-0">
           <div className="font-medium truncate">{projectProp.title}</div>
           <div className={styles.projectMeta}>
-            <span className={styles.projectTime}><Clock size={12} />{formatTime(projectProp.updatedAt)}</span>
+            <span className={styles.projectTime}><Clock size={12} />{formatRelativeTime(projectProp.updatedAt)}</span>
             <span className={styles.projectSize}>{projectProp.size.toFixed(1)} MB</span>
           </div>
         </div>

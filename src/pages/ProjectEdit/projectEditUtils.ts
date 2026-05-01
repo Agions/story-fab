@@ -10,6 +10,11 @@ import { logger } from '../../utils/logger';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
+// 注意：ProjectData 有两种定义
+// 1. core/types.ts 的 ProjectData - 通用项目管理类型
+// 2. 此处的 ProjectData - 项目编辑页专用，继承 ProjectFileLike
+//    主要区别：包含 videoPath 和 metadata 字段，用于项目编辑页的本地存储
+// ─────────────────────────────────────────────────────────────────────────────
 export interface ProjectData extends ProjectFileLike<unknown, { path?: string }> {
   id: string;
   name: string;
@@ -24,8 +29,7 @@ export interface ProjectData extends ProjectFileLike<unknown, { path?: string }>
 
 export type ProjectSaveBehavior = 'stay' | 'detail';
 
-export const PROJECT_SAVE_BEHAVIOR_KEY = 'cutdeck-project-save-behavior';
-export const PROJECT_AUTO_SAVE_KEY = 'cutdeck-project-auto-save-enabled';
+export { PROJECT_SAVE_BEHAVIOR_KEY, PROJECT_AUTO_SAVE_KEY } from '../../shared/constants/settings';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Project data normalization

@@ -1,11 +1,16 @@
 import type { Timeline } from './types';
 import { logger } from '../../../utils/logger';
+import { STORAGE_KEYS } from '../../../constants';
 
-const STORAGE_KEY = 'reelforge_timeline';
+// Timeline storage key - 使用统一的键名，兼容旧数据
+const CURRENT_KEY = STORAGE_KEYS.timeline;
+const LEGACY_KEY = 'reelforge_timeline'; // 旧键名，保留用于数据迁移
 
 export function saveToStorage(timeline: Timeline): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(timeline));
+    // 同时保存到新旧键名，确保兼容性
+    localStorage.setItem(CURRENT_KEY, JSON.stringify(timeline));
+    localStorage.setItem(LEGACY_KEY, JSON.stringify(timeline));
   } catch (error) {
     logger.error('自动保存失败:', { error });
   }
@@ -13,7 +18,8 @@ export function saveToStorage(timeline: Timeline): void {
 
 export function loadFromStorage(): Timeline | null {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
+    // 优先读取新键名，兼容旧键名
+    const data = localStorage.getItem(CURRENT_KEY) || localStorage.getItem(LEGACY_KEY);
     if (data) {
       return JSON.parse(data);
     }
@@ -24,5 +30,6 @@ export function loadFromStorage(): Timeline | null {
 }
 
 export function clearStorage(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(CURRENT_KEY);
+  localStorage.removeItem(LEGACY_KEY);
 }

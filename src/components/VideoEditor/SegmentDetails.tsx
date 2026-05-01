@@ -3,13 +3,8 @@ import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Eye } from 'lucide-react';
 import { ScriptSegment } from '../../types';
+import { formatTime } from '../../shared';
 import styles from './VideoEditor.module.less';
-
-const formatTime = (time: number) => {
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time % 60);
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-};
 
 const getTypeLabel = (type: string) => {
   switch (type) {

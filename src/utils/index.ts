@@ -5,5 +5,5 @@
 
 export * from './logger';
 export * from './project';
-export * from './i18n';
+export * from './format';
 

@@ -2,21 +2,16 @@
  * 步骤3: AI 分析 — AI Cinema Studio Redesign
  * 神经网络可视化 + 进度大数字 + 逐项 stagger 动画
  */
-import React, { useState, useEffect, memo, useRef } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useCutDeck } from '../AIEditorContext';
 import { visionService } from '../../../core/services/vision.service';
 import { notify } from '../../../shared';
 import { logger } from '../../../utils/logger';
+import { useTimeout } from '../../../hooks/useTimeout';
+import { formatTime } from '../../../utils';
 import type { AIAnalyzeProps, Scene } from '../../../core/types';
 import styles from './AIVisualizer.module.css';
 import HighlightList from './HighlightList';
-
-// 格式化时间
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-};
 
 // 分析任务配置
 interface AnalysisTask {
@@ -128,38 +123,13 @@ const CheckIcon = () => (
 
 const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
   const { state, setAnalysis, goToNextStep, dispatch } = useCutDeck();
+  const timeout = useTimeout();
 
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTaskKey, setCurrentTaskKey] = useState('');
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [visibleTasks, setVisibleTasks] = useState<string[]>([]);
-
-  // 用于跟踪所有 setTimeout IDs，便于清理
-  const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  // 辅助函数：跟踪 setTimeout 并在组件卸载时清理
-  const trackedSetTimeout = (fn: () => void, delay: number) => {
-    const id = setTimeout(fn, delay);
-    timeoutIdsRef.current.push(id);
-    return id;
-  };
-
-  // 用于 Promise 的 setTimeout 包装器
-  const delay = (ms: number): Promise<void> => {
-    return new Promise(resolve => {
-      const id = setTimeout(resolve, ms);
-      timeoutIdsRef.current.push(id);
-    });
-  };
-
-  // 组件卸载时清理所有 timeout
-  useEffect(() => {
-    return () => {
-      timeoutIdsRef.current.forEach(id => clearTimeout(id));
-      timeoutIdsRef.current = [];
-    };
-  }, []);
 
   // 配置
   const [config, setConfig] = useState({
@@ -176,7 +146,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
   useEffect(() => {
     if (analyzing) {
       ANALYSIS_TASKS.forEach((task) => {
-        trackedSetTimeout(() => {
+        timeout.set(() => {
           setVisibleTasks(prev => [...prev, task.key]);
         }, 100 + ANALYSIS_TASKS.findIndex(t => t.key === task.key) * 150);
       });
@@ -218,7 +188,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
       // 场景检测
       if (config.sceneDetection) {
         setCurrentTaskKey('scene');
-        trackedSetTimeout(() => setVisibleTasks(prev => [...prev, 'scene']), 100);
+        timeout.set(() => setVisibleTasks(prev => [...prev, 'scene']), 100);
 
         try {
           const { scenes, objects, emotions } = await visionService.detectScenesAdvanced(
@@ -251,14 +221,14 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         completedCount++;
         setCompletedTasks(prev => [...prev, 'scene']);
         setProgress(Math.round((completedCount / totalTasks) * 100));
-        await delay(600);
+        await timeout.delay(600);
       }
 
       // 物体识别
       if (config.objectDetection) {
         setCurrentTaskKey('object');
-        trackedSetTimeout(() => setVisibleTasks(prev => [...prev, 'object']), 100);
-        await delay(800);
+        timeout.set(() => setVisibleTasks(prev => [...prev, 'object']), 100);
+        await timeout.delay(800);
         completedCount++;
         setCompletedTasks(prev => [...prev, 'object']);
         setProgress(Math.round((completedCount / totalTasks) * 100));
@@ -267,8 +237,8 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
       // 情感分析
       if (config.emotionAnalysis) {
         setCurrentTaskKey('emotion');
-        trackedSetTimeout(() => setVisibleTasks(prev => [...prev, 'emotion']), 100);
-        await delay(700);
+        timeout.set(() => setVisibleTasks(prev => [...prev, 'emotion']), 100);
+        await timeout.delay(700);
         completedCount++;
         setCompletedTasks(prev => [...prev, 'emotion']);
         setProgress(Math.round((completedCount / totalTasks) * 100));
@@ -277,17 +247,17 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
       // OCR (placeholder - method not implemented)
       if (config.ocrEnabled) {
         setCurrentTaskKey('ocr');
-        trackedSetTimeout(() => setVisibleTasks(prev => [...prev, 'ocr']), 100);
+        timeout.set(() => setVisibleTasks(prev => [...prev, 'ocr']), 100);
         setCompletedTasks(prev => [...prev, 'ocr']);
         completedCount++;
         setProgress(Math.round((completedCount / totalTasks) * 100));
-        await delay(500);
+        await timeout.delay(500);
       }
 
       // ASR
       if (config.asrEnabled) {
         setCurrentTaskKey('asr');
-        trackedSetTimeout(() => setVisibleTasks(prev => [...prev, 'asr']), 100);
+        timeout.set(() => setVisibleTasks(prev => [...prev, 'asr']), 100);
         try {
           const { asrService } = await import('../../../core/services/asr.service');
           const asrResult = await asrService.recognizeSpeech(state.currentVideo, { language: 'zh_cn' });
@@ -300,7 +270,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         completedCount++;
         setCompletedTasks(prev => [...prev, 'asr']);
         setProgress(Math.round((completedCount / totalTasks) * 100));
-        await delay(500);
+        await timeout.delay(500);
       }
 
       setCurrentTaskKey('');
@@ -308,7 +278,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
       dispatch({ type: 'SET_STEP_COMPLETE', payload: { step: 'ai-analyze', complete: true } });
       notify.success('AI 分析完成！');
 
-      trackedSetTimeout(() => {
+      timeout.set(() => {
         if (onNext) onNext();
         else goToNextStep();
       }, 800);

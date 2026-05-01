@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useAIEditor } from './CutDeck/AIEditorContext';
 import type { VideoInfo } from '../core/types';
-import { notify } from '../shared';
+import { notify, formatTime } from '../shared';
 import styles from './AIVideoPreview.module.less';
 
 const Text = ({ children, type, strong, style, title, className }: { children: React.ReactNode; type?: string; strong?: boolean; style?: React.CSSProperties; title?: string; className?: string }) => {
@@ -44,12 +44,6 @@ interface ClipResultCompat {
   cutPoints: CutPointCompat[];
   segments: Array<{ id: string }>;
 }
-
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-};
 
 const AIVideoPreview: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
