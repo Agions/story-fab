@@ -107,10 +107,14 @@ export interface ImageFile extends FileInfo {
 
 // ============ 项目类型 ============
 
-/** 项目状态 */
+// Extracted to project.ts - barrel export below
+export { Project, ProjectStatus } from './project';
+
+/* Original definitions (commented out):
+/** 项目状态 *\/
 export type ProjectStatus = 'draft' | 'processing' | 'completed' | 'archived';
 
-/** 项目 */
+/** 项目 *\/
 export interface Project {
   id: ID;
   name: string;
@@ -121,6 +125,7 @@ export interface Project {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+*/
 
 // ============ 工作流类型 ============
 
