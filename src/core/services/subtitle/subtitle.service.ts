@@ -437,7 +437,8 @@ export class SubtitleService {
   ): Promise<string> {
     const mergedStyle = { ...DEFAULT_SUBTITLE_STYLE, ...style };
     logger.info('[SubtitleService] 烧录字幕:', { video: videoPath, subtitle: subtitlePath, output: outputPath });
-    return outputPath;
+    // TODO: 实现 FFmpeg 字幕烧录命令拼接
+    throw new Error('burnSubtitles not implemented: 需要 FFmpeg 字幕烧录实现');
   }
 
   private toSRT(track: SubtitleTrack): string {

@@ -136,8 +136,8 @@ const DEFAULT_ASR_OPTIONS: Required<ASROptions> = {
 
 // 语言代码映射
 const LANGUAGE_MAP: Record<string, string> = {
-  'zh_cn': ' Mandarin',
-  'en_us': ' English',
+  'zh_cn': 'Mandarin',
+  'en_us': 'English',
   'ja_jp': ' Japanese',
   'ko_kr': ' Korean',
 };

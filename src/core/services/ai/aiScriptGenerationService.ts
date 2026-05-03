@@ -329,7 +329,9 @@ const invokeAIModel = async (
   const config = AI_MODEL_CONFIGS[modelType];
   if (!config) throw new AIServiceError(`不支持的模型类型: ${modelType}`);
 
-  const url = modelType === 'google' ? `${config.url}?key=${encodeURIComponent(apiKey)}` : config.url;
+  const url = modelType === 'google'
+    ? `${config.url}?key=${encodeURIComponent(apiKey)}`
+    : config.url;
   const headers = config.headers(apiKey);
 
   try {

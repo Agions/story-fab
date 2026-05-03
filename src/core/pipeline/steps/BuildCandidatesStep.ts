@@ -138,14 +138,52 @@ async function fetchSilenceSegments(videoPath: string): Promise<Array<{ start: n
     return [];
   }
 }
-const transcriptCache = new Map<string, string>();
+/** 固定大小的 LRU 缓存实现（基于 Map 插入有序性） */
+class LRUCache<K, V> {
+  private readonly maxSize: number;
+  private readonly map: Map<K, V>;
+
+  constructor(maxSize: number) {
+    this.maxSize = maxSize;
+    this.map = new Map();
+  }
+
+  get(key: K): V | undefined {
+    if (!this.map.has(key)) return undefined;
+    // 提升到最末（最新使用）
+    const value = this.map.get(key)!;
+    this.map.delete(key);
+    this.map.set(key, value);
+    return value;
+  }
+
+  set(key: K, value: V): void {
+    if (this.map.has(key)) {
+      this.map.delete(key);
+    } else if (this.map.size >= this.maxSize) {
+      // 删除最旧的（Map 按插入顺序迭代，第一个即最旧）
+      const oldest = this.map.keys().next().value;
+      if (oldest !== undefined) this.map.delete(oldest);
+    }
+    this.map.set(key, value);
+  }
+
+  get size(): number {
+    return this.map.size;
+  }
+}
+
+/** LRU 缓存：最多缓存 200 个 transcript 片段，避免内存无限增长 */
+const transcriptCache = new LRUCache<string, string>(200);
+
 function getCachedTranscript(
   asrSegments: ASRSegment[] | undefined,
   startTime: number,
   endTime: number,
 ): string {
   const key = `${startTime.toFixed(2)}_${endTime.toFixed(2)}`;
-  if (transcriptCache.has(key)) return transcriptCache.get(key)!;
+  const cached = transcriptCache.get(key);
+  if (cached !== undefined) return cached;
   const result = extractSceneTranscript(asrSegments, startTime, endTime);
   transcriptCache.set(key, result);
   return result;

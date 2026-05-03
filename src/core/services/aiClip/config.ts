@@ -1,4 +1,5 @@
 import type { AIClipConfig } from './types';
+import { logger } from '../../../shared/utils/logging';
 
 export function exportClipConfig(config: AIClipConfig): string {
   return JSON.stringify(config, null, 2);
