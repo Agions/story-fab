@@ -82,6 +82,7 @@ export function addEffect(
 
 /** 调整播放速度 */
 export function adjustSpeed(timeline: Timeline, clipId: string, speed: number): Timeline {
+  if (speed <= 0) return timeline;
   const found = findClipInTracks(timeline.tracks, clipId);
   if (!found) return timeline;
 

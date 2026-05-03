@@ -18,7 +18,6 @@
 // 基础 & providers
 export { BaseService, ServiceError } from './providers/base.service';
 export * from './providers';
-export type { ModelProvider } from './providers/types';
 
 // AI 服务（ai/ 子目录）
 export { aiService } from './ai/ai.service';

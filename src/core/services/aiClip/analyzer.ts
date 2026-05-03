@@ -1,6 +1,5 @@
 import { visionService } from '../ai/vision.service';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotion-peak-detector';
-import { invoke } from '@tauri-apps/api/core';
 import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
 import { DEFAULT_CLIP_CONFIG } from './types';
 import { formatTime as formatSharedTime } from '../../../shared/utils/formatting';
@@ -32,7 +31,7 @@ export async function analyzeVideo(
     // Skip emotion detection here — ZCR peak detector handles it more reliably
     Promise.resolve({ scenes: [] as Scene[], objects: [], emotions: [] as EmotionAnalysis[] }),
   ]).then(([r]) => r).catch((err) => {
-    console.warn('[analyzer] detectScenesAdvanced failed:', err);
+    logger.warn('[analyzer] detectScenesAdvanced failed:', err);
     return { scenes: [] as Scene[], objects: [], emotions: [] as EmotionAnalysis[] };
   });
 
@@ -234,10 +233,12 @@ function generateCutPoints(
     });
   }
 
-  // Add emotion peak cutPoints
+  // 硬编码的情感阈值（0-100），用于筛选情感峰值作为潜在剪辑点
+  // 来源：基于音频能量分析的通用经验值，峰值能量 > 60 时通常对应情绪高涨段落
+  const EMOTION_ENERGY_THRESHOLD = 60;
   if (config.detectEmotion && config.aiOptimize && emotionPeaks.length > 0) {
     for (const peak of emotionPeaks) {
-      if (peak.energy > 60) {
+      if (peak.energy > EMOTION_ENERGY_THRESHOLD) {
         cutPoints.push({
           id: `emo_${peak.timestamp.toFixed(2)}`,
           timestamp: peak.timestamp,

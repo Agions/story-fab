@@ -143,7 +143,7 @@ export class ClipScorer {
           silenceRatio: 0,
           speakingPace: 0,
           keywordBoost: 0,
-          reasons: [`评分异常: ${err}`],
+          reasons: [`评分异常: ${err instanceof Error ? err.message : String(err)}`],
         });
       }
     }

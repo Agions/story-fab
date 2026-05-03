@@ -2,7 +2,7 @@
  * API 密钥验证服务
  */
 import axios from 'axios';
-import { logger } from '@/shared/utils/logging';
+import { logger } from '../../../shared/utils/logging';
 
 export interface ApiKeyValidationResult {
   isValid: boolean;
@@ -56,21 +56,25 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
       case 'google':
         // Google AI Studio API 验证
         await axios.get(
-          `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
-          { timeout: 10000 }
+          `https://generativelanguage.googleapis.com/v1beta/models`,
+          { params: { key: apiKey }, timeout: 10000 }
         );
         break;
 
       case 'baidu':
-        // 百度文心 - 验证 access_token
+        // 百度文心 - 验证 access_token，格式：apiKey:apiSecret
+        const [baiduApiKey, baiduSecret] = apiKey.split(':');
+        if (!baiduApiKey || !baiduSecret) {
+          return { isValid: false, error: '百度 API 密钥格式无效（应为 api_key:api_secret）' };
+        }
         await axios.post(
           'https://aip.baidubce.com/oauth/2.0/token',
           null,
           {
             params: {
               grant_type: 'client_credentials',
-              client_id: apiKey.split(':')[0] || apiKey,
-              client_secret: apiKey.split(':')[1] || '',
+              client_id: baiduApiKey,
+              client_secret: baiduSecret,
             },
             timeout: 10000,
           }

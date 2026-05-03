@@ -101,82 +101,6 @@ export class MultiFormatExporter {
   }
 
   /**
-   * 批量执行导出任务（调用 Rust render_autonomous_cut）
-   * 返回每个任务的执行结果
-   */
-  async executeExportTasks(
-    tasks: Map<string, ExportTask[]>,
-    onProgress?: (clipIndex: number, total: number, clipId: string) => void,
-  ): Promise<ExportExecutionResult> {
-    const allTasks: ExportTask[] = Array.from(tasks.values()).flat();
-
-    const outputs: ExportExecutionResult['outputs'] = [];
-    let succeeded = 0;
-    let failed = 0;
-    const total = allTasks.length;
-
-    for (let i = 0; i < allTasks.length; i++) {
-      const task = allTasks[i];
-      const clipIndex = Math.floor(i / 3); // 每 3 个 format 算一个 clip
-      onProgress?.(clipIndex, allTasks.length, task.clipId);
-
-      try {
-        // 调用 Rust 执行 FFmpeg 导出
-        const result = await this.executeSingleExport(task);
-        outputs.push({
-          clipId: task.clipId,
-          aspectRatio: task.aspectRatio,
-          outputPath: task.outputPath,
-          success: result.success,
-          error: result.error,
-        });
-        if (result.success) succeeded++;
-        else failed++;
-      } catch (err) {
-        outputs.push({
-          clipId: task.clipId,
-          aspectRatio: task.aspectRatio,
-          outputPath: task.outputPath,
-          success: false,
-          error: String(err),
-        });
-        failed++;
-      }
-    }
-
-    return { total, succeeded, failed, outputs };
-  }
-
-  /**
-   * 执行单个导出任务（通过 Rust 命令）
-   */
-  private async executeSingleExport(task: ExportTask): Promise<{ success: boolean; error?: string }> {
-    try {
-      const { invoke } = await import('@tauri-apps/api/core');
-
-      // 调用 Rust 的 cut_video 命令执行导出
-      const result = await invoke<string>('cut_video', {
-        inputPath: (task.ffmpegArgs[1] as string) ?? '',
-        outputPath: task.outputPath,
-        startTime: task.ffmpegArgs[0] ?? '0',
-        duration: String(task.duration),
-        width: task.width,
-        height: task.height,
-      }).catch(async () => {
-        // fallback: 直接用 ffmpeg 命令
-        const { Command } = await import('@tauri-apps/plugin-shell');
-        const ffmpegCmd = Command.create('ffmpeg', task.ffmpegArgs.slice(1));
-        await ffmpegCmd.execute();
-        return task.outputPath;
-      });
-
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: String(err) };
-    }
-  }
-
-  /**
    * 生成导出的文件名
    */
   buildOutputFilename(
@@ -264,7 +188,7 @@ export class MultiFormatExporter {
       const crop = `crop=${width}:${height}`;
       return cropStrategy === 'smart'
         ? `${scaleW},${crop},setsar=1:1`
-        : `${scaleW},${crop},setsar=1:1`;
+        : `${scaleW},crop=in_w:in_h:x=0:y=0,setsar=1:1`;
     } else {
       // 目标更宽 → 先 scale 到高度，再 pad 宽度
       const scaleH = `scale=-1:${height}`;
@@ -282,22 +206,6 @@ export interface ExportTask {
   width: number;
   height: number;
   duration: number;
-}
-
-/**
- * 批量执行导出的结果
- */
-export interface ExportExecutionResult {
-  total: number;
-  succeeded: number;
-  failed: number;
-  outputs: Array<{
-    clipId: string;
-    aspectRatio: AspectRatio;
-    outputPath: string;
-    success: boolean;
-    error?: string;
-  }>;
 }
 
 export const multiFormatExporter = new MultiFormatExporter();

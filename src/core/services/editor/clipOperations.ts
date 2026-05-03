@@ -142,13 +142,13 @@ export function splitClip(timeline: Timeline, clipId: string, splitMs: number): 
 
   const firstPart: TimelineClip = {
     ...clip,
-    id: `${clip.id}_1`,
+    id: crypto.randomUUID(),
     endMs: splitMs,
   };
 
   const secondPart: TimelineClip = {
     ...clip,
-    id: `${clip.id}_2`,
+    id: crypto.randomUUID(),
     startMs: splitMs,
   };
 

@@ -168,7 +168,7 @@ export class EditorService {
     const handler = actionHandlers[action.type];
     
     if (!handler) {
-      console.warn(`No handler registered for action type: ${action.type}`);
+      logger.warn(`No handler registered for action type: ${action.type}`);
       return;
     }
 
@@ -244,12 +244,16 @@ export class EditorService {
     timeline = addTrack(timeline, 'video');
     timeline = addTrack(timeline, 'text');
 
-    const videoTrack = timeline.tracks.find(t => t.type === 'video');
-    const textTrack = timeline.tracks.find(t => t.type === 'text');
+    const videoTrackIndex = timeline.tracks.findIndex(t => t.type === 'video');
+    const textTrackIndex = timeline.tracks.findIndex(t => t.type === 'text');
 
-    if (!videoTrack || !textTrack) {
+    if (videoTrackIndex === -1 || textTrackIndex === -1) {
       return timeline;
     }
+
+    const newTracks = [...timeline.tracks];
+    const videoTrack = { ...newTracks[videoTrackIndex], clips: [...newTracks[videoTrackIndex].clips] };
+    const textTrack = { ...newTracks[textTrackIndex], clips: [...newTracks[textTrackIndex].clips] };
 
     let currentMs = 0;
 
@@ -290,8 +294,11 @@ export class EditorService {
       currentMs += duration;
     }
 
+    newTracks[videoTrackIndex] = videoTrack;
+    newTracks[textTrackIndex] = textTrack;
+
     // 更新时长并推送历史
-    timeline = { ...timeline, duration: currentMs };
+    timeline = { ...timeline, tracks: newTracks, duration: currentMs };
     this.history = pushHistory(this.history, timeline);
     this.notify();
     return timeline;

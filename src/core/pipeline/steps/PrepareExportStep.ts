@@ -53,8 +53,10 @@ export const prepareExportStep: Step<PrepareExportInput, PrepareExportOutput> =
     reportProgress(options?.onProgress, STEP_META.name, 0.2, '获取导出目录...');
 
     // 获取导出目录（优先用户指定，否则调用 Rust）
-    const exportDir = outputDir
-      ?? (await tauri.getExportDir() as string ?? '/tmp/CutDeck');
+    const exportDir = outputDir ?? (await tauri.getExportDir() as string | undefined);
+    if (!exportDir) {
+      throw new Error('[PrepareExportStep] 无法获取导出目录，请检查 Tauri 配置');
+    }
 
     logger.debug(`[PrepareExportStep] 导出目录: ${exportDir}`);
 
