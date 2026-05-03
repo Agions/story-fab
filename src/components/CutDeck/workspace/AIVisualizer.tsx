@@ -41,7 +41,7 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
         <path d="M4 7V4h16v3M9 20h6M12 4v16" />
       </svg>
     ),
-    desc: '提取视频中的文字内容',
+    desc: '提取视频中的文字内容（即将上线）',
   },
   {
     key: 'asr',
@@ -244,14 +244,15 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         setProgress(Math.round((completedCount / totalTasks) * 100));
       }
 
-      // OCR (placeholder - method not implemented)
+      // OCR — stub: 功能即将上线（依赖 Rust OCR 后端）
       if (config.ocrEnabled) {
         setCurrentTaskKey('ocr');
         timeout.set(() => setVisibleTasks(prev => [...prev, 'ocr']), 100);
+        // 占位：OCR 后端尚未实现，跳过真实识别
+        await timeout.delay(500);
         setCompletedTasks(prev => [...prev, 'ocr']);
         completedCount++;
         setProgress(Math.round((completedCount / totalTasks) * 100));
-        await timeout.delay(500);
       }
 
       // ASR
