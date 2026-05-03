@@ -2,7 +2,7 @@
  * 音画同步服务
  * 提供专业的音视频同步功能
  */
-import { spawn } from 'child_process';
+import { invoke } from '@tauri-apps/api/core';
 import { logger } from '../../shared/utils/logging';
 
 
@@ -202,17 +202,7 @@ export class AudioVideoSyncService {
   }
 
   private async ffprobeOutput(args: string[]): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const proc = spawn('ffprobe', args, { shell: false });
-      let stdout = '', stderr = '';
-      proc.stdout?.on('data', (d: Buffer) => { stdout += d.toString(); });
-      proc.stderr?.on('data', (d: Buffer) => { stderr += d.toString(); });
-      proc.on('close', (code: number) => {
-        if (code === 0) resolve(stdout);
-        else reject(new Error(`ffprobe exited ${code}: ${stderr}`));
-      });
-      proc.on('error', reject);
-    });
+    return await invoke<string>('run_ffprobe', { args });
   }
 
   /**
