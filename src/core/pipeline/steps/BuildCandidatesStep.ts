@@ -13,6 +13,7 @@
 import { visionService } from '../../services/vision.service';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import type { CandidateClip } from '../../services/clipRepurposing/clipScorer';
+import type { ASRSegment } from '../../services/asr.service';
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
 import { logger } from '../../../shared/utils/logging';
 
@@ -33,6 +34,8 @@ const STEP_META = {
 export interface BuildCandidatesInput {
   videoInfo: VideoInfo;
   analysis: VideoAnalysis;
+  /** ASR 分段结果（含时间戳），用于精确提取片段字幕 */
+  asrSegments?: ASRSegment[];
   maxHighlights?: number;   // 最多高光候选，默认 15
   minDuration?: number;      // 最短片段秒数，默认 10
   maxDuration?: number;     // 最长片段秒数，默认 120
@@ -46,7 +49,7 @@ export type BuildCandidatesOutput = CandidateClip[];
 
 export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutput> =
   createStep(STEP_META, async (input, _ctx, options) => {
-    const { videoInfo, analysis, maxHighlights = 15, minDuration = 10, maxDuration = 120 } = input;
+    const { videoInfo, analysis, asrSegments, maxHighlights = 15, minDuration = 10, maxDuration = 120 } = input;
     const candidates: CandidateClip[] = [];
     const scenes = analysis?.scenes ?? [];
 
@@ -67,7 +70,7 @@ export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutp
         startTime: h.startTime,
         endTime: h.endTime,
         sceneType: 'highlight',
-        transcript: extractSceneTranscript(analysis, h.startTime, h.endTime),
+        transcript: extractSceneTranscript(asrSegments, h.startTime, h.endTime),
         audioEnergy: h.audioScore,
       });
     }
@@ -91,22 +94,21 @@ export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutp
           const subClips = splitLongScene(scene.startTime, scene.endTime, maxDuration * 0.6, maxDuration);
           candidates.push(...subClips.map(sc => ({
             ...sc,
-            transcript: extractSceneTranscript(analysis, sc.startTime, sc.endTime),
+            transcript: extractSceneTranscript(asrSegments, sc.startTime, sc.endTime),
           })));
           continue;
         }
 
         candidates.push({
-          startTime: scene.startTime,
-          endTime: scene.endTime,
-          sceneType: scene.type ?? 'scene',
-          transcript: extractSceneTranscript(analysis, scene.startTime, scene.endTime),
+          startTime: scene.startTime ?? 0,
+          endTime: scene.endTime ?? 0,
+          sceneType: 'scene',
+          transcript: extractSceneTranscript(asrSegments, scene.startTime ?? 0, scene.endTime ?? 0),
         });
       }
     }
 
-    reportProgress(options?.onProgress, STEP_META.name, 0.9, `共 ${candidates.length} 个候选片段`);
-    logger.info(`[BuildCandidatesStep] 完成，共 ${candidates.length} 个候选片段`);
+    reportProgress(options?.onProgress, STEP_META.name, 0.8, `共 ${candidates.length} 个候选片段`);
 
     return candidates;
   });
@@ -139,23 +141,17 @@ function splitLongScene(
 }
 
 function extractSceneTranscript(
-  analysis: VideoAnalysis,
+  asrSegments: ASRSegment[] | undefined,
   startTime: number,
   endTime: number,
 ): string {
-  // 从 analysis.transcript 中提取对应时间段的文本
-  const transcript = analysis.transcript;
-  if (!transcript) return '';
-  if (typeof transcript !== 'string') return '';
-
-  const segments = transcript.split('\n').filter(Boolean);
-  // 简单线性扫描：保留包含在 [startTime, endTime] 内的句子
-  return segments
-    .filter(() => {
-      // TODO: 需要时间轴信息才能精确过滤
-      // 暂时返回全部
-      return true;
-    })
-    .join(' ')
-    .slice(0, 500);
+  if (!asrSegments || asrSegments.length === 0) return '';
+  const texts: string[] = [];
+  for (const seg of asrSegments) {
+    // 重叠即为命中（允许少量边界重叠）
+    if (seg.endTime > startTime && seg.startTime < endTime) {
+      texts.push(seg.text);
+    }
+  }
+  return texts.join(' ').slice(0, 500);
 }

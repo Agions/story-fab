@@ -21,7 +21,6 @@ const MODELS = [
   { value: 'deepseek-v4-flash', label: 'DeepSeek-V4-Flash (推荐)' },
 
   { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4' },
-  { value: 'qwen3-max', label: 'Qwen3-Max' },
   { value: 'kimi-k2.6', label: 'Kimi K2.6' },
 ];
 

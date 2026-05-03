@@ -84,14 +84,14 @@ export const AI_CONFIG = {
 export const AI_PROVIDERS = {
   openai: {
     name: 'OpenAI',
-    models: ['gpt-4o', 'gpt-4o-mini'],
+    models: ['gpt-4o', 'gpt-4o-mini', 'o3', 'o3-mini'],
     vision: true,
     tts: true,
     stt: true,
   },
   anthropic: {
     name: 'Anthropic',
-    models: ['claude-3-5-sonnet', 'claude-3-haiku'],
+    models: ['claude-opus-4.7', 'claude-sonnet-4.6', 'claude-opus-4.6', 'claude-sonnet-4.5', 'claude-haiku-4.5', 'claude-3-5-sonnet'],
     vision: true,
     tts: false,
     stt: false,
