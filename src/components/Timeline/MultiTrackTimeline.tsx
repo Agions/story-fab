@@ -111,10 +111,14 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
   const tracksContainerRef = useRef<HTMLDivElement>(null);
   const msPerPixel = 1000 / localZoom;
 
-  useEffect(() => { setTracks(initialTracks); }, [initialTracks]);
-  useEffect(() => { setLocalPlayhead(playheadMs); }, [playheadMs]);
-  useEffect(() => { setLocalZoom(zoom); }, [zoom]);
-  useEffect(() => { setLocalScrollX(scrollX); }, [scrollX]);
+  // 合并4个独立 sync useEffect 为1个，初始化后不再追踪 props 变化
+  //（后续修改均通过内部 setState 或父组件回调，不依赖 props 同步）
+  useEffect(() => {
+    setTracks(initialTracks);
+    setLocalPlayhead(playheadMs);
+    setLocalZoom(zoom);
+    setLocalScrollX(scrollX);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 播放头跟随
   useEffect(() => {
