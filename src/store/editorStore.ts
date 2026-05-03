@@ -1,100 +1,27 @@
 /**
  * Editor Store
  *
- * Domains:
- * - Media state      : video, script, voice data
- * - Segment state    : single-track clips (legacy)
- * - Timeline state   : multi-track clips, playhead, snap
- * - History          : undo/redo for segments and timeline
+ * Phase 3: Store 拆分 - Timeline 相关状态已迁移到 timelineStore
  *
- * All types are defined in ./editorTypes.ts
+ * 保留职责：
+ * - Media state      : video, script, voice data
+ * - Segment state    : single-track clips (legacy, deprecated)
+ * - UI state        : zoom, volume, panel, playback
+ *
+ * Timeline 相关状态请使用 useTimelineStore
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-import type { EditorStore, EditorState, VideoData, ScriptData, VoiceData, TimelineSelection } from './editorTypes';
-import type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '../components/Timeline/types';
+import type { EditorStore, EditorState, VideoData, ScriptData, VoiceData } from './editorTypes';
 import {
   MAX_HISTORY_SIZE,
-  DEFAULT_SNAP_THRESHOLD_MS,
   DEFAULT_ZOOM,
   ZOOM_MIN,
   ZOOM_MAX,
   VOLUME_MIN,
   VOLUME_MAX,
 } from './editorTypes';
-
-// =========================================
-// Helper functions
-// =========================================
-
-/**
- * 在 timelineTracks 中更新指定 clip 的属性
- */
-const updateClipInTracks = (
-  tracks: TimelineTrack[],
-  clipId: string,
-  clipUpdates: Partial<TimelineClip>
-): TimelineTrack[] =>
-  tracks.map((t) => ({
-    ...t,
-    clips: t.clips.map((c) => (c.id === clipId ? { ...c, ...clipUpdates } : c)),
-  }));
-
-/**
- * 在 timelineTracks 中为指定 clip 添加 keyframe
- */
-const addKeyframeToClip = (
-  tracks: TimelineTrack[],
-  clipId: string,
-  keyframe: Keyframe
-): TimelineTrack[] =>
-  tracks.map((t) => ({
-    ...t,
-    clips: t.clips.map((c) =>
-      c.id === clipId ? { ...c, keyframes: [...(c.keyframes || []), keyframe] } : c
-    ),
-  }));
-
-/**
- * 在 timelineTracks 中移除指定 clip 的 keyframe
- */
-const removeKeyframeFromClip = (
-  tracks: TimelineTrack[],
-  clipId: string,
-  keyframeId: string
-): TimelineTrack[] =>
-  tracks.map((t) => ({
-    ...t,
-    clips: t.clips.map((c) =>
-      c.id === clipId
-        ? { ...c, keyframes: (c.keyframes || []).filter((kf) => kf.id !== keyframeId) }
-        : c
-    ),
-  }));
-
-/**
- * 在 timelineTracks 中更新指定 clip 的 keyframe
- */
-const updateKeyframeInClip = (
-  tracks: TimelineTrack[],
-  clipId: string,
-  keyframeId: string,
-  keyframeUpdates: Partial<Keyframe>
-): TimelineTrack[] =>
-  tracks.map((t) => ({
-    ...t,
-    clips: t.clips.map((c) =>
-      c.id === clipId
-        ? {
-            ...c,
-            keyframes: (c.keyframes || []).map((kf) =>
-              kf.id === keyframeId ? { ...kf, ...keyframeUpdates } : kf
-            ),
-          }
-        : c
-    ),
-  }));
 
 // =========================================
 // Initial state
@@ -112,11 +39,12 @@ const initialState: EditorState = {
   selection: { segmentId: undefined, multipleIds: [] },
   zoom: DEFAULT_ZOOM,
   scrollPosition: 0,
+  // Timeline 相关状态已迁移到 timelineStore
   playheadMs: 0,
   timelineTracks: [],
   timelineDuration: 60000,
   snapEnabled: true,
-  snapThreshold: DEFAULT_SNAP_THRESHOLD_MS,
+  snapThreshold: 100,
   selectedClipId: undefined,
   selectedTrackId: undefined,
   inPointMs: undefined,
@@ -144,7 +72,7 @@ export const useEditorStore = create<EditorStore>()(
         set({ volume: Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, volume)) }),
       setMuted: (muted) => set({ muted }),
 
-      // ─── Segments ───────────────────────────────────────────────────────────
+      // ─── Segments (Legacy) ─────────────────────────────────────────────────
       addSegment: (segment) => {
         get().saveHistory();
         set((s) => ({ segments: [...s.segments, segment] }));
@@ -186,173 +114,94 @@ export const useEditorStore = create<EditorStore>()(
       setZoom: (zoom) => set({ zoom: Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom)) }),
       setScrollPosition: (scrollPosition) => set({ scrollPosition }),
 
-      // ─── Timeline ───────────────────────────────────────────────────────────
-      setPlayheadMs: (ms) => set({ playheadMs: Math.max(0, ms) }),
+      // ─── Timeline (Deprecated - 使用 useTimelineStore) ───────────────────
+      // 以下方法已废弃，仅为兼容旧代码保留
+      // 请使用 useTimelineStore 中的对应方法
 
-      setTimelineTracks: (tracks) => {
-        get().saveTrackHistory();
-        set({ timelineTracks: tracks });
+      setPlayheadMs: (_ms) => {
+        console.warn('setPlayheadMs is deprecated, use useTimelineStore.setPlayheadMs');
       },
 
-      addTimelineTrack: (type, name) => {
-        const id = crypto.randomUUID();
-        const typeNames: Record<string, string> = {
-          video: '视频', audio: '音频', subtitle: '字幕', effect: '效果',
-        };
-        const count = get().timelineTracks.filter((t) => t.type === type).length;
-        const track: TimelineTrack = {
-          id,
-          type,
-          name: name || `${typeNames[type] || type}轨道 ${count + 1}`,
-          clips: [],
-          muted: false,
-          locked: false,
-          visible: true,
-          height: type === 'subtitle' ? 50 : 60,
-        };
-        set((s) => ({ timelineTracks: [...s.timelineTracks, track] }));
-        return id;
+      setTimelineTracks: (_tracks) => {
+        console.warn('setTimelineTracks is deprecated, use useTimelineStore.setTimelineTracks');
       },
 
-      removeTimelineTrack: (trackId) => {
-        get().saveTrackHistory();
-        set((s) => ({ timelineTracks: s.timelineTracks.filter((t) => t.id !== trackId) }));
+      addTimelineTrack: (_type, _name) => {
+        console.warn('addTimelineTrack is deprecated, use useTimelineStore.addTimelineTrack');
+        return '';
       },
 
-      updateTimelineTrack: (trackId, updates) =>
-        set((s) => ({
-          timelineTracks: s.timelineTracks.map((t) =>
-            t.id === trackId ? { ...t, ...updates } : t
-          ),
-        })),
-
-      addClipToTrack: (trackId, clipData) => {
-        const id = crypto.randomUUID();
-        const clip: TimelineClip = { ...clipData, id, trackId };
-        get().saveTrackHistory();
-        set((s) => ({
-          timelineTracks: s.timelineTracks.map((t) =>
-            t.id === trackId ? { ...t, clips: [...t.clips, clip] } : t
-          ),
-          selectedClipId: id,
-          selectedTrackId: trackId,
-        }));
-        return id;
+      removeTimelineTrack: (_trackId) => {
+        console.warn('removeTimelineTrack is deprecated, use useTimelineStore.removeTimelineTrack');
       },
 
-      removeClipFromTrack: (clipId) => {
-        get().saveTrackHistory();
-        set((s) => ({
-          timelineTracks: s.timelineTracks.map((t) => ({
-            ...t,
-            clips: t.clips.filter((c) => c.id !== clipId),
-          })),
-          selectedClipId: s.selectedClipId === clipId ? undefined : s.selectedClipId,
-          selectedTrackId: s.selectedClipId === clipId ? undefined : s.selectedTrackId,
-        }));
+      updateTimelineTrack: (_trackId, _updates) => {
+        console.warn('updateTimelineTrack is deprecated, use useTimelineStore.updateTimelineTrack');
       },
 
-      updateClip: (clipId, updates) =>
-        set((s) => ({
-          timelineTracks: updateClipInTracks(s.timelineTracks, clipId, updates),
-        })),
-
-      moveClip: (clipId, targetTrackId, newStartMs, newEndMs) => {
-        get().saveTrackHistory();
-        set((s) => {
-          let clipToMove: TimelineClip | undefined;
-          const afterRemove = s.timelineTracks.map((t) => {
-            const clip = t.clips.find((c) => c.id === clipId);
-            if (clip) { clipToMove = { ...clip, trackId: targetTrackId }; }
-            return clip ? { ...t, clips: t.clips.filter((c) => c.id !== clipId) } : t;
-          });
-          if (!clipToMove) return s;
-          const duration = clipToMove.endMs - clipToMove.startMs;
-          // Keep source timing in sync when resizing
-          const updatedSourceEndMs = newEndMs !== undefined
-            ? clipToMove.sourceStartMs + (newEndMs - newStartMs)
-            : clipToMove.sourceEndMs;
-          return {
-            timelineTracks: afterRemove.map((t) =>
-              t.id === targetTrackId
-                ? {
-                    ...t,
-                    clips: [
-                      ...t.clips,
-                      { ...clipToMove!, startMs: newStartMs, endMs: newEndMs ?? newStartMs + duration, sourceEndMs: updatedSourceEndMs },
-                    ],
-                  }
-                : t
-            ),
-          };
-        });
+      addClipToTrack: (_trackId, _clipData) => {
+        console.warn('addClipToTrack is deprecated, use useTimelineStore.addClipToTrack');
+        return '';
       },
 
-      splitClip: (clipId, splitMs) => {
-        get().saveTrackHistory();
-        set((s) => ({
-          timelineTracks: s.timelineTracks.map((t) => {
-            const idx = t.clips.findIndex((c) => c.id === clipId);
-            if (idx === -1) return t;
-            const clip = t.clips[idx];
-            if (splitMs <= clip.startMs || splitMs >= clip.endMs) return t;
-            const offset = splitMs - clip.startMs;
-            const sourceSplit = clip.sourceStartMs + offset;
-            const leftClip: TimelineClip = { ...clip, endMs: splitMs, sourceEndMs: sourceSplit };
-            const rightClip: TimelineClip = {
-              ...clip,
-              id: crypto.randomUUID(),
-              startMs: splitMs,
-              endMs: clip.endMs,
-              sourceStartMs: sourceSplit,
-            };
-            const newClips = [...t.clips];
-            newClips.splice(idx, 1, leftClip, rightClip);
-            return { ...t, clips: newClips };
-          }),
-        }));
+      removeClipFromTrack: (_clipId) => {
+        console.warn('removeClipFromTrack is deprecated, use useTimelineStore.removeClipFromTrack');
       },
 
-      addKeyframe: (clipId, kfData) => {
-        const id = crypto.randomUUID();
-        const keyframe: Keyframe = { ...kfData, id };
-        set((s) => ({
-          timelineTracks: addKeyframeToClip(s.timelineTracks, clipId, keyframe),
-        }));
-        return id;
+      updateClip: (_clipId, _updates) => {
+        console.warn('updateClip is deprecated, use useTimelineStore.updateClip');
       },
 
-      removeKeyframe: (clipId, keyframeId) =>
-        set((s) => ({
-          timelineTracks: removeKeyframeFromClip(s.timelineTracks, clipId, keyframeId),
-        })),
+      moveClip: (_clipId, _targetTrackId, _newStartMs, _newEndMs) => {
+        console.warn('moveClip is deprecated, use useTimelineStore.moveClip');
+      },
 
-      updateKeyframe: (clipId, keyframeId, updates) =>
-        set((s) => ({
-          timelineTracks: updateKeyframeInClip(s.timelineTracks, clipId, keyframeId, updates),
-        })),
+      splitClip: (_clipId, _splitMs) => {
+        console.warn('splitClip is deprecated, use useTimelineStore.splitClip');
+      },
 
-      setTimelineSelection: (clipId, trackId) =>
-        set({ selectedClipId: clipId, selectedTrackId: trackId }),
+      addKeyframe: (_clipId, _kfData) => {
+        console.warn('addKeyframe is deprecated, use useTimelineStore.addKeyframe');
+        return '';
+      },
 
-      clearTimelineSelection: () =>
-        set({ selectedClipId: undefined, selectedTrackId: undefined }),
+      removeKeyframe: (_clipId, _keyframeId) => {
+        console.warn('removeKeyframe is deprecated, use useTimelineStore.removeKeyframe');
+      },
 
-      setInPoint: () => set({ inPointMs: get().playheadMs }),
-      setOutPoint: () => set({ outPointMs: get().playheadMs }),
+      updateKeyframe: (_clipId, _keyframeId, _updates) => {
+        console.warn('updateKeyframe is deprecated, use useTimelineStore.updateKeyframe');
+      },
+
+      setTimelineSelection: (_clipId, _trackId) => {
+        console.warn('setTimelineSelection is deprecated, use useTimelineStore.setTimelineSelection');
+      },
+
+      clearTimelineSelection: () => {
+        console.warn('clearTimelineSelection is deprecated, use useTimelineStore.clearTimelineSelection');
+      },
+
+      setInPoint: () => {
+        console.warn('setInPoint is deprecated, use useTimelineStore.setInPoint');
+      },
+
+      setOutPoint: () => {
+        console.warn('setOutPoint is deprecated, use useTimelineStore.setOutPoint');
+      },
 
       selectAllClips: () => {
-        const allClipIds = get().timelineTracks.flatMap((t) => t.clips.map((c) => c.id));
-        if (allClipIds.length === 0) return;
-        const firstId = allClipIds[0];
-        const firstTrack = get().timelineTracks.find((t) => t.clips.some((c) => c.id === firstId));
-        set({ selectedClipId: firstId, selectedTrackId: firstTrack?.id });
+        console.warn('selectAllClips is deprecated, use useTimelineStore.selectAllClips');
       },
 
-      setTimelineDuration: (ms) => set({ timelineDuration: Math.max(0, ms) }),
-      setSnapEnabled: (enabled) => set({ snapEnabled: enabled }),
+      setTimelineDuration: (_ms) => {
+        console.warn('setTimelineDuration is deprecated, use useTimelineStore.setTimelineDuration');
+      },
 
-      // ─── History ────────────────────────────────────────────────────────────
+      setSnapEnabled: (_enabled) => {
+        console.warn('setSnapEnabled is deprecated, use useTimelineStore.setSnapEnabled');
+      },
+
+      // ─── History (Legacy segments) ─────────────────────────────────────────
       saveHistory: () =>
         set((s) => ({
           history: {
@@ -361,13 +210,9 @@ export const useEditorStore = create<EditorStore>()(
           },
         })),
 
-      saveTrackHistory: () =>
-        set((s) => ({
-          trackHistory: {
-            past: [...s.trackHistory.past.slice(-MAX_HISTORY_SIZE), s.timelineTracks],
-            future: [],
-          },
-        })),
+      saveTrackHistory: () => {
+        // No-op - timeline history now managed by timelineStore
+      },
 
       undo: () =>
         set((s) => {
@@ -389,36 +234,18 @@ export const useEditorStore = create<EditorStore>()(
           };
         }),
 
-      undoTrack: () =>
-        set((s) => {
-          if (s.trackHistory.past.length === 0) return {};
-          const previous = s.trackHistory.past[s.trackHistory.past.length - 1];
-          return {
-            timelineTracks: previous ?? s.timelineTracks,
-            trackHistory: {
-              past: s.trackHistory.past.slice(0, -1),
-              future: [s.timelineTracks, ...s.trackHistory.future],
-            },
-          };
-        }),
+      undoTrack: () => {
+        console.warn('undoTrack is deprecated, use useTimelineStore.undoTrack');
+      },
 
-      redoTrack: () =>
-        set((s) => {
-          if (s.trackHistory.future.length === 0) return s;
-          const next = s.trackHistory.future[0];
-          return {
-            timelineTracks: next,
-            trackHistory: {
-              past: [...s.trackHistory.past, s.timelineTracks],
-              future: s.trackHistory.future.slice(1),
-            },
-          };
-        }),
+      redoTrack: () => {
+        console.warn('redoTrack is deprecated, use useTimelineStore.redoTrack');
+      },
 
       canUndo: () => get().history.past.length > 0,
       canRedo: () => get().history.future.length > 0,
-      canUndoTrack: () => get().trackHistory.past.length > 0,
-      canRedoTrack: () => get().trackHistory.future.length > 0,
+      canUndoTrack: () => false,
+      canRedoTrack: () => false,
 
       reset: () => set({ ...initialState } as EditorStore),
     }),

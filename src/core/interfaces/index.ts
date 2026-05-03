@@ -311,3 +311,10 @@ export interface RustHighlightSegment {
   scene_score?: number;
   motion_score?: number;
 }
+
+// ============================================================
+// 编辑器服务接口
+// ============================================================
+
+export type { IEditorService, IActionHandler, ActionHandlerMap, TimelineSubscriber } from './editor.interface';
+export type { ITimelineState, ITimelineService, ITrackFactory, IClipFactory } from './timeline.interface';

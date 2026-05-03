@@ -255,16 +255,32 @@ export function addAudio(
 }
 
 export function adjustSpeed(timeline: Timeline, clipId: string, speed: number): Timeline {
-  return {
-    ...timeline,
-    videoTracks: timeline.videoTracks.map((track) => ({
-      ...track,
-      clips: track.clips.map((clip) =>
-        clip.id === clipId ? { ...clip, speed } : clip
-      )
-    })),
-    updatedAt: new Date().toISOString()
-  };
+  // 找到对应的 clip 获取原始时长
+  let clipDuration = 0;
+  for (const track of timeline.videoTracks) {
+    const clip = track.clips.find((c) => c.id === clipId);
+    if (clip) {
+      clipDuration = clip.sourceEnd! - clip.sourceStart!;
+      return {
+        ...timeline,
+        videoTracks: timeline.videoTracks.map((track) => ({
+          ...track,
+          clips: track.clips.map((clip) =>
+            clip.id === clipId
+              ? {
+                  ...clip,
+                  speed,
+                  // 速度变化后，新的 endTime = startTime + 原始时长 / speed
+                  endTime: clip.startTime + clipDuration / speed
+                }
+              : clip
+          )
+        })),
+        updatedAt: new Date().toISOString()
+      };
+    }
+  }
+  return timeline;
 }
 
 export function adjustVolume(timeline: Timeline, trackId: string, volume: number): Timeline {
