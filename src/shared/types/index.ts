@@ -108,7 +108,7 @@ export interface ImageFile extends FileInfo {
 // ============ 项目类型 ============
 
 // Extracted to project.ts - barrel export below
-export { Project, ProjectStatus } from './project';
+export type { Project, ProjectStatus } from './project';
 
 /* Original definitions (commented out):
 /** 项目状态 *\/

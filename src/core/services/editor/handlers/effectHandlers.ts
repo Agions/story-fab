@@ -3,7 +3,7 @@
  */
 
 import { BaseActionHandler } from './base';
-import type { EditorAction, Timeline } from '../../types/timeline';
+import type { EditorAction, Timeline } from '../../../types/timeline';
 import {
   addTransition as addTransitionOp,
   addEffect as addEffectOp,

@@ -6,7 +6,7 @@
  */
 
 // Re-export for backward compatibility
-export {
+export type {
   TimelineClip,
   TimelineTrack,
   TimelineState,

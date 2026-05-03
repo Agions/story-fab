@@ -57,7 +57,7 @@ export interface IEditorService {
 
 export interface IActionHandler {
   /** 处理动作，返回新的时间线状态 */
-  handle(timeline: Timeline): Timeline;
+  handle(timeline: Timeline, action: EditorAction): Timeline;
   
   /** 是否能处理此动作 (某些handler可能需要额外条件判断) */
   canHandle(action: EditorAction): boolean;
