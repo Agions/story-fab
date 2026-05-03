@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ErrorBoundary } from './ErrorBoundary';
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 
 vi.mock('@/utils/logger', () => ({
   logger: { error: vi.fn() },

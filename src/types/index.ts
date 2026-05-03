@@ -11,7 +11,7 @@ import {
   AI_MODELS as CORE_AI_MODELS,
   MODEL_PROVIDERS,
   getModelsByProvider,
-} from '../core/config/models.config';
+} from '../core/config/aiModels.config';
 import type { 
   ModelProvider, 
   VideoSegment as CoreVideoSegment, 
@@ -21,7 +21,7 @@ import type {
   VideoInfo as CoreVideoInfo,
   ScriptData as CoreScriptData,
   TaskStatus as CoreTaskStatus,
-} from '../core/types';
+} from '@/core/types';
 
 // Re-export canonical types from core/types (这些是编辑器/项目使用的类型)
 export type VideoSegment = CoreVideoSegment;

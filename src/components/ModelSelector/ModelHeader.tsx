@@ -6,8 +6,8 @@
 import React from 'react';
 import { Badge } from '../ui/badge';
 import { Bot } from 'lucide-react';
-import type { AIModel } from '../../core/types';
-import styles from './index.module.less';
+import type { AIModel } from '@/core/types';
+import styles from '@/components/ModelSelector/index.module.less';
 
 interface ModelHeaderProps {
   selectedModel?: AIModel;

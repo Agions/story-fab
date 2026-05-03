@@ -7,8 +7,8 @@
  *   ai.service.ts — 主服务（公开 API、请求路由、response 解析）
  */
 import { BaseService, ServiceError } from './base.service';
-import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis, VideoInfo, Scene, Keyframe } from '../types';
-import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_RECOMMENDATIONS } from '../config/models.config';
+import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis, VideoInfo, Scene, Keyframe } from '@/core/types';
+import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_RECOMMENDATIONS } from '../config/aiModels.config';
 import { visionService } from './vision.service';
 
 import {
@@ -23,7 +23,7 @@ import {
   callMoonshot,
   callBaidu,
   mockCall,
-} from './providers';
+} from '@/core/services/providers';
 
 import {
   buildSystemPrompt,
@@ -267,4 +267,4 @@ function estimateDuration(wordCount: number): number {
 export const aiService = new AIService();
 export default aiService;
 
-export type { AIResponse, RequestConfig } from './providers';
+export type { AIResponse, RequestConfig } from '@/core/services/providers';

@@ -7,8 +7,8 @@ import React from 'react';
 import { AnimatePresence } from '../common/motion-shim';
 import { ModelCard } from './ModelCard';
 import { Loader2 } from 'lucide-react';
-import type { AIModel } from '../../core/types';
-import styles from './index.module.less';
+import type { AIModel } from '@/core/types';
+import styles from '@/components/ModelSelector/index.module.less';
 
 interface ModelListProps {
   models: AIModel[];

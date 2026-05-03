@@ -1,4 +1,4 @@
-import type { Scene, ScriptSegment, VideoAnalysis } from '../../types';
+import type { Scene, ScriptSegment, VideoAnalysis } from '@/core/types';
 import type { WorkflowMode } from '../../workflow/featureBlueprint';
 import { sceneCommentaryAlignmentService } from '../scene-commentary-alignment.service';
 

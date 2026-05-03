@@ -25,7 +25,11 @@
     "noFallthroughCasesInSwitch": true,
     "rootDirs": [
       "."
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
     "src"

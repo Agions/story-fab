@@ -9,7 +9,7 @@ import {
   useModelCost,
   useRecommendedModel
 } from '../../hooks/useModel';
-import type { AIModel, ModelProvider } from '../../core/types';
+import type { AIModel, ModelProvider } from '@/core/types';
 import { useModelFilter } from './hooks/useModelFilter';
 import { useModelSelection } from './hooks/useModelSelection';
 import { ModelHeader } from './ModelHeader';
@@ -17,7 +17,7 @@ import { ModelRecommendations } from './ModelRecommendations';
 import { ModelFilter } from './ModelFilter';
 import { ModelList } from './ModelList';
 import { ModelFooter } from './ModelFooter';
-import styles from './index.module.less';
+import styles from '@/components/ModelSelector/index.module.less';
 
 interface ModelSelectorProps {
   onSelect?: (modelId: string) => void;

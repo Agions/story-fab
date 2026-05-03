@@ -5,9 +5,9 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import type { ProjectData, VideoInfo, ScriptData, ProjectSettings, TaskStatus } from '../core/types';
-import { logger } from '../utils/logger';
-import { STORAGE_KEYS } from '../constants';
+import type { ProjectData, VideoInfo, ScriptData, ProjectSettings, TaskStatus } from '@/core/types';
+import { logger } from '../shared/utils/logging';
+import { STORAGE_KEYS } from '@/constants';
 
 export interface UseProjectReturn {
   // 当前项目
@@ -344,6 +344,7 @@ export function useProjectList() {
     result.sort((a, b) => {
       const aVal = a[filter.sortBy] ?? 0;
       const bVal = b[filter.sortBy] ?? 0;
+      if (aVal === bVal) return 0;
       const comparison = aVal > bVal ? 1 : -1;
       return filter.sortOrder === 'asc' ? comparison : -comparison;
     });

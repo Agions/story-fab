@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Switch } from '../ui/switch';
 import { Settings, RotateCcw } from 'lucide-react';
-import { notify } from '../../shared';
+import { notify } from '@/shared';
 import type { ProjectSaveBehavior } from '../../shared/constants/settings';
 
 interface GeneralSettingsPanelProps {

@@ -7,9 +7,9 @@ import React from 'react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 import { Settings, Zap, Loader2 } from 'lucide-react';
-import { MODEL_PROVIDERS } from '../../core/config/models.config';
-import type { ModelProvider } from '../../core/types';
-import styles from './index.module.less';
+import { MODEL_PROVIDERS } from '../../core/config/aiModels.config';
+import type { ModelProvider } from '@/core/types';
+import styles from '@/components/ModelSelector/index.module.less';
 
 interface ModelFooterProps {
   provider?: ModelProvider;

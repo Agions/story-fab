@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import type { Project } from '../types';
-import { notify } from '../shared';
-import styles from './ProjectForm.module.less';
+import type { Project } from '@/types';
+import { notify } from '@/shared';
+import styles from '@/components/ProjectForm.module.less';
 
 interface ProjectFormProps {
   initialValues?: Partial<Project>;

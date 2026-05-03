@@ -1,9 +1,9 @@
 import React, { useCallback, memo } from 'react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
 
-import { ScriptSegment } from '../../types';
-import { formatTime } from '../../shared';
-import styles from './VideoEditor.module.less';
+import { ScriptSegment } from '@/types';
+import { formatTime } from '@/shared';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface SegmentStyleProps {
   left: string;

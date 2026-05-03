@@ -3,7 +3,7 @@
  */
 import { useState, useCallback, useMemo } from 'react';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../shared/constants/settings';
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logging';
 
 /**
  * 应用设置类型

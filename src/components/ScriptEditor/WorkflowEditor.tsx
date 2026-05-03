@@ -1,4 +1,4 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Card } from '../ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
@@ -12,10 +12,10 @@ import {
   FileText,
   Clock,
 } from 'lucide-react';
-import type { ScriptData, Scene, ScriptSegment } from '../../core/types';
-import { formatDuration } from '../../services/video';
-import { notify } from '../../shared';
-import styles from './ScriptEditor.module.less';
+import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
+import { formatDuration } from '../../services/videoProcessingFacade';
+import { notify } from '@/shared';
+import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface WorkflowEditorProps {
   script: ScriptData;

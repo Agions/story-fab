@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog';
-import styles from './ScriptEditor.module.less';
+import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface PreviewModalProps {
   open: boolean;

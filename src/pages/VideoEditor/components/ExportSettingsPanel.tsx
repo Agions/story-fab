@@ -3,7 +3,7 @@ import { Card, CardContent } from '../../../components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../components/ui/dropdown-menu';
 import { Button } from '../../../components/ui/button';
 import { Download } from 'lucide-react';
-import styles from '../index.module.less';
+import styles from '@/pages/VideoEditor/index.module.less';
 
 interface ExportSettingsPanelProps {
   outputFormat: string;

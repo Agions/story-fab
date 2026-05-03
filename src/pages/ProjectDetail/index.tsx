@@ -1,4 +1,4 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import React, { useState, useEffect, lazy, Suspense, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
@@ -10,18 +10,18 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
 import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scissors, LayoutDashboard } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
-import { useModelStore } from '../../store';
+import { useModelStore } from '@/store';
 import { saveProjectToFile, getApiKey, loadProjectWithRetry, deleteProject } from '../../services/tauri';
-import { useSettings } from '../../context/SettingsContext';
-import { notify } from '../../shared';
-import { generateScriptWithModel, parseGeneratedScript } from '../../services/aiService';
-import { resolveLegacyModel } from '../../services/aiModelAdapter';
+import { useSettings } from '@/context/SettingsContext';
+import { notify } from '@/shared';
+import { generateScriptWithModel, parseGeneratedScript } from '@/core/services/aiScriptGenerationService';
+import { resolveLegacyModel } from '@/core/services/aiModelAdapter';
+import type { Script } from '@/core/services/aiScriptGenerationService';
 import { normalizeProjectFile } from '../../core/utils/project-file';
 import type { ProjectFileLike } from '../../core/utils/project-file';
-import type { Script } from '../../services/aiService';
-import type { ScriptSegment } from '../../core/types';
-import type { VideoAnalysis } from '../../types';
-import styles from './index.module.less';
+import type { ScriptSegment } from '@/core/types';
+import type { VideoAnalysis } from '@/types';
+import styles from '@/pages/ProjectDetail/index.module.less';
 
 const loadVideoInfo = () => import('../../components/VideoInfo');
 const loadScriptEditor = () => import('../../components/ScriptEditor');

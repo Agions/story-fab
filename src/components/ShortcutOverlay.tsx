@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from './ui/dialog';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 
 export interface ShortcutOverlayProps {
   open: boolean;

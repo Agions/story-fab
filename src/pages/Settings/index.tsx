@@ -16,22 +16,22 @@ import {
   Info,
   Lock,
 } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import ApiKeysPanel from '../../components/Settings/ApiKeysPanel';
 import ModelSettingsPanel from '../../components/Settings/ModelSettingsPanel';
 import GeneralSettingsPanel from '../../components/Settings/GeneralSettingsPanel';
 import { ModelProvider } from '../../constants/models';
-import { AI_MODELS as CORE_MODELS, DEFAULT_MODEL_ID } from '../../core/config/models.config';
+import { AI_MODELS as CORE_MODELS, DEFAULT_MODEL_ID } from '../../core/config/aiModels.config';
 import {
   getAvailableModelsFromApiKeys,
   resolveDefaultModelId,
 } from '../../core/utils/model-availability';
-import { useModelStore } from '../../store';
-import { notify } from '../../shared';
+import { useModelStore } from '@/store';
+import { notify } from '@/shared';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../../shared/constants/settings';
 import packageJson from '../../../package.json';
-import styles from './index.module.less';
+import styles from '@/pages/Settings/index.module.less';
 
 interface ApiKeyConfig {
   key: string;

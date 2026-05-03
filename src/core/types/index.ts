@@ -4,7 +4,7 @@
  * 时间线相关类型: ./timeline.ts (统一单一来源)
  * 其他类型: ../types.ts
  */
-export * from '../types';
+export * from '@/core/types';
 export * from './jianying';
 
 // Timeline types - explicit re-export to avoid Keyframe conflict
@@ -27,7 +27,7 @@ export type {
   TextItem,
   Transition,
   ClipEffect,
-  Keyframe,
+  AnimationKeyframe,
   DragType,
   DragState,
   EditorAction,

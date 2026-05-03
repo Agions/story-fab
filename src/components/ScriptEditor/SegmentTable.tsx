@@ -3,10 +3,10 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
 import { Edit3, Play, Trash2 } from 'lucide-react';
-import { formatDuration } from '../../core/video';
-import type { ScriptSegment } from '../../core/types';
+import { formatDuration } from '@/core/video';
+import type { ScriptSegment } from '@/core/types';
 import { getTypeLabel } from './types';
-import styles from './ScriptEditor.module.less';
+import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface SegmentTableProps {
   segments: ScriptSegment[];

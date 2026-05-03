@@ -29,12 +29,12 @@ import {
   Target,
   Mic,
 } from 'lucide-react';
-import { notify } from '../shared';
+import { notify } from '@/shared';
 import { subtitleService } from '../core/services/subtitle.service';
 import { useEditorStore } from '../store/editorStore';
 import { useTimelineStore } from '../store/timelineStore';
-import type { SubtitleEntry } from '../core/types';
-import styles from './SubtitleExtractor.module.css';
+import type { SubtitleEntry } from '@/core/types';
+import styles from '@/components/SubtitleExtractor.module.css';
 
 interface SubtitleSegment {
   id: string;

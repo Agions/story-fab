@@ -5,10 +5,10 @@ import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '../ui/tooltip';
 import { Bot, CheckCircle, AlertTriangle, Settings, ExternalLink } from 'lucide-react';
-import { AIModelType, AI_MODEL_INFO } from '../../types';
-import { useModelStore } from '../../store';
+import { AIModelType, AI_MODEL_INFO } from '@/types';
+import { useModelStore } from '@/store';
 import { useNavigate } from 'react-router-dom';
-import styles from './ModelCard.module.less';
+import styles from '@/components/Home/ModelCard.module.less';
 
 const API_LINKS: Partial<Record<AIModelType, string>> = {
   openai: 'https://platform.openai.com/docs/quickstart',

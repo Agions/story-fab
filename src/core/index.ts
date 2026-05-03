@@ -9,7 +9,7 @@
  */
 
 // Interfaces
-export * from './interfaces';
+export * from '@/core/interfaces';
 
 // Tauri Bridge
 export { tauri, invoke, TauriBridgeError } from './tauri/TauriBridge';

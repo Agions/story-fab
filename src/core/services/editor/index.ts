@@ -6,7 +6,7 @@ export * from './export';
 export * from './storage';
 
 // Handlers (策略模式)
-export * from './handlers';
+export * from '@/core/services/editor/handlers';
 
 import {
   createEmptyTimeline,
@@ -21,7 +21,9 @@ import {
   addText,
   addAudio,
   adjustSpeed,
-  adjustVolume
+  adjustVolume,
+  addTrack,
+  findTrackByClipId,
 } from './timelineOperations';
 import { createHistory, pushHistory, undo, redo, canUndo, canRedo } from './history';
 import { createTrack } from './trackManager';
@@ -35,7 +37,9 @@ import {
   type EditorHistory,
   type ScriptSegment,
   type Timeline,
-  type VideoSegment
+  type VideoSegment,
+  type TimelineClip,
+  type TextItem,
 } from './types';
 
 // ============================================================
@@ -70,12 +74,12 @@ const actionHandlers: Record<EditorAction['type'], ActionHandlerFn> = {
   
   TRIM_CLIP: (timeline, action) => {
     if (action.type !== 'TRIM_CLIP') return timeline;
-    return trimClip(timeline, action.clipId, action.startTime, action.endTime);
+    return trimClip(timeline, action.clipId, action.startMs, action.endMs);
   },
-  
+
   SPLIT_CLIP: (timeline, action) => {
     if (action.type !== 'SPLIT_CLIP') return timeline;
-    return splitClip(timeline, action.clipId, action.splitTime);
+    return splitClip(timeline, action.clipId, action.splitMs);
   },
   
   COPY_CLIP: (timeline, action) => {
@@ -85,8 +89,11 @@ const actionHandlers: Record<EditorAction['type'], ActionHandlerFn> = {
   
   ADD_TRANSITION: (timeline, action) => {
     if (action.type !== 'ADD_TRANSITION') return timeline;
+    // Derive trackId from the clip IDs (find which track contains fromClipId)
+    const trackId = findTrackByClipId(timeline, action.fromClipId) ?? '';
     return addTransition(
       timeline,
+      trackId,
       action.fromClipId,
       action.toClipId,
       action.transitionType,
@@ -217,17 +224,75 @@ export class EditorService {
 
   createTrack(type: 'video' | 'audio' | 'text' | 'effect'): string {
     const result = createTrack(this.history.present, type, this.config);
-    this.history.present = result.timeline;
+    this.history = pushHistory(this.history, result.timeline);
     this.notify();
     return result.trackId;
   }
 
+  /**
+   * 从脚本和视频片段生成时间线
+   * @version 2.0 - 使用统一的 TimelineTrack/TimelineClip 类型
+   */
   generateTimelineFromScript(
-    _scriptSegments: ScriptSegment[],
-    _videoSegments: VideoSegment[]
+    scriptSegments: ScriptSegment[],
+    videoSegments: VideoSegment[]
   ): Timeline {
-    const timeline = createEmptyTimeline();
-    this.history.present = timeline;
+    // 使用统一的 tracks 数组
+    let timeline = createEmptyTimeline();
+
+    // 添加视频轨和文本轨
+    timeline = addTrack(timeline, 'video');
+    timeline = addTrack(timeline, 'text');
+
+    const videoTrack = timeline.tracks.find(t => t.type === 'video');
+    const textTrack = timeline.tracks.find(t => t.type === 'text');
+
+    if (!videoTrack || !textTrack) {
+      return timeline;
+    }
+
+    let currentMs = 0;
+
+    for (let i = 0; i < Math.min(scriptSegments.length, videoSegments.length); i++) {
+      const script = scriptSegments[i];
+      const video = videoSegments[i];
+      const duration = video.endTime - video.startTime;
+
+      // 添加视频片段 (TimelineClip)
+      const videoClip: TimelineClip = {
+        id: crypto.randomUUID(),
+        trackId: videoTrack.id,
+        name: `clip_${i}`,
+        startMs: currentMs,
+        endMs: currentMs + duration,
+        sourceStartMs: video.startTime,
+        sourceEndMs: video.endTime,
+        effects: [],
+        volume: 1,
+      };
+      videoTrack.clips.push(videoClip);
+
+      // 添加文本片段 (TextItem)
+      const textItem: TextItem = {
+        id: crypto.randomUUID(),
+        content: script.text ?? script.content ?? '',
+        startTime: currentMs,
+        endTime: currentMs + duration,
+        style: {
+          fontSize: 24,
+          color: '#ffffff',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          position: 'bottom',
+        },
+      };
+      textTrack.clips.push(textItem as unknown as TimelineClip);
+
+      currentMs += duration;
+    }
+
+    // 更新时长并推送历史
+    timeline = { ...timeline, duration: currentMs };
+    this.history = pushHistory(this.history, timeline);
     this.notify();
     return timeline;
   }

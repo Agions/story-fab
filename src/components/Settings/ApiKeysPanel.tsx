@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
-import { validateApiKey } from '../../services/apiKey';
-import { notify } from '../../shared';
+import { validateApiKey } from '@/core/services/apiKeyValidationService';
+import { notify } from '@/shared';
 import { ModelProvider, PROVIDER_NAMES } from '../../constants/models';
-import { MODEL_PROVIDERS } from '../../core/config/models.config';
+import { MODEL_PROVIDERS } from '../../core/config/aiModels.config';
 import { Key, Eye, EyeOff, Trash2, Check, X, Loader2 } from 'lucide-react';
 
 interface ApiKeyConfig {

@@ -8,9 +8,9 @@ import {
   Clock,
 } from 'lucide-react';
 import type { ClipSegment } from '../../../core/services/aiClip.service';
-import type { VideoInfo } from '../../../core/types';
-import { formatTime } from '../../../utils';
-import styles from '../index.module.less';
+import type { VideoInfo } from '@/core/types';
+import { formatTime } from '../../../shared/utils/formatting';
+import styles from '@/components/AIClipAssistant/index.module.less';
 
 interface PreviewStepProps {
   videoInfo: VideoInfo;

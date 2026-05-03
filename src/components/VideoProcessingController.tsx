@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logging';
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
 import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
@@ -21,11 +21,11 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
-import { notify } from '../shared';
-import type { VideoSegment } from '../core/types';
-import { BasicSettings, EffectsSettings, BatchProcessing } from './VideoProcessingController/modules';
+import { notify } from '@/shared';
+import type { VideoSegment } from '@/core/types';
+import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/modules';
 import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from './VideoProcessingController/constants';
-import styles from './VideoProcessingController.module.less';
+import styles from '@/components/VideoProcessingController.module.less';
 
 const QUALITY_OPTIONS = [
   { value: 'low', label: '低质量 (720p)', description: '适合快速预览或网络分享' },

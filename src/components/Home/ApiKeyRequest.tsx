@@ -1,14 +1,14 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import React, { useState, useEffect } from 'react';
-import { delay } from '../../shared';
+import { delay } from '@/shared';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { Key, Mail, Building2, MapPin, User } from 'lucide-react';
-import { AI_MODEL_INFO, AIModelType } from '../../types';
-import styles from './ApiKeyRequest.module.less';
+import { AI_MODEL_INFO, AIModelType } from '@/types';
+import styles from '@/components/Home/ApiKeyRequest.module.less';
 
 interface ApiKeyRequestProps {
   visible: boolean;

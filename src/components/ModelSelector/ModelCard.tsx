@@ -10,9 +10,9 @@ import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
 import { CheckCircle, Star, Bot, DollarSign } from 'lucide-react';
 import { motion } from '../common/motion-shim';
-import { MODEL_PROVIDERS } from '../../core/config/models.config';
-import type { AIModel, ModelProvider } from '../../core/types';
-import styles from './index.module.less';
+import { MODEL_PROVIDERS } from '../../core/config/aiModels.config';
+import type { AIModel, ModelProvider } from '@/core/types';
+import styles from '@/components/ModelSelector/index.module.less';
 
 interface ModelCardProps {
   model: AIModel;

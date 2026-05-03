@@ -3,7 +3,7 @@
  * 用于前端监听导出进度
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 
 export type ExportProgressCallback = (progress: ExportProgress) => void;
 

@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, exists, mkdir } from '@tauri-apps/plugin-fs';
 import { appConfigDir } from '@tauri-apps/api/path';
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 
 /**
  * 选择文件

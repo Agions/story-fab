@@ -1,4 +1,4 @@
-import type { Scene, ScriptSegment } from '../types';
+import type { Scene, ScriptSegment } from '@/core/types';
 
 export interface SceneCommentaryAlignment {
   sceneId: string;

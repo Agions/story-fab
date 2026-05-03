@@ -15,7 +15,7 @@ import { TimelineToolbar } from './TimelineToolbar';
 import { TimelineRuler } from './TimelineRuler';
 import { TimelineTrack } from './TimelineTrack';
 import { TimelineScrubber } from './TimelineScrubber';
-import { useInterval } from '../../../hooks';
+import { useInterval } from '@/hooks';
 import type { ClipData } from './TimelineClip';
 
 export interface TimelineTrackData {

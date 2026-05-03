@@ -4,7 +4,7 @@ import { Separator } from '../../ui/separator';
 import { Tooltip, TooltipTrigger, TooltipContent } from '../../ui/tooltip';
 import { Progress, ProgressTrack, ProgressIndicator } from '../../ui/progress';
 import type { ClipAnalysisResult } from '../../../core/services/aiClip.service';
-import styles from '../index.module.less';
+import styles from '@/components/AIClipAssistant/index.module.less';
 
 interface AnalyzeStepProps {
   analyzing: boolean;

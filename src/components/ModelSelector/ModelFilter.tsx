@@ -6,9 +6,9 @@
 import React from 'react';
 import { Input } from '../ui/input';
 import { Bot, Edit3, Code2, FlaskConical, Video } from 'lucide-react';
-import { MODEL_PROVIDERS } from '../../core/config/models.config';
-import type { ModelCategory, ModelProvider } from '../../core/types';
-import styles from './index.module.less';
+import { MODEL_PROVIDERS } from '../../core/config/aiModels.config';
+import type { ModelCategory, ModelProvider } from '@/core/types';
+import styles from '@/components/ModelSelector/index.module.less';
 
 const CATEGORY_OPTIONS = [
   { label: '全部', value: 'all', icon: <Bot size={14} /> },

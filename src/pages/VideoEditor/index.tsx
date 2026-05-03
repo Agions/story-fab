@@ -4,18 +4,18 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/ta
 import { Bot } from 'lucide-react';
 
 import { saveProjectToFile } from '../../services/tauri';
-import { notify } from '../../shared';
+import { notify } from '@/shared';
 import type { ClipAnalysisResult } from '../../core/services/aiClip.service';
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import { useVideoEditor } from './hooks/useVideoEditor';
 import { exportService } from '../../core/services/export.service';
 
 import Toolbar from './components/Toolbar';
-import VideoPlayer from '../../components/VideoPlayer';
+import VideoPlayer from '@/components/VideoPlayer';
 import Timeline from './components/Timeline';
 import SegmentList from './components/SegmentList';
 
-import styles from './index.module.less';
+import styles from '@/pages/VideoEditor/index.module.less';
 
 const loadKeyframePanel = () => import('./components/KeyframePanel');
 const loadAIClipPanel = () => import('./components/AIClipPanel');

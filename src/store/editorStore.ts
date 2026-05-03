@@ -13,7 +13,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-import type { EditorStore, EditorState, VideoData, ScriptData, VoiceData } from './editorTypes';
+import type { EditorStore, EditorState, VideoData, ScriptData, VoiceData, VideoSegment, EditorPanel } from './editorTypes';
 import {
   MAX_HISTORY_SIZE,
   DEFAULT_ZOOM,
@@ -26,12 +26,12 @@ import {
 // =========================================
 // Initial state
 // =========================================
-const initialState: EditorState = {
-  video: null,
-  script: null,
-  voice: null,
-  segments: [],
-  activePanel: 'video',
+const initialState = {
+  video: null as VideoData | null,
+  script: null as ScriptData | null,
+  voice: null as VoiceData | null,
+  segments: [] as VideoSegment[],
+  activePanel: 'video' as EditorPanel,
   previewPlaying: false,
   currentTime: 0,
   volume: 1,
@@ -39,19 +39,8 @@ const initialState: EditorState = {
   selection: { segmentId: undefined, multipleIds: [] },
   zoom: DEFAULT_ZOOM,
   scrollPosition: 0,
-  // Timeline 相关状态已迁移到 timelineStore
-  playheadMs: 0,
-  timelineTracks: [],
-  timelineDuration: 60000,
-  snapEnabled: true,
-  snapThreshold: 100,
-  selectedClipId: undefined,
-  selectedTrackId: undefined,
-  inPointMs: undefined,
-  outPointMs: undefined,
   history: { past: [], future: [] },
-  trackHistory: { past: [], future: [] },
-} as const;
+};
 
 // =========================================
 // Store
@@ -114,93 +103,6 @@ export const useEditorStore = create<EditorStore>()(
       setZoom: (zoom) => set({ zoom: Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom)) }),
       setScrollPosition: (scrollPosition) => set({ scrollPosition }),
 
-      // ─── Timeline (Deprecated - 使用 useTimelineStore) ───────────────────
-      // 以下方法已废弃，仅为兼容旧代码保留
-      // 请使用 useTimelineStore 中的对应方法
-
-      setPlayheadMs: (_ms) => {
-        console.warn('setPlayheadMs is deprecated, use useTimelineStore.setPlayheadMs');
-      },
-
-      setTimelineTracks: (_tracks) => {
-        console.warn('setTimelineTracks is deprecated, use useTimelineStore.setTimelineTracks');
-      },
-
-      addTimelineTrack: (_type, _name) => {
-        console.warn('addTimelineTrack is deprecated, use useTimelineStore.addTimelineTrack');
-        return '';
-      },
-
-      removeTimelineTrack: (_trackId) => {
-        console.warn('removeTimelineTrack is deprecated, use useTimelineStore.removeTimelineTrack');
-      },
-
-      updateTimelineTrack: (_trackId, _updates) => {
-        console.warn('updateTimelineTrack is deprecated, use useTimelineStore.updateTimelineTrack');
-      },
-
-      addClipToTrack: (_trackId, _clipData) => {
-        console.warn('addClipToTrack is deprecated, use useTimelineStore.addClipToTrack');
-        return '';
-      },
-
-      removeClipFromTrack: (_clipId) => {
-        console.warn('removeClipFromTrack is deprecated, use useTimelineStore.removeClipFromTrack');
-      },
-
-      updateClip: (_clipId, _updates) => {
-        console.warn('updateClip is deprecated, use useTimelineStore.updateClip');
-      },
-
-      moveClip: (_clipId, _targetTrackId, _newStartMs, _newEndMs) => {
-        console.warn('moveClip is deprecated, use useTimelineStore.moveClip');
-      },
-
-      splitClip: (_clipId, _splitMs) => {
-        console.warn('splitClip is deprecated, use useTimelineStore.splitClip');
-      },
-
-      addKeyframe: (_clipId, _kfData) => {
-        console.warn('addKeyframe is deprecated, use useTimelineStore.addKeyframe');
-        return '';
-      },
-
-      removeKeyframe: (_clipId, _keyframeId) => {
-        console.warn('removeKeyframe is deprecated, use useTimelineStore.removeKeyframe');
-      },
-
-      updateKeyframe: (_clipId, _keyframeId, _updates) => {
-        console.warn('updateKeyframe is deprecated, use useTimelineStore.updateKeyframe');
-      },
-
-      setTimelineSelection: (_clipId, _trackId) => {
-        console.warn('setTimelineSelection is deprecated, use useTimelineStore.setTimelineSelection');
-      },
-
-      clearTimelineSelection: () => {
-        console.warn('clearTimelineSelection is deprecated, use useTimelineStore.clearTimelineSelection');
-      },
-
-      setInPoint: () => {
-        console.warn('setInPoint is deprecated, use useTimelineStore.setInPoint');
-      },
-
-      setOutPoint: () => {
-        console.warn('setOutPoint is deprecated, use useTimelineStore.setOutPoint');
-      },
-
-      selectAllClips: () => {
-        console.warn('selectAllClips is deprecated, use useTimelineStore.selectAllClips');
-      },
-
-      setTimelineDuration: (_ms) => {
-        console.warn('setTimelineDuration is deprecated, use useTimelineStore.setTimelineDuration');
-      },
-
-      setSnapEnabled: (_enabled) => {
-        console.warn('setSnapEnabled is deprecated, use useTimelineStore.setSnapEnabled');
-      },
-
       // ─── History (Legacy segments) ─────────────────────────────────────────
       saveHistory: () =>
         set((s) => ({
@@ -234,20 +136,10 @@ export const useEditorStore = create<EditorStore>()(
           };
         }),
 
-      undoTrack: () => {
-        console.warn('undoTrack is deprecated, use useTimelineStore.undoTrack');
-      },
-
-      redoTrack: () => {
-        console.warn('redoTrack is deprecated, use useTimelineStore.redoTrack');
-      },
-
       canUndo: () => get().history.past.length > 0,
       canRedo: () => get().history.future.length > 0,
-      canUndoTrack: () => false,
-      canRedoTrack: () => false,
 
-      reset: () => set({ ...initialState } as EditorStore),
+      reset: () => set({ video: null, script: null, voice: null, segments: [], activePanel: 'video', previewPlaying: false, currentTime: 0, volume: 1, muted: false, selection: { segmentId: undefined, multipleIds: [] }, zoom: DEFAULT_ZOOM, scrollPosition: 0, history: { past: [], future: [] } }),
     }),
     {
       name: 'cutdeck-editor',

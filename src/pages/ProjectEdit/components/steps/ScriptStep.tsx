@@ -6,9 +6,9 @@ import { Card } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Edit } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import ScriptEditor from '../../../../components/ScriptEditor';
-import type { ScriptSegment } from '../../../../core/types';
-import styles from '../../index.module.less';
+import ScriptEditor from '@/components/ScriptEditor';
+import type { ScriptSegment } from '@/core/types';
+import styles from '@/pages/ProjectEdit/index.module.less';
 
 interface ScriptStepProps {
   videoPath: string;

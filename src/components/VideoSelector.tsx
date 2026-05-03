@@ -1,14 +1,14 @@
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logging';
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Upload, Trash2, PlayCircle, Play } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
-import { analyzeVideo, VideoMetadata, formatDuration, formatResolution } from '../services/video';
-import { notify } from '../shared';
-import { VIDEO_FORMATS } from '../constants';
-import styles from './VideoSelector.module.less';
+import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
+import { notify } from '@/shared';
+import { VIDEO_FORMATS } from '@/constants';
+import styles from '@/components/VideoSelector.module.less';
 
 interface VideoSelectorProps {
   initialVideoPath?: string;
@@ -74,7 +74,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
 
       setIsAnalyzing(true);
       try {
-        const videoMetadata = await analyzeVideo(filePath);
+        const videoMetadata = await videoProcessor.analyze(filePath);
         setMetadata(videoMetadata);
         onVideoSelect(filePath, videoMetadata);
       } catch (error) {

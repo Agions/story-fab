@@ -1,11 +1,11 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import React, { useState, useCallback, useEffect, memo } from 'react';
 import { Card } from '../ui/card';
 import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { save } from '@tauri-apps/plugin-dialog';
-import { ScriptSegment } from '../../types';
-import { notify } from '../../shared';
+import { ScriptSegment } from '@/types';
+import { notify } from '@/shared';
 
 import VideoPlayer from './VideoPlayer';
 import Timeline from './Timeline';
@@ -14,7 +14,7 @@ import EditorControls from './EditorControls';
 import ExportSettings, { ExportSettingsState } from './ExportSettings';
 import PreviewModal from './PreviewModal';
 
-import styles from './VideoEditor.module.less';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 // 全局变量存储视频时长，用于拖拽边界计算
 let globalVideoDuration = 0;

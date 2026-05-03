@@ -10,7 +10,7 @@ import { Button } from '../../ui/button';
 import { Progress } from '../../ui/progress';
 import { Plus, Trash2, Play } from 'lucide-react';
 import type { BatchItem } from '../types';
-import type { VideoSegment } from '../../../core/types';
+import type { VideoSegment } from '@/core/types';
 
 interface BatchProcessingProps {
   batchItems: BatchItem[];

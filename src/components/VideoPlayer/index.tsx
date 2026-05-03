@@ -2,13 +2,14 @@ import React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { Slider } from '../ui/slider';
 import { Button } from '../ui/button';
+import { formatTime } from '../../shared/utils/formatting';
 import {
   Play,
   Pause,
   Volume2,
   Maximize,
 } from 'lucide-react';
-import styles from './index.module.less';
+import styles from '@/components/VideoPlayer/index.module.less';
 
 interface VideoPlayerProps {
   src: string;
@@ -171,12 +172,6 @@ function VideoPlayer({
     } else {
       container.requestFullscreen();
     }
-  };
-
-  const formatTime = (time: number): string => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   return (

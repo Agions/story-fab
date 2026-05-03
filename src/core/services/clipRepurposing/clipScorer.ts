@@ -14,8 +14,8 @@
  * 评分范围：0-100，权重可配置。
  */
 
-import type { VideoAnalysis } from '../../types';
-import type { Scene } from '../../types';
+import type { VideoAnalysis } from '@/core/types';
+import type { Scene } from '@/core/types';
 
 // ============================================================
 // Data Types

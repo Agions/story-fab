@@ -1,4 +1,4 @@
-import type { WorkflowStep } from '../types';
+import type { WorkflowStep } from '@/core/types';
 
 /**
  * 工作流模式定义

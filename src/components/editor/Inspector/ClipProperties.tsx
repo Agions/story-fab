@@ -6,17 +6,12 @@
 import React, { memo, useState, useCallback } from 'react';
 import { Input } from '../../ui/input';
 import type { ClipInfo } from './InspectorPanel';
+import { formatTime } from '../../../shared/utils/formatting';
 
 interface ClipPropertiesProps {
   clip: ClipInfo;
   onUpdate?: (clipId: string, updates: Partial<ClipInfo>) => void;
   onDelete?: (clipId: string) => void;
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
 export const ClipProperties = memo<ClipPropertiesProps>(({ clip, onUpdate }) => {

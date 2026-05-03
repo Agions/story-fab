@@ -1,8 +1,10 @@
 /**
  * Editor Store 类型定义
  */
-import type { VideoSegment, EditorPanel } from '../core/types';
-import type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '../core/types/timeline';
+import type { VideoSegment, EditorPanel } from '@/core/types';
+
+// Re-export for convenience (editorStore.ts imports these from here)
+export type { VideoSegment, EditorPanel };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -63,17 +65,7 @@ export interface EditorState {
   selection: TimelineSelection;
   zoom: number;
   scrollPosition: number;
-  playheadMs: number;
-  timelineTracks: TimelineTrack[];
-  timelineDuration: number;
-  snapEnabled: boolean;
-  snapThreshold: number;
-  selectedClipId?: string;
-  selectedTrackId?: string;
-  inPointMs?: number;
-  outPointMs?: number;
   history: EditorHistory;
-  trackHistory: { past: TimelineTrack[][]; future: TimelineTrack[][] };
 }
 
 export type EditorActions = {
@@ -97,38 +89,12 @@ export type EditorActions = {
   clearSelection: () => void;
   setZoom: (zoom: number) => void;
   setScrollPosition: (position: number) => void;
-  // Timeline
-  setPlayheadMs: (ms: number) => void;
-  setTimelineTracks: (tracks: TimelineTrack[]) => void;
-  addTimelineTrack: (type: TrackType, name?: string) => string;
-  removeTimelineTrack: (trackId: string) => void;
-  updateTimelineTrack: (trackId: string, updates: Partial<TimelineTrack>) => void;
-  addClipToTrack: (trackId: string, clip: Omit<TimelineClip, 'id' | 'trackId'>) => string;
-  removeClipFromTrack: (clipId: string) => void;
-  updateClip: (clipId: string, updates: Partial<TimelineClip>) => void;
-  moveClip: (clipId: string, targetTrackId: string, newStartMs: number, newEndMs?: number) => void;
-  splitClip: (clipId: string, splitMs: number) => void;
-  addKeyframe: (clipId: string, keyframe: Omit<Keyframe, 'id'>) => string;
-  removeKeyframe: (clipId: string, keyframeId: string) => void;
-  updateKeyframe: (clipId: string, keyframeId: string, updates: Partial<Keyframe>) => void;
-  setTimelineSelection: (clipId?: string, trackId?: string) => void;
-  clearTimelineSelection: () => void;
-  setInPoint: () => void;
-  setOutPoint: () => void;
-  selectAllClips: () => void;
-  setTimelineDuration: (ms: number) => void;
-  setSnapEnabled: (enabled: boolean) => void;
   // History
   undo: () => void;
   redo: () => void;
-  undoTrack: () => void;
-  redoTrack: () => void;
   saveHistory: () => void;
-  saveTrackHistory: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
-  canUndoTrack: () => boolean;
-  canRedoTrack: () => boolean;
   reset: () => void;
 };
 

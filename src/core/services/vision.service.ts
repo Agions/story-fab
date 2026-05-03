@@ -4,7 +4,7 @@
  */
 
 import { tauri } from '../tauri/TauriBridge';
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import type {
   VideoInfo,
   Scene,
@@ -12,8 +12,8 @@ import type {
   VideoAnalysis,
   ObjectDetection,
   EmotionAnalysis,
-} from '../types';
-import type { HighlightSegment, DetectOptions, HighlightReason } from '../interfaces';
+} from '@/core/types';
+import type { HighlightSegment, DetectOptions, HighlightReason } from '@/core/interfaces';
 
 // 场景类型定义
 interface SceneType {

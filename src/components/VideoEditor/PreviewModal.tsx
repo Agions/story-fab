@@ -7,9 +7,9 @@ import {
   DialogFooter,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
-import { ScriptSegment } from '../../types';
-import { formatTime } from '../../shared';
-import styles from './VideoEditor.module.less';
+import { ScriptSegment } from '@/types';
+import { formatTime } from '@/shared';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface PreviewModalProps {
   open: boolean;

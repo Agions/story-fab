@@ -6,5 +6,5 @@
  */
 
 // 重新导出项目设置常量
-export { PROJECT_SAVE_BEHAVIOR_KEY, PROJECT_AUTO_SAVE_KEY } from '../../constants';
-export type { ProjectSaveBehavior } from '../../constants';
+export { PROJECT_SAVE_BEHAVIOR_KEY, PROJECT_AUTO_SAVE_KEY } from '@/constants';
+export type { ProjectSaveBehavior } from '@/constants';

@@ -11,11 +11,11 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/t
 import { RadioGroup, RadioGroupItem } from './ui/radio';
 import { CheckCircle, Bot, HelpCircle, Code, Video, Edit, Flame, Star, Zap } from 'lucide-react';
 import { motion } from './common/motion-shim';
-import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS } from '../core/config/models.config';
-import type { AIModel as CoreAIModel, ModelProvider } from '../core/types';
-import useLocalStorage from '../hooks/useLocalStorage';
+import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID, MODEL_PROVIDERS } from '../core/config/aiModels.config';
+import type { AIModel as CoreAIModel, ModelProvider } from '@/core/types';
+import useLocalStorage from '@/hooks/useLocalStorage';
 import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '../core/utils/model-availability';
-import styles from './AIModelSelector.module.less';
+import styles from '@/components/AIModelSelector.module.less';
 
 export type ModelCategory = 'text' | 'code' | 'image' | 'video' | 'all';
 

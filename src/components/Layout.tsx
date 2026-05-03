@@ -23,7 +23,7 @@ import {
   CircleHelp,
 } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
-import styles from './Layout.module.less';
+import styles from '@/components/Layout.module.less';
 
 interface LayoutProps {
   children: React.ReactNode;

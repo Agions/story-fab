@@ -8,22 +8,23 @@ import {
   User,
   Scissors,
 } from 'lucide-react';
-import { CutDeckProvider, useCutDeck } from '../../components/CutDeck/AIEditorContext';
+import { CutDeckProvider, useCutDeck } from '@/components/CutDeck/context';
 import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '../../hooks/useKeyboardShortcuts';
-import KeyboardShortcutsHelp from '../../components/common/KeyboardShortcutsHelp';
+import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useEditorStore } from '../../store/editorStore';
-import { notify } from '../../shared';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '../../components/CutDeck/Workspace/functionModeMap';
-import styles from './index.module.less';
+import { useTimelineStore } from '../../store/timelineStore';
+import { notify } from '@/shared';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/CutDeck/workspace/functionModeMap';
+import styles from '@/pages/AIVideoEditor/index.module.less';
 
-const Workspace = lazy(() => import('../../components/CutDeck/Workspace/Workspace'));
-const ProjectSetup = lazy(() => import('../../components/CutDeck/Workspace/ProjectSetup'));
-const VideoUpload = lazy(() => import('../../components/CutDeck/Workspace/VideoUpload'));
-const AIVisualizer = lazy(() => import('../../components/CutDeck/Workspace/AIVisualizer'));
-const ScriptWriting = lazy(() => import('../../components/CutDeck/Workspace/ScriptWriting'));
-const VideoComposing = lazy(() => import('../../components/CutDeck/Workspace/VideoComposing'));
-const VideoExport = lazy(() => import('../../components/CutDeck/Workspace/VideoExport'));
-const ClipRippling = lazy(() => import('../../components/CutDeck/Workspace/ClipRippling'));
+const Workspace = lazy(() => import('@/components/CutDeck/workspace/Workspace'));
+const ProjectSetup = lazy(() => import('@/components/CutDeck/workspace/ProjectSetup'));
+const VideoUpload = lazy(() => import('@/components/CutDeck/workspace/VideoUpload'));
+const AIVisualizer = lazy(() => import('@/components/CutDeck/workspace/AIVisualizer'));
+const ScriptWriting = lazy(() => import('@/components/CutDeck/workspace/ScriptWriting'));
+const VideoComposing = lazy(() => import('@/components/CutDeck/workspace/VideoComposing'));
+const VideoExport = lazy(() => import('@/components/CutDeck/workspace/VideoExport'));
+const ClipRippling = lazy(() => import('@/components/CutDeck/workspace/ClipRippling'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
@@ -69,19 +70,19 @@ const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
   const [shortcutsHelpVisible, setShortcutsHelpVisible] = useState(false);
   const { state, goToNextStep, setFeature } = useCutDeck();
-  const playheadMs = useEditorStore(state => state.playheadMs);
   const previewPlaying = useEditorStore(state => state.previewPlaying);
-  const selectedClipId = useEditorStore(state => state.selectedClipId);
-  const setPlayheadMs = useEditorStore(state => state.setPlayheadMs);
   const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
-  const setInPoint = useEditorStore(state => state.setInPoint);
-  const setOutPoint = useEditorStore(state => state.setOutPoint);
-  const selectAllClips = useEditorStore(state => state.selectAllClips);
   const undo = useEditorStore(state => state.undo);
-  const undoTrack = useEditorStore(state => state.undoTrack);
   const redo = useEditorStore(state => state.redo);
-  const redoTrack = useEditorStore(state => state.redoTrack);
-  const removeClipFromTrack = useEditorStore(state => state.removeClipFromTrack);
+  const playheadMs = useTimelineStore(state => state.playheadMs);
+  const selectedClipId = useTimelineStore(state => state.selectedClipId);
+  const setPlayheadMs = useTimelineStore(state => state.setPlayheadMs);
+  const setInPoint = useTimelineStore(state => state.setInPoint);
+  const setOutPoint = useTimelineStore(state => state.setOutPoint);
+  const selectAllClips = useTimelineStore(state => state.selectAllClips);
+  const undoTrack = useTimelineStore(state => state.undoTrack);
+  const redoTrack = useTimelineStore(state => state.redoTrack);
+  const removeClipFromTrack = useTimelineStore(state => state.removeClipFromTrack);
 
   // ── 快捷键注册 ────────────────────────────────────────
   useKeyboardShortcuts({

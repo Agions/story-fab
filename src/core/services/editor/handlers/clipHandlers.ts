@@ -61,7 +61,7 @@ export class TrimClipHandler extends BaseActionHandler {
   
   handle(timeline: Timeline, action: EditorAction): Timeline {
     if (action.type !== 'TRIM_CLIP') return timeline;
-    return trimClipOp(timeline, action.clipId, action.startTime, action.endTime);
+    return trimClipOp(timeline, action.clipId, action.startMs, action.endMs);
   }
 }
 
@@ -74,7 +74,7 @@ export class SplitClipHandler extends BaseActionHandler {
   
   handle(timeline: Timeline, action: EditorAction): Timeline {
     if (action.type !== 'SPLIT_CLIP') return timeline;
-    return splitClipOp(timeline, action.clipId, action.splitTime);
+    return splitClipOp(timeline, action.clipId, action.splitMs);
   }
 }
 

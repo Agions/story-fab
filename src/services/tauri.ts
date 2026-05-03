@@ -5,8 +5,8 @@ import { load } from '@tauri-apps/plugin-store';
 import { appConfigDir } from '@tauri-apps/api/path';
 import { open as openExternal } from '@tauri-apps/plugin-shell';
 import { normalizeProjectId, buildProjectIdCandidates } from '../core/utils/project-id';
-import { logger } from '../utils/logger';
-import { formatTime } from '../utils';
+import { logger } from '../shared/utils/logging';
+import { formatTime } from '../shared/utils/formatting';
 
 type ProjectFileData = {
   aiModel?: {

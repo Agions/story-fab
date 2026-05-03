@@ -1,16 +1,36 @@
 /**
- * CutDeck 时间线模型 - 统一类型定义
+ * CutDeck 时间线模型 - 统一类型定义 v2.0
  *
- * 所有时间线相关的核心类型都在此文件中定义，确保单一来源。
- * 这是 CutDeck 编辑器的核心数据模型。
+ * 设计原则:
+ * 1. TimelineTrack 是唯一的轨道类型，通过 type 字段区分 video/audio/text/effect
+ * 2. TimelineClip 是唯一的片段类型，所有时间字段统一使用 startMs/endMs
+ * 3. Timeline 是根容器，使用统一的 tracks 数组
+ * 4. 旧类型 (VideoClip/VideoTrack 等) 作为别名保留，仅用于向后兼容
+ *
+ * @version 2.0 - 2026-05-03
  */
 
-// ==================== 轨道相关类型 ====================
+// ============================================================
+// 枚举与联合类型
+// ============================================================
 
 /** 轨道类型枚举 */
-export type TrackType = 'video' | 'audio' | 'subtitle' | 'effect';
+export type TrackType = 'video' | 'audio' | 'text' | 'subtitle' | 'effect';
 
-/** 时间线片段 - 轨道上的一个剪辑 */
+/** 时间线工具 */
+export type TimelineTool = 'select' | 'razor' | 'hand';
+
+/** 拖拽操作类型 */
+export type DragType = 'move' | 'start' | 'end';
+
+// ============================================================
+// 核心Clip类型 (新统一类型)
+// ============================================================
+
+/**
+ * 时间线片段 - 轨道上的一个剪辑
+ * 时间字段统一使用 Ms (毫秒) 后缀
+ */
 export interface TimelineClip {
   id: string;
   trackId: string;
@@ -31,7 +51,7 @@ export interface TimelineClip {
   /** 是否选中 (UI状态) */
   selected?: boolean;
   /** 关键帧动画 */
-  keyframes?: Keyframe[];
+  keyframes?: AnimationKeyframe[];
   /** 特效 */
   effects?: ClipEffect[];
   /** 播放速度 (1 = 正常) */
@@ -47,23 +67,27 @@ export interface ClipEffect {
   id: string;
   type: string;
   params: Record<string, unknown>;
-  /** 效果开始时间（相对片段开始）(ms) */
   startMs?: number;
-  /** 效果结束时间 (ms) */
   endMs?: number;
 }
 
 /** 关键帧 */
-export interface Keyframe {
+export interface AnimationKeyframe {
   id: string;
-  /** 关键帧在片段内的时间偏移 (ms) */
   timeOffset: number;
   property: string;
   value: number | string | boolean;
   easing?: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
 }
 
-/** 时间线轨道 */
+// ============================================================
+// 核心Track类型 (新统一类型)
+// ============================================================
+
+/**
+ * 时间线轨道 - 统一的轨道接口
+ * 通过 type 字段区分轨道类型
+ */
 export interface TimelineTrack {
   id: string;
   type: TrackType;
@@ -81,6 +105,8 @@ export interface TimelineTrack {
   color?: string;
   /** 音量 (仅 audio track) */
   volume?: number;
+  /** 转场列表 (仅 video track) */
+  transitions?: Transition[];
 }
 
 /** 时间线标记 */
@@ -90,35 +116,46 @@ export interface TimelineMarker {
   label?: string;
 }
 
-// ==================== 时间线容器 ====================
+// ============================================================
+// 时间线容器 (新统一类型)
+// ============================================================
 
-/** 时间线完整数据 */
+/**
+ * 时间线完整数据 - 统一容器
+ * 使用 tracks 数组替代分离的 videoTracks/audioTracks 等
+ */
 export interface Timeline {
   id: string;
+  /** 统一轨道数组 (推荐) */
+  tracks: TimelineTrack[];
+  /** 总时长 (ms) */
   duration: number;
-  videoTracks: VideoTrack[];
-  audioTracks: AudioTrack[];
-  textTracks: TextTrack[];
-  effectTracks: EffectTrack[];
+  /** 时间线标记 */
   markers: TimelineMarker[];
   createdAt: string;
   updatedAt: string;
+
+  // ============================================================
+  // ⚠️ 遗留字段 - 仅用于向后兼容，新代码应使用 tracks
+  // 这些字段在未来的 major 版本中将被移除
+  // ============================================================
+  /** @deprecated 请使用 tracks */
+  videoTracks: VideoTrack[];
+  /** @deprecated 请使用 tracks */
+  audioTracks: AudioTrack[];
+  /** @deprecated 请使用 tracks */
+  textTracks: TextTrack[];
+  /** @deprecated 请使用 tracks */
+  effectTracks: EffectTrack[];
 }
 
-// ==================== 遗留类型（兼容旧代码）====================
-// 以下类型保留用于兼容旧代码，最终应迁移到新的 TimelineClip/TimelineTrack
+// ============================================================
+// 遗留类型别名 - 向后兼容
+// ============================================================
+// 以下类型保留用于兼容旧代码，推荐逐步迁移到新的 TimelineClip/TimelineTrack
+// 旧代码使用 startTime/endTime，新代码统一使用 startMs/endMs
 
-/** 视频轨道 */
-export interface VideoTrack {
-  id: string;
-  name: string;
-  clips: VideoClip[];
-  transitions?: Transition[];
-  visible: boolean;
-  locked: boolean;
-}
-
-/** 视频片段 */
+/** @deprecated 请使用 TimelineClip */
 export interface VideoClip {
   id: string;
   sourceId?: string;
@@ -130,7 +167,26 @@ export interface VideoClip {
   effects?: Array<{ type: string; params: Record<string, unknown> }>;
 }
 
-/** 音频轨道 */
+/** @deprecated 请使用 TimelineClip */
+export interface AudioClip {
+  id: string;
+  sourceId?: string;
+  startTime: number;
+  endTime: number;
+  duration?: number;
+}
+
+/** @deprecated 请使用 TimelineTrack */
+export interface VideoTrack {
+  id: string;
+  name: string;
+  clips: VideoClip[];
+  transitions?: Transition[];
+  visible: boolean;
+  locked: boolean;
+}
+
+/** @deprecated 请使用 TimelineTrack */
 export interface AudioTrack {
   id: string;
   name: string;
@@ -140,25 +196,7 @@ export interface AudioTrack {
   volume: number;
 }
 
-/** 音频片段 */
-export interface AudioClip {
-  id: string;
-  sourceId?: string;
-  startTime: number;
-  endTime: number;
-  duration?: number;
-}
-
-/** 文本轨道 */
-export interface TextTrack {
-  id: string;
-  name: string;
-  items: TextItem[];
-  visible: boolean;
-  locked: boolean;
-}
-
-/** 文本项 */
+/** @deprecated 请使用 TimelineClip */
 export interface TextItem {
   id: string;
   content: string;
@@ -168,7 +206,16 @@ export interface TextItem {
   style?: Record<string, unknown>;
 }
 
-/** 特效轨道 */
+/** @deprecated 请使用 TimelineTrack */
+export interface TextTrack {
+  id: string;
+  name: string;
+  items: TextItem[];
+  visible: boolean;
+  locked: boolean;
+}
+
+/** @deprecated 请使用 TimelineTrack */
 export interface EffectTrack {
   id: string;
   name: string;
@@ -186,7 +233,9 @@ export interface Transition {
   duration: number;
 }
 
-// ==================== 编辑器状态相关 ====================
+// ============================================================
+// 编辑器状态相关
+// ============================================================
 
 /** 时间线状态 */
 export interface TimelineState {
@@ -196,11 +245,8 @@ export interface TimelineState {
   scrollX: number;
   duration: number;
   snapEnabled: boolean;
-  snapThreshold: number; // ms
+  snapThreshold: number;
 }
-
-/** 拖拽操作类型 */
-export type DragType = 'move' | 'start' | 'end';
 
 /** 拖拽状态 */
 export interface DragState {
@@ -232,28 +278,40 @@ export interface ClipProperties {
   speed?: number;
   opacity?: number;
   color?: string;
-  keyframes: Keyframe[];
+  keyframes: AnimationKeyframe[];
 }
 
-/** 时间线工具 */
-export type TimelineTool = 'select' | 'razor' | 'hand';
+// ============================================================
+// 动作相关 - EditorAction
+// ============================================================
 
-// ==================== 动作相关 ====================
-
-/** 编辑器动作类型 */
+/**
+/** 编辑器动作类型 - 统一的命令模式
+ * 所有时间字段使用 startMs/endMs
+ *
+ * 注意: clip/text/audio 等字段在 ADD_* action 中是输入数据，
+ * 不包含 id/trackId（由操作函数生成）
+ */
 export type EditorAction =
-  | { type: 'ADD_CLIP'; trackId: string; clip: VideoClip; position: number }
+  // 片段操作
+  | { type: 'ADD_CLIP'; trackId: string; clip: Omit<TimelineClip, 'id' | 'trackId'>; position: number }
   | { type: 'REMOVE_CLIP'; trackId: string; clipId: string }
   | { type: 'MOVE_CLIP'; trackId: string; clipId: string; newPosition: number }
-  | { type: 'TRIM_CLIP'; clipId: string; startTime: number; endTime: number }
-  | { type: 'SPLIT_CLIP'; clipId: string; splitTime: number }
+  | { type: 'TRIM_CLIP'; clipId: string; startMs: number; endMs: number }
+  | { type: 'SPLIT_CLIP'; clipId: string; splitMs: number }
+  | { type: 'COPY_CLIP'; clipId: string }
+
+  // 效果操作
   | { type: 'ADD_TRANSITION'; fromClipId: string; toClipId: string; transitionType: string; duration: number }
   | { type: 'ADD_EFFECT'; clipId: string; effect: string; params: Record<string, unknown> }
-  | { type: 'ADD_TEXT'; trackId: string; text: TextItem; position: number }
-  | { type: 'ADD_AUDIO'; trackId: string; audio: AudioClip; position: number }
   | { type: 'ADJUST_SPEED'; clipId: string; speed: number }
   | { type: 'ADJUST_VOLUME'; trackId: string; volume: number }
-  | { type: 'COPY_CLIP'; clipId: string }
+
+  // 内容操作 (legacy types 用于兼容)
+  | { type: 'ADD_TEXT'; trackId: string; text: TextItem; position: number }
+  | { type: 'ADD_AUDIO'; trackId: string; audio: AudioClip; position: number }
+
+  // 历史操作
   | { type: 'UNDO' }
   | { type: 'REDO' };
 
@@ -264,7 +322,9 @@ export interface EditorHistory {
   future: Timeline[];
 }
 
-// ==================== 配置相关 ====================
+// ============================================================
+// 配置相关
+// ============================================================
 
 /** 导出设置 */
 export interface EditorExportSettings {
@@ -304,3 +364,81 @@ export const DEFAULT_EDITOR_CONFIG: EditorConfig = {
     bitrate: '8M'
   }
 };
+
+// ============================================================
+// 类型守卫与工具函数
+// ============================================================
+
+/** 判断是否为视频轨道 */
+export function isVideoTrack(track: TimelineTrack): boolean {
+  return track.type === 'video';
+}
+
+/** 判断是否为音频轨道 */
+export function isAudioTrack(track: TimelineTrack): boolean {
+  return track.type === 'audio';
+}
+
+/** 判断片段是否选中 */
+export function isClipSelected(clip: TimelineClip): boolean {
+  return clip.selected === true;
+}
+
+/** 计算片段时长 */
+export function getClipDuration(clip: TimelineClip): number {
+  return clip.endMs - clip.startMs;
+}
+
+/** 创建空时间线 */
+export function createEmptyTimeline(): Timeline {
+  const now = new Date().toISOString();
+  return {
+    id: `timeline_${Date.now()}`,
+    tracks: [],
+    duration: 0,
+    markers: [],
+    createdAt: now,
+    updatedAt: now,
+    // 遗留字段初始化为空数组
+    videoTracks: [],
+    audioTracks: [],
+    textTracks: [],
+    effectTracks: [],
+  };
+}
+
+/**
+ * 从 tracks 同步更新 legacy track arrays
+ * 用于保持向后兼容性
+ */
+export function syncLegacyTracks(timeline: Timeline): Timeline {
+  const videoTracks: VideoTrack[] = [];
+  const audioTracks: AudioTrack[] = [];
+  const textTracks: TextTrack[] = [];
+  const effectTracks: EffectTrack[] = [];
+
+  for (const track of timeline.tracks) {
+    switch (track.type) {
+      case 'video':
+        videoTracks.push(track as unknown as VideoTrack);
+        break;
+      case 'audio':
+        audioTracks.push(track as unknown as AudioTrack);
+        break;
+      case 'subtitle':
+        textTracks.push(track as unknown as TextTrack);
+        break;
+      case 'effect':
+        effectTracks.push(track as unknown as EffectTrack);
+        break;
+    }
+  }
+
+  return {
+    ...timeline,
+    videoTracks,
+    audioTracks,
+    textTracks,
+    effectTracks,
+  };
+}

@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Progress, ProgressTrack, ProgressIndicator } from '../ui/progress';
 import { Button } from '../ui/button';
 import { Scissors, Settings, Save } from 'lucide-react';
-import styles from './VideoEditor.module.less';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface EditorControlsProps {
   processing: boolean;
