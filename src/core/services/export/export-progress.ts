@@ -58,7 +58,9 @@ class ExportProgressEmitter {
     this.listeners.forEach(cb => cb(progress));
 
     // 记录日志
-    if (progress.stage === 'encoding' && progress.progress % 10 === 0) {
+    if (progress.stage === 'encoding') {
+      const p = Math.round(progress.progress);
+      if (p > 0 && p < 100 && p % 10 === 0) {
       logger.info(`[Export] ${progress.progress}% - ${progress.message || ''}`);
     }
   }

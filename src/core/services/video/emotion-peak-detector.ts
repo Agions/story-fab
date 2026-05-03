@@ -114,7 +114,7 @@ export async function detectEmotionPeaks(
 
     return { peaks };
   } catch (err) {
-    console.error('[emotion-peak-detector] detect_highlights failed:', err);
+    logger.error('[emotion-peak-detector] detect_highlights failed:', err);
     return { peaks: [] };
   }
 }

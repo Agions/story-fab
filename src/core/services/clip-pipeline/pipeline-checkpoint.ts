@@ -12,6 +12,7 @@
 
 import { readTextFile, writeTextFile, exists, mkdir, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { appDataDir } from '@tauri-apps/api/path';
+import { logger } from '../../../shared/utils/logging';
 
 /**
  * Step 名称与 Checkpoint 名称的映射表
@@ -45,6 +46,11 @@ export interface PipelineCheckpoint {
 
 const CHECKPOINT_PREFIX = 'cutdeck_checkpoint_';
 
+/** 清理 videoId 中可能污染 localStorage key 的字符 */
+function sanitizeKey(id: string): string {
+  return id.replace(/[^a-zA-Z0-9_-]/g, '');
+}
+
 /** 初始化 Tauri checkpoint 存储目录 */
 async function ensureCheckpointDir(): Promise<string> {
   const appDir = await appDataDir();
@@ -71,14 +77,16 @@ export function createCheckpoint(
 }
 
 export function saveCheckpoint(cp: PipelineCheckpoint): void {
+  const key = sanitizeKey(cp.videoId);
   localStorage.setItem(
-    `${CHECKPOINT_PREFIX}${cp.videoId}`,
+    `${CHECKPOINT_PREFIX}${key}`,
     JSON.stringify(cp)
   );
 }
 
 export function loadCheckpoint(videoId: string): PipelineCheckpoint | null {
-  const raw = localStorage.getItem(`${CHECKPOINT_PREFIX}${videoId}`);
+  const key = sanitizeKey(videoId);
+  const raw = localStorage.getItem(`${CHECKPOINT_PREFIX}${key}`);
   if (!raw) return null;
   try {
     return JSON.parse(raw) as PipelineCheckpoint;
@@ -88,7 +96,8 @@ export function loadCheckpoint(videoId: string): PipelineCheckpoint | null {
 }
 
 export function clearCheckpoint(videoId: string): void {
-  localStorage.removeItem(`${CHECKPOINT_PREFIX}${videoId}`);
+  const key = sanitizeKey(videoId);
+  localStorage.removeItem(`${CHECKPOINT_PREFIX}${key}`);
 }
 
 /** Tauri FS 异步存储 checkpoint（生产环境） */
@@ -98,7 +107,7 @@ export async function saveCheckpointTauri(cp: PipelineCheckpoint): Promise<void>
     const path = `${dir}${CHECKPOINT_PREFIX}${cp.videoId}.json`;
     await writeTextFile(path, JSON.stringify(cp), { baseDir: BaseDirectory.AppData });
   } catch (err) {
-    console.warn('[checkpoint] Tauri save failed, fallback to localStorage:', err);
+    logger.warn('[checkpoint] Tauri save failed, fallback to localStorage:', err);
     saveCheckpoint(cp);
   }
 }
@@ -113,7 +122,7 @@ export async function loadCheckpointTauri(videoId: string): Promise<PipelineChec
     const raw = await readTextFile(path, { baseDir: BaseDirectory.AppData });
     return JSON.parse(raw) as PipelineCheckpoint;
   } catch (err) {
-    console.warn('[checkpoint] Tauri load failed, fallback to localStorage:', err);
+    logger.warn('[checkpoint] Tauri load failed, fallback to localStorage:', err);
     return loadCheckpoint(videoId);
   }
 }
@@ -129,7 +138,7 @@ export async function clearCheckpointTauri(videoId: string): Promise<void> {
       await remove(path, { baseDir: BaseDirectory.AppData });
     }
   } catch (err) {
-    console.warn('[checkpoint] Tauri clear failed:', err);
+    logger.warn('[checkpoint] Tauri clear failed:', err);
   } finally {
     clearCheckpoint(videoId);
   }

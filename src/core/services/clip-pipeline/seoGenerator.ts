@@ -159,7 +159,7 @@ export class SEOGenerator {
       freq[w] = (freq[w] ?? 0) + 1;
     }
 
-    const sorted = Object.entries(freq).sort(([, a], [, b]) => b - a);
+    const sorted = Object.entries(freq).sort(([, a], [, b]) => b - a || 0);
     return sorted[0]?.[0] ?? '精彩片段';
   }
 

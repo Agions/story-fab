@@ -11,6 +11,7 @@
  *   CandidateClip    → candidate selection (transcript, audioEnergy, sceneType)
  */
 
+import type { ClipSegment } from './clip-workflow.service';
 import type { CandidateClip, ClipScore } from './clipScorer';
 import type { SEOMetadata } from './seoGenerator';
 import type { ExportTask, AspectRatio } from './multiFormatExport';
@@ -60,8 +61,6 @@ export interface RepurposingResult {
 // ============================================================
 // Conversion Helpers
 // ============================================================
-
-import type { ClipSegment } from './clip-workflow.service';
 
 /**
  * Convert RepurposingClip (Pipeline output) → ClipSegment (Timeline format).

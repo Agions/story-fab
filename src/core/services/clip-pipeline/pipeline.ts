@@ -180,12 +180,16 @@ export class ClipRepurposingPipeline {
     }
 
     // ── 组装结果 ──────────────────────────────────────────
-    const repurposingClips: RepurposingClip[] = scored.map((s, i) => ({
-      clip: s.clip,
-      score: s,
-      seo: seoResults[i],
-      exportTasks: exportTasks.get(s.clip.startTime.toString()),
-    }));
+    const repurposingClips: RepurposingClip[] = scored.map((s, i) => {
+      // 用 toFixed(3) 保证 Map key 精度一致（浮点数直接 toString 有精度风险）
+      const timeKey = s.clip.startTime.toFixed(3);
+      return {
+        clip: s.clip,
+        score: s,
+        seo: seoResults[i],
+        exportTasks: exportTasks.get(timeKey),
+      };
+    });
 
     const totalOutputDuration = scored.reduce(
       (sum, s) => sum + ((s.clip.endTime ?? 0) - (s.clip.startTime ?? 0)), 0
