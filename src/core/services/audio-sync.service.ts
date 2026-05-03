@@ -2,6 +2,7 @@
  * 音画同步服务
  * 提供专业的音视频同步功能
  */
+import { spawn } from 'child_process';
 import { logger } from '../../shared/utils/logging';
 
 
@@ -202,7 +203,6 @@ export class AudioVideoSyncService {
 
   private async ffprobeOutput(args: string[]): Promise<string> {
     return new Promise((resolve, reject) => {
-      const { spawn } = require('child_process');
       const proc = spawn('ffprobe', args, { shell: false });
       let stdout = '', stderr = '';
       proc.stdout?.on('data', (d: Buffer) => { stdout += d.toString(); });
