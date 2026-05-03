@@ -24,14 +24,13 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "rootDirs": [
-      "."
+      ".",
+      "./src"
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "ignoreDeprecations": "6.0",
   "include": [
     "src"
   ],
