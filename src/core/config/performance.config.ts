@@ -10,13 +10,13 @@ export const COST_OPTIMIZATION = {
     // 简单任务 (< 100 tokens 输入)
     simple: {
       primary: 'deepseek-v4-flash',
-      fallback: 'qwen3-max',
+      fallback: 'qwen3.6-flash',
       maxTokens: 500,
       temperature: 0.3,
     },
     // 标准任务 (100-1000 tokens)
     standard: {
-      primary: 'qwen3-max',
+      primary: 'qwen3.6-plus',
       fallback: 'deepseek-v4-flash',
       maxTokens: 2000,
       temperature: 0.5,
@@ -30,7 +30,7 @@ export const COST_OPTIMIZATION = {
     },
     // 创意任务
     creative: {
-      primary: 'claude-sonnet-4-6',
+      primary: 'claude-sonnet-4.6',
       fallback: 'gpt-5.5',
       maxTokens: 3000,
       temperature: 0.8,
@@ -124,7 +124,7 @@ export const QUALITY_OPTIMIZATION = {
   // 多模型投票
   ensemble: {
     enabled: false, // 默认关闭（成本高）
-    models: ['gpt-5.5', 'claude-opus-4-7', 'qwen3-max'],
+    models: ['gpt-5.5', 'claude-opus-4.7', 'qwen3.6-max-preview'],
     // 投票策略
     strategy: 'quality', // 'quality' | 'speed' | 'cost'
     // 超时时间

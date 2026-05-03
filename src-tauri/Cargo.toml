@@ -21,6 +21,7 @@ tauri-plugin-shell = "2"
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-notification = "2"
 tauri-plugin-clipboard-manager = "2"
+urlencoding = "2"
 tauri-plugin-deep-link = "2"
 tauri-plugin-store = "2"
 serde = { version = "1", features = ["derive"] }
