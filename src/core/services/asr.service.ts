@@ -5,6 +5,8 @@
 
 import { BaseService, ServiceError } from './base.service';
 import { logger } from '../../shared/utils/logging';
+import { tauri } from '../tauri/TauriBridge';
+import { invoke } from '@tauri-apps/api/core';
 import type { VideoInfo } from '@/core/types';
 
 // ============================================
@@ -70,6 +72,8 @@ export interface ASRResult {
   confidence?: number;
   /** 完整结果（含时间戳） */
   fullResult?: ASRFullResult[];
+  /** 数据来源：rust-whisper | web-speech | mock */
+  provider: 'rust-whisper' | 'web-speech' | 'mock';
 }
 
 export interface ASRSegment {
@@ -180,18 +184,32 @@ export class ASRService extends BaseService {
         duration: videoInfo.duration,
       });
 
-      // ASR 策略：Web Speech API（本地/无 API key）→ mock
-      // 真实场景（高准确率）推荐接入 faster-whisper（Tauri 后端）或云 ASR
-      let result = await this.tryWebSpeechASR(videoInfo, opts);
+      // ASR 策略：
+      // 1. Rust Whisper（faster-whisper，本地，优先）
+      // 2. Web Speech API（浏览器内置）
+      // 3. Mock（两者都不可用时）
+      let result: ASRResult | null = null;
+
+      try {
+        result = await this.tryRustWhisperASR(videoInfo, opts);
+      } catch (err) {
+        logger.warn('[ASRService] Rust Whisper 不可用:', String(err));
+      }
+
       if (!result) {
-        logger.warn('[ASRService] Web Speech API 不可用，使用模拟结果');
+        result = await this.tryWebSpeechASR(videoInfo, opts);
+      }
+
+      if (!result) {
+        logger.warn('[ASRService] ⚠️ 所有 ASR 方案均不可用（faster-whisper 未安装 / Web Speech API 不支持）。使用模拟结果。请安装: pip install faster-whisper');
         result = await this.mockASR(videoInfo, opts);
       }
 
-      logger.info(`[ASRService] 语音识别完成:`, {
+      logger.info(`[ASRService] 语音识别完成: provider=${result.provider}, segments=${result.segments.length}`, {
         videoId: videoInfo.id,
         textLength: result.text.length,
         segmentCount: result.segments.length,
+        provider: result.provider,
       });
 
       return result;
@@ -228,16 +246,37 @@ export class ASRService extends BaseService {
     return this.executeRequest(async () => {
       const { threshold = 0.7, minInterval = 1000 } = options || {};
 
-      // 模拟音频峰值检测
-      const peaks: Array<{ timestamp: number; intensity: number }> = [];
-      let lastPeakTime = -minInterval;
+      if (!videoInfo.path) {
+        logger.warn('[ASRService] getAudioPeaks: videoInfo.path is empty, fallback to empty peaks');
+        return [];
+      }
 
-      for (let t = 0; t < videoInfo.duration; t += 0.5) {
-        // 模拟随机峰值
-        const intensity = Math.random();
-        if (intensity > threshold && (t - lastPeakTime) > minInterval / 1000) {
-          peaks.push({ timestamp: t, intensity });
-          lastPeakTime = t;
+      // 调用 Rust ZCR 爆裂检测（过零率 → 音频能量指标）
+      const bursts = await invoke<Array<{ start_ms: number; end_ms: number; score: number }>>(
+        'detect_zcr_bursts',
+        {
+          input: {
+            audio_path: videoInfo.path,
+            window_ms: 50,
+            zcr_threshold_mult: 2.5,
+          },
+        }
+      );
+
+      // 将 ZCR burst 转换为峰值格式
+      // score > 1 表示超过阈值（爆裂区域）；score 本身即为强度
+      const peaks: Array<{ timestamp: number; intensity: number }> = [];
+      for (const burst of bursts) {
+        // 用 burst 中间的 timestamp 作为峰值时间点
+        const midMs = (burst.start_ms + burst.end_ms) / 2;
+        // intensity = 归一化 score（最小为 1），转为 0~1 范围
+        const intensity = Math.min((burst.score - 1) / (burst.score + 0.001), 1);
+        if (intensity >= (threshold - 0.3)) {
+          // 应用 minInterval 过滤（minInterval 单位是 ms）
+          const lastPeak = peaks[peaks.length - 1];
+          if (!lastPeak || midMs - lastPeak.timestamp * 1000 >= minInterval) {
+            peaks.push({ timestamp: midMs / 1000, intensity });
+          }
         }
       }
 
@@ -311,7 +350,72 @@ export class ASRService extends BaseService {
         confidence: s.confidence,
         words: s.words,
       })) : undefined,
+      provider: 'mock',
     };
+  }
+
+  /**
+   * 通过 Tauri 后端调用 Rust faster-whisper 进行语音识别
+   * 本地推理，准确率高，支持中文/英文，断网可用
+   *
+   * @returns ASRResult 或 null（Rust 不可用时）
+   */
+  private async tryRustWhisperASR(
+    videoInfo: VideoInfo,
+    opts: Required<ASROptions>,
+  ): Promise<ASRResult | null> {
+    try {
+      logger.info('[ASRService] 尝试 Rust Whisper ASR:', {
+        path: videoInfo.path,
+        language: opts.language,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const whisperResult = await (tauri.transcribeAudio as any)(
+        videoInfo.path,
+        'base',
+        opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : null,
+      );
+
+      if (!whisperResult || !whisperResult.segments || whisperResult.segments.length === 0) {
+        logger.warn('[ASRService] Rust Whisper 返回空结果');
+        return null;
+      }
+
+      const segments: ASRSegment[] = whisperResult.segments.map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (seg: any) => ({
+          id: crypto.randomUUID(),
+          startTime: seg.start_ms / 1000,
+          endTime: seg.end_ms / 1000,
+          text: seg.text.trim(),
+          confidence: whisperResult.language_probability ?? 0.9,
+        }),
+      );
+
+      logger.info(`[ASRService] Rust Whisper 完成: ${segments.length} 段`, {
+        language: whisperResult.language,
+      });
+
+      return {
+        text: segments.map(s => s.text).join(' '),
+        segments,
+        language: opts.language,
+        confidence: whisperResult.language_probability ?? 0.9,
+        fullResult: opts.enableTimestamp
+          ? segments.map(s => ({
+              start: s.startTime,
+              end: s.endTime,
+              text: s.text,
+              confidence: s.confidence,
+            }))
+          : undefined,
+        provider: 'rust-whisper',
+      };
+    } catch (err) {
+      logger.warn('[ASRService] Rust Whisper 调用失败:', String(err));
+      return null;
+    }
   }
 
   /**
@@ -378,6 +482,7 @@ export class ASRService extends BaseService {
                 text: s.text,
                 confidence: s.confidence,
               })) : undefined,
+              provider: 'web-speech',
             });
           } else {
             resolve(null);

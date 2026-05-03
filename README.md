@@ -110,10 +110,12 @@ npm run dev
 | 提供商 | 模型 | 适用场景 |
 |--------|------|----------|
 | DeepSeek | V4-Flash（推荐），V4-Pro（推理） | 🏆 性价比最高，Clip Script 生成 |
-| OpenAI | GPT-5.5（最新旗舰） | 剧情分析、内容理解 |
-| Anthropic | Claude Sonnet 4.6 | 长文本分析 |
-| 阿里云 | Qwen-Max | 中文内容创作 |
-| Kimi | K2.6 | 长文本分析 |
+| OpenAI | GPT-4o、o3、o3-mini | 剧情分析、内容理解 |
+| Anthropic | Claude 3.5 Sonnet、Claude 3 Opus | 长文本分析 |
+| 阿里云 | Qwen-Max、Qwen-Plus | 中文内容创作 |
+| 月之暗面 | Kimi（ moonshot-v1）| 长文本分析 |
+
+> ⚠️ **Whisper 字幕**：需要在本地安装 `faster-whisper`（`pip install faster-whisper`），未安装时自动降级为模拟结果。Rust 推理，**断网可用**。
 
 ---
 
