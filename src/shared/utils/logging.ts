@@ -5,7 +5,7 @@
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-const isDev = import.meta.env.DEV;
+const isDev = process.env.NODE_ENV !== 'production';
 
 const shouldLog = (level: LogLevel): boolean => {
   if (isDev) return true;

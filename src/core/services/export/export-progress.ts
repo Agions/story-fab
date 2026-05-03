@@ -61,7 +61,8 @@ class ExportProgressEmitter {
     if (progress.stage === 'encoding') {
       const p = Math.round(progress.progress);
       if (p > 0 && p < 100 && p % 10 === 0) {
-      logger.info(`[Export] ${progress.progress}% - ${progress.message || ''}`);
+        logger.info(`[Export] ${progress.progress}% - ${progress.message || ''}`);
+      }
     }
   }
 
