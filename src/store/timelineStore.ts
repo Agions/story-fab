@@ -13,7 +13,7 @@
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '../core/types/timeline';
+import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '../core/types/timeline';
 
 // =========================================
 // Types
@@ -32,6 +32,7 @@ export interface TimelineState {
   // Selection
   selectedClipId?: string;
   selectedTrackId?: string;
+  selectedMultipleIds?: string[];
   inPointMs?: number;
   outPointMs?: number;
 
@@ -57,9 +58,9 @@ export interface TimelineActions {
   splitClip: (clipId: string, splitMs: number) => void;
 
   // Keyframe management
-  addKeyframe: (clipId: string, kfData: Omit<Keyframe, 'id'>) => string;
+  addKeyframe: (clipId: string, kfData: Omit<AnimationKeyframe, 'id'>) => string;
   removeKeyframe: (clipId: string, keyframeId: string) => void;
-  updateKeyframe: (clipId: string, keyframeId: string, updates: Partial<Keyframe>) => void;
+  updateKeyframe: (clipId: string, keyframeId: string, updates: Partial<AnimationKeyframe>) => void;
 
   // Selection
   setTimelineSelection: (clipId?: string, trackId?: string) => void;
@@ -106,7 +107,7 @@ const updateClipInTracks = (
 const addKeyframeToClip = (
   tracks: TimelineTrack[],
   clipId: string,
-  keyframe: Keyframe
+  keyframe: AnimationKeyframe
 ): TimelineTrack[] =>
   tracks.map((t) => ({
     ...t,
@@ -133,7 +134,7 @@ const updateKeyframeInClip = (
   tracks: TimelineTrack[],
   clipId: string,
   keyframeId: string,
-  keyframeUpdates: Partial<Keyframe>
+  keyframeUpdates: Partial<AnimationKeyframe>
 ): TimelineTrack[] =>
   tracks.map((t) => ({
     ...t,
@@ -246,10 +247,12 @@ export const useTimelineStore = create<TimelineStore>()(
         }));
       },
 
-      updateClip: (clipId, updates) =>
+      updateClip: (clipId, updates) => {
+        get().saveTrackHistory();
         set((s) => ({
           timelineTracks: updateClipInTracks(s.timelineTracks, clipId, updates),
-        })),
+        }));
+      },
 
       moveClip: (clipId, targetTrackId, newStartMs, newEndMs) => {
         get().saveTrackHistory();
@@ -316,23 +319,28 @@ export const useTimelineStore = create<TimelineStore>()(
 
       // ─── Keyframe Management ────────────────────────────────────────────────
       addKeyframe: (clipId, kfData) => {
+        get().saveTrackHistory();
         const id = crypto.randomUUID();
-        const keyframe: Keyframe = { ...kfData, id };
+        const keyframe: AnimationKeyframe = { ...kfData, id };
         set((s) => ({
           timelineTracks: addKeyframeToClip(s.timelineTracks, clipId, keyframe),
         }));
         return id;
       },
 
-      removeKeyframe: (clipId, keyframeId) =>
+      removeKeyframe: (clipId, keyframeId) => {
+        get().saveTrackHistory();
         set((s) => ({
           timelineTracks: removeKeyframeFromClip(s.timelineTracks, clipId, keyframeId),
-        })),
+        }));
+      },
 
-      updateKeyframe: (clipId, keyframeId, updates) =>
+      updateKeyframe: (clipId, keyframeId, updates) => {
+        get().saveTrackHistory();
         set((s) => ({
           timelineTracks: updateKeyframeInClip(s.timelineTracks, clipId, keyframeId, updates),
-        })),
+        }));
+      },
 
       // ─── Selection ───────────────────────────────────────────────────────────
       setTimelineSelection: (clipId, trackId) =>
@@ -347,9 +355,14 @@ export const useTimelineStore = create<TimelineStore>()(
       selectAllClips: () => {
         const allClipIds = get().timelineTracks.flatMap((t) => t.clips.map((c) => c.id));
         if (allClipIds.length === 0) return;
-        const firstId = allClipIds[0];
+        // 选中所有 clip: 第一个作为主要选中，其余放入 multipleIds
+        const [firstId, ...restIds] = allClipIds;
         const firstTrack = get().timelineTracks.find((t) => t.clips.some((c) => c.id === firstId));
-        set({ selectedClipId: firstId, selectedTrackId: firstTrack?.id });
+        set({
+          selectedClipId: firstId,
+          selectedTrackId: firstTrack?.id,
+          selectedMultipleIds: restIds,
+        });
       },
 
       // ─── Timeline Config ─────────────────────────────────────────────────────
@@ -407,4 +420,4 @@ export const useTimelineStore = create<TimelineStore>()(
 );
 
 // Re-export types
-export type { TimelineTrack, TimelineClip, Keyframe, TrackType } from '../core/types/timeline';
+export type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '../core/types/timeline';

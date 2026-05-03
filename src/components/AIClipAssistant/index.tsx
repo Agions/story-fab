@@ -14,9 +14,9 @@ import {
   PlayCircle,
 } from 'lucide-react';
 import { useAIClipAssistant } from './hooks/useAIClipAssistant';
-import { ConfigStep, AnalyzeStep, SuggestionsStep, PreviewStep } from './components';
+import { ConfigStep, AnalyzeStep, SuggestionsStep, PreviewStep } from '@/components/AIClipAssistant/components';
 import type { AIClipAssistantProps } from './types';
-import styles from './index.module.less';
+import styles from '@/components/AIClipAssistant/index.module.less';
 
 const CLIP_STEPS = [
   { title: '配置', icon: <Settings size={14} /> },

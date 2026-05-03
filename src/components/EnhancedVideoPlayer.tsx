@@ -3,7 +3,8 @@ import { Slider } from './ui/slider';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logging';
+import { formatDuration } from '../shared/utils/formatting';
 import {
   Play,
   Pause,
@@ -19,7 +20,7 @@ import {
   Rewind,
   FastForward,
 } from 'lucide-react';
-import styles from './EnhancedVideoPlayer.module.less';
+import styles from '@/components/EnhancedVideoPlayer.module.less';
 
 interface EnhancedVideoPlayerProps {
   src: string;
@@ -278,22 +279,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     }
   }, []);
 
-  const formatTime = useCallback((seconds: number): string => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-
-    const parts = [];
-    if (hrs > 0) {
-      parts.push(hrs.toString().padStart(2, '0'));
-    }
-
-    parts.push(mins.toString().padStart(2, '0'));
-    parts.push(secs.toString().padStart(2, '0'));
-
-    return parts.join(':');
-  }, []);
-
   const VolumeIcon = isMuted || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   const playbackRates = [0.5, 1, 1.5, 2];
@@ -373,7 +358,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
                 </div>
 
                 <span className={styles.timeDisplay}>
-                  {formatTime(currentTime)} / {formatTime(duration)}
+                  {formatDuration(currentTime)} / {formatDuration(duration)}
                 </span>
               </div>
 
@@ -500,7 +485,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
                         </div>
                         <div className="flex flex-col">
                           <span className="text-xs text-muted-foreground">时长</span>
-                          <span className="text-sm font-medium">{formatTime(duration)}</span>
+                          <span className="text-sm font-medium">{formatDuration(duration)}</span>
                         </div>
                       </div>
                     </CardContent>

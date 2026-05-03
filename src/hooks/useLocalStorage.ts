@@ -3,7 +3,7 @@
  * 提供类型安全的 localStorage 状态管理
  */
 import { useState, useCallback } from 'react';
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logging';
 
 function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void] {
   const [storedValue, setStoredValue] = useState<T>(() => {

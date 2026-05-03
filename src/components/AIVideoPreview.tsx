@@ -16,10 +16,10 @@ import {
   CloudUpload,
   Trash2,
 } from 'lucide-react';
-import { useAIEditor } from './CutDeck/AIEditorContext';
-import type { VideoInfo } from '../core/types';
-import { notify, formatTime } from '../shared';
-import styles from './AIVideoPreview.module.less';
+import { useCutDeck } from '@/components/CutDeck/context';
+import type { VideoInfo } from '@/core/types';
+import { notify, formatTime } from '@/shared';
+import styles from '@/components/AIVideoPreview.module.less';
 
 const Text = ({ children, type, strong, style, title, className }: { children: React.ReactNode; type?: string; strong?: boolean; style?: React.CSSProperties; title?: string; className?: string }) => {
   const classNames = [className, type === 'secondary' ? 'text-muted-foreground' : undefined].filter(Boolean).join(' ') || undefined;
@@ -47,7 +47,7 @@ interface ClipResultCompat {
 
 const AIVideoPreview: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { state, setVideo, setPlaying, setCurrentTime, dispatch } = useAIEditor();
+  const { state, setVideo, setPlaying, setCurrentTime, dispatch } = useCutDeck();
   const { isPlaying, currentTime, duration, currentVideo, analysis } = state;
   
   const [isDragging, setIsDragging] = useState(false);

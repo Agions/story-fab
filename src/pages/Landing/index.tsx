@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import styles from './index.module.css';
+import styles from '@/pages/Landing/index.module.css';
 
 // 功能特性数据
 const features = [

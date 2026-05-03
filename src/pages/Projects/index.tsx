@@ -1,21 +1,17 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import React, { useState, useEffect, lazy, Suspense, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Badge } from '../../components/ui/badge';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../components/ui/tooltip';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '../../components/ui/dropdown-menu';
-import { Progress } from '../../components/ui/progress';
 import { Skeleton } from '../../components/ui/skeleton';
-import { Plus, Edit3, Trash2, Play, MoreHorizontal, Grid3X3, List, Search, Video, FolderOpen, Download } from 'lucide-react';
+import { Plus, Edit3, Trash2, Play, Download } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
-import { notify } from '../../shared';
+import { notify } from '@/shared';
 import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '../../services/tauri';
 import { preloadProjectDetailPage, preloadProjectEditPage, preloadVideoEditorPage } from '../../core/utils/route-preload';
 import type { ProjectUIStatus, ProjectUIStats, ProjectView } from './types';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../components/ui/alert-dialog';
+import { ProjectsToolbar } from './components/ProjectsToolbar';
+import { StatusFilterBar } from './components/StatusFilterBar';
+import { ProjectCard } from './components/ProjectCard';
 
 const loadProjectsListView = () => import('./components/ProjectsListView');
 const ProjectsListView = lazy(loadProjectsListView);
@@ -162,83 +158,26 @@ const ProjectManager: React.FC = () => {
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
       {/* 工具栏 */}
-      <Card className="mb-4" style={{ padding: '12px 20px' }}>
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="搜索项目..."
-                className="w-60 pl-9"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-              />
-            </div>
-            <select
-              className="h-9 w-28 px-3 rounded-md border border-input bg-background text-sm"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as ProjectStatusFilter)}
-            >
-              <option value="all">全部状态</option>
-              <option value="draft">草稿</option>
-              <option value="processing">制作中</option>
-              <option value="completed">已完成</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
-              <Button
-                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                size="sm"
-                className="h-8 px-2"
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid3X3 size={16} />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                size="sm"
-                className="h-8 px-2"
-                onClick={() => setViewMode('list')}
-              >
-                <List size={16} />
-              </Button>
-            </div>
-            {loadFailed && (
-              <Button variant="outline" size="sm" onClick={() => { void loadProjectData(); }}>
-                重试
-              </Button>
-            )}
-            <Button
-              className="bg-gradient-to-r from-[#667eea] to-[#764ba2] border-0"
-              onClick={() => navigate('/project/new')}
-            >
-              <Plus size={16} className="mr-1" />
-              新建项目
-            </Button>
-          </div>
-        </div>
-      </Card>
+      <Suspense fallback={null}>
+        <ProjectsToolbar
+          searchText={searchText}
+          statusFilter={statusFilter}
+          viewMode={viewMode}
+          onSearchChange={setSearchText}
+          onStatusFilterChange={setStatusFilter}
+          onViewModeChange={setViewMode}
+          onNewProject={() => navigate('/project/new')}
+        />
+      </Suspense>
 
       {/* 项目统计 */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {statusFilters.map((item, idx) => (
-          <Badge
-            key={idx}
-            variant={statusFilter === item.filter ? 'default' : 'outline'}
-            className="cursor-pointer px-3 py-1.5 text-sm"
-            style={{
-              background: statusFilter === item.filter ? `${item.color}15` : undefined,
-              borderColor: statusFilter === item.filter ? item.color : undefined,
-              color: statusFilter === item.filter ? item.color : undefined,
-            }}
-            onClick={() => setStatusFilter(item.filter)}
-          >
-            {item.label} <strong>{item.value}</strong>
-          </Badge>
-        ))}
-      </div>
+      <Suspense fallback={null}>
+        <StatusFilterBar
+          statusFilters={statusFilters}
+          currentFilter={statusFilter}
+          onFilterChange={setStatusFilter}
+        />
+      </Suspense>
 
       {/* 内容区 */}
       {viewMode === 'grid' ? (
@@ -258,81 +197,20 @@ const ProjectManager: React.FC = () => {
           {filteredProjects.map(project => {
             const uiStatus = getProjectUIStatus(project);
             return (
-              <Card
+              <ProjectCard
                 key={project.id}
-                className="cursor-pointer overflow-hidden"
-                style={{ padding: 16, height: '100%', display: 'flex', flexDirection: 'column' }}
-                onClick={() => navigate(`/project/${project.id}`)}
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <Badge variant={uiStatus.status === 'completed' ? 'default' : uiStatus.status === 'processing' ? 'default' : 'secondary'}>
-                    {statusConfig[uiStatus.status]?.text || '草稿'}
-                  </Badge>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        onClick={(e) => e.stopPropagation()}
-                        onMouseEnter={() => { void preloadProjectEditPage(); void preloadVideoEditorPage(); }}
-                      >
-                        <MoreHorizontal size={16} />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>操作</AlertDialogTitle>
-                      </AlertDialogHeader>
-                      <div className="flex flex-col gap-1">
-                        {projectActions(project).filter((a) => a.key !== 'divider').map((action) => (
-                          <Button
-                            key={action.key}
-                            variant="ghost"
-                            className={`justify-start ${action.danger ? 'text-destructive' : ''}`}
-                            onClick={() => {
-                              if (action.onClick) action.onClick();
-                            }}
-                          >
-                            {action.icon}
-                            <span className="ml-2">{action.label}</span>
-                          </Button>
-                        ))}
-                      </div>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>取消</AlertDialogCancel>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-
-                <h5 className="font-medium truncate mb-1">{project.name}</h5>
-                <p className="text-xs text-muted-foreground truncate mb-3">{project.description || '无项目描述'}</p>
-
-                <Progress value={uiStatus.progress} className="mb-3" />
-
-                <div className="mt-auto flex justify-between items-center">
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger className="flex items-center gap-1">
-                          <Video size={12} /> {uiStatus.videoCount}
-                        </TooltipTrigger>
-                        <TooltipContent>视频数</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger className="flex items-center gap-1">
-                          <FolderOpen size={12} /> {uiStatus.scriptCount}
-                        </TooltipTrigger>
-                        <TooltipContent>脚本数</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{formatDate(project.updatedAt)}</span>
-                </div>
-              </Card>
+                project={project}
+                uiStatus={uiStatus}
+                statusConfig={statusConfig}
+                formatDate={formatDate}
+                onOpen={() => {
+                  addRecentProject(project.id);
+                  navigate(`/project/${project.id}`);
+                }}
+                onDelete={() => setDeleteConfirmId(project.id)}
+                onPreload={() => { void preloadProjectEditPage(); void preloadVideoEditorPage(); }}
+                projectActions={projectActions}
+              />
             );
           })}
 

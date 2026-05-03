@@ -1,4 +1,4 @@
-import type { ScriptSegment, ScriptData } from '../../types';
+import type { ScriptSegment, ScriptData } from '@/core/types';
 import type { DuplicateResult } from './types';
 import { SYNONYMS, SENTENCE_PATTERNS, ALTERNATIVE_PHRASES } from './types';
 

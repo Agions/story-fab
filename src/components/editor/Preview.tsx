@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useMemo, useState, useRef } from 'react';
 import { Button } from '../ui/button';
 import { Maximize, ZoomIn, ZoomOut } from 'lucide-react';
-import styles from './Preview.module.less';
+import styles from '@/components/editor/Preview.module.less';
 
 interface PreviewProps {
   playing?: boolean;

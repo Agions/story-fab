@@ -1,4 +1,4 @@
-import type { VideoInfo } from '../../core/types';
+import type { VideoInfo } from '@/core/types';
 import type {
   CutPoint,
   ClipSuggestion,

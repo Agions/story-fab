@@ -9,6 +9,7 @@ import {
   addEffect as addEffectOp,
   adjustSpeed as adjustSpeedOp,
   adjustVolume as adjustVolumeOp,
+  findTrackByClipId,
 } from '../timelineOperations';
 
 // ============================================================
@@ -20,8 +21,10 @@ export class AddTransitionHandler extends BaseActionHandler {
   
   handle(timeline: Timeline, action: EditorAction): Timeline {
     if (action.type !== 'ADD_TRANSITION') return timeline;
+    const trackId = findTrackByClipId(timeline, action.fromClipId) ?? '';
     return addTransitionOp(
       timeline,
+      trackId,
       action.fromClipId,
       action.toClipId,
       action.transitionType,

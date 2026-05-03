@@ -8,7 +8,7 @@ import WelcomeHeader from './components/WelcomeHeader';
 import StatsOverview from './components/StatsOverview';
 import RecentProjects from './components/RecentProjects';
 import QuickActions from './components/QuickActions';
-import styles from './index.module.less';
+import styles from '@/pages/Dashboard/index.module.less';
 
 const Dashboard: React.FC = () => {
   const {

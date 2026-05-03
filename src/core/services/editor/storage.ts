@@ -1,6 +1,6 @@
 import type { Timeline } from './types';
-import { logger } from '../../../utils/logger';
-import { STORAGE_KEYS } from '../../../constants';
+import { logger } from '../../../shared/utils/logging';
+import { STORAGE_KEYS } from '@/constants';
 
 // Timeline storage key - 使用统一的键名，兼容旧数据
 const CURRENT_KEY = STORAGE_KEYS.timeline;

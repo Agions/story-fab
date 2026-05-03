@@ -1,4 +1,4 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 /**
  * Error Boundary 组件
  * 捕获子组件错误，提供降级 UI

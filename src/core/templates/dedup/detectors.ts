@@ -1,4 +1,4 @@
-import type { ScriptSegment } from '../../types';
+import type { ScriptSegment } from '@/core/types';
 import type { DuplicateResult, DedupConfig } from './types';
 import { COMMON_PHRASES, SYNONYMS, SENTENCE_PATTERNS } from './types';
 

@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import type { AIModel, ModelProvider } from '../../../core/types';
+import type { AIModel, ModelProvider } from '@/core/types';
 
 interface UseModelSelectionProps {
   onSelect?: (modelId: string) => void;

@@ -1,11 +1,11 @@
 import { useState, useCallback, useRef } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
-import { VideoSegment, extractKeyFrames, analyzeVideo } from '../../../services/video';
+import { VideoSegment, extractKeyFrames, analyzeVideo } from '../../../services/videoProcessingFacade';
 import { clipWorkflowService } from '../../../core/services/clip-workflow.service';
-import type { VideoInfo } from '../../../core/types';
+import type { VideoInfo } from '@/core/types';
 import type { ClipSegment } from '../../../core/services/aiClip.service';
-import { notify } from '../../../shared';
-import { logger } from '../../../utils/logger';
+import { notify } from '@/shared';
+import { logger } from '../../../shared/utils/logging';
 
 export const useVideoEditor = (projectId: string | undefined) => {
   // 视频状态

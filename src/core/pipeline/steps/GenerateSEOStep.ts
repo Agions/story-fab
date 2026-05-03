@@ -11,7 +11,7 @@ import { createStep, type Step, type PipelineContext, type StepOptions, reportPr
 import type { ClipScore } from '../../services/clipRepurposing/clipScorer';
 import { SEOGenerator } from '../../services/clipRepurposing/seoGenerator';
 import type { SEOMetadata, SocialPlatform } from '../../services/clipRepurposing/seoGenerator';
-import { logger } from '../../../utils/logger';
+import { logger } from '../../../shared/utils/logging';
 
 // ============================================================
 // Metadata

@@ -23,7 +23,7 @@ export {
   API_ENDPOINTS,
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
-} from '../../constants';
+} from '@/constants';
 
 // 路由路径（仅在 shared 中定义）
 export const ROUTES = {

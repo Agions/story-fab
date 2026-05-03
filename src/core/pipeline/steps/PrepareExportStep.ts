@@ -14,8 +14,8 @@ import type { AspectRatio } from '../../services/clipRepurposing/multiFormatExpo
 import type { ExportTask } from '../../services/clipRepurposing/multiFormatExport';
 import { multiFormatExporter } from '../../services/clipRepurposing/multiFormatExport';
 import { tauri } from '../../tauri/TauriBridge';
-import type { VideoInfo } from '../../types';
-import { logger } from '../../../utils/logger';
+import type { VideoInfo } from '@/core/types';
+import { logger } from '../../../shared/utils/logging';
 
 // ============================================================
 // Metadata

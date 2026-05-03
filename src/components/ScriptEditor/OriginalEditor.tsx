@@ -1,4 +1,4 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
@@ -11,15 +11,15 @@ import {
   ChevronDown,
   Plus,
 } from 'lucide-react';
-import type { ScriptSegment } from '../../core/types';
-import { VideoSegment, formatDuration, previewSegment } from '../../services/video';
+import type { ScriptSegment } from '@/core/types';
+import { VideoSegment, formatDuration, previewSegment } from '../../services/videoProcessingFacade';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import { notify } from '../../shared';
+import { notify } from '@/shared';
 import SegmentTable from './SegmentTable';
 import SegmentEditForm from './SegmentEditForm';
 import PreviewModal from './PreviewModal';
 import AIModal from './AIModal';
-import styles from './ScriptEditor.module.less';
+import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface OriginalEditorProps {
   videoPath: string;

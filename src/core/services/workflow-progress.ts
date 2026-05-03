@@ -3,7 +3,7 @@
  * 用于跟踪工作流执行进度
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 
 export type ProgressCallback = (progress: ProgressInfo) => void;
 

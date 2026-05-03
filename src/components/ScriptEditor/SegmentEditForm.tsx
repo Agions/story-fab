@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '../ui/select';
 import { segmentTypeOptions } from './types';
-import styles from './ScriptEditor.module.less';
+import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface SegmentFormValues {
   start: number;

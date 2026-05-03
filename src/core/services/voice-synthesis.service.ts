@@ -4,7 +4,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 
 type AudioContextWindow = Window & {
   webkitAudioContext?: typeof AudioContext;

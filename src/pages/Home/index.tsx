@@ -1,4 +1,4 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/card';
@@ -10,16 +10,16 @@ import {
   Video, Plus, Play, Rocket, Zap, FileText, Clock, CheckCircle, ArrowRight,
   FlaskConical, Scissors, VolumeX, Download, Folder, TrendingUp, Loader2,
 } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
-import { useSettings } from '../../context/SettingsContext';
+import { useTheme } from '@/context/ThemeContext';
+import { useSettings } from '@/context/SettingsContext';
 import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '../../services/tauri';
 import { preloadProjectEditPage, preloadProjectsPage } from '../../core/utils/route-preload';
 import {
   extractProjectMediaMetrics,
   pickPreferredSizeMb,
   resolveProjectVideoPath,
-} from '../../shared';
-import styles from './index.module.less';
+} from '@/shared';
+import styles from '@/pages/Home/index.module.less';
 
 const AMBER = '#d4a574';
 

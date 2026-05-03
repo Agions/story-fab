@@ -3,8 +3,8 @@
  */
 
 // 功能组件
-export { default as ProcessingProgress } from './ProcessingProgress';
-export { default as PreviewModal } from './PreviewModal';
+export { default as ProcessingProgress } from '@/components/common/ProcessingProgress';
+export { default as PreviewModal } from '@/components/common/PreviewModal';
 export { default as AnimatedContainer } from './AnimatedContainer';
 
 // ErrorBoundary

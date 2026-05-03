@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { clamp } from './utils';
-import styles from './Timeline.module.less';
+import styles from '@/components/Timeline/Timeline.module.less';
 
 interface PlayheadProps {
   playheadMs: number;

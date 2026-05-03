@@ -2,7 +2,7 @@
  * VideoProcessingController Types
  * Shared types for the VideoProcessingController module
  */
-import type { VideoSegment } from '../../core/types';
+import type { VideoSegment } from '@/core/types';
 
 export interface BatchItem {
   id: string;

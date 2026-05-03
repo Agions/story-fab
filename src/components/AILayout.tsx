@@ -23,9 +23,9 @@ import {
   Edit,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAIEditor, AIFeatureType } from './CutDeck/AIEditorContext';
-import { notify } from '../shared';
-import styles from './AILayout.module.less';
+import { useCutDeck, AIFeatureType } from '@/components/CutDeck/context';
+import { notify } from '@/shared';
+import styles from '@/components/AILayout.module.less';
 
 const coreFunctions = [
   {
@@ -64,7 +64,7 @@ interface AILayoutProps {
 
 const AILayout: React.FC<AILayoutProps> = ({ children }) => {
   const navigate = useNavigate();
-  const { state, setFeature, setPlaying } = useAIEditor();
+  const { state, setFeature, setPlaying } = useCutDeck();
   const { isPlaying, selectedFeature, currentVideo } = state;
 
   const handleFunctionClick = (functionKey: string) => {

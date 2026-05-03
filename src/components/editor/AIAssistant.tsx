@@ -33,15 +33,16 @@ import {
   HelpCircle,
   XCircle,
 } from 'lucide-react';
-import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '../../core/config/models.config';
-import type { ModelProvider, AIModel } from '../../core/types';
+import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '../../core/config/aiModels.config';
+import type { ModelProvider, AIModel } from '@/core/types';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import { getAvailableModelsFromApiKeys, resolveDefaultModelId } from '../../core/utils/model-availability';
-import styles from './AIAssistant.module.less';
+import styles from '@/components/editor/AIAssistant.module.less';
 
 interface AIAssistantProps {}
 
 interface AssistantMessage {
+  id?: string;
   role: 'ai' | 'user';
   content: string;
   time: Date;
@@ -137,7 +138,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
   const renderMessages = () => {
     return messages.map((msg, index) => (
       <div
-        key={index}
+        key={msg.id ?? `msg-${index}`}
         className={`${styles.message} ${msg.role === 'ai' ? styles.aiMessage : styles.userMessage}`}
       >
         <div className={styles.messageAvatar}>

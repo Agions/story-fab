@@ -27,8 +27,8 @@ import {
 } from '../../ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
 import { Button } from '../../ui/button';
-import { formatDuration, notify } from '../../../shared';
-import styles from './PreviewModal.module.less';
+import { formatDuration, notify } from '@/shared';
+import styles from '@/components/common/PreviewModal/PreviewModal.module.less';
 
 // 文案数据类型
 export interface ScriptPreview {

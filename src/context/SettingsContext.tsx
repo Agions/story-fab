@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useSettingsStore, AppSettings } from '../hooks/useSettings';
+import { useSettingsStore, AppSettings } from '@/hooks/useSettings';
 
 interface SettingsContextType {
   settings: AppSettings;
@@ -84,7 +84,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   );
 };
 
-// 使用Context的Hook
+
 export const useSettings = (): SettingsContextType => {
   const context = useContext(SettingsContext);
   if (context === undefined) {
@@ -92,5 +92,3 @@ export const useSettings = (): SettingsContextType => {
   }
   return context;
 };
-
-export default SettingsContext; 

@@ -4,7 +4,7 @@
 import React from 'react';
 import { Folder, Clock, BarChart3 } from 'lucide-react';
 import { DashboardStats } from '../types';
-import styles from '../index.module.less';
+import styles from '@/pages/Dashboard/index.module.less';
 
 interface StatsOverviewProps {
   stats: DashboardStats;

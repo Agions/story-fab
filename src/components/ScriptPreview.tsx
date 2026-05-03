@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logging';
 import React, { useState } from 'react';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
@@ -13,9 +13,9 @@ import {
   List, 
   Calendar
 } from 'lucide-react';
-import type { Script, ScriptSegment } from '../types';
-import { notify, formatTime } from '../shared';
-import styles from './ScriptPreview.module.less';
+import type { Script, ScriptSegment } from '@/types';
+import { notify, formatTime } from '@/shared';
+import styles from '@/components/ScriptPreview.module.less';
 
 const Title = ({ children, level, className }: { children: React.ReactNode; level?: number; className?: string }) => <h3 className={className} style={{ fontSize: level === 3 ? '1.25rem' : '1rem', fontWeight: level ? 600 : 400 }}>{children}</h3>;
 const Paragraph = ({ children, className }: { children: React.ReactNode; className?: string }) => <p className={className}>{children}</p>;

@@ -44,7 +44,7 @@ import { ClipPropertiesPanel } from './ClipPropertiesPanel';
 import { clamp, generateId } from './utils';
 import { MIN_CLIP_DURATION, DEFAULT_TRACK_HEIGHT, MIN_ZOOM, MAX_ZOOM, SNAP_THRESHOLD_PX, TRACK_COLORS } from './constants';
 
-import styles from './Timeline.module.less';
+import styles from '@/components/Timeline/Timeline.module.less';
 
 // ============================================
 // MultiTrackTimeline 主组件
@@ -129,6 +129,17 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     return () => clearInterval(interval);
   }, [isPlaying, duration]);
 
+  // 轨道操作
+  const updateTrack = useCallback((trackId: string, updates: Partial<TimelineTrack>) => {
+    const updated = tracks.map((t) => t.id === trackId ? { ...t, ...updates } : t);
+    setTracks(updated);
+    onTracksChange?.(updated);
+  }, [tracks, onTracksChange]);
+
+  // tracks ref to avoid stale closure in keyboard handler
+  const tracksRef = useRef(tracks);
+  tracksRef.current = tracks;
+
   // 键盘快捷键
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -137,12 +148,19 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
         else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') { e.preventDefault(); onRedo?.(); }
       }
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectedClipId) {
-        handleClipDelete(selectedClipId);
+        const currentTracks = tracksRef.current;
+        const targetTrack = currentTracks.find((t: TimelineTrack) => t.clips.some((c: TimelineClip) => c.id === selectedClipId));
+        if (targetTrack) {
+          const updatedClips = targetTrack.clips.filter((c: TimelineClip) => c.id !== selectedClipId);
+          updateTrack(targetTrack.id, { clips: updatedClips });
+          onClipDelete?.(selectedClipId);
+          onSelectionChange?.(undefined, undefined);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedClipId, onUndo, onRedo]);
+  }, [selectedClipId, onUndo, onRedo, updateTrack, onClipDelete, onSelectionChange]);
 
   // 吸附
   const getSnapPoints = useCallback((excludeClipId: string): number[] => {
@@ -168,13 +186,6 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
   }, [snapEnabled, getSnapPoints, msPerPixel]);
 
   const allClips = useMemo(() => tracks.flatMap((t) => t.clips), [tracks]);
-
-  // 轨道操作
-  const updateTrack = useCallback((trackId: string, updates: Partial<TimelineTrack>) => {
-    const updated = tracks.map((t) => t.id === trackId ? { ...t, ...updates } : t);
-    setTracks(updated);
-    onTracksChange?.(updated);
-  }, [tracks, onTracksChange]);
 
   const handleToggleMute = useCallback((trackId: string) => {
     const track = tracks.find((t) => t.id === trackId);
@@ -273,7 +284,22 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     });
   }, [tracks, updateTrack, onClipDelete, onSelectionChange]);
 
-  // 拖拽
+  // 拖拽事件监听器 refs，用于组件卸载时清理
+  const dragMoveHandlerRef = useRef<((e: MouseEvent) => void) | null>(null);
+  const dragUpHandlerRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (dragMoveHandlerRef.current) {
+        document.removeEventListener('mousemove', dragMoveHandlerRef.current);
+      }
+      if (dragUpHandlerRef.current) {
+        document.removeEventListener('mouseup', dragUpHandlerRef.current);
+      }
+    };
+  }, []);
+
+  // 拖拽片段
   const handleDragStart = useCallback((
     clipId: string,
     trackId: string,
@@ -331,8 +357,12 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
       setDragClipId(null);
       setDragTrackId(null);
       setDragType(null);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      if (dragMoveHandlerRef.current) {
+        document.removeEventListener('mousemove', dragMoveHandlerRef.current);
+      }
+      if (dragUpHandlerRef.current) {
+        document.removeEventListener('mouseup', dragUpHandlerRef.current);
+      }
 
       const finalTrack = tracks.find((t) => t.id === trackId);
       const finalClip = finalTrack?.clips.find((c) => c.id === clipId);
@@ -341,6 +371,8 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
       }
     };
 
+    dragMoveHandlerRef.current = handleMouseMove;
+    dragUpHandlerRef.current = handleMouseUp;
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   }, [tracks, msPerPixel, snapToBoundary, onClipUpdate]);

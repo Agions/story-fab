@@ -18,7 +18,7 @@ export {
   getModelsByProvider,
   getModelsByCategory,
   getRecommendedModels,
-} from '../config/models.config';
+} from '../config/aiModels.config';
 
 // ============================================================================
 // Legacy re-exports（已废弃，请使用上述导出）

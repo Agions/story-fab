@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Video, Clock, File } from 'lucide-react';
-import { formatDuration } from '../shared';
-import styles from './VideoInfo.module.less';
+import { formatDuration } from '@/shared';
+import styles from '@/components/VideoInfo.module.less';
 
 interface VideoInfoProps {
   name: string;

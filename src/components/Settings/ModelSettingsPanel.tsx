@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Badge } from '../ui/badge';
 import { Bot, Zap, DollarSign } from 'lucide-react';
-import { AI_MODELS, MODEL_VERIFICATION, MODEL_CATALOG_VERIFIED_AT } from '../../core/config/models.config';
+import { AI_MODELS, MODEL_VERIFICATION, MODEL_CATALOG_VERIFIED_AT } from '../../core/config/aiModels.config';
 import { PROVIDER_NAMES } from '../../constants/models';
-import type { AIModel } from '../../core/types';
+import type { AIModel } from '@/core/types';
 
 interface ModelSettingsPanelProps {
   defaultModel: string;

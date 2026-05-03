@@ -27,8 +27,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { Project, ProjectStatus } from '../types';
-import { formatRelativeTime, formatDuration } from '../../../shared';
-import styles from '../index.module.less';
+import { formatRelativeTime, formatDuration } from '@/shared';
+import styles from '@/pages/Dashboard/index.module.less';
 
 const STATUS_CONFIG: Record<ProjectStatus, { label: string; className: string; icon: React.ReactNode }> = {
   completed: { label: '已完成', className: styles.statusCompleted, icon: <CheckCircle size={12} /> },

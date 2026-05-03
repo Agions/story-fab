@@ -6,7 +6,7 @@
 import React from 'react';
 import { Progress, ProgressTrack, ProgressIndicator } from '../../ui/progress';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
-import styles from './ProcessingProgress.module.less';
+import styles from '@/components/common/ProcessingProgress/ProcessingProgress.module.less';
 
 export type ProgressStatus = 'active' | 'success' | 'exception' | 'normal';
 

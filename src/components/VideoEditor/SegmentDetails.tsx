@@ -2,9 +2,9 @@ import React, { useCallback, memo } from 'react';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Eye } from 'lucide-react';
-import { ScriptSegment } from '../../types';
-import { formatTime } from '../../shared';
-import styles from './VideoEditor.module.less';
+import { ScriptSegment } from '@/types';
+import { formatTime } from '@/shared';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 const getTypeLabel = (type: string) => {
   switch (type) {

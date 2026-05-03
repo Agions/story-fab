@@ -3,9 +3,9 @@ import { Card, CardContent } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { Plus, Trash2 } from 'lucide-react';
-import { VideoSegment } from '../../../services/video';
-import { formatDuration } from '../../../utils';
-import styles from '../index.module.less';
+import { VideoSegment } from '../../../services/videoProcessingFacade';
+import { formatDuration } from '../../../shared/utils/formatting';
+import styles from '@/pages/VideoEditor/index.module.less';
 
 const getSegmentKey = (segment: VideoSegment, index: number): string => {
   return `${index}-${segment.start}-${segment.end}`;

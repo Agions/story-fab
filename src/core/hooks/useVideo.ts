@@ -4,8 +4,8 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { VideoInfo, VideoAnalysis, Scene } from '../types';
-import { delay } from '../../shared';
+import type { VideoInfo, VideoAnalysis, Scene } from '@/core/types';
+import { delay } from '@/shared';
 
 interface TaskStatusInfo {
   id?: string;

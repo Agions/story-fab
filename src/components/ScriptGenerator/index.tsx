@@ -1,4 +1,4 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 /**
  * 脚本生成器组件
  * 专业的 AI 脚本生成界面
@@ -28,10 +28,10 @@ import {
 import { motion, AnimatePresence } from '../common/motion-shim';
 import { useModel, useModelCost } from '../../hooks/useModel';
 import { useProject } from '../../hooks/useProject';
-import ModelSelector from '../ModelSelector';
-import { notify } from '../../shared';
-import type { ScriptData, ScriptSegment } from '../../core/types';
-import styles from './index.module.less';
+import ModelSelector from '@/components/ModelSelector';
+import { notify } from '@/shared';
+import type { ScriptData, ScriptSegment } from '@/core/types';
+import styles from '@/components/ScriptGenerator/index.module.less';
 
 const LENGTH_OPTIONS = [
   { value: 'short', label: '简短', desc: '1-3分钟', words: '300-500字' },

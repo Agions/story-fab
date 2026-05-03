@@ -1,5 +1,5 @@
 import { analyzeVideo } from './analyzer';
-import type { VideoInfo } from '../../types';
+import type { VideoInfo } from '@/core/types';
 import type { AIClipConfig, BatchClipTask, ClipAnalysisResult, ClipSegment, ClipSuggestion } from './types';
 
 /** In-flight tasks registry */
@@ -77,7 +77,14 @@ export async function batchProcess(
   }
 
   // Wait for all to complete
-  await Promise.all(pending);
+  // Note: processVideo catches all errors internally, so Promise.all should not reject.
+  // But we guard synchronously in case scheduleNext throws before pushing.
+  try {
+    await Promise.all(pending);
+  } catch (err) {
+    // Defensive: if Promise.all rejects (should not happen), treat as batch error
+    task.errors.push(`[Batch] Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
   task.status = controller.signal.aborted ? 'failed' : 'completed';
   task.errors = controller.signal.aborted

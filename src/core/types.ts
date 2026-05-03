@@ -177,40 +177,7 @@ export interface Subtitle {
   language?: string;
 }
 
-// ==================== 编辑器相关类型 ====================
-
-export interface EditorTimeline {
-  duration: number;
-  currentTime: number;
-  zoom: number;
-  tracks: Track[];
-}
-
-export interface Track {
-  id: string;
-  type: 'video' | 'audio' | 'subtitle';
-  segments: TrackSegment[];
-  muted?: boolean;
-  locked?: boolean;
-}
-
-export interface TrackSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
-  assetId: string;
-  effects?: Effect[];
-}
-
-export interface Effect {
-  id: string;
-  type: string;
-  params: Record<string, unknown>;
-}
-
 export type EditorPanel = 'video' | 'script' | 'subtitle' | 'voice' | 'effect';
-
-// ==================== AI 相关类型 ====================
 
 export type AIFeatureType = 'video-narration' | 'first-person' | 'remix' | 'smart-clip';
 
@@ -409,7 +376,6 @@ export interface ProjectData {
   scripts?: Script[];
   videoAssets?: VideoAsset[];
   videos?: VideoInfo[];
-  timeline?: EditorTimeline;
   settings?: ProjectSettings;
   status?: string;
   createdAt?: string;

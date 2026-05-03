@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 import type { TimelineClip } from './types';
 import { formatTime } from './utils';
 import { MIN_CLIP_DURATION } from './constants';
-import styles from './Timeline.module.less';
+import styles from '@/components/Timeline/Timeline.module.less';
 
 interface ClipPropertiesPanelProps {
   clip: TimelineClip;

@@ -1,8 +1,9 @@
 import { visionService } from '../vision.service';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotion-peak-detector';
 import { invoke } from '@tauri-apps/api/core';
-import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '../../types';
+import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
 import { DEFAULT_CLIP_CONFIG } from './types';
+import { formatTime as formatSharedTime } from '../../../shared/utils/formatting';
 import type {
   AIClipConfig,
   CutPoint,
@@ -30,7 +31,10 @@ export async function analyzeVideo(
     ),
     // Skip emotion detection here — ZCR peak detector handles it more reliably
     Promise.resolve({ scenes: [] as Scene[], objects: [], emotions: [] as EmotionAnalysis[] }),
-  ]).then(([r]) => r).catch(() => ({ scenes: [] as Scene[], objects: [], emotions: [] as EmotionAnalysis[] }));
+  ]).then(([r]) => r).catch((err) => {
+    console.warn('[analyzer] detectScenesAdvanced failed:', err);
+    return { scenes: [] as Scene[], objects: [], emotions: [] as EmotionAnalysis[] };
+  });
 
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
   onProgress?.(30, '提取关键帧');
@@ -207,7 +211,7 @@ function generateCutPoints(
           timestamp: kf.timestamp,
           type: 'keyframe',
           confidence: kf.importance,
-          description: `关键帧 @ ${formatTime(kf.timestamp)}`,
+          description: `关键帧 @ ${formatSharedTime(kf.timestamp)}`,
           suggestedAction: 'keep',
           metadata: { motionScore: kf.importance }
         });
@@ -467,10 +471,4 @@ function estimateFinalDuration(
   }
 
   return Math.max(0, estimated);
-}
-
-function formatTime(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }

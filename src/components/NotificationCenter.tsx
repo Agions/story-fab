@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from './ui/button';
 import { Bell } from 'lucide-react';
-import { useAppStore } from '../store';
-import styles from './NotificationCenter.module.less';
+import { useAppStore } from '@/store';
+import styles from '@/components/NotificationCenter.module.less';
 
 interface NotificationCenterProps {
   open: boolean;

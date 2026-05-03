@@ -4,20 +4,20 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { logger } from '../../utils/logger';
-import { delay } from '../../shared';
+import { logger } from '../../shared/utils/logging';
+import { delay } from '@/shared';
 import {
   editorService,
   saveToStorage,
   type EditorConfig,
   type Timeline,
-  type VideoClip,
+  type TimelineClip,
   type VideoSegment,
   type TextItem,
   type AudioClip,
   type EditorExportSettings,
-} from '../services/editor.service';
-import type { ExportSettings, ScriptSegment } from '../types';
+} from '@/core/services/editor.service';
+import type { ExportSettings, ScriptSegment } from '@/core/types';
 
 // 剪辑状态
 export interface EditorState {
@@ -43,7 +43,7 @@ export interface EditorOperations {
   setPlaybackRate: (rate: number) => void;
 
   // 片段操作
-  addClip: (trackId: string, clip: VideoClip, position: number) => void;
+  addClip: (trackId: string, clip: TimelineClip, position: number) => void;
   removeClip: (trackId: string, clipId: string) => void;
   moveClip: (trackId: string, clipId: string, newPosition: number) => void;
   copyClip: (clipId: string) => void;
@@ -146,6 +146,9 @@ export function useEditor(_config?: Partial<EditorConfig>): {
   const play = useCallback(() => {
     if (!state.timeline || state.isPlaying) return;
 
+    // Capture current timeline ref to avoid stale closure in animation loop
+    const timelineRef = state.timeline;
+
     playbackRef.current = {
       isPlaying: true,
       startTime: performance.now(),
@@ -157,12 +160,13 @@ export function useEditor(_config?: Partial<EditorConfig>): {
       const elapsed = (performance.now() - playbackRef.current.startTime) / 1000;
       const newTime = playbackRef.current.startPosition + elapsed;
 
-      if (state.timeline && newTime >= state.timeline.duration) {
+      // Use captured timelineRef instead of state.timeline to avoid stale closure
+      if (newTime >= timelineRef.duration) {
         // 播放结束
         setState(prev => ({
           ...prev,
           isPlaying: false,
-          currentTime: state.timeline!.duration
+          currentTime: timelineRef.duration
         }));
         return;
       }
@@ -201,7 +205,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
   }, []);
 
   // 片段操作
-  const addClip = useCallback((trackId: string, clip: VideoClip, position: number) => {
+  const addClip = useCallback((trackId: string, clip: TimelineClip, position: number) => {
     editorService.dispatch({
       type: 'ADD_CLIP',
       trackId,
@@ -238,8 +242,8 @@ export function useEditor(_config?: Partial<EditorConfig>): {
     editorService.dispatch({
       type: 'TRIM_CLIP',
       clipId,
-      startTime,
-      endTime
+      startMs: startTime,
+      endMs: endTime
     });
   }, []);
 
@@ -247,7 +251,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
     editorService.dispatch({
       type: 'SPLIT_CLIP',
       clipId,
-      splitTime
+      splitMs: splitTime
     });
   }, []);
 

@@ -3,15 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from './ui/tooltip';
-import { ExportFormat, exportScript } from '../services/export';
-import { Script } from '../services/aiService';
-import { notify } from '../shared';
-import { logger } from '../utils/logger';
+import { ScriptExportFormat, exportScriptToFormat } from '@/core/services/export/scriptExportService';
+import type { AIScriptDraft as Script } from '@/core/services/aiScriptGenerationService';
+import { notify } from '@/shared';
+import { logger } from '../shared/utils/logging';
 import { Download, FileText, File, Globe } from 'lucide-react';
-import styles from './ExportPanel.module.less';
+import styles from '@/components/ExportPanel.module.less';
 
 export interface ScriptExportSettings {
-  format: ExportFormat;
+  format: ScriptExportFormat;
   filename: string;
 }
 
@@ -21,14 +21,14 @@ interface ExportPanelProps {
 }
 
 const formatOptions = [
-  { value: ExportFormat.TXT, label: '纯文本 (.txt)', desc: '简单文本格式，适合通用场景', icon: FileText },
-  { value: ExportFormat.SRT, label: '字幕文件 (.srt)', desc: '标准字幕格式，可导入视频编辑软件', icon: FileText },
-  { value: ExportFormat.PDF, label: 'PDF文档 (.pdf)', desc: '带格式的PDF文档，适合打印或分享', icon: File },
-  { value: ExportFormat.HTML, label: '网页 (.html)', desc: '可在浏览器中打开的网页格式', icon: Globe },
+  { value: ScriptExportFormat.TXT, label: '纯文本 (.txt)', desc: '简单文本格式，适合通用场景', icon: FileText },
+  { value: ScriptExportFormat.SRT, label: '字幕文件 (.srt)', desc: '标准字幕格式，可导入视频编辑软件', icon: FileText },
+  { value: ScriptExportFormat.PDF, label: 'PDF文档 (.pdf)', desc: '带格式的PDF文档，适合打印或分享', icon: File },
+  { value: ScriptExportFormat.HTML, label: '网页 (.html)', desc: '可在浏览器中打开的网页格式', icon: Globe },
 ] as const;
 
 const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
-  const [exportFormat, setExportFormat] = useState<ExportFormat>(ExportFormat.TXT);
+  const [exportFormat, setExportFormat] = useState<ScriptExportFormat>(ScriptExportFormat.TXT);
   const [filename, setFilename] = useState<string>(`脚本_${script?.id ?? Date.now()}`);
   const [exporting, setExporting] = useState(false);
 
@@ -63,7 +63,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ script, onExport }) => {
 
     setExporting(true);
     try {
-      const success = await exportScript(script, exportFormat, filename);
+      const success = await exportScriptToFormat(script, exportFormat, filename);
       if (success) {
         notify.success(`脚本已成功导出为${exportFormat.toUpperCase()}格式`);
       } else {

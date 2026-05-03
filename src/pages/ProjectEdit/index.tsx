@@ -8,30 +8,27 @@
  *   index.tsx           — 主组件（状态编排）
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Card } from '../../components/ui/card';
-import { Spin } from '../../components/ui/spin';
-import { Button } from '../../components/ui/button';
-import { Steps } from '../../components/ui/steps';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../../components/ui/select';
-import { Switch } from '../../components/ui/switch';
-import { Badge } from '../../components/ui/badge';
-import { Input } from '../../components/ui/input';
-import { ArrowLeft, Save, Video, Edit, CheckCircle } from 'lucide-react';
+import { Spin } from '@/components/ui/spin';
+import { Button } from '@/components/ui/button';
+import { Steps } from '@/components/ui/steps';
+import { Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
-import { VideoMetadata, analyzeVideo, extractKeyFrames } from '../../services/video';
-import type { ScriptSegment } from '../../core/types';
-import { generateScriptWithAI, analyzeKeyFramesWithAI } from '../../services/aiService';
+import { VideoMetadata, analyzeVideo, extractKeyFrames } from '../../services/videoProcessingFacade';
+import type { ScriptSegment } from '@/core/types';
+import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/aiScriptGenerationService';
 import { loadProjectWithRetry, saveProjectToFile } from '../../services/tauri';
-import { notify } from '../../shared';
-import { useSettings } from '../../context/SettingsContext';
+import { notify } from '@/shared';
+import { useSettings } from '@/context/SettingsContext';
 import { v4 as uuid } from 'uuid';
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 
 import { VideoStep } from './components/steps/VideoStep';
 import { AnalyzeStep } from './components/steps/AnalyzeStep';
 import { ScriptStep } from './components/steps/ScriptStep';
+import { ProjectEditHeader } from './components/ProjectEditHeader';
+import { AutoSaveBadge } from './components/AutoSaveBadge';
+import { ProjectForm } from './components/ProjectForm';
 import { useProjectAutoSave } from './hooks/useProjectAutoSave';
 import {
   type ProjectData,
@@ -44,7 +41,7 @@ import {
   parseScriptText,
 } from './projectEditUtils';
 
-import styles from './index.module.less';
+import styles from '@/pages/ProjectEdit/index.module.less';
 
 
 
@@ -54,80 +51,7 @@ const STEP_ITEMS = [
   { title: '编辑脚本', icon: <CheckCircle size={18} />, description: '编辑和优化脚本' },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Header
-// ─────────────────────────────────────────────────────────────────────────────
-interface ProjectEditHeaderProps {
-  isNewProject: boolean;
-  loading: boolean;
-  initialLoading: boolean;
-  saving: boolean;
-  saveBehavior: ProjectSaveBehavior;
-  autoSaveEnabled: boolean;
-  onBack: () => void;
-  onSave: () => void;
-  onSaveBehaviorChange: (v: ProjectSaveBehavior) => void;
-  onAutoSaveToggle: (checked: boolean) => void;
-}
 
-const ProjectEditHeader = React.memo<ProjectEditHeaderProps>(({
-  isNewProject, loading, initialLoading, saving, saveBehavior,
-  autoSaveEnabled, onBack, onSave, onSaveBehaviorChange, onAutoSaveToggle,
-}) => (
-  <div className={styles.header}>
-    <Button variant="ghost" icon={<ArrowLeft />} onClick={onBack}>返回</Button>
-    <h3 className="text-base font-semibold">{isNewProject ? '创建新项目' : '编辑项目'}</h3>
-    <div className="flex items-center gap-4">
-      <div className={styles.saveBehaviorControl}>
-        <span className={styles.saveBehaviorLabel}>保存后：</span>
-        <Select value={saveBehavior} onValueChange={(v: string) => onSaveBehaviorChange(v as ProjectSaveBehavior)}>
-          <SelectTrigger size="sm" className="w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="stay">留在编辑页</SelectItem>
-            <SelectItem value="detail">跳转项目详情</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className={styles.saveBehaviorControl}>
-        <span className={styles.saveBehaviorLabel}>自动保存：</span>
-        <Switch size="sm" checked={autoSaveEnabled} onCheckedChange={onAutoSaveToggle} />
-      </div>
-      <Button
-        variant="default" icon={<Save />} onClick={onSave}
-        disabled={loading || initialLoading || saving}
-      >
-        保存项目
-      </Button>
-    </div>
-  </div>
-));
-
-ProjectEditHeader.displayName = 'ProjectEditHeader';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AutoSave badge
-// ─────────────────────────────────────────────────────────────────────────────
-const AutoSaveBadge = React.memo<{
-  enabled: boolean;
-  videoPath: string;
-  state: 'idle' | 'saving' | 'saved' | 'error';
-  lastAt: string;
-}>(({ enabled, videoPath, state, lastAt }) => {
-  if (!enabled) return <Badge variant="secondary">自动保存已关闭</Badge>;
-  if (!videoPath) return <Badge variant="secondary">未开始自动保存</Badge>;
-  if (state === 'saving') return <Badge variant="default">草稿自动保存中...</Badge>;
-  if (state === 'saved') return <Badge variant="default">{lastAt ? `草稿已保存 ${lastAt}` : '草稿已保存'}</Badge>;
-  if (state === 'error') return <Badge variant="destructive">草稿保存失败</Badge>;
-  return <Badge variant="secondary">自动保存待触发</Badge>;
-});
-
-AutoSaveBadge.displayName = 'AutoSaveBadge';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main component
-// ─────────────────────────────────────────────────────────────────────────────
 const ProjectEdit: React.FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -347,7 +271,7 @@ const ProjectEdit: React.FC = () => {
 
       stage = 'script';
       notify.info('正在根据视频内容生成脚本...');
-      const text = await generateScriptWithAI(meta, descriptions, {
+      const text = await generateScriptWithOpenAI(meta, descriptions, {
         style: '自然流畅', tone: '专业', length: 'medium', purpose: '内容展示',
       });
 
@@ -456,30 +380,12 @@ const ProjectEdit: React.FC = () => {
           <AutoSaveBadge enabled={autoSaveEnabled} videoPath={videoPath} state={autoSaveState} lastAt={lastAutoSaveAt} />
         </div>
 
-        <Card className={styles.card}>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">项目名称</label>
-              <Input
-                placeholder="请输入项目名称"
-                maxLength={100}
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">项目描述</label>
-              <textarea
-                className="flex min-h-[60px] w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20"
-                placeholder="请输入项目描述（选填）"
-                rows={2}
-                maxLength={500}
-                value={formDescription}
-                onChange={(e) => setFormDescription(e.target.value)}
-              />
-            </div>
-          </div>
-        </Card>
+        <ProjectForm
+          name={formName}
+          description={formDescription}
+          onNameChange={setFormName}
+          onDescriptionChange={setFormDescription}
+        />
 
         <div className={styles.stepsContainer}>
           <Steps current={currentStep} onChange={goToStep} items={STEP_ITEMS} />

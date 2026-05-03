@@ -1,6 +1,6 @@
 import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { getConfigDir } from './fileOperations';
-import { logger } from '../../utils/logger';
+import { logger } from '../../shared/utils/logging';
 
 /**
  * 获取API密钥

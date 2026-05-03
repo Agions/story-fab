@@ -5,6 +5,9 @@
 import { notify } from './notify';
 export * from './notify';
 
+// Re-export formatting functions from format.ts for backwards compatibility
+export { formatFileSize, formatRelativeTime } from './format';
+
 /**
  * 防抖函数
  */

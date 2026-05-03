@@ -15,7 +15,7 @@ import {
   preloadProjectsPage,
   preloadSettingsPage,
 } from '../../../core/utils/route-preload';
-import styles from '../index.module.less';
+import styles from '@/pages/Dashboard/index.module.less';
 
 const QuickActions: React.FC = React.memo(() => {
   const navigate = useNavigate();

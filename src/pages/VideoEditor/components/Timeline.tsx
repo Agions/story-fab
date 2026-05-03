@@ -1,6 +1,6 @@
 import React, { useRef, memo, useMemo } from 'react';
-import { VideoSegment } from '../../../services/video';
-import styles from '../index.module.less';
+import { VideoSegment } from '../../../services/videoProcessingFacade';
+import styles from '@/pages/VideoEditor/index.module.less';
 
 interface TimelineProps {
   segments: VideoSegment[];
@@ -22,7 +22,7 @@ const Timeline: React.FC<TimelineProps> = ({
   const renderedSegments = useMemo(() => (
     segments.map((segment, index) => (
       <div
-        key={index}
+        key={`segment-${index}`}
         className={`${styles.timelineSegment} ${selectedIndex === index ? styles.selected : ''}`}
         style={{
           left: `${(segment.start / safeDuration) * 100}%`,

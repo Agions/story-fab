@@ -4,8 +4,8 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { preloadProjectEditPage } from '../../../core/utils/route-preload';
-import { useAppStore } from '../../../store';
-import styles from '../index.module.less';
+import { useAppStore } from '@/store';
+import styles from '@/pages/Dashboard/index.module.less';
 
 interface WelcomeHeaderProps {
   onCreateProject: () => void;

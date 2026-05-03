@@ -1,45 +1,54 @@
 /**
- * Editor Service Types - 统一到 core/types/timeline.ts
- * 此文件保留用于兼容旧代码，最终应删除
+ * Editor Service Types - 统一导出入口
  *
- * @deprecated 请从 'core/types/timeline' 导入
+ * 所有类型统一从 core/types/timeline 导出
+ * 此文件作为 editor 模块的公共类型索引
+ *
+ * @deprecated 仅用于向后兼容，新代码请直接从 'core/types/timeline' 导入
  */
 
-// Re-export canonical types from core/types/timeline
 export type {
-  // Timeline 模型
+  // 核心模型
   Timeline,
   TimelineTrack,
-  TimelineMarker,
   TimelineClip,
+  TimelineMarker,
+  TrackType,
+  TimelineTool,
+
+  // 片段相关
+  ClipEffect,
+  AnimationKeyframe,
+  ClipProperties,
+
+  // 状态与选择
   TimelineState,
   TimelineSelection,
-  TimelineTool,
-  ClipProperties,
-  // 类型
-  TrackType,
+  DragState,
+  DragType,
+
+  // 轨道类型 (legacy aliases)
   VideoTrack,
   AudioTrack,
   TextTrack,
   EffectTrack,
+
+  // 片段类型 (legacy aliases)
   VideoClip,
   AudioClip,
   TextItem,
   Transition,
-  ClipEffect,
-  Keyframe,
-  DragType,
-  DragState,
+
   // 配置
-  EditorExportSettings,
   EditorConfig,
-  // 动作
+  EditorExportSettings,
+
+  // 动作与历史
   EditorAction,
   EditorHistory,
 } from '../../types/timeline';
 
-// Value export (cannot use 'export type')
 export { DEFAULT_EDITOR_CONFIG } from '../../types/timeline';
 
-// Legacy re-exports (from ../../types)
-export type { VideoSegment, ScriptSegment } from '../../types';
+// Legacy re-exports from ../../types
+export type { VideoSegment, ScriptSegment } from '@/core/types';
