@@ -5,6 +5,9 @@ export * from './trackManager';
 export * from './export';
 export * from './storage';
 
+// Handlers (策略模式)
+export * from './handlers';
+
 import {
   createEmptyTimeline,
   addClip,
@@ -35,6 +38,96 @@ import {
   type VideoSegment
 } from './types';
 
+// ============================================================
+// 动作处理器接口 (策略模式)
+// ============================================================
+
+/**
+ * 动作处理器函数类型
+ * 接收时间线和动作，返回新的时间线
+ */
+type ActionHandlerFn = (timeline: Timeline, action: EditorAction) => Timeline;
+
+// ============================================================
+// 动作处理器映射 (策略模式核心)
+// ============================================================
+
+const actionHandlers: Record<EditorAction['type'], ActionHandlerFn> = {
+  ADD_CLIP: (timeline, action) => {
+    if (action.type !== 'ADD_CLIP') return timeline;
+    return addClip(timeline, action.trackId, action.clip, action.position);
+  },
+  
+  REMOVE_CLIP: (timeline, action) => {
+    if (action.type !== 'REMOVE_CLIP') return timeline;
+    return removeClip(timeline, action.trackId, action.clipId);
+  },
+  
+  MOVE_CLIP: (timeline, action) => {
+    if (action.type !== 'MOVE_CLIP') return timeline;
+    return moveClip(timeline, action.trackId, action.clipId, action.newPosition);
+  },
+  
+  TRIM_CLIP: (timeline, action) => {
+    if (action.type !== 'TRIM_CLIP') return timeline;
+    return trimClip(timeline, action.clipId, action.startTime, action.endTime);
+  },
+  
+  SPLIT_CLIP: (timeline, action) => {
+    if (action.type !== 'SPLIT_CLIP') return timeline;
+    return splitClip(timeline, action.clipId, action.splitTime);
+  },
+  
+  COPY_CLIP: (timeline, action) => {
+    if (action.type !== 'COPY_CLIP') return timeline;
+    return copyClip(timeline, action.clipId);
+  },
+  
+  ADD_TRANSITION: (timeline, action) => {
+    if (action.type !== 'ADD_TRANSITION') return timeline;
+    return addTransition(
+      timeline,
+      action.fromClipId,
+      action.toClipId,
+      action.transitionType,
+      action.duration
+    );
+  },
+  
+  ADD_EFFECT: (timeline, action) => {
+    if (action.type !== 'ADD_EFFECT') return timeline;
+    return addEffect(timeline, action.clipId, action.effect, action.params);
+  },
+  
+  ADD_TEXT: (timeline, action) => {
+    if (action.type !== 'ADD_TEXT') return timeline;
+    return addText(timeline, action.trackId, action.text, action.position);
+  },
+  
+  ADD_AUDIO: (timeline, action) => {
+    if (action.type !== 'ADD_AUDIO') return timeline;
+    return addAudio(timeline, action.trackId, action.audio, action.position);
+  },
+  
+  ADJUST_SPEED: (timeline, action) => {
+    if (action.type !== 'ADJUST_SPEED') return timeline;
+    return adjustSpeed(timeline, action.clipId, action.speed);
+  },
+  
+  ADJUST_VOLUME: (timeline, action) => {
+    if (action.type !== 'ADJUST_VOLUME') return timeline;
+    return adjustVolume(timeline, action.trackId, action.volume);
+  },
+  
+  // UNDO/REDO 由 dispatch 方法直接处理，因为它们需要修改内部 history 状态
+  UNDO: () => { throw new Error('UNDO should be handled by dispatch()'); },
+  REDO: () => { throw new Error('REDO should be handled by dispatch()'); },
+};
+
+// ============================================================
+// EditorService - 使用策略模式重构
+// ============================================================
+
 export class EditorService {
   private config: EditorConfig;
   private history: EditorHistory;
@@ -64,49 +157,39 @@ export class EditorService {
   }
 
   dispatch(action: EditorAction): void {
-    const newTimeline = this.applyAction(this.history.present, action);
+    // 策略模式：通过 action.type 直接从映射表获取处理器
+    const handler = actionHandlers[action.type];
+    
+    if (!handler) {
+      console.warn(`No handler registered for action type: ${action.type}`);
+      return;
+    }
+
+    // UNDO/REDO 需要特殊处理（直接操作 history）
+    if (action.type === 'UNDO' || action.type === 'REDO') {
+      this.handleUndoRedo(action);
+      return;
+    }
+
+    // 其他操作：调用 handler 获取新时间线，记录历史，通知订阅者
+    const newTimeline = handler(this.history.present, action);
     this.history = pushHistory(this.history, newTimeline);
     this.notify();
   }
 
-  private applyAction(timeline: Timeline, action: EditorAction): Timeline {
-    switch (action.type) {
-      case 'ADD_CLIP':
-        return addClip(timeline, action.trackId, action.clip, action.position);
-      case 'REMOVE_CLIP':
-        return removeClip(timeline, action.trackId, action.clipId);
-      case 'MOVE_CLIP':
-        return moveClip(timeline, action.trackId, action.clipId, action.newPosition);
-      case 'TRIM_CLIP':
-        return trimClip(timeline, action.clipId, action.startTime, action.endTime);
-      case 'SPLIT_CLIP':
-        return splitClip(timeline, action.clipId, action.splitTime);
-      case 'ADD_TRANSITION':
-        return addTransition(
-          timeline,
-          action.fromClipId,
-          action.toClipId,
-          action.transitionType,
-          action.duration
-        );
-      case 'ADD_EFFECT':
-        return addEffect(timeline, action.clipId, action.effect, action.params);
-      case 'ADD_TEXT':
-        return addText(timeline, action.trackId, action.text, action.position);
-      case 'ADD_AUDIO':
-        return addAudio(timeline, action.trackId, action.audio, action.position);
-      case 'ADJUST_SPEED':
-        return adjustSpeed(timeline, action.clipId, action.speed);
-      case 'ADJUST_VOLUME':
-        return adjustVolume(timeline, action.trackId, action.volume);
-      case 'COPY_CLIP':
-        return copyClip(timeline, action.clipId);
-      case 'UNDO':
-        return this.undo();
-      case 'REDO':
-        return this.redo();
-      default:
-        return timeline;
+  /**
+   * 处理 UNDO/REDO 操作
+   * 这些操作需要直接访问和修改内部 history 状态
+   */
+  private handleUndoRedo(action: EditorAction): void {
+    if (action.type === 'UNDO') {
+      const result = undo(this.history);
+      this.history = result.history;
+      this.notify();
+    } else if (action.type === 'REDO') {
+      const result = redo(this.history);
+      this.history = result.history;
+      this.notify();
     }
   }
 
@@ -143,7 +226,6 @@ export class EditorService {
     _scriptSegments: ScriptSegment[],
     _videoSegments: VideoSegment[]
   ): Timeline {
-    // 简化的实现
     const timeline = createEmptyTimeline();
     this.history.present = timeline;
     this.notify();
@@ -190,6 +272,13 @@ export class EditorService {
   destroy(): void {
     this.stopAutoSave();
     this.listeners.clear();
+  }
+
+  /**
+   * 获取已注册的动作处理器数量（用于测试/调试）
+   */
+  getRegisteredHandlerCount(): number {
+    return Object.keys(actionHandlers).filter(k => k !== 'UNDO' && k !== 'REDO').length;
   }
 }
 

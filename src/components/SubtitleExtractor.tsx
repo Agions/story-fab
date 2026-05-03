@@ -32,6 +32,7 @@ import {
 import { notify } from '../shared';
 import { subtitleService } from '../core/services/subtitle.service';
 import { useEditorStore } from '../store/editorStore';
+import { useTimelineStore } from '../store/timelineStore';
 import type { SubtitleEntry } from '../core/types';
 import styles from './SubtitleExtractor.module.css';
 
@@ -67,9 +68,9 @@ interface SubtitleExtractorProps {
 }
 
 const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoUrl, onExtracted }) => {
-  const playheadMs = useEditorStore(state => state.playheadMs);
+  const playheadMs = useTimelineStore(state => state.playheadMs);
   const previewPlaying = useEditorStore(state => state.previewPlaying);
-  const setPlayheadMs = useEditorStore(state => state.setPlayheadMs);
+  const setPlayheadMs = useTimelineStore(state => state.setPlayheadMs);
   const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
   const videoRef = useRef<HTMLVideoElement>(null);
 

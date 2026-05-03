@@ -12,6 +12,7 @@ import { Slider } from '../../../ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
 import { visionService } from '../../../../core/services/vision.service';
 import { useEditorStore } from '../../../../store/editorStore';
+import { useTimelineStore } from '../../../../store/timelineStore';
 import { notify } from '../../../../shared/utils/notify';
 import type { VideoInfo } from '../../../../core/types';
 import styles from './HighlightList.module.css';
@@ -54,7 +55,7 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
   const [error, setError] = useState<string | null>(null);
   const [threshold, setThreshold] = useState(1.5);
   const [topN, setTopN] = useState(10);
-  const setPlayheadMs = useEditorStore((s) => s.setPlayheadMs);
+  const setPlayheadMs = useTimelineStore((s) => s.setPlayheadMs);
 
   const handleThresholdChange = (value: number | readonly number[]) => {
     const val = Array.isArray(value) ? value[0] : value;
