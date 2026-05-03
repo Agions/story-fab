@@ -99,3 +99,23 @@ pub async fn analyze_video(path: String) -> Result<VideoMetadataResult, String> 
 
     Ok(VideoMetadataResult { duration, width, height, fps, codec, bitrate })
 }
+
+/// Run ffprobe with arbitrary args, returns raw stdout.
+#[tauri::command]
+pub async fn run_ffprobe(args: Vec<String>) -> Result<String, String> {
+    let output = tokio::process::Command::new(ffprobe_binary())
+        .args(&args)
+        .output()
+        .await
+        .map_err(|e| format!("运行ffprobe失败: {e}"))?;
+
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).to_string())
+    } else {
+        Err(format!(
+            "ffprobe exited {}: {}",
+            output.status,
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    }
+}
