@@ -11,10 +11,13 @@
  */
 
 import { visionService } from './vision.service';
+import { asrService } from './asr.service';
+import { logger } from '../../shared/utils/logging';
 import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
 import { ClipRepurposingPipeline } from './clipRepurposing/pipeline';
 import type { RepurposingOptions } from './clipRepurposing/pipeline';
 import { clipSegmentFromRepurposing } from './clipRepurposing/types';
+import type { ASRSegment } from './asr.service';
 
 // 剪辑配置
 interface ClipConfig {
@@ -106,6 +109,19 @@ export class ClipWorkflowService {
   }
 
   /**
+   * 执行 ASR 识别（Rust Whisper 优先，失败则 Mock）
+   */
+  private async runASR(videoInfo: VideoInfo): Promise<ASRSegment[]> {
+    try {
+      const result = await asrService.recognizeSpeech(videoInfo);
+      return result.segments;
+    } catch (err) {
+      logger.warn('[ClipWorkflowService] ASR 失败，使用空分段:', String(err));
+      return [];
+    }
+  }
+
+  /**
    * 完整剪辑流程 — 轻量路径
    * 
    * 流程：视频分析 → 场景检测 → 静音检测 → 智能剪辑 → 生成时间轴
@@ -176,14 +192,19 @@ export class ClipWorkflowService {
    * @param videoInfo 视频信息
    * @param analysis 已有视频分析结果（可避免重复分析）
    * @param pipelineOptions Pipeline 专属选项
+   * @param asrSegments 可选：外部传入的 ASR 分段（未传入时自动调用 Rust Whisper）
    */
   async processVideoWithPipeline(
     videoInfo: VideoInfo,
     analysis: VideoAnalysis | undefined,
     pipelineOptions?: Partial<RepurposingOptions>,
+    asrSegments?: ASRSegment[],
   ): Promise<ClipResult> {
     // 若未传入 analysis， 先做一次轻量分析
     const resolvedAnalysis = analysis ?? await this.analyzeVideo(videoInfo);
+
+    // ASR 分段：未传入时自动调用 Rust Whisper（本地，离线可用）
+    const resolvedASR = asrSegments ?? await this.runASR(videoInfo);
 
     const pipelineResult = await this.pipeline.run(
       videoInfo,
@@ -198,6 +219,7 @@ export class ClipWorkflowService {
         generateSEO: pipelineOptions?.generateSEO ?? false,
         onProgress: pipelineOptions?.onProgress,
       },
+      resolvedASR, // 传入 ASR 分段用于 transcript 提取
     );
 
     // Pipeline 结果 → ClipSegment[]（向后兼容）

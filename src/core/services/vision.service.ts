@@ -285,6 +285,9 @@ export class VisionService {
 
   /**
    * 分析场景特征
+   * @deprecated 🔴 BETA — 当前使用 Math.random() 模拟特征，非真实 CV 分析。
+   *             brightness/motion/complexity/hasText/hasFaces 均为假数据。
+   *             真实实现需接入 OpenCV.js / TensorFlow.js MoveNet / YOLO。
    */
   private async analyzeSceneFeatures(
     scene: Scene,
@@ -381,6 +384,8 @@ export class VisionService {
 
   /**
    * 物体检测
+   * @deprecated 🔴 BETA — 当前使用 Math.random() 生成假检测结果，非真实目标识别。
+   *             真实实现需接入 YOLO / TensorFlow Object Detection。
    */
   private async detectObjectsInScenes(
     scenes: Scene[],
