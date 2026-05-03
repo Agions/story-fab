@@ -3,7 +3,7 @@
  */
 
 // Context exports
-export { CutDeckProvider, useCutDeck, CutDeckContext, useAIEditor } from './context';
+export { CutDeckProvider, useCutDeck, CutDeckContext } from './context';
 export type { CutDeckContextType } from './context';
 
 // Types exports
