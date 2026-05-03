@@ -8,7 +8,6 @@ use crate::highlight_detector::HighlightDetector;
 use crate::smart_segmenter::SmartSegmenter;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use std::process::Command;
 use tokio::fs as tokio_fs;
 
 // ─── Video / FFprobe Commands ────────────────────────────────────────────────
@@ -240,4 +239,199 @@ pub fn detect_smart_segments(
     };
     let segments = segmenter.smart_segment(&input.video_path, &options);
     Ok(segments)
+}
+
+// ─── TTS (Edge TTS) Commands ─────────────────────────────────────────────────
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SynthesizeSpeechInput {
+    pub text: String,
+    pub voice: String,
+    pub speed: f32,
+    pub format: String,
+    pub backend: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SynthesizeSpeechOutput {
+    pub audio_path: String,
+    pub duration_secs: f64,
+}
+
+impl SynthesizeSpeechInput {
+    fn voice_id(&self) -> &str {
+        &self.voice
+    }
+
+    fn edge_rate_percent(&self) -> String {
+        let pct = ((self.speed - 1.0) * 100.0).round() as i32;
+        if pct > 0 {
+            format!("+{pct}%")
+        } else {
+            format!("{pct}%")
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn synthesize_speech(
+    input: SynthesizeSpeechInput,
+) -> Result<SynthesizeSpeechOutput, String> {
+    if input.text.trim().is_empty() {
+        return Err("Text cannot be empty".to_string());
+    }
+
+    // Output path
+    let mut tmp_audio = std::env::temp_dir();
+    let ext = match input.format.as_str() {
+        "wav" | "audio/wav" => "wav",
+        "ogg" | "audio/ogg" => "ogg",
+        _ => "mp3",
+    };
+    tmp_audio.push(format!("tts_output_{}.{}", std::process::id(), ext));
+    let tmp_audio_path = tmp_audio.to_string_lossy().to_string();
+
+    // Write text to temp file (edge-tts --file flag)
+    let mut tmp_text = std::env::temp_dir();
+    tmp_text.push(format!("tts_input_{}.txt", std::process::id()));
+    let tmp_text_path = tmp_text.to_string_lossy().to_string();
+    tokio::fs::write(&tmp_text_path, &input.text)
+        .await
+        .map_err(|e| format!("Failed to write text file: {e}"))?;
+
+    let edge_tts_path = "/home/ubuntu/.hermes/hermes-agent/venv/bin/edge-tts";
+
+    let rate = input.edge_rate_percent();
+    let voice = input.voice_id();
+
+    let mut cmd = tokio::process::Command::new(edge_tts_path);
+    cmd.arg("--file").arg(&tmp_text_path);
+    cmd.arg("--voice").arg(voice);
+    cmd.arg("--rate").arg(&rate);
+    cmd.arg("--write-media").arg(&tmp_audio_path);
+
+    let output = cmd
+        .output()
+        .await
+        .map_err(|e| format!("Failed to spawn edge-tts: {e}"))?;
+
+    let _ = tokio::fs::remove_file(&tmp_text_path).await;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("edge-tts failed: {stderr}"));
+    }
+
+    let metadata = tokio::fs::metadata(&tmp_audio_path)
+        .await
+        .map_err(|e| format!("Failed to read audio file metadata: {e}"))?;
+    let file_size_bytes = metadata.len();
+
+    let duration_secs = match ext {
+        "wav" => file_size_bytes as f64 / 32000.0,
+        _ => file_size_bytes as f64 / 16000.0,
+    };
+
+    Ok(SynthesizeSpeechOutput {
+        audio_path: tmp_audio_path,
+        duration_secs,
+    })
+}
+
+#[tauri::command]
+pub async fn list_tts_backends() -> Result<Vec<TtsBackendInfo>, String> {
+    let mut backends = Vec::new();
+
+    // Check Edge TTS
+    let edge_path = "/home/ubuntu/.hermes/hermes-agent/venv/bin/edge-tts";
+    let edge_available = tokio::fs::metadata(edge_path).await.is_ok();
+    if edge_available {
+        backends.push(TtsBackendInfo {
+            name: "edge".to_string(),
+            label: "Microsoft Edge TTS".to_string(),
+            description: "免费，无需 API key，音质好，需要网络".to_string(),
+            requires_network: true,
+            requires_model_download: false,
+            model_path: None,
+        });
+    }
+
+    Ok(backends)
+}
+
+#[derive(Debug, Serialize)]
+pub struct TtsBackendInfo {
+    pub name: String,
+    pub label: String,
+    pub description: String,
+    #[serde(rename = "requiresNetwork")]
+    pub requires_network: bool,
+    #[serde(rename = "requiresModelDownload")]
+    pub requires_model_download: bool,
+    #[serde(rename = "modelPath")]
+    pub model_path: Option<String>,
+}
+
+#[tauri::command]
+pub async fn translate_text(text: String, from_lang: String, to_lang: String) -> Result<String, String> {
+    if text.trim().is_empty() {
+        return Err("Text cannot be empty".to_string());
+    }
+
+    let langpair = format!("{}|{}", from_lang, to_lang);
+    let encoded_text = urlencoding::encode(&text);
+    let url = format!(
+        "https://api.mymemory.translated.net/get?q={}&langpair={}",
+        encoded_text, langpair
+    );
+
+    let output = tokio::process::Command::new("curl")
+        .arg("-s")
+        .arg("-G")
+        .arg("--data-urlencode")
+        .arg(format!("q={}", text))
+        .arg("--data-urlencode")
+        .arg(format!("langpair={}", langpair))
+        .arg("https://api.mymemory.translated.net/get")
+        .output()
+        .await
+        .map_err(|e| format!("Failed to spawn curl: {e}"))?;
+
+    if !output.status.success() {
+        return Err(format!("curl failed: {}", String::from_utf8_lossy(&output.stderr)));
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    #[derive(serde::Deserialize)]
+    struct MyMemoryResponse {
+        response_data: Option<ResponseData>,
+        response_status: Option<i32>,
+    }
+    #[derive(serde::Deserialize)]
+    struct ResponseData {
+        translated_text: Option<String>,
+    }
+
+    let resp: MyMemoryResponse = serde_json::from_str(&stdout)
+        .map_err(|e| format!("Failed to parse translation response: {e}"))?;
+
+    if resp.response_status != Some(200) {
+        return Err(format!("Translation API error: status {:?}", resp.response_status));
+    }
+
+    resp.response_data
+        .and_then(|d| d.translated_text)
+        .ok_or_else(|| "No translation returned".to_string())
+}
+
+#[tauri::command]
+pub async fn check_tts_available() -> Result<bool, String> {
+    let edge_tts_path = "/home/ubuntu/.hermes/hermes-agent/venv/bin/edge-tts";
+    let output = tokio::process::Command::new(edge_tts_path)
+        .arg("--version")
+        .output()
+        .await
+        .map_err(|e| format!("edge-tts not found: {e}"))?;
+    Ok(output.status.success())
 }

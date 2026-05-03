@@ -6,8 +6,9 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod binary;
 pub mod commands;
-mod types;
-mod utils;
+pub mod lib_optimized;
+pub mod types;
+pub mod utils;
 pub mod video_effects;
 pub mod subtitle;
 pub mod highlight_detector;
@@ -20,13 +21,17 @@ pub use types::*;
 pub use commands::ffprobe::{analyze_video, check_ffmpeg};
 pub use commands::ai::{
     detect_highlights, detect_zcr_bursts, detect_smart_segments, extract_key_frames, generate_thumbnail,
-    get_export_dir, run_ai_director_plan,
+    get_export_dir, run_ai_director_plan, synthesize_speech, check_tts_available, list_tts_backends, TtsBackendInfo, translate_text,
 };
 pub use commands::project::{
     check_app_data_directory, delete_file, delete_project_file, get_file_size,
     list_app_data_files, list_project_files, load_project_file, read_text_file, save_project_file,
 };
-pub use commands::render::{render_autonomous_cut, transcode_with_crop};
+pub use commands::render::{
+    render_autonomous_cut, transcode_with_crop, generate_preview, cancel_export,
+    clean_temp_file, open_file, voice_discovery,
+};
+pub use lib_optimized::cut_video;
 
 // Video effects re-exports (from existing modules)
 pub use video_effects::{
@@ -74,6 +79,12 @@ pub fn run() {
             get_file_size,
             render_autonomous_cut,
             transcode_with_crop,
+            generate_preview,
+            cancel_export,
+            clean_temp_file,
+            open_file,
+            voice_discovery,
+            cut_video,
             check_ffmpeg,
             analyze_video,
             generate_thumbnail,
@@ -95,6 +106,12 @@ pub fn run() {
             detect_highlights,
             detect_zcr_bursts,
             detect_smart_segments,
+            // TTS / AI
+            synthesize_speech,
+            check_tts_available,
+            list_tts_backends,
+            translate_text,
+            get_export_dir,
         ])
         .setup(|app| {
             tracing::info!("[CutDeck] 应用初始化中...");

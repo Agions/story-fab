@@ -28,9 +28,11 @@ export const TauriCommand = {
   HIGHLIGHT_DETECT:        'detect_highlights',
   HIGHLIGHT_OPTIONS_NEW:   'highlight_options_new',
 
-  // Subtitle
+  // Subtitle / Whisper ASR
   SUBTITLE_EXTRACT:        'subtitle_extract',
   SUBTITLE_BURN_IN:        'subtitle_burn_in',
+  TRANSCRIBE_AUDIO:        'transcribe_audio',
+  LIST_WHISPER_MODELS:     'list_whisper_models',
 
   // Smart segmenter
   SMART_SEGMENT:           'smart_segment',
@@ -234,6 +236,37 @@ export const tauri = {
       video_path: videoPath,
       timestamp,
     });
+  },
+
+  /**
+   * Whisper 语音转字幕（Rust faster-whisper）
+   */
+  async transcribeAudio(
+    audioPath: string,
+    modelSize?: string,
+    language?: string,
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return invoke(TauriCommand.TRANSCRIBE_AUDIO, {
+      audio_path: audioPath,
+      model_size: modelSize,
+      language,
+    }) as Promise<{
+      language: string;
+      language_probability: number;
+      duration_ms: number;
+      segments: Array<{ start_ms: number; end_ms: number; text: string }>;
+    }>;
+  },
+
+  /**
+   * 列出本地已下载的 Whisper 模型
+   */
+  async listWhisperModels() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return invoke(TauriCommand.LIST_WHISPER_MODELS, {}) as Promise<
+      Array<{ name: string; size: string; is_downloaded: boolean; path: string | null }>
+    >;
   },
 };
 

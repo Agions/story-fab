@@ -2,6 +2,7 @@
  * 音画同步服务
  * 提供专业的音视频同步功能
  */
+import { logger } from '../../shared/utils/logging';
 
 
 // 同步配置
@@ -128,16 +129,90 @@ export class AudioVideoSyncService {
    * 分析时间线
    */
   private async analyzeTimeline(videoPath: string): Promise<SyncTimeline> {
-    // 返回模拟时间线
-    // 实际需要分析视频元数据
-    return {
-      videoSegments: [
-        { start: 0, end: 30 },
-        { start: 30, end: 60 },
-        { start: 60, end: 90 },
-      ],
-      issues: [],
-    };
+    try {
+      // 用 FFprobe 提取视频音频流时间戳
+      const videoStreamIndex = await this.getStreamIndex(videoPath, 'v');
+
+      if (videoStreamIndex === -1) {
+        return { videoSegments: [], issues: [] };
+      }
+
+      // 提取关键帧时间点用于分段
+      const keyframes = await this.getKeyframes(videoPath);
+      if (keyframes.length === 0) {
+        // 没有关键帧数据，按固定长度分段
+        const duration = await this.getDuration(videoPath);
+        const segments = [];
+        for (let t = 0; t < duration; t += 30) {
+          segments.push({ start: t, end: Math.min(t + 30, duration) });
+        }
+        return { videoSegments: segments, issues: [] };
+      }
+
+      // 按关键帧分段的简化逻辑
+      const videoSegments = [];
+      for (let i = 0; i < keyframes.length - 1; i++) {
+        videoSegments.push({
+          start: keyframes[i],
+          end: keyframes[i + 1],
+          audioStart: undefined,
+          audioEnd: undefined,
+        });
+      }
+      return { videoSegments, issues: [] };
+    } catch (err) {
+      logger.warn('[AudioVideoSync] FFprobe 分析失败，使用默认分段:', err);
+      const duration = await this.getDuration(videoPath);
+      const segments = [];
+      for (let t = 0; t < duration; t += 30) {
+        segments.push({ start: t, end: Math.min(t + 30, duration) });
+      }
+      return { videoSegments: segments, issues: [] };
+    }
+  }
+
+  private async getStreamIndex(filePath: string, codec: 'v' | 'a'): Promise<number> {
+    const flag = codec === 'v' ? 'v:0' : 'a:0';
+    const probe = await this.ffprobeOutput(['-select_streams', flag, '-show_entries', 'stream=index', '-of', 'csv=p=0', filePath]);
+    const line = probe.trim().split('\n').filter(Boolean)[0];
+    return line ? parseInt(line, 10) : -1;
+  }
+
+  private async getKeyframes(filePath: string): Promise<number[]> {
+    // 提取视频关键帧时间戳（I帧），用于分段
+    const probe = await this.ffprobeOutput([
+      '-select_streams', 'v:0',
+      '-read_intervals', '%+#(keyframes)',
+      '-show_entries', 'packet=pts_time',
+      '-of', 'csv=p=0',
+      '-skip_frame', 'nokey',
+      filePath,
+    ]);
+    return probe.trim().split('\n').filter(Boolean).map(parseFloat).filter(t => !isNaN(t));
+  }
+
+  private async getDuration(filePath: string): Promise<number> {
+    const probe = await this.ffprobeOutput([
+      '-show_entries', 'format=duration',
+      '-of', 'csv=p=0',
+      filePath,
+    ]);
+    return parseFloat(probe.trim()) || 0;
+  }
+
+  private async ffprobeOutput(args: string[]): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const { spawn } = require('child_process');
+      const proc = spawn('ffprobe', args, { shell: false });
+      let stdout = '', stderr = '';
+      proc.stdout?.on('data', (d: Buffer) => { stdout += d.toString(); });
+      proc.stderr?.on('data', (d: Buffer) => { stderr += d.toString(); });
+      proc.on('close', (code: number) => {
+        if (code === 0) resolve(stdout);
+        else reject(new Error(`ffprobe exited ${code}: ${stderr}`));
+      });
+      proc.on('error', reject);
+    });
   }
 
   /**

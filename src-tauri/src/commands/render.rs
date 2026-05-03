@@ -1,6 +1,7 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::types::{AutonomousRenderInput, TranscodeCropInput};
 use crate::utils::{chrono_like_timestamp, format_srt_time};
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -520,4 +521,174 @@ fn pick_overlay_layout_for_marker(
             }
         }
     }
+}
+
+// ─── Preview Generation ────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GeneratePreviewInput {
+    pub input_path: String,
+    pub segment: PreviewSegment,
+    #[serde(default)]
+    pub transition: Option<String>,
+    #[serde(default)]
+    pub transition_duration: Option<f64>,
+    #[serde(default)]
+    pub volume: Option<f64>,
+    #[serde(default)]
+    pub add_subtitles: Option<bool>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PreviewSegment {
+    pub start: f64,
+    pub end: f64,
+    #[serde(default)]
+    pub seg_type: Option<String>,
+}
+
+#[tauri::command]
+pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, String> {
+    if input.input_path.trim().is_empty() {
+        return Err("输入路径不能为空".to_string());
+    }
+
+    let output_path = std::env::temp_dir().join(format!(
+        "cutdeck_preview_{}_{}.mp4",
+        std::process::id(),
+        chrono_like_timestamp()
+    ));
+    let output_path_str = output_path.to_string_lossy().to_string();
+
+    let duration = (input.segment.end - input.segment.start).max(0.1);
+
+    let mut cmd = tokio::process::Command::new(ffmpeg_binary());
+    cmd.arg("-y")
+        .arg("-ss").arg(input.segment_start.to_string())
+        .arg("-t").arg(duration.to_string())
+        .arg("-i").arg(&input.input_path)
+        .arg("-c:v").arg("libx264")
+        .arg("-preset").arg("ultrafast")
+        .arg("-crf").arg("28")
+        .arg("-c:a").arg("aac")
+        .arg("-b:a").arg("128k")
+        .arg("-movflags").arg("+faststart");
+
+    // Apply volume if specified
+    if let Some(vol) = input.volume {
+        if (0.0..=2.0).contains(&vol) {
+            cmd.arg("-af").arg(format!("volume={}", vol));
+        }
+    }
+
+    // Apply subtitle burn-in if requested
+    if input.add_subtitles.unwrap_or(false) {
+        // Subtitles would need a subtitle track - skip for preview
+        tracing::warn!("Subtitle burn-in not implemented for preview");
+    }
+
+    cmd.arg(&output_path_str);
+
+    let output = cmd.output().await
+        .map_err(|e| format!("生成预览失败: {e}"))?;
+
+    if !output.status.success() {
+        return Err(format!(
+            "预览生成失败: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ));
+    }
+
+    Ok(output_path_str)
+}
+
+// ─── Export Cancellation ──────────────────────────────────────────────────────
+
+#[tauri::command]
+pub fn cancel_export(_export_id: String) -> Result<(), String> {
+    // In a full implementation, this would signal an active export process to abort.
+    // For now, we just acknowledge the cancellation request.
+    tracing::info!("Export cancellation requested: {}", _export_id);
+    Ok(())
+}
+
+// ─── Temp File Cleanup ────────────────────────────────────────────────────────
+
+#[tauri::command]
+pub async fn clean_temp_file(path: String) -> Result<(), String> {
+    if path.trim().is_empty() {
+        return Err("路径不能为空".to_string());
+    }
+
+    // Only clean up files in temp directory for safety
+    let temp_dir = std::env::temp_dir();
+    let file_path = PathBuf::from(&path);
+
+    if !file_path.starts_with(&temp_dir) {
+        return Err("只能删除临时目录下的文件".to_string());
+    }
+
+    if file_path.exists() {
+        tokio::fs::remove_file(&path)
+            .await
+            .map_err(|e| format!("删除临时文件失败: {e}"))?;
+    }
+
+    Ok(())
+}
+
+// ─── Open File ────────────────────────────────────────────────────────────────
+
+#[tauri::command]
+pub fn open_file(path: String) -> Result<(), String> {
+    if path.trim().is_empty() {
+        return Err("路径不能为空".to_string());
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("cmd")
+            .args(["/C", "start", "", &path])
+            .spawn()
+            .map_err(|e| format!("打开文件失败: {e}"))?;
+    }
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&path)
+            .spawn()
+            .map_err(|e| format!("打开文件失败: {e}"))?;
+    }
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&path)
+            .spawn()
+            .map_err(|e| format!("打开文件失败: {e}"))?;
+    }
+
+    Ok(())
+}
+
+// ─── Voice Discovery ──────────────────────────────────────────────────────────
+
+#[derive(Serialize)]
+pub struct VoiceDiscoveryResult {
+    pub voices: Vec<VoiceInfo>,
+}
+
+#[derive(Serialize)]
+pub struct VoiceInfo {
+    pub name: String,
+    pub locale: String,
+    pub gender: String,
+}
+
+#[tauri::command]
+pub async fn voice_discovery() -> Result<VoiceDiscoveryResult, String> {
+    // Return empty list - edge-tts does not have a voice discovery API
+    // The frontend should use hardcoded voice names
+    Ok(VoiceDiscoveryResult { voices: vec![] })
 }
