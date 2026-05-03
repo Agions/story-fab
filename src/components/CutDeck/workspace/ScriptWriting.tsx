@@ -4,7 +4,7 @@
  */
 import React, { useState, useCallback, useEffect, memo, useMemo, useRef } from 'react';
 import { useCutDeck } from '../context';
-import { aiService } from '../../../core/services/ai.service';
+import { aiService } from '../../../core/services/ai/ai.service';
 import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '../../../core/config/aiModels.config';
 import useLocalStorage from '../../../hooks/useLocalStorage';

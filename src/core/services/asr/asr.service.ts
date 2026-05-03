@@ -3,9 +3,9 @@
  * 提供音频转文字能力，支持多语言和多种音频格式
  */
 
-import { BaseService, ServiceError } from './base.service';
-import { logger } from '../../shared/utils/logging';
-import { tauri } from '../tauri/TauriBridge';
+import { BaseService, ServiceError } from '../providers/base.service';
+import { logger } from '../../../shared/utils/logging';
+import { tauri } from '../../tauri/TauriBridge';
 import { invoke } from '@tauri-apps/api/core';
 import type { VideoInfo } from '@/core/types';
 

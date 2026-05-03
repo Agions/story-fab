@@ -41,7 +41,8 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
 
   protected async doExtractKeyFrames(
     videoPath: string,
-    options: ExtractKeyFramesOptions
+    options: ExtractKeyFramesOptions,
+    duration?: number,
   ): Promise<KeyFrame[]> {
     const { maxFrames = 10, sceneThreshold = 0.3 } = options ?? {};
     const framePaths = await invoke<string[]>('extract_key_frames', {
@@ -49,8 +50,9 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
       count: maxFrames,
       threshold: sceneThreshold,
     });
-    const metadata = await invoke<VideoMetadata>('analyze_video', { path: videoPath });
-    const interval = metadata.duration / (framePaths.length || maxFrames);
+    // 复用外部已知的 duration，避免重复调用 Rust analyze_video
+    const totalDuration = duration ?? 0;
+    const interval = framePaths.length > 0 ? totalDuration / framePaths.length : 0;
     return framePaths.map((path, index) => ({
       id: uuidv4(),
       timestamp: index * interval,

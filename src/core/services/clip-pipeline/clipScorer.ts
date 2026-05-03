@@ -29,6 +29,8 @@ export interface CandidateClip {
   sceneType: string;   // 场景类型标签
   transcript: string; // 原始转录文本
   audioEnergy?: number; // 音频能量（0-1，可选）
+  /** 静音时段区间（毫秒），用于精确计算静音比和语速 */
+  silenceSegments?: Array<{ startMs: number; endMs: number }>;
 }
 
 export interface ClipScore {

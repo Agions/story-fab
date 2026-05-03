@@ -4,8 +4,8 @@
  * 集成 Whisper AI 转录 (Rust faster-whisper 后端)
  */
 
-import { logger } from '../../shared/utils/logging';
-import { formatSrtTime } from '../../shared/utils/formatting';
+import { logger } from '../../../shared/utils/logging';
+import { formatSrtTime } from '../../../shared/utils/formatting';
 import type { SubtitleEntry, VideoInfo } from '@/core/types';
 
 // ============================================
@@ -250,7 +250,7 @@ export class SubtitleService {
 
     logger.info('[SubtitleService] 提取字幕:', { videoPath, language });
 
-    const { asrService } = await import('./asr.service');
+    const { asrService } = await import('../asr/asr.service');
 
     const langMap: Record<string, 'zh_cn' | 'en_us' | 'ja_jp' | 'ko_kr'> = {
       'zh-CN': 'zh_cn',

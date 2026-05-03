@@ -2,7 +2,7 @@
  * OpenAI API 适配器
  */
 import type { RequestConfig, AIResponse } from './types';
-import { ServiceError } from '../base.service';
+import { ServiceError } from './base.service';
 
 export async function callOpenAI(apiKey: string, config: RequestConfig): Promise<AIResponse> {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {

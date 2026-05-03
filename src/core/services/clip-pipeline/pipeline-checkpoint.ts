@@ -2,10 +2,35 @@
  * Pipeline 断点存储服务
  * 支持 localStorage 持久化（开发/浏览器端）
  * + Tauri FS 持久化（生产环境）
+ *
+ * 注意：PipelineStep 值必须与 ClipRepurposingPipeline 中实际 step.meta.name 对应：
+ *   build-candidates → analyze
+ *   score-clips      → segment
+ *   generate-seo     → subtitle (仅当 generateSEO=true 时)
+ *   prepare-export   → export   (仅当 multiFormat=true 时)
  */
 
 import { readTextFile, writeTextFile, exists, mkdir, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { appDataDir } from '@tauri-apps/api/path';
+
+/**
+ * Step 名称与 Checkpoint 名称的映射表
+ * 保证 checkpoint 可正确记录 Pipeline 实际执行的步骤
+ */
+export const PIPELINE_STEP_TO_CHECKPOINT: Record<string, PipelineStep> = {
+  'build-candidates': 'analyze',
+  'score-clips': 'segment',
+  'generate-seo': 'subtitle',
+  'prepare-export': 'export',
+};
+
+/** 反向映射：checkpoint step → pipeline stage */
+export const CHECKPOINT_TO_PIPELINE_STAGE: Record<PipelineStep, string> = {
+  analyze: 'analyzing',
+  segment: 'scoring',
+  subtitle: 'generating_seo',
+  export: 'exporting',
+};
 
 export type PipelineStep = 'analyze' | 'segment' | 'subtitle' | 'export';
 

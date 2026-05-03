@@ -3,7 +3,7 @@
  * 均使用 OpenAI 的 /chat/completions 接口格式
  */
 import type { RequestConfig, AIResponse } from './types';
-import { ServiceError } from '../base.service';
+import { ServiceError } from './base.service';
 
 interface OpenAILikeResponse {
   choices?: Array<{ message?: { content?: string } }>;

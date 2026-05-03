@@ -7,7 +7,7 @@ import {
   Download,
   Clock,
 } from 'lucide-react';
-import type { ClipSegment } from '../../../core/services/aiClip.service';
+import type { ClipSegment } from '../../../core/services/aiClip';
 import type { VideoInfo } from '@/core/types';
 import { formatTime } from '../../../shared/utils/formatting';
 import styles from '@/components/AIClipAssistant/index.module.less';

@@ -5,10 +5,10 @@ import { Bot } from 'lucide-react';
 
 import { saveProjectToFile } from '../../services/tauri';
 import { notify } from '@/shared';
-import type { ClipAnalysisResult } from '../../core/services/aiClip.service';
+import type { ClipAnalysisResult } from '../../core/services/aiClip';
 import { logger } from '../../shared/utils/logging';
 import { useVideoEditor } from './hooks/useVideoEditor';
-import { exportService } from '../../core/services/export.service';
+import { exportService } from '../../core/services/export/export.service';
 
 import Toolbar from './components/Toolbar';
 import VideoPlayer from '@/components/VideoPlayer';

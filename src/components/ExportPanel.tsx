@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from './ui/tooltip';
 import { ScriptExportFormat, exportScriptToFormat } from '@/core/services/export/scriptExportService';
-import type { AIScriptDraft as Script } from '@/core/services/aiScriptGenerationService';
+import type { AIScriptDraft as Script } from '@/core/services/ai/aiScriptGenerationService';
 import { notify } from '@/shared';
 import { logger } from '../shared/utils/logging';
 import { Download, FileText, File, Globe } from 'lucide-react';

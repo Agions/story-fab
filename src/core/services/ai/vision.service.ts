@@ -3,8 +3,8 @@
  * 优化画面识别准确性
  */
 
-import { tauri } from '../tauri/TauriBridge';
-import { logger } from '../../shared/utils/logging';
+import { tauri } from '../../tauri/TauriBridge';
+import { logger } from '../../../shared/utils/logging';
 import type {
   VideoInfo,
   Scene,

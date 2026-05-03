@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { aiClipService, type AIClipConfig, type ClipAnalysisResult, type ClipSegment } from '../../../core/services/aiClip.service';
+import { aiClipService, type AIClipConfig, type ClipAnalysisResult, type ClipSegment } from '../../../core/services/aiClip';
 import type { VideoInfo } from '@/core/types';
 import { notify } from '@/shared';
 

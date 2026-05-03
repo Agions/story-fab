@@ -3,7 +3,7 @@ import { Card, CardContent } from '../../ui/card';
 import { Separator } from '../../ui/separator';
 import { Tooltip, TooltipTrigger, TooltipContent } from '../../ui/tooltip';
 import { Progress, ProgressTrack, ProgressIndicator } from '../../ui/progress';
-import type { ClipAnalysisResult } from '../../../core/services/aiClip.service';
+import type { ClipAnalysisResult } from '../../../core/services/aiClip';
 import styles from '@/components/AIClipAssistant/index.module.less';
 
 interface AnalyzeStepProps {

@@ -10,12 +10,13 @@
  * 3. 过长的场景自动拆分
  */
 
-import { visionService } from '../../services/vision.service';
+import { visionService } from '../../services/ai/vision.service';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
-import type { CandidateClip } from '../../services/clipRepurposing/clipScorer';
-import type { ASRSegment } from '../../services/asr.service';
+import type { CandidateClip } from '../../services/clip-pipeline/clipScorer';
+import type { ASRSegment } from '../../services/asr/asr.service';
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
 import { logger } from '../../../shared/utils/logging';
+import { invoke } from '@tauri-apps/api/core';
 
 // ============================================================
 // Step Metadata
@@ -55,6 +56,11 @@ export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutp
 
     reportProgress(options?.onProgress, STEP_META.name, 0.1, '调用 Rust 高光检测...');
 
+    // ── Stage 0: 获取静音段（用于精确评分） ───────────────────
+    const allSilenceSegments = await fetchSilenceSegments(videoInfo.path);
+    const inRange = (s: number, e: number, seg: { start: number; end: number }) =>
+      seg.start < e && seg.end > s;
+
     // ── Stage 1: Rust 高光检测 ──────────────────────────────
     const highlights = await visionService.detectHighlights(videoInfo, {
       topN: maxHighlights,
@@ -66,12 +72,14 @@ export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutp
     logger.debug(`[BuildCandidatesStep] Rust 高光检测返回 ${highlights.length} 个片段`);
 
     for (const h of highlights) {
+      const clipSilence = allSilenceSegments.filter(s => inRange(h.startTime, h.endTime, s));
       candidates.push({
         startTime: h.startTime,
         endTime: h.endTime,
         sceneType: 'highlight',
-        transcript: extractSceneTranscript(asrSegments, h.startTime, h.endTime),
+        transcript: getCachedTranscript(asrSegments, h.startTime, h.endTime),
         audioEnergy: h.audioScore,
+        silenceSegments: clipSilence.map(s => ({ startMs: s.start * 1000, endMs: s.end * 1000 })),
       });
     }
 
@@ -94,7 +102,7 @@ export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutp
           const subClips = splitLongScene(scene.startTime, scene.endTime, maxDuration * 0.6, maxDuration);
           candidates.push(...subClips.map(sc => ({
             ...sc,
-            transcript: extractSceneTranscript(asrSegments, sc.startTime, sc.endTime),
+            transcript: getCachedTranscript(asrSegments, sc.startTime, sc.endTime),
           })));
           continue;
         }
@@ -103,7 +111,7 @@ export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutp
           startTime: scene.startTime ?? 0,
           endTime: scene.endTime ?? 0,
           sceneType: 'scene',
-          transcript: extractSceneTranscript(asrSegments, scene.startTime ?? 0, scene.endTime ?? 0),
+          transcript: getCachedTranscript(asrSegments, scene.startTime ?? 0, scene.endTime ?? 0),
         });
       }
     }
@@ -116,6 +124,32 @@ export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutp
 // ============================================================
 // Helpers
 // ============================================================
+
+/** 调用 Rust detect_smart_segments 获取静音区间（秒） */
+async function fetchSilenceSegments(videoPath: string): Promise<Array<{ start: number; end: number }>> {
+  try {
+    const result = await invoke<{ silence_segments?: Array<{ start: number; end: number }> }>(
+      'detect_smart_segments',
+      { video_path: videoPath, min_silence_duration_ms: 500, threshold_db: -40 },
+    );
+    return result.silence_segments ?? [];
+  } catch {
+    logger.debug('[BuildCandidatesStep] detect_smart_segments 不可用，返回空静音段');
+    return [];
+  }
+}
+const transcriptCache = new Map<string, string>();
+function getCachedTranscript(
+  asrSegments: ASRSegment[] | undefined,
+  startTime: number,
+  endTime: number,
+): string {
+  const key = `${startTime.toFixed(2)}_${endTime.toFixed(2)}`;
+  if (transcriptCache.has(key)) return transcriptCache.get(key)!;
+  const result = extractSceneTranscript(asrSegments, startTime, endTime);
+  transcriptCache.set(key, result);
+  return result;
+}
 
 function splitLongScene(
   start: number,

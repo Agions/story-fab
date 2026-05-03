@@ -61,7 +61,7 @@ export interface RepurposingResult {
 // Conversion Helpers
 // ============================================================
 
-import type { ClipSegment } from '../clip-workflow.service';
+import type { ClipSegment } from './clip-workflow.service';
 
 /**
  * Convert RepurposingClip (Pipeline output) → ClipSegment (Timeline format).

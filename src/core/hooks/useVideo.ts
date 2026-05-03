@@ -306,15 +306,18 @@ export function useVideo(): UseVideoReturn {
 
     const count = Math.floor(video.duration / interval);
 
-    // 并发提取所有关键帧
-    const thumbnails = await Promise.all(
-      Array.from({ length: count }, async (_, i) => {
-        const timestamp = i * interval;
+    // 并发提取所有关键帧（分批控制，每批最多 5 个）
+    const BATCH_SIZE = 5;
+    const thumbnails: string[] = [];
+    for (let i = 0; i < count; i += BATCH_SIZE) {
+      const batch = Array.from({ length: Math.min(BATCH_SIZE, count - i) }, async (_, j) => {
+        const timestamp = (i + j) * interval;
         return extractThumbnail(timestamp);
-      })
-    );
-
-    return thumbnails.filter((t): t is string => t !== null);
+      });
+      const results = await Promise.all(batch);
+      thumbnails.push(...results.filter((t): t is string => t !== null));
+    }
+    return thumbnails;
   }, [video, extractThumbnail]);
   
   return {
