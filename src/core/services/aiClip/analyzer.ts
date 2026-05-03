@@ -1,3 +1,5 @@
+import { invoke } from '@tauri-apps/api/core';
+import { logger } from '../../../shared/utils/logging';
 import { visionService } from '../ai/vision.service';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotion-peak-detector';
 import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';

@@ -5,6 +5,7 @@
  */
 
 import { invoke } from '@tauri-apps/api/core';
+import { logger } from '../../../shared/utils/logging';
 
 /** ZCR burst entry from Rust backend */
 interface ZCRBurst {
