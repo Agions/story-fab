@@ -45,6 +45,19 @@ interface SpeechRecognitionCtor {
   new (): SpeechRecognition;
 }
 
+// Rust Whisper ASR 响应类型（来自 src-tauri/src/asr.rs）
+interface RustWhisperSegment {
+  start_ms: number;
+  end_ms: number;
+  text: string;
+}
+
+interface RustWhisperResult {
+  segments: RustWhisperSegment[];
+  language?: string;
+  language_probability?: number;
+}
+
 interface SpeechRecognition extends EventTarget {
   lang: string;
   continuous: boolean;
@@ -370,12 +383,11 @@ export class ASRService extends BaseService {
         language: opts.language,
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const whisperResult = await (tauri.transcribeAudio as any)(
-        videoInfo.path,
-        'base',
-        opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : null,
-      );
+      const whisperResult = await invoke<RustWhisperResult>('transcribe_audio', {
+        audioPath: videoInfo.path,
+        model: 'base',
+        language: opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : null,
+      });
 
       if (!whisperResult || !whisperResult.segments || whisperResult.segments.length === 0) {
         logger.warn('[ASRService] Rust Whisper 返回空结果');
@@ -383,8 +395,7 @@ export class ASRService extends BaseService {
       }
 
       const segments: ASRSegment[] = whisperResult.segments.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (seg: any) => ({
+        (seg: RustWhisperSegment) => ({
           id: crypto.randomUUID(),
           startTime: seg.start_ms / 1000,
           endTime: seg.end_ms / 1000,
