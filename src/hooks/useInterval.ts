@@ -22,7 +22,7 @@ export interface UseIntervalReturn {
  * const interval = useInterval();
  * 
  * // 使用 set 方法
- * interval.set(() => console.log('Tick'), 1000);
+ * interval.set(() => doSomething(), 1000);
  * 
  * // 使用 clear 方法
  * interval.clear(id);

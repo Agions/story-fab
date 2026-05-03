@@ -22,7 +22,7 @@ export interface UseTimeoutReturn {
  * const timeout = useTimeout();
  * 
  * // 使用 set 方法
- * timeout.set(() => console.log('Hello'), 1000);
+ * timeout.set(() => doSomething(), 1000);
  * 
  * // 使用 delay 方法 (返回 Promise)
  * await timeout.delay(2000);
