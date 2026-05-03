@@ -1,0 +1,563 @@
+/**
+ * ProjectCreate.module.less
+ * AI Cinema Studio Design System
+ * Deep Charcoal #0C0D14 | Amber #FF9F43 | Electric Cyan #00D4FF
+ */
+
+// ============================================================================
+// Variables
+// ============================================================================
+
+@bg-deep: #0C0D14;
+@amber: #FF9F43;
+@amber-dark: #e8890f;
+@cyan: #00D4FF;
+@text-primary: #FFFFFF;
+@text-secondary: rgba(255, 255, 255, 0.65);
+@text-muted: rgba(255, 255, 255, 0.38);
+
+@glass-bg: rgba(20, 21, 32, 0.8);
+@glass-border: rgba(255, 255, 255, 0.07);
+@glass-highlight: rgba(255, 255, 255, 0.1);
+
+@amber-glow: rgba(255, 159, 67, 0.35);
+@amber-glow-lg: rgba(255, 159, 67, 0.15);
+
+@radius-lg: 16px;
+@radius-md: 12px;
+@radius-sm: 8px;
+
+// ============================================================================
+// Keyframe Animations
+// ============================================================================
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes amberPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 @amber-glow;
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 159, 67, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes iconBounce {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+// ============================================================================
+// Layout
+// ============================================================================
+
+.stepContent {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 8px;
+  animation: fadeSlideUp 0.4s ease-out;
+}
+
+.stepTitle {
+  margin-bottom: 28px;
+}
+
+.stepTitle h2 {
+  font-family: 'Outfit', 'Segoe UI', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: @text-primary;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.01em;
+}
+
+.stepTitle p {
+  font-family: 'Figtree', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: @text-muted;
+  margin: 0;
+}
+
+// ============================================================================
+// Mode Selection Cards
+// ============================================================================
+
+.modeSection {
+  margin-bottom: 28px;
+}
+
+.modeLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: @text-secondary;
+  margin-bottom: 12px;
+  display: block;
+  letter-spacing: 0.01em;
+}
+
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 560px) {
+  .modeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modeCard {
+  position: relative;
+  padding: 18px 16px;
+  border-radius: @radius-md;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid @glass-border;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: @radius-md;
+    background: radial-gradient(ellipse at top, @amber-glow-lg 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  &:hover {
+    border-color: rgba(255, 159, 67, 0.25);
+    background: rgba(255, 159, 67, 0.04);
+    transform: translateY(-1px);
+
+    &::before {
+      opacity: 0.5;
+    }
+  }
+
+  &.modeActive {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.08);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .modeCheckIcon {
+      opacity: 1;
+      transform: scale(1);
+      animation: iconBounce 0.35s ease-out;
+    }
+  }
+}
+
+.modeIcon {
+  font-size: 22px;
+  margin-bottom: 10px;
+  display: block;
+  filter: drop-shadow(0 0 6px @amber-glow-lg);
+  transition: filter 0.3s ease;
+}
+
+.modeCard.modeActive .modeIcon {
+  filter: drop-shadow(0 0 10px @amber-glow);
+}
+
+.modeName {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: @text-primary;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.modeDesc {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: @text-muted;
+  display: block;
+  line-height: 1.4;
+}
+
+.modeCheckIcon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: @amber;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.25s ease;
+  box-shadow: 0 0 10px @amber-glow;
+}
+
+.modeCheckDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: @bg-deep;
+}
+
+// ============================================================================
+// Glass Form Card
+// ============================================================================
+
+.formCard {
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  padding: 28px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 @glass-highlight;
+  animation: fadeSlideUp 0.45s ease-out 0.1s both;
+}
+
+// ============================================================================
+// Form Fields
+// ============================================================================
+
+.fieldGroup {
+  margin-bottom: 20px;
+}
+
+.fieldLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: @text-secondary;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.textInput {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: @radius-sm;
+  font-family: 'Figtree', sans-serif;
+  font-size: 15px;
+  color: @text-primary;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  caret-color: @amber;
+
+  &::placeholder {
+    color: @text-muted;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &:focus {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.05);
+    box-shadow: 0 0 0 3px @amber-glow-lg, 0 0 12px @amber-glow-lg;
+  }
+}
+
+.textareaInput {
+  width: 100%;
+  padding: 14px 16px;
+  min-height: 96px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: @radius-sm;
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  color: @text-primary;
+  outline: none;
+  resize: vertical;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  line-height: 1.6;
+  caret-color: @amber;
+
+  &::placeholder {
+    color: @text-muted;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  &:focus {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.05);
+    box-shadow: 0 0 0 3px @amber-glow-lg;
+  }
+}
+
+.charCount {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: @text-muted;
+  pointer-events: none;
+}
+
+// ============================================================================
+// Create Button
+// ============================================================================
+
+.createBtn {
+  width: 100%;
+  height: 50px;
+  border-radius: @radius-md;
+  background: linear-gradient(135deg, @amber 0%, #FFB06B 100%);
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: @bg-deep;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 4px 16px @amber-glow,
+    0 0 0 0 @amber-glow;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.15) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #FFB06B 0%, @amber 100%);
+    box-shadow:
+      0 6px 24px @amber-glow,
+      0 0 20px @amber-glow-lg;
+    transform: translateY(-1px);
+
+    &::after {
+      opacity: 1;
+      animation: shimmer 1.5s linear infinite;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px @amber-glow-lg;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.createBtnIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.createBtnText {
+  letter-spacing: 0.01em;
+}
+
+// ============================================================================
+// Existing Project Card
+// ============================================================================
+
+.projectCard {
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  padding: 24px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 @glass-highlight;
+  animation: fadeSlideUp 0.4s ease-out;
+}
+
+.projectHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.projectIconBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 159, 67, 0.1);
+  border: 1px solid rgba(255, 159, 67, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px @amber-glow-lg;
+}
+
+.projectMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.projectName {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: @text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.projectDesc {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: @text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.infoItem {
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: @radius-sm;
+}
+
+.infoLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: @text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.infoValue {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: @text-primary;
+}
+
+.nextBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: @radius-md;
+  background: linear-gradient(135deg, @amber 0%, #FFB06B 100%);
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: @bg-deep;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px @amber-glow;
+  margin-top: 4px;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px @amber-glow;
+  }
+}
+
+.nextBtnArrow {
+  width: 16px;
+  height: 16px;
+}
+
+// ============================================================================
+// Alert / Warning
+// ============================================================================
+
+.hintAlert {
+  padding: 14px 18px;
+  background: rgba(0, 212, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  border-radius: @radius-md;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  margin-top: 16px;
+  animation: fadeSlideUp 0.4s ease-out 0.15s both;
+}
+
+.hintAlert strong {
+  color: @cyan;
+}

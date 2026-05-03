@@ -1,0 +1,969 @@
+/**
+ * VideoSynthesize.module.less
+ * AI Cinema Studio Design System
+ * Deep Charcoal #0C0D14 | Amber #FF9F43 | Electric Cyan #00D4FF
+ */
+
+// ============================================================================
+// Variables
+// ============================================================================
+
+@bg-deep: #0C0D14;
+@amber: #FF9F43;
+@cyan: #00D4FF;
+@text-primary: #FFFFFF;
+@text-secondary: rgba(255, 255, 255, 0.65);
+@text-muted: rgba(255, 255, 255, 0.38);
+
+@glass-bg: rgba(20, 21, 32, 0.8);
+@glass-border: rgba(255, 255, 255, 0.07);
+@glass-highlight: rgba(255, 255, 255, 0.1);
+
+@amber-glow: rgba(255, 159, 67, 0.35);
+@amber-glow-lg: rgba(255, 159, 67, 0.12);
+@cyan-glow: rgba(0, 212, 255, 0.25);
+
+@radius-lg: 16px;
+@radius-md: 12px;
+@radius-sm: 8px;
+
+// ============================================================================
+// Keyframe Animations
+// ============================================================================
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes amberPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 @amber-glow;
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 159, 67, 0);
+  }
+}
+
+@keyframes amberGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px @amber-glow, 0 0 40px rgba(255, 159, 67, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px @amber-glow, 0 0 60px rgba(255, 159, 67, 0.3);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+// ============================================================================
+// Layout
+// ============================================================================
+
+.stepContent {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 8px;
+  animation: fadeSlideUp 0.4s ease-out;
+}
+
+.stepTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stepTitleLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stepTitle h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: @text-primary;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: rgba(82, 196, 26, 0.1);
+  border: 1px solid rgba(82, 196, 26, 0.2);
+  border-radius: 20px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #52c41a;
+}
+
+.statusBadgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #52c41a;
+  animation: amberPulse 1.5s ease-in-out infinite;
+}
+
+// ============================================================================
+// Alert / Warning
+// ============================================================================
+
+.warningAlert {
+  padding: 24px 28px;
+  background: rgba(250, 173, 20, 0.06);
+  border: 1px solid rgba(250, 173, 20, 0.15);
+  border-radius: @radius-md;
+  text-align: center;
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.warningAlertBtn {
+  padding: 8px 20px;
+  background: rgba(250, 173, 20, 0.1);
+  border: 1px solid rgba(250, 173, 20, 0.25);
+  border-radius: 8px;
+  color: #faad14;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: rgba(250, 173, 20, 0.15);
+    border-color: rgba(250, 173, 20, 0.35);
+  }
+}
+
+// ============================================================================
+// Alignment Alert
+// ============================================================================
+
+.alignmentAlert {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: @radius-sm;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+
+  &.alertSuccess {
+    background: rgba(82, 196, 26, 0.07);
+    border: 1px solid rgba(82, 196, 26, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  &.alertWarning {
+    background: rgba(250, 173, 20, 0.07);
+    border: 1px solid rgba(250, 173, 20, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+.alertIcon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.alertSuccess .alertIcon { color: #52c41a; }
+.alertWarning .alertIcon { color: #faad14; }
+
+.alertTitle {
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+// ============================================================================
+// Tabs
+// ============================================================================
+
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: @radius-md;
+  padding: 4px;
+}
+
+.tabBtn {
+  flex: 1;
+  height: 38px;
+  border-radius: @radius-sm;
+  background: transparent;
+  border: none;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: @text-muted;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.25s ease;
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover {
+    color: @text-secondary;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  &.tabActive {
+    background: @glass-bg;
+    color: @amber;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 @glass-highlight;
+    border: 1px solid rgba(255, 159, 67, 0.2);
+  }
+}
+
+// ============================================================================
+// Panel Card
+// ============================================================================
+
+.panelCard {
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  overflow: hidden;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 @glass-highlight;
+  animation: fadeSlideUp 0.45s ease-out 0.05s both;
+}
+
+.panelHeader {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panelHeaderIcon {
+  width: 18px;
+  height: 18px;
+  color: @amber;
+}
+
+.panelTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: @text-primary;
+  margin: 0;
+}
+
+.panelBody {
+  padding: 22px;
+}
+
+// ============================================================================
+// Preview Player Area
+// ============================================================================
+
+.previewSection {
+  margin-bottom: 24px;
+}
+
+.previewPlayer {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: @radius-md;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.previewVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.previewOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.previewPlayer:hover .previewOverlay {
+  opacity: 1;
+}
+
+.playBtn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 159, 67, 0.9);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px @amber-glow;
+
+  &:hover {
+    transform: scale(1.08);
+    background: @amber;
+    box-shadow: 0 0 40px @amber-glow;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    color: @bg-deep;
+    margin-left: 3px;
+  }
+}
+
+.previewPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.previewPlaceholderIcon {
+  width: 40px;
+  height: 40px;
+}
+
+.previewPlaceholderText {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+}
+
+// ============================================================================
+// Switch Row
+// ============================================================================
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.switchLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: @text-primary;
+}
+
+.switchSub {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: @text-muted;
+  margin-top: 2px;
+}
+
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &.toggleOn {
+    background: rgba(255, 159, 67, 0.3);
+    border-color: @amber;
+    box-shadow: 0 0 8px @amber-glow-lg;
+
+    &::after {
+      left: 23px;
+      background: @amber;
+    }
+  }
+}
+
+// ============================================================================
+// Slider Controls
+// ============================================================================
+
+.sliderGroup {
+  margin-bottom: 20px;
+}
+
+.sliderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.sliderLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: @text-secondary;
+}
+
+.sliderValue {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: @amber;
+  min-width: 40px;
+  text-align: right;
+}
+
+.sliderTrack {
+  position: relative;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.sliderFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, @amber, #FFB06B);
+  pointer-events: none;
+}
+
+.sliderInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.sliderThumb {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: @amber;
+  border: 2px solid @bg-deep;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 8px @amber-glow;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  .sliderTrack:hover & {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 14px @amber-glow;
+  }
+}
+
+// ============================================================================
+// Voice Options
+// ============================================================================
+
+.voiceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 560px) {
+  .voiceGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.voiceItem {
+  position: relative;
+  padding: 14px;
+  border-radius: @radius-sm;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: rgba(255, 159, 67, 0.2);
+    background: rgba(255, 159, 67, 0.03);
+  }
+
+  &.voiceActive {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.06);
+  }
+}
+
+.voiceName {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: @text-primary;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.voiceEmoji {
+  font-size: 15px;
+}
+
+.voiceDesc {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  color: @text-muted;
+}
+
+.voiceCheck {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: @amber;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px @amber-glow;
+}
+
+.voiceItem.voiceActive .voiceCheck {
+  opacity: 1;
+  transform: scale(1);
+  animation: checkPop 0.3s ease-out;
+}
+
+.voiceCheckDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: @bg-deep;
+}
+
+// ============================================================================
+// Subtitle Position
+// ============================================================================
+
+.positionGroup {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.positionBtn {
+  flex: 1;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.07);
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: @text-muted;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+    color: @text-secondary;
+  }
+
+  &.positionActive {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.08);
+    color: @amber;
+  }
+}
+
+// ============================================================================
+// Effect Style Grid
+// ============================================================================
+
+.effectGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 560px) {
+  .effectGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.effectItem {
+  padding: 14px 12px;
+  border-radius: @radius-sm;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: center;
+
+  &:hover {
+    border-color: rgba(255, 159, 67, 0.2);
+    background: rgba(255, 159, 67, 0.03);
+  }
+
+  &.effectActive {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.07);
+  }
+}
+
+.effectName {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: @text-primary;
+  margin-bottom: 3px;
+}
+
+.effectDesc {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  color: @text-muted;
+}
+
+// ============================================================================
+// Synthesize Button (Amber Solid + Glow)
+// ============================================================================
+
+.synthesizeSection {
+  margin-top: 20px;
+}
+
+.synthesizeBtn {
+  width: 100%;
+  height: 54px;
+  border-radius: @radius-md;
+  background: linear-gradient(135deg, @amber 0%, #FFB06B 50%, @amber 100%);
+  background-size: 200% 100%;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: @bg-deep;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: amberGlow 2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.01em;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    background-position: 100% 0;
+    transform: translateY(-2px);
+
+    &::after {
+      opacity: 1;
+      animation: shimmer 1.5s linear infinite;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    animation: none;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.synthesizeBtnReady {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  animation: amberGlow 2s ease-in-out infinite;
+}
+
+// ============================================================================
+// Status Row
+// ============================================================================
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: @text-muted;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+
+  &.dotGreen { background: #52c41a; }
+  &.dotRed { background: #ff4d4f; }
+  &.dotAmber { background: @amber; }
+}
+
+// ============================================================================
+// Synthesizing State (Progress Circle)
+// ============================================================================
+
+.synthesizingCard {
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  padding: 56px 32px;
+  text-align: center;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 @glass-highlight;
+}
+
+.synthesizeProgressCircle {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 24px;
+}
+
+.synthesizeProgressCircleSvg {
+  width: 100px;
+  height: 100px;
+  transform: rotate(-90deg);
+}
+
+.synthesizeProgressCircleTrack {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 6;
+}
+
+.synthesizeProgressCircleFill {
+  fill: none;
+  stroke: @amber;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.synthesizeProgressPercent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: @amber;
+}
+
+.synthesizeProgressLabel {
+  font-family: 'Outfit', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: @text-primary;
+  margin-bottom: 6px;
+}
+
+.synthesizeProgressSub {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: @text-muted;
+}
+
+// ============================================================================
+// Complete State
+// ============================================================================
+
+.completeCard {
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(82, 196, 26, 0.2);
+  border-radius: @radius-lg;
+  padding: 48px 32px;
+  text-align: center;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(82, 196, 26, 0.05);
+}
+
+.completeIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  color: #52c41a;
+}
+
+.completeTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: @text-primary;
+  margin: 0 0 8px;
+}
+
+.completeDesc {
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  color: @text-muted;
+  margin: 0 0 24px;
+}
+
+.completeActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.completeBtn {
+  height: 42px;
+  padding: 0 24px;
+  border-radius: 10px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.completeBtnSecondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: @text-secondary;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: @text-primary;
+  }
+}
+
+.completeBtnPrimary {
+  background: linear-gradient(135deg, @amber 0%, #FFB06B 100%);
+  border: none;
+  color: @bg-deep;
+  font-weight: 600;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px @amber-glow;
+  }
+}

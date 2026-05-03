@@ -14,7 +14,7 @@ import {
   type ClipSegment,
   type ClipSuggestion,
 } from './types';
-import type { VideoInfo } from '../../types';
+import type { VideoInfo } from '@/core/types';
 
 export class AIClipService {
   async analyzeVideo(

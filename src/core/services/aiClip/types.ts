@@ -1,4 +1,4 @@
-import type { VideoInfo } from '../../types';
+import type { VideoInfo } from '@/core/types';
 
 // 剪辑点类型
 export type CutPointType = 'scene' | 'silence' | 'keyframe' | 'emotion' | 'manual' | 'ai-suggested' | 'zcr-burst';

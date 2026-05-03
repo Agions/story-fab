@@ -1,0 +1,919 @@
+/**
+ * ScriptGenerate.module.less
+ * AI Cinema Studio Design System
+ * Deep Charcoal #0C0D14 | Amber #FF9F43 | Electric Cyan #00D4FF
+ */
+
+// ============================================================================
+// Variables
+// ============================================================================
+
+@bg-deep: #0C0D14;
+@amber: #FF9F43;
+@cyan: #00D4FF;
+@text-primary: #FFFFFF;
+@text-secondary: rgba(255, 255, 255, 0.65);
+@text-muted: rgba(255, 255, 255, 0.38);
+
+@glass-bg: rgba(20, 21, 32, 0.8);
+@glass-border: rgba(255, 255, 255, 0.07);
+@glass-highlight: rgba(255, 255, 255, 0.1);
+
+@amber-glow: rgba(255, 159, 67, 0.3);
+@cyan-glow: rgba(0, 212, 255, 0.25);
+
+@radius-lg: 16px;
+@radius-md: 12px;
+@radius-sm: 8px;
+
+// ============================================================================
+// Keyframe Animations
+// ============================================================================
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes cyanPulse {
+  0% { box-shadow: 0 0 0 0 @cyan-glow; }
+  50% { box-shadow: 0 0 0 6px rgba(0, 212, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+// ============================================================================
+// Layout
+// ============================================================================
+
+.stepContent {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 8px;
+  animation: fadeSlideUp 0.4s ease-out;
+}
+
+.stepTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stepTitleLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stepTitle h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: @text-primary;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.modeTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: rgba(255, 159, 67, 0.12);
+  border: 1px solid rgba(255, 159, 67, 0.3);
+  border-radius: 20px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: @amber;
+  box-shadow: 0 0 12px @amber-glow;
+}
+
+.modeTagDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: @amber;
+  animation: glowPulse 1.5s ease-in-out infinite;
+}
+
+// ============================================================================
+// Two-Column Layout
+// ============================================================================
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================================
+// Left Column: Config
+// ============================================================================
+
+.configCard {
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  overflow: hidden;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 @glass-highlight;
+  animation: fadeSlideUp 0.45s ease-out 0.05s both;
+}
+
+.configHeader {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.configHeaderIcon {
+  width: 18px;
+  height: 18px;
+  color: @amber;
+}
+
+.configTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: @text-primary;
+  margin: 0;
+}
+
+.configBody {
+  padding: 20px 22px;
+}
+
+// ============================================================================
+// Function Mode Cards
+// ============================================================================
+
+.modeList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.modeItem {
+  position: relative;
+  padding: 15px 16px;
+  border-radius: @radius-md;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: @radius-md;
+    background: radial-gradient(ellipse at top left, rgba(255, 159, 67, 0.06) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    border-color: rgba(255, 159, 67, 0.2);
+    background: rgba(255, 159, 67, 0.03);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &.modeActive {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.07);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .modeItemCheck {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.modeItemInner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.modeItemIcon {
+  font-size: 20px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 5px rgba(255, 159, 67, 0.2));
+}
+
+.modeItemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.modeItemName {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: @text-primary;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.modeItemBadge {
+  padding: 2px 7px;
+  background: rgba(82, 196, 26, 0.15);
+  border: 1px solid rgba(82, 196, 26, 0.3);
+  border-radius: 10px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: #52c41a;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.modeItemDesc {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: @text-muted;
+  line-height: 1.4;
+}
+
+.modeItemCheck {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: @amber;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.25s ease;
+  box-shadow: 0 0 10px @amber-glow;
+}
+
+.modeItemCheckDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: @bg-deep;
+}
+
+// ============================================================================
+// Style & Length Selectors
+// ============================================================================
+
+.subConfigRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.selectGroup label {
+  display: block;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: @text-muted;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.selectWrapper {
+  position: relative;
+}
+
+.selectInput {
+  width: 100%;
+  height: 40px;
+  padding: 0 36px 0 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: @radius-sm;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: @text-primary;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  option {
+    background: #1a1b26;
+    color: @text-primary;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  &:focus {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.05);
+    box-shadow: 0 0 0 3px rgba(255, 159, 67, 0.1);
+  }
+}
+
+.selectArrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: @text-muted;
+  pointer-events: none;
+}
+
+// ============================================================================
+// Features List
+// ============================================================================
+
+.featuresSection {
+  margin-bottom: 16px;
+}
+
+.featuresLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: @text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.featureTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.featureTag {
+  padding: 4px 10px;
+  background: rgba(255, 159, 67, 0.08);
+  border: 1px solid rgba(255, 159, 67, 0.15);
+  border-radius: 20px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.exampleSection {
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: @radius-sm;
+  border-left: 3px solid rgba(255, 159, 67, 0.3);
+}
+
+.exampleLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: @text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.exampleText {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+// ============================================================================
+// Generate Button (Cyan border)
+// ============================================================================
+
+.generateBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: @radius-md;
+  background: transparent;
+  border: 1.5px solid @cyan;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: @cyan;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 0 @cyan-glow;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(0, 212, 255, 0.03) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    border-color: @cyan;
+    box-shadow: 0 0 20px @cyan-glow, 0 0 40px rgba(0, 212, 255, 0.1);
+    transform: translateY(-1px);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.generateBtnIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.generateBtnSpinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  border-top-color: @cyan;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+// ============================================================================
+// Right Column: Script Editor
+// ============================================================================
+
+.editorCard {
+  background: @glass-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  overflow: hidden;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 @glass-highlight;
+  animation: fadeSlideUp 0.45s ease-out 0.1s both;
+}
+
+.editorHeader {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editorHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editorHeaderIcon {
+  width: 18px;
+  height: 18px;
+  color: @cyan;
+}
+
+.editorTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: @text-primary;
+  margin: 0;
+}
+
+.editorActions {
+  display: flex;
+  gap: 8px;
+}
+
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: @text-muted;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: @text-primary;
+  }
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+// ============================================================================
+// Generate Section (top of editor)
+// ============================================================================
+
+.generateSection {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.generateRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.generateStats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(82, 196, 26, 0.1);
+  border: 1px solid rgba(82, 196, 26, 0.2);
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #52c41a;
+}
+
+.regenBtn {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1.5px solid @cyan;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: @cyan;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 0 @cyan-glow;
+
+  &:hover {
+    box-shadow: 0 0 16px @cyan-glow;
+    background: rgba(0, 212, 255, 0.05);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// ============================================================================
+// Progress Animation
+// ============================================================================
+
+.progressSection {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.progressLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: @text-secondary;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progressLabelIcon {
+  width: 16px;
+  height: 16px;
+  color: @cyan;
+  animation: spin 1.5s linear infinite;
+}
+
+.progressTrack {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, @cyan, rgba(0, 212, 255, 0.5));
+  background-size: 200% 100%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: shimmer 2s linear infinite;
+}
+
+.progressPercent {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: @cyan;
+}
+
+// ============================================================================
+// Typewriter Script Preview
+// ============================================================================
+
+.scriptPreview {
+  padding: 22px;
+  min-height: 220px;
+  position: relative;
+}
+
+.typewriterWrapper {
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.typewriterText {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 14px;
+  line-height: 2;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.typewriterCursor {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background: @cyan;
+  margin-left: 1px;
+  vertical-align: middle;
+  animation: blink 0.8s step-end infinite;
+}
+
+.typingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.typingDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: @cyan;
+  opacity: 0.5;
+  animation: glowPulse 1s ease-in-out infinite;
+
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.4s; }
+}
+
+.typingLabel {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: @text-muted;
+  margin-left: 4px;
+}
+
+// ============================================================================
+// Script Textarea
+// ============================================================================
+
+.scriptEditor {
+  padding: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.scriptTextarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.07);
+  border-radius: @radius-sm;
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.85);
+  outline: none;
+  resize: vertical;
+  transition: all 0.3s ease;
+  caret-color: @cyan;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: @text-muted;
+    font-style: italic;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  &:focus {
+    border-color: @cyan;
+    background: rgba(0, 212, 255, 0.03);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================================================
+// Script Stats Bar
+// ============================================================================
+
+.scriptStats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: @text-muted;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.statValue {
+  color: @text-secondary;
+  font-weight: 500;
+}
+
+// ============================================================================
+// Empty State
+// ============================================================================
+
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.emptyTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 0 6px;
+}
+
+.emptyDesc {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.18);
+}
+
+// ============================================================================
+// Alignment Gate Alert
+// ============================================================================
+
+.alignmentAlert {
+  margin: 16px 22px 0;
+  padding: 12px 16px;
+  border-radius: @radius-sm;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+
+  &.alertSuccess {
+    background: rgba(82, 196, 26, 0.07);
+    border: 1px solid rgba(82, 196, 26, 0.18);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  &.alertWarning {
+    background: rgba(250, 173, 20, 0.07);
+    border: 1px solid rgba(250, 173, 20, 0.18);
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+.alignmentIcon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.alertSuccess .alignmentIcon { color: #52c41a; }
+.alertWarning .alignmentIcon { color: #faad14; }
+
+.alignmentTitle {
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: rgba(255, 255, 255, 0.8);
+}
