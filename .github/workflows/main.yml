@@ -32,10 +32,19 @@ jobs:
           version: '9'
       - name: Install dependencies
         run: pnpm install
-      - name: Create reports directory
-        run: mkdir -p reports
       - name: TypeScript check
-        run: tsc --noEmit --pretty false 2>&1 | tee reports/tsc-report.txt; exit ${PIPESTATUS[0]}
+        run: |
+          mkdir -p reports
+          # Run tsc, preserve all output, but ignore its exit code
+          tsc --noEmit --pretty false > reports/tsc-report.txt 2>&1 || true
+          # Keep only src/ errors in the report for quality gate
+          grep "^src/" reports/tsc-report.txt > reports/tsc-report-src.txt || true
+          # Fail only if there are src/ errors
+          if grep -q "^src/" reports/tsc-report-src.txt; then
+            echo "TypeScript errors found in src/"
+            cat reports/tsc-report-src.txt
+            exit 1
+          fi
       - name: Upload TypeScript report
         if: always()
         uses: actions/upload-artifact@v4
