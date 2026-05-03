@@ -1,7 +1,7 @@
 /**
  * CutDeck context — context barrel export
  */
-export { CutDeckProvider, useCutDeck, CutDeckContext, useAIEditor } from './CutDeckContext';
+export { CutDeckProvider, useCutDeck, CutDeckContext } from './CutDeckContext';
 export type { CutDeckContextType } from './CutDeckContext';
 
 // Re-export types for convenience
