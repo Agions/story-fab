@@ -3,7 +3,7 @@
  */
 
 import { BaseActionHandler } from './base';
-import type { EditorAction, Timeline, VideoClip } from '../../types/timeline';
+import type { EditorAction, Timeline, VideoClip } from '../../../types/timeline';
 import {
   addClip as addClipOp,
   removeClip as removeClipOp,
