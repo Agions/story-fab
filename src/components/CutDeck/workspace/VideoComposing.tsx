@@ -5,9 +5,9 @@
  */
 import React, { useState, useCallback, useMemo, memo, useEffect } from 'react';
 import { useCutDeck } from '../context';
-import { voiceSynthesisService } from '../../../core/services/voice-synthesis.service';
-import { videoEffectService } from '../../../core/services/video-effect.service';
-import { audioVideoSyncService } from '../../../core/services/audio-sync.service';
+import { voiceSynthesisService } from '../../../core/services/ai/voice-synthesis.service';
+import { videoEffectService } from '../../../core/services/video/video-effect.service';
+import { audioVideoSyncService } from '../../../core/services/asr/audio-sync.service';
 import { orchestrateCommentaryAgents } from '../../../core/services/workflow/commentaryAgents';
 import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '../../../core/workflow/alignmentGate';
 import { FEATURE_TO_FUNCTION, FUNCTION_TO_MODE } from './functionModeMap';

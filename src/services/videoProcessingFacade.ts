@@ -46,8 +46,9 @@ export const analyzeVideo = (videoPath: string) => videoProcessor.analyze(videoP
 
 export const extractKeyFrames = (
   videoPath: string,
-  options?: ExtractKeyFramesOptions
-) => videoProcessor.extractKeyFrames(videoPath, options);
+  options?: ExtractKeyFramesOptions,
+  duration?: number,
+) => videoProcessor.extractKeyFrames(videoPath, options, duration);
 
 export const generateThumbnail = (videoPath: string, time?: number) =>
   videoProcessor.generateThumbnail(videoPath, time);

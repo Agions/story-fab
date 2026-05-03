@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import axios from 'axios';
-import { validateApiKey } from './apiKeyValidationService';
+import { validateApiKey } from './providers/apiKeyValidationService';
 
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
