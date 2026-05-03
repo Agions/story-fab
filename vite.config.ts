@@ -32,7 +32,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@/core': path.resolve(__dirname, './src/core'),
       '@/store': path.resolve(__dirname, './src/store/index'),
+      '@/shared': path.resolve(__dirname, './src/shared'),
+      '@/components': path.resolve(__dirname, './src/components'),
       '@/scripts': path.resolve(__dirname, './scripts'),
     },
   },
