@@ -94,8 +94,10 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
   protected async doPreview(inputPath: string, segment: VideoSegment): Promise<string> {
     return await invoke<string>('generate_preview', {
       inputPath,
-      segmentStart: segment.start,
-      segmentEnd: segment.end,
+      segment: {
+        start: segment.start,
+        end: segment.end,
+      },
     });
   }
 }

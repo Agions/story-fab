@@ -38,8 +38,7 @@ export interface SubtitleExtractOptions {
 
 export interface SubtitleTranslateOptions {
   targetLanguage: string;
-  apiKey?: string;
-  provider?: 'google' | 'deepl' | 'youdao';
+  provider?: 'mymemory'; // free, no API key
 }
 
 // ============================================
@@ -341,7 +340,7 @@ export class SubtitleService {
   }
 
   /**
-   * 翻译字幕
+   * 翻译字幕（使用 MyMemory 免费 API 作为翻译后端）
    * @param track 字幕轨道
    * @param options 翻译选项
    */
@@ -349,16 +348,82 @@ export class SubtitleService {
     track: SubtitleTrack,
     options: SubtitleTranslateOptions
   ): Promise<SubtitleTrack> {
-    const { targetLanguage } = options;
+    const { targetLanguage, provider = 'mymemory' } = options;
     logger.info('[SubtitleService] 翻译字幕:', {
       sourceLang: track.language,
       targetLang: targetLanguage,
+      provider,
     });
+
+    const langMap: Record<string, string> = {
+      'en': 'English', 'zh-CN': '中文', 'ja-JP': '日本語',
+      'ko-KR': '한국어', 'es': 'Español', 'fr': 'Français',
+      'de': 'Deutsch', 'ru': 'Русский', 'pt': 'Português',
+      'id': 'Bahasa Indonesia', 'vi': 'Tiếng Việt', 'th': 'ไทย',
+      'ar': 'العربية', 'it': 'Italiano',
+    };
+
+    const targetLangName = langMap[targetLanguage] || targetLanguage;
+
+    // 分批翻译（每批20条，避免单次请求过长）
+    const BATCH_SIZE = 20;
+    const translatedEntries: SubtitleEntry[] = [];
+
+    for (let i = 0; i < track.entries.length; i += BATCH_SIZE) {
+      const batch = track.entries.slice(i, i + BATCH_SIZE);
+      const textsToTranslate = batch.map(e => e.text).join('\n');
+
+      try {
+        const translatedText = await this.translateText(textsToTranslate, targetLangName, provider);
+        const lines = translatedText.split('\n').filter(l => l.trim());
+
+        batch.forEach((entry, idx) => {
+          translatedEntries.push({
+            ...entry,
+            id: `${entry.id}-tl`,
+            text: lines[idx]?.trim() || entry.text,
+          });
+        });
+      } catch (error) {
+        logger.warn('[SubtitleService] 批次翻译失败，使用原文:', error);
+        translatedEntries.push(...batch.map(e => ({ ...e, id: `${e.id}-tl` })));
+      }
+    }
+
     return {
       ...track,
       id: crypto.randomUUID(),
       language: targetLanguage,
+      entries: translatedEntries,
     };
+  }
+
+  private async translateText(text: string, targetLang: string, _provider: string): Promise<string> {
+    const langCode = this.normalizeLangCode(targetLang);
+    const langPair = `en|${langCode}`;
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${encodeURIComponent(langPair)}`;
+
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`MyMemory API error: ${resp.status}`);
+    const data = await resp.json() as { responseData?: { translatedText?: string }; responseStatus?: number };
+
+    if (data.responseStatus && data.responseStatus !== 200) {
+      throw new Error(`MyMemory translation failed: ${data.responseStatus}`);
+    }
+    const translated = data.responseData?.translatedText;
+    if (!translated) throw new Error('MyMemory returned empty translation');
+    return translated;
+  }
+
+  private normalizeLangCode(lang: string): string {
+    const map: Record<string, string> = {
+      chinese: 'zh', english: 'en', japanese: 'ja', korean: 'ko',
+      french: 'fr', german: 'de', spanish: 'es', russian: 'ru',
+      portuguese: 'pt', italian: 'it', dutch: 'nl', polish: 'pl',
+      vietnamese: 'vi', thai: 'th', arabic: 'ar', hindi: 'hi',
+    };
+    const lower = lang.toLowerCase();
+    return map[lower] ?? lower;
   }
 
   /**

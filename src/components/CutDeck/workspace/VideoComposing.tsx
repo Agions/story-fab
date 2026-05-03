@@ -135,8 +135,8 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
       const voiceResult = await voiceSynthesisService.synthesize(scriptContent);
 
       setProgress(60);
-      if (voiceResult.audioUrl) {
-        setVoice(voiceResult.audioUrl, {
+      if (voiceResult.audioPath) {
+        setVoice(voiceResult.audioPath, {
           voiceId: config.voiceId,
           speed: config.voiceSpeed / 100,
           volume: config.voiceVolume / 100
