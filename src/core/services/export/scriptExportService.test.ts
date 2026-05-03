@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { exportScriptToFormat, ScriptExportFormat } from './scriptExportService';
 
 // Mock dependencies — use fn(() => ...) to avoid clearMocks:true wiping mockResolvedValue state
-vi.mock('./tauri', () => ({
+vi.mock('@/services/tauri', () => ({
   saveFile: vi.fn(() => Promise.resolve(true)),
 }));
 
-vi.mock('@/shared/utils/format', () => ({
+vi.mock('../../shared/utils/formatting', () => ({
   formatTime: (s: number) => {
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
