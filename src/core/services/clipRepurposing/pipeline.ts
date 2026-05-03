@@ -15,6 +15,7 @@
 import { logger } from '../../../shared/utils/logging';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import type { CandidateClip, ClipScore } from './clipScorer';
+import type { ASRSegment } from '../../services/asr.service';
 import type { SEOMetadata, SocialPlatform } from './seoGenerator';
 import type { AspectRatio, ExportTask } from './multiFormatExport';
 
@@ -91,6 +92,7 @@ export class ClipRepurposingPipeline {
     videoInfo: VideoInfo,
     analysis: VideoAnalysis,
     options?: RepurposingOptions,
+    asrSegments?: ASRSegment[],
   ): Promise<RepurposingResult> {
     const opts: Required<RepurposingOptions> = {
       ...DEFAULT_REPURPOSING_OPTIONS,
@@ -117,7 +119,7 @@ export class ClipRepurposingPipeline {
     ctx.stepIndex = 0;
     opts.onProgress('analyzing', 10, '识别高光候选片段...');
     const candidates = await buildCandidatesStep.execute(
-      { videoInfo, analysis },
+      { videoInfo, analysis, asrSegments },
       ctx,
       stepOptions,
     );
