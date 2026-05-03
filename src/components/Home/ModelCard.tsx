@@ -27,7 +27,7 @@ interface ModelCardProps {
   onRequestApiKey?: (modelType: AIModelType) => void;
 }
 
-const ModelCard: React.FC<ModelCardProps> = ({
+const ModelCard: React.FC<ModelCardProps> = React.memo(({
   modelType,
   onSelect,
   onRequestApiKey
@@ -182,6 +182,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
       </Dialog>
     </>
   );
-};
+});
 
+ModelCard.displayName = 'ModelCard';
 export default ModelCard;

@@ -75,7 +75,7 @@ const getFeatureIcon = (feature: string) => {
   return <Flame />;
 };
 
-const AIModelSelector: React.FC<AIModelSelectorProps> = ({
+const AIModelSelector: React.FC<AIModelSelectorProps> = React.memo(({
   selectedModel = DEFAULT_MODEL_ID,
   onChange,
   onConfigureAPI,
@@ -335,6 +335,7 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = ({
       )}
     </motion.div>
   );
-};
+});
 
-export default React.memo(AIModelSelector);
+AIModelSelector.displayName = 'AIModelSelector';
+export { AIModelSelector };
