@@ -23,6 +23,9 @@
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "types": [
+      "vite/client"
+    ],
     "rootDirs": [
       ".",
       "./src"

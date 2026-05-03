@@ -3,6 +3,7 @@
 //! Uses faster-whisper (Python) as the primary engine via subprocess,
 //! with graceful fallback handling when the Python environment is unavailable.
 
+use crate::binary::resolve_binary_path;
 use anyhow::Context;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -165,42 +166,6 @@ fn extract_audio_to_wav(video_path: &str, output_wav: &Path) -> Result<(), Strin
         ));
     }
     Ok(())
-}
-
-fn resolve_binary_path(binary_name: &str) -> String {
-    let env_key = format!("CUTDECK_{}_PATH", binary_name.to_uppercase());
-    if let Ok(path) = std::env::var(&env_key) {
-        if !path.trim().is_empty() && std::path::Path::new(&path).exists() {
-            return path;
-        }
-    }
-
-    if binary_name == "ffprobe" {
-        if let Ok(ffmpeg_path) = std::env::var("CUTDECK_FFMPEG_PATH") {
-            let ffmpeg = std::path::PathBuf::from(ffmpeg_path);
-            if let Some(parent) = ffmpeg.parent() {
-                let probe = parent.join("ffprobe");
-                if probe.exists() {
-                    return probe.to_string_lossy().to_string();
-                }
-            }
-        }
-    }
-
-    let common_dirs = [
-        "/opt/homebrew/bin",
-        "/usr/local/bin",
-        "/usr/bin",
-        "/bin",
-    ];
-    for dir in &common_dirs {
-        let candidate = std::path::Path::new(dir).join(binary_name);
-        if candidate.exists() {
-            return candidate.to_string_lossy().to_string();
-        }
-    }
-
-    binary_name.to_string()
 }
 
 // ============================================

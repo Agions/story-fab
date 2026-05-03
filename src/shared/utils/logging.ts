@@ -5,8 +5,7 @@
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
+const isDev = import.meta.env.MODE !== 'production';
 
 const shouldLog = (level: LogLevel): boolean => {
   if (isDev) return true;

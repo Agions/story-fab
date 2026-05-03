@@ -1,113 +1,12 @@
-use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::types::{
     AutonomousRenderInput, DetectHighlightsInput, DetectSmartSegmentsInput, DirectorPlanInput,
     DirectorPlanOutput, TranscodeCropInput,
 };
-use crate::utils::{chrono_like_timestamp, format_srt_time, parse_fraction};
 use crate::highlight_detector::HighlightDetector;
 use crate::smart_segmenter::SmartSegmenter;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tokio::fs as tokio_fs;
-
-// ─── Video / FFprobe Commands ────────────────────────────────────────────────
-
-#[tauri::command]
-pub async fn generate_thumbnail(path: String) -> Result<String, String> {
-    if path.trim().is_empty() {
-        return Err("路径不能为空".to_string());
-    }
-    let output_path = std::env::temp_dir().join(format!(
-        "cutdeck_thumb_{}_{}.jpg",
-        std::process::id(),
-        chrono_like_timestamp()
-    ));
-    let output = tokio::process::Command::new(ffmpeg_binary())
-        .arg("-y")
-        .arg("-ss")
-        .arg("00:00:01")
-        .arg("-i")
-        .arg(&path)
-        .arg("-frames:v")
-        .arg("1")
-        .arg("-q:v")
-        .arg("2")
-        .arg(&output_path)
-        .output()
-        .await
-        .map_err(|e| format!("执行 ffmpeg 生成缩略图失败: {e}"))?;
-    if !output.status.success() {
-        return Err(format!(
-            "生成缩略图失败: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
-    }
-    Ok(output_path.to_string_lossy().to_string())
-}
-
-#[tauri::command]
-pub async fn extract_key_frames(
-    path: String,
-    count: Option<u32>,
-) -> Result<Vec<String>, String> {
-    if path.trim().is_empty() {
-        return Err("路径不能为空".to_string());
-    }
-    let frame_count = count.unwrap_or(10).clamp(1, 60);
-    let output_dir = std::env::temp_dir().join(format!(
-        "cutdeck_frames_{}_{}",
-        std::process::id(),
-        chrono_like_timestamp()
-    ));
-    tokio_fs::create_dir_all(&output_dir)
-        .await
-        .map_err(|e| format!("创建关键帧目录失败: {e}"))?;
-    let pattern = output_dir.join("frame_%03d.jpg");
-    let output = tokio::process::Command::new(ffmpeg_binary())
-        .arg("-y")
-        .arg("-i")
-        .arg(&path)
-        .arg("-vf")
-        .arg("fps=1")
-        .arg("-frames:v")
-        .arg(frame_count.to_string())
-        .arg("-q:v")
-        .arg("2")
-        .arg(&pattern)
-        .output()
-        .await
-        .map_err(|e| format!("执行 ffmpeg 提取关键帧失败: {e}"))?;
-    if !output.status.success() {
-        return Err(format!(
-            "提取关键帧失败: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
-    }
-    let mut frames = tokio_fs::read_dir(&output_dir)
-        .await
-        .map_err(|e| format!("读取关键帧目录失败: {e}"))?;
-    let mut all_frames = Vec::new();
-    let mut dir_entry = frames
-        .next_entry()
-        .await
-        .map_err(|e| format!("读取关键帧目录失败: {e}"))?;
-    while let Some(entry) = dir_entry {
-        let path = entry.path();
-        if path.extension().and_then(|e| e.to_str()) == Some("jpg") {
-            all_frames.push(path);
-        }
-        dir_entry = frames
-            .next_entry()
-            .await
-            .map_err(|e| format!("读取关键帧目录失败: {e}"))?;
-    }
-    all_frames.sort();
-    Ok(all_frames
-        .into_iter()
-        .take(frame_count as usize)
-        .map(|p| p.to_string_lossy().to_string())
-        .collect())
-}
 
 // ─── AI Director ────────────────────────────────────────────────────────────
 

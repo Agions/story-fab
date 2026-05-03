@@ -3,6 +3,7 @@
 //! Uses FFmpeg to extract audio waveform data, then computes Short-Time Energy (STE)
 //! to identify highlight moments without any external AI service.
 
+use crate::binary::resolve_binary_path;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -562,37 +563,6 @@ impl Default for HighlightDetector {
     fn default() -> Self {
         Self::new()
     }
-}
-
-fn resolve_binary_path(binary_name: &str) -> String {
-    let env_key = format!("CUTDECK_{}_PATH", binary_name.to_uppercase());
-    if let Ok(path) = std::env::var(&env_key) {
-        if !path.trim().is_empty() && PathBuf::from(&path).exists() {
-            return path;
-        }
-    }
-
-    if binary_name == "ffprobe" {
-        if let Ok(ffmpeg_path) = std::env::var("CUTDECK_FFMPEG_PATH") {
-            let ffmpeg = PathBuf::from(ffmpeg_path);
-            if let Some(parent) = ffmpeg.parent() {
-                let probe = parent.join("ffprobe");
-                if probe.exists() {
-                    return probe.to_string_lossy().to_string();
-                }
-            }
-        }
-    }
-
-    let common_dirs = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"];
-    for dir in common_dirs {
-        let candidate = PathBuf::from(dir).join(binary_name);
-        if candidate.exists() {
-            return candidate.to_string_lossy().to_string();
-        }
-    }
-
-    binary_name.to_string()
 }
 
 fn chrono_like_timestamp() -> String {
