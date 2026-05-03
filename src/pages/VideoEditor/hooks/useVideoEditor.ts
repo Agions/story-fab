@@ -1,9 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { VideoSegment, extractKeyFrames, analyzeVideo } from '../../../services/videoProcessingFacade';
-import { clipWorkflowService } from '../../../core/services/clip-workflow.service';
+import { clipWorkflowService } from '../../../core/services/clip-pipeline/clip-workflow.service';
 import type { VideoInfo } from '@/core/types';
-import type { ClipSegment } from '../../../core/services/aiClip.service';
+import type { ClipSegment } from '../../../core/services/aiClip';
 import { notify } from '@/shared';
 import { logger } from '../../../shared/utils/logging';
 
@@ -86,7 +86,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
         const frames = await extractKeyFrames(selected, {
           interval: Math.max(5, Math.floor(metadata.duration / 10)),
           maxFrames: 10,
-        });
+        }, metadata.duration);
 
         setKeyframes(frames.map(frame => frame.path));
 

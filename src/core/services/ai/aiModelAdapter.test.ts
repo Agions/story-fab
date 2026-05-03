@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveLegacyModel, getLegacyModelCompatMap } from './aiModelAdapter';
+import { resolveLegacyModel, getLegacyModelCompatMap } from './ai/aiModelAdapter';
 
 describe('aiModelAdapter', () => {
   describe('resolveLegacyModel', () => {

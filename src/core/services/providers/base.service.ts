@@ -2,7 +2,7 @@
  * BaseService - 统一的服务层抽象基类
  * 提供统一的错误处理、请求拦截和日志记录
  */
-import { logger } from '../../shared/utils/logging';
+import { logger } from '../../../shared/utils/logging';
 import { delay } from '@/shared';
 
 /**

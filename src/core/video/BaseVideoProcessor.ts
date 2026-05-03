@@ -145,10 +145,10 @@ export abstract class BaseVideoProcessor implements IVideoProcessor {
 
   // ---------- Extraction ----------
 
-  async extractKeyFrames(videoPath: string, options = {}) {
+  async extractKeyFrames(videoPath: string, options: ExtractKeyFramesOptions = {}, duration?: number) {
     if (!videoPath?.trim()) throw new VideoProcessingError('提取关键帧', '视频路径不能为空');
     if (!(await this.ensureAvailable())) throw new VideoProcessingError('提取关键帧', '未安装FFmpeg');
-    return this.doExtractKeyFrames(videoPath, options);
+    return this.doExtractKeyFrames(videoPath, options, duration);
   }
 
   async generateThumbnail(videoPath: string, time = 1) {
@@ -210,7 +210,7 @@ export abstract class BaseVideoProcessor implements IVideoProcessor {
   protected abstract doAnalyze(videoPath: string): Promise<VideoMetadata>;
 
   /** 平台特定：提取关键帧 */
-  protected abstract doExtractKeyFrames(videoPath: string, options: ExtractKeyFramesOptions): Promise<KeyFrame[]>;
+  protected abstract doExtractKeyFrames(videoPath: string, options: ExtractKeyFramesOptions, duration?: number): Promise<KeyFrame[]>;
 
   /** 平台特定：生成缩略图 */
   protected abstract doGenerateThumbnail(videoPath: string, time: number): Promise<string>;

@@ -89,7 +89,7 @@ const AIAssistant: React.FC<AIAssistantProps> = () => {
     setProcessing(true);
 
     try {
-      const { aiService } = await import('../../core/services/ai.service');
+      const { aiService } = await import('../../core/services/ai/ai.service');
 
       const model = CORE_AI_MODELS.find(m => m.id === selectedModelId) || CORE_AI_MODELS[0];
       const providerKey = (apiKeys || {})[model.provider as ModelProvider];

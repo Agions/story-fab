@@ -5,7 +5,7 @@ import type {
   ClipSegment,
   AIClipConfig,
   ClipAnalysisResult
-} from '../../core/services/aiClip.service';
+} from '../../core/services/aiClip';
 
 export interface AIClipAssistantProps {
   videoInfo: VideoInfo;

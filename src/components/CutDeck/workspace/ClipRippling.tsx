@@ -27,14 +27,14 @@ import {
 } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { motion } from '../../common/motion-shim';
-import { ClipRepurposingPipeline } from '../../../core/services/clipRepurposing/pipeline';
+import { ClipRepurposingPipeline } from '../../../core/services/clip-pipeline/pipeline';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import type {
   RepurposingClip,
   PipelineStage,
   RepurposingOptions,
-} from '../../../core/services/clipRepurposing/pipeline';
-import type { SocialPlatform } from '../../../core/services/clipRepurposing/seoGenerator';
+} from '../../../core/services/clip-pipeline/pipeline';
+import type { SocialPlatform } from '../../../core/services/clip-pipeline/seoGenerator';
 import { transcodeWithCrop, type AspectRatio } from '../../../services/tauri';
 import styles from './ClipRippling.module.css';
 

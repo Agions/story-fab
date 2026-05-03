@@ -3,7 +3,7 @@
  * 提供专业的音视频同步功能
  */
 import { invoke } from '@tauri-apps/api/core';
-import { logger } from '../../shared/utils/logging';
+import { logger } from '../../../shared/utils/logging';
 
 
 // 同步配置

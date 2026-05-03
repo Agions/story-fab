@@ -11,7 +11,7 @@
 import React, { useState, useCallback } from 'react';
 import { Slider } from '../../../ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
-import { visionService } from '../../../../core/services/vision.service';
+import { visionService } from '../../../../core/services/ai/vision.service';
 import { useTimelineStore } from '../../../../store/timelineStore';
 import { notify } from '../../../../shared/utils/notify';
 import { formatDuration } from '../../../../shared/utils/formatting';

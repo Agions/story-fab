@@ -2,7 +2,7 @@
  * 百度文心 API 适配器（需换取 access_token）
  */
 import type { RequestConfig, AIResponse } from './types';
-import { ServiceError } from '../base.service';
+import { ServiceError } from './base.service';
 
 export async function callBaidu(apiKey: string, apiSecret: string, config: RequestConfig): Promise<AIResponse> {
   // 获取 access token

@@ -12,7 +12,7 @@ import { notify } from '@/shared';
 import { exportScriptToFile, saveProjectToFile, loadProjectWithRetry, listProjects } from '../../services/tauri';
 import { findProjectByScriptId, normalizeProjectFile } from '../../core/utils/project-file';
 import type { ProjectFileLike } from '../../core/utils/project-file';
-import type { Script } from '@/core/services/aiScriptGenerationService';
+import type { Script } from '@/core/services/ai/aiScriptGenerationService';
 import type { ScriptSegment } from '@/core/types';
 import styles from '@/pages/ScriptDetail/index.module.less';
 

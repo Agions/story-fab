@@ -6,9 +6,9 @@
  *   prompts.ts   — Prompt 构建纯函数
  *   ai.service.ts — 主服务（公开 API、请求路由、response 解析）
  */
-import { BaseService, ServiceError } from './base.service';
+import { BaseService, ServiceError } from '../providers/base.service';
 import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis, VideoInfo, Scene, Keyframe } from '@/core/types';
-import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_RECOMMENDATIONS } from '../config/aiModels.config';
+import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_RECOMMENDATIONS } from '../../config/aiModels.config';
 import { visionService } from './vision.service';
 
 import {
@@ -31,7 +31,7 @@ import {
   buildAnalysisPrompt,
   buildOptimizationPrompt,
   buildTranslationPrompt,
-} from './prompts';
+} from '../providers/prompts';
 
 // =========================================
 // AIService

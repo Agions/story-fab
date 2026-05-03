@@ -53,11 +53,11 @@ export const PLATFORM_PRESETS: Record<string, PlatformPreset> = {
     bitratePreset: 'medium',
     subtitlePosition: 'bottom',
   },
-  video号: {
+  'video号': {
     id: 'video号',
     name: '视频号',
     aspectRatio: '16:9',
-    resolution: { width: 1080, height: 1920 },
+    resolution: { width: 1920, height: 1080 },
     frameRate: 30,
     bitratePreset: 'medium',
     subtitlePosition: 'bottom',

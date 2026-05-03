@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect, memo } from 'react';
 import { useCutDeck } from '../context';
-import { visionService } from '../../../core/services/vision.service';
+import { visionService } from '../../../core/services/ai/vision.service';
 import { notify } from '@/shared';
 import { logger } from '../../../shared/utils/logging';
 import { useTimeout } from '../../../hooks/useTimeout';
@@ -260,7 +260,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         setCurrentTaskKey('asr');
         timeout.set(() => setVisibleTasks(prev => [...prev, 'asr']), 100);
         try {
-          const { asrService } = await import('../../../core/services/asr.service');
+          const { asrService } = await import('../../../core/services/asr/asr.service');
           const asrResult = await asrService.recognizeSpeech(state.currentVideo, { language: 'zh_cn' });
           if (asrResult && asrResult.text) {
             setCompletedTasks(prev => [...prev, 'asr_done']);

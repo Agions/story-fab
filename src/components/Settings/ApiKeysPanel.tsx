@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
-import { validateApiKey } from '@/core/services/apiKeyValidationService';
+import { validateApiKey } from '@/core/services/providers/apiKeyValidationService';
 import { notify } from '@/shared';
 import { ModelProvider, PROVIDER_NAMES } from '../../constants/models';
 import { MODEL_PROVIDERS } from '../../core/config/aiModels.config';

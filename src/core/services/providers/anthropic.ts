@@ -2,7 +2,7 @@
  * Anthropic API 适配器
  */
 import type { RequestConfig, AIResponse } from './types';
-import { ServiceError } from '../base.service';
+import { ServiceError } from './base.service';
 
 export async function callAnthropic(apiKey: string, config: RequestConfig): Promise<AIResponse> {
   const response = await fetch('https://api.anthropic.com/v1/messages', {

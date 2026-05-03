@@ -11,7 +11,7 @@ import {
   TestTube,
   CheckCircle,
 } from 'lucide-react';
-import type { ClipAnalysisResult } from '../../../core/services/aiClip.service';
+import type { ClipAnalysisResult } from '../../../core/services/aiClip';
 import styles from '@/components/AIClipAssistant/index.module.less';
 
 interface SuggestionsStepProps {

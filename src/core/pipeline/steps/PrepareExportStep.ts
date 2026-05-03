@@ -9,10 +9,10 @@
  */
 
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
-import type { ClipScore } from '../../services/clipRepurposing/clipScorer';
-import type { AspectRatio } from '../../services/clipRepurposing/multiFormatExport';
-import type { ExportTask } from '../../services/clipRepurposing/multiFormatExport';
-import { multiFormatExporter } from '../../services/clipRepurposing/multiFormatExport';
+import type { ClipScore } from '../../services/clip-pipeline/clipScorer';
+import type { AspectRatio } from '../../services/clip-pipeline/multiFormatExport';
+import type { ExportTask } from '../../services/clip-pipeline/multiFormatExport';
+import { multiFormatExporter } from '../../services/clip-pipeline/multiFormatExport';
 import { tauri } from '../../tauri/TauriBridge';
 import type { VideoInfo } from '@/core/types';
 import { logger } from '../../../shared/utils/logging';
