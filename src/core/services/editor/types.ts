@@ -6,7 +6,7 @@
  */
 
 // Re-export canonical types from core/types/timeline
-export {
+export type {
   // Timeline 模型
   Timeline,
   TimelineTrack,
@@ -33,11 +33,13 @@ export {
   // 配置
   EditorExportSettings,
   EditorConfig,
-  DEFAULT_EDITOR_CONFIG,
   // 动作
   EditorAction,
   EditorHistory,
-} from '../../core/types/timeline';
+} from '../../types/timeline';
+
+// Value export (cannot use 'export type')
+export { DEFAULT_EDITOR_CONFIG } from '../../types/timeline';
 
 // Legacy re-exports (from ../../types)
 export type { VideoSegment, ScriptSegment } from '../../types';

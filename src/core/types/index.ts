@@ -5,5 +5,34 @@
  * 其他类型: ../types.ts
  */
 export * from '../types';
-export * from './timeline';
 export * from './jianying';
+
+// Timeline types - explicit re-export to avoid Keyframe conflict
+export type {
+  Timeline,
+  TimelineTrack,
+  TimelineMarker,
+  TimelineClip,
+  TimelineState,
+  TimelineSelection,
+  TimelineTool,
+  ClipProperties,
+  TrackType,
+  VideoTrack,
+  AudioTrack,
+  TextTrack,
+  EffectTrack,
+  VideoClip,
+  AudioClip,
+  TextItem,
+  Transition,
+  ClipEffect,
+  Keyframe,
+  DragType,
+  DragState,
+  EditorAction,
+  EditorHistory,
+  EditorExportSettings,
+  EditorConfig,
+  DEFAULT_EDITOR_CONFIG,
+} from './timeline';
