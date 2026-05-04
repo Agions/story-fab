@@ -1,6 +1,8 @@
 // ClipFlow 科技暗黑主题
 // 全局主题变量
 
+@import '../styles/_mixins.less';
+
 // 浅色主题
 :root {
   // 文本颜色
@@ -158,21 +160,7 @@
   }
 
   .ant-select-dropdown {
-    background-color: var(--bg-color-elevated);
-    border-color: var(--border-color);
-
-    .ant-select-item {
-      color: var(--text-color-primary);
-
-      &:hover {
-        background-color: rgba(99, 102, 241, 0.1);
-      }
-
-      &-selected {
-        background-color: rgba(99, 102, 241, 0.15);
-        color: var(--primary-color);
-      }
-    }
+    .select-dropdown-base();
   }
 
   // 警告提示
@@ -326,16 +314,7 @@
 
     .ant-dropdown-menu-item,
     .ant-menu-item {
-      color: var(--text-color-primary);
-
-      &:hover {
-        background-color: rgba(99, 102, 241, 0.1);
-      }
-
-      &-selected {
-        background-color: rgba(99, 102, 241, 0.15);
-        color: var(--primary-color);
-      }
+      .dropdown-item-base();
     }
   }
 
