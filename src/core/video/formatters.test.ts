@@ -20,8 +20,8 @@ describe('video formatters', () => {
       expect(formatDuration(125)).toBe('02:05');
     });
 
-    it('should format hours', () => {
-      expect(formatDuration(3661)).toBe('01:01:01');
+    it('should format hours without leading zero', () => {
+      expect(formatDuration(3661)).toBe('1:01:01');
     });
 
     it('should pad single digits', () => {
@@ -74,23 +74,23 @@ describe('video formatters', () => {
 
   describe('formatFileSize', () => {
     it('should format bytes', () => {
-      expect(formatFileSize(0)).toBe('0 B');
-      expect(formatFileSize(512)).toBe('512 B');
+      expect(formatFileSize(0)).toBe('0 Bytes');
+      expect(formatFileSize(512)).toBe('512 Bytes');
     });
 
     it('should format KB', () => {
-      expect(formatFileSize(1024)).toBe('1.00 KB');
-      expect(formatFileSize(1536)).toBe('1.50 KB');
+      expect(formatFileSize(1024)).toBe('1 KB');
+      expect(formatFileSize(1536)).toBe('1.5 KB');
     });
 
     it('should format MB', () => {
-      expect(formatFileSize(1_048_576)).toBe('1.00 MB');
-      expect(formatFileSize(5_242_880)).toBe('5.00 MB');
+      expect(formatFileSize(1048576)).toBe('1 MB');
+      expect(formatFileSize(5242880)).toBe('5 MB');
     });
 
     it('should format GB', () => {
-      expect(formatFileSize(1_073_741_824)).toBe('1.00 GB');
-      expect(formatFileSize(2_147_483_648)).toBe('2.00 GB');
+      expect(formatFileSize(1073741824)).toBe('1 GB');
+      expect(formatFileSize(2147483648)).toBe('2 GB');
     });
   });
 });

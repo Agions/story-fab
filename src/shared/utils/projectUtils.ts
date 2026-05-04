@@ -4,6 +4,9 @@
 
 import type { Project, ProjectStatus } from '@/core/types';
 
+// Re-export formatting utilities
+export { formatFileSize as formatProjectSize, formatDuration as formatProjectDuration } from './format';
+
 /**
  * 创建新项目
  */
@@ -63,25 +66,6 @@ export function getStatusText(status: ProjectStatus): string {
     failed: '失败',
   };
   return texts[status] || status;
-}
-
-/**
- * 格式化项目大小
- */
-export { formatFileSize as formatProjectSize } from './format';
-
-/**
- * 格式化项目时长
- */
-export function formatProjectDuration(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-  
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 
 /**
