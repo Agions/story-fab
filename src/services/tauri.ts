@@ -2,11 +2,11 @@ import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, BaseDirectory, mkdir, exists } from '@tauri-apps/plugin-fs';
 import { load } from '@tauri-apps/plugin-store';
-import { appConfigDir } from '@tauri-apps/api/path';
 import { open as openExternal } from '@tauri-apps/plugin-shell';
 import { normalizeProjectId, buildProjectIdCandidates } from '../core/utils/project-id';
 import { logger } from '../shared/utils/logging';
 import { formatTime } from '../shared/utils/formatting';
+import { getConfigDir } from './file/fileOperations';
 
 type ProjectFileData = {
   aiModel?: {
@@ -343,24 +343,6 @@ export const exportScriptToFile = async (script: ExportScriptData, filename: str
   } catch (error) {
     logger.error('导出脚本失败:', error);
     throw error;
-  }
-};
-
-/**
- * 获取应用配置目录
- */
-export const getConfigDir = async (): Promise<string> => {
-  try {
-    const configDir = await appConfigDir();
-    // 确保目录存在
-    const configExists = await exists(configDir);
-    if (!configExists) {
-      await mkdir(configDir, { recursive: true });
-    }
-    return configDir;
-  } catch (error) {
-    logger.error('获取配置目录失败:', error);
-    return '';
   }
 };
 
