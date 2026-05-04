@@ -35,6 +35,7 @@ import { useEditorStore } from '../store/editorStore';
 import { useTimelineStore } from '../store/timelineStore';
 import type { SubtitleEntry } from '@/core/types';
 import styles from '@/components/SubtitleExtractor.module.css';
+import { formatTime } from './common/timeUtils';
 
 interface SubtitleSegment {
   id: string;
@@ -51,14 +52,6 @@ function formatSRTTime(seconds: number): string {
   const s = Math.floor(seconds % 60);
   const ms = Math.floor((seconds % 1) * 1000);
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
-}
-
-function formatDisplayTime(seconds: number): string {
-  const totalSeconds = Math.floor(seconds);
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-  const cs = Math.floor((seconds % 1) * 100);
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${cs.toString().padStart(2, '0')}`;
 }
 
 interface SubtitleExtractorProps {
@@ -197,8 +190,8 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
             {currentSub && <div className={styles.currentSubtitleHint}>{currentSub.text}</div>}
           </div>
           <div className={styles.timeDisplay}>
-            <span className={styles.timeMain}>{formatDisplayTime(playheadSec)}</span>
-            {videoDuration > 0 && <span className={styles.timeTotal}> / {formatDisplayTime(videoDuration)}</span>}
+            <span className={styles.timeMain}>{formatTime(playheadSec)}</span>
+            {videoDuration > 0 && <span className={styles.timeTotal}> / {formatTime(videoDuration)}</span>}
           </div>
         </div>
 
@@ -212,7 +205,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
                 const width = Math.max(((sub.endTime - sub.startTime) / totalDuration) * 100, 0.5);
                 const isActive = activeSubId === sub.id || (playheadSec >= sub.startTime && playheadSec <= sub.endTime);
                 return (
-                  <Tooltip key={sub.id} title={`${formatDisplayTime(sub.startTime)} - ${sub.text.slice(0, 20)}${sub.text.length > 20 ? '…' : ''}`}>
+                  <Tooltip key={sub.id} title={`${formatTime(sub.startTime)} - ${sub.text.slice(0, 20)}${sub.text.length > 20 ? '…' : ''}`}>
                     <div className={`${styles.subBlock} ${isActive ? styles.subBlockActive : ''}`}
                       style={{ left: `${left}%`, width: `${width}%` }}
                       onClick={() => { seekTo(sub.startTime); setActiveSubId(sub.id); }} />
@@ -269,9 +262,9 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
                     <div key={sub.id} className={`flex items-center gap-3 p-3 rounded-md border border-border hover:bg-muted/50 cursor-pointer ${isCurrent ? 'bg-primary/5 border-primary/30' : ''}`}
                       onClick={() => seekTo(sub.startTime)}>
                       <div className="flex items-center gap-2 min-w-[120px]">
-                        <span className="text-xs font-mono text-muted-foreground">{formatDisplayTime(sub.startTime)}</span>
+                        <span className="text-xs font-mono text-muted-foreground">{formatTime(sub.startTime)}</span>
                         <span className="text-xs text-muted-foreground">→</span>
-                        <span className="text-xs font-mono text-muted-foreground">{formatDisplayTime(sub.endTime)}</span>
+                        <span className="text-xs font-mono text-muted-foreground">{formatTime(sub.endTime)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         {isEditing ? (

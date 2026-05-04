@@ -17,6 +17,7 @@ import { notify } from '../../../../shared/utils/notify';
 import { formatDuration } from '../../../../shared/utils/formatting';
 import type { VideoInfo } from '@/core/types';
 import styles from './HighlightList.module.css';
+import { formatTime } from '@/components/common/timeUtils';
 
 interface Highlight {
   startTime: number;  // seconds
@@ -34,14 +35,6 @@ const REASON_CONFIG: Record<string, { label: string; cls: string }> = {
   motion_burst:  { label: 'Motion', cls: 'motion' },
   combined:      { label: 'Combo', cls: 'combo'  },
 };
-
-function formatTime(seconds: number): string {
-  const totalSeconds = Math.floor(seconds);
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-  const cs = Math.floor((seconds % 1) * 100);
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${cs.toString().padStart(2, '0')}`;
-}
 
 interface HighlightListProps {
   videoInfo: VideoInfo;
