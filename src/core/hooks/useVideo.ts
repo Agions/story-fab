@@ -6,18 +6,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { VideoInfo, VideoAnalysis, Scene } from '@/core/types';
 import { delay } from '@/shared';
-
-interface TaskStatusInfo {
-  id?: string;
-  type?: string;
-  status: 'idle' | 'running' | 'completed' | 'failed' | 'cancelled';
-  progress: number;
-  message?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  completedAt?: string;
-  error?: string;
-}
+import type { TaskStatusInfo } from '@/core/services/ai/types';
 
 export interface UseVideoReturn {
   // 视频信息
