@@ -1,6 +1,6 @@
 import type { ScriptSegment, ScriptData } from '@/core/types';
 import type { DuplicateResult } from './types';
-import { SYNONYMS, SENTENCE_PATTERNS, ALTERNATIVE_PHRASES } from './types';
+import { SYNONYMS, SENTENCE_PATTERNS, ALTERNATIVE_PHRASES, COMMON_PHRASES } from './types';
 
 export function mergeSegments(
   segments: ScriptSegment[],
@@ -113,51 +113,7 @@ export function replaceTemplatePhrases(segment: ScriptSegment): ScriptSegment {
 }
 
 function getOriginalPhrases(category: string): string[] {
-  const originals: Record<string, string[]> = {
-    intro: [
-      '大家好，欢迎来到',
-      '今天给大家带来',
-      '今天要和大家分享',
-      '今天我们要聊的是',
-      '最近我发现',
-      '今天给大家推荐'
-    ],
-    transition: [
-      '接下来我们看看',
-      '那么接下来',
-      '说完这个，我们再来看看',
-      '不仅如此',
-      '更重要的是',
-      '除此之外',
-      '另外值得一提的是'
-    ],
-    conclusion: [
-      '好了，今天的分享就到这里',
-      '以上就是今天的全部内容',
-      '希望今天的分享对你有帮助',
-      '如果你觉得有用，记得点赞收藏',
-      '我们下期再见',
-      '感谢大家的观看'
-    ],
-    emphasis: [
-      '非常重要',
-      '值得注意的是',
-      '关键点在于',
-      '这里需要特别注意',
-      '这一点很关键',
-      '千万不要忽视'
-    ],
-    subjective: [
-      '我觉得',
-      '个人认为',
-      '在我看来',
-      '说实话',
-      '老实说',
-      '坦白讲',
-      '不得不说'
-    ]
-  };
-  return originals[category] || [];
+  return COMMON_PHRASES[category as keyof typeof COMMON_PHRASES] || [];
 }
 
 function getAlternativePhrase(category: string, original: string): string {
