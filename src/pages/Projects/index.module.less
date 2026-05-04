@@ -89,30 +89,12 @@
   :global {
     .ant-select {
       .ant-select-selector {
-        background: @bg-surface !important;
-        border-color: @border-default !important;
-        border-radius: @radius-md !important;
-        color: @text-primary;
+        .input-base();
       }
     }
 
     .ant-input-affix-wrapper {
-      background: @bg-surface !important;
-      border-color: @border-default !important;
-      border-radius: @radius-md !important;
-
-      .ant-input {
-        background: transparent !important;
-        color: @text-primary;
-
-        &::placeholder {
-          color: @text-muted;
-        }
-      }
-
-      .ant-input-prefix {
-        color: @text-muted;
-      }
+      .input-affix-wrapper-base();
     }
   }
 }
@@ -124,8 +106,8 @@
   overflow: hidden;
   background: @bg-card;
   border: 1px solid @border-subtle;
-  backdrop-filter: blur(20px);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  .glass-base();
+  .transition-bounce();
 
   &:hover {
     transform: translateY(-4px);

@@ -7,14 +7,16 @@
  * ```less
  * @import '_mixins.less';
  * 
- * .my-select {
- *   .select-dropdown-base();
+ * .my-card {
+ *   .glass-card();
  * }
  * ```
  */
 
+@import 'variables.less';
+
 // =============================================
-// 主色调渐变
+// 主色调渐变（琥珀色）
 // =============================================
 .primary-gradient() {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
@@ -30,6 +32,137 @@
 
 .primary-glow-shadow-hover() {
   box-shadow: 0 0 25px rgba(99, 102, 241, 0.5);
+}
+
+// =============================================
+// 琥珀色渐变（Amber）- 通用按钮/强调色
+// =============================================
+.amber-gradient() {
+  background: linear-gradient(135deg, @primary-color 0%, @primary-dark 100%);
+  border: none;
+  color: @ink-black !important;
+}
+
+.amber-gradient-hover() {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.amber-glow-shadow() {
+  box-shadow: 0 0 30px @primary-glow;
+}
+
+.amber-glow-shadow-hover() {
+  box-shadow: 0 0 40px @primary-glow;
+}
+
+// =============================================
+// 玻璃拟态卡片（深色背景 + 模糊 + 边框）
+// =============================================
+.glass-card() {
+  background: rgba(20, 21, 32, 0.80);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid @border-subtle;
+  border-radius: @radius-xl;
+}
+
+.glass-card-hover() {
+  &:hover {
+    border-color: @primary-color;
+    box-shadow: 0 0 20px @primary-glow, 0 8px 32px rgba(0, 0, 0, 0.4);
+    transform: translateY(-4px);
+  }
+}
+
+// 玻璃拟态卡片（小尺寸，@radius-lg）
+.glass-card-sm() {
+  background: rgba(20, 21, 32, 0.80);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid @border-subtle;
+  border-radius: @radius-lg;
+}
+
+// 玻璃拟态基础（仅背景+模糊+边框）
+.glass-base() {
+  background: rgba(18, 18, 26, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// =============================================
+// 设置卡片（电影导演工作室风格）
+// =============================================
+.settings-card() {
+  background: @bg-card;
+  backdrop-filter: blur(20px);
+  border-radius: @radius-xl;
+  border: 1px solid @border-subtle;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 32px;
+
+  &:hover {
+    border-color: rgba(212, 165, 116, 0.1);
+  }
+}
+
+// =============================================
+// 输入框/选择框基础样式
+// =============================================
+.input-base() {
+  background: @bg-surface !important;
+  border-color: @border-default !important;
+  border-radius: @radius-md !important;
+  color: @text-primary !important;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: @text-muted !important;
+  }
+
+  &:hover {
+    border-color: rgba(212, 165, 116, 0.3) !important;
+  }
+
+  &:focus,
+  &-focused {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 3px @primary-glow !important;
+  }
+}
+
+.input-affix-wrapper-base() {
+  background: @bg-surface !important;
+  border-color: @border-default !important;
+  border-radius: @radius-lg !important;
+  padding: 8px 14px !important;
+  transition: all 0.2s ease;
+
+  &:hover,
+  &:focus,
+  &.ant-input-affix-wrapper-focused {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 3px @primary-glow !important;
+    background: rgba(20, 21, 32, 0.95) !important;
+  }
+
+  .ant-input {
+    background: transparent !important;
+    color: @text-primary !important;
+    font-family: @font-body;
+    font-size: 14px;
+
+    &::placeholder {
+      color: @text-tertiary !important;
+    }
+  }
+
+  .ant-input-prefix {
+    color: @text-tertiary;
+    margin-right: 8px;
+  }
 }
 
 // =============================================
@@ -65,7 +198,7 @@
 
     &-option-selected {
       background: rgba(255, 159, 67, 0.12) !important;
-      color: @accent !important;
+      color: @primary-color !important;
     }
 
     &-option-active {
@@ -113,12 +246,59 @@
 }
 
 // =============================================
-// 玻璃拟态基础
+// 状态徽章（带圆点指示器）
 // =============================================
-.glass-base() {
-  background: rgba(18, 18, 26, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.status-badge-base() {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: @radius-full;
+  font-family: @font-body;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+
+  .statusDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+}
+
+.status-badge-completed(@accent-color; @accent-glow) {
+  background: rgba(255, 159, 67, 0.12);
+  border-color: rgba(255, 159, 67, 0.25);
+  color: @accent-color;
+
+  .statusDot {
+    background: @primary-color;
+    box-shadow: 0 0 6px @accent-glow;
+  }
+}
+
+.status-badge-processing(@color; @glow) {
+  background: rgba(0, 212, 255, 0.10);
+  border-color: rgba(0, 212, 255, 0.20);
+  color: @color;
+
+  .statusDot {
+    background: @color;
+    box-shadow: 0 0 6px @glow;
+    animation: sparkPulse 1.8s ease-in-out infinite;
+  }
+}
+
+.status-badge-draft() {
+  background: rgba(136, 136, 160, 0.10);
+  border-color: rgba(136, 136, 160, 0.18);
+  color: @text-secondary;
+
+  .statusDot {
+    background: @text-tertiary;
+  }
 }
 
 // =============================================
@@ -130,4 +310,161 @@
 
 .transition-slow(@property: all) {
   transition: @property 0.3s ease;
+}
+
+.transition-bounce(@property: all) {
+  transition: @property 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+// =============================================
+// 关键帧动画
+// =============================================
+.fade-in-up() {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.fade-in() {
+  animation: fadeIn 0.3s ease both;
+}
+
+.keyframes-fadeInUp() {
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+.keyframes-fadeIn() {
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+.keyframes-shimmer() {
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}
+
+.keyframes-neuralPulse() {
+  @keyframes neuralPulse {
+    0%, 100% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+  }
+}
+
+.keyframes-sparkPulse() {
+  @keyframes sparkPulse {
+    0%, 100% {
+      opacity: 0.5;
+      transform: scale(0.85);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+}
+
+// =============================================
+// 骨架屏动画
+// =============================================
+.skeleton-shimmer() {
+  background: linear-gradient(90deg, @bg-elevated 25%, rgba(255,255,255,0.04) 50%, @bg-elevated 75%) !important;
+  background-size: 200% 100% !important;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+// =============================================
+// 缩略图时长标签
+// =============================================
+.duration-badge() {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.70);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: @radius-sm;
+  padding: 2px 8px;
+  font-family: @font-mono;
+  font-size: 11px;
+  font-weight: 500;
+  color: @text-primary;
+  letter-spacing: 0.02em;
+}
+
+// =============================================
+// 圆形图标按钮
+// =============================================
+.circle-icon-btn(@size: 32px) {
+  width: @size !important;
+  height: @size !important;
+  background: rgba(0, 0, 0, 0.50) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 50% !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.15s ease !important;
+  padding: 0 !important;
+
+  &:hover {
+    background: rgba(255, 159, 67, 0.20) !important;
+    border-color: @primary-color !important;
+    transform: scale(1.1);
+  }
+
+  .anticon {
+    font-size: 14px;
+    color: @text-primary;
+  }
+}
+
+// =============================================
+// 分页样式
+// =============================================
+.pagination-base() {
+  .ant-pagination-item {
+    background-color: transparent;
+    border-color: @border-default;
+
+    a {
+      color: @text-primary;
+    }
+
+    &:hover {
+      border-color: @primary-color;
+
+      a {
+        color: @primary-color;
+      }
+    }
+  }
+
+  .ant-pagination-item-active {
+    background-color: rgba(99, 102, 241, 0.15);
+    border-color: @primary-color;
+
+    a {
+      color: @primary-color;
+    }
+  }
 }
