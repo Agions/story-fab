@@ -12,3 +12,7 @@ export { ErrorBoundary } from './ErrorBoundary';
 
 // motion-shim (framer-motion compatibility)
 export { motion, AnimatePresence } from './motion-shim';
+
+// Utilities
+export { formatTime } from './timeUtils';
+export { SelectField } from './SelectField';
