@@ -45,6 +45,9 @@
 @radius-2xl: 24px;
 @radius-full: 9999px;
 
+// 导入共享 mixins
+@import '../../styles/_mixins.less';
+
 // ============================================================================
 // 页面容器
 // ============================================================================
@@ -942,23 +945,7 @@
 }
 
 :global(.ant-select-dropdown) {
-  background: @bg-elevated !important;
-  border: 1px solid @border-default !important;
-  border-radius: @radius-md !important;
-
-  .ant-select-item {
-    color: @text-primary !important;
-    font-family: @font-body !important;
-
-    &-option-selected {
-      background: rgba(255, 159, 67, 0.12) !important;
-      color: @accent !important;
-    }
-
-    &-option-active {
-      background: rgba(255, 255, 255, 0.04) !important;
-    }
-  }
+  .select-dropdown-amber();
 }
 
 // 确认弹窗
