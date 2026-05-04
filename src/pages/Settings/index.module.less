@@ -71,21 +71,7 @@
 
 /* 设置卡片 - 电影胶片风格 */
 .settingsCard {
-  background: @bg-card;
-  backdrop-filter: blur(20px);
-  border-radius: @radius-xl;
-  border: 1px solid @border-subtle;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-bottom: 32px;
-
-  &:hover {
-    border-color: rgba(212, 165, 116, 0.1);
-  }
-
-  @media (max-width: 768px) {
-    border-radius: @radius-lg;
-  }
+  .settings-card();
 }
 
 /* 标签页 */
@@ -226,25 +212,7 @@
   .ant-input-affix-wrapper,
   .ant-select-selector,
   .ant-picker {
-    background: @bg-surface !important;
-    border-color: @border-default !important;
-    border-radius: @radius-md !important;
-    color: @text-primary !important;
-    transition: all 0.2s ease;
-
-    &::placeholder {
-      color: @text-muted !important;
-    }
-
-    &:hover {
-      border-color: rgba(212, 165, 116, 0.3) !important;
-    }
-
-    &:focus,
-    &-focused {
-      border-color: @film-amber !important;
-      box-shadow: 0 0 0 3px @film-amber-glow !important;
-    }
+    .input-base();
   }
 
   .ant-input-password-icon {
@@ -256,22 +224,7 @@
   }
 
   .ant-select-dropdown {
-    background: @bg-elevated !important;
-    border: 1px solid @border-subtle !important;
-    border-radius: @radius-md !important;
-
-    .ant-select-item {
-      color: @text-secondary;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.03);
-      }
-
-      &-option-selected {
-        background: rgba(212, 165, 116, 0.1) !important;
-        color: @film-amber !important;
-      }
-    }
+    .select-dropdown-amber();
   }
 
   .ant-switch {

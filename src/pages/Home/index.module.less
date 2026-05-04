@@ -1,6 +1,8 @@
 // Home page styles — extracted from inline style objects
 // Purple (#667eea, #764ba2, #8B5CF6, #a855f7, #6366f1) → Amber (#d4a574)
 
+@import '../../styles/_mixins.less';
+
 .container {
   max-width: 1400px;
   margin: 0 auto;
@@ -83,8 +85,7 @@
 
 // Base card style (dark mode)
 .cardDark {
-  background: rgba(18, 18, 26, 0.8);
-  border: 1px solid #2a2a3a;
+  .glass-base();
   border-radius: 12px;
 }
 
