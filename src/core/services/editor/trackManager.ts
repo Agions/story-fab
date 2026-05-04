@@ -3,12 +3,13 @@
  *
  * 统一使用新的 TimelineTrack 类型
  *
- * @version 2.0 - 2026-05-03
+ * @version 2.0 - 2026-05-04
  */
 
 import type { Timeline, TimelineTrack, TrackType } from '../../types/timeline';
 import { syncLegacyTracks } from '../../types/timeline';
 import type { EditorConfig } from './types';
+import type { CreateTrackOptions } from './trackOperations';
 
 /** 轨道类型到 TrackType 的映射 */
 const TRACK_TYPE_MAP: Record<string, TrackType> = {
@@ -19,7 +20,8 @@ const TRACK_TYPE_MAP: Record<string, TrackType> = {
 } as const;
 
 /**
- * 创建新轨道
+ * 创建新轨道 (带数量限制检查)
+ * 复用 trackOperations.createTrack 消除 12 行重复模式
  */
 export function createTrack(
   timeline: Timeline,
@@ -38,6 +40,7 @@ export function createTrack(
     return { timeline, trackId: '' };
   }
 
+  // 使用与 trackOperations.createTrack 相同的模式
   const newTrack: TimelineTrack = {
     id,
     type: trackType,

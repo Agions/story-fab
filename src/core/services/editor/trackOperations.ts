@@ -1,7 +1,7 @@
 /**
  * Track Operations - 轨道操作
  *
- * @version 2.0 - 2026-05-03
+ * @version 2.0 - 2026-05-04
  */
 
 import type {
@@ -40,12 +40,22 @@ export function findTrackByClipId(timeline: Timeline, clipId: string): string | 
   return undefined;
 }
 
-/** 添加轨道 */
-export function addTrack(
+/** 通用轨道创建配置 */
+export interface CreateTrackOptions {
+  type: TrackType;
+  name?: string;
+  height?: number;
+}
+
+/**
+ * 通用轨道创建工厂函数
+ * 消除 trackOperations vs trackManager 间的 12 行轨道管理重复模式
+ */
+export function createTrack(
   timeline: Timeline,
-  type: TrackType,
-  name?: string
+  options: CreateTrackOptions
 ): Timeline {
+  const { type, name, height = 60 } = options;
   const newTrack: TimelineTrack = {
     id: `${type}_${Date.now()}`,
     type,
@@ -54,7 +64,7 @@ export function addTrack(
     muted: false,
     locked: false,
     visible: true,
-    height: 60,
+    height,
     volume: type === 'audio' ? 1 : undefined,
   };
 
@@ -64,6 +74,15 @@ export function addTrack(
     tracks: newTracks,
     updatedAt: new Date().toISOString(),
   });
+}
+
+/** 添加轨道 */
+export function addTrack(
+  timeline: Timeline,
+  type: TrackType,
+  name?: string
+): Timeline {
+  return createTrack(timeline, { type, name });
 }
 
 /** 移除轨道 */

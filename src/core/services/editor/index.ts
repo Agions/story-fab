@@ -4,6 +4,7 @@ export * from './history';
 export * from './trackManager';
 export * from './export';
 export * from './storage';
+export * from './operationBase';
 
 // Handlers (策略模式)
 export * from '@/core/services/editor/handlers';

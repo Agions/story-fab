@@ -1,7 +1,7 @@
 /**
  * Clip Operations - 片段操作
  *
- * @version 2.0 - 2026-05-03
+ * @version 2.0 - 2026-05-04
  */
 
 import type {
@@ -15,6 +15,7 @@ import {
   updateClipInTrack,
   calculateDuration,
 } from './timelineHelpers';
+import { lookupTrack, updateTrackClips } from './operationBase';
 
 /** 添加片段到轨道 */
 export function addClip(
@@ -23,9 +24,10 @@ export function addClip(
   clip: Omit<TimelineClip, 'id' | 'trackId'>,
   position: number
 ): Timeline {
-  const trackIndex = findTrackIndex(timeline.tracks, trackId);
-  if (trackIndex === -1) return timeline;
+  const result = lookupTrack(timeline, trackId);
+  if (!result) return timeline;
 
+  const { track, trackIndex } = result;
   const duration = clip.endMs - clip.startMs;
   const newClip: TimelineClip = {
     ...clip,
@@ -35,13 +37,11 @@ export function addClip(
     endMs: position + duration,
   };
 
-  const updatedTrack = {
-    ...timeline.tracks[trackIndex],
-    clips: [...timeline.tracks[trackIndex].clips, newClip].sort((a, b) => a.startMs - b.startMs),
-  };
-
   const newTracks = [...timeline.tracks];
-  newTracks[trackIndex] = updatedTrack;
+  newTracks[trackIndex] = {
+    ...track,
+    clips: [...track.clips, newClip].sort((a, b) => a.startMs - b.startMs),
+  };
   const newDuration = Math.max(timeline.duration, newClip.endMs);
 
   return syncLegacyTracks({
@@ -54,13 +54,14 @@ export function addClip(
 
 /** 移除片段 */
 export function removeClip(timeline: Timeline, trackId: string, clipId: string): Timeline {
-  const trackIndex = findTrackIndex(timeline.tracks, trackId);
-  if (trackIndex === -1) return timeline;
+  const result = lookupTrack(timeline, trackId);
+  if (!result) return timeline;
 
+  const { track, trackIndex } = result;
   const newTracks = [...timeline.tracks];
   newTracks[trackIndex] = {
-    ...timeline.tracks[trackIndex],
-    clips: timeline.tracks[trackIndex].clips.filter((c) => c.id !== clipId),
+    ...track,
+    clips: track.clips.filter((c) => c.id !== clipId),
   };
 
   return syncLegacyTracks({

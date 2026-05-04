@@ -1,7 +1,7 @@
 /**
  * Media Operations - 文本与音频操作 (legacy types 兼容)
  *
- * @version 2.0 - 2026-05-03
+ * @version 2.0 - 2026-05-04
  */
 
 import type {
@@ -9,43 +9,50 @@ import type {
   TimelineClip,
   TextItem,
   AudioClip,
-  VideoClip,
 } from '../../types/timeline';
 import { syncLegacyTracks } from '../../types/timeline';
-import { findTrackIndex } from './timelineHelpers';
+import { lookupTrack } from './operationBase';
 
-/** 添加文本项 */
-export function addText(
+/**
+ * 创建基础 TimelineClip 的配置
+ */
+interface ClipConfig {
+  id: string;
+  trackId: string;
+  startMs: number;
+  endMs: number;
+  name: string;
+  type: 'text' | 'audio';
+  volume?: number;
+}
+
+/**
+ * 通用添加片段到轨道的工厂函数
+ * 消除 addText/addAudio 间的内部重复 (原 17 行重复 [82-99] vs [43-60])
+ */
+function addMediaClip(
   timeline: Timeline,
   trackId: string,
-  text: TextItem,
-  position: number
+  config: ClipConfig
 ): Timeline {
-  const trackIndex = findTrackIndex(timeline.tracks, trackId);
-  if (trackIndex === -1) return timeline;
+  const result = lookupTrack(timeline, trackId);
+  if (!result) return timeline;
 
-  const duration = text.duration ?? 5;
-  const legacyClip: VideoClip = {
-    id: `text_${Date.now()}`,
-    sourceId: undefined,
-    startTime: position,
-    endTime: position + duration,
-  };
-
+  const { track, trackIndex } = result;
   const newClip: TimelineClip = {
-    id: legacyClip.id,
-    trackId,
-    startMs: position,
-    endMs: position + duration,
+    id: config.id,
+    trackId: config.trackId,
+    startMs: config.startMs,
+    endMs: config.endMs,
     sourceStartMs: 0,
-    sourceEndMs: duration,
-    name: text.content.substring(0, 20),
-    type: 'text',
+    sourceEndMs: config.endMs - config.startMs,
+    name: config.name,
+    type: config.type,
     effects: [],
     keyframes: [],
+    ...(config.type === 'audio' && config.volume !== undefined ? { volume: config.volume } : {}),
   };
 
-  const track = timeline.tracks[trackIndex];
   const newTracks = [...timeline.tracks];
   newTracks[trackIndex] = {
     ...track,
@@ -59,6 +66,24 @@ export function addText(
   });
 }
 
+/** 添加文本项 */
+export function addText(
+  timeline: Timeline,
+  trackId: string,
+  text: TextItem,
+  position: number
+): Timeline {
+  const duration = text.duration ?? 5;
+  return addMediaClip(timeline, trackId, {
+    id: `text_${Date.now()}`,
+    trackId,
+    startMs: position,
+    endMs: position + duration,
+    name: text.content.substring(0, 20),
+    type: 'text',
+  });
+}
+
 /** 添加音频片段 */
 export function addAudio(
   timeline: Timeline,
@@ -66,34 +91,14 @@ export function addAudio(
   audio: AudioClip,
   position: number
 ): Timeline {
-  const trackIndex = findTrackIndex(timeline.tracks, trackId);
-  if (trackIndex === -1) return timeline;
-
   const duration = audio.duration ?? 5;
-  const newClip: TimelineClip = {
+  return addMediaClip(timeline, trackId, {
     id: `audio_${Date.now()}`,
     trackId,
     startMs: position,
     endMs: position + duration,
-    sourceStartMs: 0,
-    sourceEndMs: duration,
     name: 'Audio',
     type: 'audio',
     volume: 1,
-    effects: [],
-    keyframes: [],
-  };
-
-  const track = timeline.tracks[trackIndex];
-  const newTracks = [...timeline.tracks];
-  newTracks[trackIndex] = {
-    ...track,
-    clips: [...track.clips, newClip].sort((a, b) => a.startMs - b.startMs),
-  };
-
-  return syncLegacyTracks({
-    ...timeline,
-    tracks: newTracks,
-    updatedAt: new Date().toISOString(),
   });
 }
