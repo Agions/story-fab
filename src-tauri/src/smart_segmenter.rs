@@ -340,13 +340,20 @@ impl SmartSegmenter {
         std::fs::write(&temp_pcm, &output.stdout)
             .map_err(|e| format!("Write PCM failed: {}", e))?;
 
-        let pcm_data = std::fs::read(&temp_pcm)
-            .map_err(|e| format!("Read PCM failed: {}", e))?;
+        let pcm_data = match std::fs::read(&temp_pcm) {
+            Ok(d) => d,
+            Err(e) => {
+                let _ = std::fs::remove_file(&temp_pcm);
+                return Err(format!("Read PCM failed: {}", e));
+            }
+        };
 
+        // Always cleanup temp file, even on parse failure
         let _ = std::fs::remove_file(&temp_pcm);
 
+        // chunks (not _exact) — last partial chunk is safely dropped
         let samples: Vec<f32> = pcm_data
-            .chunks_exact(2)
+            .chunks(2)
             .map(|chunk| {
                 let s16 = i16::from_le_bytes([chunk[0], chunk[1]]);
                 s16 as f32 / 32768.0
