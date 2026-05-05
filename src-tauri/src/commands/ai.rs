@@ -63,10 +63,10 @@ pub fn run_ai_director_plan(input: DirectorPlanInput) -> DirectorPlanOutput {
 pub fn get_export_dir() -> String {
     if let Some(download_dir) = dirs::download_dir() {
         let export_dir = download_dir.join("CutDeck");
-        return export_dir.to_string_lossy().to_string();
+        return export_dir.display().to_string();
     }
     let temp_dir = std::env::temp_dir().join("CutDeck");
-    temp_dir.to_string_lossy().to_string()
+    temp_dir.display().to_string()
 }
 
 /// Parameters for detect_zcr_bursts command
@@ -177,12 +177,12 @@ pub async fn synthesize_speech(
         _ => "mp3",
     };
     tmp_audio.push(format!("tts_output_{}.{}", std::process::id(), ext));
-    let tmp_audio_path = tmp_audio.to_string_lossy().to_string();
+    let tmp_audio_path = tmp_audio.display().to_string();
 
     // Write text to temp file (edge-tts --file flag)
     let mut tmp_text = std::env::temp_dir();
     tmp_text.push(format!("tts_input_{}.txt", std::process::id()));
-    let tmp_text_path = tmp_text.to_string_lossy().to_string();
+    let tmp_text_path = tmp_text.display().to_string();
     tokio::fs::write(&tmp_text_path, &input.text)
         .await
         .map_err(|e| format!("Failed to write text file: {e}"))?;
@@ -236,9 +236,9 @@ pub async fn list_tts_backends() -> Result<Vec<TtsBackendInfo>, String> {
     let edge_available = tokio::fs::metadata(edge_path).await.is_ok();
     if edge_available {
         backends.push(TtsBackendInfo {
-            name: "edge".to_string(),
-            label: "Microsoft Edge TTS".to_string(),
-            description: "免费，无需 API key，音质好，需要网络".to_string(),
+            name: "edge".into(),
+            label: "Microsoft Edge TTS".into(),
+            description: "免费，无需 API key，音质好，需要网络".into(),
             requires_network: true,
             requires_model_download: false,
             model_path: None,

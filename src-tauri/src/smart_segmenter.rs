@@ -295,7 +295,7 @@ impl SmartSegmenter {
             return Err(String::from_utf8_lossy(&output.stderr).to_string());
         }
 
-        Ok(temp_audio.to_string_lossy().to_string())
+        Ok(temp_audio.display().to_string())
     }
 
     fn compute_energy_profile(&self, audio_path: &str, window_ms: u64) -> Result<Vec<(u64, f32)>, String> {
