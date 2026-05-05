@@ -4,7 +4,7 @@
 //! dialogue detection, and motion analysis — all without external AI services.
 
 use crate::binary::resolve_binary_path;
-use crate::utils::chrono_like_timestamp;
+use crate::utils::{cmd_err, chrono_like_timestamp};
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 
@@ -288,7 +288,7 @@ impl SmartSegmenter {
             .map_err(|e| format!("Audio extraction failed: {}", e))?;
 
         if !output.status.success() {
-            return Err(String::from_utf8_lossy(&output.stderr).to_string());
+            return Err(cmd_err("FFmpeg failed", &output));
         }
 
         Ok(temp_audio.display().to_string())
@@ -333,7 +333,7 @@ impl SmartSegmenter {
             .map_err(|e| format!("FFmpeg failed: {}", e))?;
 
         if !output.status.success() {
-            return Err(String::from_utf8_lossy(&output.stderr).to_string());
+            return Err(cmd_err("FFmpeg failed", &output));
         }
 
         // Write to temp file to avoid memory issues with large files
@@ -451,7 +451,7 @@ impl SmartSegmenter {
             .map_err(|e| format!("Probe failed: {}", e))?;
 
         if !output.status.success() {
-            return Err(String::from_utf8_lossy(&output.stderr).to_string());
+            return Err(cmd_err("FFmpeg failed", &output));
         }
 
         let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
