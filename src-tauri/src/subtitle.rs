@@ -304,12 +304,15 @@ print(json.dumps(result, ensure_ascii=False))
         total_segments: None,
     });
 
+    // Use tokio::process::Command with kill_on_drop=true so the Python child
+    // is killed when the async task is cancelled (client disconnect).
     let output = tokio::process::Command::new("python3")
         .arg("-c")
         .arg(&python_code)
+        .kill_on_drop(true)
         .output()
         .await
-        .map_err(|e| format!("执行 faster-whisper 失败: {e}"))?;
+        .map_err(|e| format!("执行 faster-whisper 失败: {}", e))?;
 
     // Cleanup temp wav
     if let Some(ref wav) = temp_wav {
