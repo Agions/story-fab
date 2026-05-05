@@ -2,6 +2,7 @@
 // All commands create a fresh VideoProcessor instance per call to avoid
 // shared-state issues in a single-threaded Tauri handler environment.
 
+use crate::utils::{chrono_like_timestamp, parse_fraction};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -133,7 +134,7 @@ impl VideoProcessor {
 
     pub fn extract_keyframes(&self, path: &str, max_frames: u32, scene_threshold: f64) -> Result<Vec<String>, String> {
         let temp_dir = std::env::temp_dir()
-            .join(format!("cutdeck_frames_{}_{}", std::process::id(), chrono_now()));
+            .join(format!("cutdeck_frames_{}_{}", std::process::id(), chrono_like_timestamp()));
 
         fs::create_dir_all(&temp_dir)
             .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -238,7 +239,7 @@ impl VideoProcessor {
 
         // Create concat file — use random suffix to avoid same-ms collisions
         let concat_file = std::env::temp_dir()
-            .join(format!("concat_{}_{}.txt", chrono_now(), rand_suffix()));
+            .join(format!("concat_{}.txt", chrono_like_timestamp()));
 
         let concat_content = inputs
             .iter()
@@ -271,7 +272,7 @@ impl VideoProcessor {
 
     pub fn generate_thumbnail(&self, path: &str, time: f64) -> Result<String, String> {
         let temp_dir = std::env::temp_dir()
-            .join(format!("cutdeck_thumb_{}_{}", std::process::id(), chrono_now()));
+            .join(format!("cutdeck_thumb_{}_{}", std::process::id(), chrono_like_timestamp()));
 
         fs::create_dir_all(&temp_dir)
             .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -304,13 +305,7 @@ impl VideoProcessor {
     }
 
     fn parse_fraction(s: &str) -> f64 {
-        if let Some((n, d)) = s.split_once('/') {
-            let n: f64 = n.parse().unwrap_or(0.0);
-            let d: f64 = d.parse().unwrap_or(1.0);
-            if d.abs() > f64::EPSILON { n / d } else { 0.0 }
-        } else {
-            s.parse().unwrap_or(0.0)
-        }
+        parse_fraction(s)
     }
 
     pub fn detect_hw_accel(&self) -> Option<String> {
@@ -348,22 +343,6 @@ fn format_time(seconds: f64) -> String {
     format!("{:02}:{:02}:{:02}.{:03}", h, m, s, ms)
 }
 
-fn chrono_now() -> u128 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis())
-        .unwrap_or(0)
-}
-
-/// Short random hex suffix — avoids same-ms path collisions.
-fn rand_suffix() -> String {
-    use std::time::Instant;
-    static INSTANT: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
-    let start = INSTANT.get_or_init(Instant::now);
-    let elapsed = start.elapsed().as_nanos();
-    format!("{:08x}", (elapsed ^ 0x5de66e6c0u128) & 0xffffffff_u128)
-}
-
 // Tauri commands
 
 #[tauri::command]
@@ -399,7 +378,7 @@ pub fn cut_video(
 ) -> Result<String, String> {
     let processor = VideoProcessor::new();
     let temp_dir = std::env::temp_dir()
-        .join(format!("cutdeck_cut_{}_{}", chrono_now(), rand_suffix()));
+        .join(format!("cutdeck_cut_{}", chrono_like_timestamp()));
 
     fs::create_dir_all(&temp_dir)
         .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -446,7 +425,7 @@ pub fn render_autonomous_cut_optimized(input: serde_json::Value) -> Result<Strin
         .ok_or("缺少 segments")?;
 
     let temp_dir = std::env::temp_dir()
-        .join(format!("cutdeck_render_{}_{}", chrono_now(), rand_suffix()));
+        .join(format!("cutdeck_render_{}", chrono_like_timestamp()));
 
     fs::create_dir_all(&temp_dir)
         .map_err(|e| format!("创建临时目录失败: {}", e))?;
