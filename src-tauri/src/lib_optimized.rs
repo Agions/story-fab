@@ -3,7 +3,7 @@
 // shared-state issues in a single-threaded Tauri handler environment.
 
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
-use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction};
+use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::process::Command;
@@ -312,15 +312,6 @@ impl Default for VideoProcessor {
     fn default() -> Self {
         Self::new()
     }
-}
-
-fn format_time(seconds: f64) -> String {
-    let secs = seconds.max(0.0);
-    let h = (secs / 3600.0).floor() as u64;
-    let m = ((secs % 3600.0) / 60.0).floor() as u64;
-    let s = (secs % 60.0).floor() as u64;
-    let ms = ((secs % 1.0) * 1000.0).round() as u64;
-    format!("{:02}:{:02}:{:02}.{:03}", h, m, s, ms)
 }
 
 // Tauri commands
