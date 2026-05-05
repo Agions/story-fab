@@ -292,11 +292,15 @@ impl VideoProcessor {
             .map_err(|e| format!("生成缩略图失败: {}", e))?;
 
         if !result.status.success() {
-            fs::remove_dir_all(&temp_dir).ok();
+            let _ = fs::remove_dir_all(&temp_dir);
             return Err(format!("生成失败: {}", String::from_utf8_lossy(&result.stderr)));
         }
 
-        Ok(output.to_string_lossy().to_string())
+        // Cleanup temp dir on success (keep only the output file path)
+        let output_path = output.to_string_lossy().to_string();
+        let _ = fs::remove_dir_all(&temp_dir);
+
+        Ok(output_path)
     }
 
     fn parse_fraction(s: &str) -> f64 {
@@ -403,21 +407,25 @@ pub fn cut_video(
     // Process each segment
     let mut temp_files: Vec<PathBuf> = Vec::new();
 
-    for (i, seg) in segments.iter().enumerate() {
-        let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
-        processor.cut_video_segment(&input_path, &temp_file.to_string_lossy(), seg.start, seg.end, use_hw_accel)?;
-        temp_files.push(temp_file);
-    }
+    let result = (|| {
+        for (i, seg) in segments.iter().enumerate() {
+            let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
+            processor.cut_video_segment(&input_path, &temp_file.to_string_lossy(), seg.start, seg.end, use_hw_accel)?;
+            temp_files.push(temp_file);
+        }
 
-    // Merge
-    processor.concat_segments(&temp_files, &output_path)?;
+        // Merge
+        processor.concat_segments(&temp_files, &output_path)?;
+        Ok::<(), String>(())
+    })();
 
-    // Cleanup
+    // Cleanup temp files regardless of success/failure
     for f in &temp_files {
         let _ = fs::remove_file(f);
     }
     let _ = fs::remove_dir_all(&temp_dir);
 
+    result?;
     Ok(output_path)
 }
 
@@ -445,21 +453,26 @@ pub fn render_autonomous_cut_optimized(input: serde_json::Value) -> Result<Strin
 
     let mut temp_files: Vec<PathBuf> = Vec::new();
 
-    for (i, seg) in segments.iter().enumerate() {
-        let start = seg["start"].as_f64().unwrap_or(0.0);
-        let end = seg["end"].as_f64().ok_or("缺少 end")?;
-        let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
+    let result = (|| {
+        for (i, seg) in segments.iter().enumerate() {
+            let start = seg["start"].as_f64().unwrap_or(0.0);
+            let end = seg["end"].as_f64().ok_or("缺少 end")?;
+            let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
 
-        processor.cut_video_segment(input_path, &temp_file.to_string_lossy(), start, end, None)?;
-        temp_files.push(temp_file);
-    }
+            processor.cut_video_segment(input_path, &temp_file.to_string_lossy(), start, end, None)?;
+            temp_files.push(temp_file);
+        }
 
-    processor.concat_segments(&temp_files, output_path)?;
+        processor.concat_segments(&temp_files, output_path)?;
+        Ok::<(), String>(())
+    })();
 
+    // Cleanup temp files regardless of success/failure
     for f in temp_files {
         let _ = fs::remove_file(f);
     }
     let _ = fs::remove_dir_all(&temp_dir);
 
+    result?;
     Ok(output_path.to_string())
 }

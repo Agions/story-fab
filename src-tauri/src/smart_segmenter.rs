@@ -3,6 +3,7 @@
 //! Segments video into meaningful chunks based on scene changes, silence detection,
 //! dialogue detection, and motion analysis — all without external AI services.
 
+use crate::utils::chrono_like_timestamp;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -503,9 +504,4 @@ fn resolve_binary_path(binary_name: &str) -> String {
     binary_name.to_string()
 }
 
-fn chrono_like_timestamp() -> u128 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis())
-        .unwrap_or(0)
-}
+

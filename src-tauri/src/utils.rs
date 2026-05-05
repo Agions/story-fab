@@ -1,6 +1,6 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub(crate) fn parse_fraction(value: &str) -> f64 {
+pub fn parse_fraction(value: &str) -> f64 {
     if let Some((num, den)) = value.split_once('/') {
         let n = num.parse::<f64>().unwrap_or(0.0);
         let d = den.parse::<f64>().unwrap_or(1.0);
@@ -12,11 +12,14 @@ pub(crate) fn parse_fraction(value: &str) -> f64 {
     value.parse::<f64>().unwrap_or(0.0)
 }
 
-pub(crate) fn chrono_like_timestamp() -> u64 {
-    SystemTime::now()
+/// Returns timestamp with random suffix to avoid collisions (for temp file names)
+pub fn chrono_like_timestamp() -> String {
+    let ms = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_millis() as u64)
-        .unwrap_or(0)
+        .map(|d| d.as_millis())
+        .unwrap_or(0);
+    let rand = (ms ^ 0x5de66e6c0_u128) & 0xffffff_u128;
+    format!("{:x}_{:06x}", ms, rand)
 }
 
 pub(crate) fn format_srt_time(seconds: f64) -> String {
