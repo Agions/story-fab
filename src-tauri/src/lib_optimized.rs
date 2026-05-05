@@ -2,10 +2,10 @@
 // All commands create a fresh VideoProcessor instance per call to avoid
 // shared-state issues in a single-threaded Tauri handler environment.
 
+use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction};
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::PathBuf;
 use std::process::Command;
 
 /// Typed segment for cut_video command — replaces raw serde_json::Value.
@@ -27,30 +27,10 @@ pub struct VideoProcessor {
 
 impl VideoProcessor {
     pub fn new() -> Self {
-        let (ffmpeg, ffprobe) = Self::resolve_binaries();
         Self {
-            ffmpeg_path: ffmpeg,
-            ffprobe_path: ffprobe,
+            ffmpeg_path: ffmpeg_binary(),
+            ffprobe_path: ffprobe_binary(),
         }
-    }
-
-    fn resolve_binaries() -> (String, String) {
-        let ffmpeg = std::env::var("CUTDECK_FFMPEG_PATH")
-            .or_else(|_| std::env::var("FFMPEG_PATH"))
-            .unwrap_or_else(|_| "ffmpeg".to_string());
-        
-        let ffprobe = std::env::var("CUTDECK_FFPROBE_PATH")
-            .or_else(|_| {
-                if let Ok(ffmpeg_dir) = std::env::var("CUTDECK_FFMPEG_PATH") {
-                    let parent = PathBuf::from(&ffmpeg_dir).parent();
-                    parent.map(|p| p.join("ffprobe").display().to_string())
-                } else {
-                    None
-                }
-            })
-            .unwrap_or_else(|_| "ffprobe".to_string());
-        
-        (ffmpeg, ffprobe)
     }
 
     pub fn check_installed(&self) -> (bool, Option<String>) {
