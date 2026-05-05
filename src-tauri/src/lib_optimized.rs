@@ -318,30 +318,6 @@ impl Default for VideoProcessor {
 // Tauri commands
 
 #[tauri::command]
-pub fn check_ffmpeg() -> Result<(bool, Option<String>), String> {
-    let processor = VideoProcessor::new();
-    Ok(processor.check_installed())
-}
-
-#[tauri::command]
-pub fn analyze_video(path: String) -> Result<serde_json::Value, String> {
-    let processor = VideoProcessor::new();
-    processor.get_metadata(&path)
-}
-
-#[tauri::command]
-pub fn extract_key_frames(path: String, count: Option<u32>, threshold: Option<f64>) -> Result<Vec<String>, String> {
-    let processor = VideoProcessor::new();
-    processor.extract_keyframes(&path, count.unwrap_or(10), threshold.unwrap_or(0.3))
-}
-
-#[tauri::command]
-pub fn generate_thumbnail(path: String, time: Option<f64>) -> Result<String, String> {
-    let processor = VideoProcessor::new();
-    processor.generate_thumbnail(&path, time.unwrap_or(1.0))
-}
-
-#[tauri::command]
 pub fn cut_video(
     input_path: String,
     output_path: String,
@@ -384,22 +360,4 @@ pub fn cut_video(
 pub fn get_hw_acceleration() -> Result<Option<String>, String> {
     let processor = VideoProcessor::new();
     Ok(processor.detect_hw_accel())
-}
-
-#[tauri::command]
-pub fn render_autonomous_cut_optimized(input: serde_json::Value) -> Result<String, String> {
-    let input_path = input["input_path"].as_str().ok_or("缺少 input_path")?;
-    let output_path = input["output_path"].as_str().ok_or("缺少 output_path")?;
-    let segments = input["segments"]
-        .as_array()
-        .ok_or("缺少 segments")?
-        .iter()
-        .map(|seg| CutSegment {
-            start: seg["start"].as_f64().unwrap_or(0.0),
-            end: seg["end"].as_f64().ok_or("缺少 end")?,
-            source_start_ms: None,
-            source_end_ms: None,
-        })
-        .collect();
-    cut_video(input_path.to_string(), output_path.to_string(), segments, Some(false))
 }
