@@ -4,7 +4,7 @@
 //! to identify highlight moments without any external AI service.
 
 use crate::binary::resolve_binary_path;
-use crate::utils::chrono_like_timestamp;
+use crate::utils::{cmd_err, chrono_like_timestamp};
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 
@@ -394,7 +394,7 @@ impl HighlightDetector {
             .map_err(|e| format!("FFmpeg failed to extract audio from '{}': {}", audio_path, e))?;
 
         if !output.status.success() {
-            return Err(String::from_utf8_lossy(&output.stderr).to_string());
+            return Err(cmd_err("FFmpeg failed", &output));
         }
 
         // Read PCM data
@@ -539,7 +539,7 @@ impl HighlightDetector {
         if !output.status.success() {
             // Cleanup temp file on failure
             let _ = std::fs::remove_file(&temp_audio);
-            return Err(String::from_utf8_lossy(&output.stderr).to_string());
+            return Err(cmd_err("FFmpeg failed", &output));
         }
 
         Ok(temp_audio.display().to_string())

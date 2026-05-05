@@ -4,6 +4,7 @@
 //! with graceful fallback handling when the Python environment is unavailable.
 
 use crate::binary::resolve_binary_path;
+use crate::utils::cmd_err;
 use anyhow::Context;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -133,8 +134,7 @@ pub async fn download_whisper_model(model_size: String) -> Result<String, String
     if output.status.success() {
         Ok(format!("模型 {} 下载完成", model_size))
     } else {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        Err(format!("模型下载失败: {}", stderr))
+        Err(cmd_err("模型下载失败", &output))
     }
 }
 
@@ -160,10 +160,7 @@ fn extract_audio_to_wav(video_path: &str, output_wav: &Path) -> Result<(), Strin
         .map_err(|e| format!("运行 ffmpeg 提取音频失败: {e}"))?;
 
     if !output.status.success() {
-        return Err(format!(
-            "ffmpeg 音频提取失败: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
+        return Err(cmd_err("ffmpeg 音频提取失败", &output));
     }
     Ok(())
 }
@@ -356,27 +353,32 @@ print(json.dumps(result, ensure_ascii=False))
     Ok(result)
 }
 
+/// Common languages supported by Whisper (code, name)
+const WHISPER_LANGS: &[(&str, &str)] = &[
+    ("auto", "自动检测"),
+    ("zh", "中文"),
+    ("en", "英语"),
+    ("ja", "日语"),
+    ("ko", "韩语"),
+    ("fr", "法语"),
+    ("de", "德语"),
+    ("es", "西班牙语"),
+    ("pt", "葡萄牙语"),
+    ("it", "意大利语"),
+    ("ru", "俄语"),
+    ("ar", "阿拉伯语"),
+    ("hi", "印地语"),
+    ("id", "印尼语"),
+    ("ms", "马来语"),
+    ("th", "泰语"),
+    ("vi", "越南语"),
+];
+
 /// Get supported languages for whisper transcription
 #[tauri::command]
 pub fn get_whisper_supported_languages() -> Vec<serde_json::Value> {
-    // Common languages supported by Whisper
-    vec![
-        serde_json::json!({"code": "auto", "name": "自动检测"}),
-        serde_json::json!({"code": "zh", "name": "中文"}),
-        serde_json::json!({"code": "en", "name": "英语"}),
-        serde_json::json!({"code": "ja", "name": "日语"}),
-        serde_json::json!({"code": "ko", "name": "韩语"}),
-        serde_json::json!({"code": "fr", "name": "法语"}),
-        serde_json::json!({"code": "de", "name": "德语"}),
-        serde_json::json!({"code": "es", "name": "西班牙语"}),
-        serde_json::json!({"code": "pt", "name": "葡萄牙语"}),
-        serde_json::json!({"code": "it", "name": "意大利语"}),
-        serde_json::json!({"code": "ru", "name": "俄语"}),
-        serde_json::json!({"code": "ar", "name": "阿拉伯语"}),
-        serde_json::json!({"code": "hi", "name": "印地语"}),
-        serde_json::json!({"code": "id", "name": "印尼语"}),
-        serde_json::json!({"code": "ms", "name": "马来语"}),
-        serde_json::json!({"code": "th", "name": "泰语"}),
-        serde_json::json!({"code": "vi", "name": "越南语"}),
-    ]
+    WHISPER_LANGS
+        .iter()
+        .map(|(code, name)| serde_json::json!({"code": code, "name": name}))
+        .collect()
 }
