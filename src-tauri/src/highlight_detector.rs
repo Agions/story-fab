@@ -54,6 +54,27 @@ pub struct HighlightSegment {
     pub motion_score: Option<f32>,
 }
 
+impl HighlightSegment {
+    /// Factory: audio energy based highlight
+    fn audio(start_ms: u64, end_ms: u64, score: f32) -> Self {
+        Self { start_ms, end_ms, score, reason: "audio_energy".into(), audio_score: Some(score), scene_score: None, motion_score: None }
+    }
+
+    /// Factory: scene change based highlight
+    fn scene(start_ms: u64, end_ms: u64, score: f32) -> Self {
+        Self { start_ms, end_ms, score, reason: "scene_change".into(), audio_score: None, scene_score: Some(score), motion_score: None }
+    }
+
+    /// Merge another segment into this one (averaged scores, extended end).
+    fn combine_with(&mut self, other: &Self) {
+        self.end_ms = self.end_ms.max(other.end_ms);
+        self.score = (self.score + other.score) / 2.0;
+        self.reason = "combined".into();
+        self.audio_score = Some((self.audio_score.unwrap_or(other.score) + other.audio_score.unwrap_or(0.0)) / 2.0);
+        self.scene_score = Some((self.scene_score.unwrap_or(other.score) + other.scene_score.unwrap_or(0.0)) / 2.0);
+    }
+}
+
 /// Parameters for highlight detection
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -186,15 +207,7 @@ impl HighlightDetector {
                     .fold(0.0f32, |max, &e| max.max(e));
                 let score = ((peak_energy - mean_energy) / (std_energy.max(0.001))).clamp(0.0, 1.0) * 0.8 + 0.2;
 
-                Some(HighlightSegment {
-                    start_ms,
-                    end_ms,
-                    score,
-                    reason: "audio_energy".to_string(),
-                    audio_score: Some(score),
-                    scene_score: None,
-                    motion_score: None,
-                })
+                Some(HighlightSegment::audio(start_ms, end_ms, score))
             })
             .collect();
 
@@ -277,15 +290,7 @@ impl HighlightDetector {
                 if let (Some(start), Some(end)) = (current_start, current_end) {
                     let duration = end.saturating_sub(start);
                     if duration >= min_duration_ms {
-                        segments.push(HighlightSegment {
-                            start_ms: start,
-                            end_ms: end,
-                            score: current_max_score.min(1.0),
-                            reason: "scene_change".to_string(),
-                            audio_score: None,
-                            scene_score: Some(current_max_score.min(1.0)),
-                            motion_score: None,
-                        });
+                        segments.push(HighlightSegment::scene(start, end, current_max_score.min(1.0)));
                     }
                 }
                 current_start = Some(time_ms);
@@ -298,15 +303,7 @@ impl HighlightDetector {
         if let (Some(start), Some(end)) = (current_start, current_end) {
             let duration = end.saturating_sub(start);
             if duration >= min_duration_ms {
-                segments.push(HighlightSegment {
-                    start_ms: start,
-                    end_ms: end,
-                    score: current_max_score.min(1.0),
-                    reason: "scene_change".to_string(),
-                    audio_score: None,
-                    scene_score: Some(current_max_score.min(1.0)),
-                    motion_score: None,
-                });
+                segments.push(HighlightSegment::scene(start, end, current_max_score.min(1.0)));
             }
         }
 
@@ -354,19 +351,8 @@ impl HighlightDetector {
         let mut merged: Vec<HighlightSegment> = Vec::new();
         for seg in all_segments {
             if let Some(last) = merged.last_mut() {
-                // Overlap if seg.start is within last segment's range
                 if seg.start_ms <= last.end_ms {
-                    // Extend the end if needed
-                    last.end_ms = last.end_ms.max(seg.end_ms);
-                    // Combine scores (weighted average)
-                    last.score = (last.score + seg.score) / 2.0;
-                    last.reason = "combined".to_string();
-                    last.audio_score = Some(
-                        (last.audio_score.unwrap_or(seg.score) + seg.audio_score.unwrap_or(0.0)) / 2.0
-                    );
-                    last.scene_score = Some(
-                        (last.scene_score.unwrap_or(seg.score) + seg.scene_score.unwrap_or(0.0)) / 2.0
-                    );
+                    last.combine_with(&seg);
                     continue;
                 }
             }
