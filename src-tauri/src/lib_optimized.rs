@@ -6,6 +6,7 @@ use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time};
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::path::PathBuf;
 use std::process::Command;
 
 /// Typed segment for cut_video command — replaces raw serde_json::Value.
