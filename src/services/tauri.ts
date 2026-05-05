@@ -480,34 +480,48 @@ export const saveAppData = async <T>(key: string, data: T): Promise<boolean> => 
 };
 
 /**
- * 打开外部URL
- * @param url 要打开的URL
+/**
+ * Opens a URL externally with security checks
  * @returns 是否成功打开
  */
-export const openExternalUrl = async (url: string): Promise<boolean> => {
+const BLOCKED_PROTOCOLS = ['javascript:', 'data:', 'vbscript:', 'file:'];
+const ALLOWED_PROTOCOLS = ['http:', 'https:'];
+
+const isSafeUrl = (url: string): boolean => {
   try {
-    // 确保URL有效
-    let validUrl = url.trim();
-    
-    // 添加https前缀如果缺少协议
-    if (!validUrl.startsWith('http://') && !validUrl.startsWith('https://')) {
-      validUrl = 'https://' + validUrl;
-    }
-    
-    logger.info(`正在打开外部链接: ${validUrl}`);
-    await openExternal(validUrl);
+    const lower = url.toLowerCase();
+    if (BLOCKED_PROTOCOLS.some(p => lower.startsWith(p))) return false;
+    const urlObj = new URL(url);
+    return ALLOWED_PROTOCOLS.includes(urlObj.protocol);
+  } catch {
+    return false;
+  }
+};
+
+export const openExternalUrl = async (url: string): Promise<boolean> => {
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+
+  // Ensure https prefix
+  const withProtocol = trimmed.startsWith('http://') || trimmed.startsWith('https://')
+    ? trimmed
+    : `https://${trimmed}`;
+
+  // Security check: reject dangerous protocols
+  if (!isSafeUrl(withProtocol)) {
+    logger.error('openExternalUrl: blocked unsafe URL', { url: withProtocol });
+    return false;
+  }
+
+  try {
+    logger.info(`正在打开外部链接: ${withProtocol}`);
+    await openExternal(withProtocol);
     return true;
   } catch (error) {
     logger.error('打开外部链接失败:', error);
-    
-    // 降级处理：尝试使用window.open
+    // Fallback: try window.open (still protected by the protocol check above)
     try {
-      let validUrl = url.trim();
-      if (!validUrl.startsWith('http://') && !validUrl.startsWith('https://')) {
-        validUrl = 'https://' + validUrl;
-      }
-      
-      window.open(validUrl, '_blank', 'noopener,noreferrer');
+      window.open(withProtocol, '_blank', 'noopener,noreferrer');
       logger.info('通过window.open打开链接');
       return true;
     } catch (windowError) {
