@@ -4,8 +4,8 @@
  */
 import { CUT_DECK_STEPS } from './workflow.constants';
 
-// AI 功能类型
-export type AIFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
+// CutDeck 功能类型
+export type CutDeckFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
 
 // AI 剪辑流程步骤
 export type CutDeckStep = 
@@ -34,7 +34,7 @@ export interface CutDeckState {
   };
   
   // 当前选中的 AI 功能
-  selectedFeature: AIFeatureType;
+  selectedFeature: CutDeckFeatureType;
 
   // 项目信息
   project: import('../../../core/types').ProjectData | null;
@@ -105,7 +105,7 @@ export interface CutDeckState {
 export type CutDeckAction =
   | { type: 'SET_STEP'; payload: CutDeckStep }
   | { type: 'SET_STEP_COMPLETE'; payload: { step: CutDeckStep; complete: boolean } }
-  | { type: 'SET_FEATURE'; payload: AIFeatureType }
+  | { type: 'SET_FEATURE'; payload: CutDeckFeatureType }
   | { type: 'SET_PROJECT'; payload: import('../../../core/types').ProjectData | null }
   | { type: 'SET_VIDEO'; payload: import('../../../core/types').VideoInfo | null }
   | { type: 'SET_ANALYSIS'; payload: import('../../../core/types').VideoAnalysis | null }

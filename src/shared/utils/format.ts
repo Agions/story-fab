@@ -8,7 +8,7 @@
  * 用于视频播放器时间显示
  */
 export function formatTime(seconds: number): string {
-  if (isNaN(seconds) || seconds < 0) {
+  if (!isFinite(seconds) || seconds < 0) {
     return '00:00';
   }
 

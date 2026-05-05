@@ -17,7 +17,7 @@ import { notify } from '../../../../shared/utils/notify';
 import { formatDuration } from '../../../../shared/utils/formatting';
 import type { VideoInfo } from '@/core/types';
 import styles from './HighlightList.module.css';
-import { formatTime } from '@/components/common/timeUtils';
+import { formatTime } from '@/shared/utils/format';
 
 interface Highlight {
   startTime: number;  // seconds

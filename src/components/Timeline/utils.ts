@@ -1,5 +1,11 @@
 // Timeline 工具函数
 
+/**
+ * Shared time & ID generation utilities for Timeline components.
+ * formatTime: frames-level timecode (MM:SS:FF at 30fps)
+ * generateId: crypto.randomUUID-based collision-free IDs
+ */
+
 export function formatTime(ms: number): string {
   const totalSeconds = ms / 1000;
   const minutes = Math.floor(totalSeconds / 60);
@@ -8,11 +14,10 @@ export function formatTime(ms: number): string {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${frames.toString().padStart(2, '0')}`;
 }
 
-export function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
+export function generateId(prefix = 'clip'): string {
+  return `${prefix}-${crypto.randomUUID()}`;
 }
 
-export function generateId(prefix = 'clip'): string {
-  // crypto.randomUUID is collision-free; prefix is only for debugging readability
-  return `${prefix}-${crypto.randomUUID()}`;
+export function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }

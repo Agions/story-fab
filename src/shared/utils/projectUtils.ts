@@ -4,6 +4,10 @@
 
 import type { Project, ProjectStatus } from '@/core/types';
 
+// Re-export filter/sort from store (single source of truth)
+export { filterProjects, sortProjects } from '@/store/projectStore';
+export type { ProjectFilter, ProjectSortBy, SortOrder } from '@/store/projectStore';
+
 // Re-export formatting utilities
 export { formatFileSize as formatProjectSize, formatDuration as formatProjectDuration } from './format';
 
@@ -12,7 +16,7 @@ export { formatFileSize as formatProjectSize, formatDuration as formatProjectDur
  */
 export function createProject(data: Partial<Project> = {}): Project {
   const now = new Date().toISOString();
-  
+
   return {
     id: data.id || `project-${Date.now()}`,
     title: data.title || '新项目',
@@ -68,73 +72,3 @@ export function getStatusText(status: ProjectStatus): string {
   return texts[status] || status;
 }
 
-/**
- * 过滤项目
- */
-export function filterProjects(
-  projects: Project[],
-  filters: {
-    status?: ProjectStatus;
-    starred?: boolean;
-    tags?: string[];
-    search?: string;
-  }
-): Project[] {
-  let result = [...projects];
-  
-  if (filters.status) {
-    result = result.filter(p => p.status === filters.status);
-  }
-  
-  if (filters.starred !== undefined) {
-    result = result.filter(p => p.starred === filters.starred);
-  }
-  
-  if (filters.tags?.length) {
-    result = result.filter(p => 
-      filters.tags!.some(tag => p.tags.includes(tag))
-    );
-  }
-  
-  if (filters.search) {
-    const search = filters.search.toLowerCase();
-    result = result.filter(p => 
-      p.title.toLowerCase().includes(search) ||
-      p.description?.toLowerCase().includes(search)
-    );
-  }
-  
-  return result;
-}
-
-/**
- * 排序项目
- */
-export function sortProjects(
-  projects: Project[],
-  sortBy: 'updatedAt' | 'createdAt' | 'title' | 'duration',
-  order: 'asc' | 'desc' = 'desc'
-): Project[] {
-  const sorted = [...projects].sort((a, b) => {
-    let comparison = 0;
-    
-    switch (sortBy) {
-      case 'title':
-        comparison = a.title.localeCompare(b.title);
-        break;
-      case 'createdAt':
-        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        break;
-      case 'updatedAt':
-        comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-        break;
-      case 'duration':
-        comparison = a.duration - b.duration;
-        break;
-    }
-    
-    return order === 'asc' ? comparison : -comparison;
-  });
-  
-  return sorted;
-}
