@@ -215,6 +215,27 @@ jobs:
           path: dist/
           retention-days: 7
 
+  rust:
+    name: Rust Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - name: Cargo check
+        run: cd src-tauri && cargo check 2>&1
+      - name: Upload cargo report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cargo-report
+          path: src-tauri/target/
+          retention-days: 1
+
   reports:
     name: Quality Reports
     needs: [lint, typecheck, coverage]

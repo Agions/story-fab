@@ -354,18 +354,4 @@ function generateMockScenes(duration: number): Scene[] {
   return scenes;
 }
 
-function generateMockKeyframes(duration: number) {
-  const keyframes = [];
-  const count = Math.floor(duration / KEYFRAME_INTERVAL_SECONDS);
 
-  for (let i = 0; i < count; i++) {
-    keyframes.push({
-      id: crypto.randomUUID(),
-      timestamp: i * KEYFRAME_INTERVAL_SECONDS,
-      thumbnail: '',
-      description: `关键帧 ${i + 1}`
-    });
-  }
-
-  return keyframes;
-}
