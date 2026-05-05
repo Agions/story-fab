@@ -212,6 +212,7 @@ export interface AIModel {
   tokenLimit?: number;
   isPro?: boolean;
   isAvailable?: boolean;
+  apiConfigured?: boolean;
   pricing?: {
     input: number;
     output: number;

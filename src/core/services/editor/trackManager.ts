@@ -7,7 +7,7 @@
  */
 
 import type { Timeline, TimelineTrack, TrackType } from '../../types/timeline';
-import { syncLegacyTracks } from '../../types/timeline';
+import { createEmptyTimeline, syncLegacyTracks } from '../../types/timeline';
 import type { EditorConfig } from './types';
 import type { CreateTrackOptions } from './trackOperations';
 
@@ -99,22 +99,10 @@ export function generateTimelineFromScript(
     position: number
   ) => void
 ): Timeline {
-  // 遗留函数，保持原接口签名，内部实现已不推荐使用
-  return createEmptyTimelineLegacy();
+  // 遗留函数，保持原接口签名
+  return createEmptyTimeline();
 }
 
 function createEmptyTimelineLegacy(): Timeline {
-  const now = new Date().toISOString();
-  return {
-    id: `timeline_${Date.now()}`,
-    tracks: [],
-    duration: 0,
-    markers: [],
-    createdAt: now,
-    updatedAt: now,
-    videoTracks: [],
-    audioTracks: [],
-    textTracks: [],
-    effectTracks: [],
-  };
+  return createEmptyTimeline();
 }

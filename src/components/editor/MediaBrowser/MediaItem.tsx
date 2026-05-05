@@ -6,18 +6,12 @@
 import React, { memo, useCallback } from 'react';
 import { FileVideo, FileAudio, FileImage, FileText } from 'lucide-react';
 import type { MediaFile } from './MediaBrowserPanel';
+import { formatDuration } from '@/shared';
 
 interface MediaItemProps {
   item: MediaFile;
   onDoubleClick?: () => void;
   onDrag?: (e: React.DragEvent) => void;
-}
-
-function formatDuration(seconds?: number): string {
-  if (!seconds) return '';
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 const TYPE_ICONS = {

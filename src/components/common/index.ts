@@ -14,5 +14,4 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { motion, AnimatePresence } from './motion-shim';
 
 // Utilities
-export { formatTime } from './timeUtils';
 export { SelectField } from './SelectField';

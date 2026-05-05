@@ -389,7 +389,9 @@ export function getClipDuration(clip: TimelineClip): number {
   return clip.endMs - clip.startMs;
 }
 
-/** 创建空时间线 */
+/**
+ * 创建空时间线
+ */
 export function createEmptyTimeline(): Timeline {
   const now = new Date().toISOString();
   return {
@@ -399,7 +401,6 @@ export function createEmptyTimeline(): Timeline {
     markers: [],
     createdAt: now,
     updatedAt: now,
-    // 遗留字段初始化为空数组
     videoTracks: [],
     audioTracks: [],
     textTracks: [],
