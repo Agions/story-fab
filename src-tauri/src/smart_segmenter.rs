@@ -61,6 +61,22 @@ pub struct VideoSegment {
     pub silence_ratio: Option<f32>,
 }
 
+impl VideoSegment {
+    /// Factory: segment with given start/end, type, and optional overrides.
+    fn new(start_ms: u64, end_ms: u64, segment_type: impl Into<String>, confidence: f32, is_scene_change: Option<bool>) -> Self {
+        Self {
+            start_ms,
+            end_ms,
+            duration_ms: end_ms.saturating_sub(start_ms),
+            segment_type: segment_type.into(),
+            confidence,
+            is_scene_change,
+            peak_energy: None,
+            silence_ratio: None,
+        }
+    }
+}
+
 /// Parameters for smart segmentation
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -92,6 +108,12 @@ impl Default for SegmentOptions {
     }
 }
 
+impl SegmentOptions {
+    fn min_ms(&self) -> u64 { self.min_duration_ms.unwrap_or(1000) }
+    fn max_ms(&self) -> u64 { self.max_duration_ms.unwrap_or(30000) }
+    fn scene_thresh(&self) -> f32 { self.scene_threshold.unwrap_or(0.3) }
+}
+
 /// Smart video segmenter
 pub struct SmartSegmenter {
     ffmpeg_path: String,
@@ -109,8 +131,8 @@ impl SmartSegmenter {
     /// Perform smart segmentation on a video file
     pub fn smart_segment(&self, video_path: &str, options: &SegmentOptions) -> Vec<VideoSegment> {
         let opts = options.clone();
-        let min_duration_ms = opts.min_duration_ms.unwrap_or(1000) as u64;
-        let max_duration_ms = opts.max_duration_ms.unwrap_or(30000) as u64;
+        let min_duration_ms = opts.min_ms();
+        let max_duration_ms = opts.max_ms();
 
         // Step 1: Get video duration
         let duration_ms = match self.probe_duration_ms(video_path) {
@@ -140,8 +162,9 @@ impl SmartSegmenter {
         };
 
         // Step 4: Detect scene changes
+        let scene_threshold = opts.scene_thresh();
         let scene_changes = if opts.detect_transitions.unwrap_or(true) {
-            self.detect_scene_changes(video_path, opts.scene_threshold.unwrap_or(0.3))
+            self.detect_scene_changes(video_path, scene_threshold)
         } else {
             Vec::new()
         };
@@ -175,9 +198,9 @@ impl SmartSegmenter {
     }
 
     fn scene_based_segmentation(&self, video_path: &str, duration_ms: u64, opts: &SegmentOptions) -> Vec<VideoSegment> {
-        let min_duration_ms = opts.min_duration_ms.unwrap_or(1000) as u64;
-        let max_duration_ms = opts.max_duration_ms.unwrap_or(30000) as u64;
-        let scene_threshold = opts.scene_threshold.unwrap_or(0.3);
+        let min_duration_ms = opts.min_ms();
+        let max_duration_ms = opts.max_ms();
+        let scene_threshold = opts.scene_thresh();
 
         let scene_changes = self.detect_scene_changes(video_path, scene_threshold);
 
@@ -187,16 +210,7 @@ impl SmartSegmenter {
             let mut current = 0u64;
             while current < duration_ms {
                 let end = (current + max_duration_ms).min(duration_ms);
-                segments.push(VideoSegment {
-                    start_ms: current,
-                    end_ms: end,
-                    duration_ms: end - current,
-                    segment_type: "content".to_string(),
-                    confidence: 0.5,
-                    is_scene_change: Some(false),
-                    peak_energy: None,
-                    silence_ratio: None,
-                });
+                segments.push(VideoSegment::new(current, end, "content", 0.5, Some(false)));
                 current = end;
             }
             return segments;
@@ -208,32 +222,14 @@ impl SmartSegmenter {
 
         for change_time in scene_changes {
             if change_time > prev_end && change_time - prev_end >= min_duration_ms {
-                segments.push(VideoSegment {
-                    start_ms: prev_end,
-                    end_ms: change_time,
-                    duration_ms: change_time - prev_end,
-                    segment_type: "content".to_string(),
-                    confidence: 0.7,
-                    is_scene_change: Some(false),
-                    peak_energy: None,
-                    silence_ratio: None,
-                });
+                segments.push(VideoSegment::new(prev_end, change_time, "content", 0.7, Some(false)));
             }
             prev_end = change_time;
         }
 
         // Final segment
         if prev_end < duration_ms {
-            segments.push(VideoSegment {
-                start_ms: prev_end,
-                end_ms: duration_ms,
-                duration_ms: duration_ms.saturating_sub(prev_end),
-                segment_type: "content".to_string(),
-                confidence: 0.7,
-                is_scene_change: Some(false),
-                peak_energy: None,
-                silence_ratio: None,
-            });
+            segments.push(VideoSegment::new(prev_end, duration_ms, "content", 0.7, Some(false)));
         }
 
         segments
