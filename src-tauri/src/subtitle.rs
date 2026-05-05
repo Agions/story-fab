@@ -5,7 +5,6 @@
 
 use crate::binary::resolve_binary_path;
 use crate::utils::cmd_err;
-use anyhow::Context;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::process::Command;
