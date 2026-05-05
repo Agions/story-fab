@@ -6,6 +6,7 @@
 use crate::binary::resolve_binary_path;
 use crate::utils::{cmd_err, chrono_like_timestamp};
 use serde::{Deserialize, Serialize};
+use std::fs;
 use std::process::Command;
 
 /// Reason why a segment was identified as a highlight
@@ -331,6 +332,8 @@ impl HighlightDetector {
         if let Ok(audio_path) = self.extract_audio_path(video_path) {
             let audio_segments = self.detect_audio_highlights(&audio_path, &opts);
             all_segments.extend(audio_segments);
+            // Always cleanup temp audio, even on error
+            let _ = std::fs::remove_file(&audio_path);
         }
 
         // 2. Scene change highlights
@@ -398,16 +401,19 @@ impl HighlightDetector {
         }
 
         // Read PCM data
-        let pcm_data = std::fs::read(&temp_wav)
-            .map_err(|e| format!("Failed to read PCM from '{}': {}", temp_wav.display(), e))?;
+        let pcm_data = match std::fs::read(&temp_wav) {
+            Ok(d) => d,
+            Err(e) => {
+                let _ = std::fs::remove_file(&temp_wav);
+                return Err(format!("Failed to read PCM from '{}': {}", temp_wav.display(), e));
+            }
+        };
 
-        if let Err(e) = std::fs::remove_file(&temp_wav) {
-            log::warn!("Failed to remove temp PCM file '{}': {}", temp_wav.display(), e);
-        }
+        let _ = std::fs::remove_file(&temp_wav);
 
-        // Convert s16le to f32 normalized
+        // Convert s16le to f32 normalized — chunks (not _exact) for odd-length safety
         let samples: Vec<f32> = pcm_data
-            .chunks_exact(2)
+            .chunks(2)
             .map(|chunk| {
                 let s16 = i16::from_le_bytes([chunk[0], chunk[1]]);
                 s16 as f32 / 32768.0
