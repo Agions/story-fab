@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tokio::fs as tokio_fs;
 
+const EDGE_TTS_PATH: &str = "/home/ubuntu/.hermes/hermes-agent/venv/bin/edge-tts";
+
 // ─── AI Director ────────────────────────────────────────────────────────────
 
 #[tauri::command]
@@ -157,20 +159,7 @@ pub struct SynthesizeSpeechOutput {
     pub duration_secs: f64,
 }
 
-impl SynthesizeSpeechInput {
-    fn voice_id(&self) -> &str {
-        &self.voice
-    }
 
-    fn edge_rate_percent(&self) -> String {
-        let pct = ((self.speed - 1.0) * 100.0).round() as i32;
-        if pct > 0 {
-            format!("+{pct}%")
-        } else {
-            format!("{pct}%")
-        }
-    }
-}
 
 #[tauri::command]
 pub async fn synthesize_speech(
@@ -198,12 +187,13 @@ pub async fn synthesize_speech(
         .await
         .map_err(|e| format!("Failed to write text file: {e}"))?;
 
-    let edge_tts_path = "/home/ubuntu/.hermes/hermes-agent/venv/bin/edge-tts";
+    let mut cmd = tokio::process::Command::new(EDGE_TTS_PATH);
+    let rate = {
+        let pct = ((input.speed - 1.0) * 100.0).round() as i32;
+        if pct > 0 { format!("+{pct}%") } else { format!("{pct}%") }
+    };
+    let voice = &input.voice;
 
-    let rate = input.edge_rate_percent();
-    let voice = input.voice_id();
-
-    let mut cmd = tokio::process::Command::new(edge_tts_path);
     cmd.arg("--file").arg(&tmp_text_path);
     cmd.arg("--voice").arg(voice);
     cmd.arg("--rate").arg(&rate);
@@ -242,7 +232,7 @@ pub async fn list_tts_backends() -> Result<Vec<TtsBackendInfo>, String> {
     let mut backends = Vec::new();
 
     // Check Edge TTS
-    let edge_path = "/home/ubuntu/.hermes/hermes-agent/venv/bin/edge-tts";
+    let edge_path = EDGE_TTS_PATH;
     let edge_available = tokio::fs::metadata(edge_path).await.is_ok();
     if edge_available {
         backends.push(TtsBackendInfo {
@@ -326,7 +316,7 @@ pub async fn translate_text(text: String, from_lang: String, to_lang: String) ->
 
 #[tauri::command]
 pub async fn check_tts_available() -> Result<bool, String> {
-    let edge_tts_path = "/home/ubuntu/.hermes/hermes-agent/venv/bin/edge-tts";
+    let edge_tts_path = EDGE_TTS_PATH;
     let output = tokio::process::Command::new(edge_tts_path)
         .arg("--version")
         .output()
