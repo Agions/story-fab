@@ -9,7 +9,6 @@ pub mod commands;
 pub mod lib_optimized;
 pub mod types;
 pub mod utils;
-pub mod video_effects;
 pub mod subtitle;
 pub mod highlight_detector;
 pub mod smart_segmenter;
@@ -33,11 +32,6 @@ pub use commands::render::{
 };
 pub use lib_optimized::cut_video;
 
-// Video effects re-exports (from existing modules)
-pub use video_effects::{
-    apply_filter, apply_filter_chain, build_filter_chain, build_filtergraph, generate_chain_preview,
-    generate_filter_preview,
-};
 // Subtitle re-exports
 pub use subtitle::{
     check_faster_whisper, download_whisper_model, get_whisper_supported_languages,
@@ -88,13 +82,6 @@ pub fn run() {
             check_ffmpeg,
             analyze_video,
             run_ffprobe,
-            // Whisper subtitle transcription
-            build_filtergraph,
-            build_filter_chain,
-            apply_filter,
-            apply_filter_chain,
-            generate_filter_preview,
-            generate_chain_preview,
             // Whisper subtitle transcription
             subtitle::transcribe_audio,
             subtitle::check_faster_whisper,
