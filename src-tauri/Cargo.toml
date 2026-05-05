@@ -33,6 +33,7 @@ tokio = { version = "1", features = ["process", "rt-multi-thread", "fs"] }
 anyhow = "1"
 thiserror = "2"
 dirs = "6"
+parking_lot = "0.12"
 
 [profile.release]
 lto       = "thin"
