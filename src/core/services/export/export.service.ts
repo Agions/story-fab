@@ -7,9 +7,10 @@
 import { invoke } from '@tauri-apps/api/core';
 import { logger } from '../../../shared/utils/logging';
 
-// Re-export types from shared source
-export type { ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, ExportResult } from '../../export/types';
-export { EXPORT_PRESETS, FORMAT_INFO } from '../../export/types';
+import type { ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, ExportResult } from '../../export/types';
+import { EXPORT_PRESETS, FORMAT_INFO } from '../../export/types';
+export type { ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, ExportResult };
+export { EXPORT_PRESETS, FORMAT_INFO };
 
 export const FORMAT_MIME_TYPES: Record<ExportFormat, string> = {
   mp4: 'video/mp4',
