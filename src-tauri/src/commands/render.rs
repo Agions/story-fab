@@ -1,6 +1,6 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::types::{AutonomousRenderInput, TranscodeCropInput};
-use crate::utils::{chrono_like_timestamp, format_srt_time};
+use crate::utils::{chrono_like_timestamp, cmd_err, format_srt_time};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::process::Command;
@@ -72,7 +72,7 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
     if output.status.success() {
         Ok(input.output_path)
     } else {
-        Err(ff_err(&output, "裁切导出失败"))
+        Err(cmd_err("裁切导出失败", &output))
     }
 }
 
@@ -136,8 +136,7 @@ pub fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, Str
                 .output()
                 .map_err(|e| format!("执行 ffmpeg 切段失败: {e}"))?;
             if !output.status.success() {
-                let stderr = String::from_utf8_lossy(&output.stderr);
-                return Err(format!("切段失败: {stderr}"));
+                return Err(cmd_err("切段失败", &output));
             }
             temp_files.push(temp_file);
         }
@@ -181,10 +180,6 @@ pub fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, Str
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 /// Format an ffmpeg error from command output.
-fn ff_err(output: &std::process::Output, msg: &str) -> String {
-    format!("{msg}: {}", String::from_utf8_lossy(&output.stderr))
-}
-
 /// Append ffmpeg -ss / -t time-segment args to `cmd` from start/end Option<f64>.
 fn apply_time_segment(cmd: &mut std::process::Command, start: Option<f64>, end: Option<f64>) {
     if let Some(s) = start {
@@ -223,7 +218,7 @@ fn render_single_cut(input: &AutonomousRenderInput) -> Result<String, String> {
     if output.status.success() {
         Ok(input.output_path.clone())
     } else {
-        Err(ff_err(&output, "自动出片失败"))
+        Err(cmd_err("自动出片失败", &output))
     }
 }
 
@@ -387,7 +382,7 @@ fn apply_post_processing(
     if output.status.success() {
         Ok(())
     } else {
-        Err(ff_err(&output, "后处理失败"))
+        Err(cmd_err("后处理失败", &output))
     }
 }
 
@@ -432,7 +427,7 @@ fn merge_by_concat(
     if merge_output.status.success() {
         Ok(())
     } else {
-        Err(String::from_utf8_lossy(&merge_output.stderr).to_string())
+        Err(cmd_err("合并失败", &merge_output))
     }
 }
 
@@ -483,7 +478,7 @@ fn merge_with_transitions(
             .map_err(|e| format!("执行 ffmpeg xfade 失败: {e}"))?;
 
         if !output.status.success() {
-            return Err(String::from_utf8_lossy(&output.stderr).to_string());
+            return Err(cmd_err("xfade 失败", &output));
         }
 
         if current != temp_files[0] {
@@ -511,7 +506,7 @@ fn probe_duration(path: &PathBuf) -> Result<f64, String> {
         .output()
         .map_err(|e| format!("执行 ffprobe 失败: {e}"))?;
     if !output.status.success() {
-        return Err(String::from_utf8_lossy(&output.stderr).to_string());
+        return Err(cmd_err("probe 失败", &output));
     }
     let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
     text.parse::<f64>()
@@ -635,7 +630,7 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
         .map_err(|e| format!("生成预览失败: {e}"))?;
 
     if !output.status.success() {
-        return Err(ff_err(&output, "预览生成失败"));
+        return Err(cmd_err("预览生成失败", &output));
     }
 
     Ok(output_path_str)
