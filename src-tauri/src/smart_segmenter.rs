@@ -6,8 +6,6 @@
 use crate::binary::resolve_binary_path;
 use crate::utils::chrono_like_timestamp;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::path::PathBuf;
 use std::process::Command;
 
 /// Type of video segment
@@ -400,9 +398,9 @@ impl SmartSegmenter {
 
         // Don't forget the last segment
         if let Some(start) = segment_start {
-            if let Some((last_time, last_energy)) = energy_data.last() {
-                let duration = *last_energy - start as f32;
-                if duration >= min_duration_ms as f32 {
+            if let Some((last_time, _)) = energy_data.last() {
+                let duration = *last_time - start;
+                if duration >= min_duration_ms as u64 {
                     segments.push((start, *last_time));
                 }
             }

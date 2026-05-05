@@ -4,6 +4,41 @@ use crate::utils::{chrono_like_timestamp, format_srt_time};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::process::Command;
+use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+// ─── Active Export Cancellation Tracker ─────────────────────────────────────
+
+static ACTIVE_EXPORT: Mutex<Option<String>> = Mutex::new(None);
+static CANCEL_REQUESTED: AtomicBool = AtomicBool::new(false);
+
+fn enter_export(export_id: &str) {
+    let mut guard = ACTIVE_EXPORT.lock().unwrap();
+    *guard = Some(export_id.to_string());
+    CANCEL_REQUESTED.store(false, Ordering::SeqCst);
+}
+
+fn exit_export() {
+    let mut guard = ACTIVE_EXPORT.lock().unwrap();
+    *guard = None;
+}
+
+fn is_cancelled() -> bool {
+    CANCEL_REQUESTED.load(Ordering::SeqCst)
+}
+
+#[tauri::command]
+pub fn cancel_export(export_id: String) -> Result<(), String> {
+    let active = ACTIVE_EXPORT.lock().unwrap();
+    if *active == Some(export_id) {
+        CANCEL_REQUESTED.store(true, Ordering::SeqCst);
+        tracing::info!("取消导出已标记: {}", export_id);
+        Ok(())
+    } else {
+        tracing::warn!("取消导出失败: export_id {} 不匹配当前活动导出", export_id);
+        Err("导出不存在或已完成".to_string())
+    }
+}
 
 // ─── Transcode ──────────────────────────────────────────────────────────────
 
@@ -87,60 +122,69 @@ pub fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, Str
     }
 
     let mut temp_files: Vec<PathBuf> = Vec::new();
-    for (index, segment) in segments.iter().enumerate() {
-        let temp_file = temp_root.join(format!("seg_{index}.mp4"));
-        let duration = (segment.end - segment.start).max(0.1);
-        let output = Command::new(ffmpeg_binary())
-            .arg("-y")
-            .arg("-ss")
-            .arg(segment.start.to_string())
-            .arg("-t")
-            .arg(duration.to_string())
-            .arg("-i")
-            .arg(&input.input_path)
-            .arg("-c:v")
-            .arg("libx264")
-            .arg("-c:a")
-            .arg("aac")
-            .arg("-preset")
-            .arg("veryfast")
-            .arg("-movflags")
-            .arg("+faststart")
-            .arg(&temp_file)
-            .output()
-            .map_err(|e| format!("执行 ffmpeg 切段失败: {e}"))?;
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(format!("切段失败: {stderr}"));
+
+    let merge_ok = (|| {
+        for (index, segment) in segments.iter().enumerate() {
+            let temp_file = temp_root.join(format!("seg_{index}.mp4"));
+            let duration = (segment.end - segment.start).max(0.1);
+            let output = Command::new(ffmpeg_binary())
+                .arg("-y")
+                .arg("-ss")
+                .arg(segment.start.to_string())
+                .arg("-t")
+                .arg(duration.to_string())
+                .arg("-i")
+                .arg(&input.input_path)
+                .arg("-c:v")
+                .arg("libx264")
+                .arg("-c:a")
+                .arg("aac")
+                .arg("-preset")
+                .arg("veryfast")
+                .arg("-movflags")
+                .arg("+faststart")
+                .arg(&temp_file)
+                .output()
+                .map_err(|e| format!("执行 ffmpeg 切段失败: {e}"))?;
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                return Err(format!("切段失败: {stderr}"));
+            }
+            temp_files.push(temp_file);
         }
-        temp_files.push(temp_file);
+
+        if transition == "cut" || transition_duration <= 0.0 {
+            merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy())
+        } else {
+            merge_with_transitions(
+                &temp_root,
+                &temp_files,
+                &merged_output.to_string_lossy(),
+                &transition,
+                transition_duration,
+            )
+            .or_else(|_| merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy()))
+        }
+    })();
+
+    // Cleanup temp segment files (not merged_output — still needed for post-processing)
+    for file in temp_files {
+        let _ = std::fs::remove_file(file);
     }
 
-    let merge_result = if transition == "cut" || transition_duration <= 0.0 {
-        merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy())
-    } else {
-        merge_with_transitions(
-            &temp_root,
-            &temp_files,
-            &merged_output.to_string_lossy(),
-            &transition,
-            transition_duration,
-        )
-        .or_else(|_| merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy()))
-    };
-
-    if let Err(e) = merge_result {
+    if let Err(e) = merge_ok {
+        // Cleanup merged_output and temp_root even on merge failure
+        let _ = std::fs::remove_file(&merged_output);
+        let _ = std::fs::remove_dir(&temp_root);
         return Err(format!("自动出片合并失败: {e}"));
     }
 
     let post_result =
         apply_post_processing(&merged_output, &input, &temp_root, &input.output_path);
 
-    for file in temp_files {
-        let _ = std::fs::remove_file(file);
-    }
+    // Cleanup after post-processing is done
     let _ = std::fs::remove_file(&merged_output);
-    let _ = std::fs::remove_dir(temp_root);
+    let _ = std::fs::remove_dir(&temp_root);
 
     post_result.map(|_| input.output_path)
 }
@@ -566,7 +610,7 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
 
     let mut cmd = tokio::process::Command::new(ffmpeg_binary());
     cmd.arg("-y")
-        .arg("-ss").arg(input.segment_start.to_string())
+        .arg("-ss").arg(input.segment.start.to_string())
         .arg("-t").arg(duration.to_string())
         .arg("-i").arg(&input.input_path)
         .arg("-c:v").arg("libx264")
@@ -591,7 +635,8 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
 
     cmd.arg(&output_path_str);
 
-    let output = cmd.output().await
+    let output = cmd.output()
+        .await
         .map_err(|e| format!("生成预览失败: {e}"))?;
 
     if !output.status.success() {
