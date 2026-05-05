@@ -4,7 +4,7 @@
 //! to identify highlight moments without any external AI service.
 
 use crate::binary::resolve_binary_path;
-use crate::utils::{cmd_err, chrono_like_timestamp};
+use crate::utils::{cmd_err, chrono_like_timestamp, parse_scdet_output, pcm_samples_from_wav};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::process::Command;
@@ -224,54 +224,18 @@ impl HighlightDetector {
         let min_duration_ms = opts.min_duration_ms.unwrap_or(500);
         let top_n = opts.top_n.unwrap_or(10);
 
-        let temp_dir = std::env::temp_dir().join(format!("cutdeck_scdet_{}", chrono_like_timestamp()));
-        let _ = std::fs::create_dir_all(&temp_dir);
-        let output_file = temp_dir.join("scdet.txt");
-
-        // Run FFmpeg with scene detection filter
-        // Using freiware's scene detection (free, no license issues)
-        let filter = format!(
-            "scdet=threshold={:.2}:sc_pass=1:debug=0",
-            threshold
-        );
-
-        let output = Command::new(&self.ffmpeg_path)
+        let stderr = Command::new(&self.ffmpeg_path)
             .args(&[
                 "-hide_banner",
                 "-i", video_path,
-                "-vf", &filter,
-                "-f", "null",
-                "-"
+                "-vf", &format!("scdet=threshold={:.2}:sc_pass=1:debug=0", threshold),
+                "-f", "null", "-"
             ])
-            .output();
+            .output()
+            .map(|o| String::from_utf8_lossy(&o.stderr).into_owned())
+            .unwrap_or_default();
 
-        let stderr = output
-            .as_ref()
-            .map_or(String::new(), |o| String::from_utf8_lossy(&o.stderr).into_owned());
-
-        // Parse scene change timestamps from FFmpeg output
-        // FFmpeg scdet outputs: [scdet] <time> <score> <type>
-        let mut scene_changes: Vec<(u64, f32)> = Vec::new();
-
-        for line in stderr.lines() {
-            if line.contains("[scdet]") {
-                let parts: Vec<&str> = line.split_whitespace().collect();
-                if parts.len() >= 3 {
-                    // Try to parse time and score
-                    for (i, part) in parts.iter().enumerate() {
-                        if *part == "[scdet]" && i + 2 < parts.len() {
-                            if let Ok(time_secs) = parts[i + 1].parse::<f64>() {
-                                if let Ok(score) = parts[i + 2].parse::<f32>() {
-                                    let time_ms = (time_secs * 1000.0) as u64;
-                                    scene_changes.push((time_ms, score));
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        let scene_changes = parse_scdet_output(&stderr);
 
         // Merge nearby scene changes into segments
         let mut segments: Vec<HighlightSegment> = Vec::new();
@@ -299,8 +263,6 @@ impl HighlightDetector {
                 current_max_score = score;
             }
         }
-
-        // Don't forget the last segment
         if let (Some(start), Some(end)) = (current_start, current_end) {
             let duration = end.saturating_sub(start);
             if duration >= min_duration_ms {
@@ -308,15 +270,7 @@ impl HighlightDetector {
             }
         }
 
-        // Cleanup - warn if temp dir removal fails
-        if let Err(e) = std::fs::remove_dir_all(&temp_dir) {
-            log::warn!("Failed to remove temp dir '{}': {}", temp_dir.display(), e);
-        }
-
-        // Sort segments by score descending (most important first)
         segments.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
-
-        // Return top N highlights
         segments.into_iter().take(top_n).collect()
     }
 
@@ -387,9 +341,9 @@ impl HighlightDetector {
             .args(&[
                 "-y",
                 "-i", audio_path,
-                "-ac", "1",           // Mono
-                "-ar", "44100",       // 44.1kHz
-                "-f", "s16le",        // Signed 16-bit little-endian PCM
+                "-ac", "1",
+                "-ar", "44100",
+                "-f", "s16le",
                 "-acodec", "pcm_s16le",
                 &temp_wav.display(),
             ])
@@ -397,10 +351,10 @@ impl HighlightDetector {
             .map_err(|e| format!("FFmpeg failed to extract audio from '{}': {}", audio_path, e))?;
 
         if !output.status.success() {
+            let _ = std::fs::remove_file(&temp_wav);
             return Err(cmd_err("FFmpeg failed", &output));
         }
 
-        // Read PCM data
         let pcm_data = match std::fs::read(&temp_wav) {
             Ok(d) => d,
             Err(e) => {
@@ -408,19 +362,9 @@ impl HighlightDetector {
                 return Err(format!("Failed to read PCM from '{}': {}", temp_wav.display(), e));
             }
         };
-
         let _ = std::fs::remove_file(&temp_wav);
 
-        // Convert s16le to f32 normalized — chunks (not _exact) for odd-length safety
-        let samples: Vec<f32> = pcm_data
-            .chunks(2)
-            .map(|chunk| {
-                let s16 = i16::from_le_bytes([chunk[0], chunk[1]]);
-                s16 as f32 / 32768.0
-            })
-            .collect();
-
-        Ok(samples)
+        Ok(pcm_samples_from_wav(&pcm_data))
     }
 
     /// Compute Zero-Crossing Rate (ZCR) for audio burst detection.

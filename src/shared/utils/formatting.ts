@@ -25,27 +25,24 @@ export {
 export { formatTime as formatTimestamp } from './format';
 
 /**
- * 格式化秒数为 SRT 字幕时间码 (HH:MM:SS,mmm)
- * @param seconds 秒数
- * @returns SRT 时间码格式
+ * Shared factory for subtitle timecodes.
+ * @param seconds Seconds as float
+ * @param sep Separator between seconds and milliseconds (',' for SRT, '.' for VTT)
  */
-export const formatSrtTime = (seconds: number): string => {
+const subtitle_time = (seconds: number, sep: string): string => {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.floor(seconds % 60);
   const ms = Math.floor((seconds % 1) * 1000);
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}${sep}${ms.toString().padStart(3, '0')}`;
 };
 
 /**
- * 格式化秒数为 VTT 字幕时间码 (HH:MM:SS.mmm)
- * @param seconds 秒数
- * @returns VTT 时间码格式
+ * Format seconds as SRT timecode (HH:MM:SS,mmm)
  */
-export const formatVttTime = (seconds: number): string => {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  const ms = Math.floor((seconds % 1) * 1000);
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
-};
+export const formatSrtTime = (seconds: number): string => subtitle_time(seconds, ',');
+
+/**
+ * Format seconds as VTT timecode (HH:MM:SS.mmm)
+ */
+export const formatVttTime = (seconds: number): string => subtitle_time(seconds, '.');
