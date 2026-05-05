@@ -78,9 +78,32 @@ pub async fn analyze_video(path: String) -> Result<VideoMetadataResult, String> 
     Ok(VideoMetadataResult { duration, width, height, fps, codec, bitrate })
 }
 
+/// Allowed ffprobe argument prefixes (whitelist to prevent injection)
+const ALLOWED_FFPROBE_ARGS: &[&str] = &[
+    "-v", "-select_streams", "-show_entries", "-show_format", "-show_streams",
+    "-of", "-count_frames", "-i", "-sexagesimal", "-unit", "-prefix",
+    "-hide_banner", "-loglevel", "-threads", "-timeout",
+];
+
+/// Validate args are all in the whitelist (no -exec, -report, etc.)
+fn validate_ffprobe_args(args: &[String]) -> Result<(), String> {
+    for arg in args {
+        // Allow flag args (start with -)
+        if arg.starts_with('-') {
+            let is_allowed = ALLOWED_FFPROBE_ARGS.iter().any(|&p| arg == p || arg.starts_with(&format!("{p}=")));
+            if !is_allowed {
+                return Err(format!("ffprobe 不允许的参数: {}", arg));
+            }
+        }
+        // Non-flag args (file paths) are allowed
+    }
+    Ok(())
+}
+
 /// Run ffprobe with arbitrary args, returns raw stdout.
 #[tauri::command]
 pub async fn run_ffprobe(args: Vec<String>) -> Result<String, String> {
+    validate_ffprobe_args(&args)?;
     let output = tokio::process::Command::new(ffprobe_binary())
         .args(&args)
         .output()

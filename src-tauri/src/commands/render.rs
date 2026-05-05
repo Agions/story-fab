@@ -13,13 +13,14 @@ static ACTIVE_EXPORT: Mutex<Option<String>> = Mutex::new(None);
 static CANCEL_REQUESTED: AtomicBool = AtomicBool::new(false);
 
 fn enter_export(export_id: &str) {
-    let mut guard = ACTIVE_EXPORT.lock().unwrap();
+    // Poisoned guard: re-acquire to handle panics gracefully
+    let mut guard = ACTIVE_EXPORT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     *guard = Some(export_id.to_string());
     CANCEL_REQUESTED.store(false, Ordering::SeqCst);
 }
 
 fn exit_export() {
-    let mut guard = ACTIVE_EXPORT.lock().unwrap();
+    let mut guard = ACTIVE_EXPORT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     *guard = None;
 }
 
@@ -29,7 +30,7 @@ fn is_cancelled() -> bool {
 
 #[tauri::command]
 pub fn cancel_export(export_id: String) -> Result<(), String> {
-    let active = ACTIVE_EXPORT.lock().unwrap();
+    let active = ACTIVE_EXPORT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     if *active == Some(export_id) {
         CANCEL_REQUESTED.store(true, Ordering::SeqCst);
         tracing::info!("取消导出已标记: {}", export_id);
@@ -447,7 +448,7 @@ fn merge_with_transitions(
 
     for (index, next) in temp_files.iter().enumerate().skip(1) {
         let merged = temp_root.join(format!("xfade_{index}.mp4"));
-        let current_duration = probe_duration(&current).unwrap_or(2.0);
+        let current_duration = probe_duration(&current)?;
         let offset = (current_duration - transition_duration).max(0.1);
 
         let filter = format!(
@@ -488,8 +489,17 @@ fn merge_with_transitions(
     }
 
     std::fs::copy(&current, output_path).map_err(|e| format!("写入最终文件失败: {e}"))?;
-    if current != temp_files[0] {
-        let _ = std::fs::remove_file(current);
+
+    // Clean up: final merged result + all intermediate xfade files
+    let _ = std::fs::remove_file(&current);
+    if let Ok(entries) = std::fs::read_dir(temp_root) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name_str = name.to_string_lossy();
+            if name_str.starts_with("xfade_") && name_str.ends_with(".mp4") {
+                let _ = std::fs::remove_file(entry.path());
+            }
+        }
     }
     Ok(())
 }
@@ -634,16 +644,6 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
     }
 
     Ok(output_path_str)
-}
-
-// ─── Export Cancellation ──────────────────────────────────────────────────────
-
-#[tauri::command]
-pub fn cancel_export(_export_id: String) -> Result<(), String> {
-    // In a full implementation, this would signal an active export process to abort.
-    // For now, we just acknowledge the cancellation request.
-    tracing::info!("Export cancellation requested: {}", _export_id);
-    Ok(())
 }
 
 // ─── Temp File Cleanup ────────────────────────────────────────────────────────
