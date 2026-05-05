@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { VideoInfo, VideoAnalysis, Scene } from '@/core/types';
-import { delay } from '@/shared';
+import { delay, formatDuration } from '@/shared';
 import type { TaskStatusInfo } from '@/core/services/ai/types';
 
 export interface UseVideoReturn {
@@ -328,12 +328,6 @@ export function useVideo(): UseVideoReturn {
 }
 
 // 辅助函数
-function formatDuration(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
 function generateMockScenes(duration: number): Scene[] {
   const scenes: Scene[] = [];
   const sceneCount = Math.floor(duration / SCENE_DURATION_SECONDS);
