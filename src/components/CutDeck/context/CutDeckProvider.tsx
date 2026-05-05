@@ -3,7 +3,7 @@
  * 从 AIEditorContext.tsx 提取的 Provider 组件
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
-import type { CutDeckState, CutDeckStep, AIFeatureType, CutDeckAction } from '../types/workflow.types';
+import type { CutDeckState, CutDeckStep, CutDeckFeatureType, CutDeckAction } from '../types/workflow.types';
 import { initialState } from '../types/workflow.initialState';
 import { clipFlowReducer } from '../types/workflow.reducer';
 import { getNextStep, getPrevStep } from '../types/workflow.types';
@@ -16,7 +16,7 @@ interface CutDeckContextType {
   dispatch: React.Dispatch<CutDeckAction>;
   // 便捷方法
   setStep: (step: CutDeckStep) => void;
-  setFeature: (feature: AIFeatureType) => void;
+  setFeature: (feature: CutDeckFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
   setPlaying: (playing: boolean) => void;
@@ -29,6 +29,10 @@ interface CutDeckContextType {
   setVoice: (audioUrl: string | null, settings?: { voiceId?: string; speed?: number; volume?: number }) => void;
   setSynthesis: (videoUrl: string | null, settings?: { syncAudioVideo?: boolean; addSubtitles?: boolean; addWatermark?: boolean }) => void;
   setExportSettings: (settings: ExportSettings | null) => void;
+  setDuration: (duration: number) => void;
+  updateVideo: (updates: Partial<VideoInfo>) => void;
+  // Blob URL 清理
+  revokeVideoBlobUrl: () => void;
   // 流程控制
   goToNextStep: () => void;
   goToPrevStep: () => void;
@@ -51,12 +55,23 @@ interface CutDeckProviderProps {
 export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(clipFlowReducer, initialState);
 
+  // 追踪当前 blob URL，用于清理
+  const videoBlobUrlRef = React.useRef<string | null>(null);
+
+  // 清理 blob URL，防止内存泄漏
+  const revokeVideoBlobUrl = React.useCallback(() => {
+    if (videoBlobUrlRef.current) {
+      URL.revokeObjectURL(videoBlobUrlRef.current);
+      videoBlobUrlRef.current = null;
+    }
+  }, []);
+
   // 便捷方法 - 使用 useCallback 稳定函数引用
   const setStep = useCallback((step: CutDeckStep) => {
     dispatch({ type: 'SET_STEP', payload: step });
   }, []);
 
-  const setFeature = useCallback((feature: AIFeatureType) => {
+  const setFeature = useCallback((feature: CutDeckFeatureType) => {
     dispatch({ type: 'SET_FEATURE', payload: feature });
   }, []);
 
@@ -65,8 +80,23 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
   }, []);
 
   const setVideo = useCallback((video: VideoInfo | null) => {
+    // 清理旧的 blob URL
+    revokeVideoBlobUrl();
     dispatch({ type: 'SET_VIDEO', payload: video });
+  }, [revokeVideoBlobUrl]);
+
+  const setDuration = useCallback((duration: number) => {
+    dispatch({ type: 'SET_DURATION', payload: duration });
   }, []);
+
+  const updateVideo = useCallback((updates: Partial<VideoInfo>) => {
+    if (state.currentVideo) {
+      dispatch({
+        type: 'SET_VIDEO',
+        payload: { ...state.currentVideo, ...updates },
+      });
+    }
+  }, [state.currentVideo]);
 
   const setPlaying = useCallback((playing: boolean) => {
     dispatch({ type: 'SET_PLAYING', payload: playing });
@@ -120,8 +150,9 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
   }, [state.currentStep]);
 
   const reset = useCallback(() => {
+    revokeVideoBlobUrl();
     dispatch({ type: 'RESET' });
-  }, []);
+  }, [revokeVideoBlobUrl]);
 
   const resetStep = useCallback((step: CutDeckStep) => {
     dispatch({ type: 'RESET_STEP', payload: step });
@@ -157,6 +188,9 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     setVoice,
     setSynthesis,
     setExportSettings,
+    setDuration,
+    updateVideo,
+    revokeVideoBlobUrl,
     goToNextStep,
     goToPrevStep,
     reset,
@@ -180,6 +214,9 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     setVoice,
     setSynthesis,
     setExportSettings,
+    setDuration,
+    updateVideo,
+    revokeVideoBlobUrl,
     goToNextStep,
     goToPrevStep,
     reset,

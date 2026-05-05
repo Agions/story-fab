@@ -4,7 +4,7 @@
  */
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import type { CutDeckState, CutDeckStep, AIFeatureType } from '../types/workflow.types';
+import type { CutDeckState, CutDeckStep, CutDeckFeatureType } from '../types/workflow.types';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
 import { initialState } from '../types/workflow.initialState';
 import { getNextStep, getPrevStep } from '../types/workflow.types';
@@ -16,7 +16,7 @@ export interface CutDeckStore extends CutDeckState {
   // Setters
   setStep: (step: CutDeckStep) => void;
   setStepComplete: (step: CutDeckStep, complete: boolean) => void;
-  setFeature: (feature: AIFeatureType) => void;
+  setFeature: (feature: CutDeckFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
   setAnalysis: (analysis: VideoAnalysis | null) => void;
