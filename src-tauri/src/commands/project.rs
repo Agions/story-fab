@@ -1,11 +1,10 @@
-use crate::types::AutonomousRenderInput;
 use crate::utils::chrono_like_timestamp;
 use std::path::PathBuf;
 use tauri::Manager;
 use tokio::fs as tokio_fs;
 
-#[tauri::command]
-pub async fn check_app_data_directory(app: tauri::AppHandle) -> Result<String, String> {
+/// Returns (app_data_dir, cutdeck_dir). Creates CutDeck subdir if needed.
+async fn get_cutdeck_dir(app: &tauri::AppHandle) -> Result<(PathBuf, PathBuf), String> {
     let app_dir = app
         .path()
         .app_data_dir()
@@ -14,6 +13,12 @@ pub async fn check_app_data_directory(app: tauri::AppHandle) -> Result<String, S
     tokio_fs::create_dir_all(&cutdeck_dir)
         .await
         .map_err(|e| format!("创建目录失败: {e}"))?;
+    Ok((app_dir, cutdeck_dir))
+}
+
+#[tauri::command]
+pub async fn check_app_data_directory(app: tauri::AppHandle) -> Result<String, String> {
+    let (_, cutdeck_dir) = get_cutdeck_dir(&app).await?;
     Ok(cutdeck_dir.to_string_lossy().to_string())
 }
 
@@ -23,16 +28,8 @@ pub async fn save_project_file(
     project_id: String,
     content: String,
 ) -> Result<(), String> {
-    let app_dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let cutdeck_dir = app_dir.join("CutDeck");
-    tokio_fs::create_dir_all(&cutdeck_dir)
-        .await
-        .map_err(|e| format!("创建目录失败: {e}"))?;
-    let mut target_path = PathBuf::from(&cutdeck_dir);
-    target_path.push(format!("{project_id}.json"));
+    let (_, cutdeck_dir) = get_cutdeck_dir(&app).await?;
+    let target_path = cutdeck_dir.join(format!("{project_id}.json"));
     tokio_fs::write(&target_path, content)
         .await
         .map_err(|e| format!("写入项目文件失败: {e}"))?;
@@ -44,11 +41,7 @@ pub async fn load_project_file(
     app: tauri::AppHandle,
     project_id: String,
 ) -> Result<String, String> {
-    let app_dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let cutdeck_dir = app_dir.join("CutDeck");
+    let (_, cutdeck_dir) = get_cutdeck_dir(&app).await?;
     let target_path = cutdeck_dir.join(format!("{project_id}.json"));
     tokio_fs::read_to_string(&target_path)
         .await
@@ -60,11 +53,7 @@ pub async fn delete_project_file(
     app: tauri::AppHandle,
     project_id: String,
 ) -> Result<(), String> {
-    let app_dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let cutdeck_dir = app_dir.join("CutDeck");
+    let (_, cutdeck_dir) = get_cutdeck_dir(&app).await?;
     let target_path = cutdeck_dir.join(format!("{project_id}.json"));
     if target_path.exists() {
         tokio_fs::remove_file(&target_path)
@@ -78,14 +67,7 @@ pub async fn delete_project_file(
 pub async fn list_project_files(
     app: tauri::AppHandle,
 ) -> Result<Vec<serde_json::Value>, String> {
-    let app_dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let cutdeck_dir = app_dir.join("CutDeck");
-    tokio_fs::create_dir_all(&cutdeck_dir)
-        .await
-        .map_err(|e| format!("创建目录失败: {e}"))?;
+    let (_, cutdeck_dir) = get_cutdeck_dir(&app).await?;
 
     let mut result: Vec<serde_json::Value> = Vec::new();
     let mut entries =
@@ -144,10 +126,7 @@ pub async fn list_app_data_files(
     app: tauri::AppHandle,
     directory: String,
 ) -> Result<Vec<String>, String> {
-    let app_dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
+    let (app_dir, _) = get_cutdeck_dir(&app).await?;
     let target_dir = app_dir.join(directory);
     tokio_fs::create_dir_all(&target_dir)
         .await

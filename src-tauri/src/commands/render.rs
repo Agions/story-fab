@@ -535,8 +535,8 @@ fn build_overlay_enable_expr(overlays: &[crate::types::AutonomousOverlayMarker])
 }
 
 struct OverlayLayout {
-    x: String,
-    y: String,
+    x: &'static str,
+    y: &'static str,
     scale: f64,
 }
 
@@ -545,24 +545,16 @@ fn pick_overlay_layout_for_marker(
     index: usize,
 ) -> OverlayLayout {
     match marker.label.as_str() {
-        "corner-tr" => OverlayLayout { x: "W-w-16".to_string(), y: "16".to_string(), scale: 0.20 },
-        "corner-tl" => OverlayLayout { x: "16".to_string(), y: "16".to_string(), scale: 0.20 },
-        "corner-br" => OverlayLayout { x: "W-w-16".to_string(), y: "H-h-16".to_string(), scale: 0.20 },
+        "corner-tr" => OverlayLayout { x: "W-w-16", y: "16", scale: 0.20 },
+        "corner-tl" => OverlayLayout { x: "16", y: "16", scale: 0.20 },
+        "corner-br" => OverlayLayout { x: "W-w-16", y: "H-h-16", scale: 0.20 },
         "anchor" => {
-            let positions = ["H*0.7", "H*0.5", "H*0.3", "H*0.65", "H*0.35"];
-            OverlayLayout {
-                x: "W*0.82".to_string(),
-                y: positions[index % positions.len()].to_string(),
-                scale: 0.26,
-            }
+            const ANCHOR_Y: [&str; 5] = ["H*0.7", "H*0.5", "H*0.3", "H*0.65", "H*0.35"];
+            OverlayLayout { x: "W*0.82", y: ANCHOR_Y[index % 5], scale: 0.26 }
         }
         _ => {
-            let x_positions = ["W*0.05", "W*0.78", "W*0.05", "W*0.78"];
-            OverlayLayout {
-                x: x_positions[index % x_positions.len()].to_string(),
-                y: "H*0.72".to_string(),
-                scale: 0.22,
-            }
+            const DEFAULT_X: [&str; 4] = ["W*0.05", "W*0.78", "W*0.05", "W*0.78"];
+            OverlayLayout { x: DEFAULT_X[index % 4], y: "H*0.72", scale: 0.22 }
         }
     }
 }
