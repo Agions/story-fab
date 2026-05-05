@@ -8,6 +8,9 @@ import { logger } from '../shared/utils/logging';
 import { formatTime } from '../shared/utils/formatting';
 import { getConfigDir } from './file/fileOperations';
 
+const errMsg = (err: unknown): string =>
+  err instanceof Error ? err.message : String(err);
+
 type ProjectFileData = {
   aiModel?: {
     apiKey?: string;
@@ -84,7 +87,7 @@ export const ensureAppDataDir = async (): Promise<void> => {
       dirExists = await exists(appDir, { baseDir: BaseDirectory.AppData });
     } catch (existsError) {
       logger.error('检查目录是否存在时出错', { existsError });
-      throw new Error(`检查目录出错: ${existsError instanceof Error ? existsError.message : '未知错误'}`);
+      throw new Error(`检查目录出错: ${errMsg(existsError)}`);
     }
     
     if (!dirExists) {
@@ -93,7 +96,7 @@ export const ensureAppDataDir = async (): Promise<void> => {
         await mkdir(appDir, { baseDir: BaseDirectory.AppData, recursive: true });
       } catch (createError) {
         logger.error('创建目录失败', { createError });
-        throw new Error(`创建目录失败: ${createError instanceof Error ? createError.message : '未知错误'}`);
+        throw new Error(`创建目录失败: ${errMsg(createError)}`);
       }
       
       // 验证目录是否创建成功
@@ -104,7 +107,7 @@ export const ensureAppDataDir = async (): Promise<void> => {
         }
       } catch (verifyError) {
         logger.error('验证目录是否创建成功时出错', { verifyError });
-        throw new Error(`验证目录出错: ${verifyError instanceof Error ? verifyError.message : '未知错误'}`);
+        throw new Error(`验证目录出错: ${errMsg(verifyError)}`);
       }
       logger.info('应用数据目录创建成功');
     }
@@ -201,7 +204,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
         return;
       } catch (backupErr) {
         logger.error('备用保存也失败', { backupErr });
-        const writeErrMessage = writeErr instanceof Error ? writeErr.message : '未知错误';
+        const writeErrMessage = errMsg(writeErr);
         throw new Error(`文件写入失败: ${writeErrMessage}`);
       }
     }
@@ -215,8 +218,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
       logger.info('验证文件存在: 成功');
     } catch (verifyErr) {
       logger.error('验证文件存在时出错:', verifyErr);
-      const verifyErrMessage = verifyErr instanceof Error ? verifyErr.message : '未知错误';
-      throw new Error(`无法验证文件是否保存成功: ${verifyErrMessage}`);
+        throw new Error(`无法验证文件是否保存成功: ${errMsg(verifyErr)}`);
     }
     
     emitProjectsChanged();
