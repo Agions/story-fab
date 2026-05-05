@@ -9,7 +9,12 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tokio::fs as tokio_fs;
 
-const EDGE_TTS_PATH: &str = "/home/ubuntu/.hermes/hermes-agent/venv/bin/edge-tts";
+const DEFAULT_EDGE_TTS: &str = "/usr/bin/edge-tts";
+
+/// Resolve edge-tts path: CUTDECK_EDGE_TTS_PATH env > DEFAULT_EDGE_TTS
+fn edge_tts_path() -> String {
+    std::env::var("CUTDECK_EDGE_TTS_PATH").unwrap_or_else(|_| DEFAULT_EDGE_TTS.to_string())
+}
 
 /// Compute mean of an iterator of f64, returning 0.0 for empty input.
 fn mean_f64<I: IntoIterator<Item = f64>>(iter: I) -> f64 {
@@ -188,7 +193,7 @@ pub async fn synthesize_speech(
         .await
         .map_err(|e| format!("Failed to write text file: {e}"))?;
 
-    let mut cmd = tokio::process::Command::new(EDGE_TTS_PATH);
+    let mut cmd = tokio::process::Command::new(edge_tts_path());
     let rate = {
         let pct = ((input.speed - 1.0) * 100.0).round() as i32;
         if pct > 0 { format!("+{pct}%") } else { format!("{pct}%") }
@@ -232,7 +237,7 @@ pub async fn list_tts_backends() -> Result<Vec<TtsBackendInfo>, String> {
     let mut backends = Vec::new();
 
     // Check Edge TTS
-    let edge_path = EDGE_TTS_PATH;
+    let edge_path = edge_tts_path();
     let edge_available = tokio::fs::metadata(edge_path).await.is_ok();
     if edge_available {
         backends.push(TtsBackendInfo {
@@ -316,7 +321,7 @@ pub async fn translate_text(text: String, from_lang: String, to_lang: String) ->
 
 #[tauri::command]
 pub async fn check_tts_available() -> Result<bool, String> {
-    let edge_tts_path = EDGE_TTS_PATH;
+    let edge_tts_path = edge_tts_path();
     let output = tokio::process::Command::new(edge_tts_path)
         .arg("--version")
         .output()
