@@ -233,8 +233,7 @@ impl HighlightDetector {
 
         let stderr = output
             .as_ref()
-            .map(|o| String::from_utf8_lossy(&o.stderr).to_string())
-            .unwrap_or_default();
+            .map_or(String::new(), |o| String::from_utf8_lossy(&o.stderr).into_owned());
 
         // Parse scene change timestamps from FFmpeg output
         // FFmpeg scdet outputs: [scdet] <time> <score> <type>
@@ -403,7 +402,7 @@ impl HighlightDetector {
                 "-ar", "44100",       // 44.1kHz
                 "-f", "s16le",        // Signed 16-bit little-endian PCM
                 "-acodec", "pcm_s16le",
-                &temp_wav.to_string_lossy(),
+                &temp_wav.display(),
             ])
             .output()
             .map_err(|e| format!("FFmpeg failed to extract audio from '{}': {}", audio_path, e))?;
@@ -546,7 +545,7 @@ impl HighlightDetector {
                 "-acodec", "pcm_s16le",
                 "-ar", "44100",
                 "-ac", "1",
-                &temp_audio.to_string_lossy(),
+                &temp_audio.display(),
             ])
             .output()
             .map_err(|e| format!("FFmpeg audio extraction failed: {}", e))?;
@@ -557,7 +556,7 @@ impl HighlightDetector {
             return Err(String::from_utf8_lossy(&output.stderr).to_string());
         }
 
-        Ok(temp_audio.to_string_lossy().to_string())
+        Ok(temp_audio.display().to_string())
     }
 }
 

@@ -85,7 +85,7 @@ pub fn list_whisper_models() -> Vec<WhisperModelInfo> {
                 name: name.to_string(),
                 size: size.to_string(),
                 is_downloaded: path.exists(),
-                path: path.exists().then(|| path.to_string_lossy().to_string()),
+                path: path.exists().then(|| path.display().to_string()),
             }
         })
         .collect()
@@ -182,8 +182,8 @@ pub async fn transcribe_audio(
     model_size: Option<String>,
     language: Option<String>,
 ) -> Result<SubtitleResult, String> {
-    let model = model_size.unwrap_or_else(|| "base".to_string());
-    let lang = language.unwrap_or_else(|| "auto".to_string());
+    let model = model_size.unwrap_or_else(|| "base".into());
+    let lang = language.unwrap_or_else(|| "auto".into());
 
     log::info!(
         "[CutDeck] Starting transcription: path={}, model={}, lang={}",
@@ -224,7 +224,7 @@ pub async fn transcribe_audio(
 
     let final_audio_path = temp_wav
         .as_ref()
-        .map(|p| p.to_string_lossy().to_string())
+        .map(|p| p.display().to_string())
         .unwrap_or_else(|| audio_path.clone());
 
     // Emit progress: audio ready
