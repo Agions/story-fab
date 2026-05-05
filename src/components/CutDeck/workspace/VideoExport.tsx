@@ -113,10 +113,8 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
 
       // 实际调用 Rust render_autonomous_cut
       const result = await invoke<string>('render_autonomous_cut', {
-        input: {
-          input: state.synthesisData.finalVideoUrl ?? '',
-          outputPath,
-        },
+        input_path: state.synthesisData.finalVideoUrl ?? '',
+        output_path: outputPath,
       });
 
       setProgress(100);
