@@ -14,7 +14,7 @@ pub(crate) fn resolve_binary_path(binary_name: &str) -> String {
             if let Some(parent) = ffmpeg.parent() {
                 let probe = parent.join("ffprobe");
                 if probe.exists() {
-                    return probe.to_string_lossy().to_string();
+                    return probe.display().to_string();
                 }
             }
         }
@@ -24,7 +24,7 @@ pub(crate) fn resolve_binary_path(binary_name: &str) -> String {
     for dir in common_dirs {
         let candidate = Path::new(dir).join(binary_name);
         if candidate.exists() {
-            return candidate.to_string_lossy().to_string();
+            return candidate.display().to_string();
         }
     }
 
