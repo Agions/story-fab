@@ -4,7 +4,7 @@
 //! dialogue detection, and motion analysis — all without external AI services.
 
 use crate::binary::resolve_binary_path;
-use crate::utils::{cmd_err, chrono_like_timestamp};
+use crate::utils::{cmd_err, chrono_like_timestamp, parse_scdet_output, pcm_samples_from_wav};
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 
@@ -236,38 +236,21 @@ impl SmartSegmenter {
     }
 
     fn detect_scene_changes(&self, video_path: &str, threshold: f32) -> Vec<u64> {
-        // Use FFmpeg scene detection filter
-        let output = Command::new(&self.ffmpeg_path)
+        let stderr = Command::new(&self.ffmpeg_path)
             .args(&[
                 "-hide_banner",
                 "-i", video_path,
                 "-vf", &format!("scdet=threshold={:.2}", threshold),
                 "-f", "null", "-"
             ])
-            .output();
-
-        let stderr = output
-            .as_ref()
+            .output()
             .map(|o| String::from_utf8_lossy(&o.stderr).to_string())
             .unwrap_or_default();
 
-        let mut scene_changes = Vec::new();
-        for line in stderr.lines() {
-            if line.contains("[scdet]") {
-                let parts: Vec<&str> = line.split_whitespace().collect();
-                for (i, part) in parts.iter().enumerate() {
-                    if *part == "[scdet]" && i + 1 < parts.len() {
-                        if let Ok(time_secs) = parts[i + 1].parse::<f64>() {
-                            scene_changes.push((time_secs * 1000.0) as u64);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-
-        scene_changes.sort();
-        scene_changes
+        parse_scdet_output(&stderr)
+            .into_iter()
+            .map(|(ms, _)| ms)
+            .collect()
     }
 
     fn extract_audio(&self, video_path: &str) -> Result<String, String> {
@@ -318,10 +301,7 @@ impl SmartSegmenter {
     }
 
     fn extract_pcm(&self, audio_path: &str) -> Result<Vec<f32>, String> {
-        let temp_pcm = std::env::temp_dir()
-            .join(format!("cutdeck_pcm_{}.raw", chrono_like_timestamp()));
-
-        let output = Command::new(&self.ffmpeg_path)
+        let pcm_data = Command::new(&self.ffmpeg_path)
             .args(&[
                 "-y",
                 "-i", audio_path,
@@ -332,35 +312,27 @@ impl SmartSegmenter {
             .output()
             .map_err(|e| format!("FFmpeg failed: {}", e))?;
 
-        if !output.status.success() {
-            return Err(cmd_err("FFmpeg failed", &output));
+        if !pcm_data.status.success() {
+            return Err(cmd_err("FFmpeg failed", &pcm_data));
         }
 
         // Write to temp file to avoid memory issues with large files
-        std::fs::write(&temp_pcm, &output.stdout)
-            .map_err(|e| format!("Write PCM failed: {}", e))?;
+        let temp_pcm = std::env::temp_dir()
+            .join(format!("cutdeck_pcm_{}.raw", chrono_like_timestamp()));
+        if let Err(e) = std::fs::write(&temp_pcm, &pcm_data.stdout) {
+            return Err(format!("Write PCM failed: {}", e));
+        }
 
-        let pcm_data = match std::fs::read(&temp_pcm) {
+        let raw = match std::fs::read(&temp_pcm) {
             Ok(d) => d,
             Err(e) => {
                 let _ = std::fs::remove_file(&temp_pcm);
                 return Err(format!("Read PCM failed: {}", e));
             }
         };
-
-        // Always cleanup temp file, even on parse failure
         let _ = std::fs::remove_file(&temp_pcm);
 
-        // chunks (not _exact) — last partial chunk is safely dropped
-        let samples: Vec<f32> = pcm_data
-            .chunks(2)
-            .map(|chunk| {
-                let s16 = i16::from_le_bytes([chunk[0], chunk[1]]);
-                s16 as f32 / 32768.0
-            })
-            .collect();
-
-        Ok(samples)
+        Ok(pcm_samples_from_wav(&raw))
     }
 
     fn segment_by_energy(&self, energy_data: Vec<(u64, f32)>, min_duration_ms: u64, max_duration_ms: u64) -> Vec<(u64, u64)> {

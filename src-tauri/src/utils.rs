@@ -51,3 +51,37 @@ pub(crate) fn format_srt_time(seconds: f64) -> String {
     let millis = total_ms % 1000;
     format!("{:02}:{:02}:{:02},{:03}", hours, minutes, secs, millis)
 }
+
+/// Convert s16le PCM bytes to normalized f32 samples.
+/// Uses `chunks(2)` (not `_exact`) to safely drop any trailing partial chunk.
+pub fn pcm_samples_from_wav(pcm_data: &[u8]) -> Vec<f32> {
+    pcm_data
+        .chunks(2)
+        .map(|chunk| {
+            let s16 = i16::from_le_bytes([chunk[0], chunk[1]]);
+            s16 as f32 / 32768.0
+        })
+        .collect()
+}
+
+/// Parse FFmpeg scdet stderr output, returning Vec of (time_ms, score).
+pub fn parse_scdet_output(stderr: &str) -> Vec<(u64, f32)> {
+    let mut scene_changes = Vec::new();
+    for line in stderr.lines() {
+        if line.contains("[scdet]") {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            for (i, part) in parts.iter().enumerate() {
+                if *part == "[scdet]" && i + 2 < parts.len() {
+                    if let (Ok(time_secs), Ok(score)) = (
+                        parts[i + 1].parse::<f64>(),
+                        parts[i + 2].parse::<f32>(),
+                    ) {
+                        scene_changes.push(((time_secs * 1000.0) as u64, score));
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    scene_changes
+}
