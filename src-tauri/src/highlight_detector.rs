@@ -4,6 +4,7 @@
 //! to identify highlight moments without any external AI service.
 
 use crate::binary::resolve_binary_path;
+use crate::utils::chrono_like_timestamp;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -552,6 +553,8 @@ impl HighlightDetector {
             .map_err(|e| format!("FFmpeg audio extraction failed: {}", e))?;
 
         if !output.status.success() {
+            // Cleanup temp file on failure
+            let _ = std::fs::remove_file(&temp_audio);
             return Err(String::from_utf8_lossy(&output.stderr).to_string());
         }
 
@@ -564,18 +567,6 @@ impl Default for HighlightDetector {
         Self::new()
     }
 }
-
-fn chrono_like_timestamp() -> String {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let ms = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_millis())
-        .unwrap_or(0);
-    // Add a short random suffix to avoid same-ms collisions
-    let rand = (ms ^ 0x5de66e6c0_u128) & 0xffffff_u128;
-    format!("{:x}_{:06x}", ms, rand)
-}
-
 
 // ──────────────────────────────────────────────────────────────────
 // highlight_detector.rs — get_highlights helper: sort segments by score (descending)
