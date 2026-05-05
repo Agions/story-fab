@@ -95,7 +95,7 @@ impl VideoProcessor {
         let width = video_stream["width"].as_u64().unwrap_or(0) as u32;
         let height = video_stream["height"].as_u64().unwrap_or(0) as u32;
         let codec = video_stream["codec_name"].as_str().unwrap_or("unknown").to_string();
-        let fps = Self::parse_fraction(video_stream["r_frame_rate"].as_str().unwrap_or("0/1"));
+        let fps = parse_fraction(video_stream["r_frame_rate"].as_str().unwrap_or("0/1"));
 
         // Audio info
         let audio_stream = data["streams"]
@@ -302,10 +302,6 @@ impl VideoProcessor {
         let _ = fs::remove_dir_all(&temp_dir);
 
         Ok(output_path)
-    }
-
-    fn parse_fraction(s: &str) -> f64 {
-        parse_fraction(s)
     }
 
     pub fn detect_hw_accel(&self) -> Option<String> {
