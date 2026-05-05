@@ -18,32 +18,49 @@ import {
 } from 'lucide-react';
 import { useCutDeck } from '@/components/CutDeck/context';
 import type { VideoInfo } from '@/core/types';
+import type { CutPoint, ClipSuggestion } from '@/core/interfaces';
 import { notify, formatTime } from '@/shared';
 import styles from '@/components/AIVideoPreview.module.less';
 
-const Text = ({ children, type, strong, style, title, className }: { children: React.ReactNode; type?: string; strong?: boolean; style?: React.CSSProperties; title?: string; className?: string }) => {
-  const classNames = [className, type === 'secondary' ? 'text-muted-foreground' : undefined].filter(Boolean).join(' ') || undefined;
-  return strong ? <strong className={classNames} style={style} title={title}>{children}</strong> : <span className={classNames} style={style} title={title}>{children}</span>;
-};
+// Re-expose compat aliases for consumers that reference them by that name
+export type ClipSuggestionCompat = ClipSuggestion;
+export type CutPointCompat = CutPoint;
 
-interface ClipSuggestionCompat {
-  id: string;
-  description: string;
-  confidence: number;
-}
-
-interface CutPointCompat {
-  id: string;
-  timestamp: number;
-  type: 'scene' | 'silence' | 'highlight';
-  description: string;
-}
-
-interface ClipResultCompat {
+export interface ClipResultCompat {
   suggestions: ClipSuggestionCompat[];
   cutPoints: CutPointCompat[];
   segments: Array<{ id: string }>;
 }
+
+const Text = ({
+  children,
+  type,
+  strong,
+  style,
+  title,
+  className,
+}: {
+  children: React.ReactNode;
+  type?: string;
+  strong?: boolean;
+  style?: React.CSSProperties;
+  title?: string;
+  className?: string;
+}) => {
+  const classNames =
+    [className, type === 'secondary' ? 'text-muted-foreground' : undefined]
+      .filter(Boolean)
+      .join(' ') || undefined;
+  return strong ? (
+    <strong className={classNames} style={style} title={title}>
+      {children}
+    </strong>
+  ) : (
+    <span className={classNames} style={style} title={title}>
+      {children}
+    </span>
+  );
+};
 
 const AIVideoPreview: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -60,13 +77,19 @@ const AIVideoPreview: React.FC = () => {
       cutPoints: scenes.map((scene, index) => ({
         id: scene.id || `scene-${index}`,
         timestamp: scene.startTime,
-        type: 'scene',
-        description: scene.description || `场景 ${index + 1}`
+        type: 'scene' as const,
+        description: scene.description || `场景 ${index + 1}`,
+        confidence: scene.confidence ?? 0.8,
       })),
       suggestions: scenes.slice(0, 5).map((scene, index) => ({
         id: scene.id || `suggestion-${index}`,
         description: scene.description || `建议保留 ${formatTime(scene.startTime)} 的关键片段`,
-        confidence: Number(scene.confidence ?? 0.8)
+        confidence: Number(scene.confidence ?? 0.8),
+        startTime: scene.startTime,
+        endTime: scene.endTime,
+        type: 'trim' as const,
+        reason: 'AI scene analysis',
+        autoApplicable: false,
       }))
     };
   }, [analysis]);

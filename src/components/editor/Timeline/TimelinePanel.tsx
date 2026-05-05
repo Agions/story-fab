@@ -16,6 +16,7 @@ import { TimelineRuler } from './TimelineRuler';
 import { TimelineTrack } from './TimelineTrack';
 import { TimelineScrubber } from './TimelineScrubber';
 import { useInterval } from '@/hooks';
+import { formatTimecode } from '@/shared/utils';
 import type { ClipData } from './TimelineClip';
 
 export interface TimelineTrackData {
@@ -43,14 +44,6 @@ const TRACK_NAMES = {
 const MIN_ZOOM = 10;
 const MAX_ZOOM = 200;
 const DEFAULT_ZOOM = 50;
-
-function formatTimecode(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  const f = Math.floor((seconds % 1) * 30);
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}:${f.toString().padStart(2, '0')}`;
-}
 
 export const TimelinePanel: React.FC<TimelinePanelProps> = ({
   tracks: initialTracks,

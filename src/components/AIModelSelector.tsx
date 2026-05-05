@@ -124,7 +124,7 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = React.memo(({
     return candidateModels.filter(model => {
       if (activeCategory !== 'all' && !model.category.includes(activeCategory)) return false;
       if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+        const query = searchQuery.trim().toLowerCase();
         return (
           model.name.toLowerCase().includes(query) ||
           model.provider.toLowerCase().includes(query) ||
@@ -273,7 +273,7 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = React.memo(({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger className="text-xs text-muted-foreground">
-                          <Zap /> {(model.tokenLimit / 1000).toFixed(0)}K tokens
+                          <Zap /> {((model.tokenLimit ?? 4096) / 1000).toFixed(0)}K tokens
                         </TooltipTrigger>
                         <TooltipContent>模型可处理的最大上下文长度</TooltipContent>
                       </Tooltip>
@@ -311,7 +311,7 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = React.memo(({
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger className="flex items-center gap-0.5">
-                            <Zap /> {(model.tokenLimit / 1000).toFixed(0)}K
+                            <Zap /> {((model.tokenLimit ?? 4096) / 1000).toFixed(0)}K
                           </TooltipTrigger>
                           <TooltipContent>模型可处理的最大上下文长度</TooltipContent>
                         </Tooltip>

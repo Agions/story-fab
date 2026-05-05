@@ -205,15 +205,245 @@ export const MODEL_VERIFICATION: Record<string, ModelVerificationMeta> = {
   'spark-3.5': { checkedAt: '2026-05-03', source: 'xfyun.cn/doc/spark/Web.html', verified: true },
 };
 
+/**
+ * 模型选择启发式算法
+ *
+ * 根据任务类型 + 内容特征（长度/复杂度）自动推荐最佳模型，
+ * 考虑 tokenLimit + trim 策略，避免内容截断。
+ *
+ * 启发式规则：
+ * 1. 短内容 + 快速任务 → 高性价比模型（gpt-4o-mini / qwen3.6-flash）
+ * 2. 长内容 → 大 contextWindow 模型（gemini-2.5-pro / kimi-k2.6）
+ * 3. 高复杂度 → 高智能模型（claude-opus-4.7 / gpt-5.5）
+ * 4. 超长内容 → 启用 trim 策略，选择支持超长上下文的模型
+ */
+
+/** 内容特征 */
+export interface ContentProfile {
+  /** 预估 token 数量 */
+  estimatedTokens: number;
+  /** 是否为多模态内容（包含图像/视频） */
+  isMultimodal: boolean;
+  /** 语言复杂度：simple=日常对话，normal=普通文章，complex=技术/专业 */
+  complexity: 'simple' | 'normal' | 'complex';
+}
+
+/** 任务类型 */
+export type TaskType = 'script' | 'analysis' | 'code' | 'fast' | 'video';
+
+export interface ModelSelectionHint {
+  modelId: string;
+  reason: string;
+  needsTrim: boolean;
+  trimRatio: number; // 0-1，建议裁剪比例
+  score: number; // 0-100，适配度
+}
+
+/**
+ * 预估内容所需 token
+ * 中文约 1.5 tokens/字，英文约 0.25 tokens/词
+ */
+export function estimateContentTokens(text: string, isEnglish: boolean = false): number {
+  if (isEnglish) {
+    const words = text.trim().split(/\s+/).length;
+    return Math.round(words * 1.3); // 英文词→token 约 1.3x
+  }
+  return Math.round(text.length * 1.5); // 中文约 1.5 tokens/字
+}
+
+/**
+ * 根据内容特征 + 任务类型，选择最佳模型
+ * 
+ * @param taskType 任务类型
+ * @param profile 内容特征
+ * @returns 最佳模型 ID + 原因 + 是否需要 trim
+ */
+export function selectOptimalModel(
+  taskType: TaskType,
+  profile: ContentProfile,
+): ModelSelectionHint {
+  const { estimatedTokens, isMultimodal, complexity } = profile;
+
+  // 宽松系数：当预估可能不准确时，给足够 buffer
+  const SAFETY_BUFFER = 1.2;
+  const effectiveTokens = estimatedTokens * SAFETY_BUFFER;
+
+  // 任务 → 推荐模型列表（已按优先级排序）
+  const taskModelIds: Record<TaskType, string[]> = {
+    script:    ['gpt-5.5', 'claude-opus-4.7', 'qwen3.6-plus', 'kimi-k2.6', 'gpt-4o'],
+    analysis:  ['gpt-5.5', 'gemini-2.5-pro', 'claude-opus-4.7', 'qwen3.6-max-preview', 'gpt-4o'],
+    code:      ['o3', 'claude-sonnet-4.6', 'deepseek-v4-pro', 'deepseek-v4-flash'],
+    fast:      ['qwen3.6-flash', 'gpt-5.4-mini', 'glm-5-turbo', 'deepseek-v4-flash'],
+    video:     ['gpt-5.5', 'gemini-2.5-pro', 'kimi-k2.6', 'gpt-4o'],
+  };
+
+  const candidateIds = taskModelIds[taskType] || taskModelIds.script;
+
+  // 如果是多模态任务，排除不支持的模型
+  const multimodalExcludes = ['o3', 'o3-mini', 'deepseek-v4-flash', 'deepseek-v4-pro'];
+  const candidates = isMultimodal
+    ? candidateIds.filter(id => !multimodalExcludes.includes(id))
+    : candidateIds;
+
+  let bestHint: ModelSelectionHint | null = null;
+
+  for (const modelId of candidates) {
+    const model = getModelById(modelId);
+    if (!model) continue;
+
+    // 检查 tokenLimit 是否足够
+    const tokenLimit = model.tokenLimit ?? model.contextWindow ?? 0;
+    const maxTokens = model.maxTokens ?? tokenLimit;
+
+    if (maxTokens === 0) continue;
+
+    let score = 50; // 基础分
+    let needsTrim = false;
+    let trimRatio = 0;
+
+    // Token 不足检测
+    if (effectiveTokens > maxTokens) {
+      needsTrim = true;
+      trimRatio = Math.min(1, maxTokens / effectiveTokens);
+      score = Math.max(0, 100 - (1 - trimRatio) * 80); // 截断风险越大分数越低
+    } else {
+      // 宽松范围内，给高分
+      const headroom = (maxTokens - effectiveTokens) / maxTokens;
+      score = 60 + Math.min(40, headroom * 50);
+    }
+
+    // 复杂度加成：高复杂度任务倾向于更智能的模型
+    if (complexity === 'complex' && model.isPro) {
+      score = Math.min(100, score + 15);
+    }
+
+    // 超长内容特殊处理：优先选择大 contextWindow 模型并启用 trim
+    if (estimatedTokens > 100000 && tokenLimit >= 1000000) {
+      score = Math.min(100, score + 20);
+    }
+
+    if (!bestHint || score > bestHint.score) {
+      bestHint = {
+        modelId,
+        reason: buildReason(model, effectiveTokens, maxTokens, taskType, complexity),
+        needsTrim,
+        trimRatio,
+        score: Math.round(score),
+      };
+    }
+  }
+
+  // Fallback：如果所有推荐模型都 token 不足，选择支持最长上下文的模型
+  if (!bestHint) {
+    const fallback = AI_MODELS
+      .filter(m => (m.tokenLimit ?? 0) > 0)
+      .sort((a, b) => (b.tokenLimit ?? 0) - (a.tokenLimit ?? 0))[0];
+    if (fallback) {
+      bestHint = {
+        modelId: fallback.id,
+        reason: `Fallback：选择最大上下文模型 ${fallback.name}（${(fallback.tokenLimit ?? 0) / 1000}K）`,
+        needsTrim: true,
+        trimRatio: Math.max(0, 1 - estimatedTokens / (fallback.tokenLimit ?? 1)),
+        score: 20,
+      };
+    }
+  }
+
+  return bestHint ?? { modelId: 'gpt-4o', reason: '默认选择', needsTrim: false, trimRatio: 0, score: 50 };
+}
+
+/**
+ * 生成选择原因描述
+ */
+function buildReason(
+  model: AIModel,
+  effectiveTokens: number,
+  maxTokens: number,
+  taskType: TaskType,
+  complexity: ContentProfile['complexity'],
+): string {
+  const tokenLimitK = ((model.tokenLimit ?? 0) / 1000).toFixed(0);
+  const effectiveK = (effectiveTokens / 1000).toFixed(0);
+
+  if (effectiveTokens > maxTokens) {
+    return `⚠️ 内容 ${effectiveK}K > 模型上限 ${tokenLimit}K，将自动 trim`;
+  }
+
+  const complexityStr = complexity === 'complex' ? '复杂' : complexity === 'simple' ? '简单' : '';
+  const taskLabels: Record<TaskType, string> = {
+    script: '脚本生成', analysis: '视频分析', code: '代码任务', fast: '快速响应', video: '视频理解'
+  };
+
+  return `${taskLabels[taskType]}${complexityStr} → ${model.name}（${tokenLimit}K 上限，剩余 ${Math.round((1 - effectiveTokens / maxTokens) * 100)}%）`;
+}
+
+/**
+ * 批量推荐多个模型（用于展示推荐列表）
+ */
+export function recommendModelsForTask(
+  taskType: TaskType,
+  profile: ContentProfile,
+  limit: number = 5,
+): ModelSelectionHint[] {
+  const { estimatedTokens, isMultimodal } = profile;
+
+  const taskModelIds: Record<TaskType, string[]> = {
+    script:    ['gpt-5.5', 'claude-opus-4.7', 'qwen3.6-plus', 'kimi-k2.6', 'gpt-4o', 'gemini-2.5-pro'],
+    analysis:  ['gpt-5.5', 'gemini-2.5-pro', 'claude-opus-4.7', 'qwen3.6-max-preview', 'gpt-4o'],
+    code:      ['o3', 'claude-sonnet-4.6', 'deepseek-v4-pro', 'deepseek-v4-flash', 'gpt-5.4'],
+    fast:      ['qwen3.6-flash', 'gpt-5.4-mini', 'glm-5-turbo', 'deepseek-v4-flash'],
+    video:     ['gpt-5.5', 'gemini-2.5-pro', 'kimi-k2.6', 'gpt-4o'],
+  };
+
+  const multimodalExcludes = ['o3', 'o3-mini', 'deepseek-v4-flash', 'deepseek-v4-pro'];
+  const candidateIds = (taskModelIds[taskType] || taskModelIds.script)
+    .filter(id => !isMultimodal || !multimodalExcludes.includes(id));
+
+  const hints: ModelSelectionHint[] = [];
+
+  for (const modelId of candidateIds) {
+    const model = getModelById(modelId);
+    if (!model) continue;
+
+    const tokenLimit = model.tokenLimit ?? model.contextWindow ?? 0;
+    const maxTokens = model.maxTokens ?? tokenLimit;
+
+    if (maxTokens === 0) continue;
+
+    const effectiveTokens = estimatedTokens * 1.2;
+    const needsTrim = effectiveTokens > maxTokens;
+    const trimRatio = needsTrim ? Math.min(1, maxTokens / effectiveTokens) : 0;
+
+    // 计算适配度分数
+    let score = 60;
+    if (needsTrim) {
+      score = Math.max(0, 100 - (1 - trimRatio) * 80);
+    } else {
+      const headroom = (maxTokens - effectiveTokens) / maxTokens;
+      score = 60 + Math.min(40, headroom * 50);
+    }
+
+    hints.push({
+      modelId,
+      reason: buildReason(model, estimatedTokens * 1.2, maxTokens, taskType, profile.complexity),
+      needsTrim,
+      trimRatio,
+      score: Math.round(score),
+    });
+  }
+
+  return hints
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
 // =============================================================================
 // AI 模型列表（全部来自真实 API / 官方文档，2026-05）
 // =============================================================================
 
 export const AI_MODELS: AIModel[] = [
-  // ========== OpenAI ==========
   {
     id: 'gpt-5.5',
-    name: 'GPT-5.5',
     provider: 'openai',
     category: ['text', 'code', 'image', 'video'],
     description: 'OpenAI 最新旗舰模型（2026），支持多模态输入，适合视频素材分析与解说文案生成。',

@@ -8,6 +8,9 @@ export * from './notify';
 // Re-export formatting functions from format.ts for backwards compatibility
 export { formatFileSize, formatRelativeTime } from './format';
 
+// Timecode formatting
+export { formatTimecode, formatTimecodeSimple } from './timecode';
+
 /**
  * 防抖函数
  */
@@ -61,7 +64,7 @@ export function deepClone<T>(obj: T): T {
 }
 
 /**
- * 生成唯一 ID
+ * 生成唯一 ID（通用版，时间戳+随机数）
  */
 export function generateId(prefix?: string): string {
   const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
