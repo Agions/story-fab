@@ -1,4 +1,5 @@
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{SystemTime, UNIX_EPOCH, Instant};
 
 pub fn parse_fraction(value: &str) -> f64 {
     if let Some((num, den)) = value.split_once('/') {
@@ -13,12 +14,18 @@ pub fn parse_fraction(value: &str) -> f64 {
 }
 
 /// Returns timestamp with random suffix to avoid collisions (for temp file names)
+static TS_COUNTER: AtomicU64 = AtomicU64::new(0);
+
 pub fn chrono_like_timestamp() -> String {
     let ms = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_millis())
+        .map(|d| d.as_millis() as u64)
         .unwrap_or(0);
-    let rand = (ms ^ 0x5de66e6c0_u128) & 0xffffff_u128;
+    // Counter ensures uniqueness even on sub-ms rapid retries
+    let counter = TS_COUNTER.fetch_add(1, Ordering::Relaxed);
+    let nano = Instant::now().elapsed().as_nanos() as u64;
+    // Mix counter + nanoseconds into rand bits (not crypto-strong, just collision-resistant)
+    let rand = (ms ^ counter ^ nano) & 0xffffff_u64;
     format!("{:x}_{:06x}", ms, rand)
 }
 
