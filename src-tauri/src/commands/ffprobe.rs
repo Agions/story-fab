@@ -1,6 +1,17 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::types::{FFmpegCheckResult, VideoMetadataResult};
 use crate::utils::parse_fraction;
+use serde_json::Value;
+
+/// Extract a string from a JSON value, or None.
+fn json_str(v: &Value, key: &str) -> Option<String> {
+    v.get(key)?.as_str().map(String::from)
+}
+
+/// Parse a u64 from a JSON string field, or None.
+fn json_parse_u64(v: &Value, key: &str) -> Option<u64> {
+    json_str(v, key)?.parse().ok()
+}
 
 #[tauri::command]
 pub async fn check_ffmpeg() -> Result<FFmpegCheckResult, String> {
@@ -68,33 +79,13 @@ pub async fn analyze_video(path: String) -> Result<VideoMetadataResult, String> 
 
     let width = stream.get("width").and_then(|v| v.as_u64()).unwrap_or(0) as u32;
     let height = stream.get("height").and_then(|v| v.as_u64()).unwrap_or(0) as u32;
-    let codec = stream
-        .get("codec_name")
-        .and_then(|v| v.as_str())
-        .unwrap_or("unknown")
-        .to_string();
-    let fps = parse_fraction(
-        stream
-            .get("r_frame_rate")
-            .and_then(|v| v.as_str())
-            .unwrap_or("0/1"),
-    );
+    let codec = stream.get("codec_name").and_then(|v| v.as_str()).unwrap_or("unknown").to_string();
+    let fps = parse_fraction(stream.get("r_frame_rate").and_then(|v| v.as_str()).unwrap_or("0/1"));
 
     let format = payload.get("format").cloned().unwrap_or(serde_json::Value::Null);
-    let duration = format
-        .get("duration")
-        .and_then(|v| v.as_str())
-        .and_then(|v| v.parse::<f64>().ok())
-        .unwrap_or(0.0);
-
-    let stream_bitrate = stream
-        .get("bit_rate")
-        .and_then(|v| v.as_str())
-        .and_then(|v| v.parse::<u64>().ok());
-    let format_bitrate = format
-        .get("bit_rate")
-        .and_then(|v| v.as_str())
-        .and_then(|v| v.parse::<u64>().ok());
+    let duration = json_parse_u64(&format, "duration").map(|v| v as f64).unwrap_or(0.0);
+    let stream_bitrate = json_parse_u64(stream, "bit_rate");
+    let format_bitrate = json_parse_u64(&format, "bit_rate");
     let bitrate = stream_bitrate.or(format_bitrate).unwrap_or(0);
 
     Ok(VideoMetadataResult { duration, width, height, fps, codec, bitrate })
