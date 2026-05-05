@@ -72,8 +72,7 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
     if output.status.success() {
         Ok(input.output_path)
     } else {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        Err(format!("裁切导出失败: {stderr}"))
+        Err(ff_err(&output, "裁切导出失败"))
     }
 }
 
@@ -181,6 +180,11 @@ pub fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, Str
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
+/// Format an ffmpeg error from command output.
+fn ff_err(output: &std::process::Output, msg: &str) -> String {
+    format!("{msg}: {}", String::from_utf8_lossy(&output.stderr))
+}
+
 /// Append ffmpeg -ss / -t time-segment args to `cmd` from start/end Option<f64>.
 fn apply_time_segment(cmd: &mut std::process::Command, start: Option<f64>, end: Option<f64>) {
     if let Some(s) = start {
@@ -219,8 +223,7 @@ fn render_single_cut(input: &AutonomousRenderInput) -> Result<String, String> {
     if output.status.success() {
         Ok(input.output_path.clone())
     } else {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        Err(format!("自动出片失败: {stderr}"))
+        Err(ff_err(&output, "自动出片失败"))
     }
 }
 
@@ -384,8 +387,7 @@ fn apply_post_processing(
     if output.status.success() {
         Ok(())
     } else {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        Err(format!("后处理失败: {stderr}"))
+        Err(ff_err(&output, "后处理失败"))
     }
 }
 
@@ -633,10 +635,7 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
         .map_err(|e| format!("生成预览失败: {e}"))?;
 
     if !output.status.success() {
-        return Err(format!(
-            "预览生成失败: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
+        return Err(ff_err(&output, "预览生成失败"));
     }
 
     Ok(output_path_str)
