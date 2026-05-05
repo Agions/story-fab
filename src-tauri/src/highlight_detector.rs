@@ -421,7 +421,7 @@ impl HighlightDetector {
         }
         if in_burst && !zcr_values.is_empty() {
             let start_ms = timestamps[start_idx];
-            let end_ms = *timestamps.last().unwrap();
+            let end_ms = *timestamps.last().unwrap_or(&0);
             if end_ms > start_ms + 200 {
                 let peak_zcr = zcr_values[start_idx..].iter().fold(0.0f32, |m, v| m.max(*v));
                 bursts.push((start_ms, end_ms, peak_zcr / zcr_threshold.max(0.001)));
