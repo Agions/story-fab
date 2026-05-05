@@ -6,8 +6,6 @@
 use crate::binary::resolve_binary_path;
 use crate::utils::chrono_like_timestamp;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::path::PathBuf;
 use std::process::Command;
 
 /// Reason why a segment was identified as a highlight
@@ -213,6 +211,7 @@ impl HighlightDetector {
         let top_n = opts.top_n.unwrap_or(10);
 
         let temp_dir = std::env::temp_dir().join(format!("cutdeck_scdet_{}", chrono_like_timestamp()));
+        let _ = std::fs::create_dir_all(&temp_dir);
         let output_file = temp_dir.join("scdet.txt");
 
         // Run FFmpeg with scene detection filter
