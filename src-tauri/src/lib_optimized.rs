@@ -43,7 +43,7 @@ impl VideoProcessor {
             .or_else(|_| {
                 if let Ok(ffmpeg_dir) = std::env::var("CUTDECK_FFMPEG_PATH") {
                     let parent = PathBuf::from(&ffmpeg_dir).parent();
-                    parent.map(|p| p.join("ffprobe").to_string_lossy().to_string())
+                    parent.map(|p| p.join("ffprobe").display().to_string())
                 } else {
                     None
                 }
@@ -179,7 +179,7 @@ impl VideoProcessor {
         let result: Vec<String> = frames
             .into_iter()
             .take(max_frames as usize)
-            .map(|p| p.to_string_lossy().to_string())
+            .map(|p| p.display().to_string())
             .collect();
 
         // Cleanup
@@ -297,7 +297,7 @@ impl VideoProcessor {
         }
 
         // Cleanup temp dir on success (keep only the output file path)
-        let output_path = output.to_string_lossy().to_string();
+        let output_path = output.display().to_string();
         let _ = fs::remove_dir_all(&temp_dir);
 
         Ok(output_path)
