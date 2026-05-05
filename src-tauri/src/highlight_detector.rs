@@ -318,7 +318,7 @@ impl HighlightDetector {
         }
 
         // Sort segments by score descending (most important first)
-        sort_segments_by_score_desc(&mut segments);
+        segments.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
 
         // Return top N highlights
         segments.into_iter().take(top_n).collect()
@@ -568,8 +568,3 @@ impl Default for HighlightDetector {
     }
 }
 
-// ──────────────────────────────────────────────────────────────────
-// highlight_detector.rs — get_highlights helper: sort segments by score (descending)
-fn sort_segments_by_score_desc(segments: &mut Vec<HighlightSegment>) {
-    segments.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
-}
