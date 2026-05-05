@@ -145,6 +145,9 @@ pub async fn download_whisper_model(model_size: String) -> Result<String, String
 /// Extract audio from video file to a temporary WAV (16kHz mono) for whisper
 fn extract_audio_to_wav(video_path: &str, output_wav: &Path) -> Result<(), String> {
     let ffmpeg = resolve_binary_path("ffmpeg");
+    if ffmpeg.is_empty() {
+        return Err("无法定位 ffmpeg，请设置 CUTDECK_FFMPEG_PATH 环境变量".to_string());
+    }
     let output = Command::new(&ffmpeg)
         .args([
             "-y",                      // overwrite

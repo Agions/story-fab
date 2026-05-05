@@ -289,11 +289,24 @@ impl VideoProcessor {
             return Err(cmd_err("生成失败", &result));
         }
 
-        // Cleanup temp dir on success (keep only the output file path)
-        let output_path = output.display().to_string();
-        let _ = fs::remove_dir_all(&temp_dir);
+        // Move thumb.jpg out of temp_dir before cleanup
+        // temp_dir is deleted, so we must extract the file first
+        let thumb_data = fs::read(&output)
+            .map_err(|e| {
+                let _ = fs::remove_dir_all(&temp_dir);
+                format!("读取缩略图失败: {}", e)
+            })?;
 
-        Ok(output_path)
+        let final_path = std::env::temp_dir()
+            .join(format!("cutdeck_thumb_{}.jpg", chrono_like_timestamp()));
+        fs::write(&final_path, &thumb_data)
+            .map_err(|e| {
+                let _ = fs::remove_dir_all(&temp_dir);
+                format!("保存缩略图失败: {}", e)
+            })?;
+
+        let _ = fs::remove_dir_all(&temp_dir);
+        Ok(final_path.display().to_string())
     }
 
     pub fn detect_hw_accel(&self) -> Option<String> {
