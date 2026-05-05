@@ -1,6 +1,10 @@
 use std::path::{Path, PathBuf};
 
 pub(crate) fn resolve_binary_path(binary_name: &str) -> String {
+    // Guard against empty input — Command::new("") panics
+    if binary_name.is_empty() {
+        return binary_name.to_string();
+    }
     let env_key = format!("CUTDECK_{}_PATH", binary_name.to_uppercase());
     if let Ok(path) = std::env::var(&env_key) {
         if !path.trim().is_empty() && Path::new(&path).exists() {
