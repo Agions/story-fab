@@ -2,7 +2,7 @@
 // All commands create a fresh VideoProcessor instance per call to avoid
 // shared-state issues in a single-threaded Tauri handler environment.
 
-use crate::utils::{chrono_like_timestamp, parse_fraction};
+use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -55,14 +55,7 @@ impl VideoProcessor {
 
     pub fn check_installed(&self) -> (bool, Option<String>) {
         match Command::new(&self.ffmpeg_path).arg("-version").output() {
-            Ok(out) if out.status.success() => {
-                let version = String::from_utf8_lossy(&out.stdout)
-                    .lines()
-                    .next()
-                    .map(|s| s.to_string())
-                    .or_else(|| String::from_utf8_lossy(&out.stderr).lines().next().map(|s| s.to_string()));
-                (true, version)
-            }
+            Ok(out) if out.status.success() => (true, cmd_first_line(&out)),
             _ => (false, None),
         }
     }
@@ -79,7 +72,7 @@ impl VideoProcessor {
             .map_err(|e| format!("运行 ffprobe 失败: {}", e))?;
 
         if !output.status.success() {
-            return Err(format!("ffprobe 失败: {}", String::from_utf8_lossy(&output.stderr)));
+            return Err(cmd_err("ffprobe 失败", &output));
         }
 
         let data: serde_json::Value = serde_json::from_slice(&output.stdout)
@@ -158,7 +151,7 @@ impl VideoProcessor {
 
         if !output.status.success() {
             fs::remove_dir_all(&temp_dir).ok();
-            return Err(format!("提取失败: {}", String::from_utf8_lossy(&output.stderr)));
+            return Err(cmd_err("提取失败", &output));
         }
 
         // Collect frames
@@ -220,7 +213,7 @@ impl VideoProcessor {
             .map_err(|e| format!("裁剪失败: {}", e))?;
 
         if !result.status.success() {
-            return Err(format!("裁剪失败: {}", String::from_utf8_lossy(&result.stderr)));
+            return Err(cmd_err("裁剪失败", &result));
         }
 
         Ok(())
@@ -263,7 +256,7 @@ impl VideoProcessor {
         let _ = fs::remove_file(&concat_file);
 
         if !result.status.success() {
-            return Err(format!("合并失败: {}", String::from_utf8_lossy(&result.stderr)));
+            return Err(cmd_err("合并失败", &result));
         }
 
         Ok(())
@@ -293,7 +286,7 @@ impl VideoProcessor {
 
         if !result.status.success() {
             let _ = fs::remove_dir_all(&temp_dir);
-            return Err(format!("生成失败: {}", String::from_utf8_lossy(&result.stderr)));
+            return Err(cmd_err("生成失败", &result));
         }
 
         // Cleanup temp dir on success (keep only the output file path)
@@ -309,8 +302,7 @@ impl VideoProcessor {
             .output()
             .ok()?;
 
-        let s = String::from_utf8_lossy(&output.stdout);
-
+        let s = &String::from_utf8_lossy(&output.stdout);
         if s.contains("h264_nvenc") {
             Some("nvenc".to_string())
         } else if s.contains("h264_qsv") {
