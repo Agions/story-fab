@@ -22,6 +22,20 @@ pub fn chrono_like_timestamp() -> String {
     format!("{:x}_{:06x}", ms, rand)
 }
 
+/// Extract first line from command output (stdout, fallback to stderr)
+pub fn cmd_first_line(out: &std::process::Output) -> Option<String> {
+    String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .next()
+        .map(|s| s.to_string())
+        .or_else(|| String::from_utf8_lossy(&out.stderr).lines().next().map(|s| s.to_string()))
+}
+
+/// Build error string from failed command
+pub fn cmd_err(msg: &str, out: &std::process::Output) -> String {
+    format!("{}: {}", msg, String::from_utf8_lossy(&out.stderr))
+}
+
 pub(crate) fn format_srt_time(seconds: f64) -> String {
     let total_ms = (seconds * 1000.0).round() as u64;
     let hours = total_ms / 3_600_000;

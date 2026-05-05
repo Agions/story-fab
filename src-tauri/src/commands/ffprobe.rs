@@ -1,6 +1,6 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::types::{FFmpegCheckResult, VideoMetadataResult};
-use crate::utils::parse_fraction;
+use crate::utils::{cmd_err, cmd_first_line, parse_fraction};
 use serde_json::Value;
 
 /// Extract a string from a JSON value, or None.
@@ -23,17 +23,7 @@ pub async fn check_ffmpeg() -> Result<FFmpegCheckResult, String> {
         .map_err(|e| e.to_string())?;
 
     if output.status.success() {
-        let line = String::from_utf8_lossy(&output.stdout)
-            .lines()
-            .next()
-            .map(|s| s.trim().to_string())
-            .or_else(|| {
-                String::from_utf8_lossy(&output.stderr)
-                    .lines()
-                    .next()
-                    .map(|s| s.trim().to_string())
-            });
-        Ok(FFmpegCheckResult { installed: true, version: line })
+        Ok(FFmpegCheckResult { installed: true, version: cmd_first_line(&output).map(|s| s.trim().to_string()) })
     } else {
         Ok(FFmpegCheckResult { installed: false, version: None })
     }
@@ -62,10 +52,7 @@ pub async fn analyze_video(path: String) -> Result<VideoMetadataResult, String> 
         .map_err(|e| format!("运行ffprobe失败: {e}"))?;
 
     if !output.status.success() {
-        return Err(format!(
-            "ffprobe命令执行失败: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
+        return Err(cmd_err("ffprobe命令执行失败", &output));
     }
 
     let payload: serde_json::Value =
@@ -103,10 +90,6 @@ pub async fn run_ffprobe(args: Vec<String>) -> Result<String, String> {
     if output.status.success() {
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
     } else {
-        Err(format!(
-            "ffprobe exited {}: {}",
-            output.status,
-            String::from_utf8_lossy(&output.stderr)
-        ))
+        Err(cmd_err("ffprobe exited", &output))
     }
 }

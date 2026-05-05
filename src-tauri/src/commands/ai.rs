@@ -4,6 +4,7 @@ use crate::types::{
 };
 use crate::highlight_detector::HighlightDetector;
 use crate::smart_segmenter::SmartSegmenter;
+use crate::utils::cmd_err;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tokio::fs as tokio_fs;
@@ -207,8 +208,7 @@ pub async fn synthesize_speech(
     let _ = tokio::fs::remove_file(&tmp_text_path).await;
 
     if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!("edge-tts failed: {stderr}"));
+        return Err(cmd_err("edge-tts failed", &output));
     }
 
     let metadata = tokio::fs::metadata(&tmp_audio_path)
@@ -287,7 +287,7 @@ pub async fn translate_text(text: String, from_lang: String, to_lang: String) ->
         .map_err(|e| format!("Failed to spawn curl: {e}"))?;
 
     if !output.status.success() {
-        return Err(format!("curl failed: {}", String::from_utf8_lossy(&output.stderr)));
+        return Err(cmd_err("curl failed", &output));
     }
 
     let stdout = String::from_utf8_lossy(&output.stdout);
