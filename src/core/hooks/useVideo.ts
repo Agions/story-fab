@@ -354,4 +354,13 @@ function generateMockScenes(duration: number): Scene[] {
   return scenes;
 }
 
+function generateMockKeyframes(duration: number): string[] {
+  if (duration <= 0) return [];
+  const count = Math.floor(duration / KEYFRAME_INTERVAL_SECONDS);
+  return Array.from({ length: count }, (_, i) => {
+    const t = i * KEYFRAME_INTERVAL_SECONDS;
+    return `mock_keyframe_${t}s`;
+  });
+}
+
 
