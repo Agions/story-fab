@@ -131,7 +131,7 @@ impl VideoProcessor {
             .map_err(|e| format!("提取关键帧失败: {}", e))?;
 
         if !output.status.success() {
-            fs::remove_dir_all(&temp_dir).ok();
+            let _ = fs::remove_dir_all(&temp_dir);
             return Err(cmd_err("提取失败", &output));
         }
 
@@ -156,7 +156,7 @@ impl VideoProcessor {
             .map(|p| p.display().to_string())
             .collect();
 
-        // Cleanup
+        // Cleanup — caller gets frame paths but they're in temp_dir, so clean now
         let _ = fs::remove_dir_all(&temp_dir);
 
         Ok(result)
@@ -356,8 +356,3 @@ pub fn cut_video(
     Ok(output_path)
 }
 
-#[tauri::command]
-pub fn get_hw_acceleration() -> Result<Option<String>, String> {
-    let processor = VideoProcessor::new();
-    Ok(processor.detect_hw_accel())
-}
