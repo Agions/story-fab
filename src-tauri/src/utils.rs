@@ -52,6 +52,16 @@ pub(crate) fn format_srt_time(seconds: f64) -> String {
     format!("{:02}:{:02}:{:02},{:03}", hours, minutes, secs, millis)
 }
 
+/// Format seconds as HH:MM:SS.mmm (dot separator, used by FFmpeg/lib_optimized)
+pub(crate) fn format_time(seconds: f64) -> String {
+    let total_ms = (seconds * 1000.0).round() as u64;
+    let hours = total_ms / 3_600_000;
+    let minutes = (total_ms % 3_600_000) / 60_000;
+    let secs = (total_ms % 60_000) / 1000;
+    let millis = total_ms % 1000;
+    format!("{:02}:{:02}:{:02}.{:03}", hours, minutes, secs, millis)
+}
+
 /// Convert s16le PCM bytes to normalized f32 samples.
 /// Uses `chunks(2)` (not `_exact`) to safely drop any trailing partial chunk.
 pub fn pcm_samples_from_wav(pcm_data: &[u8]) -> Vec<f32> {
