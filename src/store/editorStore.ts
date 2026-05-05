@@ -129,10 +129,6 @@ export const useEditorStore = create<EditorStore>()(
           },
         })),
 
-      saveTrackHistory: () => {
-        // No-op - timeline history now managed by timelineStore
-      },
-
       undo: () =>
         set((s) => {
           if (s.history.past.length === 0) return {};

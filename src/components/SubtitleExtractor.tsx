@@ -35,7 +35,7 @@ import { useEditorStore } from '../store/editorStore';
 import { useTimelineStore } from '../store/timelineStore';
 import type { SubtitleEntry } from '@/core/types';
 import styles from '@/components/SubtitleExtractor.module.css';
-import { formatTime } from './common/timeUtils';
+import { formatTime } from '@/shared/utils/format';
 
 interface SubtitleSegment {
   id: string;

@@ -6,7 +6,7 @@ import { open as openExternal } from '@tauri-apps/plugin-shell';
 import { normalizeProjectId, buildProjectIdCandidates } from '../core/utils/project-id';
 import { logger } from '../shared/utils/logging';
 import { formatTime } from '../shared/utils/formatting';
-import { getConfigDir } from './file/fileOperations';
+import { getConfigDir, selectFile, saveFile } from './file/fileOperations';
 
 const errMsg = (err: unknown): string =>
   err instanceof Error ? err.message : String(err);
@@ -69,165 +69,87 @@ const normalizeListedProject = (value: unknown): ProjectFileData | null => {
 
 // 确保应用数据目录
 export const ensureAppDataDir = async (): Promise<void> => {
+  const appDir = 'CutDeck';
+
+  // 优先使用 Rust 函数检查目录
   try {
-    const appDir = 'CutDeck';
-    
-    // 先尝试使用Rust函数检查目录
-    try {
-      const dirPath = await invoke<string>('check_app_data_directory');
-      logger.info('Rust目录检查成功', { dirPath });
-      return;
-    } catch (rustError) {
-      logger.warn('Rust目录检查失败，回退到前端检查', { rustError });
-    }
-    
-    // 前端备用检查
-    let dirExists = false;
-    try {
-      dirExists = await exists(appDir, { baseDir: BaseDirectory.AppData });
-    } catch (existsError) {
-      logger.error('检查目录是否存在时出错', { existsError });
-      throw new Error(`检查目录出错: ${errMsg(existsError)}`);
-    }
-    
-    if (!dirExists) {
-      logger.info('应用数据目录不存在，创建目录', { appDir });
-      try {
-        await mkdir(appDir, { baseDir: BaseDirectory.AppData, recursive: true });
-      } catch (createError) {
-        logger.error('创建目录失败', { createError });
-        throw new Error(`创建目录失败: ${errMsg(createError)}`);
-      }
-      
-      // 验证目录是否创建成功
-      try {
-        const checkExists = await exists(appDir, { baseDir: BaseDirectory.AppData });
-        if (!checkExists) {
-          throw new Error('无法创建应用数据目录，请检查权限');
-        }
-      } catch (verifyError) {
-        logger.error('验证目录是否创建成功时出错', { verifyError });
-        throw new Error(`验证目录出错: ${errMsg(verifyError)}`);
-      }
-      logger.info('应用数据目录创建成功');
-    }
-    
+    const dirPath = await invoke<string>('check_app_data_directory');
+    logger.info('Rust目录检查成功', { dirPath });
     return;
-  } catch (error) {
-    logger.error('创建应用数据目录失败', { error });
-    throw error;
+  } catch (rustError) {
+    logger.warn('Rust目录检查失败，回退到前端检查', { rustError });
   }
+
+  // 前端检查
+  const dirExists = await exists(appDir, { baseDir: BaseDirectory.AppData }).catch((e) => {
+    logger.error('检查目录是否存在时出错', { e });
+    throw new Error(`检查目录出错: ${errMsg(e)}`);
+  });
+
+  if (dirExists) return;
+
+  // 创建目录
+  logger.info('应用数据目录不存在，创建目录', { appDir });
+  await mkdir(appDir, { baseDir: BaseDirectory.AppData, recursive: true }).catch((e) => {
+    logger.error('创建目录失败', { e });
+    throw new Error(`创建目录失败: ${errMsg(e)}`);
+  });
+
+  // 验证目录是否创建成功
+  const checkExists = await exists(appDir, { baseDir: BaseDirectory.AppData });
+  if (!checkExists) {
+    throw new Error('无法创建应用数据目录，请检查权限');
+  }
+  logger.info('应用数据目录创建成功');
 };
 
 // 保存项目数据到文件
 export const saveProjectToFile = async (projectId: string, project: object): Promise<void> => {
   const normalizedProjectId = normalizeProjectId(projectId || '');
-
   if (!project || !normalizedProjectId) {
-    logger.error('保存项目文件失败: 项目数据无效');
     throw new Error('无效的项目数据');
   }
 
-  try {
-    // 确保目录存在
-    await ensureAppDataDir().catch(err => {
-      logger.error('确保应用数据目录存在时出错', { err });
-      throw new Error(`应用数据目录错误: ${err.message || '未知错误'}`);
-    });
-    
-    const projectPath = `CutDeck/${normalizedProjectId}.json`;
-    logger.info('正在保存项目文件', { projectPath });
-    
-    // 准备项目数据
-    let projectData: string;
-    try {
-      // 移除可能导致循环引用的字段
-      const cleanProject = { ...(project as ProjectFileData) };
-      if (cleanProject.aiModel && cleanProject.aiModel.apiKey) {
-        // 创建新对象避免修改原始对象
-        cleanProject.aiModel = { 
-          ...cleanProject.aiModel,
-          apiKey: undefined // 不保存API密钥到项目文件中
-        };
-      }
-      
-      projectData = JSON.stringify(cleanProject, null, 2);
-      if (!projectData) {
-        throw new Error('项目数据序列化为空');
-      }
-    } catch (err: unknown) {
-      logger.error('序列化项目数据失败', { err });
-      throw new Error('无法序列化项目数据');
-    }
-    
-    // 使用Rust函数直接写入文件，提供更好的错误处理
-    try {
-      await invoke('save_project_file', {
-        projectId: normalizedProjectId,
-        content: projectData
-      });
-      emitProjectsChanged();
-      logger.info('文件写入成功 (通过Rust函数)');
-      return;
-    } catch (rustErr) {
-      logger.warn('通过Rust保存文件失败，尝试使用JS API保存', { rustErr });
-      // 继续使用JS API作为备选方案
-    }
-    
-    // 检查文件是否已存在
-    const fileExists = await exists(projectPath, { baseDir: BaseDirectory.AppData })
-      .catch(err => {
-        logger.error('检查文件是否存在时出错', { err });
-        return false;
-      });
-      
-    logger.info(`项目文件${fileExists ? '已存在' : '不存在'}，准备${fileExists ? '更新' : '新建'}`, { fileExists });
-    
-    // 执行写入
-    try {
-      await writeTextFile(
-        projectPath,
-        projectData,
-        { baseDir: BaseDirectory.AppData }
-      );
-      logger.info('文件写入完成');
-    } catch (writeErr) {
-      logger.error('文件写入失败', { writeErr });
-      
-      // 尝试备用方法保存
-      try {
-        const configDir = await getConfigDir();
-        const backupPath = `${configDir}${normalizedProjectId}.json`;
-        await writeTextFile(backupPath, projectData);
-        emitProjectsChanged();
-        logger.info('使用备用路径保存成功', { backupPath });
-        return;
-      } catch (backupErr) {
-        logger.error('备用保存也失败', { backupErr });
-        const writeErrMessage = errMsg(writeErr);
-        throw new Error(`文件写入失败: ${writeErrMessage}`);
-      }
-    }
-    
-    // 验证文件是否写入成功
-    try {
-      const verifyExists = await exists(projectPath, { baseDir: BaseDirectory.AppData });
-      if (!verifyExists) {
-        throw new Error('文件似乎已写入但无法验证其存在');
-      }
-      logger.info('验证文件存在: 成功');
-    } catch (verifyErr) {
-      logger.error('验证文件存在时出错:', verifyErr);
-        throw new Error(`无法验证文件是否保存成功: ${errMsg(verifyErr)}`);
-    }
-    
-    emitProjectsChanged();
-    logger.info('项目文件保存成功', { projectPath });
-    return;
-  } catch (error) {
-    logger.error('保存项目文件失败', { error });
-    throw error;
+  // 确保目录存在
+  await ensureAppDataDir().catch((err) => {
+    throw new Error(`应用数据目录错误: ${err.message || '未知错误'}`);
+  });
+
+  // 准备项目数据（移除可能导致循环引用的字段）
+  const cleanProject = { ...(project as ProjectFileData) };
+  if (cleanProject.aiModel?.apiKey) {
+    cleanProject.aiModel = { ...cleanProject.aiModel, apiKey: undefined };
   }
+
+  const projectData = JSON.stringify(cleanProject, null, 2);
+  if (!projectData) throw new Error('项目数据序列化为空');
+
+  const projectPath = `CutDeck/${normalizedProjectId}.json`;
+
+  // 优先使用 Rust 函数写入
+  try {
+    await invoke('save_project_file', { projectId: normalizedProjectId, content: projectData });
+    emitProjectsChanged();
+    logger.info('文件写入成功 (通过Rust函数)', { projectPath });
+    return;
+  } catch (rustErr) {
+    logger.warn('通过Rust保存文件失败，尝试使用JS API保存', { rustErr });
+  }
+
+  // JS API 备选方案
+  await writeTextFile(projectPath, projectData, { baseDir: BaseDirectory.AppData })
+    .catch(async (writeErr) => {
+      // 备用路径
+      const configDir = await getConfigDir();
+      const backupPath = `${configDir}${normalizedProjectId}.json`;
+      await writeTextFile(backupPath, projectData);
+      emitProjectsChanged();
+      logger.info('使用备用路径保存成功', { backupPath });
+      return;
+    });
+
+  emitProjectsChanged();
+  logger.info('项目文件保存成功', { projectPath });
 };
 
 // 读取项目数据
@@ -381,62 +303,7 @@ export const saveApiKey = async (service: string, apiKey: string): Promise<boole
 };
 
 /**
- * 选择文件
- * @param filters 文件过滤器
- */
-export const selectFile = async (filters?: { name: string, extensions: string[] }[]): Promise<string | null> => {
-  try {
-    const selected = await open({
-      multiple: false,
-      filters: filters || [
-        { name: '视频文件', extensions: ['mp4', 'mov', 'avi', 'mkv'] }
-      ]
-    });
-    
-    if (selected === null) {
-      return null;
-    }
-    
-    // Tauri的open函数在选择单个文件时可能返回字符串或数组
-    return Array.isArray(selected) ? selected[0] : selected;
-  } catch (error) {
-    logger.error('选择文件失败:', error);
-    return null;
-  }
-};
-
-/**
- * 保存文件
- * @param defaultPath 默认保存路径
- * @param filters 文件过滤器
- */
-export const saveFile = async (
-  content: string,
-  defaultPath?: string,
-  filters?: { name: string, extensions: string[] }[]
-): Promise<boolean> => {
-  try {
-    const savePath = await save({
-      defaultPath,
-      filters: filters || [
-        { name: '文本文件', extensions: ['txt'] }
-      ]
-    });
-    
-    if (savePath === null) {
-      return false;
-    }
-    
-    await writeTextFile(savePath, content);
-    return true;
-  } catch (error) {
-    logger.error('保存文件失败:', error);
-    return false;
-  }
-};
-
-/**
- * 获取应用数据
+ * 获取API密钥
  * @param key 数据键名
  */
 export const getAppData = async <T>(key: string): Promise<T | null> => {

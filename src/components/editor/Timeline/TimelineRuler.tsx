@@ -4,19 +4,13 @@
  * 1px 刻度线每秒，更长刻度每分钟
  */
 import React, { memo, useMemo } from 'react';
+import { formatTimecodeSimple } from '@/shared/utils';
 
 interface TimelineRulerProps {
   duration: number;      // 总时长 (秒)
   pixelsPerSecond: number;
   scrollX: number;      // 水平滚动偏移 (像素)
   width: number;        // 可视区域宽度
-}
-
-function formatTimecode(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
 export const TimelineRuler = memo<TimelineRulerProps>(({
@@ -54,7 +48,7 @@ export const TimelineRuler = memo<TimelineRulerProps>(({
       result.push({
         x,
         major,
-        label: major ? formatTimecode(sec) : '',
+        label: major ? formatTimecodeSimple(sec) : '',
       });
     }
 

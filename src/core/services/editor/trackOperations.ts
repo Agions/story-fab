@@ -9,26 +9,11 @@ import type {
   TimelineTrack,
   TrackType,
 } from '../../types/timeline';
-import { syncLegacyTracks } from '../../types/timeline';
+import { createEmptyTimeline, syncLegacyTracks } from '../../types/timeline';
 import { calculateDuration } from './timelineHelpers';
 
 /** 创建空时间线 */
-export function createEmptyTimeline(): Timeline {
-  const now = new Date().toISOString();
-  const timeline: Timeline = {
-    id: `timeline_${Date.now()}`,
-    tracks: [],
-    duration: 0,
-    markers: [],
-    createdAt: now,
-    updatedAt: now,
-    videoTracks: [],
-    audioTracks: [],
-    textTracks: [],
-    effectTracks: [],
-  };
-  return timeline;
-}
+export { createEmptyTimeline } from '../../types/timeline';
 
 /** 通过 clipId 查找所在的 trackId */
 export function findTrackByClipId(timeline: Timeline, clipId: string): string | undefined {

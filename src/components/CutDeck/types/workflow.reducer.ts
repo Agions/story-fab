@@ -25,25 +25,28 @@ export function clipFlowReducer(state: CutDeckState, action: CutDeckAction): Cut
       return { ...state, selectedFeature: action.payload };
     
     case 'SET_PROJECT':
+      // 深拷贝project对象，防止外部mutation影响state
       return { 
         ...state, 
-        project: action.payload,
+        project: action.payload ? JSON.parse(JSON.stringify(action.payload)) : null,
         stepStatus: action.payload ? { ...state.stepStatus, 'project-create': true } : state.stepStatus,
         currentStep: action.payload ? 'video-upload' : state.currentStep,
       };
     
     case 'SET_VIDEO':
+      // 深拷贝video对象及其thumbnail，防止Blob URL泄漏
       return { 
         ...state, 
-        currentVideo: action.payload,
+        currentVideo: action.payload ? JSON.parse(JSON.stringify(action.payload)) : null,
         duration: action.payload?.duration || 0,
         stepStatus: action.payload ? { ...state.stepStatus, 'video-upload': true } : state.stepStatus,
       };
     
     case 'SET_ANALYSIS':
+      // 深拷贝analysis，防止外部mutation
       return { 
         ...state, 
-        analysis: action.payload,
+        analysis: action.payload ? JSON.parse(JSON.stringify(action.payload)) : null,
         stepStatus: action.payload ? { ...state.stepStatus, 'ai-analyze': true } : state.stepStatus,
       };
     
@@ -154,7 +157,7 @@ export function clipFlowReducer(state: CutDeckState, action: CutDeckAction): Cut
       return { ...state, error: action.payload };
     
     case 'RESET':
-      return initialState;
+      return { ...initialState };
     
     case 'RESET_STEP': {
       const resetIndex = CUT_DECK_STEPS.indexOf(action.payload);
