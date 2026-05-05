@@ -396,42 +396,18 @@ pub fn get_hw_acceleration() -> Result<Option<String>, String> {
 
 #[tauri::command]
 pub fn render_autonomous_cut_optimized(input: serde_json::Value) -> Result<String, String> {
-    let processor = VideoProcessor::new();
-    
     let input_path = input["input_path"].as_str().ok_or("缺少 input_path")?;
     let output_path = input["output_path"].as_str().ok_or("缺少 output_path")?;
     let segments = input["segments"]
         .as_array()
-        .ok_or("缺少 segments")?;
-
-    let temp_dir = std::env::temp_dir()
-        .join(format!("cutdeck_render_{}", chrono_like_timestamp()));
-
-    fs::create_dir_all(&temp_dir)
-        .map_err(|e| format!("创建临时目录失败: {}", e))?;
-
-    let mut temp_files: Vec<PathBuf> = Vec::new();
-
-    let result = (|| {
-        for (i, seg) in segments.iter().enumerate() {
-            let start = seg["start"].as_f64().unwrap_or(0.0);
-            let end = seg["end"].as_f64().ok_or("缺少 end")?;
-            let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
-
-            processor.cut_video_segment(input_path, &temp_file.to_string_lossy(), start, end, None)?;
-            temp_files.push(temp_file);
-        }
-
-        processor.concat_segments(&temp_files, output_path)?;
-        Ok::<(), String>(())
-    })();
-
-    // Cleanup temp files regardless of success/failure
-    for f in temp_files {
-        let _ = fs::remove_file(f);
-    }
-    let _ = fs::remove_dir_all(&temp_dir);
-
-    result?;
-    Ok(output_path.to_string())
+        .ok_or("缺少 segments")?
+        .iter()
+        .map(|seg| CutSegment {
+            start: seg["start"].as_f64().unwrap_or(0.0),
+            end: seg["end"].as_f64().ok_or("缺少 end")?,
+            source_start_ms: None,
+            source_end_ms: None,
+        })
+        .collect();
+    cut_video(input_path.to_string(), output_path.to_string(), segments, Some(false))
 }
