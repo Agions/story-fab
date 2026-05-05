@@ -49,14 +49,8 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
     }
     let mut cmd = Command::new(ffmpeg_binary());
     cmd.arg("-y");
-    if let Some(start) = input.start_time {
-        cmd.arg("-ss").arg(start.to_string());
-    }
+    apply_time_segment(&mut cmd, input.start_time, input.end_time);
     cmd.arg("-i").arg(&input.input_path);
-    if let (Some(start), Some(end)) = (input.start_time, input.end_time) {
-        let dur = (end - start).max(0.1);
-        cmd.arg("-t").arg(dur.to_string());
-    }
     let vf_filter: String = match input.aspect.as_str() {
         "9:16" => {
             "scale=1080:1920:force_original_aspect_ratio=decrease,crop=1080:1920:(iw-1080)/2:(ih-1920)/2,setsar=1".to_string()
@@ -70,11 +64,7 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
         _ => return Err("不支持的宽高比，仅支持 9:16、1:1、16:9".to_string()),
     };
     cmd.arg("-vf").arg(vf_filter);
-    let (crf, preset) = match input.quality.as_deref() {
-        Some("low") => (28, "veryfast"),
-        Some("medium") => (23, "fast"),
-        _ => (20, "medium"),
-    };
+    let (crf, preset) = quality_params(input.quality.as_deref());
     cmd.args(["-c:v", "libx264", "-crf", &crf.to_string(), "-preset", preset]);
     cmd.args(["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart"]);
     cmd.arg(&input.output_path);
@@ -99,7 +89,7 @@ pub fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, Str
         .filter(|segment| segment.end > segment.start)
         .collect::<Vec<_>>();
 
-    let transition = input.transition.clone().unwrap_or_else(|| "cut".to_string());
+    let transition = input.transition.unwrap_or_else(|| "cut".to_string());
     let transition_duration = input.transition_duration.unwrap_or(0.35).clamp(0.0, 1.5);
 
     let temp_root = std::env::temp_dir().join(format!(
@@ -191,18 +181,29 @@ pub fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, Str
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
+/// Append ffmpeg -ss / -t time-segment args to `cmd` from start/end Option<f64>.
+fn apply_time_segment(cmd: &mut std::process::Command, start: Option<f64>, end: Option<f64>) {
+    if let Some(s) = start {
+        cmd.arg("-ss").arg(s.to_string());
+    }
+    if let (Some(s), Some(e)) = (start, end) {
+        cmd.arg("-t").arg((e - s).max(0.1).to_string());
+    }
+}
+
+/// Returns (crf, preset) for a quality tier.
+fn quality_params(quality: Option<&str>) -> (u32, &'static str) {
+    match quality {
+        Some("low") => (28, "veryfast"),
+        Some("medium") => (23, "fast"),
+        _ => (20, "medium"),
+    }
+}
+
 fn render_single_cut(input: &AutonomousRenderInput) -> Result<String, String> {
     let mut cmd = Command::new(ffmpeg_binary());
     cmd.arg("-y");
-    if let Some(start) = input.start_time {
-        cmd.arg("-ss").arg(start.to_string());
-    }
-    if let Some(end) = input.end_time {
-        if let Some(start) = input.start_time {
-            let duration = (end - start).max(0.1);
-            cmd.arg("-t").arg(duration.to_string());
-        }
-    }
+    apply_time_segment(&mut cmd, input.start_time, input.end_time);
     cmd.arg("-i")
         .arg(&input.input_path)
         .arg("-c:v")
