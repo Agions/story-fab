@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { exportScriptToFormat, ScriptExportFormat } from './scriptExportService';
 
 // Mock dependencies — use fn(() => ...) to avoid clearMocks:true wiping mockResolvedValue state
-vi.mock('@/services/tauri', () => ({
+vi.mock('@/services/file/fileOperations', () => ({
   saveFile: vi.fn(() => Promise.resolve(true)),
 }));
 
@@ -23,7 +23,7 @@ vi.mock('@/shared/utils/logging', () => ({
   },
 }));
 
-import { saveFile } from '@/services/tauri';
+import { saveFile } from '@/services/file/fileOperations';
 
 const makeScript = (segments: Array<{ startTime: number; endTime: number; content: string }>) => ({
   id: 'test-script-001',
