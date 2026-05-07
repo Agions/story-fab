@@ -316,23 +316,7 @@ impl SmartSegmenter {
             return Err(cmd_err("FFmpeg failed", &pcm_data));
         }
 
-        // Write to temp file to avoid memory issues with large files
-        let temp_pcm = std::env::temp_dir()
-            .join(format!("cutdeck_pcm_{}.raw", chrono_like_timestamp()));
-        if let Err(e) = std::fs::write(&temp_pcm, &pcm_data.stdout) {
-            return Err(format!("Write PCM failed: {}", e));
-        }
-
-        let raw = match std::fs::read(&temp_pcm) {
-            Ok(d) => d,
-            Err(e) => {
-                let _ = std::fs::remove_file(&temp_pcm);
-                return Err(format!("Read PCM failed: {}", e));
-            }
-        };
-        let _ = std::fs::remove_file(&temp_pcm);
-
-        Ok(pcm_samples_from_wav(&raw))
+        Ok(pcm_samples_from_wav(&pcm_data.stdout))
     }
 
     fn segment_by_energy(&self, energy_data: Vec<(u64, f32)>, min_duration_ms: u64, max_duration_ms: u64) -> Vec<(u64, u64)> {

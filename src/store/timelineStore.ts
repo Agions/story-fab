@@ -12,7 +12,7 @@
  * - trackHistory: 时间线历史记录（undo/redo）
  */
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '../core/types/timeline';
 
 // =========================================
@@ -54,7 +54,7 @@ export interface TimelineActions {
   addClipToTrack: (trackId: string, clipData: Omit<TimelineClip, 'id' | 'trackId'>) => string;
   removeClipFromTrack: (clipId: string) => void;
   updateClip: (clipId: string, updates: Partial<TimelineClip>) => void;
-  moveClip: (clipId: string, targetTrackId: string, newStartMs: number, newEndMs?: number) => void;
+  moveClip: (clipId: string, targetTrackId: string, newStartMs: number, newEndMs?: number, skipHistory?: boolean) => void;
   splitClip: (clipId: string, splitMs: number) => void;
 
   // Keyframe management
@@ -172,8 +172,9 @@ const initialState: TimelineState = {
 // =========================================
 
 export const useTimelineStore = create<TimelineStore>()(
-  persist(
-    (set, get) => ({
+  devtools(
+    persist(
+      (set, get) => ({
       ...initialState,
 
       // ─── Playhead ────────────────────────────────────────────────────────────
@@ -254,8 +255,8 @@ export const useTimelineStore = create<TimelineStore>()(
         }));
       },
 
-      moveClip: (clipId, targetTrackId, newStartMs, newEndMs) => {
-        get().saveTrackHistory();
+      moveClip: (clipId, targetTrackId, newStartMs, newEndMs, skipHistory) => {
+        if (!skipHistory) get().saveTrackHistory();
         set((s) => {
           let clipToMove: TimelineClip | undefined;
           const afterRemove = s.timelineTracks.map((t) => {
@@ -416,6 +417,8 @@ export const useTimelineStore = create<TimelineStore>()(
         snapThreshold: state.snapThreshold,
       }),
     }
+    ),
+    { name: 'TimelineStore' }
   )
 );
 

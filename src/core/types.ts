@@ -75,7 +75,8 @@ export interface Scene {
   id: string;
   startTime: number;
   endTime: number;
-  type: 'action' | 'dialog' | 'landscape' | 'closeup';
+  type: 'action' | 'dialog' | 'landscape' | 'closeup'
+      | 'intro' | 'outro' | 'emotion' | 'product' | 'demo' | 'interview' | 'text';
   score: number;
   thumbnail?: string;
   description?: string;

@@ -60,6 +60,3 @@ export { detectEmotionPeaks, calculateEmotionScore } from './video/emotion-peak-
 
 // 工作流（workflow/ 子目录）
 export { orchestrateCommentaryAgents } from './workflow/commentaryAgents';
-
-// 脚本模板
-export { scriptTemplateService } from '../templates/script.templates';

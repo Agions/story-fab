@@ -70,63 +70,74 @@ const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
   const [shortcutsHelpVisible, setShortcutsHelpVisible] = useState(false);
   const { state, goToNextStep, setFeature } = useCutDeck();
-  const previewPlaying = useEditorStore(state => state.previewPlaying);
-  const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
-  const undo = useEditorStore(state => state.undo);
-  const redo = useEditorStore(state => state.redo);
-  const playheadMs = useTimelineStore(state => state.playheadMs);
-  const selectedClipId = useTimelineStore(state => state.selectedClipId);
-  const setPlayheadMs = useTimelineStore(state => state.setPlayheadMs);
-  const setInPoint = useTimelineStore(state => state.setInPoint);
-  const setOutPoint = useTimelineStore(state => state.setOutPoint);
-  const selectAllClips = useTimelineStore(state => state.selectAllClips);
-  const undoTrack = useTimelineStore(state => state.undoTrack);
-  const redoTrack = useTimelineStore(state => state.redoTrack);
-  const removeClipFromTrack = useTimelineStore(state => state.removeClipFromTrack);
+
+  // ── Store selectors — use shallow equality for multi-field objects ──────────
+  // Avoids N separate selector calls (each triggers re-render)
+  const editorStore = useEditorStore(
+    useCallback((s) => ({
+      previewPlaying: s.previewPlaying,
+      setPreviewPlaying: s.setPreviewPlaying,
+      undo: s.undo,
+      redo: s.redo,
+    }), [])
+  );
+  const timelineStore = useTimelineStore(
+    useCallback((s) => ({
+      playheadMs: s.playheadMs,
+      selectedClipId: s.selectedClipId,
+      setPlayheadMs: s.setPlayheadMs,
+      setInPoint: s.setInPoint,
+      setOutPoint: s.setOutPoint,
+      selectAllClips: s.selectAllClips,
+      undoTrack: s.undoTrack,
+      redoTrack: s.redoTrack,
+      removeClipFromTrack: s.removeClipFromTrack,
+    }), [])
+  );
 
   // ── 快捷键注册 ────────────────────────────────────────
   useKeyboardShortcuts({
     enabled: true,
     preventDefault: true,
     onPlayPause: () => {
-      setPreviewPlaying(!previewPlaying);
+      editorStore.setPreviewPlaying(!editorStore.previewPlaying);
     },
     onPause: () => {
-      setPreviewPlaying(false);
+      editorStore.setPreviewPlaying(false);
     },
     onSeek: (delta) => {
-      const newTime = Math.max(0, (playheadMs / 1000) + delta);
-      setPlayheadMs(newTime * 1000);
+      const newTime = Math.max(0, (timelineStore.playheadMs / 1000) + delta);
+      timelineStore.setPlayheadMs(newTime * 1000);
     },
     onSeekTo: (time) => {
-      setPlayheadMs(time * 1000);
+      timelineStore.setPlayheadMs(time * 1000);
     },
     onDelete: () => {
-      if (selectedClipId) {
-        removeClipFromTrack(selectedClipId);
+      if (timelineStore.selectedClipId) {
+        timelineStore.removeClipFromTrack(timelineStore.selectedClipId);
         notify.success('片段已删除');
       } else {
         notify.warning('请先选择要删除的片段');
       }
     },
     onInPoint: () => {
-      setInPoint();
-      notify.success(`入点: ${(playheadMs / 1000).toFixed(1)}s`);
+      timelineStore.setInPoint();
+      notify.success(`入点: ${(timelineStore.playheadMs / 1000).toFixed(1)}s`);
     },
     onOutPoint: () => {
-      setOutPoint();
-      notify.success(`出点: ${(playheadMs / 1000).toFixed(1)}s`);
+      timelineStore.setOutPoint();
+      notify.success(`出点: ${(timelineStore.playheadMs / 1000).toFixed(1)}s`);
     },
     onSelectAll: () => {
-      selectAllClips();
+      timelineStore.selectAllClips();
     },
     onUndo: () => {
-      undo();
-      undoTrack();
+      editorStore.undo();
+      timelineStore.undoTrack();
     },
     onRedo: () => {
-      redo();
-      redoTrack();
+      editorStore.redo();
+      timelineStore.redoTrack();
     },
     onExport: () => {
       goToNextStep();

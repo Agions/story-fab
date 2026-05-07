@@ -3,11 +3,14 @@
 // shared-state issues in a single-threaded Tauri handler environment.
 
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
-use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time};
+use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time, write_concat_file, cleanup_temp_dir};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
+use tokio::process::Command as TokioCommand;
+use tokio::fs as tokio_fs;
+use futures_util::future::join_all;
 
 /// Typed segment for cut_video command — replaces raw serde_json::Value.
 #[derive(Debug, Clone, Deserialize)]
@@ -210,18 +213,7 @@ impl VideoProcessor {
             return Ok(());
         }
 
-        // Create concat file — use random suffix to avoid same-ms collisions
-        let concat_file = std::env::temp_dir()
-            .join(format!("concat_{}.txt", chrono_like_timestamp()));
-
-        let concat_content = inputs
-            .iter()
-            .map(|p| format!("file '{}'", p.to_string_lossy().replace('\'', "'\\''")))
-            .collect::<Vec<_>>()
-            .join("\n");
-
-        fs::write(&concat_file, &concat_content)
-            .map_err(|e| format!("写入 concat 文件失败: {}", e))?;
+        let concat_file = write_concat_file(inputs)?;
 
         let result = Command::new(&self.ffmpeg_path)
             .args(&[
@@ -318,41 +310,85 @@ impl Default for VideoProcessor {
 // Tauri commands
 
 #[tauri::command]
-pub fn cut_video(
+pub async fn cut_video(
     input_path: String,
     output_path: String,
     segments: Vec<CutSegment>,
     use_hw_accel: Option<bool>,
 ) -> Result<String, String> {
-    let processor = VideoProcessor::new();
     let temp_dir = std::env::temp_dir()
         .join(format!("cutdeck_cut_{}", chrono_like_timestamp()));
 
-    fs::create_dir_all(&temp_dir)
+    tokio_fs::create_dir_all(&temp_dir)
+        .await
         .map_err(|e| format!("创建临时目录失败: {}", e))?;
 
-    // Process each segment
+    // ── Parallel segment cutting ───────────────────────────────────────────────
+    let ffmpeg_bin = ffmpeg_binary();
+    let hw_accel = use_hw_accel.unwrap_or(false);
+
+    let tasks: Vec<_> = segments
+        .iter()
+        .enumerate()
+        .map(|(i, seg)| {
+            let ffmpeg_bin = ffmpeg_bin.clone();
+            let input_path = input_path.clone();
+            let temp_dir = temp_dir.clone();
+            async move {
+                let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
+                let duration = (seg.end - seg.start).max(0.1);
+
+                let mut args = vec![
+                    "-y",
+                    "-ss",
+                    &format_time(seg.start),
+                    "-t",
+                    &format_time(duration),
+                    "-i",
+                    &input_path,
+                ];
+
+                if hw_accel {
+                    args.extend(&["-c:v", "h264_nvenc", "-preset", "fast"]);
+                } else {
+                    args.extend(&["-c:v", "libx264", "-preset", "fast", "-crf", "23"]);
+                }
+
+                args.extend(&["-c:a", "aac", "-movflags", "+faststart"]);
+                args.push(temp_file.to_string_lossy().as_ref());
+
+                let result = TokioCommand::new(&ffmpeg_bin)
+                    .args(&args)
+                    .output()
+                    .await
+                    .map_err(|e| format!("裁剪失败: {}", e))?;
+
+                if !result.status.success() {
+                    return Err(cmd_err("裁剪失败", &result));
+                }
+                Ok::<PathBuf, String>(temp_file)
+            }
+        })
+        .collect();
+
+    let results = join_all(tasks).await;
     let mut temp_files: Vec<PathBuf> = Vec::new();
-
-    let result = (|| {
-        for (i, seg) in segments.iter().enumerate() {
-            let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
-            processor.cut_video_segment(&input_path, &temp_file.to_string_lossy(), seg.start, seg.end, use_hw_accel)?;
-            temp_files.push(temp_file);
-        }
-
-        // Merge
-        processor.concat_segments(&temp_files, &output_path)?;
-        Ok::<(), String>(())
-    })();
-
-    // Cleanup temp files regardless of success/failure
-    for f in &temp_files {
-        let _ = fs::remove_file(f);
+    for result in results {
+        temp_files.push(result?);
     }
-    let _ = fs::remove_dir_all(&temp_dir);
 
-    result?;
+    // ── Merge ────────────────────────────────────────────────────────────────
+    let processor = VideoProcessor::new();
+    processor.concat_segments(&temp_files, &output_path)
+        .map_err(|e| format!("合并失败: {}", e))?;
+
+    // Cleanup temp files
+    for f in temp_files {
+        let _ = tokio_fs::remove_file(&f).await;
+    }
+    let _ = tokio_fs::remove_dir_all(&temp_dir).await;
+
+    merge_result?;
     Ok(output_path)
 }
 

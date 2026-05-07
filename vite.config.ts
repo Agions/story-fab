@@ -43,10 +43,9 @@ export default defineConfig({
     target: 'esnext',
     minify: 'esbuild',
     sourcemap: false,
-    chunkSizeWarningLimit: 600,  // 复杂 React 应用的实际 chunk 大小
+    chunkSizeWarningLimit: 600,
     cssCodeSplit: true,
-    // 图片资源优化
-    assetsInlineLimit: 4096, // 4kb以下的图片内联为 base64
+    assetsInlineLimit: 4096,
     assetsDir: 'assets',
     rollupOptions: {
       output: {
@@ -54,7 +53,6 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
         inlineDynamicImports: false,
-        // Simplified vendor chunking — avoids 200+ lines of dead-path conditions
         manualChunks(id) {
           if (!id.includes('node_modules')) return null
 
@@ -66,7 +64,6 @@ export default defineConfig({
           // Tauri
           if (/node_modules\/@tauri-apps\//.test(id)) return 'vendor-tauri'
 
-          // UI library
           // UI library — antd icons share modules with rc-* packages, keep them together
           if (/node_modules\/antd\//.test(id)) return 'vendor-antd'
           if (/node_modules\/@ant-design\//.test(id) || /node_modules\/rc-[a-z-]+\//.test(id)) return 'vendor-antd-icons'
@@ -75,6 +72,12 @@ export default defineConfig({
           if (/node_modules\/dayjs\//.test(id)) return 'vendor-dayjs'
           if (/node_modules\/axios\//.test(id)) return 'vendor-axios'
           if (/node_modules\/i18next\//.test(id) || /node_modules\/react-i18next\//.test(id)) return 'vendor-i18n'
+
+          // Icon libraries — large tree-shakeable exports, benefit from isolated chunk
+          if (/node_modules\/lucide-react\//.test(id)) return 'vendor-icons'
+
+          // Animation / UI utilities
+          if (/node_modules\/framer-motion\//.test(id) || /node_modules\/vaul\//.test(id)) return 'vendor-motion'
 
           // No catch-all — every node_modules module must have an explicit chunk above.
           // If you hit this, add a new explicit rule before the fallback.

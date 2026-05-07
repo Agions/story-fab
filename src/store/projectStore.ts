@@ -3,7 +3,7 @@
  * 包含: 项目列表、当前项目、加载状态、筛选排序
  */
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import type { Project, ProjectStatus } from '@/core/types';
 
 // ─── Pure filter/sort functions (exported for testing) ────────────────────────
@@ -66,8 +66,9 @@ export interface ProjectState {
 // ─── Store implementation ──────────────────────────────────────────────────────
 
 export const useProjectStore = create<ProjectState>()(
-  persist(
-    (set, get) => ({
+  devtools(
+    persist(
+      (set, get) => ({
       projects: [] as Project[],
       currentProject: null as Project | null,
       loading: false,
@@ -108,10 +109,14 @@ export const useProjectStore = create<ProjectState>()(
       setFilter: (filter) => set({ filter }),
       clearFilter: () => set({ filter: {} }),
 
-      getFilteredProjects: () => {
-        const { projects, sortBy, sortOrder, filter } = get();
+      getFilteredProjects: (() => {
+        let cached: { key: string; result: Project[] } | null = null;
+        return () => {
+          const { projects, sortBy, sortOrder, filter } = get();
+          const key = JSON.stringify({ projects: projects.length, sortBy, sortOrder, filter });
+          if (cached && cached.key === key) return cached.result;
 
-        let result = [...projects];
+          let result = [...projects];
 
         if (filter.status) {
           result = result.filter(p => p.status === filter.status);
@@ -151,8 +156,10 @@ export const useProjectStore = create<ProjectState>()(
           return sortOrder === 'asc' ? comparison : -comparison;
         });
 
+        cached = { key, result };
         return result;
-      },
+        };
+      })(),
 
       getProjectById: (id) => {
         return get().projects.find(p => p.id === id);
@@ -168,5 +175,7 @@ export const useProjectStore = create<ProjectState>()(
         sortOrder: state.sortOrder,
       }),
     }
+    ),
+    { name: 'ProjectStore' }
   )
 );

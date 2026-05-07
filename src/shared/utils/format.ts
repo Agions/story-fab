@@ -6,6 +6,7 @@
 /**
  * 格式化时间 (秒 -> mm:ss 或 hh:mm:ss)
  * 用于视频播放器时间显示
+ * 接受 number | null | undefined，自动处理 NaN 和负数
  */
 export function formatTime(seconds: number): string {
   if (!isFinite(seconds) || seconds < 0) {
@@ -23,7 +24,8 @@ export function formatTime(seconds: number): string {
 }
 
 /**
- * 格式化时长 (秒 -> mm:ss 或 hh:mm:ss)
+ * 格式化时长 (秒 -> m:ss 或 h:mm:ss)
+ * 小时不补零（与 formatTime 的 hh:mm:ss 补零风格不同）
  */
 export function formatDuration(seconds: number): string {
   if (isNaN(seconds) || seconds < 0) {
@@ -38,6 +40,20 @@ export function formatDuration(seconds: number): string {
     return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * 格式化时长（中文本地化版本）
+ * 例：90秒 → "1分30秒"，3600秒 → "1小时0分0秒"
+ */
+export function formatDurationChinese(seconds: number): string {
+  if (isNaN(seconds) || seconds < 0) return '0秒';
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  if (hours > 0) return `${hours}小时${mins}分${secs}秒`;
+  if (mins > 0) return `${mins}分${secs}秒`;
+  return `${secs}秒`;
 }
 
 /**
@@ -192,4 +208,23 @@ export function truncateText(text: string, maxLength: number, suffix: string = '
  */
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ============================================================
+// 时间戳工具 — 统一管理 Date.now() / toISOString 调用
+// ============================================================
+
+/**
+ * 获取当前时间戳（毫秒）
+ */
+export function now(): number {
+  return Date.now();
+}
+
+/**
+ * 获取当前时间的 ISO 8601 字符串
+ * 用于数据库 timestamp 字段
+ */
+export function nowISO(): string {
+  return new Date().toISOString();
 }
