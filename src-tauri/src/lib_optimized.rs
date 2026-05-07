@@ -174,13 +174,15 @@ impl VideoProcessor {
         hw_accel: Option<bool>,
     ) -> Result<(), String> {
         let duration = (end - start).max(0.1);
+    let start_time = format_time(start);
+    let duration_time = format_time(duration);
 
-        let mut args = vec![
-            "-y",
-            "-ss", &format_time(start),
-            "-t", &format_time(duration),
-            "-i", input,
-        ];
+    let mut args = vec![
+        "-y",
+        "-ss", &start_time,
+        "-t", &duration_time,
+        "-i", input,
+    ];
 
         // Hardware acceleration if enabled
         if hw_accel.unwrap_or(false) {
@@ -388,7 +390,6 @@ pub async fn cut_video(
     }
     let _ = tokio_fs::remove_dir_all(&temp_dir).await;
 
-    merge_result?;
     Ok(output_path)
 }
 
