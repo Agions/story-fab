@@ -1,4 +1,4 @@
-import { saveFile } from '@/services/tauri';
+import { saveFile } from '@/services/file/fileOperations';
 import type { AIScriptDraft as Script } from '@/core/services/ai/aiScriptGenerationService';
 import { formatTime, formatDate } from '@/shared/utils/format';
 import { formatSrtTime } from '../../../shared/utils/formatting';
