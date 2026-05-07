@@ -249,15 +249,11 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.82.0
-      - name: Rust cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
       - name: Cargo check
         run: |
           set -e
           cd src-tauri
-          which cargo && cargo --version
+          cargo --version && rustc --version
           cargo check 2>&1
       - name: Upload cargo report
         if: always()
