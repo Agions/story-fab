@@ -13,6 +13,17 @@
  */
 
 import type { ClipScore } from './clipScorer';
+import {
+  TITLE_MAX_LENGTH,
+  TITLE_SENTENCE_BOUNDARY_MIN,
+  TITLE_ELLIPSIS_SUFFIX,
+  TEMPLATE_HOOK_LENGTH,
+  TEMPLATE_TOPIC_LENGTH,
+  TEMPLATE_BIO_MAX_LENGTH,
+  TEMPLATE_BIO_TRUNCATE_SUFFIX,
+  HASHTAG_MAX_COUNT,
+  HASHTAG_WORDS_SAMPLE,
+} from './seoConstants';
 
 export type SocialPlatform = 'youtube' | 'tiktok' | 'instagram' | 'douyin' | 'xiaohongshu' | 'bilibili' | 'youtube_shorts';
 
@@ -167,21 +178,21 @@ export class SEOGenerator {
     // 从转录中提取高注意力开头
     const trimmed = transcript.trim();
 
-    // 取前 40 字作为 hook
-    if (trimmed.length <= 40) return trimmed;
+    // 取前 TITLE_MAX_LENGTH 字作为 hook
+    if (trimmed.length <= TITLE_MAX_LENGTH) return trimmed;
 
     // 尝试找到句子边界
     const punctIdx = Math.max(
-      trimmed.slice(0, 40).lastIndexOf('。'),
-      trimmed.slice(0, 40).lastIndexOf('！'),
-      trimmed.slice(0, 40).lastIndexOf('，'),
-      trimmed.slice(0, 40).lastIndexOf('...'),
+      trimmed.slice(0, TITLE_MAX_LENGTH).lastIndexOf('。'),
+      trimmed.slice(0, TITLE_MAX_LENGTH).lastIndexOf('！'),
+      trimmed.slice(0, TITLE_MAX_LENGTH).lastIndexOf('，'),
+      trimmed.slice(0, TITLE_MAX_LENGTH).lastIndexOf('...'),
     );
 
-    if (punctIdx > 20) {
+    if (punctIdx > TITLE_SENTENCE_BOUNDARY_MIN) {
       return trimmed.slice(0, punctIdx + 1);
     }
-    return trimmed.slice(0, 40) + '...';
+    return trimmed.slice(0, TITLE_MAX_LENGTH) + TITLE_ELLIPSIS_SUFFIX;
   }
 
   private buildTitle(hook: string, topic: string): string {
@@ -189,11 +200,13 @@ export class SEOGenerator {
     const tmpl = templates[Math.floor(Math.random() * templates.length)];
 
     const filled = tmpl
-      .replace('{hook}', hook.replace(/[。，！、]/g, '').slice(0, 20))
-      .replace('{topic}', topic.slice(0, 15));
+      .replace('{hook}', hook.replace(/[。，！、]/g, '').slice(0, TEMPLATE_HOOK_LENGTH))
+      .replace('{topic}', topic.slice(0, TEMPLATE_TOPIC_LENGTH));
 
-    // 截断到 60 字符
-    return filled.length > 60 ? filled.slice(0, 57) + '...' : filled;
+    // 截断到 TEMPLATE_BIO_MAX_LENGTH 字符
+    return filled.length > TEMPLATE_BIO_MAX_LENGTH
+      ? filled.slice(0, TEMPLATE_BIO_MAX_LENGTH - TEMPLATE_BIO_TRUNCATE_SUFFIX.length) + TEMPLATE_BIO_TRUNCATE_SUFFIX
+      : filled;
   }
 
   private buildDescription(
@@ -235,8 +248,8 @@ export class SEOGenerator {
       hashtags.add(tag);
     }
 
-    // 截取 5-10 个
-    return Array.from(hashtags).slice(0, 10);
+    // 截取 HASHTAG_MAX_COUNT 个
+    return Array.from(hashtags).slice(0, HASHTAG_MAX_COUNT);
   }
 
   private extractContentHashtags(transcript: string, topic: string): string[] {
@@ -260,7 +273,7 @@ export class SEOGenerator {
       .filter(w => w.length >= 2 && w.length <= 6)
       .filter(w => !STOP_WORDS.has(w.toLowerCase()));
 
-    for (const w of words.slice(0, 5)) {
+    for (const w of words.slice(0, HASHTAG_WORDS_SAMPLE)) {
       if (this.language === 'zh') {
         tags.push(`#${w}`);
       } else {

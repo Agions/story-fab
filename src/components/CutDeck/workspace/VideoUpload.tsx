@@ -8,6 +8,7 @@ import React, { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { useCutDeck } from '../context';
 import { logger } from '../../../shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
+import { MAX_FILE_SIZE } from '@/shared/constants';
 import type { VideoInfo } from '@/core/types';
 import styles from './VideoUpload.module.css';
 
@@ -15,6 +16,15 @@ import { VIDEO_FORMATS } from '@/constants';
 
 // 支持的视频格式
 const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map(f => `.${f}`);
+
+// ── Magic number constants ────────────────────────────────────────────────────
+// Chunk size for simulated upload (1 MB)
+const CHUNK_SIZE = 1024 * 1024;
+// Interval (ms) for checking pause → resume transition
+const PAUSE_CHECK_INTERVAL_MS = 100;
+// Simulated per-chunk upload delay range: min=80ms, max=230ms
+const UPLOAD_DELAY_MIN_MS = 80;
+const UPLOAD_DELAY_RANGE_MS = 150;
 
 // 模拟断点续传存储
 const createChunkStore = () => {
@@ -74,7 +84,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
     if (!VIDEO_EXTENSIONS.includes(ext)) {
       return { valid: false, error: `不支持的视频格式: ${ext}` };
     }
-    if (file.size > 2 * 1024 * 1024 * 1024) {
+    if (file.size > MAX_FILE_SIZE) {
       return { valid: false, error: '视频文件不能超过 2GB' };
     }
     return { valid: true };
@@ -98,7 +108,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
     chunkStore.clear(uploadId);
 
     try {
-      const chunkSize = 1024 * 1024;
+      const chunkSize = CHUNK_SIZE;
       const totalChunks = Math.ceil(file.size / chunkSize);
 
       for (let i = 0; i < totalChunks; i++) {
@@ -112,7 +122,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
                 }
                 resolve();
               }
-            }, 100);
+            }, PAUSE_CHECK_INTERVAL_MS);
             pauseIntervalRef.current = checkResume;
           });
         }
@@ -123,7 +133,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
         const progress = Math.min(((i + 1) / totalChunks) * 100, 100);
         setUploadProgress(progress);
 
-        await new Promise(r => setTimeout(r, 80 + Math.random() * 150));
+        await new Promise(r => setTimeout(r, UPLOAD_DELAY_MIN_MS + Math.random() * UPLOAD_DELAY_RANGE_MS));
       }
 
       const videoInfo = await new Promise<VideoInfo>((resolve, reject) => {

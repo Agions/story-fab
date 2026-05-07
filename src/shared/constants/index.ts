@@ -52,6 +52,9 @@ export const DEFAULTS = {
   PAGE_SIZE_OPTIONS: [10, 20, 50, 100]
 } as const;
 
+// 独立常量（从 DEFAULTS 中提取，方便按名导入）
+export const MAX_FILE_SIZE = DEFAULTS.MAX_FILE_SIZE;
+
 // 质量选项
 export const QUALITY_OPTIONS = [
   { value: 'low', label: '低 (480p)', desc: '文件小，加载快' },
