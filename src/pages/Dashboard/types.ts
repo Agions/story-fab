@@ -1,21 +1,10 @@
 /**
  * CutDeck Dashboard 类型定义
+ * Project / ProjectStatus 从 @/core/types 统一导出，避免重复定义。
  */
+import type { Project, ProjectStatus } from '@/core/types';
 
-/** 项目状态 */
-export type ProjectStatus = 'draft' | 'processing' | 'completed' | 'failed';
-
-export interface Project {
-  id: string;
-  title: string;
-  thumbnail: string;
-  duration: number;
-  updatedAt: string;
-  size: number;
-  starred: boolean;
-  tags: string[];
-  status: ProjectStatus;
-}
+export type { Project, ProjectStatus };
 
 export interface DashboardStats {
   totalProjects: number;
