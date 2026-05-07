@@ -15,8 +15,7 @@ export { formatTimecode, formatTimecodeSimple } from './timecode';
 /**
  * 防抖函数
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -31,8 +30,7 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * 节流函数
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -337,4 +335,36 @@ export function pickPreferredSizeMb(
   if (exactSizeMb > 0) return exactSizeMb;
   if (explicitSizeMb > 0) return explicitSizeMb;
   return estimatedSizeMb;
+}
+
+// ============================================================
+// 并发映射 — 限制并发数量的并行处理工具
+// ============================================================
+
+/**
+ * 并发映射：并行处理数组元素，限制同时运行的任务数
+ * 用于批量 API 调用、文件处理等需要控制并发量的场景
+ *
+ * @example
+ * ```ts
+ * const results = await concurrentMap(urls, fetch, 4);
+ * ```
+ */
+export async function concurrentMap<T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+  limit = 8
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let index = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, () =>
+    (async () => {
+      while (index < items.length) {
+        const i = index++;
+        results[i] = await fn(items[i]);
+      }
+    })()
+  );
+  await Promise.all(workers);
+  return results;
 }
