@@ -11,7 +11,7 @@
  * Timeline 相关状态请使用 useTimelineStore
  */
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 
 import type { EditorStore, EditorState, VideoData, ScriptData, VoiceData, VideoSegment, EditorPanel } from './editorTypes';
 import {
@@ -63,8 +63,9 @@ const initialState = {
 // Store
 // =========================================
 export const useEditorStore = create<EditorStore>()(
-  persist(
-    (set, get) => ({
+  devtools(
+    persist(
+      (set, get) => ({
       ...initialState,
 
       // ─── Media ─────────────────────────────────────────────────────────────
@@ -164,6 +165,8 @@ export const useEditorStore = create<EditorStore>()(
         muted: state.muted,
       }),
     }
+    ),
+    { name: 'EditorStore' }
   )
 );
 

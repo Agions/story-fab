@@ -62,6 +62,39 @@ pub(crate) fn format_time(seconds: f64) -> String {
     format!("{:02}:{:02}:{:02}.{:03}", hours, minutes, secs, millis)
 }
 
+/// Write an FFmpeg concat file and return the path.
+/// The file is written to std::env::temp_dir() with a unique name.
+/// Caller is responsible for cleanup.
+pub fn write_concat_file(entries: &[impl AsRef<std::path::Path>]) -> Result<std::path::PathBuf, String> {
+    let concat_file = std::env::temp_dir()
+        .join(format!("concat_{}.txt", chrono_like_timestamp()));
+
+    let content = entries
+        .iter()
+        .map(|p| {
+            let escaped = p.as_ref().to_string_lossy().replace('\'', "'\\''");
+            format!("file '{}'", escaped)
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    std::fs::write(&concat_file, content)
+        .map_err(|e| format!("写入 concat 文件失败: {}", e))?;
+
+    Ok(concat_file)
+}
+
+/// Clean up a temp directory and all its contents.
+/// Silently ignores errors (for cleanup paths).
+pub fn cleanup_temp_dir(dir: &std::path::Path) {
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let _ = std::fs::remove_file(entry.path());
+        }
+    }
+    let _ = std::fs::remove_dir(dir);
+}
+
 /// Convert s16le PCM bytes to normalized f32 samples.
 /// Uses `chunks(2)` (not `_exact`) to safely drop any trailing partial chunk.
 pub fn pcm_samples_from_wav(pcm_data: &[u8]) -> Vec<f32> {

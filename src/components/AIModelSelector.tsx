@@ -141,19 +141,19 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = React.memo(({
     if (onChange) onChange(modelId);
   }, [onChange]);
 
-  const loadingRef = useRef<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const simulateLoading = useCallback(() => {
-    loadingRef.current = true;
-    setTimeout(() => { loadingRef.current = false; }, 500);
+    setIsLoading(true);
+    setTimeout(() => { setIsLoading(false); }, 500);
   }, []);
 
-  const categoryOptions = [
+  const categoryOptions = useMemo(() => [
     { label: '全部', value: 'all' as ModelCategory, icon: <Bot /> },
     { label: '文本', value: 'text' as ModelCategory, icon: <Edit /> },
     { label: '代码', value: 'code' as ModelCategory, icon: <Code /> },
     { label: '图像', value: 'image' as ModelCategory, icon: <Bot /> },
     { label: '视频', value: 'video' as ModelCategory, icon: <Video /> },
-  ];
+  ], []);
 
   return (
     <motion.div className={`${styles.container} ${className}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
@@ -208,7 +208,7 @@ const AIModelSelector: React.FC<AIModelSelectorProps> = React.memo(({
       )}
 
       <div className={styles.content}>
-        {loadingRef.current ? (
+        {isLoading ? (
           <div className={styles.loadingContainer}>加载中...</div>
         ) : viewMode === 'card' ? (
           <div className={`${styles.modelGrid} grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4`}>

@@ -4,6 +4,7 @@
  * 自动在组件卸载时清理所有注册的 timeout
  */
 import { useRef, useEffect, useCallback } from 'react';
+import { usePromiseDelay } from './usePromiseDelay';
 
 export interface UseTimeoutReturn {
   /** 设置一个带自动清理的 setTimeout，返回 timeout id */
@@ -32,6 +33,7 @@ export interface UseTimeoutReturn {
  */
 export function useTimeout(): UseTimeoutReturn {
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const promiseDelay = usePromiseDelay();
 
   // 组件卸载时清理所有 timeout
   useEffect(() => {
@@ -52,12 +54,5 @@ export function useTimeout(): UseTimeoutReturn {
     timeoutIdsRef.current = timeoutIdsRef.current.filter(tid => tid !== id);
   }, []);
 
-  const delay = useCallback((ms: number): Promise<void> => {
-    return new Promise(resolve => {
-      const id = setTimeout(resolve, ms);
-      timeoutIdsRef.current.push(id);
-    });
-  }, []);
-
-  return { set, clear, delay };
+  return { set, clear, delay: promiseDelay.delay };
 }

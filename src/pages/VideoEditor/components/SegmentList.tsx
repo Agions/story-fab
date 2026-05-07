@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, memo } from 'react';
+import React, { useCallback, useMemo, memo, useRef } from 'react';
 import { Card, CardContent } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
@@ -6,10 +6,6 @@ import { Plus, Trash2 } from 'lucide-react';
 import { VideoSegment } from '../../../services/videoProcessingFacade';
 import { formatDuration } from '../../../shared/utils/formatting';
 import styles from '@/pages/VideoEditor/index.module.less';
-
-const getSegmentKey = (segment: VideoSegment, index: number): string => {
-  return `${index}-${segment.start}-${segment.end}`;
-};
 
 interface SegmentItemProps {
   index: number;
@@ -90,6 +86,16 @@ const SegmentList: React.FC<SegmentListProps> = ({
   onDeleteSegment,
   onAddSegment,
 }) => {
+  // Stable segment key derived from segment data — avoids re-creating keys on every render
+  const segmentKeyRef = useRef<Map<string, string>>(new Map());
+  const getSegmentKey = useCallback((segment: VideoSegment, index: number): string => {
+    const key = `${index}-${segment.start.toFixed(3)}-${segment.end.toFixed(3)}`;
+    if (!segmentKeyRef.current.has(key)) {
+      segmentKeyRef.current.set(key, key);
+    }
+    return key;
+  }, []);
+
   const renderedItems = useMemo(() => (
     segments.map((segment, index) => (
       <SegmentItem
@@ -101,7 +107,7 @@ const SegmentList: React.FC<SegmentListProps> = ({
         onDeleteSegment={onDeleteSegment}
       />
     ))
-  ), [onDeleteSegment, onSelectSegment, segments, selectedIndex]);
+  ), [segments, selectedIndex, onSelectSegment, onDeleteSegment, getSegmentKey]);
 
   if (segments.length === 0) {
     return (

@@ -191,23 +191,26 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
 
   const allClips = useMemo(() => tracks.flatMap((t) => t.clips), [tracks]);
 
+  // 轨道操作工具函数（避免重复 find）
+  const getTrackById = useCallback((trackId: string) => tracks.find((t) => t.id === trackId), [tracks]);
+
   const handleToggleMute = useCallback((trackId: string) => {
-    const track = tracks.find((t) => t.id === trackId);
+    const track = getTrackById(trackId);
     if (track) updateTrack(trackId, { muted: !track.muted });
-  }, [tracks, updateTrack]);
+  }, [getTrackById, updateTrack]);
 
   const handleToggleLock = useCallback((trackId: string) => {
-    const track = tracks.find((t) => t.id === trackId);
+    const track = getTrackById(trackId);
     if (track) updateTrack(trackId, { locked: !track.locked });
-  }, [tracks, updateTrack]);
+  }, [getTrackById, updateTrack]);
 
   const handleToggleVisible = useCallback((trackId: string) => {
-    const track = tracks.find((t) => t.id === trackId);
+    const track = getTrackById(trackId);
     if (track) updateTrack(trackId, { visible: !track.visible });
-  }, [tracks, updateTrack]);
+  }, [getTrackById, updateTrack]);
 
   const handleResizeTrack = useCallback((trackId: string, deltaY: number) => {
-    const track = tracks.find((t) => t.id === trackId);
+    const track = getTrackById(trackId);
     if (track) {
       const newHeight = Math.max(30, Math.min(200, track.height + deltaY));
       updateTrack(trackId, { height: newHeight });
@@ -238,7 +241,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
   }, [tracks, onTracksChange]);
 
   const handleAddClip = useCallback((trackId: string) => {
-    const track = tracks.find((t) => t.id === trackId);
+    const track = getTrackById(trackId);
     if (!track || track.locked) return;
     const newClip: TimelineClip = {
       id: generateId('clip'),
@@ -252,7 +255,16 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     };
     updateTrack(trackId, { clips: [...track.clips, newClip] });
     onSelectionChange?.(newClip.id, trackId);
-  }, [tracks, localPlayhead, allClips.length, updateTrack, onSelectionChange]);
+  }, [getTrackById, localPlayhead, allClips.length, updateTrack, onSelectionChange]);
+
+  // 片段操作工具函数
+  const getClipById = useCallback((clipId: string) => {
+    for (const track of tracks) {
+      const clip = track.clips.find((c) => c.id === clipId);
+      if (clip) return { track, clip };
+    }
+    return undefined;
+  }, [tracks]);
 
   // 片段操作
   const handleClipClick = useCallback((clipId: string, trackId: string, e: React.MouseEvent) => {
@@ -311,8 +323,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     e: React.MouseEvent
   ) => {
     e.preventDefault();
-    const track = tracks.find((t) => t.id === trackId);
-    const clip = track?.clips.find((c) => c.id === clipId);
+    const { track, clip } = getClipById(clipId) ?? {};
     if (!clip || track?.locked) return;
 
     setIsDragging(true);
@@ -368,8 +379,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
         document.removeEventListener('mouseup', dragUpHandlerRef.current);
       }
 
-      const finalTrack = tracks.find((t) => t.id === trackId);
-      const finalClip = finalTrack?.clips.find((c) => c.id === clipId);
+      const { clip: finalClip } = getClipById(clipId) ?? {};
       if (finalClip) {
         onClipUpdate?.(clipId, { startMs: finalClip.startMs, endMs: finalClip.endMs });
       }
@@ -379,7 +389,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     dragUpHandlerRef.current = handleMouseUp;
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  }, [tracks, msPerPixel, snapToBoundary, onClipUpdate]);
+  }, [getClipById, msPerPixel, snapToBoundary, onClipUpdate]);
 
   // 时间线点击
   const handleTimelineClick = useCallback((e: React.MouseEvent) => {
@@ -410,12 +420,12 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
   }, [localZoom, localScrollX, onZoomChange, onScrollXChange]);
 
   // 添加轨道菜单
-  const trackMenuItems = [
+  const trackMenuItems = useMemo(() => [
     { key: 'video', label: '视频轨道', onClick: () => handleAddTrack('video') },
     { key: 'audio', label: '音频轨道', onClick: () => handleAddTrack('audio') },
     { key: 'subtitle', label: '字幕轨道', onClick: () => handleAddTrack('subtitle') },
     { key: 'effect', label: '效果轨道', onClick: () => handleAddTrack('effect') },
-  ];
+  ], [handleAddTrack]);
 
   const containerWidth = containerRef.current?.clientWidth || 800;
   const totalHeight = tracks.reduce((sum, t) => sum + t.height, 0);

@@ -1,10 +1,10 @@
-import React, { useState, useCallback, lazy, Suspense, useEffect, useRef } from 'react';
+import React, { useState, useCallback, lazy, Suspense, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs';
 import { Bot } from 'lucide-react';
 
 import { saveProjectToFile } from '../../services/tauri';
-import { notify } from '@/shared';
+import { notify, withLock } from '@/shared';
 import type { ClipAnalysisResult } from '../../core/services/aiClip';
 import { logger } from '../../shared/utils/logging';
 import { useVideoEditor } from './hooks/useVideoEditor';
@@ -33,11 +33,6 @@ const PanelLoading: React.FC = () => (
 const VideoEditorPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const [activeTab, setActiveTab] = useState<string>('trim');
-  const aliveRef = useRef(true);
-
-  useEffect(() => () => {
-    aliveRef.current = false;
-  }, []);
 
   useEffect(() => {
     const warmup = () => {
@@ -91,29 +86,16 @@ const VideoEditorPage: React.FC = () => {
   // 保存项目
   const handleSaveProject = useCallback(async () => {
     if (isSaving) return;
-    setIsSaving(true);
-    try {
+    await withLock(setIsSaving, '保存', async () => {
       const projectToSave = {
         id: projectId || 'new',
         segments,
         updatedAt: new Date().toISOString(),
       };
-
       await saveProjectToFile(projectId || 'new', projectToSave);
-      if (aliveRef.current) {
-        notify.success('项目保存成功');
-      }
-    } catch (error) {
-      logger.error('保存失败:', error);
-      if (aliveRef.current) {
-        notify.error(error, '保存失败，请重试');
-      }
-    } finally {
-      if (aliveRef.current) {
-        setIsSaving(false);
-      }
-    }
-  }, [isSaving, projectId, segments, setIsSaving]);
+      notify.success('项目保存成功');
+    });
+  }, [isSaving, projectId, segments]);
 
   // 导出视频
   const handleExportVideo = useCallback(async () => {
@@ -122,34 +104,14 @@ const VideoEditorPage: React.FC = () => {
       notify.warning('请先加载视频并添加剪辑片段');
       return;
     }
-
-    setIsExporting(true);
-    try {
-      // 输出路径
+    notify.info('正在导出视频...');
+    await withLock(setIsExporting, '导出', async () => {
       const outputPath = `export/${Date.now()}.${outputFormat}`;
-
-      // 显示进度
-      notify.info('正在导出视频...');
-
-      // 执行导出
-      const result = await exportService.exportVideo(
-        videoSrc,
-        outputPath,
-        {}
-      );
-
-      // 导出成功
+      const result = await exportService.exportVideo(videoSrc, outputPath, {});
       notify.success(`视频导出成功: ${result.outputPath}`);
       logger.info('导出成功', { result });
-    } catch (error) {
-      logger.error('导出失败:', error);
-      notify.error(String(error), '导出失败');
-    } finally {
-      if (aliveRef.current) {
-        setIsExporting(false);
-      }
-    }
-  }, [isExporting, videoSrc, segments, outputFormat, videoQuality, setIsExporting]);
+    });
+  }, [isExporting, videoSrc, segments, outputFormat]);
 
   // AI 分析完成
   const handleAnalysisComplete = useCallback((result: ClipAnalysisResult) => {

@@ -366,7 +366,7 @@ function buildReason(
   const effectiveK = (effectiveTokens / 1000).toFixed(0);
 
   if (effectiveTokens > maxTokens) {
-    return `⚠️ 内容 ${effectiveK}K > 模型上限 ${tokenLimit}K，将自动 trim`;
+    return `⚠️ 内容 ${effectiveK}K > 模型上限 ${tokenLimitK}K，将自动 trim`;
   }
 
   const complexityStr = complexity === 'complex' ? '复杂' : complexity === 'simple' ? '简单' : '';
@@ -374,7 +374,7 @@ function buildReason(
     script: '脚本生成', analysis: '视频分析', code: '代码任务', fast: '快速响应', video: '视频理解'
   };
 
-  return `${taskLabels[taskType]}${complexityStr} → ${model.name}（${tokenLimit}K 上限，剩余 ${Math.round((1 - effectiveTokens / maxTokens) * 100)}%）`;
+  return `${taskLabels[taskType]}${complexityStr} → ${model.name}（${tokenLimitK}K 上限，剩余 ${Math.round((1 - effectiveTokens / maxTokens) * 100)}%）`;
 }
 
 /**

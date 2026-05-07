@@ -35,12 +35,12 @@
 }
 
 // =============================================
-// 琥珀色渐变（Amber）- 通用按钮/强调色
+// 琥珀色按钮样式（ant-btn-primary 专用）
+// 解决 8 处重复的 linear-gradient 定义
 // =============================================
-.amber-gradient() {
-  background: linear-gradient(135deg, @primary-color 0%, @primary-dark 100%);
-  border: none;
-  color: @ink-black !important;
+.amber-btn-primary() {
+  background: linear-gradient(135deg, @film-amber 0%, #c49464 100%) !important;
+  border: none !important;
 }
 
 .amber-gradient-hover() {

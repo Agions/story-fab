@@ -5,6 +5,7 @@
 
 import { tauri } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
+import { formatDurationChinese } from '../../../shared/utils/format';
 import type {
   VideoInfo,
   Scene,
@@ -348,10 +349,10 @@ export class VisionService {
       const baseEmotions = [...EMOTION_DIMENSIONS];
 
       // 基于场景类型调整情感
-      if ((scene.type as string) === 'intro') {
+      if (scene.type === 'intro') {
         baseEmotions.find(e => e.id === 'excited')!.score = 0.7;
         baseEmotions.find(e => e.id === 'positive')!.score = 0.6;
-      } else if ((scene.type as string) === 'emotion') {
+      } else if (scene.type === 'emotion') {
         baseEmotions.find(e => e.id === 'excited')!.score = 0.8;
         baseEmotions.find(e => e.id === 'positive')!.score = 0.5;
       } else {
@@ -595,13 +596,8 @@ export class VisionService {
     return parts.join('');
   }
 
-  /**
-   * 格式化时长
-   */
   private formatDuration(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return mins > 0 ? `${mins}分${secs}秒` : `${secs}秒`;
+    return formatDurationChinese(seconds);
   }
 
   /**
