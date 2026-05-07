@@ -339,13 +339,15 @@ pub async fn cut_video(
             async move {
                 let temp_file = temp_dir.join(format!("seg_{:03}.mp4", i));
                 let duration = (seg.end - seg.start).max(0.1);
+                let start_time = format_time(seg.start);
+                let duration_str = format_time(duration);
 
                 let mut args = vec![
                     "-y",
                     "-ss",
-                    &format_time(seg.start),
+                    &start_time,
                     "-t",
-                    &format_time(duration),
+                    &duration_str,
                     "-i",
                     &input_path,
                 ];
@@ -357,7 +359,8 @@ pub async fn cut_video(
                 }
 
                 args.extend(&["-c:a", "aac", "-movflags", "+faststart"]);
-                args.push(temp_file.to_string_lossy().as_ref());
+                let temp_file_str = temp_file.to_string_lossy();
+                args.push(temp_file_str.as_ref());
 
                 let result = TokioCommand::new(&ffmpeg_bin)
                     .args(&args)
