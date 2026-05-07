@@ -254,7 +254,11 @@ jobs:
         with:
           workspaces: src-tauri
       - name: Cargo check
-        run: cd src-tauri && cargo clean && cargo check 2>&1
+        run: |
+          set -e
+          cd src-tauri
+          which cargo && cargo --version
+          cargo check 2>&1
       - name: Upload cargo report
         if: always()
         uses: actions/upload-artifact@v4
