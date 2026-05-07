@@ -33,7 +33,7 @@ fn is_cancelled() -> bool {
 #[tauri::command]
 pub fn cancel_export(export_id: String) -> Result<(), String> {
     let active = ACTIVE_EXPORT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
-    if *active == Some(export_id) {
+    if *active == Some(export_id.clone()) {
         CANCEL_REQUESTED.store(true, Ordering::SeqCst);
         tracing::info!("取消导出已标记: {}", export_id);
         Ok(())
@@ -91,7 +91,7 @@ pub async fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<Strin
         .filter(|segment| segment.end > segment.start)
         .collect::<Vec<_>>();
 
-    let transition = input.transition.unwrap_or_else(|| "cut".to_string());
+    let transition = input.transition.as_ref().map(String::as_str).unwrap_or("cut");
     let transition_duration = input.transition_duration.unwrap_or(0.35).clamp(0.0, 1.5);
 
     let temp_root = std::env::temp_dir().join(format!(
