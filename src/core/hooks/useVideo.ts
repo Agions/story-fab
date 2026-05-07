@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { VideoInfo, VideoAnalysis, Scene } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, Scene, Keyframe } from '@/core/types';
 import { delay, formatDuration } from '@/shared';
 import type { TaskStatusInfo } from '@/core/services/ai/types';
 
@@ -348,12 +348,17 @@ function generateMockScenes(duration: number): Scene[] {
   return scenes;
 }
 
-function generateMockKeyframes(duration: number): string[] {
+function generateMockKeyframes(duration: number): Keyframe[] {
   if (duration <= 0) return [];
   const count = Math.floor(duration / KEYFRAME_INTERVAL_SECONDS);
   return Array.from({ length: count }, (_, i) => {
     const t = i * KEYFRAME_INTERVAL_SECONDS;
-    return `mock_keyframe_${t}s`;
+    return {
+      id: `mock_keyframe_${t}s`,
+      timestamp: t,
+      imageUrl: `mock://frame/${t}`,
+      description: `场景帧 at ${t}s`
+    };
   });
 }
 
