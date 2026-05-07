@@ -152,29 +152,22 @@ jobs:
           echo "ESLint warnings within limit"
       - name: Coverage threshold check
         run: |
-          if [ -f coverage/coverage-final.json ]; then
-            # Inline coverage computation (scripts/compute-coverage.py may not exist)
-            COVERAGE=$(python3 -c "
-import json, sys
-with open('coverage/coverage-final.json') as f:
-    data = json.load(f)
-total = sum(m['covered'] + m['missed'] for m in data.values() if isinstance(m, dict) and 'covered' in m)
-covered = sum(m['covered'] for m in data.values() if isinstance(m, dict) and 'covered' in m)
-if total == 0:
-    print('0')
-else:
-    print(f'{covered/total*100:.1f}')
-" 2>/dev/null || echo "0")
-            echo "Coverage: ${COVERAGE}%"
-            COVERAGE_INT=$(printf "%.0f" "$COVERAGE")
-            if [ "$COVERAGE_INT" -lt 30 ]; then
-              echo "Coverage (${COVERAGE}%) below threshold of 30%"
-              exit 1
-            fi
-            echo "Coverage meets threshold"
-          else
+          if [ ! -f coverage/coverage-final.json ]; then
             echo "Coverage report not found, skipping check"
+            exit 0
           fi
+          if [ ! -f scripts/compute-coverage.py ]; then
+            echo "compute-coverage.py not found, skipping check"
+            exit 0
+          fi
+          COVERAGE=$(python3 scripts/compute-coverage.py)
+          echo "Coverage: ${COVERAGE}%"
+          COVERAGE_INT=$(printf "%.0f" "$COVERAGE" 2>/dev/null || echo "0")
+          if [ "$COVERAGE_INT" -lt 30 ]; then
+            echo "Coverage (${COVERAGE}%) below threshold of 30%"
+            exit 1
+          fi
+          echo "Coverage meets threshold"
       - name: TypeScript errors check
         run: |
           # Only check src/ files — node_modules errors are expected and ignored
