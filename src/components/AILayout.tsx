@@ -23,7 +23,7 @@ import {
   Edit,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useCutDeck, AIFeatureType } from '@/components/CutDeck/context';
+import { useCutDeck, CutDeckFeatureType } from '@/components/CutDeck/context';
 import { notify } from '@/shared';
 import styles from '@/components/AILayout.module.less';
 
@@ -71,7 +71,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
     notify.info(`已切换到 ${functionKey} 模式`);
   };
 
-  const handleFeatureClick = (featureKey: AIFeatureType) => {
+  const handleFeatureClick = (featureKey: CutDeckFeatureType) => {
     setFeature(featureKey);
   };
 
@@ -327,7 +327,7 @@ const AILayout: React.FC<AILayoutProps> = ({ children }) => {
               <div
                 key={feature.key}
                 className={`${styles.featureItem} ${selectedFeature === feature.key ? styles.active : ''}`}
-                onClick={() => handleFeatureClick(feature.key as AIFeatureType)}
+                onClick={() => handleFeatureClick(feature.key as CutDeckFeatureType)}
               >
                 <div className={styles.featureIcon}>{feature.icon}</div>
                 <div className={styles.featureInfo}>
