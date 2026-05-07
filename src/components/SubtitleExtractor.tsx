@@ -9,6 +9,10 @@
  * 设计风格：AI Cinema Studio Dark (#0C0D14)
  */
 import React, { useState, useCallback, useRef } from 'react';
+
+// ── Progress animation constants ──────────────────────────────────────────────
+const PROGRESS_UPDATE_INTERVAL_MS = 250;
+const PROGRESS_CAP = 88;
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -102,7 +106,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
       video.pause();
       setPreviewPlaying(false);
     } else {
-      video.play().catch(() => {});
+      video.play().catch((e) => { console.warn('[SubtitleExtractor] 播放失败:', e); });
       setPreviewPlaying(true);
     }
   }, [previewPlaying]);
@@ -114,7 +118,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     setPlayheadMs(timeSec * 1000);
     if (!previewPlaying) {
       setPreviewPlaying(true);
-      video.play().catch(() => {});
+      video.play().catch((e) => { console.warn('[SubtitleExtractor] 播放失败:', e); });
     }
   }, [previewPlaying]);
 
@@ -125,7 +129,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     setExtractedSubtitles([]);
     setActiveSubId(null);
     try {
-      const interval = setInterval(() => { setProgress(prev => Math.min(prev + 8, 88)); }, 250);
+      const interval = setInterval(() => { setProgress(prev => Math.min(prev + 8, PROGRESS_CAP)); }, PROGRESS_UPDATE_INTERVAL_MS);
       const result = await subtitleService.extractSubtitles(videoUrl, { language: 'zh-CN' });
       clearInterval(interval);
       setProgress(100);

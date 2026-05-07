@@ -261,6 +261,8 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       }));
       await processVideo(segmentsToProcess);
       notify.success('视频处理完成');
+    } catch (error) {
+      notify.error(error as Parameters<typeof notify.error>[0], '视频处理失败');
     }
   }, [segments, processVideo]);
 

@@ -15,5 +15,4 @@ export { useTimelineStore } from './timelineStore'; // Phase 3: Timeline 状态�
 export { useModelStore } from './mainStore';
 
 // CutDeck workspace 专用 store（保留在 components/CutDeck/context/）
-export { useCutDeckStore, useCutDeckStoreShallow } from '../components/CutDeck/context/cutDeckStore';
-export type { CutDeckStore } from '../components/CutDeck/context/cutDeckStore';
+// 注意：CutDeck 使用 Context+Reducer 模式（useCutDeck），非 Zustand
