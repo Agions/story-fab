@@ -345,7 +345,7 @@ impl HighlightDetector {
                 "-ar", "44100",
                 "-f", "s16le",
                 "-acodec", "pcm_s16le",
-                &temp_wav.display(),
+                &temp_wav.to_string_lossy(),
             ])
             .output()
             .map_err(|e| format!("FFmpeg failed to extract audio from '{}': {}", audio_path, e))?;
@@ -444,7 +444,7 @@ impl HighlightDetector {
                 "-acodec", "pcm_s16le",
                 "-ar", "44100",
                 "-ac", "1",
-                &temp_audio.display(),
+                &temp_audio.to_string_lossy(),
             ])
             .output()
             .map_err(|e| format!("FFmpeg audio extraction failed: {}", e))?;
