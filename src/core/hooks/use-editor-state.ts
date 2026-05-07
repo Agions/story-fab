@@ -16,7 +16,7 @@ import {
   type TextItem,
   type AudioClip,
   type EditorExportSettings,
-} from '@/core/services/editor.service';
+} from '@/core/services/editor';
 import type { ExportSettings, ScriptSegment } from '@/core/types';
 
 // 剪辑状态

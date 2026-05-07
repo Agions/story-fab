@@ -59,6 +59,7 @@ export function useDashboard(): UseDashboardReturn {
             id: String(project.id),
             title: String(project.name || '未命名项目'),
             thumbnail: `https://picsum.photos/seed/${project.id || 'default'}/300/200`,
+            createdAt: String(project.createdAt || new Date().toISOString()),
             updatedAt: String(project.updatedAt || project.createdAt || new Date().toISOString()),
             duration: metrics.durationSec,
             size,

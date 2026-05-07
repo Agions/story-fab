@@ -444,6 +444,7 @@ export function recommendModelsForTask(
 export const AI_MODELS: AIModel[] = [
   {
     id: 'gpt-5.5',
+    name: 'GPT-5.5',
     provider: 'openai',
     category: ['text', 'code', 'image', 'video'],
     description: 'OpenAI 最新旗舰模型（2026），支持多模态输入，适合视频素材分析与解说文案生成。',
