@@ -4,6 +4,7 @@
  * 自动在组件卸载时清理所有注册的 interval
  */
 import { useRef, useEffect, useCallback } from 'react';
+import { usePromiseDelay } from './usePromiseDelay';
 
 export interface UseIntervalReturn {
   /** 设置一个带自动清理的 setInterval，返回 interval id */
@@ -32,6 +33,7 @@ export interface UseIntervalReturn {
  */
 export function useInterval(): UseIntervalReturn {
   const intervalIdsRef = useRef<ReturnType<typeof setInterval>[]>([]);
+  const promiseDelay = usePromiseDelay();
 
   // 组件卸载时清理所有 interval
   useEffect(() => {
@@ -52,12 +54,5 @@ export function useInterval(): UseIntervalReturn {
     intervalIdsRef.current = intervalIdsRef.current.filter(iid => iid !== id);
   }, []);
 
-  const delay = useCallback((ms: number): Promise<void> => {
-    return new Promise(resolve => {
-      const id = setInterval(resolve, ms);
-      intervalIdsRef.current.push(id);
-    });
-  }, []);
-
-  return { set, clear, delay };
+  return { set, clear, delay: promiseDelay.delay };
 }

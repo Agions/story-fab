@@ -38,24 +38,36 @@ export const TrackHeader = memo<TrackHeaderProps>(({
   const [resizing, setResizing] = useState(false);
   const startYRef = useRef(0);
 
+  const moveRef = useRef<((moveEvent: MouseEvent) => void) | null>(null);
+  const upRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (moveRef.current) document.removeEventListener('mousemove', moveRef.current);
+      if (upRef.current) document.removeEventListener('mouseup', upRef.current);
+    };
+  }, []);
+
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setResizing(true);
     startYRef.current = e.clientY;
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
+    moveRef.current = (moveEvent: MouseEvent) => {
       const deltaY = moveEvent.clientY - startYRef.current;
       onResizeTrack(track.id, deltaY);
     };
 
-    const handleMouseUp = () => {
+    upRef.current = () => {
       setResizing(false);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      if (moveRef.current) document.removeEventListener('mousemove', moveRef.current);
+      if (upRef.current) document.removeEventListener('mouseup', upRef.current);
+      moveRef.current = null;
+      upRef.current = null;
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', moveRef.current);
+    document.addEventListener('mouseup', upRef.current);
   }, [track.id, onResizeTrack]);
 
   return (

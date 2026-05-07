@@ -1,11 +1,13 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::types::{AutonomousRenderInput, TranscodeCropInput};
-use crate::utils::{chrono_like_timestamp, cmd_err, format_srt_time};
+use crate::utils::{chrono_like_timestamp, cmd_err, format_srt_time, write_concat_file};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::process::Command;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
+use tokio::process::Command as TokioCommand;
+use tokio::fs as tokio_fs;
 
 // ─── Active Export Cancellation Tracker ─────────────────────────────────────
 
@@ -80,7 +82,7 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
 // ─── Autonomous Cut ─────────────────────────────────────────────────────────
 
 #[tauri::command]
-pub fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, String> {
+pub async fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, String> {
     let segments = input
         .segments
         .clone()
@@ -97,85 +99,127 @@ pub fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, Str
         std::process::id(),
         chrono_like_timestamp()
     ));
-    std::fs::create_dir_all(&temp_root).map_err(|e| format!("创建临时目录失败: {e}"))?;
+    tokio_fs::create_dir_all(&temp_root)
+        .await
+        .map_err(|e| format!("创建临时目录失败: {e}"))?;
     let merged_output = temp_root.join("merged_output.mp4");
 
     if segments.len() <= 1 {
-        let mut fallback = input.clone();
-        fallback.output_path = merged_output.to_string_lossy().to_string();
-        render_single_cut(&fallback)?;
-        let post =
-            apply_post_processing(&merged_output, &input, &temp_root, &input.output_path);
-        let _ = std::fs::remove_file(&merged_output);
-        let _ = std::fs::remove_dir(&temp_root);
-        return post.map(|_| input.output_path);
+        let fallback_output = merged_output.to_string_lossy().to_string();
+        render_single_cut_sync(&input.input_path, &fallback_output, input.start_time, input.end_time)?;
+        apply_post_processing(&merged_output, &input, &temp_root, &input.output_path)?;
+        let _ = tokio_fs::remove_file(&merged_output).await;
+        let _ = tokio_fs::remove_dir(&temp_root).await;
+        return Ok(input.output_path);
     }
 
-    let mut temp_files: Vec<PathBuf> = Vec::new();
+    // ── Parallel segment cutting via Tokio ──────────────────────────────────
+    let ffmpeg_bin = ffmpeg_binary();
+    let input_path = input.input_path.clone();
+    let temp_root_clone = temp_root.clone();
 
-    let merge_ok = (|| {
-        for (index, segment) in segments.iter().enumerate() {
-            let temp_file = temp_root.join(format!("seg_{index}.mp4"));
-            let duration = (segment.end - segment.start).max(0.1);
-            let output = Command::new(ffmpeg_binary())
-                .arg("-y")
-                .arg("-ss")
-                .arg(segment.start.to_string())
-                .arg("-t")
-                .arg(duration.to_string())
-                .arg("-i")
-                .arg(&input.input_path)
-                .arg("-c:v")
-                .arg("libx264")
-                .arg("-c:a")
-                .arg("aac")
-                .arg("-preset")
-                .arg("veryfast")
-                .arg("-movflags")
-                .arg("+faststart")
-                .arg(&temp_file)
-                .output()
-                .map_err(|e| format!("执行 ffmpeg 切段失败: {e}"))?;
-            if !output.status.success() {
-                return Err(cmd_err("切段失败", &output));
+    let tasks: Vec<_> = segments
+        .iter()
+        .enumerate()
+        .map(|(index, segment)| {
+            let ffmpeg_bin = ffmpeg_bin.clone();
+            let input_path = input_path.clone();
+            let temp_root = temp_root_clone.clone();
+            async move {
+                let temp_file = temp_root.join(format!("seg_{index}.mp4"));
+                let duration = (segment.end - segment.start).max(0.1);
+                let output = TokioCommand::new(&ffmpeg_bin)
+                    .arg("-y")
+                    .arg("-ss")
+                    .arg(segment.start.to_string())
+                    .arg("-t")
+                    .arg(duration.to_string())
+                    .arg("-i")
+                    .arg(&input_path)
+                    .arg("-c:v")
+                    .arg("libx264")
+                    .arg("-c:a")
+                    .arg("aac")
+                    .arg("-preset")
+                    .arg("veryfast")
+                    .arg("-movflags")
+                    .arg("+faststart")
+                    .arg(temp_file.to_string_lossy().as_ref())
+                    .output()
+                    .await
+                    .map_err(|e| format!("执行 ffmpeg 切段失败: {e}"))?;
+                if !output.status.success() {
+                    return Err(cmd_err("切段失败", &output));
+                }
+                Ok::<PathBuf, String>(temp_file)
             }
-            temp_files.push(temp_file);
-        }
+        })
+        .collect();
 
-        if transition == "cut" || transition_duration <= 0.0 {
-            merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy())
-        } else {
-            merge_with_transitions(
-                &temp_root,
-                &temp_files,
-                &merged_output.to_string_lossy(),
-                &transition,
-                transition_duration,
-            )
-            .or_else(|_| merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy()))
-        }
-    })();
-
-    // Cleanup temp segment files (not merged_output — still needed for post-processing)
-    for file in temp_files {
-        let _ = std::fs::remove_file(file);
+    let results = futures_util::future::join_all(tasks).await;
+    let mut temp_files: Vec<PathBuf> = Vec::new();
+    for result in results {
+        temp_files.push(result?);
     }
 
-    if let Err(e) = merge_ok {
-        // Cleanup merged_output and temp_root even on merge failure
-        let _ = std::fs::remove_file(&merged_output);
-        let _ = std::fs::remove_dir(&temp_root);
+    // ── Merge ────────────────────────────────────────────────────────────────
+    let merge_result = if transition == "cut" || transition_duration <= 0.0 {
+        merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy())
+    } else {
+        merge_with_transitions(
+            &temp_root,
+            &temp_files,
+            &merged_output.to_string_lossy(),
+            &transition,
+            transition_duration,
+        )
+        .or_else(|_| merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy()))
+    };
+
+    // Cleanup temp segment files
+    for file in temp_files {
+        let _ = tokio_fs::remove_file(&file).await;
+    }
+
+    if let Err(e) = merge_result {
+        let _ = tokio_fs::remove_file(&merged_output).await;
+        let _ = tokio_fs::remove_dir(&temp_root).await;
         return Err(format!("自动出片合并失败: {e}"));
     }
 
     let post_result =
         apply_post_processing(&merged_output, &input, &temp_root, &input.output_path);
 
-    // Cleanup after post-processing is done
-    let _ = std::fs::remove_file(&merged_output);
-    let _ = std::fs::remove_dir(&temp_root);
+    // Cleanup
+    let _ = tokio_fs::remove_file(&merged_output).await;
+    let _ = tokio_fs::remove_dir(&temp_root).await;
 
     post_result.map(|_| input.output_path)
+}
+
+/// Synchronous single-cut fallback (keeps existing logic, no async needed)
+fn render_single_cut_sync(
+    input_path: &str,
+    output_path: &str,
+    start: Option<f64>,
+    end: Option<f64>,
+) -> Result<String, String> {
+    let mut cmd = Command::new(ffmpeg_binary());
+    cmd.arg("-y");
+    apply_time_segment(&mut cmd, start, end);
+    cmd.arg("-i").arg(input_path);
+    cmd.arg("-c:v").arg("libx264");
+    cmd.arg("-c:a").arg("aac");
+    cmd.arg("-movflags").arg("+faststart");
+    cmd.arg(output_path);
+    let output = cmd
+        .output()
+        .map_err(|e| format!("执行 ffmpeg 失败（请确认已安装 ffmpeg）: {e}"))?;
+    if output.status.success() {
+        Ok(output_path.to_string())
+    } else {
+        Err(cmd_err("自动出片失败", &output))
+    }
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -200,28 +244,7 @@ fn quality_params(quality: Option<&str>) -> (u32, &'static str) {
     }
 }
 
-fn render_single_cut(input: &AutonomousRenderInput) -> Result<String, String> {
-    let mut cmd = Command::new(ffmpeg_binary());
-    cmd.arg("-y");
-    apply_time_segment(&mut cmd, input.start_time, input.end_time);
-    cmd.arg("-i")
-        .arg(&input.input_path)
-        .arg("-c:v")
-        .arg("libx264")
-        .arg("-c:a")
-        .arg("aac")
-        .arg("-movflags")
-        .arg("+faststart")
-        .arg(&input.output_path);
-    let output = cmd
-        .output()
-        .map_err(|e| format!("执行 ffmpeg 失败（请确认已安装 ffmpeg）: {e}"))?;
-    if output.status.success() {
-        Ok(input.output_path.clone())
-    } else {
-        Err(cmd_err("自动出片失败", &output))
-    }
-}
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
 fn apply_post_processing(
     merged_input: &PathBuf,
@@ -392,18 +415,7 @@ fn merge_by_concat(
     temp_files: &[PathBuf],
     output_path: &str,
 ) -> Result<(), String> {
-    let concat_list_path = temp_root.join("concat.txt");
-    let concat_body = temp_files
-        .iter()
-        .map(|path| {
-            format!(
-                "file '{}'\n",
-                path.to_string_lossy().replace('\'', "'\\''")
-            )
-        })
-        .collect::<String>();
-    std::fs::write(&concat_list_path, concat_body)
-        .map_err(|e| format!("写入 concat 列表失败: {e}"))?;
+    let concat_list_path = write_concat_file(temp_files)?;
 
     let merge_output = Command::new(ffmpeg_binary())
         .arg("-y")

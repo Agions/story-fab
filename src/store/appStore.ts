@@ -3,15 +3,8 @@
  * 包含: 用户认证、UI状态、通知、设置、自动保存
  */
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-
-// User type
-export interface User {
-  id: string;
-  name: string;
-  email?: string;
-  avatar?: string;
-}
+import { persist, createJSONStorage, devtools } from 'zustand/middleware';
+import type { User } from '@/core/types';
 
 // ==========================================
 // 类型定义
@@ -62,8 +55,9 @@ const defaultSettings: UserSettings = {
 // Store 创建
 // ==========================================
 export const useAppStore = create<AppState>()(
-  persist(
-    (set): AppState => ({
+  devtools(
+    persist(
+      (set): AppState => ({
       // 初始状态
       user: null as User | null,
       isAuthenticated: false,
@@ -109,5 +103,7 @@ export const useAppStore = create<AppState>()(
         autoSave: state.autoSave,
       }),
     }
+    ),
+    { name: 'AppStore' }
   )
 );

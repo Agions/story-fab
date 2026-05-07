@@ -5,9 +5,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import { notify } from '@/shared';
-import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '../../services/tauri';
+import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '@/services/tauri';
 import type { ProjectUIStatus, ProjectUIStats, ProjectView } from '../pages/Projects/types';
 
 export type { ProjectUIStatus, ProjectUIStats, ProjectView };
