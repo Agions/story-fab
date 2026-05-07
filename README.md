@@ -1,6 +1,8 @@
+# CutDeck
+
 <div align="center">
 
-<p><img src="./docs/public/logo.svg" alt="CutDeck" width="120" /></p>
+<p><img src="./public/logo.svg" alt="CutDeck" width="120" /></p>
 
 <h1 style="
   font-family: 'Syne', system-ui, sans-serif;
@@ -16,7 +18,6 @@
 
 <p style="font-size: 1.15rem; color: #94a3b8; margin: 0 0 2rem;">
   AI 驱动的专业视频剪辑工具 · 长视频一键智能剪辑 · 多平台分发
-  <span style="font-size: 0.95rem;">AI-Powered Professional Video Editor · One-Click Long Video Editing · Multi-Platform Distribution</span>
 </p>
 
 <p>
@@ -40,7 +41,7 @@
 
 ## 🎯 解决的问题
 
-传统视频剪辑的最大痛点：**一个长视频，想剪成多个精彩短片段分发到不同平台，需要人工反复观看、逐个标记、手动导出。**
+**传统视频剪辑的最大痛点**：一个长视频，想剪成多个精彩短片段分发到不同平台，需要人工反复观看、逐个标记、手动导出。
 
 CutDeck 用 AI 把这个过程自动化：
 
@@ -74,32 +75,55 @@ CutDeck 用 AI 把这个过程自动化：
 
 ### 🎬 多格式导出
 
-9:16 竖屏（抖音）· 1:1 方屏（Instagram）· 16:9 横屏（YouTube）· 一键导出
+- **9:16** 竖屏（抖音 / 快手）
+- **1:1** 方屏（Instagram）
+- **16:9** 横屏（YouTube / B站）
+- 一键批量导出，自定义分辨率、帧率、码率
 
 ### 🎙️ 本地 Whisper 字幕
 
-faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，断网可用
+faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，**断网可用**。
+
+> 未安装 faster-whisper 时自动降级为模拟结果，不影响使用流程。
 
 ### ⌨️ 专业剪辑体验
 
 - 多轨道时间轴（视频 / 音频 / 字幕独立轨道）
-- 20+ 全局快捷键（空格 / I-O 入出点 / J-K-L 逐帧 / ⌘Z 撤销）
+- 20+ 全局快捷键（`空格` 播放 / `I`/`O` 入出点 / `J`-`K`-`L` 逐帧 / `⌘Z` 撤销）
 - Timeline 虚拟化（100+ clips 无卡顿）
 
 ---
 
 ## 🚀 快速开始
 
+### 环境要求
+
+- Node.js 18+
+- Rust 1.75+（用于 Tauri 后端编译）
+- FFmpeg（系统安装或通过 Tauri 自动下载）
+
+### 安装运行
+
 ```bash
 git clone https://github.com/Agions/CutDeck.git
 cd CutDeck
 npm install
 npm run dev
-
-# 访问 http://localhost:1430
 ```
 
-完整文档：https://agions.github.io/CutDeck
+访问 **http://localhost:1430**
+
+### 构建桌面应用
+
+```bash
+# 安装 Rust（已有可跳过）
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 构建 Tauri 应用
+npm run tauri build
+```
+
+产物位于 `src-tauri/target/release/`（或 `target/bundle/` 下各平台安装包）。
 
 ---
 
@@ -109,13 +133,11 @@ npm run dev
 
 | 提供商 | 模型 | 适用场景 |
 |--------|------|----------|
-| DeepSeek | V4-Flash（推荐），V4-Pro（推理） | 🏆 性价比最高，Clip Script 生成 |
+| DeepSeek | V4-Flash（推荐）、V4-Pro（推理） | 🏆 性价比最高，Clip Script 生成 |
 | OpenAI | GPT-4o、o3、o3-mini | 剧情分析、内容理解 |
 | Anthropic | Claude 3.5 Sonnet、Claude 3 Opus | 长文本分析 |
 | 阿里云 | Qwen-Max、Qwen-Plus | 中文内容创作 |
-| 月之暗面 | Kimi（ moonshot-v1）| 长文本分析 |
-
-> ⚠️ **Whisper 字幕**：需要在本地安装 `faster-whisper`（`pip install faster-whisper`），未安装时自动降级为模拟结果。Rust 推理，**断网可用**。
+| 月之暗面 | Kimi（moonshot-v1）| 长文本分析 |
 
 ---
 
@@ -126,14 +148,14 @@ npm run dev
 │                        UI 层 (React 18)                     │
 │     Landing · Dashboard · 编辑器 · AI 控制台                  │
 ├──────────────────────────────────────────────────────────────┤
-│                      核心层 (core/)                           │
+│                      核心层 (src/core/)                      │
 │   services/ · pipeline/ · hooks/ · video/ · types/           │
 ├──────────────────────────────────────────────────────────────┤
-│                      状态层 (store/)                         │
-│   Zustand v5 持久化 stores                                   │
+│                      状态层 (src/store/)                     │
+│   Zustand v5 持久化 stores（app · project · editor）         │
 ├──────────────────────────────────────────────────────────────┤
 │                      外部依赖层                               │
-│        FFmpeg · Tauri IPC (Rust) · AI APIs                   │
+│        FFmpeg · Tauri IPC (Rust) · AI APIs                  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -141,23 +163,37 @@ npm run dev
 
 ```
 CutDeck/
-├── src/                          # React 前端
-│   ├── core/                     # 核心业务模块（域驱动）
-│   │   ├── types.ts              # 全局类型定义
-│   │   ├── video/                # 视频处理管道
-│   │   ├── services/             # 业务服务（AI · Vision · ASR · 字幕 · 导出）
-│   │   ├── pipeline/             # AI 剪辑工作流（Step 架构）
-│   │   │   └── steps/            # BuildCandidates · ScoreClips · GenerateSEO · PrepareExport
-│   │   └── hooks/                # React Hooks
-│   ├── store/                    # Zustand Stores（app · project · editor）
-│   ├── components/               # React UI 组件
-│   └── pages/                    # 页面组件
-├── src-tauri/                    # Tauri 后端 (Rust)
+├── public/                     # 静态资源
+│   ├── logo.svg                # 应用 Logo
+│   └── favicon.svg             # Favicon
+├── src/                        # React 前端
+│   ├── core/                   # 核心业务模块（域驱动）
+│   │   ├── types.ts            # 全局类型定义
+│   │   ├── video/              # 视频处理管道
+│   │   ├── services/           # 业务服务（AI · Vision · ASR · 字幕 · 导出）
+│   │   ├── pipeline/           # AI 剪辑工作流（Step 架构）
+│   │   │   └── steps/          # BuildCandidates · ScoreClips · GenerateSEO · PrepareExport
+│   │   └── hooks/              # React Hooks
+│   ├── store/                  # Zustand Stores（app · project · editor）
+│   ├── components/             # React UI 组件
+│   ├── pages/                  # 页面组件（Landing · Dashboard · Editor · Settings）
+│   ├── context/                # React Context（Settings · Theme · Toast）
+│   ├── hooks/                  # 通用 Hooks（useLocalStorage · useSettings · useModel）
+│   ├── services/               # 外部服务抽象（Tauri IPC · AI API）
+│   ├── shared/                 # 共享工具（常量 · 工具函数 · 通知系统）
+│   └── styles/                 # 全局样式与主题
+├── src-tauri/                  # Tauri 后端 (Rust)
 │   └── src/
-│       ├── commands/             # FFmpeg · 高光检测 · 智能分段 · 渲染
-│       └── lib.rs               # 命令注册
-└── docs/                        # VitePress 文档
+│       ├── commands/           # FFmpeg · 高光检测 · 智能分段 · 字幕
+│       ├── lib.rs              # 命令注册入口
+│       ├── highlight_detector.rs
+│       ├── smart_segmenter.rs
+│       ├── subtitle.rs
+│       └── utils.rs
+└── scripts/                    # 构建与部署脚本
 ```
+
+### 技术栈
 
 | 层级 | 技术 |
 |------|------|
@@ -175,27 +211,29 @@ CutDeck/
 
 | 文档 | 说明 |
 |------|------|
-| [快速开始](https://agions.github.io/CutDeck/guide/quick-start) | 5 分钟上手 |
-| [功能介绍](https://agions.github.io/CutDeck/features) | 全部核心功能 |
-| [AI 剪辑指南](https://agions.github.io/CutDeck/guide/clip-repurpose) | ClipRepurposing Pipeline 完整说明 |
-| [Whisper 字幕](https://agions.github.io/CutDeck/guide/subtitle) | ASR 字幕生成 |
-| [多格式导出](https://agions.github.io/CutDeck/guide/export) | 9:16 / 1:1 / 16:9 导出说明 |
-| [安装配置](https://agions.github.io/CutDeck/installation) | 详细安装与故障排查 |
-| [常见问题](https://agions.github.io/CutDeck/faq) | FAQ |
+| [CHANGELOG](./CHANGELOG.md) | 版本更新记录 |
+| 快速开始 | 5 分钟上手（见上文 🚀 快速开始） |
+| AI 剪辑指南 | ClipRepurposing Pipeline 完整说明 |
+| Whisper 字幕 | ASR 字幕生成 |
+| 多格式导出 | 9:16 / 1:1 / 16:9 导出说明 |
 
 ---
 
 ## 📦 下载安装
 
-Windows / macOS / Linux 预构建包在 [GitHub Releases](https://github.com/Agions/CutDeck/releases) 页面下载：
+桌面应用预构建包在 [GitHub Releases](https://github.com/Agions/CutDeck/releases) 页面下载：
 
-| Platform | File |
-|----------|------|
-| Windows | CutDeck-{version}-windows-x64-setup.exe |
-| macOS | CutDeck-{version}-macos-arm64.dmg |
-| Linux | CutDeck-{version}-linux-x64.deb |
+| 平台 | 文件名 |
+|------|--------|
+| Windows | `CutDeck-{version}-windows-x64-setup.exe` |
+| macOS (Apple Silicon) | `CutDeck-{version}-macos-arm64.dmg` |
+| macOS (Intel) | `CutDeck-{version}-macos-x64.dmg` |
+| Linux | `CutDeck-{version}-linux-x64.deb` |
 
-> macOS 首次运行被拦截？右键 → **打开** → 确认。或运行：`sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"`
+> **macOS 首次运行被拦截？** 右键 → **打开** → 确认。或运行：
+> ```bash
+> sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"
+> ```
 
 ---
 
@@ -206,13 +244,13 @@ Windows / macOS / Linux 预构建包在 [GitHub Releases](https://github.com/Agi
 | 🐛 报告 Bug | [GitHub Issues](https://github.com/Agions/CutDeck/issues) |
 | 📝 完善文档 | 直接提交 PR |
 | 💡 功能建议 | [GitHub Issues](https://github.com/Agions/CutDeck/issues) |
-| 🔧 提交代码 | Fork → PR → Review |
+| 🔧 提交代码 | Fork → 开发 → PR → Review |
 
 ---
 
 ## 📄 许可证
 
-[MIT License](LICENSE) · Copyright © 2025-2026 [Agions](https://github.com/Agions)
+[MIT License](./LICENSE) · Copyright © 2025-2026 [Agions](https://github.com/Agions)
 
 ---
 
