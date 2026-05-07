@@ -113,7 +113,7 @@ export const useProjectStore = create<ProjectState>()(
         let cached: { key: string; result: Project[] } | null = null;
         return () => {
           const { projects, sortBy, sortOrder, filter } = get();
-          const key = JSON.stringify({ projects: projects.length, sortBy, sortOrder, filter });
+          const key = JSON.stringify({ projects: projects.map(p => p.id).join(','), sortBy, sortOrder, filter });
           if (cached && cached.key === key) return cached.result;
 
           let result = [...projects];

@@ -4,6 +4,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../shared/constants/settings';
 import { logger } from '../shared/utils/logging';
+import useLocalStorage from './useLocalStorage';
 
 /**
  * 应用设置类型
@@ -16,32 +17,6 @@ export interface AppSettings {
   projectSaveBehavior: ProjectSaveBehavior;
   outputPath: string;
   recentProjects: string[];
-}
-
-/**
- * 本地存储 Hook
- */
-export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void] {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
-
-  const setValue = useCallback((value: T | ((prev: T) => T)) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
-    } catch (error) {
-      logger.error('LocalStorage save error:', { error });
-    }
-  }, [key, storedValue]);
-
-  return [storedValue, setValue];
 }
 
 /**
