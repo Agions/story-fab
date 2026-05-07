@@ -231,7 +231,7 @@ export const loadProjectWithRetry = async <T = ProjectFileData>(
     } catch (error) {
       lastError = error;
       if (attempt >= retries) break;
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs * (attempt + 1)));
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs * Math.pow(2, attempt)));
     }
   }
 

@@ -90,12 +90,14 @@ fn validate_ffprobe_args(args: &[String]) -> Result<(), String> {
     for arg in args {
         // Allow flag args (start with -)
         if arg.starts_with('-') {
-            let is_allowed = ALLOWED_FFPROBE_ARGS.iter().any(|&p| arg == p || arg.starts_with(&format!("{p}=")));
+            let is_allowed = ALLOWED_FFPROBE_ARGS.iter().any(|&p| {
+                arg == p || arg.starts_with(&format!("{p}="))
+            });
             if !is_allowed {
                 return Err(format!("ffprobe 不允许的参数: {}", arg));
             }
         }
-        // Non-flag args (file paths) are allowed
+        // Non-flag args (file paths, values) are always allowed
     }
     Ok(())
 }

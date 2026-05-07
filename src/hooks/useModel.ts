@@ -66,18 +66,8 @@ export function useModel(): UseModelReturn {
 
   // 按提供商分组的模型
   const modelsByProvider = useMemo(() => {
-    const providers: ModelProvider[] = [
-      'openai',
-      'anthropic',
-      'google',
-      'alibaba',
-      'zhipu',
-      'iflytek',
-      'deepseek',
-      'moonshot',
-    ];
     return Object.fromEntries(
-      providers.map(p => [p, getModelsByProvider(p)])
+      (Object.keys(MODEL_PROVIDERS) as ModelProvider[]).map(p => [p, getModelsByProvider(p)])
     ) as Record<ModelProvider, AIModel[]>;
   }, []);
   

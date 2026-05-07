@@ -11,9 +11,6 @@ export type { CutDeckState, CutDeckStep, CutDeckAction, CutDeckFeatureType } fro
 export type { getNextStep, getPrevStep } from './types';
 export { CUT_DECK_STEPS, INITIAL_STEP_STATUS, DEFAULT_VOICE_SETTINGS, DEFAULT_SYNTHESIS_SETTINGS } from './types';
 
-// Modes exports
-export type { EditorMode } from './modes';
-
 // Workspace exports
 export { Workspace, ProjectSetup, VideoUpload, AIVisualizer, ScriptWriting, VideoComposing, ClipRippling, VideoExport, StepList } from './workspace';
 export type { AIFunctionType } from './workspace';

@@ -42,30 +42,61 @@ export const notify = {
   success: (content: string, key?: string) => {
     emitToast({ type: 'success', content, duration: MESSAGE_DURATION, key });
   },
-  
+
   error: (error: unknown, fallback: string, key?: string) => {
-    emitToast({ 
-      type: 'error', 
-      content: toErrorMessage(error, fallback), 
+    emitToast({
+      type: 'error',
+      content: toErrorMessage(error, fallback),
       duration: MESSAGE_DURATION * 2,
-      key 
+      key
     });
   },
-  
+
   warning: (content: string, key?: string) => {
     emitToast({ type: 'warning', content, duration: MESSAGE_DURATION, key });
   },
-  
+
   info: (content: string, key?: string) => {
     emitToast({ type: 'info', content, duration: MESSAGE_DURATION, key });
   },
-  
+
   loading: (content: string, key: string) => {
     emitToast({ type: 'loading', content, duration: 0, key });
   },
-  
+
   destroy: (key?: string) => {
     // For destroy without key, we'd need a more complex system
     // For now, individual toasts handle their own removal via duration
   },
 };
+
+/**
+ * Wraps an async operation with a lock-check pattern.
+ * Calls `setBusy(true)` before, always calls `setBusy(false)` in finally.
+ * On error, shows a toast notification via `notify.error`.
+ *
+ * Usage:
+ * ```ts
+ * const [busy, setBusy] = useState(false);
+ * const doThing = async () => {
+ *   return withLock(setBusy, '操作描述', async () => {
+ *     // actual work
+ *   });
+ * };
+ * ```
+ */
+export async function withLock<T>(
+  setBusy: (busy: boolean) => void,
+  label: string,
+  fn: () => Promise<T>,
+): Promise<T | undefined> {
+  setBusy(true);
+  try {
+    return await fn();
+  } catch (error) {
+    notify.error(error, `${label}失败`);
+    return undefined;
+  } finally {
+    setBusy(false);
+  }
+}

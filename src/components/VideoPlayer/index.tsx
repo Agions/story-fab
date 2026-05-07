@@ -56,14 +56,21 @@ function VideoPlayer({
       onEnded?.();
     };
 
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+
     videoElement.addEventListener('timeupdate', handleTimeUpdate);
     videoElement.addEventListener('durationchange', handleDurationChange);
     videoElement.addEventListener('ended', handleEnded);
+    videoElement.addEventListener('play', handlePlay);
+    videoElement.addEventListener('pause', handlePause);
 
     return () => {
       videoElement.removeEventListener('timeupdate', handleTimeUpdate);
       videoElement.removeEventListener('durationchange', handleDurationChange);
       videoElement.removeEventListener('ended', handleEnded);
+      videoElement.removeEventListener('play', handlePlay);
+      videoElement.removeEventListener('pause', handlePause);
     };
   }, [onTimeUpdate, onEnded]);
 
@@ -109,7 +116,6 @@ function VideoPlayer({
         case 'M':
           e.preventDefault();
           video.muted = !video.muted;
-          setVolume(video.muted ? 0 : video.volume);
           break;
         case 'f':
         case 'F':
@@ -138,13 +144,11 @@ function VideoPlayer({
   const togglePlay = () => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
-
-    if (isPlaying) {
-      videoElement.pause();
+    if (videoElement.paused) {
+      void videoElement.play();
     } else {
-      videoElement.play();
+      videoElement.pause();
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleSliderChange = (value: number | readonly number[]) => {

@@ -4,7 +4,7 @@
  * 颜色: --accent-primary (#f97316)
  * 2px 宽，高度覆盖整个时间线区域
  */
-import React, { memo, useCallback } from 'react';
+import React, { memo, useRef, useEffect } from 'react';
 
 interface TimelineScrubberProps {
   currentTime: number;      // 秒
@@ -23,26 +23,38 @@ export const TimelineScrubber = memo<TimelineScrubberProps>(({
 }) => {
   const position = currentTime * pixelsPerSecond - scrollX;
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+  const moveRef = useRef<((moveEvent: PointerEvent) => void) | null>(null);
+  const upRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (moveRef.current) document.removeEventListener('pointermove', moveRef.current);
+      if (upRef.current) document.removeEventListener('pointerup', upRef.current);
+    };
+  }, []);
+
+  const onPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
     const container = e.currentTarget.closest('[data-timeline-tracks]') as HTMLElement | null;
     if (!container) return;
     const rect = container.getBoundingClientRect();
 
-    const handleMove = (moveEvent: PointerEvent) => {
+    moveRef.current = (moveEvent: PointerEvent) => {
       const x = moveEvent.clientX - rect.left + scrollX;
       const time = Math.max(0, x / pixelsPerSecond);
       onSeek(time);
     };
 
-    const handleUp = () => {
-      document.removeEventListener('pointermove', handleMove);
-      document.removeEventListener('pointerup', handleUp);
+    upRef.current = () => {
+      if (moveRef.current) document.removeEventListener('pointermove', moveRef.current);
+      if (upRef.current) document.removeEventListener('pointerup', upRef.current);
+      moveRef.current = null;
+      upRef.current = null;
     };
 
-    document.addEventListener('pointermove', handleMove);
-    document.addEventListener('pointerup', handleUp);
-  }, [pixelsPerSecond, scrollX, onSeek]);
+    document.addEventListener('pointermove', moveRef.current);
+    document.addEventListener('pointerup', upRef.current);
+  };
 
   return (
     <div
@@ -53,7 +65,7 @@ export const TimelineScrubber = memo<TimelineScrubberProps>(({
         height: totalHeight,
         transform: 'translateX(-50%)',
       }}
-      onPointerDown={handlePointerDown}
+      onPointerDown={onPointerDown}
     >
       {/* Scrubber line */}
       <div

@@ -386,11 +386,12 @@ impl HighlightDetector {
         for i in (0..pcm_data.len().saturating_sub(window_samples)).step_by(hop) {
             let window = &pcm_data[i..i + window_samples];
             let mut crossings = 0u32;
-            for j in 1..window.len() {
-                if (window[j] >= 0.0 && window[j - 1] < 0.0)
-                || (window[j] < 0.0 && window[j - 1] >= 0.0) {
+            let mut prev = window[0];
+            for cur in &window[1..] {
+                if (cur >= &0.0 && prev < 0.0) || (cur < &0.0 && prev >= 0.0) {
                     crossings += 1;
                 }
+                prev = *cur;
             }
             let zcr = crossings as f32 / (window_samples - 1) as f32;
             zcr_values.push(zcr);

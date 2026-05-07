@@ -5,8 +5,9 @@
 import { notify } from './notify';
 export * from './notify';
 
-// Re-export formatting functions from format.ts for backwards compatibility
-export { formatFileSize, formatRelativeTime } from './format';
+// Time formatting & timestamps
+export { formatTime, formatDuration, formatDate, formatDateTime, formatRelativeTime } from './format';
+export { now, nowISO } from './format';
 
 // Timecode formatting
 export { formatTimecode, formatTimecodeSimple } from './timecode';
