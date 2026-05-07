@@ -19,28 +19,10 @@ import {
   pickPreferredSizeMb,
   RawProjectRecord,
   resolveProjectVideoPath,
+  concurrentMap,
 } from '@/shared';
 import { preloadProjectEditPage } from '../../../core/utils/route-preload';
 import { Project, DashboardStats } from '../types';
-
-const concurrentMap = async <T, R>(
-  items: T[],
-  fn: (item: T) => Promise<R>,
-  limit = 8
-): Promise<R[]> => {
-  const results: R[] = new Array(items.length);
-  let index = 0;
-  const workers = Array.from({ length: Math.min(limit, items.length) }, () =>
-    (async () => {
-      while (index < items.length) {
-        const i = index++;
-        results[i] = await fn(items[i]);
-      }
-    })()
-  );
-  await Promise.all(workers);
-  return results;
-};
 
 export interface UseDashboardReturn {
   projects: Project[];
