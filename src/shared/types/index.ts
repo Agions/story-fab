@@ -142,8 +142,8 @@ export type WorkflowStep =
   | 'preview'
   | 'export';
 
-// Re-export WorkflowStatus from core for backwards compatibility
-export type { WorkflowStatus } from '@/core/types';
+// WorkflowStatus — defined locally to avoid circular dependency with @/core/types
+export type WorkflowStatus = 'idle' | 'running' | 'completed' | 'error' | 'paused';
 
 /** 工作流 */
 export interface Workflow {

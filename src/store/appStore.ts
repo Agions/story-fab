@@ -12,6 +12,7 @@ import type { User } from '@/core/types';
 export interface UserSettings {
   compactMode: boolean;
   language: string;
+  recentProjects: string[];
 }
 
 export interface AppState {
@@ -49,6 +50,7 @@ export interface AppState {
 const defaultSettings: UserSettings = {
   compactMode: false,
   language: 'zh-CN',
+  recentProjects: [],
 };
 
 // ==========================================

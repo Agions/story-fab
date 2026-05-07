@@ -2,7 +2,7 @@
  * AI 视频编辑器页面
  * 采用标签页分离布局：AI第一人称解说 / AI解说 / AI混剪
  */
-import React, { useState, lazy, Suspense, useEffect } from 'react';
+import React, { useState, lazy, Suspense, useEffect, useCallback } from 'react';
 import {
   Mic,
   User,
