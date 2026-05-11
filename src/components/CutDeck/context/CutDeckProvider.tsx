@@ -3,11 +3,9 @@
  * 从 AIEditorContext.tsx 提取的 Provider 组件
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
-import type { CutDeckState, CutDeckStep, CutDeckFeatureType, CutDeckAction } from '../types/workflow.types';
-import { initialState } from '../types/workflow.initialState';
+import type { CutDeckState, CutDeckStep, CutDeckFeatureType, CutDeckAction } from '../types/workflow';
+import { initialState, getNextStep, getPrevStep, CUT_DECK_STEPS } from '../types/workflow';
 import { clipFlowReducer } from '../types/workflow.reducer';
-import { getNextStep, getPrevStep } from '../types/workflow.types';
-import { CUT_DECK_STEPS } from '../types/workflow.constants';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
 
 // 上下文类型
