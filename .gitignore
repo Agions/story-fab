@@ -99,3 +99,4 @@ ARCHITECTURE.md
 ROADMAP.md
 .learnings/
 pnpm-lock.yaml
+src-tauri/Cargo.lock

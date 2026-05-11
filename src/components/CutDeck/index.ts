@@ -8,7 +8,7 @@ export type { CutDeckContextType } from './context';
 
 // Types exports
 export type { CutDeckState, CutDeckStep, CutDeckAction, CutDeckFeatureType } from './types';
-export type { getNextStep, getPrevStep } from './types';
+export { getNextStep, getPrevStep } from './types';
 export { CUT_DECK_STEPS, INITIAL_STEP_STATUS, DEFAULT_VOICE_SETTINGS, DEFAULT_SYNTHESIS_SETTINGS } from './types';
 
 // Workspace exports
