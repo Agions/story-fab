@@ -168,20 +168,27 @@ CutDeck/
 │   └── favicon.svg             # Favicon
 ├── src/                        # React 前端
 │   ├── core/                   # 核心业务模块（域驱动）
-│   │   ├── types.ts            # 全局类型定义
+│   │   ├── types.ts           # 全局类型定义（canonical source）
+│   │   ├── types/              # 类型子目录（jianying · timeline）
 │   │   ├── video/              # 视频处理管道
-│   │   ├── services/           # 业务服务（AI · Vision · ASR · 字幕 · 导出）
+│   │   ├── services/           # 业务服务（AI · Vision · ASR · 字幕 · 导出 · 编辑器）
 │   │   ├── pipeline/           # AI 剪辑工作流（Step 架构）
 │   │   │   └── steps/          # BuildCandidates · ScoreClips · GenerateSEO · PrepareExport
-│   │   └── hooks/              # React Hooks
-│   ├── store/                  # Zustand Stores（app · project · editor）
-│   ├── components/             # React UI 组件
-│   ├── pages/                  # 页面组件（Landing · Dashboard · Editor · Settings）
-│   ├── context/                # React Context（Settings · Theme · Toast）
+│   │   ├── hooks/              # 核心 Hooks（useVideo · useProject）
+│   │   ├── interfaces/         # 接口定义（IVideoProcessor 等）
+│   │   └── tauri/              # Tauri IPC 桥接层
+│   ├── store/                  # Zustand Stores（main · editor）
+│   ├── components/              # React UI 组件
+│   │   ├── CutDeck/            # AI 剪辑工作台（Context · Workspace · Types）
+│   │   ├── editor/             # 时间轴编辑器（Timeline · Preview · Inspector · AssetPanel）
+│   │   ├── VideoPlayer/        # 视频播放器封装
+│   │   └── ui/                 # shadcn/ui 组件库
+│   ├── pages/                  # 页面路由
+│   ├── context/                # React Context（Settings · Theme）
 │   ├── hooks/                  # 通用 Hooks（useLocalStorage · useSettings · useModel）
-│   ├── services/               # 外部服务抽象（Tauri IPC · AI API）
-│   ├── shared/                 # 共享工具（常量 · 工具函数 · 通知系统）
-│   └── styles/                 # 全局样式与主题
+│   ├── services/               # Tauri IPC 封装（tauri.ts · file/ · videoProcessingFacade.ts）
+│   ├── shared/                 # 共享工具（format · logging · constants · notify）
+│   └── styles/                 # 全局样式与主题（globals.css · _mixins.less · variables.less）
 ├── src-tauri/                  # Tauri 后端 (Rust)
 │   └── src/
 │       ├── commands/           # FFmpeg · 高光检测 · 智能分段 · 字幕
@@ -211,11 +218,12 @@ CutDeck/
 
 | 文档 | 说明 |
 |------|------|
-| [CHANGELOG](./CHANGELOG.md) | 版本更新记录 |
+| [CHANGELOG](./CHANGELOG.md) | 版本更新记录（含 v2.0.0 shadcn/Tailwind 迁移说明） |
+| [架构说明](#-技术架构) | 目录结构与模块职责 |
 | 快速开始 | 5 分钟上手（见上文 🚀 快速开始） |
-| AI 剪辑指南 | ClipRepurposing Pipeline 完整说明 |
-| Whisper 字幕 | ASR 字幕生成 |
-| 多格式导出 | 9:16 / 1:1 / 16:9 导出说明 |
+| AI 剪辑 | `src/core/pipeline/steps/` — BuildCandidates · ScoreClips · GenerateSEO · PrepareExport |
+| Whisper 字幕 | `src/core/services/subtitle/` + `src-tauri/src/subtitle.rs` |
+| 多格式导出 | `src/core/services/clip-pipeline/multiFormatExport.ts` |
 
 ---
 
