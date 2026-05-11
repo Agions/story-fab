@@ -52,7 +52,7 @@ pub(crate) fn format_srt_time(seconds: f64) -> String {
     format!("{:02}:{:02}:{:02},{:03}", hours, minutes, secs, millis)
 }
 
-/// Format seconds as HH:MM:SS.mmm (dot separator, used by FFmpeg/lib_optimized)
+/// Format seconds as HH:MM:SS.mmm (dot separator, used by FFmpeg)
 pub(crate) fn format_time(seconds: f64) -> String {
     let total_ms = (seconds * 1000.0).round() as u64;
     let hours = total_ms / 3_600_000;

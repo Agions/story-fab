@@ -1,7 +1,7 @@
 /**
  * CutDeck 统一色彩系统 - TypeScript
  *
- * 基于 design-system.css OKLCH 语义化分层
+ * 基于 globals.css OKLCH 语义化分层（设计系统入口）
  * 提供 Ant Design 5 兼容的 Design Token
  *
  * 使用方式：
@@ -9,9 +9,10 @@
  *   // 或在 ConfigProvider 中使用 antdTokens
  *
  * 收敛说明：
- * - design-system.css（CSS custom properties）— 唯一真相来源
- * - colors.ts（TypeScript）— 提供 antdTokens 兼容，统一导出
- * - variables.less — 旧 LESS 组件兼容，通过 var() 引用 design-system.css
+ * 架构说明：
+ * - globals.css :root {} — 运行时 CSS 入口（main.tsx 已导入）
+ * - colors.ts（TypeScript）— OKLCH 原始值 + antdTokens 兼容层
+ * - variables.less — 被 _mixins.less 引用，编译时使用
  * - dashboardTokens / videoEditorTokens — 已废弃（0 usage），已移除
  */
 
@@ -23,7 +24,7 @@ type ThemeConfig = {
 
 // =============================================
 // 🎨 色彩 Token（OKLCH 语义化分层）
-// 与 design-system.css :root {} 保持完全一致
+// 与 globals.css :root {} 保持数值一致（OKLCH + hex 双重定义）
 // =============================================
 
 export const colors = {
