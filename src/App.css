@@ -1,10 +1,10 @@
 /* CutDeck App-level Styles
  * 仅放全局级别的布局、字体、选择器样式
- * 设计 token 统一在 index.css / global.css 中定义
+ * 设计 token 统一在 globals.css CSS variables 中定义
  */
 
 /* ============================================================================
-   Reset & Base（与 index.css 保持一致）
+   Reset & Base
    ============================================================================ */
 * {
   margin: 0;
@@ -13,15 +13,15 @@
 }
 
 /* ============================================================================
-   Body — 使用设计系统字体栈
+   Body — 使用设计系统字体栈 + globals.css tokens
    ============================================================================ */
 body {
   font-family: 'Outfit', 'Figtree', -apple-system, BlinkMacSystemFont,
     'Segoe UI', 'Noto Sans SC', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-dark-0, #0C0D14);
-  color: var(--text-primary, #F0F0F5);
+  background-color: var(--bg-primary, #0d0d0f);
+  color: var(--text-primary, #f0f0f2);
   font-size: 14px;
   line-height: 1.6;
   overflow-x: hidden;
@@ -42,7 +42,7 @@ video {
 }
 
 /* ============================================================================
-   Scrollbar — 使用 CSS 变量
+   Scrollbar
    ============================================================================ */
 ::-webkit-scrollbar {
   width: 6px;
@@ -54,13 +54,13 @@ video {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--border-focus, #3D4166);
+  background-color: var(--border-default, #3a3a42);
   border-radius: 4px;
   transition: background-color 0.2s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--text-muted, #55556A);
+  background-color: var(--text-secondary, #8a8a96);
 }
 
 /* ============================================================================
@@ -92,7 +92,7 @@ video {
 .page-loading {
   position: fixed;
   inset: 0;
-  background-color: var(--bg-overlay, rgba(20, 21, 32, 0.85));
+  background-color: rgba(13, 13, 15, 0.85);
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
@@ -102,7 +102,7 @@ video {
 }
 
 /* ============================================================================
-   Card Hover — 微交互（使用设计系统 easing）
+   Card Hover — 微交互
    ============================================================================ */
 .ant-card-hoverable {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
@@ -115,7 +115,7 @@ video {
 }
 
 /* ============================================================================
-   Button Ripple — 移除全局 all transition，使用具体属性
+   Button Ripple
    ============================================================================ */
 .ant-btn {
   position: relative;
@@ -126,14 +126,14 @@ video {
    Text Selection — 使用品牌色 Amber
    ============================================================================ */
 ::selection {
-  background-color: rgba(255, 159, 67, 0.25);
-  color: #FFBE76;
+  background-color: rgba(249, 115, 22, 0.25);
+  color: #fed7aa;
 }
 
 /* ============================================================================
-   Dark Mode Body — 与 ThemeContext 联动
+   Dark Mode Body
    ============================================================================ */
 body.dark-mode {
-  background-color: #0C0D14;
-  color: #F0F0F5;
+  background-color: #0d0d0f;
+  color: #f0f0f2;
 }
