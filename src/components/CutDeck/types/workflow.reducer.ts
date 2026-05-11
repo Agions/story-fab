@@ -2,9 +2,9 @@
  * AI Editor Reducer
  * 从 AIEditorContext.tsx 提取的 reducer 逻辑
  */
-import type { CutDeckState, CutDeckAction, CutDeckStep } from './workflow.types';
-import { initialState } from './workflow.initialState';
-import { CUT_DECK_STEPS } from './workflow.constants';
+import type { CutDeckState, CutDeckAction, CutDeckStep } from './workflow';
+import { initialState } from './workflow';
+import { CUT_DECK_STEPS } from './workflow';
 
 // Reducer
 export function clipFlowReducer(state: CutDeckState, action: CutDeckAction): CutDeckState {
