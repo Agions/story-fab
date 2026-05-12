@@ -101,10 +101,8 @@ faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，**
 | 依赖 | 版本 | 说明 |
 |------|------|------|
 | Node.js | 18+ | 前端构建 |
-| Rust | 1.75+ | Tauri 后端编译（`src-tauri/`） |
+| Rust | 1.85+ | Tauri 后端编译（`src-tauri/`） |
 | FFmpeg | 系统安装 | 视频编解码（命令行工具） |
-
-> ⚠️ **Rust 版本注意**：项目使用 Rust 2021 edition。部分依赖（如 `dlopen2_derive`）可能需要 Rust 1.85+。如遇编译错误，运行 `rustup update` 升级。
 
 ### 安装运行
 
@@ -120,14 +118,13 @@ npm run dev
 ### 构建桌面应用
 
 ```bash
-# 安装 Rust（已有可跳过）
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# 构建 Tauri 应用
+# 使用 Tauri CLI 构建
 npm run tauri build
 ```
 
 产物位于 `src-tauri/target/release/`（或 `target/bundle/` 下各平台安装包）。
+
+> 💡 首次构建 Tauri 会自动下载 Rust 工具链，无需手动安装。
 
 ---
 
@@ -183,18 +180,18 @@ npm run tauri build
 | 语音识别 | faster-whisper |
 
 
-## 📖 文档导航
+## 📖 文档
 
 | 文档 | 说明 |
 |------|------|
 | [CHANGELOG](./CHANGELOG.md) | 版本更新记录 |
 
-| 模块 | 位置 |
+| 模块 | 路径 |
 |------|------|
-| AI 剪辑管道 | `src/core/pipeline/steps/` |
+| AI 剪辑管道 | `src/core/services/clip-pipeline/` |
 | Rust 命令 | `src-tauri/src/commands/` |
 | Whisper 字幕 | `src/core/services/subtitle/` + `src-tauri/src/subtitle.rs` |
-| 多格式导出 | `src/core/services/clip-pipeline/multiFormatExport.ts` |
+| 多格式导出 | `src/core/services/clip-pipeline/multiExport.ts` |
 
 ---
 
