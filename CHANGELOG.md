@@ -1,23 +1,21 @@
 ## [Unreleased]
 
-### 🐛 Bug Fixes (from code review)
+### 🐛 Bug Fixes
 
-- **src/constants/index.ts:**
-  - Add missing `legacy.token` and `legacy.projects` to `STORAGE_KEYS` for backward compatibility
-- **src/components/CutDeck/Workspace/ScriptWriting.tsx:**
-  - Add missing `useRef` to React import list
-  - Add null checks for `Timeout | null` before calling `timeout.clear()`
-- **src/components/editor/Timeline/TimelinePanel.tsx:**
-  - Add `return undefined` in useEffect for non-isPlaying code path (TS7030)
-- **src/core/services/base.service.ts:**
-  - Rename `delay` parameter to `delayMs` to avoid shadowing imported `delay()` function
-- **src/shared/utils/pipeline-checkpoint.ts:**
-  - Replace `new Promise(resolve => setTimeout(resolve, 1000))` with `delay(1000)`
-- **src/test/code-review.test.ts:**
-  - Add `EslintJsonOutput` type to replace 7× `any` type assertions
-  - Replace inline `any[]` with properly typed `EslintJsonOutput['results'][number][]`
-  - Replace `any` in coverage data mapping with `{ s?: Record<string, number> }`
-  - Replace `any` in diagnostic messageText with `{ messageText?: string }`
+- **src/constants/index.ts:** Add missing `legacy.token` and `legacy.projects` to `STORAGE_KEYS` for backward compatibility
+- **src/components/CutDeck/workspace/ScriptWriting.tsx:** Add missing `useRef` to React import; add null checks for `Timeout | null` before calling `timeout.clear()`
+- **src/components/editor/Timeline/TimelinePanel.tsx:** Add `return undefined` in useEffect for non-isPlaying code path (TS7030)
+- **src/core/services/providers/base.service.ts:** Rename `delay` parameter to `delayMs` to avoid shadowing imported `delay()` function
+- **src/shared/utils/pipeline-checkpoint.ts:** Replace `new Promise(resolve => setTimeout(resolve, 1000))` with `delay(1000)`
+- **src/test/code-review.test.ts:** Add `EslintJsonOutput` type to replace 7× `any` type assertions; properly type coverage data mapping and diagnostic messageText
+
+### ⚙️ Chores
+
+- **docs:** Add `docs/ARCHITECTURE.md` (depth architecture doc) and `docs/DEVELOPER_GUIDE.md` (developer guide)
+- **README:** Add AI model table (9 providers), update directory structure, fix docs navigation
+- **workflow:** Consolidate `workflow.types.ts`, `workflow.constants.ts`, `workflow.initialState.ts` → `workflow.ts` (eliminate circular imports)
+- **dead code:** Remove ScriptGenerator, MenuBar, appConfig.ts, templates/dedup/, CutDeck/modes/, and orphaned LESS/CSS files
+
 ---
 
 ## v2.0.0 (2026-04-22)
