@@ -82,7 +82,7 @@ export const QUALITY_PRESETS = {
 // Multi-Format Exporter
 // ============================================================
 
-export class MultiFormatExporter {
+export class MultiExporter {
   /**
    * 准备导出任务列表
    * 生成各格式的 FFmpeg 命令参数
@@ -208,5 +208,5 @@ export interface ExportTask {
   duration: number;
 }
 
-export const multiFormatExporter = new MultiFormatExporter();
-export default multiFormatExporter;
+export const multiExporter = new MultiExporter();
+export default multiExporter;

@@ -1,5 +1,5 @@
 /**
- * HighlightList — 高光时刻列表
+ * Highlights — 高光时刻列表
 
  * 基于 Rust highlight_detector.rs 的音频能量+场景切换分析结果，
  * 以深色面板呈现，点击定位到 Timeline 播放头。
@@ -17,7 +17,7 @@ import { useTimelineStore } from '../../../../store/timelineStore';
 import { notify } from '../../../../shared/utils/notify';
 import { formatDuration } from '../../../../shared/utils/formatting';
 import type { VideoInfo } from '@/core/types';
-import styles from './HighlightList.module.css';
+import styles from './Highlights.module.css';
 import { formatTime } from '@/shared/utils/format';
 
 interface Highlight {
@@ -37,13 +37,13 @@ const REASON_CONFIG: Record<string, { label: string; cls: string }> = {
   combined:      { label: 'Combo', cls: 'combo'  },
 };
 
-interface HighlightListProps {
+interface HighlightsProps {
   videoInfo: VideoInfo;
   /** 是否默认展开 */
   defaultExpanded?: boolean;
 }
 
-const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpanded: _defaultExpanded = false }) => {
+const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _defaultExpanded = false }) => {
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [detected, setDetected] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -213,5 +213,5 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
   );
 };
 
-export { HighlightList };
-export type { Highlight, HighlightListProps };
+export { Highlights };
+export type { Highlight, HighlightsProps };

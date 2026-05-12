@@ -10,9 +10,9 @@
 
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
 import type { ClipScore } from '../../services/clip-pipeline/clipScorer';
-import type { AspectRatio } from '../../services/clip-pipeline/multiFormatExport';
-import type { ExportTask } from '../../services/clip-pipeline/multiFormatExport';
-import { multiFormatExporter } from '../../services/clip-pipeline/multiFormatExport';
+import type { AspectRatio } from '../../services/clip-pipeline/multiExport';
+import type { ExportTask } from '../../services/clip-pipeline/multiExport';
+import { multiExporter } from '../../services/clip-pipeline/multiExport';
 import { tauri } from '../../tauri/TauriBridge';
 import type { VideoInfo } from '@/core/types';
 import { logger } from '../../../shared/utils/logging';
@@ -64,7 +64,7 @@ export const prepareExportStep: Step<PrepareExportInput, PrepareExportOutput> =
 
     for (const scored of clips) {
       const clip = scored.clip;
-      const tasks = multiFormatExporter.prepareExportTasks({
+      const tasks = multiExporter.prepareExportTasks({
         clipId: `clip_${clip.startTime}_${clip.endTime}`,
         sourceVideoPath: videoInfo.path ?? videoInfo.id,
         startTime: clip.startTime,
