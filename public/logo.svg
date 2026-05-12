@@ -1,52 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="CutDeck logo">
+  <title>CutDeck</title>
+  <desc>AI-powered professional video editing tool logo — film frame with play button and lightning bolt</desc>
   <defs>
-    <!-- 渐变定义 -->
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1"/>
-      <stop offset="50%" style="stop-color:#8b5cf6"/>
-      <stop offset="100%" style="stop-color:#06b6d4"/>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
     </linearGradient>
-    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00d2ff;stop-opacity:0.8"/>
-      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0.8"/>
+    <linearGradient id="darkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#0f0f17"/>
     </linearGradient>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
       <feMerge>
-        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
   </defs>
 
-  <!-- 背景圆 -->
-  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" filter="url(#glow)"/>
+  <!-- Dark rounded square background -->
+  <rect width="512" height="512" rx="96" fill="url(#darkGrad)"/>
 
-  <!-- 电影胶片元素 -->
-  <g fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round">
-    <!-- 主胶片轮廓 -->
-    <rect x="140" y="120" width="232" height="272" rx="20" fill="rgba(0,0,0,0.3)"/>
-
-    <!-- 胶片孔 -->
-    <rect x="155" y="140" width="24" height="32" rx="4" fill="#fff"/>
-    <rect x="155" y="190" width="24" height="32" rx="4" fill="#fff"/>
-    <rect x="155" y="240" width="24" height="32" rx="4" fill="#fff"/>
-    <rect x="155" y="290" width="24" height="32" rx="4" fill="#fff"/>
-    <rect x="155" y="340" width="24" height="32" rx="4" fill="#fff"/>
-
-    <rect x="333" y="140" width="24" height="32" rx="4" fill="#fff"/>
-    <rect x="333" y="190" width="24" height="32" rx="4" fill="#fff"/>
-    <rect x="333" y="240" width="24" height="32" rx="4" fill="#fff"/>
-    <rect x="333" y="290" width="24" height="32" rx="4" fill="#fff"/>
-    <rect x="333" y="340" width="24" height="32" rx="4" fill="#fff"/>
-
-    <!-- 播放按钮三角形 -->
-    <path d="M235 200 L310 256 L235 312 Z" fill="#fff" stroke="none"/>
-
-    <!-- AI 闪电元素 -->
-    <path d="M280 150 L250 190 L275 190 L255 230 L295 180 L270 180 Z" fill="#00d2ff" stroke="none"/>
+  <!-- Timeline grid lines (subtle) -->
+  <g stroke="#2a2a3e" stroke-width="1" fill="none" opacity="0.6">
+    <line x1="80" y1="420" x2="432" y2="420"/>
+    <line x1="80" y1="388" x2="432" y2="388"/>
+    <line x1="80" y1="356" x2="432" y2="356"/>
+    <line x1="80" y1="324" x2="432" y2="324"/>
+    <line x1="80" y1="292" x2="432" y2="292"/>
+    <line x1="80" y1="260" x2="432" y2="260"/>
   </g>
 
-  <!-- 外圈光效 -->
-  <circle cx="256" cy="256" r="245" fill="none" stroke="url(#glowGradient)" stroke-width="4" opacity="0.6"/>
+  <!-- Film frame with orange stroke -->
+  <g filter="url(#glow)">
+    <rect x="120" y="118" width="272" height="200" rx="16"
+          fill="#1a1a2e" stroke="url(#brandGrad)" stroke-width="8"/>
+    
+    <!-- Top sprocket holes -->
+    <rect x="148" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+    <rect x="193" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+    <rect x="238" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+    <rect x="283" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+    <rect x="328" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+
+    <!-- Bottom sprocket holes -->
+    <rect x="148" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+    <rect x="193" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+    <rect x="238" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+    <rect x="283" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+    <rect x="328" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
+
+    <!-- Play button -->
+    <path d="M218 186 L316 218 L218 250 Z" fill="url(#brandGrad)"/>
+  </g>
+
+  <!-- AI lightning bolt -->
+  <g filter="url(#glow)">
+    <path d="M362 218 L330 266 L356 266 L332 338 L392 258 L360 258 Z"
+          fill="#fb923c" stroke="#fdba74" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Accent dot -->
+  <circle cx="382" cy="138" r="9" fill="#fb923c" opacity="0.75" filter="url(#glow)"/>
 </svg>
