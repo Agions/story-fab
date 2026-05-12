@@ -377,11 +377,11 @@ export class SubtitleService {
         const translatedText = await this.translateText(textsToTranslate, targetLangName, provider);
         const lines = translatedText.split('\n').filter(l => l.trim());
 
-        batch.forEach((entry, idx) => {
+        batch.forEach((entry, index) => {
           translatedEntries.push({
             ...entry,
             id: `${entry.id}-tl`,
-            text: lines[idx]?.trim() || entry.text,
+            text: lines[index]?.trim() || entry.text,
           });
         });
       } catch (error) {
