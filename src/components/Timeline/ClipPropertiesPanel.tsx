@@ -4,9 +4,8 @@ import { Slider } from '../ui/slider';
 import { Input } from '../ui/input';
 import { cn } from '../../lib/utils';
 import type { TimelineClip } from './types';
-import { formatTime } from './utils';
+import { formatTimecodeMs, MS_PER_SECOND } from '@/shared/utils';
 import { MIN_CLIP_DURATION } from './constants';
-import { MS_PER_SECOND } from '@/shared/utils';
 import styles from '@/components/Timeline/Timeline.module.less';
 
 interface ClipPropertiesPanelProps {
@@ -58,9 +57,9 @@ export const ClipPropertiesPanel = memo<ClipPropertiesPanelProps>(({ clip, onUpd
         </div>
         <div className={styles.propRow}>
           <label>时长</label>
-          <span className={styles.propTime}>{formatTime(clip.endMs - clip.startMs)}</span>
+          <span className={styles.propTime}>{formatTimecodeMs(clip.endMs - clip.startMs)}</span>
           <label>源</label>
-          <span className={styles.propTime}>{formatTime(clip.sourceEndMs - clip.sourceStartMs)}</span>
+          <span className={styles.propTime}>{formatTimecodeMs(clip.sourceEndMs - clip.sourceStartMs)}</span>
         </div>
       </div>
       <div className={cn(styles.propertiesFooter, 'flex items-center justify-end gap-2')}>

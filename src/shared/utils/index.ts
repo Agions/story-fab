@@ -6,7 +6,7 @@ import { notify } from './notify';
 export * from './notify';
 
 // Time formatting & timestamps
-export { formatTime, formatDuration, formatDate, formatDateTime, formatRelativeTime } from './format';
+export { formatTime, formatDuration, formatDate, formatDateTime, formatRelativeTime, clamp, formatTimecodeMs } from './format';
 export { now, nowISO } from './format';
 export { MS_PER_SECOND } from './format';
 
