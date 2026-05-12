@@ -69,7 +69,7 @@ const normalizeText = (value?: string) => value?.trim().replace(/\s+/g, ' ') || 
 
 const createDefaultProjectName = () => {
   const now = new Date();
-  const pad = (num: number) => String(num).padStart(2, '0');
+  const pad = (value: number) => String(value).padStart(2, '0');
   const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
   return `未命名项目-${timestamp}`;
 };
