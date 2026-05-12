@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import type { AIClipConfig } from '../../../core/services/aiClip';
 import type { VideoInfo } from '@/core/types';
-import styles from '@/components/AIClipAssistant/index.module.less';
+import styles from '@/components/AIClip/index.module.less';
 
 interface ConfigStepProps {
   videoInfo: VideoInfo;
