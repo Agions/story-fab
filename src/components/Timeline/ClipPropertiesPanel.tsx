@@ -6,6 +6,7 @@ import { cn } from '../../lib/utils';
 import type { TimelineClip } from './types';
 import { formatTime } from './utils';
 import { MIN_CLIP_DURATION } from './constants';
+import { MS_PER_SECOND } from '@/shared/utils';
 import styles from '@/components/Timeline/Timeline.module.less';
 
 interface ClipPropertiesPanelProps {
@@ -16,18 +17,18 @@ interface ClipPropertiesPanelProps {
 }
 
 export const ClipPropertiesPanel = memo<ClipPropertiesPanelProps>(({ clip, onUpdate, onClose, onDelete }) => {
-  const [startSec, setStartSec] = useState(clip.startMs / 1000);
-  const [endSec, setEndSec] = useState(clip.endMs / 1000);
+  const [startSec, setStartSec] = useState(clip.startMs / MS_PER_SECOND);
+  const [endSec, setEndSec] = useState(clip.endMs / MS_PER_SECOND);
   const [volume, setVolume] = useState(100);
 
   useEffect(() => {
-    setStartSec(clip.startMs / 1000);
-    setEndSec(clip.endMs / 1000);
+    setStartSec(clip.startMs / MS_PER_SECOND);
+    setEndSec(clip.endMs / MS_PER_SECOND);
   }, [clip]);
 
   const handleApply = () => {
-    const newStartMs = startSec * 1000;
-    const newEndMs = endSec * 1000;
+    const newStartMs = startSec * MS_PER_SECOND;
+    const newEndMs = endSec * MS_PER_SECOND;
     if (newEndMs > newStartMs + MIN_CLIP_DURATION) {
       onUpdate(clip.id, { startMs: newStartMs, endMs: newEndMs });
     }
