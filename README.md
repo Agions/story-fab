@@ -98,9 +98,13 @@ faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，**
 
 ### 环境要求
 
-- Node.js 18+
-- Rust 1.75+（用于 Tauri 后端编译）
-- FFmpeg（系统安装或通过 Tauri 自动下载）
+| 依赖 | 版本 | 说明 |
+|------|------|------|
+| Node.js | 18+ | 前端构建 |
+| Rust | 1.75+ | Tauri 后端编译（`src-tauri/`） |
+| FFmpeg | 系统安装 | 视频编解码（命令行工具） |
+
+> ⚠️ **Rust 版本注意**：项目使用 Rust 2021 edition。部分依赖（如 `dlopen2_derive`）可能需要 Rust 1.85+。如遇编译错误，运行 `rustup update` 升级。
 
 ### 安装运行
 
@@ -133,30 +137,36 @@ npm run tauri build
 
 | 提供商 | 模型 | 适用场景 |
 |--------|------|----------|
-| DeepSeek | V4-Flash（推荐）、V4-Pro（推理） | 🏆 性价比最高，Clip Script 生成 |
-| OpenAI | GPT-4o、o3、o3-mini | 剧情分析、内容理解 |
-| Anthropic | Claude 3.5 Sonnet、Claude 3 Opus | 长文本分析 |
-| 阿里云 | Qwen-Max、Qwen-Plus | 中文内容创作 |
-| 月之暗面 | Kimi（moonshot-v1）| 长文本分析 |
+| **DeepSeek** | V4-Flash（推荐）、V4-Pro | 🏆 性价比最高，Clip Script 生成 |
+| **OpenAI** | GPT-4o、o3、o3-mini | 剧情分析、内容理解 |
+| **Anthropic** | Claude 3.5 Sonnet、Claude 3 Opus | 长文本分析 |
+| **Google** | Gemini 2.0 Flash、Pro | 多模态理解 |
+| **阿里云** | Qwen-Max、Qwen-Plus | 中文内容创作 |
+| **月之暗面** | Kimi（moonshot-v1）| 长文本分析 |
+| **智谱AI** | GLM-4-Plus、GLM-4V | 中文多模态 |
+| **Azure OpenAI** | GPT-4o、o1 | 企业用户 |
+| **科大讯飞** | Spark 4.0 Ultra | 语音相关任务 |
+
+> 📝 模型列表由 `src/core/config/aiModels.config.ts` 统一管理，每次版本更新后请同步该文件。
 
 ---
 
 ## 🏗️ 技术架构
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                        UI 层 (React 18)                     │
-│     Landing · Dashboard · 编辑器 · AI 控制台                  │
-├──────────────────────────────────────────────────────────────┤
-│                      核心层 (src/core/)                      │
-│   services/ · pipeline/ · hooks/ · video/ · types/           │
-├──────────────────────────────────────────────────────────────┤
-│                      状态层 (src/store/)                     │
-│   Zustand v5 持久化 stores（app · project · editor）         │
-├──────────────────────────────────────────────────────────────┤
-│                      外部依赖层                               │
-│        FFmpeg · Tauri IPC (Rust) · AI APIs                  │
-└──────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        UI 层 (React 18)                        │
+│   Landing · Dashboard · Projects · 编辑器 · AI 控制台 · 设置    │
+├─────────────────────────────────────────────────────────────────┤
+│                      核心层 (src/core/)                         │
+│   services/ · pipeline/ · hooks/ · video/ · config/ · types/   │
+├─────────────────────────────────────────────────────────────────┤
+│                      状态层 (src/store/)                        │
+│          Zustand v5 持久化 stores（app · project · editor）     │
+├─────────────────────────────────────────────────────────────────┤
+│                      外部依赖层                                  │
+│        FFmpeg · Tauri IPC (Rust) · AI APIs · 文件系统          │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ### 目录结构
@@ -164,40 +174,64 @@ npm run tauri build
 ```
 CutDeck/
 ├── public/                     # 静态资源
-│   ├── logo.svg                # 应用 Logo
-│   └── favicon.svg             # Favicon
 ├── src/                        # React 前端
 │   ├── core/                   # 核心业务模块（域驱动）
-│   │   ├── types.ts           # 全局类型定义（canonical source）
-│   │   ├── types/              # 类型子目录（jianying · timeline）
-│   │   ├── video/              # 视频处理管道
-│   │   ├── services/           # 业务服务（AI · Vision · ASR · 字幕 · 导出 · 编辑器）
-│   │   ├── pipeline/           # AI 剪辑工作流（Step 架构）
-│   │   │   └── steps/          # BuildCandidates · ScoreClips · GenerateSEO · PrepareExport
-│   │   ├── hooks/              # 核心 Hooks（useVideo · useProject）
-│   │   ├── interfaces/         # 接口定义（IVideoProcessor 等）
-│   │   └── tauri/              # Tauri IPC 桥接层
-│   ├── store/                  # Zustand Stores（main · editor）
-│   ├── components/              # React UI 组件
-│   │   ├── CutDeck/            # AI 剪辑工作台（Context · Workspace · Types）
-│   │   ├── editor/             # 时间轴编辑器（Timeline · Preview · Inspector · AssetPanel）
-│   │   ├── VideoPlayer/        # 视频播放器封装
-│   │   └── ui/                 # shadcn/ui 组件库
-│   ├── pages/                  # 页面路由
-│   ├── context/                # React Context（Settings · Theme）
-│   ├── hooks/                  # 通用 Hooks（useLocalStorage · useSettings · useModel）
-│   ├── services/               # Tauri IPC 封装（tauri.ts · file/ · videoProcessingFacade.ts）
-│   ├── shared/                 # 共享工具（format · logging · constants · notify）
-│   └── styles/                 # 全局样式与主题（globals.css · _mixins.less · variables.less）
+│   │   ├── config/            # AI 模型配置、导出配置、性能配置
+│   │   ├── services/          # 业务服务层（垂直拆分）
+│   │   │   ├── ai/            # AI 通用适配（OpenAI · Anthropic · Google · DeepSeek …）
+│   │   │   ├── aiClip/        # AI 拆条（启发式分析 · 批量处理）
+│   │   │   ├── asr/           # 自动语音识别（faster-whisper 封装）
+│   │   │   ├── clip-pipeline/ # AI 剪辑 7 步管道（Build · Score · SEO · Export）
+│   │   │   ├── editor/        # 编辑器操作（clip · track · media · effect · history）
+│   │   │   ├── export/         # 导出服务（jianying draft · script export）
+│   │   │   ├── providers/     # AI Provider 适配器 + API Key 验证
+│   │   │   ├── subtitle/      # 字幕服务（whisper · jianying 适配）
+│   │   │   ├── video/         # 视频效果服务（情感峰值检测）
+│   │   │   └── workflow/      # 工作流进度跟踪
+│   │   ├── pipeline/          # 步骤式 AI 管道（Step 抽象 + Build · Score · SEO · Export steps）
+│   │   ├── types/             # 类型定义（jianying draft · timeline）
+│   │   ├── interfaces/        # 接口定义（IVideoProcessor 等）
+│   │   ├── hooks/             # 核心 Hooks（useVideo · use-editor-state）
+│   │   ├── utils/             # 核心工具（project-id · model-availability · route-preload）
+│   │   ├── video/             # 视频处理（BaseVideoProcessor · TauriVideoProcessor）
+│   │   ├── api/               # HTTP 客户端
+│   │   └── tauri/            # Tauri IPC 桥接层
+│   ├── store/                 # Zustand Stores（app · editor · main · project · timeline）
+│   ├── components/             # React UI 组件
+│   │   ├── CutDeck/           # AI 剪辑工作台（Context · Workspace · Types · workflow）
+│   │   ├── editor/            # 时间轴编辑器（Timeline · Preview · Inspector · AssetPanel）
+│   │   ├── VideoEditor/       # 视频编辑器页面组件
+│   │   ├── ScriptEditor/      # 脚本编辑器页面组件
+│   │   ├── AIClipAssistant/   # AI 剪辑助手（多步骤引导）
+│   │   ├── VideoPlayer/       # 视频播放器封装
+│   │   ├── ModelSelector/     # AI 模型选择器
+│   │   └── ui/                # shadcn/ui 组件库
+│   ├── pages/                  # 页面路由（Dashboard · Projects · VideoEditor · AIVideoEditor …）
+│   ├── context/               # React Context（Settings · Theme）
+│   ├── hooks/                 # 通用 Hooks（useLocalStorage · useSettings · useProject · useModel …）
+│   ├── services/              # Tauri IPC 封装（tauri.ts · file/ · videoProcessingFacade.ts）
+│   ├── shared/                # 共享工具（format · logging · constants · notify · utils）
+│   ├── styles/                # 全局样式（globals.css · _mixins.less · variables.less）
+│   └── lib/                   # lib/utils.ts（clsx · tailwind-merge）
 ├── src-tauri/                  # Tauri 后端 (Rust)
 │   └── src/
-│       ├── commands/           # FFmpeg · 高光检测 · 智能分段 · 字幕
-│       ├── lib.rs              # 命令注册入口
-│       ├── highlight_detector.rs
-│       ├── smart_segmenter.rs
-│       ├── subtitle.rs
-│       └── utils.rs
-└── scripts/                    # 构建与部署脚本
+│       ├── lib.rs             # 命令注册入口
+│       ├── main.rs            # Tauri main entry
+│       ├── types.rs           # Rust 类型定义
+│       ├── commands/          # Tauri 命令模块
+│       │   ├── ai.rs         # AI 字幕 · Whisper · 场景分析
+│       │   ├── ffprobe.rs    # FFprobe 封装（视频元数据）
+│       │   ├── project.rs    # 项目管理（创建 · 删除 · 列表）
+│       │   └── render.rs     # 渲染管道（cut_video · cut_subtitle_segment）
+│       ├── lib_optimized.rs  # cut_video 核心实现（被前端 3 处调用）
+│       ├── highlight_detector.rs  # 高光检测（音频能量峰值）
+│       ├── smart_segmenter.rs     # 智能分段
+│       ├── subtitle.rs            # 字幕处理
+│       ├── binary.rs              # 二进制路径管理（ffmpeg · ffprobe）
+│       └── utils.rs               # 通用工具（timecode · format）
+└── docs/                      # 文档
+    ├── ARCHITECTURE.md        # 深度架构文档
+    └── DEVELOPER_GUIDE.md     # 开发者指南
 ```
 
 ### 技术栈
@@ -206,9 +240,9 @@ CutDeck/
 |------|------|
 | 前端框架 | React 18 + TypeScript 5 + Vite 6 |
 | 状态管理 | Zustand v5（持久化） |
-| UI 组件 | shadcn/ui + Tailwind CSS 4 |
+| UI 组件 | shadcn/ui + Tailwind CSS 4（OKLCH 色彩空间） |
 | 桌面运行时 | Tauri v2 |
-| 后端语言 | Rust |
+| 后端语言 | Rust 2021 edition |
 | 视频处理 | FFmpeg |
 | 语音识别 | faster-whisper |
 
@@ -219,9 +253,10 @@ CutDeck/
 | 文档 | 说明 |
 |------|------|
 | [CHANGELOG](./CHANGELOG.md) | 版本更新记录（含 v2.0.0 shadcn/Tailwind 迁移说明） |
-| [架构说明](#-技术架构) | 目录结构与模块职责 |
-| 快速开始 | 5 分钟上手（见上文 🚀 快速开始） |
-| AI 剪辑 | `src/core/pipeline/steps/` — BuildCandidates · ScoreClips · GenerateSEO · PrepareExport |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 深度架构说明（数据流·模块职责·Rust IPC·AI Pipeline） |
+| [docs/DEVELOPER_GUIDE.md](./docs/DEVELOPER_GUIDE.md) | 开发规范（代码风格·Git 工作流·提交规范·测试·发布） |
+| Rust 命令 | `src-tauri/src/commands/` — ai · ffprobe · project · render |
+| AI 剪辑管道 | `src/core/pipeline/steps/` — BuildCandidates · ScoreClips · GenerateSEO · PrepareExport |
 | Whisper 字幕 | `src/core/services/subtitle/` + `src-tauri/src/subtitle.rs` |
 | 多格式导出 | `src/core/services/clip-pipeline/multiFormatExport.ts` |
 
