@@ -5,6 +5,7 @@ import { detectEmotionPeaks, type EmoPeak } from '../video/emotion-peak-detector
 import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
 import { DEFAULT_CLIP_CONFIG } from './types';
 import { formatTime as formatSharedTime } from '../../../shared/utils/formatting';
+import { MS_PER_SECOND } from '@/shared/utils';
 import type {
   AIClipConfig,
   CutPoint,
@@ -59,7 +60,7 @@ export async function analyzeVideo(
     minDurationMs: 300,
   }).catch(() => ({ peaks: [] as EmoPeak[] }));
   const emotionPeaks = rawPeaks.map(p => ({
-    timestamp: p.startMs / 1000,
+    timestamp: p.startMs / MS_PER_SECOND,
     energy: p.energy,
     type: p.type,
   }));
@@ -165,9 +166,9 @@ async function detectSilenceSegments(
     return rustSegments
       .filter(seg => seg.segment_type === 'Silence' || (seg.silence_ratio ?? 0) > 0.3)
       .map(seg => ({
-        start: seg.start_ms / 1000,
-        end: seg.end_ms / 1000,
-        duration: seg.duration_ms / 1000,
+        start: seg.start_ms / MS_PER_SECOND,
+        end: seg.end_ms / MS_PER_SECOND,
+        duration: seg.duration_ms / MS_PER_SECOND,
       }));
   } catch (error) {
     // Rust 失败时返回空，不阻断主流程

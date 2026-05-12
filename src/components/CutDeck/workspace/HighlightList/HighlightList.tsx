@@ -8,6 +8,7 @@
  * - bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
 
  */
+import { MS_PER_SECOND } from '@/shared/utils';
 import React, { useState, useCallback } from 'react';
 import { Slider } from '../../../ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
@@ -88,7 +89,7 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
   }, [videoInfo, threshold, topN]);
 
   const handleSeek = useCallback((h: Highlight) => {
-    setPlayheadMs(h.startTime * 1000);
+    setPlayheadMs(h.startTime * MS_PER_SECOND);
   }, [setPlayheadMs]);
 
   return (

@@ -8,6 +8,7 @@
  *
  * 设计风格：AI Cinema Studio Dark (#0C0D14)
  */
+import { MS_PER_SECOND } from '@/shared/utils';
 import React, { useState, useCallback, useRef } from 'react';
 
 // ── Progress animation constants ──────────────────────────────────────────────
@@ -54,7 +55,7 @@ function formatSRTTime(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.floor(seconds % 60);
-  const ms = Math.floor((seconds % 1) * 1000);
+  const ms = Math.floor((seconds % 1) * MS_PER_SECOND);
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
 }
 
@@ -82,13 +83,13 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
   const [videoDuration, setVideoDuration] = useState(0);
 
   const totalDuration = videoDuration > 0 ? videoDuration : 1;
-  const playheadSec = playheadMs / 1000;
+  const playheadSec = playheadMs / MS_PER_SECOND;
   const currentSub = extractedSubtitles.find(s => playheadSec >= s.startTime && playheadSec <= s.endTime);
 
   const handleVideoTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    setPlayheadMs(video.currentTime * 1000);
+    setPlayheadMs(video.currentTime * MS_PER_SECOND);
   }, []);
 
   const handleVideoEnded = useCallback(() => { setPreviewPlaying(false); }, []);
@@ -115,7 +116,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = timeSec;
-    setPlayheadMs(timeSec * 1000);
+    setPlayheadMs(timeSec * MS_PER_SECOND);
     if (!previewPlaying) {
       setPreviewPlaying(true);
       video.play().catch((e) => { console.warn('[SubtitleExtractor] 播放失败:', e); });
