@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createCheckpoint, saveCheckpoint, loadCheckpoint, clearCheckpoint } from './pipeline-checkpoint';
+import { createCheckpoint, saveCheckpoint, loadCheckpoint, clearCheckpoint } from './checkpoint';
 
 describe('PipelineCheckpoint', () => {
   beforeEach(() => {
