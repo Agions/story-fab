@@ -428,6 +428,8 @@ export class SubtitleService {
 
   /**
    * 烧录字幕到视频
+   * 通过 Tauri invoke 调用 Rust backend 的 export_video 命令
+   * Rust 实现位于 src-tauri/src/commands/render.rs:271
    */
   async burnSubtitles(
     videoPath: string,
@@ -435,10 +437,23 @@ export class SubtitleService {
     outputPath: string,
     style?: Partial<SubtitleStyle>
   ): Promise<string> {
-    const mergedStyle = { ...DEFAULT_SUBTITLE_STYLE, ...style };
     logger.info('[SubtitleService] 烧录字幕:', { video: videoPath, subtitle: subtitlePath, output: outputPath });
-    // TODO: 实现 FFmpeg 字幕烧录命令拼接
-    throw new Error('burnSubtitles not implemented: 需要 FFmpeg 字幕烧录实现');
+    const { invoke } = await import('@tauri-apps/api/core');
+    const result = await invoke<{ outputPath: string }>('export_video', {
+      inputPath: videoPath,
+      outputPath,
+      format: 'mp4',
+      resolution: 'original',
+      frameRate: 30,
+      videoCodec: 'h264',
+      audioCodec: 'aac',
+      crf: 23,
+      subtitleEnabled: true,
+      subtitlePath,
+      burnSubtitles: true,
+    });
+    logger.info('[SubtitleService] 字幕烧录完成:', result);
+    return result.outputPath;
   }
 
   private toSRT(track: SubtitleTrack): string {
