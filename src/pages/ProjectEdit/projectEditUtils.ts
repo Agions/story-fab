@@ -45,8 +45,8 @@ export const normalizeText = (value?: string) => value?.trim().replace(/\s+/g, '
 
 export const createDefaultProjectName = () => {
   const now = new Date();
-  const pad = (value: number) => String(value).padStart(2, '0');
-  const ts = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+  const pad2 = (value: number) => String(value).padStart(2, '0');
+  const ts = `${now.getFullYear()}${pad2(now.getMonth() + 1)}${pad2(now.getDate())}-${pad2(now.getHours())}${pad2(now.getMinutes())}`;
   return `未命名项目-${ts}`;
 };
 
