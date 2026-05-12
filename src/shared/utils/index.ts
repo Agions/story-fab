@@ -25,44 +25,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
-}
-
-/**
- * 节流函数
- */
-export function throttle<T extends (...args: unknown[]) => unknown>(
-  func: T,
-  limit: number
-): (...args: Parameters<T>) => void {
-  let inThrottle = false;
-
-  return function (...args: Parameters<T>) {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
-    }
-  };
-}
-
-/**
- * 深拷贝
- */
-export function deepClone<T>(obj: T): T {
-  if (obj === null || typeof obj !== 'object') return obj;
-  if (obj instanceof Date) return new Date(obj.getTime()) as unknown as T;
-  if (Array.isArray(obj)) return obj.map(item => deepClone(item)) as unknown as T;
-
-  const cloned = {} as T;
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      cloned[key] = deepClone(obj[key]);
-    }
-  }
-  return cloned;
-}
-
-/**
+}/**
  * 生成唯一 ID（通用版，时间戳+随机数）
  */
 export function generateId(prefix?: string): string {
