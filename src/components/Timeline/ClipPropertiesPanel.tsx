@@ -6,6 +6,7 @@ import { cn } from '@/shared/utils/cn';
 import type { TimelineClip } from './types';
 import { formatTimecodeMs, MS_PER_SECOND } from '@/shared/utils';
 import { MIN_CLIP_DURATION } from './constants';
+import { MS_PER_SECOND } from '@/shared/utils';
 import styles from '@/components/Timeline/Timeline.module.less';
 
 interface ClipPropertiesPanelProps {
