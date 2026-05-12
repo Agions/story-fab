@@ -1,45 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="StoryFab favicon">
-  <title>StoryFab</title>
-  <defs>
-    <linearGradient id="bgGradF" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f0c29"/>
-      <stop offset="100%" stop-color="#24243e"/>
-    </linearGradient>
-    <linearGradient id="filmGradF" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff8a5b"/>
-      <stop offset="100%" stop-color="#e63946"/>
-    </linearGradient>
-    <linearGradient id="aiGradF" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4cc9f0"/>
-      <stop offset="100%" stop-color="#7209b7"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Rounded square bg -->
-  <rect width="64" height="64" rx="14" ry="14" fill="url(#bgGradF)"/>
-
-  <!-- Diagonal film strip (small) -->
-  <g transform="rotate(-22 32 32)">
-    <rect x="10" y="25" width="44" height="14" rx="2" fill="url(#filmGradF)"/>
-    <g fill="#0f0c29">
-      <rect x="13" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="19" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="25" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="31" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="37" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="43" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="13" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="19" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="25" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="31" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="37" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="43" y="34" width="4" height="2" rx="0.5"/>
-    </g>
-  </g>
-
-  <!-- Center play -->
-  <g transform="translate(32 32)">
-    <circle r="11" fill="#0f0c29" opacity="0.92"/>
-    <path d="M -3.5 -5 L 5 0 L -3.5 5 Z" fill="url(#aiGradF)"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="CutDeck favicon">
+  <title>CutDeck</title>
+  <rect width="32" height="32" rx="6" fill="#0f0f17"/>
+  <rect x="4" y="6" width="24" height="17" rx="3" fill="#1a1a2e" stroke="#f97316" stroke-width="1.5"/>
+  <rect x="8" y="9" width="3.5" height="4" rx="1" fill="#f97316" opacity="0.8"/>
+  <rect x="13" y="9" width="3.5" height="4" rx="1" fill="#f97316" opacity="0.8"/>
+  <rect x="18" y="9" width="3.5" height="4" rx="1" fill="#f97316" opacity="0.8"/>
+  <rect x="8" y="16" width="3.5" height="4" rx="1" fill="#f97316" opacity="0.8"/>
+  <rect x="13" y="16" width="3.5" height="4" rx="1" fill="#f97316" opacity="0.8"/>
+  <rect x="18" y="16" width="3.5" height="4" rx="1" fill="#f97316" opacity="0.8"/>
+  <path d="M11 10.5 L20 14.5 L11 18.5 Z" fill="#f97316"/>
 </svg>
