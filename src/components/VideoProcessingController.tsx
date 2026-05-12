@@ -23,7 +23,7 @@ import {
 import { invoke } from '@tauri-apps/api/core';
 import { notify } from '@/shared';
 import type { VideoSegment } from '@/core/types';
-import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/modules';
+import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/mods';
 import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from './VideoProcessingController/constants';
 import styles from '@/components/VideoProcessingController.module.less';
 
