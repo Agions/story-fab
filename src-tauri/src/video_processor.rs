@@ -3,7 +3,7 @@
 // shared-state issues in a single-threaded Tauri handler environment.
 
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
-use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time, write_concat_file, cleanup_temp_dir};
+use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time, write_concat_file};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -117,7 +117,7 @@ impl VideoProcessor {
 
         // Use scene detection for intelligent extraction
         let pattern = temp_dir.join("frame_%04d.jpg");
-        
+
         let output = Command::new(&self.ffmpeg_path)
             .args(&[
                 "-y",
@@ -395,4 +395,3 @@ pub async fn cut_video(
 
     Ok(output_path)
 }
-
