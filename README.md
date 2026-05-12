@@ -169,7 +169,6 @@ npm run tauri build
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-> 📖 **完整架构文档**：[`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — 包含 Rust 后端模块、AI 剪辑管道（7步）、Provider 适配器模式、数据流图、ADR 和 FAQ。
 
 ### 技术栈
 
@@ -188,7 +187,6 @@ npm run tauri build
 
 | 文档 | 说明 |
 |------|------|
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 系统架构、AI 剪辑管道（7步）、Rust IPC 设计 |
 | [CHANGELOG](./CHANGELOG.md) | 版本更新记录 |
 
 | 模块 | 位置 |
