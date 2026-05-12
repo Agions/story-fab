@@ -37,10 +37,10 @@ export { analyzeVideo } from './aiClip/analyzer';
 export { batchProcess } from './aiClip/batchProcessor';
 
 // 剪辑 pipeline（clip-pipeline/ 子目录）
-export { clipWorkflowService, ClipWorkflowService } from './clip-pipeline/clip-workflow.service';
+export { clipWorkflowService, ClipWorkflowService } from './clip-pipeline/clipWorkflow';
 export { clipRepurposingPipeline, ClipRepurposingPipeline } from './clip-pipeline/pipeline';
 export { clipScorer } from './clip-pipeline/clipScorer';
-export { multiFormatExporter } from './clip-pipeline/multiFormatExport';
+export { multiExporter } from './clip-pipeline/multiExport';
 export { seoGenerator } from './clip-pipeline/seoGenerator';
 
 // 编辑器服务

@@ -17,7 +17,7 @@ import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import type { CandidateClip, ClipScore } from './clipScorer';
 import type { ASRSegment } from '../../services/asr/asr.service';
 import type { SEOMetadata, SocialPlatform } from './seoGenerator';
-import type { AspectRatio, ExportTask } from './multiFormatExport';
+import type { AspectRatio, ExportTask } from './multiExport';
 
 // Step-based pipeline components
 import {

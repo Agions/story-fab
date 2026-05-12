@@ -11,10 +11,10 @@
  *   CandidateClip    → candidate selection (transcript, audioEnergy, sceneType)
  */
 
-import type { ClipSegment } from './clip-workflow.service';
+import type { ClipSegment } from './clipWorkflow';
 import type { CandidateClip, ClipScore } from './clipScorer';
 import type { SEOMetadata } from './seoGenerator';
-import type { ExportTask, AspectRatio } from './multiFormatExport';
+import type { ExportTask, AspectRatio } from './multiExport';
 
 // ============================================================
 // Shared Base
