@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
-import { VideoSegment, extractKeyFrames, analyzeVideo } from '../../../services/videoProcessingFacade';
+import { VideoSegment, extractKeyFrames, analyzeVideo } from '../../../services/videoFacade';
 import { clipWorkflowService } from '../../../core/services/clip-pipeline/clip-workflow.service';
 import type { VideoInfo } from '@/core/types';
 import type { ClipSegment } from '../../../core/services/aiClip';

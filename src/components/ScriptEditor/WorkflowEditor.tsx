@@ -13,7 +13,7 @@ import {
   Clock,
 } from 'lucide-react';
 import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
-import { formatDuration } from '../../services/videoProcessingFacade';
+import { formatDuration } from '../../services/videoFacade';
 import { notify } from '@/shared';
 import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
