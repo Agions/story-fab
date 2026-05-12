@@ -41,7 +41,7 @@ import { TimeRuler } from './TimeRuler';
 import { Playhead } from './Playhead';
 import { ClipRenderer } from './ClipRenderer';
 import { ClipPropertiesPanel } from './ClipPropertiesPanel';
-import { clamp, generateId } from './utils';
+import { clamp, generateId } from '@/shared/utils';
 import { MIN_CLIP_DURATION, DEFAULT_TRACK_HEIGHT, MIN_ZOOM, MAX_ZOOM, SNAP_THRESHOLD_PX, TRACK_COLORS } from './constants';
 
 import styles from '@/components/Timeline/Timeline.module.less';

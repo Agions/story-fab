@@ -230,3 +230,22 @@ export function now(): number {
 export function nowISO(): string {
   return new Date().toISOString();
 }
+
+/**
+ * 限制数值在 [min, max] 范围内
+ */
+export function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+/**
+ * 帧级时间码（毫秒 → MM:SS:FF @ 30fps）
+ * 用于 Timeline 播放头 / 时间尺
+ */
+export function formatTimecodeMs(ms: number): string {
+  const totalSeconds = ms / MS_PER_SECOND;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+  const frames = Math.floor((ms % MS_PER_SECOND) / (MS_PER_SECOND / 30));
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(frames).padStart(2, '0')}`;
+}

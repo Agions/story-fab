@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { formatTime } from './utils';
+import { formatTimecodeMs } from '@/shared/utils';
 import styles from '@/components/Timeline/Timeline.module.less';
 
 interface TimeRulerProps {
@@ -41,7 +41,7 @@ export const TimeRuler = memo<TimeRulerProps>(({ duration, zoom, scrollX, width 
         const x = (ms / msPerPixel) - scrollX;
         return (
           <div key={ms} className={`${styles.tick} ${major ? styles.major : styles.minor}`} style={{ left: x }}>
-            {major && <span className={styles.tickLabel}>{formatTime(ms)}</span>}
+            {major && <span className={styles.tickLabel}>{formatTimecodeMs(ms)}</span>}
           </div>
         );
       })}
