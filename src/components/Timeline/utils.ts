@@ -1,3 +1,4 @@
+import { MS_PER_SECOND } from '@/shared/utils';
 // Timeline 工具函数
 
 /**
@@ -7,7 +8,7 @@
  */
 
 export function formatTime(ms: number): string {
-  const totalSeconds = ms / 1000;
+  const totalSeconds = ms / MS_PER_SECOND;
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = Math.floor(totalSeconds % 60);
   const frames = Math.floor((ms % 1000) / (1000 / 30));
