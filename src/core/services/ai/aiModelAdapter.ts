@@ -1,5 +1,5 @@
 import type { ModelProvider } from '@/core/types';
-import type { LegacyAIModelType } from './aiScriptGenerationService';
+import type { LegacyAIModelType } from './scriptService';
 
 const PROVIDER_TO_LEGACY_MODEL: Record<ModelProvider, LegacyAIModelType> = {
   openai: 'openai',

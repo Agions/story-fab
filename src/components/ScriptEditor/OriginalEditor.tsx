@@ -12,7 +12,7 @@ import {
   Plus,
 } from 'lucide-react';
 import type { ScriptSegment } from '@/core/types';
-import { VideoSegment, formatDuration, previewSegment } from '../../services/videoProcessingFacade';
+import { VideoSegment, formatDuration, previewSegment } from '../../services/videoFacade';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { notify } from '@/shared';
 import SegmentTable from './SegmentTable';

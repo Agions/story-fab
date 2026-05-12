@@ -1,5 +1,5 @@
 import { saveFile } from '@/services/file/fileOperations';
-import type { AIScriptDraft as Script } from '@/core/services/ai/aiScriptGenerationService';
+import type { AIScriptDraft as Script } from '@/core/services/ai/scriptService';
 import { formatTime, formatDate } from '@/shared/utils/format';
 import { formatSrtTime } from '../../../shared/utils/formatting';
 import { logger } from '@/shared/utils/logging';
