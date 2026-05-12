@@ -131,8 +131,8 @@ const AIVideoPreview: React.FC = () => {
   };
 
   const handleProgressChange = (value: number | readonly number[]) => {
-    const val = Array.isArray(value) ? value[0] : value;
-    seekTo(val);
+    const resolvedValue = Array.isArray(value) ? value[0] : value;
+    seekTo(resolvedValue);
   };
 
   const handleUploadFile = (file: File) => {

@@ -32,14 +32,16 @@ import { ProjectForm } from './components/ProjectForm';
 import { useProjectAutoSave } from './hooks/useProjectAutoSave';
 import {
   type ProjectData,
-  type ProjectSaveBehavior,
-  PROJECT_SAVE_BEHAVIOR_KEY,
-  PROJECT_AUTO_SAVE_KEY,
   normalizeProjectData,
   createDefaultProjectName,
   buildDraftFingerprint,
   parseScriptText,
 } from './projectEditUtils';
+import {
+  PROJECT_SAVE_BEHAVIOR_KEY,
+  PROJECT_AUTO_SAVE_KEY,
+  type ProjectSaveBehavior,
+} from '@/shared/constants/settings';
 
 import styles from '@/pages/ProjectEdit/index.module.less';
 

@@ -130,8 +130,8 @@ export class AIService extends BaseService {
           : [];
 
         const keyframes: Keyframe[] = keyframesResult.status === 'fulfilled'
-          ? keyframesResult.value.map((k, idx) => ({
-              id: k.id || `kf_${idx}`,
+          ? keyframesResult.value.map((k, index) => ({
+              id: k.id || `kf_${index}`,
               timestamp: k.timestamp || 0,
               thumbnail: k.thumbnail || '',
               description: k.description || '',
