@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateEmotionScore } from './emotion-peak-detector';
+import { calculateEmotionScore } from './emotionDetector';
 
 describe('EmotionPeakDetector', () => {
   describe('calculateEmotionScore', () => {
