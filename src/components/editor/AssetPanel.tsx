@@ -217,13 +217,13 @@ const AssetPanel: React.FC = () => {
                   <MoreHorizontal size={14} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {assetMenu(asset.id).map((item, idx) =>
+                  {assetMenu(asset.id).map((item, index) =>
                     item.key === '4' ? (
-                      <DropdownMenuItem key={idx} className="text-destructive focus:text-destructive" onClick={(e: React.MouseEvent) => { e.stopPropagation(); item.onClick(); }}>
+                      <DropdownMenuItem key={index} className="text-destructive focus:text-destructive" onClick={(e: React.MouseEvent) => { e.stopPropagation(); item.onClick(); }}>
                         {item.label}
                       </DropdownMenuItem>
                     ) : (
-                      <DropdownMenuItem key={idx} onClick={(e: React.MouseEvent) => { e.stopPropagation(); item.onClick(); }}>
+                      <DropdownMenuItem key={index} onClick={(e: React.MouseEvent) => { e.stopPropagation(); item.onClick(); }}>
                         {item.label}
                       </DropdownMenuItem>
                     )

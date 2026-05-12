@@ -108,8 +108,8 @@ export const ModelCard: React.FC<ModelCardProps> = ({
             </p>
 
             <div className={styles.features}>
-              {model.features?.slice(0, 3).map((feature, idx) => (
-                <Badge key={idx} variant="secondary" className="text-xs">
+              {model.features?.slice(0, 3).map((feature, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
                   {feature}
                 </Badge>
               ))}

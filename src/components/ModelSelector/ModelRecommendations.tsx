@@ -28,14 +28,14 @@ export const ModelRecommendations: React.FC<ModelRecommendationsProps> = ({
         <Star size={12} className="inline" /> 推荐模型
       </span>
       <div className="flex flex-wrap gap-2">
-        {models.map((model, idx) => (
+        {models.map((model, index) => (
           <Button
             key={model.id}
             variant={currentModelId === model.id ? 'default' : 'outline'}
             size="sm"
-            onClick={() => onSelect(idx)}
+            onClick={() => onSelect(index)}
           >
-            {idx === 0 && <Star size={12} className="mr-1" />}
+            {index === 0 && <Star size={12} className="mr-1" />}
             {model.name}
           </Button>
         ))}

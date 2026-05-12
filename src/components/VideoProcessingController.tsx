@@ -229,8 +229,8 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         const outputPath = await processVideo(segmentsToProcess, item.name);
         newOutputPaths.push(outputPath);
 
-        setBatchItems(prevItems => prevItems.map((prevItem, idx) =>
-          idx === i ? { ...prevItem, completed: true } : prevItem
+        setBatchItems(prevItems => prevItems.map((prevItem, index) =>
+          index === i ? { ...prevItem, completed: true } : prevItem
         ));
 
         setBatchProgress(((i + 1) / batchItems.length) * 100);
@@ -267,8 +267,8 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
   }, [segments, processVideo]);
 
   const handleAudioVolumeChange = (value: number | readonly number[]) => {
-    const val = Array.isArray(value) ? value[0] : value;
-    setAudioVolume(val);
+    const resolvedValue = Array.isArray(value) ? value[0] : value;
+    setAudioVolume(resolvedValue);
   };
 
   const [activePanels, setActivePanels] = useState<string[]>(['basic']);
