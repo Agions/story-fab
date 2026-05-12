@@ -5,6 +5,6 @@
 export * from './aiModelAdapter';
 export * from './ai.service';
 export * from './scriptService';
-export * from './scene-commentary-alignment.service';
+export * from './scene-commentary.service';
 export * from './vision.service';
 export * from './voice-synthesis.service';

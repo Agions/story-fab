@@ -24,7 +24,7 @@ export { aiService } from './ai/ai.service';
 export { visionService } from './ai/vision.service';
 export { voiceSynthesisService, VoiceSynthesisService } from './ai/voice-synthesis.service';
 export { scriptGenerationService } from './ai/scriptService';
-export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './ai/scene-commentary-alignment.service';
+export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './ai/scene-commentary.service';
 export { resolveLegacyModel, getLegacyModelCompatMap } from './ai/aiModelAdapter';
 
 // ASR & 音视频同步（asr/ 子目录）
@@ -56,7 +56,7 @@ export { subtitleService, SubtitleService } from './subtitle/subtitle.service';
 
 // 视频特效 & 信号（video/ 子目录）
 export { videoEffectService, VideoEffectService } from './video/video-effect.service';
-export { detectEmotionPeaks, calculateEmotionScore } from './video/emotion-peak-detector';
+export { detectEmotionPeaks, calculateEmotionScore } from './video/emotionDetector';
 
 // 工作流（workflow/ 子目录）
 export { orchestrateCommentaryAgents } from './workflow/commentaryAgents';
