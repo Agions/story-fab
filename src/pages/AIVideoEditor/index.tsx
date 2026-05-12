@@ -176,7 +176,7 @@ const AIVideoEditorContent: React.FC = () => {
 
   // 快捷键：? 显示帮助面板
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
+    const handleKeydown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (
         target.tagName === 'INPUT' ||
@@ -188,8 +188,8 @@ const AIVideoEditorContent: React.FC = () => {
         setShortcutsHelpVisible(true);
       }
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
   }, []);
 
   return (
