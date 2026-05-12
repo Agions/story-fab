@@ -8,7 +8,7 @@ import {
   DEFAULT_STEPS,
   type WorkflowStepDefinition,
   type ProgressInfo,
-} from './workflow-progress';
+} from './workflowProgress';
 
 describe('WorkflowProgressTracker', () => {
   let tracker: WorkflowProgressTracker;
