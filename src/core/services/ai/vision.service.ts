@@ -513,21 +513,21 @@ export class VisionService {
     emotions: EmotionAnalysis[]
   ): Promise<VideoAnalysis> {
     // 统计信息
-    const sceneTypes = scenes.reduce((acc, scene) => {
-      acc[scene.type || 'unknown'] = (acc[scene.type || 'unknown'] || 0) + 1;
-      return acc;
+    const sceneTypes = scenes.reduce((countsByType, scene) => {
+      countsByType[scene.type || 'unknown'] = (countsByType[scene.type || 'unknown'] || 0) + 1;
+      return countsByType;
     }, {} as Record<string, number>);
 
-    const objectCategories = objects.reduce((acc, obj) => {
+    const objectCategories = objects.reduce((countsByCategory, obj) => {
       const key = Array.isArray(obj.category) ? obj.category[0] : obj.category;
-      acc[key || 'unknown'] = (acc[key || 'unknown'] || 0) + 1;
-      return acc;
+      countsByCategory[key || 'unknown'] = (countsByCategory[key || 'unknown'] || 0) + 1;
+      return countsByCategory;
     }, {} as Record<string, number>);
 
-    const dominantEmotions = emotions.reduce((acc, emotion) => {
+    const dominantEmotions = emotions.reduce((countsByEmotion, emotion) => {
       const emotionKey = emotion.dominant ?? 'neutral';
-      acc[emotionKey] = (acc[emotionKey] || 0) + 1;
-      return acc;
+      countsByEmotion[emotionKey] = (countsByEmotion[emotionKey] || 0) + 1;
+      return countsByEmotion;
     }, {} as Record<string, number>);
 
     // 生成摘要
