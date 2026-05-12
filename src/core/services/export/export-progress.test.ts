@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { exportProgress } from './export-progress';
+import { exportProgress } from './exportProgress';
 
 describe('exportProgress', () => {
   // Use a fresh emitter instance per test to avoid state pollution

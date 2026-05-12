@@ -23,7 +23,7 @@ export * from './providers';
 export { aiService } from './ai/ai.service';
 export { visionService } from './ai/vision.service';
 export { voiceSynthesisService, VoiceSynthesisService } from './ai/voice-synthesis.service';
-export { scriptGenerationService } from './ai/aiScriptGenerationService';
+export { scriptGenerationService } from './ai/scriptService';
 export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './ai/scene-commentary-alignment.service';
 export { resolveLegacyModel, getLegacyModelCompatMap } from './ai/aiModelAdapter';
 
@@ -49,7 +49,7 @@ export * from './editor';
 
 // 导出服务（export/ 子目录）
 export { exportService, ExportService } from './export/export.service';
-export { exportProgress } from './export/export-progress';
+export { exportProgress } from './export/exportProgress';
 
 // 字幕服务（subtitle/ 子目录）
 export { subtitleService, SubtitleService } from './subtitle/subtitle.service';
