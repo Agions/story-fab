@@ -11,7 +11,7 @@ import { useTimeout } from '../../../hooks/useTimeout';
 import { formatTime } from '../../../shared/utils/formatting';
 import type { AIAnalyzeProps, Scene } from '@/core/types';
 import styles from './AIVisualizer.module.css';
-import { HighlightList } from './HighlightList';
+import { Highlights } from './Highlights';
 
 // 分析任务配置
 interface AnalysisTask {
@@ -387,7 +387,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
           {/* 高光时刻 — Rust highlight_detector.rs */}
           {state.currentVideo && (
             <div style={{ marginTop: 16 }}>
-              <HighlightList videoInfo={state.currentVideo} />
+              <Highlights videoInfo={state.currentVideo} />
             </div>
           )}
 
