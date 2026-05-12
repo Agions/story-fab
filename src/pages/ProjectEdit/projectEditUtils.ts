@@ -27,10 +27,6 @@ export interface ProjectData extends ProjectFileLike<unknown, { path?: string }>
   script?: ScriptSegment[];
 }
 
-export type ProjectSaveBehavior = 'stay' | 'detail';
-
-export { PROJECT_SAVE_BEHAVIOR_KEY, PROJECT_AUTO_SAVE_KEY } from '../../shared/constants/settings';
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Project data normalization
 // ─────────────────────────────────────────────────────────────────────────────

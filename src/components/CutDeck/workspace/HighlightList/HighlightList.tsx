@@ -52,13 +52,13 @@ const HighlightList: React.FC<HighlightListProps> = ({ videoInfo, defaultExpande
   const setPlayheadMs = useTimelineStore((s) => s.setPlayheadMs);
 
   const handleThresholdChange = (value: number | readonly number[]) => {
-    const val = Array.isArray(value) ? value[0] : value;
-    setThreshold(val);
+    const resolvedValue = Array.isArray(value) ? value[0] : value;
+    setThreshold(resolvedValue);
   };
 
   const handleTopNChange = (value: number | readonly number[]) => {
-    const val = Array.isArray(value) ? value[0] : value;
-    setTopN(val);
+    const resolvedValue = Array.isArray(value) ? value[0] : value;
+    setTopN(resolvedValue);
   };
 
   const detect = useCallback(async () => {

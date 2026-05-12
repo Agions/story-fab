@@ -294,9 +294,9 @@ export const useTimelineStore = create<TimelineStore>()(
         get().saveTrackHistory();
         set((s) => ({
           timelineTracks: s.timelineTracks.map((t) => {
-            const idx = t.clips.findIndex((c) => c.id === clipId);
-            if (idx === -1) return t;
-            const clip = t.clips[idx];
+            const index = t.clips.findIndex((c) => c.id === clipId);
+            if (index === -1) return t;
+            const clip = t.clips[index];
             if (splitMs <= clip.startMs || splitMs >= clip.endMs) return t;
             const offset = splitMs - clip.startMs;
             const sourceSplit = clip.sourceStartMs + offset;
@@ -309,7 +309,7 @@ export const useTimelineStore = create<TimelineStore>()(
               sourceStartMs: sourceSplit,
             };
             const newClips = [...t.clips];
-            newClips.splice(idx, 1, leftClip, rightClip);
+            newClips.splice(index, 1, leftClip, rightClip);
             return { ...t, clips: newClips };
           }),
         }));
