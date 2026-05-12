@@ -166,10 +166,10 @@ export class EditorService {
 
   dispatch(action: EditorAction): void {
     // 策略模式：通过 action.type 直接从映射表获取处理器
-    const handler = actionHandlers[action.type];
+    const actionHandler = actionHandlers[action.type];
     
-    if (!handler) {
-      logger.warn(`No handler registered for action type: ${action.type}`);
+    if (!actionHandler) {
+      logger.warn(`No actionHandler registered for action type: ${action.type}`);
       return;
     }
 
@@ -179,8 +179,8 @@ export class EditorService {
       return;
     }
 
-    // 其他操作：调用 handler 获取新时间线，记录历史，通知订阅者
-    const newTimeline = handler(this.history.present, action);
+    // 其他操作：调用 actionHandler 获取新时间线，记录历史，通知订阅者
+    const newTimeline = actionHandler(this.history.present, action);
     this.history = pushHistory(this.history, newTimeline);
     this.notify();
   }
