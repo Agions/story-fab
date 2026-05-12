@@ -94,9 +94,6 @@ TIMELINE_REFACTOR.md
 
 
 # Internal planning docs
-SPEC.md
-ARCHITECTURE.md
-ROADMAP.md
-.learnings/
+# (placeholder — add docs as needed)
 pnpm-lock.yaml
 src-tauri/Cargo.lock
