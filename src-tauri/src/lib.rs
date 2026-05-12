@@ -6,14 +6,14 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod binary;
 pub mod commands;
-pub mod lib_optimized;
+pub mod video_processor;
 pub mod types;
 pub mod utils;
 pub mod subtitle;
 pub mod highlight_detector;
 pub mod smart_segmenter;
 
-pub use commands::{ai, ffprobe, project, render};
+pub use commands::{ai, ffprobe, project, render, export_state, file_ops};
 pub use types::*;
 
 // Re-export all commands so generate_handler! can find them at crate root
@@ -27,10 +27,11 @@ pub use commands::project::{
     list_app_data_files, list_project_files, load_project_file, read_text_file, save_project_file,
 };
 pub use commands::render::{
-    render_autonomous_cut, transcode_with_crop, generate_preview, cancel_export,
-    clean_temp_file, open_file, voice_discovery,
+    render_autonomous_cut, transcode_with_crop, generate_preview,
 };
-pub use lib_optimized::cut_video;
+pub use commands::export_state::cancel_export;
+pub use commands::file_ops::{clean_temp_file, open_file, voice_discovery};
+pub use video_processor::cut_video;
 
 // Subtitle re-exports
 pub use subtitle::{

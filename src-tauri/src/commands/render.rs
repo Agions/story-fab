@@ -1,47 +1,16 @@
+//! Render commands: autonomous cut, transcode with crop, and preview generation.
+//!
+//! Cancellation is managed by the shared `export_state` module.
+
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
+use crate::commands::export_state;
 use crate::types::{AutonomousRenderInput, TranscodeCropInput};
 use crate::utils::{chrono_like_timestamp, cmd_err, format_srt_time, write_concat_file};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::path::PathBuf;
 use std::process::Command;
-use std::sync::Mutex;
-use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::process::Command as TokioCommand;
 use tokio::fs as tokio_fs;
-
-// ─── Active Export Cancellation Tracker ─────────────────────────────────────
-
-static ACTIVE_EXPORT: Mutex<Option<String>> = Mutex::new(None);
-static CANCEL_REQUESTED: AtomicBool = AtomicBool::new(false);
-
-fn enter_export(export_id: &str) {
-    // Poisoned guard: re-acquire to handle panics gracefully
-    let mut guard = ACTIVE_EXPORT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
-    *guard = Some(export_id.to_string());
-    CANCEL_REQUESTED.store(false, Ordering::SeqCst);
-}
-
-fn exit_export() {
-    let mut guard = ACTIVE_EXPORT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
-    *guard = None;
-}
-
-fn is_cancelled() -> bool {
-    CANCEL_REQUESTED.load(Ordering::SeqCst)
-}
-
-#[tauri::command]
-pub fn cancel_export(export_id: String) -> Result<(), String> {
-    let active = ACTIVE_EXPORT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
-    if *active == Some(export_id.clone()) {
-        CANCEL_REQUESTED.store(true, Ordering::SeqCst);
-        tracing::info!("取消导出已标记: {}", export_id);
-        Ok(())
-    } else {
-        tracing::warn!("取消导出失败: export_id {} 不匹配当前活动导出", export_id);
-        Err("导出不存在或已完成".to_string())
-    }
-}
 
 // ─── Transcode ──────────────────────────────────────────────────────────────
 
@@ -83,6 +52,17 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
 
 #[tauri::command]
 pub async fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, String> {
+    export_state::enter_export(&input.output_path);
+
+    let result = render_autonomous_cut_inner(input).await;
+
+    export_state::exit_export();
+    result
+}
+
+async fn render_autonomous_cut_inner(
+    input: AutonomousRenderInput,
+) -> Result<String, String> {
     let segments = input
         .segments
         .clone()
@@ -170,7 +150,7 @@ pub async fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<Strin
             &temp_root,
             &temp_files,
             &merged_output.to_string_lossy(),
-            &transition,
+            transition,
             transition_duration,
         )
         .or_else(|_| merge_by_concat(&temp_root, &temp_files, &merged_output.to_string_lossy()))
@@ -224,7 +204,6 @@ fn render_single_cut_sync(
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-/// Format an ffmpeg error from command output.
 /// Append ffmpeg -ss / -t time-segment args to `cmd` from start/end Option<f64>.
 fn apply_time_segment(cmd: &mut std::process::Command, start: Option<f64>, end: Option<f64>) {
     if let Some(s) = start {
@@ -244,7 +223,7 @@ fn quality_params(quality: Option<&str>) -> (u32, &'static str) {
     }
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+// ─── Post-processing ─────────────────────────────────────────────────────────
 
 fn apply_post_processing(
     merged_input: &PathBuf,
@@ -620,7 +599,7 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
 
     let duration = (input.segment.end - input.segment.start).max(0.1);
 
-    let mut cmd = tokio::process::Command::new(ffmpeg_binary());
+    let mut cmd = TokioCommand::new(ffmpeg_binary());
     cmd.arg("-y")
         .arg("-ss").arg(input.segment.start.to_string())
         .arg("-t").arg(duration.to_string())
@@ -641,7 +620,6 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
 
     // Apply subtitle burn-in if requested
     if input.add_subtitles.unwrap_or(false) {
-        // Subtitles would need a subtitle track - skip for preview
         tracing::warn!("Subtitle burn-in not implemented for preview");
     }
 
@@ -656,83 +634,4 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
     }
 
     Ok(output_path_str)
-}
-
-// ─── Temp File Cleanup ────────────────────────────────────────────────────────
-
-#[tauri::command]
-pub async fn clean_temp_file(path: String) -> Result<(), String> {
-    if path.trim().is_empty() {
-        return Err("路径不能为空".to_string());
-    }
-
-    // Only clean up files in temp directory for safety
-    let temp_dir = std::env::temp_dir();
-    let file_path = PathBuf::from(&path);
-
-    if !file_path.starts_with(&temp_dir) {
-        return Err("只能删除临时目录下的文件".to_string());
-    }
-
-    if file_path.exists() {
-        tokio::fs::remove_file(&path)
-            .await
-            .map_err(|e| format!("删除临时文件失败: {e}"))?;
-    }
-
-    Ok(())
-}
-
-// ─── Open File ────────────────────────────────────────────────────────────────
-
-#[tauri::command]
-pub fn open_file(path: String) -> Result<(), String> {
-    if path.trim().is_empty() {
-        return Err("路径不能为空".to_string());
-    }
-
-    #[cfg(target_os = "windows")]
-    {
-        std::process::Command::new("cmd")
-            .args(["/C", "start", "", &path])
-            .spawn()
-            .map_err(|e| format!("打开文件失败: {e}"))?;
-    }
-    #[cfg(target_os = "macos")]
-    {
-        std::process::Command::new("open")
-            .arg(&path)
-            .spawn()
-            .map_err(|e| format!("打开文件失败: {e}"))?;
-    }
-    #[cfg(target_os = "linux")]
-    {
-        std::process::Command::new("xdg-open")
-            .arg(&path)
-            .spawn()
-            .map_err(|e| format!("打开文件失败: {e}"))?;
-    }
-
-    Ok(())
-}
-
-// ─── Voice Discovery ──────────────────────────────────────────────────────────
-
-#[derive(Serialize)]
-pub struct VoiceDiscoveryResult {
-    pub voices: Vec<VoiceInfo>,
-}
-
-#[derive(Serialize)]
-pub struct VoiceInfo {
-    pub name: String,
-    pub locale: String,
-    pub gender: String,
-}
-
-#[tauri::command]
-pub async fn voice_discovery() -> Result<VoiceDiscoveryResult, String> {
-    // Return empty list - edge-tts does not have a voice discovery API
-    // The frontend should use hardcoded voice names
-    Ok(VoiceDiscoveryResult { voices: vec![] })
 }
