@@ -243,7 +243,6 @@ npm run tauri build
 | **阿里云** | Qwen3.6-Max（旗舰）、Qwen3.6-Plus、Qwen3.6-Flash | 中文内容创作、编程能力 |
 | **月之暗面** | Kimi K2.6（推荐）、Kimi K2.5 | 中文长文本分析、视频语义 |
 | **智谱AI** | GLM-5（旗舰）、GLM-5-Turbo、GLM-4.7 | 中文多模态、高上下文 |
-| **Azure OpenAI** | GPT-5.5、GPT-5.4-nano | 企业用户、合规部署 |
 | **科大讯飞** | Spark 4.0、Spark 3.5 | 语音相关任务、TTS 前置处理 |
 
 ### 模型速查

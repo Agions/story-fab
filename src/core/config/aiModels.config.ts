@@ -97,14 +97,6 @@ export const MODEL_PROVIDERS: Record<
     keyFormat: 'sk-...',
     keyPlaceholder: 'sk-xxx...xxxx',
   },
-  azure: {
-    name: 'Azure OpenAI',
-    icon: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Microsoft-Azure.svg',
-    website: 'https://azure.microsoft.com/services/cognitive-services/openai',
-    apiDocs: 'https://learn.microsoft.com/azure/cognitive-services/openai',
-    keyFormat: 'Azure API Key',
-    keyPlaceholder: 'Your Azure API Key',
-  },
   local: {
     name: '本地模型',
     icon: 'https://localhost/favicon.ico',

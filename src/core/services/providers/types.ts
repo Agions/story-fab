@@ -32,7 +32,6 @@ export const MODEL_PROVIDERS: Record<SupportedProvider, ModelProvider> = {
   openai:       { name: 'OpenAI',         baseUrl: 'https://api.openai.com/v1' },
   anthropic:    { name: 'Anthropic',      baseUrl: 'https://api.anthropic.com/v1' },
   google:       { name: 'Google',         baseUrl: 'https://generativelanguage.googleapis.com/v1beta' },
-  azure:        { name: 'Azure OpenAI',   baseUrl: '' },
   local:        { name: 'Local Model',   baseUrl: '' },
   custom:       { name: 'Custom Provider', baseUrl: '' },
   alibaba:      { name: '阿里通义千问',   baseUrl: 'https://dashscope.aliyuncs.com' },
