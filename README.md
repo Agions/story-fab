@@ -230,19 +230,61 @@ npm run tauri build
 
 ## 🤖 支持的 AI 模型
 
-只需配置**一个** API Key 即可使用全部 AI 功能：
+只需配置**一个** API Key 即可使用全部 AI 功能。所有模型数据由 `src/core/config/aiModels.config.ts` 统一维护（验证日期：2026-05）。
 
-| 提供商 | 模型 | 适用场景 |
-|--------|------|----------|
-| **DeepSeek** | V4-Flash（推荐）、V4-Pro | 🏆 性价比最高，Clip Script 生成 |
-| **OpenAI** | GPT-4o、o3、o3-mini | 剧情分析、内容理解 |
-| **Anthropic** | Claude 3.5 Sonnet、Claude 3 Opus | 长文本分析 |
-| **Google** | Gemini 2.0 Flash、Pro | 多模态理解 |
-| **阿里云** | Qwen-Max、Qwen-Plus | 中文内容创作 |
-| **月之暗面** | Kimi（moonshot-v1）| 长文本分析 |
-| **智谱AI** | GLM-4-Plus、GLM-4V | 中文多模态 |
-| **Azure OpenAI** | GPT-4o、o1 | 企业用户 |
-| **科大讯飞** | Spark 4.0 Ultra | 语音相关任务 |
+### 按提供商
+
+| 提供商 | 推荐模型 | 适用场景 |
+|--------|----------|----------|
+| **DeepSeek** | V4-Pro（推荐）、V4-Flash | 🏆 性价比最高，Clip Script 生成、复杂推理 |
+| **OpenAI** | GPT-5.5（旗舰）、GPT-5.5-Pro、GPT-5.4-nano | 多模态视频理解、高质量脚本生成 |
+| **Anthropic** | Claude Opus 4.7（旗舰）、Claude Sonnet 4.6、Claude Haiku 4.5 | 长文本分析与脚本创作、风格稳定 |
+| **Google** | Gemini 2.5 Pro、Gemini 2.5 Flash（性价比） | 多模态理解、长上下文 |
+| **阿里云** | Qwen3.6-Max（旗舰）、Qwen3.6-Plus、Qwen3.6-Flash | 中文内容创作、编程能力 |
+| **月之暗面** | Kimi K2.6（推荐）、Kimi K2.5 | 中文长文本分析、视频语义 |
+| **智谱AI** | GLM-5（旗舰）、GLM-5-Turbo、GLM-4.7 | 中文多模态、高上下文 |
+| **Azure OpenAI** | GPT-5.5、GPT-5.4-nano | 企业用户、合规部署 |
+| **科大讯飞** | Spark 4.0、Spark 3.5 | 语音相关任务、TTS 前置处理 |
+
+### 模型速查
+
+#### OpenAI（旗舰：GPT-5.5）
+- 🏆 **GPT-5.5** — 最新旗舰（2026-04），最强多模态，支持视频理解与 agentic 工作流
+- **GPT-5.5-Pro** — 高端推理版，最复杂决策与规划
+- **GPT-5.4-nano** — 轻量高速，性价比最高，适合批量脚本生成
+- **GPT-4o** — 成熟旗舰（2024），多模态均衡
+- **o3/o3-mini** — 推理专项，适合镜头匹配、时间轴修正
+
+#### DeepSeek（旗舰：V4-Pro）
+- **V4-Pro** — 复杂推理与代码任务首选
+- **V4-Flash** — 高性价比，快速响应
+- **R1 / R1-0528** — 推理模型，适合判别类任务
+
+#### Anthropic（旗舰：Claude Opus 4.7）
+- **Opus 4.7** — 最高智能（2026-04），复杂视频语义分析与高质量脚本
+- **Sonnet 4.6** — 长文本组织与风格润色
+- **Haiku 4.5** — 轻量高速，批量分析
+
+#### Google（旗舰：Gemini 2.5 Pro）
+- **Gemini 2.5 Pro** — 超长上下文（1M token），适合长视频分析
+- **Gemini 2.5 Flash** — 高性价比，多模态日常任务
+
+#### 阿里云（旗舰：Qwen3.6-Max）
+- **Qwen3.6-Max** — 旗舰推理，中文创作能力最强
+- **Qwen3.6-Plus** — 高性价比均衡选择
+- **Qwen3.6-Flash** — 快速响应，批量脚本改写
+
+#### 月之暗面（旗舰：Kimi K2.6）
+- **Kimi K2.6**（2026-04）— 当前旗舰，开源模型中 SWE-Bench 顶级，262K 上下文
+- ⚠️ Kimi K2 系列将于 2026-05-25 停止维护，推荐迁移至 K2.6
+
+#### 智谱AI（旗舰：GLM-5）
+- **GLM-5** — 旗舰模型，中文多模态与长上下文
+- **GLM-5-Turbo** — 高性价比均衡选择
+
+#### 讯飞 Spark
+- **Spark 4.0** — 最新语音相关任务
+- **Spark 3.5** — 成熟稳定选项
 
 > 📝 模型列表由 `src/core/config/aiModels.config.ts` 统一管理，每次版本更新后请同步该文件。
 
