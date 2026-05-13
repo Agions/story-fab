@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '../core/tauri/TauriBridge';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, BaseDirectory, mkdir, exists } from '@tauri-apps/plugin-fs';
 import { load } from '@tauri-apps/plugin-store';
@@ -128,7 +129,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
 
   // 优先使用 Rust 函数写入
   try {
-    await invoke('save_project_file', { projectId: normalizedProjectId, content: projectData });
+    await tauri.saveProject(normalizedProjectId, projectData);
     emitProjectsChanged();
     logger.info('文件写入成功 (通过Rust函数)', { projectPath });
     return;
@@ -453,7 +454,7 @@ export const deleteProject = async (projectId: string): Promise<boolean> => {
   try {
     const normalizedProjectId = normalizeProjectId(projectId || '');
     if (!normalizedProjectId) return false;
-    await invoke('delete_project_file', { projectId: normalizedProjectId });
+    await tauri.deleteProject(normalizedProjectId);
     emitProjectsChanged();
     logger.info('项目删除成功', { projectId });
     return true;
