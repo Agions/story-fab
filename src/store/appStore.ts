@@ -95,7 +95,7 @@ export const useAppStore = create<AppState>()(
       setAutoSave: (autoSave) => set({ autoSave }),
     }),
     {
-      name: 'cutdeck-app',
+      name: 'CutDeck-app',
       storage: createJSONStorage(() => localStorage),
       // 只持久化这些字段
       partialize: (state) => ({

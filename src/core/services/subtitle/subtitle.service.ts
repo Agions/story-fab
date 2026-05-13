@@ -6,6 +6,7 @@
 
 import { logger } from '../../../shared/utils/logging';
 import { formatSrtTime } from '../../../shared/utils/formatting';
+import tauri from '../../tauri/TauriBridge';
 import type { SubtitleEntry, VideoInfo } from '@/core/types';
 
 // ============================================

@@ -1,4 +1,4 @@
-# cut-deck 开发者指南
+# CutDeck 开发者指南
 
 ## 1. 开发环境搭建
 
@@ -20,8 +20,8 @@ ffprobe -version
 ### 1.2 克隆与安装
 
 ```bash
-git clone https://github.com/Agions/cut-deck.git
-cd cut-deck
+git clone https://github.com/Agions/CutDeck.git
+cd CutDeck
 npm install
 ```
 
@@ -45,14 +45,14 @@ npm run dev
 | `CUTDECK_FFMPEG_PATH` | 系统 PATH 中的 `ffmpeg` | FFmpeg 可执行文件路径 |
 | `CUTDECK_FFPROBE_PATH` | 系统 PATH 中的 `ffprobe` | FFprobe 可执行文件路径 |
 | `CUTDECK_EDGE_TTS_PATH` | `/usr/bin/edge-tts` | Edge TTS 路径 |
-| `RUST_LOG` | `cutdeck=info,warn` | Rust 日志级别 |
+| `RUST_LOG` | `CutDeck=info,warn` | Rust 日志级别 |
 
 ---
 
 ## 2. 项目结构速查
 
 ```
-cut-deck/
+CutDeck/
 ├── src/                         # React 前端（TypeScript）
 ├── src-tauri/                   # Rust 后端
 ├── docs/                        # 项目文档
@@ -350,7 +350,7 @@ cd src-tauri && cargo build --release
 ```bash
 # 更新版本（三处需同步）
 1. src-tauri/Cargo.toml       [package.version]
-2. package.json                [dependencies.@agions/cutdeck-tauri]
+2. package.json                [dependencies.@agions/CutDeck-tauri]
 3. docs/CHANGELOG.md          [## [Unreleased] → ## vX.Y.Z]
 ```
 
@@ -439,8 +439,8 @@ sudo apt install ffmpeg
 
 ### Q: 桌面应用签名/公证（macOS）？
 
-首次在 macOS 运行 cut-deck 时，右键点击应用图标选择"打开"。如遇系统拦截：
+首次在 macOS 运行 CutDeck 时，右键点击应用图标选择"打开"。如遇系统拦截：
 
 ```bash
-sudo xattr -rd com.apple.quarantine "/Applications/cut-deck.app"
+sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"
 ```

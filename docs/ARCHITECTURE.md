@@ -1,8 +1,8 @@
-# cut-deck 架构文档
+# CutDeck 架构文档
 
 ## 1. 系统概览
 
-cut-deck 是一款基于 Tauri 2.x 的桌面视频剪辑应用，采用 **React + TypeScript** 前端 + **Rust** 后端的架构。前端负责 UI 交互与 AI 业务逻辑，Rust 后端处理 CPU 密集型的视频编解码操作（FFmpeg）和本地 AI 推理（Whisper）。
+CutDeck 是一款基于 Tauri 2.x 的桌面视频剪辑应用，采用 **React + TypeScript** 前端 + **Rust** 后端的架构。前端负责 UI 交互与 AI 业务逻辑，Rust 后端处理 CPU 密集型的视频编解码操作（FFmpeg）和本地 AI 推理（Whisper）。
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -204,7 +204,7 @@ Checkpoint 支持断点续跑，避免 AI 调用重复消耗。
 ### 5.2 项目持久化
 
 ```
-项目文件 → JSON (.cutdeck project)
+项目文件 → JSON (.CutDeck project)
   → TauriBridge.invoke('save_project_file')   [Rust: fs]
   → TauriBridge.invoke('load_project_file')   [Rust: fs]
 ```
