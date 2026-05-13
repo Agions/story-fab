@@ -117,7 +117,7 @@ export class ExportService {
     if (this.currentExportId) {
       logger.info('[ExportService] 取消导出:', { exportId: this.currentExportId });
       try {
-        await invoke('cancel_export', { exportId: this.currentExportId });
+        await invoke(TauriCommand.CANCEL_EXPORT, { exportId: this.currentExportId });
       } catch (error) {
         logger.warn('[ExportService] 取消导出失败:', { error });
       }
