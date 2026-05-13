@@ -11,4 +11,4 @@ pub mod transcode;
 
 pub use autonomous_cut::render_autonomous_cut;
 pub use preview::generate_preview;
-pub use transcode::transcode_with_crop;
+pub use transcode::{export_video, transcode_with_crop};

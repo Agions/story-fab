@@ -105,6 +105,22 @@ pub struct AutonomousRenderInput {
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct ExportVideoInput {
+    pub input_path: String,
+    pub output_path: String,
+    pub format: Option<String>,
+    pub resolution: Option<String>,
+    pub frame_rate: Option<u32>,
+    pub video_codec: Option<String>,
+    pub audio_codec: Option<String>,
+    pub crf: Option<u32>,
+    pub subtitle_enabled: Option<bool>,
+    pub subtitle_path: Option<String>,
+    pub burn_subtitles: Option<bool>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TranscodeCropInput {
     pub input_path: String,
     pub output_path: String,

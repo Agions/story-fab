@@ -27,7 +27,7 @@ pub use commands::project::{
     list_app_data_files, list_project_files, load_project_file, read_text_file, save_project_file,
 };
 pub use commands::render::{
-    render_autonomous_cut, transcode_with_crop, generate_preview,
+    export_video, render_autonomous_cut, transcode_with_crop, generate_preview,
 };
 pub use commands::export_state::cancel_export;
 pub use commands::file_ops::{clean_temp_file, open_file, voice_discovery};
@@ -75,6 +75,7 @@ pub fn run() {
             render_autonomous_cut,
             transcode_with_crop,
             generate_preview,
+            export_video,
             cancel_export,
             clean_temp_file,
             open_file,

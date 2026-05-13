@@ -79,23 +79,22 @@ export class ExportService {
     });
 
     try {
-      const result = await invoke<{
-        outputPath: string;
-        duration: number;
-        fileSize: number;
-      }>('export_video', {
-        inputPath,
-        outputPath,
-        format: fullConfig.format,
-        resolution: fullConfig.resolution,
-        frameRate: fullConfig.frameRate,
-        videoCodec: fullConfig.encoder.videoCodec,
-        audioCodec: fullConfig.audioCodec,
-        crf: fullConfig.encoder.crf ?? 23,
-        subtitleEnabled: fullConfig.subtitleEnabled,
-        subtitlePath: fullConfig.subtitlePath,
-        burnSubtitles: fullConfig.burnSubtitles,
-      });
+      const result = await invoke(
+        TauriCommand.EXPORT_VIDEO,
+        {
+          inputPath,
+          outputPath,
+          format: fullConfig.format,
+          resolution: fullConfig.resolution,
+          frameRate: fullConfig.frameRate,
+          videoCodec: fullConfig.encoder.videoCodec,
+          audioCodec: fullConfig.audioCodec,
+          crf: fullConfig.encoder.crf ?? 23,
+          subtitleEnabled: fullConfig.subtitleEnabled,
+          subtitlePath: fullConfig.subtitlePath,
+          burnSubtitles: fullConfig.burnSubtitles,
+        }
+      ) as { outputPath: string; duration: number; fileSize: number };
 
       logger.info('[ExportService] 导出完成:', { exportId, result });
 

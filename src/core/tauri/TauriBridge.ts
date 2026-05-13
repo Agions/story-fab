@@ -27,6 +27,7 @@ export const TauriCommand = {
   DETECT_SMART_SEGMENTS:   'detect_smart_segments',
 
   // Render / Transcode
+  EXPORT_VIDEO:            'export_video',
   TRANSCODE_WITH_CROP:     'transcode_with_crop',
   AUTONOMOUS_RENDER:       'render_autonomous_cut',
   GENERATE_PREVIEW:        'generate_preview',
@@ -458,6 +459,40 @@ export const tauri = {
   /** 检查应用数据目录是否存在 */
   async checkAppDataDir() {
     return invoke(TauriCommand.CHECK_APP_DATA_DIR, {}) as Promise<string>;
+  },
+
+  // ── Render / Transcode ─────────────────────────────────────────
+
+  /** 通用视频导出（支持字幕烧录） */
+  async exportVideo(input: {
+    inputPath: string;
+    outputPath: string;
+    format?: string;
+    resolution?: string;
+    frameRate?: number;
+    videoCodec?: string;
+    audioCodec?: string;
+    crf?: number;
+    subtitleEnabled?: boolean;
+    subtitlePath?: string;
+    burnSubtitles?: boolean;
+  }) {
+    return invoke(
+      TauriCommand.EXPORT_VIDEO,
+      {
+        inputPath: input.inputPath,
+        outputPath: input.outputPath,
+        format: input.format,
+        resolution: input.resolution,
+        frameRate: input.frameRate,
+        videoCodec: input.videoCodec,
+        audioCodec: input.audioCodec,
+        crf: input.crf,
+        subtitleEnabled: input.subtitleEnabled,
+        subtitlePath: input.subtitlePath,
+        burnSubtitles: input.burnSubtitles,
+      }
+    ) as Promise<{ outputPath: string; duration: number; fileSize: number }>;
   },
 
   // ── Export state ────────────────────────────────────────────────

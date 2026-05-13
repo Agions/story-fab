@@ -166,7 +166,7 @@ export const useProjectStore = create<ProjectState>()(
       },
     }),
     {
-      name: 'cutdeck-projects',
+      name: 'CutDeck-projects',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         projects: state.projects,

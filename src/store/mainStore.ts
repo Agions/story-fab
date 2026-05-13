@@ -50,7 +50,7 @@ export const useModelStore = create<AppState>()(
         })),
     }),
     {
-      name: 'cutdeck-app-settings',
+      name: 'CutDeck-app-settings',
       partialize: (state) => ({
         selectedAIModel: state.selectedAIModel,
         aiModelsSettings: state.aiModelsSettings,

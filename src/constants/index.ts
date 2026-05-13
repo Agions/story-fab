@@ -127,30 +127,30 @@ export const HOTKEYS = {
 
 // 存储键名
 export const STORAGE_KEYS = {
-  user: 'cutdeck_user',
-  projects: 'cutdeck_projects',
-  settings: 'cutdeck_settings',
-  theme: 'cutdeck_theme',
-  language: 'cutdeck_language',
-  recentFiles: 'cutdeck_recent_files',
+  user: 'CutDeck_user',
+  projects: 'CutDeck_projects',
+  settings: 'CutDeck_settings',
+  theme: 'CutDeck_theme',
+  language: 'CutDeck_language',
+  recentFiles: 'CutDeck_recent_files',
   // 认证相关
-  authToken: 'cutdeck_auth_token',
+  authToken: 'CutDeck_auth_token',
   // 时间线
-  timeline: 'cutdeck_timeline',
+  timeline: 'CutDeck_timeline',
   // 项目设置
-  projectSaveBehavior: 'cutdeck-project-save-behavior',
-  projectAutoSave: 'cutdeck-project-auto-save-enabled',
+  projectSaveBehavior: 'CutDeck-project-save-behavior',
+  projectAutoSave: 'CutDeck-project-auto-save-enabled',
   // 兼容旧版存储键名
   legacy: {
-    token: 'cutdeck_token_v1',
-    projects: 'cutdeck_projects_v1',
+    token: 'CutDeck_token_v1',
+    projects: 'CutDeck_projects_v1',
   },
 };
 
 // 项目保存行为
 export type ProjectSaveBehavior = 'stay' | 'detail';
-export const PROJECT_SAVE_BEHAVIOR_KEY = 'cutdeck-project-save-behavior' as const;
-export const PROJECT_AUTO_SAVE_KEY = 'cutdeck-project-auto-save-enabled';
+export const PROJECT_SAVE_BEHAVIOR_KEY = 'CutDeck-project-save-behavior' as const;
+export const PROJECT_AUTO_SAVE_KEY = 'CutDeck-project-auto-save-enabled';
 
 // API 端点
 export const API_ENDPOINTS = {
