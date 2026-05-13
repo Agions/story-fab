@@ -15,44 +15,68 @@ import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 // 命令名称常量（与 Rust 端保持一致）
 // ============================================================
 export const TauriCommand = {
-  // Video processing
-  VIDEO_GET_INFO:          'video_get_info',
-  VIDEO_EXTRACT_FRAMES:    'video_extract_frames',
-  VIDEO_TRIM:              'video_trim',
-  VIDEO_CONCAT:            'video_concat',
-  VIDEO_EXPORT:            'video_export',
-  VIDEO_GET_EXPORT_DIR:    'get_export_dir',
-  VIDEO_GET_THUMBNAIL:     'video_get_thumbnail',
+  // FFprobe / Video analysis
+  CHECK_FFMPEG:            'check_ffmpeg',
+  ANALYZE_VIDEO:           'analyze_video',
+  GET_EXPORT_DIR:          'get_export_dir',
+  RUN_FFPROBE:             'run_ffprobe',
 
-  // Highlight detection (Rust 已实现)
-  HIGHLIGHT_DETECT:        'detect_highlights',
-  HIGHLIGHT_OPTIONS_NEW:   'highlight_options_new',
+  // Highlight detection
+  DETECT_HIGHLIGHTS:       'detect_highlights',
+  DETECT_ZCR_BURSTS:       'detect_zcr_bursts',
+  DETECT_SMART_SEGMENTS:   'detect_smart_segments',
+
+  // Render / Transcode
+  TRANSCODE_WITH_CROP:     'transcode_with_crop',
+  AUTONOMOUS_RENDER:       'render_autonomous_cut',
+  GENERATE_PREVIEW:        'generate_preview',
+  CUT_VIDEO:               'cut_video',
 
   // Subtitle / Whisper ASR
   SUBTITLE_EXTRACT:        'subtitle_extract',
   SUBTITLE_BURN_IN:        'subtitle_burn_in',
   TRANSCRIBE_AUDIO:        'transcribe_audio',
   LIST_WHISPER_MODELS:     'list_whisper_models',
+  CHECK_FASTER_WHISPER:    'check_faster_whisper',
+  DOWNLOAD_WHISPER_MODEL:  'download_whisper_model',
+  GET_WHISPER_LANGUAGES:   'get_whisper_supported_languages',
 
-  // Smart segmenter
-  SMART_SEGMENT:           'smart_segment',
+  // TTS
+  SYNTHESIZE_SPEECH:       'synthesize_speech',
+  LIST_TTS_BACKENDS:       'list_tts_backends',
+  CHECK_TTS_AVAILABLE:     'check_tts_available',
 
-  // Video effects
-  VIDEO_APPLY_EFFECT:      'video_apply_effect',
+  // AI Director
+  RUN_AI_DIRECTOR_PLAN:   'run_ai_director_plan',
+
+  // Translate
+  TRANSLATE_TEXT:          'translate_text',
 
   // File operations
-  FILE_READ:               'file_read',
-  FILE_WRITE:              'file_write',
+  FILE_READ:               'read_text_file',
+  FILE_WRITE:              'write_text_file',
+  FILE_DELETE:             'delete_file',
   FILE_EXISTS:             'file_exists',
+  CLEAN_TEMP_FILE:         'clean_temp_file',
+  OPEN_FILE:               'open_file',
+  VOICE_DISCOVERY:         'voice_discovery',
+  GET_FILE_SIZE:           'get_file_size',
 
   // Project
-  PROJECT_LOAD:            'load_project',
-  PROJECT_SAVE:            'save_project',
+  PROJECT_LOAD:            'load_project_file',
+  PROJECT_SAVE:            'save_project_file',
+  PROJECT_DELETE:          'delete_project_file',
+  PROJECT_LIST:            'list_project_files',
+  LIST_APP_DATA_FILES:     'list_app_data_files',
+  CHECK_APP_DATA_DIR:      'check_app_data_directory',
 
   // Window
   WINDOW_MINIMIZE:         'window_minimize',
   WINDOW_MAXIMIZE:         'window_maximize',
   WINDOW_CLOSE:            'window_close',
+
+  // Export state
+  CANCEL_EXPORT:           'cancel_export',
 } as const;
 
 export type TauriCommand = typeof TauriCommand[keyof typeof TauriCommand];
@@ -146,16 +170,29 @@ export async function invoke<C extends TauriCommand>(
 // ============================================================
 
 export const tauri = {
-  /**
-   * 获取视频信息
-   */
-  async getVideoInfo(path: string) {
-    return invoke(TauriCommand.VIDEO_GET_INFO, { path });
+  // ── FFmpeg / Video analysis ──────────────────────────────────────
+
+  /** 检查 FFmpeg 是否可用 */
+  async checkFFmpeg() {
+    return invoke(TauriCommand.CHECK_FFMPEG, {}) as Promise<{
+      installed: boolean;
+      version?: string;
+    }>;
   },
 
-  /**
-   * 检测高光片段（Rust highlight_detector）
-   */
+  /** 分析视频元数据（时长、分辨率、编码等） */
+  async analyzeVideo(path: string) {
+    return invoke(TauriCommand.ANALYZE_VIDEO, { path });
+  },
+
+  /** 运行 ffprobe 原始命令 */
+  async runFfprobe(args: string[]) {
+    return invoke(TauriCommand.RUN_FFPROBE, { args }) as Promise<string>;
+  },
+
+  // ── Highlight detection ──────────────────────────────────────────
+
+  /** 基于视觉+音频高光检测（Rust highlight_detector） */
   async detectHighlights(
     videoPath: string,
     options: {
@@ -165,15 +202,89 @@ export const tauri = {
       windowMs?: number;
     } = {},
   ) {
-    return invoke(TauriCommand.HIGHLIGHT_DETECT, {
+    return invoke(TauriCommand.DETECT_HIGHLIGHTS, {
       video_path: videoPath,
       ...options,
     });
   },
 
-  /**
-   * 提取字幕
-   */
+  /** 基于 ZCR 爆点的检测 */
+  async detectZCRBursts(
+    videoPath: string,
+    options: { threshold?: number; minDurationMs?: number; topN?: number } = {},
+  ) {
+    return invoke(TauriCommand.DETECT_ZCR_BURSTS, {
+      video_path: videoPath,
+      ...options,
+    });
+  },
+
+  /** 智能分段（场景检测 + 语义） */
+  async detectSmartSegments(
+    videoPath: string,
+    options: Record<string, unknown> = {},
+  ) {
+    return invoke(TauriCommand.DETECT_SMART_SEGMENTS, {
+      video_path: videoPath,
+      ...options,
+    });
+  },
+
+  // ── Render / Transcode ──────────────────────────────────────────
+
+  /** 比例裁切 + 编码导出（9:16 / 1:1 / 16:9） */
+  async transcodeWithCrop(input: {
+    inputPath: string;
+    outputPath: string;
+    aspect: '9:16' | '1:1' | '16:9';
+    startTime?: number;
+    endTime?: number;
+    quality?: 'low' | 'medium' | 'high';
+  }) {
+    return invoke(TauriCommand.TRANSCODE_WITH_CROP, {
+      input: {
+        inputPath: input.inputPath,
+        outputPath: input.outputPath,
+        aspect: input.aspect,
+        startTime: input.startTime ?? null,
+        endTime: input.endTime ?? null,
+        quality: input.quality ?? 'high',
+      },
+    }) as Promise<string>;
+  },
+
+  /** 全自动 AI 剪辑渲染 */
+  async autonomousRender(input: Record<string, unknown>) {
+    return invoke(TauriCommand.AUTONOMOUS_RENDER, { input }) as Promise<string>;
+  },
+
+  /** 生成预览片段 */
+  async generatePreview(input: {
+    inputPath: string;
+    segment: { start: number; end: number };
+  }) {
+    return invoke(TauriCommand.GENERATE_PREVIEW, { input }) as Promise<string>;
+  },
+
+  /** 裁剪视频（多段合并） */
+  async cutVideo(input: {
+    inputPath: string;
+    outputPath: string;
+    segments: Array<{ start: number; end: number }>;
+    useHwAccel?: boolean;
+    onProgress?: (progress: unknown) => void;
+  }) {
+    return invoke(TauriCommand.CUT_VIDEO, {
+      inputPath: input.inputPath,
+      outputPath: input.outputPath,
+      segments: input.segments,
+      useHwAccel: input.useHwAccel ?? false,
+    }) as Promise<string>;
+  },
+
+  // ── Subtitle / Whisper ASR ──────────────────────────────────────
+
+  /** 提取字幕（SRT/VTT） */
   async extractSubtitle(videoPath: string, lang?: string) {
     return invoke(TauriCommand.SUBTITLE_EXTRACT, {
       video_path: videoPath,
@@ -181,9 +292,7 @@ export const tauri = {
     });
   },
 
-  /**
-   * 烧录字幕到视频
-   */
+  /** 烧录字幕到视频 */
   async burnSubtitle(
     videoPath: string,
     subtitlePath: string,
@@ -196,57 +305,12 @@ export const tauri = {
     });
   },
 
-  /**
-   * 智能分段
-   */
-  async smartSegment(videoPath: string, options?: Record<string, unknown>) {
-    return invoke(TauriCommand.SMART_SEGMENT, {
-      video_path: videoPath,
-      ...options,
-    });
-  },
-
-  /**
-   * 应用视频效果
-   */
-  async applyEffect(
-    videoPath: string,
-    effectType: string,
-    params: Record<string, unknown>,
-  ) {
-    return invoke(TauriCommand.VIDEO_APPLY_EFFECT, {
-      video_path: videoPath,
-      effect_type: effectType,
-      params,
-    });
-  },
-
-  /**
-   * 获取导出目录
-   */
-  async getExportDir() {
-    return invoke(TauriCommand.VIDEO_GET_EXPORT_DIR, {});
-  },
-
-  /**
-   * 获取视频缩略图
-   */
-  async getThumbnail(videoPath: string, timestamp: number) {
-    return invoke(TauriCommand.VIDEO_GET_THUMBNAIL, {
-      video_path: videoPath,
-      timestamp,
-    });
-  },
-
-  /**
-   * Whisper 语音转字幕（Rust faster-whisper）
-   */
+  /** Whisper 语音转字幕（Rust faster-whisper） */
   async transcribeAudio(
     audioPath: string,
     modelSize?: string,
     language?: string,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return invoke(TauriCommand.TRANSCRIBE_AUDIO, {
       audio_path: audioPath,
       model_size: modelSize,
@@ -259,14 +323,148 @@ export const tauri = {
     }>;
   },
 
-  /**
-   * 列出本地已下载的 Whisper 模型
-   */
+  /** 列出本地已下载的 Whisper 模型 */
   async listWhisperModels() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return invoke(TauriCommand.LIST_WHISPER_MODELS, {}) as Promise<
       Array<{ name: string; size: string; is_downloaded: boolean; path: string | null }>
     >;
+  },
+
+  /** 检查 faster-whisper 是否可用 */
+  async checkFasterWhisper() {
+    return invoke(TauriCommand.CHECK_FASTER_WHISPER, {}) as Promise<boolean>;
+  },
+
+  /** 下载指定大小的 Whisper 模型 */
+  async downloadWhisperModel(modelSize: string) {
+    return invoke(TauriCommand.DOWNLOAD_WHISPER_MODEL, {
+      model_size: modelSize,
+    }) as Promise<string>;
+  },
+
+  /** 获取 Whisper 支持的语言列表 */
+  async getWhisperLanguages() {
+    return invoke(TauriCommand.GET_WHISPER_LANGUAGES, {}) as Promise<
+      Array<{ code: string; name: string }>
+    >;
+  },
+
+  // ── TTS ─────────────────────────────────────────────────────────
+
+  /** 语音合成 */
+  async synthesizeSpeech(input: Record<string, unknown>) {
+    return invoke(TauriCommand.SYNTHESIZE_SPEECH, { input }) as Promise<string>;
+  },
+
+  /** 列出可用的 TTS 后端 */
+  async listTTSBackends() {
+    return invoke(TauriCommand.LIST_TTS_BACKENDS, {}) as Promise<
+      Array<{ id: string; name: string; voices: unknown[] }>
+    >;
+  },
+
+  /** 检查 TTS 是否可用 */
+  async checkTTSAvailable() {
+    return invoke(TauriCommand.CHECK_TTS_AVAILABLE, {}) as Promise<boolean>;
+  },
+
+  // ── AI Director ────────────────────────────────────────────────
+
+  /** AI 导演计划 */
+  async runAIDirectorPlan(input: Record<string, unknown>) {
+    return invoke(TauriCommand.RUN_AI_DIRECTOR_PLAN, { input });
+  },
+
+  // ── Translate ───────────────────────────────────────────────────
+
+  /** 翻译文本 */
+  async translateText(text: string, fromLang: string, toLang: string) {
+    return invoke(TauriCommand.TRANSLATE_TEXT, {
+      text,
+      from_lang: fromLang,
+      to_lang: toLang,
+    }) as Promise<string>;
+  },
+
+  // ── File operations ─────────────────────────────────────────────
+
+  /** 读取文本文件 */
+  async readTextFile(path: string) {
+    return invoke(TauriCommand.FILE_READ, { path }) as Promise<string>;
+  },
+
+  /** 写入文本文件 */
+  async writeTextFile(path: string, content: string) {
+    return invoke(TauriCommand.FILE_WRITE, { path, content }) as Promise<void>;
+  },
+
+  /** 删除文件 */
+  async deleteFile(path: string) {
+    return invoke(TauriCommand.FILE_DELETE, { path }) as Promise<void>;
+  },
+
+  /** 清理临时文件 */
+  async cleanTempFile(path: string) {
+    return invoke(TauriCommand.CLEAN_TEMP_FILE, { path }) as Promise<void>;
+  },
+
+  /** 用系统默认应用打开文件 */
+  async openFile(path: string) {
+    return invoke(TauriCommand.OPEN_FILE, { path }) as Promise<void>;
+  },
+
+  /** 获取文件大小（字节） */
+  async getFileSize(path: string) {
+    return invoke(TauriCommand.GET_FILE_SIZE, { path }) as Promise<number>;
+  },
+
+  /** 语音发现（枚举可用 TTS 引擎） */
+  async voiceDiscovery() {
+    return invoke(TauriCommand.VOICE_DISCOVERY, {});
+  },
+
+  // ── Project ─────────────────────────────────────────────────────
+
+  /** 获取导出目录 */
+  async getExportDir() {
+    return invoke(TauriCommand.GET_EXPORT_DIR, {}) as Promise<string>;
+  },
+
+  /** 保存项目文件 */
+  async saveProject(projectId: string, content: string) {
+    return invoke(TauriCommand.PROJECT_SAVE, { projectId, content }) as Promise<void>;
+  },
+
+  /** 加载项目文件 */
+  async loadProject(projectId: string) {
+    return invoke(TauriCommand.PROJECT_LOAD, { projectId }) as Promise<string>;
+  },
+
+  /** 删除项目文件 */
+  async deleteProject(projectId: string) {
+    return invoke(TauriCommand.PROJECT_DELETE, { projectId }) as Promise<void>;
+  },
+
+  /** 列出所有项目 */
+  async listProjects() {
+    return invoke(TauriCommand.PROJECT_LIST, {}) as Promise<unknown[]>;
+  },
+
+  /** 列出应用数据目录中的文件 */
+  async listAppDataFiles(directory: string) {
+    return invoke(TauriCommand.LIST_APP_DATA_FILES, { directory }) as Promise<string[]>;
+  },
+
+  /** 检查应用数据目录是否存在 */
+  async checkAppDataDir() {
+    return invoke(TauriCommand.CHECK_APP_DATA_DIR, {}) as Promise<string>;
+  },
+
+  // ── Export state ────────────────────────────────────────────────
+
+  /** 取消正在进行的导出 */
+  async cancelExport(exportId: string) {
+    return invoke(TauriCommand.CANCEL_EXPORT, { exportId }) as Promise<void>;
   },
 };
 
