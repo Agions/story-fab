@@ -3,7 +3,7 @@
 ### 🐛 Bug Fixes
 
 - **src/constants/index.ts:** Add missing `legacy.token` and `legacy.projects` to `STORAGE_KEYS` for backward compatibility
-- **src/components/cut-deck/workspace/ScriptWriting.tsx:** Add missing `useRef` to React import; add null checks for `Timeout | null` before calling `timeout.clear()`
+- **src/components/CutDeck/workspace/ScriptWriting.tsx:** Add missing `useRef` to React import; add null checks for `Timeout | null` before calling `timeout.clear()`
 - **src/components/editor/Timeline/TimelinePanel.tsx:** Add `return undefined` in useEffect for non-isPlaying code path (TS7030)
 - **src/core/services/providers/base.service.ts:** Rename `delay` parameter to `delayMs` to avoid shadowing imported `delay()` function
 - **src/shared/utils/pipeline-checkpoint.ts:** Replace `new Promise(resolve => setTimeout(resolve, 1000))` with `delay(1000)`
@@ -14,7 +14,7 @@
 - **docs:** Add `docs/ARCHITECTURE.md` (depth architecture doc) and `docs/DEVELOPER_GUIDE.md` (developer guide)
 - **README:** Add AI model table (9 providers), update directory structure, fix docs navigation
 - **workflow:** Consolidate `workflow.types.ts`, `workflow.constants.ts`, `workflow.initialState.ts` → `workflow.ts` (eliminate circular imports)
-- **dead code:** Remove ScriptGenerator, MenuBar, appConfig.ts, templates/dedup/, cut-deck/modes/, and orphaned LESS/CSS files
+- **dead code:** Remove ScriptGenerator, MenuBar, appConfig.ts, templates/dedup/, CutDeck/modes/, and orphaned LESS/CSS files
 
 ---
 
@@ -286,7 +286,7 @@ src-tauri/src/
 - **Layout**：全新侧栏（琥珀光强调）+ 顶栏（用户信息）
 - **Dashboard**：玻璃拟态卡片 + 状态 Badge（琥珀/电青/灰）
 - **Landing**：Canvas 粒子 Hero + 3步骤流 + 4列特性网格
-- **cut-deck 工作流**：垂直步骤列表 + 四态动画（完成/进行/等待）
+- **CutDeck 工作流**：垂直步骤列表 + 四态动画（完成/进行/等待）
 - **VideoUpload**：拖拽脉冲动画 + 琥珀光进度条
 - **AIAnalyze**：神经网络可视化（电青脉冲点阵）
 - **ProjectCreate / ScriptGenerate / VideoSynthesize / VideoExport**：全组件重设计
@@ -364,7 +364,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - WorkflowMonitor：移除 eslint-disable，Timeline items 添加 key
 - TimelineClip：移除未使用 Badge import，修复 handleDoubleClick 依赖
 - ai.service：移除废弃的 generateMockScenes/generateMockKeyframes
-- cut-deck.tsx / VideoExport.tsx：移除未使用 import
+- CutDeck.tsx / VideoExport.tsx：移除未使用 import
 
 ### 📖 文档更新
 
@@ -410,8 +410,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 项目重命名
 
-- **旧名称**: cut-deck (126+ 同名项目，侵权风险)
-- **新名称**: cut-deck
+- **旧名称**: CutDeck (126+ 同名项目，侵权风险)
+- **新名称**: CutDeck
 - 体现"AI视频创作 + 故事叙事"的核心价值
 
 ### 📚 文档更新
@@ -521,4 +521,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 旧版本
 
-- 查看 [GitHub Releases](https://github.com/agions/cutdeck/releases)
+- 查看 [GitHub Releases](https://github.com/agions/CutDeck/releases)

@@ -23,13 +23,13 @@ export interface AppSettings {
  * 设置状态 Hook (兼容 SettingsContext)
  */
 export function useSettingsStore() {
-  const [autoSave, setAutoSave] = useLocalStorage('cutdeck-autosave', true);
-  const [compactMode, setCompactMode] = useLocalStorage('cutdeck-compact', false);
-  const [theme, setTheme] = useLocalStorage('cutdeck-theme', 'light');
-  const [defaultModel, setDefaultModel] = useLocalStorage('cutdeck-default-model', 'deepseek-v4-flash');
+  const [autoSave, setAutoSave] = useLocalStorage('CutDeck-autosave', true);
+  const [compactMode, setCompactMode] = useLocalStorage('CutDeck-compact', false);
+  const [theme, setTheme] = useLocalStorage('CutDeck-theme', 'light');
+  const [defaultModel, setDefaultModel] = useLocalStorage('CutDeck-default-model', 'deepseek-v4-flash');
   const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
-  const [outputPath, setOutputPath] = useLocalStorage('cutdeck-output-path', '');
-  const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('cutdeck-recent-projects', []);
+  const [outputPath, setOutputPath] = useLocalStorage('CutDeck-output-path', '');
+  const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('CutDeck-recent-projects', []);
 
   const settings = useMemo<AppSettings>(() => ({
     autoSave,

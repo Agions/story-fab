@@ -32,7 +32,7 @@ type ExportScriptData = {
   segments: ExportScriptSegment[];
 };
 
-export const PROJECTS_CHANGED_EVENT = 'cutdeck:projects:changed';
+export const PROJECTS_CHANGED_EVENT = 'CutDeck:projects:changed';
 
 const emitProjectsChanged = (): void => {
   if (typeof window !== 'undefined') {
