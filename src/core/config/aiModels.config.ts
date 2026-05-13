@@ -127,7 +127,7 @@ export const MODEL_PROVIDERS: Record<
 // 验证元数据（来源：各大厂商官方文档 + OpenRouter 实时数据，2026-05）
 // =============================================================================
 
-export const MODEL_CATALOG_VERIFIED_AT = '2026-05-03';
+export const MODEL_CATALOG_VERIFIED_AT = '2026-05-13';
 export const DEFAULT_MODEL_ID = 'gpt-4o' as const;
 
 export const MODEL_VERIFICATION: Record<string, ModelVerificationMeta> = {
@@ -165,14 +165,15 @@ export const MODEL_VERIFICATION: Record<string, ModelVerificationMeta> = {
   'claude-3.5-sonnet-20241022': { checkedAt: '2026-05-03', source: 'docs.anthropic.com', verified: true },
   'claude-3-opus':     { checkedAt: '2026-05-03', source: 'docs.anthropic.com', verified: true },
   'claude-3.7-sonnet': { checkedAt: '2026-05-03', source: 'openrouter/anthropic/claude-3.7-sonnet (API confirmed)', verified: true },
-  // Google
+  // Google（gemini-3.1 为最新旗舰，gemini-2.5 仍可用）
+  'gemini-3.1-pro-preview':{ checkedAt: '2026-05-13', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
+  'gemini-3.1-flash-lite': { checkedAt: '2026-05-13', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
+  'gemini-3-flash-preview':{ checkedAt: '2026-05-03', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
   'gemini-2.5-pro':        { checkedAt: '2026-05-03', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
   'gemini-2.5-flash':      { checkedAt: '2026-05-03', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
   'gemini-2.5-flash-lite': { checkedAt: '2026-05-03', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
   'gemini-2.0-flash':      { checkedAt: '2026-05-03', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
   'gemini-2.0-flash-lite': { checkedAt: '2026-05-03', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
-  'gemini-3-flash-preview':{ checkedAt: '2026-05-03', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
-  'gemini-3.1-pro-preview':{ checkedAt: '2026-05-03', source: 'ai.google.dev/gemini-api/docs/models', verified: true },
   // DeepSeek（官方：deepseek-v4-flash / deepseek-v4-pro 为最新主力，deepseek-chat / deepseek-reasoner 将废弃）
   'deepseek-v4-pro':       { checkedAt: '2026-05-03', source: 'platform.deepseek.com 官方定价页', verified: true },
   'deepseek-v4-flash':     { checkedAt: '2026-05-03', source: 'platform.deepseek.com 官方定价页', verified: true },
@@ -732,6 +733,42 @@ export const AI_MODELS: AIModel[] = [
     pricing: { input: 0, output: 0, unit: 'see anthropic.com/pricing' },
   },
   // ========== Google ==========
+  {
+    id: 'gemini-3.1-pro',
+    name: 'Gemini 3.1 Pro',
+    provider: 'google',
+    category: ['text', 'code', 'image', 'video'],
+    description: 'Google 最新旗舰模型（2026-02），推理能力 2x+ 提升，2M token 上下文，适合超长视频素材理解与多镜头关联分析。',
+    features: ['超长上下文', '多模态推理', '视频理解', 'Deep Think模式'],
+    tokenLimit: 2000000,
+    contextWindow: 2000000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'see ai.google.dev/pricing' },
+  },
+  {
+    id: 'gemini-3.1-flash',
+    name: 'Gemini 3.1 Flash',
+    provider: 'google',
+    category: ['text', 'image', 'video'],
+    description: 'Google 高性价比模型（2026-03），多模态能力强，适合批量素材分类与标签生成。',
+    features: ['高速', '低成本', '多模态'],
+    tokenLimit: 1000000,
+    contextWindow: 1000000,
+    isPro: false,
+    pricing: { input: 0, output: 0, unit: 'Free (with quota)' },
+  },
+  {
+    id: 'gemini-3.1-flash-lite',
+    name: 'Gemini 3.1 Flash Lite',
+    provider: 'google',
+    category: ['text', 'image', 'video'],
+    description: 'Google 最快最便宜模型（2026-03），适合大批量素材分类与低延迟任务。',
+    features: ['高性价比', '快速', '多模态'],
+    tokenLimit: 1000000,
+    contextWindow: 1000000,
+    isPro: false,
+    pricing: { input: 0, output: 0, unit: 'Free (with quota)' },
+  },
   {
     id: 'gemini-2.5-pro',
     name: 'Gemini 2.5 Pro',
