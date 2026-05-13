@@ -1,5 +1,5 @@
 /**
- * CutDeck 统一色彩系统 - TypeScript
+ * cut_deck 统一色彩系统 - TypeScript
  *
  * 基于 globals.css OKLCH 语义化分层（设计系统入口）
  * 提供 Ant Design 5 兼容的 Design Token

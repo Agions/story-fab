@@ -9,4 +9,4 @@ export {
 } from './CutDeckProvider';
 
 export type { CutDeckContextType } from './CutDeckProvider';
-export type { CutDeckAction, CutDeckState, CutDeckStep, CutDeckFeatureType } from '../types';
+export type { cut_deckAction, cut_deckState, cut_deckStep, cut_deckFeatureType } from '../types';

@@ -16,7 +16,7 @@ import {
   CloudUpload,
   Trash2,
 } from 'lucide-react';
-import { useCutDeck } from '@/components/CutDeck/context';
+import { useCutDeck } from '@/components/cut-deck/context';
 import type { VideoInfo } from '@/core/types';
 import type { CutPoint, ClipSuggestion } from '@/core/interfaces';
 import { notify, formatTime } from '@/shared';
