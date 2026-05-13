@@ -1,6 +1,6 @@
-//! Render commands — re-exports from split sub-modules.
+//! Render command modules
 //!
-//! Modules:
+//! Split from the monolithic render.rs for maintainability:
 //! - `transcode.rs`     — Aspect-ratio cropping / quality transcoding
 //! - `autonomous_cut.rs` — AI-driven multi-segment autonomous cut
 //! - `preview.rs`       — Quick preview generation
