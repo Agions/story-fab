@@ -1,5 +1,5 @@
 /**
- * CutDeck Dashboard — re-export from Dashboard.tsx
+ * cut_deck Dashboard — re-export from Dashboard.tsx
  */
 export { default } from './Dashboard';
 export * from './types';

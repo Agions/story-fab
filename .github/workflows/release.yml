@@ -61,7 +61,7 @@ jobs:
         run: |
           VERSION="${GITHUB_REF#refs/tags/v}"
           gh release create "${{ github.ref_name }}" \
-            --title "CutDeck v$VERSION" \
+            --title "cut-deck v$VERSION" \
             --draft \
             --notes "" \
             --repo ${{ github.repository }}
@@ -71,33 +71,33 @@ jobs:
         if: matrix.platform.label == 'macOS ARM64' || matrix.platform.label == 'macOS x64'
         run: |
           cat > "HOW-TO-RUN.txt" << 'RUNEOF'
-          === CutDeck macOS Installation Instructions ===
+          === cut-deck macOS Installation Instructions ===
 
-          Because CutDeck is not signed with an Apple Developer certificate,
+          Because cut-deck is not signed with an Apple Developer certificate,
           you must explicitly allow it to run on your Mac:
 
           METHOD 1 — Easiest (Recommended):
-          1. Right-click on CutDeck.app
+          1. Right-click on cut-deck.app
           2. Select "Open" from the context menu
           3. macOS will show a warning popup
           4. Click "Open Anyway"
-          5. CutDeck will launch ✅
+          5. cut-deck will launch ✅
 
           METHOD 2 — Terminal:
           1. Open Terminal (Applications → Utilities → Terminal)
           2. Copy and paste this command:
-             sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"
+             sudo xattr -rd com.apple.quarantine "/Applications/cut-deck.app"
           3. Press Enter, enter your password when prompted
-          4. Launch CutDeck from Applications normally
+          4. Launch cut-deck from Applications normally
 
           METHOD 3 — System Settings:
-          1. Try to open CutDeck (double-click)
+          1. Try to open cut-deck (double-click)
           2. Go to System Settings → Privacy & Security
           3. Scroll down to "Security policy" section
-          4. Click "Open Anyway" next to CutDeck
-          5. Launch CutDeck again
+          4. Click "Open Anyway" next to cut-deck
+          5. Launch cut-deck again
 
-          For more help: https://github.com/Agions/CutDeck/releases
+          For more help: https://github.com/Agions/cut-deck/releases
           RUNEOF
 
       - name: Build Tauri app
@@ -106,7 +106,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "CutDeck v${{ github.ref_name }}"
+          releaseName: "cut-deck v${{ github.ref_name }}"
           args: --target ${{ matrix.platform.target }}
 
       - name: Copy run instructions to bundle
@@ -123,9 +123,9 @@ jobs:
         run: |
           APP_PATH=$(find src-tauri/target/${{ matrix.platform.target }}/release/bundle -name "*.app" -type d | head -1)
           echo "Found app: $APP_PATH"
-          7z a -tzip "CutDeck-${{ matrix.platform.label }}.zip" "$APP_PATH"
-          echo "Packaged: CutDeck-${{ matrix.platform.label }}.zip"
-          ls -lh "CutDeck-${{ matrix.platform.label }}.zip"
+          7z a -tzip "cut-deck-${{ matrix.platform.label }}.zip" "$APP_PATH"
+          echo "Packaged: cut-deck-${{ matrix.platform.label }}.zip"
+          ls -lh "cut-deck-${{ matrix.platform.label }}.zip"
 
       - name: Package Linux AppImage
         if: matrix.platform.label == 'Linux x64' || matrix.platform.label == 'Linux ARM64'
@@ -137,11 +137,11 @@ jobs:
           # Compress if larger than 1.5 GB (stay safely under 2 GB GitHub limit)
           if [ "$SIZE" -gt 1610612736 ]; then
             echo "Large AppImage — compressing with 7z..."
-            7z a -t7z "CutDeck-${{ matrix.platform.label }}.7z" "$APPIMAGE" -mx9
-            ls -lh "CutDeck-${{ matrix.platform.label }}.7z"
+            7z a -t7z "cut-deck-${{ matrix.platform.label }}.7z" "$APPIMAGE" -mx9
+            ls -lh "cut-deck-${{ matrix.platform.label }}.7z"
           else
-            mv "$APPIMAGE" "CutDeck-${{ matrix.platform.label }}.AppImage"
-            ls -lh "CutDeck-${{ matrix.platform.label }}.AppImage"
+            mv "$APPIMAGE" "cut-deck-${{ matrix.platform.label }}.AppImage"
+            ls -lh "cut-deck-${{ matrix.platform.label }}.AppImage"
           fi
 
       - name: Upload artifact
@@ -154,8 +154,8 @@ jobs:
             src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.deb
             src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.rpm
             src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.AppImage
-            CutDeck-${{ matrix.platform.label }}.zip
-            CutDeck-${{ matrix.platform.label }}.7z
+            cut-deck-${{ matrix.platform.label }}.zip
+            cut-deck-${{ matrix.platform.label }}.7z
             HOW-TO-RUN.txt
           retention-days: 7
 

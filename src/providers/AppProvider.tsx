@@ -9,7 +9,7 @@ interface AppProviderProps {
 }
 
 /**
- * CutDeck Design System — antd removed
+ * cut_deck Design System — antd removed
  * Theme tokens are now in globals.css CSS variables
  * Component-level antd theming has been removed
  * Dark mode is handled via Tailwind .dark class on <html>

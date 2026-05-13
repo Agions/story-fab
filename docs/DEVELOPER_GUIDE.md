@@ -1,4 +1,4 @@
-# CutDeck 开发者指南
+# cut-deck 开发者指南
 
 ## 1. 开发环境搭建
 
@@ -20,8 +20,8 @@ ffprobe -version
 ### 1.2 克隆与安装
 
 ```bash
-git clone https://github.com/Agions/CutDeck.git
-cd CutDeck
+git clone https://github.com/Agions/cut-deck.git
+cd cut-deck
 npm install
 ```
 
@@ -52,7 +52,7 @@ npm run dev
 ## 2. 项目结构速查
 
 ```
-CutDeck/
+cut-deck/
 ├── src/                         # React 前端（TypeScript）
 ├── src-tauri/                   # Rust 后端
 ├── docs/                        # 项目文档
@@ -439,8 +439,8 @@ sudo apt install ffmpeg
 
 ### Q: 桌面应用签名/公证（macOS）？
 
-首次在 macOS 运行 CutDeck 时，右键点击应用图标选择"打开"。如遇系统拦截：
+首次在 macOS 运行 cut-deck 时，右键点击应用图标选择"打开"。如遇系统拦截：
 
 ```bash
-sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"
+sudo xattr -rd com.apple.quarantine "/Applications/cut-deck.app"
 ```

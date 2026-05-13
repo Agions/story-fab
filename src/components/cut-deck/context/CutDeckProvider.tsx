@@ -3,18 +3,18 @@
  * 从 AIEditorContext.tsx 提取的 Provider 组件
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
-import type { CutDeckState, CutDeckStep, CutDeckFeatureType, CutDeckAction } from '../types/workflow';
+import type { cut_deckState, cut_deckStep, cut_deckFeatureType, cut_deckAction } from '../types/workflow';
 import { initialState, getNextStep, getPrevStep, CUT_DECK_STEPS } from '../types/workflow';
 import { clipFlowReducer } from '../types/workflow.reducer';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
 
 // 上下文类型
 interface CutDeckContextType {
-  state: CutDeckState;
-  dispatch: React.Dispatch<CutDeckAction>;
+  state: cut_deckState;
+  dispatch: React.Dispatch<cut_deckAction>;
   // 便捷方法
-  setStep: (step: CutDeckStep) => void;
-  setFeature: (feature: CutDeckFeatureType) => void;
+  setStep: (step: cut_deckStep) => void;
+  setFeature: (feature: cut_deckFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
   setPlaying: (playing: boolean) => void;
@@ -35,7 +35,7 @@ interface CutDeckContextType {
   goToNextStep: () => void;
   goToPrevStep: () => void;
   reset: () => void;
-  resetStep: (step: CutDeckStep) => void;
+  resetStep: (step: cut_deckStep) => void;
   // 计算属性
   canProceed: () => boolean;
   completedSteps: number;
@@ -65,11 +65,11 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
   }, []);
 
   // 便捷方法 - 使用 useCallback 稳定函数引用
-  const setStep = useCallback((step: CutDeckStep) => {
+  const setStep = useCallback((step: cut_deckStep) => {
     dispatch({ type: 'SET_STEP', payload: step });
   }, []);
 
-  const setFeature = useCallback((feature: CutDeckFeatureType) => {
+  const setFeature = useCallback((feature: cut_deckFeatureType) => {
     dispatch({ type: 'SET_FEATURE', payload: feature });
   }, []);
 
@@ -152,7 +152,7 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     dispatch({ type: 'RESET' });
   }, [revokeVideoBlobUrl]);
 
-  const resetStep = useCallback((step: CutDeckStep) => {
+  const resetStep = useCallback((step: cut_deckStep) => {
     dispatch({ type: 'RESET_STEP', payload: step });
   }, []);
 

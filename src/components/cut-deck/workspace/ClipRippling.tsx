@@ -163,7 +163,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
     const clipsToExport = results.filter(c => c.clip.id !== undefined && selectedClips.has(c.clip.id));
 
     // 动态获取导出目录
-    const exportDir = await invoke<string>('get_export_dir').catch(() => '/tmp/CutDeck');
+    const exportDir = await invoke<string>('get_export_dir').catch(() => '/tmp/cut_deck');
 
     try {
       for (const clip of clipsToExport) {
