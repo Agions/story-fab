@@ -4,7 +4,7 @@
  * 集成 Tauri 后端进行实际视频处理
  */
 
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, TauriCommand } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
 
 import type { ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, ExportResult } from '../../export/types';

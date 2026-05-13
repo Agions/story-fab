@@ -1,7 +1,8 @@
 import { logger } from '../../shared/utils/logging';
 import React, { useState, useCallback, useEffect, memo } from 'react';
 import { Card } from '../ui/card';
-import { invoke, convertFileSrc } from '@tauri-apps/api/core';
+import { invoke } from '@tauri-apps/api/core';
+import { convertFileSrc } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { save } from '@tauri-apps/plugin-dialog';
 import { ScriptSegment } from '@/types';

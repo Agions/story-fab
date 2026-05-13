@@ -20,7 +20,7 @@ import {
   VolumeX,
   CheckCircle,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, TauriCommand } from '@/core/tauri/TauriBridge';
 import { notify } from '@/shared';
 import type { VideoSegment } from '@/core/types';
 import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/mods';
@@ -179,7 +179,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
 
       const audioParams = { volume: audioVolume / 100, process: audioProcess };
 
-      await invoke('cut_video', {
+      await invoke(TauriCommand.CUT_VIDEO, {
         inputPath: videoPath,
         outputPath,
         segments: segmentsToProcess,
@@ -188,7 +188,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
         transition: transitionType,
         transitionDuration: transitionDuration,
         audioParams,
-        addSubtitles: useSubtitles
+        addSubtitles: useSubtitles,
       });
 
       if (onProcessingComplete) {
