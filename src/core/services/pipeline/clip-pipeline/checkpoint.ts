@@ -12,7 +12,7 @@
 
 import { readTextFile, writeTextFile, exists, mkdir, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { appDataDir } from '@tauri-apps/api/path';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '../../../../shared/utils/logging';
 
 /**
  * Step 名称与 Checkpoint 名称的映射表
