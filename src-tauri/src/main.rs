@@ -5,5 +5,5 @@
 )]
 
 fn main() {
-    cutdeck_lib::run();
+    CutDeck_lib::run();
 }
