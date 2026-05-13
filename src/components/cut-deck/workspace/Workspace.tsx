@@ -19,7 +19,7 @@ import {
   Check,
   Bolt,
 } from 'lucide-react';
-import { useCutDeck, type CutDeckStep, CUT_DECK_STEPS } from '../context';
+import { useCutDeck, type cut_deckStep, CUT_DECK_STEPS } from '../context';
 import styles from './Workspace.module.less';
 import StepList from './StepList';
 
@@ -27,10 +27,10 @@ import StepList from './StepList';
 // 类型定义
 // ============================================================================
 
-export type { CutDeckStep };
+export type { cut_deckStep };
 
 interface StepConfig {
-  key: CutDeckStep;
+  key: cut_deckStep;
   title: string;
   icon: React.ReactNode;
 }
@@ -54,23 +54,23 @@ const STEPS: StepConfig[] = [
 ];
 
 // 正确的顺序映射（按照任务描述的视觉顺序）
-const STEP_ORDER: readonly CutDeckStep[] = CUT_DECK_STEPS;
+const STEP_ORDER: readonly cut_deckStep[] = CUT_DECK_STEPS;
 
 // ============================================================================
 // 辅助函数
 // ============================================================================
 
-const getStepIndex = (step: CutDeckStep): number => STEP_ORDER.indexOf(step);
+const getStepIndex = (step: cut_deckStep): number => STEP_ORDER.indexOf(step);
 
 const isStepCompleted = (
-  step: CutDeckStep,
-  stepStatus: Record<CutDeckStep, boolean>
+  step: cut_deckStep,
+  stepStatus: Record<cut_deckStep, boolean>
 ): boolean => stepStatus[step];
 
 const isStepAccessible = (
-  step: CutDeckStep,
-  currentStep: CutDeckStep,
-  stepStatus: Record<CutDeckStep, boolean>
+  step: cut_deckStep,
+  currentStep: cut_deckStep,
+  stepStatus: Record<cut_deckStep, boolean>
 ): boolean => {
   // 已完成的步骤可以点击跳转
   if (stepStatus[step]) return true;
@@ -112,7 +112,7 @@ const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
     }
   }, [currentStep]);
 
-  const handleStepClick = (step: CutDeckStep) => {
+  const handleStepClick = (step: cut_deckStep) => {
     if (isStepAccessible(step, currentStep, stepStatus)) {
       setStep(step);
     }

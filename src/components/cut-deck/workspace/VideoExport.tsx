@@ -107,7 +107,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     try {
       // 获取当前视频时长用于输出文件名
       const duration = state.currentVideo?.duration ?? 0;
-      const outputPath = `/tmp/CutDeck/export_${Date.now()}.mp4`;
+      const outputPath = `/tmp/cut_deck/export_${Date.now()}.mp4`;
 
       setProgressStage('正在编码...');
 

@@ -1,9 +1,9 @@
-// CutDeck Workflow — re-exports for convenient imports
+// cut_deck Workflow — re-exports for convenient imports
 export type {
-  CutDeckFeatureType,
-  CutDeckStep,
-  CutDeckState,
-  CutDeckAction,
+  cut_deckFeatureType,
+  cut_deckStep,
+  cut_deckState,
+  cut_deckAction,
 } from './workflow';
 export {
   initialState,

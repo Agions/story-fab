@@ -1,5 +1,5 @@
 /**
- * CutDeck Workspace — AI 视频剪辑工作流组件导出
+ * cut_deck Workspace — AI 视频剪辑工作流组件导出
  */
 export { default as Workspace } from './Workspace';
 export { default as ProjectSetup } from './ProjectSetup';
