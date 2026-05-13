@@ -29,7 +29,6 @@ export const useModelStore = create<AppState>()(
         iflytek: { enabled: false },
         deepseek: { enabled: false },
         moonshot: { enabled: false },
-        azure: { enabled: false },
         local: { enabled: false },
         custom: { enabled: false },
       } as Record<AIModelType, AIModelSettings>,
