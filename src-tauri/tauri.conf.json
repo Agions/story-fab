@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
-  "productName": "cut-deck",
+  "productName": "CutDeck",
   "version": "2.0.0",
-  "identifier": "com.cutdeck.desktop",
+  "identifier": "com.CutDeck.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "cut-deck - AI \u89c6\u9891\u521b\u4f5c\u5e73\u53f0",
+        "title": "CutDeck - AI \u89c6\u9891\u521b\u4f5c\u5e73\u53f0",
         "label": "main",
         "width": 1200,
         "height": 800,
@@ -54,9 +54,9 @@
     ],
     "category": "Video",
     "shortDescription": "AI-powered video editing tool",
-    "longDescription": "cut-deck is an AI-driven professional video editing tool with autonomous cutting, smart segmentation, highlight detection, and subtitle generation.",
-    "publisher": "cut-deck",
-    "copyright": "Copyright \u00a9 2024 cut-deck",
+    "longDescription": "CutDeck is an AI-driven professional video editing tool with autonomous cutting, smart segmentation, highlight detection, and subtitle generation.",
+    "publisher": "CutDeck",
+    "copyright": "Copyright \u00a9 2024 CutDeck",
     "windows": {
       "nsis": {
         "installMode": "currentUser",
@@ -106,7 +106,7 @@
     "deep-link": {
       "desktop": {
         "schemes": [
-          "cutdeck"
+          "CutDeck"
         ]
       }
     }
