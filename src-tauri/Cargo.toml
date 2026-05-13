@@ -1,7 +1,7 @@
 [package]
-name = "CutDeck"
+name = "cut-deck"
 version = "2.0.0"
-description = "CutDeck - AI 驱动的专业智能视频剪辑工具"
+description = "cut-deck - AI 驱动的专业智能视频剪辑工具"
 authors = ["Agions <agions@qq.com>"]
 license = "MIT"
 edition = "2021"

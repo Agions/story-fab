@@ -1,5 +1,5 @@
 /**
- * CutDeck 时间线模型 - 统一类型定义 v2.0
+ * cut_deck 时间线模型 - 统一类型定义 v2.0
  *
  * 设计原则:
  * 1. TimelineTrack 是唯一的轨道类型，通过 type 字段区分 video/audio/text/effect

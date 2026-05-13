@@ -1,5 +1,5 @@
 /**
- * CutDeck — AI 视频剪辑工作台导出
+ * cut_deck — AI 视频剪辑工作台导出
  */
 
 // Context exports
@@ -7,7 +7,7 @@ export { CutDeckProvider, useCutDeck, CutDeckContext } from './context';
 export type { CutDeckContextType } from './context';
 
 // Types exports
-export type { CutDeckState, CutDeckStep, CutDeckAction, CutDeckFeatureType } from './types';
+export type { cut_deckState, cut_deckStep, cut_deckAction, cut_deckFeatureType } from './types';
 export { getNextStep, getPrevStep } from './types';
 export { CUT_DECK_STEPS, INITIAL_STEP_STATUS, DEFAULT_VOICE_SETTINGS, DEFAULT_SYNTHESIS_SETTINGS } from './types';
 

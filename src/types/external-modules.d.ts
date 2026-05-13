@@ -1,4 +1,4 @@
-// CutDeck external module type declarations
+// cut_deck external module type declarations
 
 declare module 'jspdf' {
   export class jsPDF {
