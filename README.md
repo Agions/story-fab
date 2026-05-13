@@ -290,28 +290,6 @@ npm run tauri build
 
 ---
 
-## 📖 文档
-
-| 文档 | 说明 |
-|------|------|
-| [ARCHITECTURE](./docs/ARCHITECTURE.md) | 深度架构文档（Rust 层、AI 管道、渲染流程） |
-| [DEVELOPER_GUIDE](./docs/DEVELOPER_GUIDE.md) | 开发者指南（调试、测试、发布） |
-| [CHANGELOG](./CHANGELOG.md) | 版本更新记录 |
-
-### 关键模块速查
-
-| 模块 | 路径 | 职责 |
-|------|------|------|
-| AI 剪辑管道 | `src/core/services/clip-pipeline/` | 7 步 AI 拆条流水线 |
-| Rust 命令 | `src-tauri/src/commands/` | FFmpeg/FFprobe/Render/AI IPC |
-| 高光检测 | `src-tauri/src/highlight_detector.rs` | 音频能量 + 场景切换检测 |
-| 智能分段 | `src-tauri/src/smart_segmenter.rs` | 静默/对话/镜头切换分段 |
-| Whisper 字幕 | `src-tauri/src/subtitle.rs` | 本地语音识别 |
-| 多格式导出 | `src/core/services/clip-pipeline/multiExport.ts` | 9:16 / 1:1 / 16:9 |
-| Tauri Bridge | `src/core/tauri/TauriBridge.ts` | Rust IPC 统一封装 |
-
----
-
 ## 📦 下载安装
 
 桌面应用预构建包在 [GitHub Releases](https://github.com/Agions/CutDeck/releases) 页面下载：
