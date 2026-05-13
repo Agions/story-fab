@@ -10,7 +10,7 @@ const PROVIDER_TO_LEGACY_MODEL: Record<ModelProvider, LegacyAIModelType> = {
   iflytek: 'spark',
   deepseek: 'deepseek',
   moonshot: 'moonshot',
-  azure: 'openai',
+  // resolved to openai
   local: 'openai',
   custom: 'openai',
 };
