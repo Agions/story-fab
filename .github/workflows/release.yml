@@ -108,7 +108,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "CutDeck v${{ github.ref_name }}"
+          releaseName: "cut-deck v${{ github.ref_name }}"
           args: --target ${{ matrix.platform.target }}
 
       - name: Copy run instructions to bundle

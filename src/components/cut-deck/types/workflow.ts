@@ -1,5 +1,5 @@
 /**
- * CutDeck Workflow — unified types, constants, initial state, helpers
+ * cut_deck Workflow — unified types, constants, initial state, helpers
  * Previously split across: workflow.types.ts / workflow.constants.ts / workflow.initialState.ts
  * All content now in one self-contained file, zero circular imports.
  */
@@ -7,9 +7,9 @@ import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type CutDeckFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
+export type cut_deckFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
 
-export type CutDeckStep =
+export type cut_deckStep =
   | 'project-create'
   | 'video-upload'
   | 'ai-analyze'
@@ -18,8 +18,8 @@ export type CutDeckStep =
   | 'video-synthesize'
   | 'export';
 
-export interface CutDeckState {
-  currentStep: CutDeckStep;
+export interface cut_deckState {
+  currentStep: cut_deckStep;
   stepStatus: {
     'project-create': boolean;
     'video-upload': boolean;
@@ -29,7 +29,7 @@ export interface CutDeckState {
     'video-synthesize': boolean;
     'export': boolean;
   };
-  selectedFeature: CutDeckFeatureType;
+  selectedFeature: cut_deckFeatureType;
   project: ProjectData | null;
   currentVideo: VideoInfo | null;
   analysis: VideoAnalysis | null;
@@ -59,11 +59,11 @@ export interface CutDeckState {
   error: string | null;
 }
 
-// CutDeckAction discriminated union
-export type CutDeckAction =
-  | { type: 'SET_STEP'; payload: CutDeckStep }
-  | { type: 'SET_STEP_COMPLETE'; payload: { step: CutDeckStep; complete: boolean } }
-  | { type: 'SET_FEATURE'; payload: CutDeckFeatureType }
+// cut_deckAction discriminated union
+export type cut_deckAction =
+  | { type: 'SET_STEP'; payload: cut_deckStep }
+  | { type: 'SET_STEP_COMPLETE'; payload: { step: cut_deckStep; complete: boolean } }
+  | { type: 'SET_FEATURE'; payload: cut_deckFeatureType }
   | { type: 'SET_PROJECT'; payload: ProjectData | null }
   | { type: 'SET_VIDEO'; payload: VideoInfo | null }
   | { type: 'SET_ANALYSIS'; payload: VideoAnalysis | null }
@@ -85,7 +85,7 @@ export type CutDeckAction =
   | { type: 'SET_DURATION'; payload: number }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' }
-  | { type: 'RESET_STEP'; payload: CutDeckStep };
+  | { type: 'RESET_STEP'; payload: cut_deckStep };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -123,7 +123,7 @@ export const DEFAULT_SYNTHESIS_SETTINGS = {
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 
-export const initialState: CutDeckState = {
+export const initialState: cut_deckState = {
   currentStep: 'project-create',
   stepStatus: { ...INITIAL_STEP_STATUS },
   selectedFeature: 'none',
@@ -155,12 +155,12 @@ export const initialState: CutDeckState = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function getNextStep(currentStep: CutDeckStep): CutDeckStep {
+export function getNextStep(currentStep: cut_deckStep): cut_deckStep {
   const currentIndex = CUT_DECK_STEPS.indexOf(currentStep);
   return currentIndex < CUT_DECK_STEPS.length - 1 ? CUT_DECK_STEPS[currentIndex + 1] : currentStep;
 }
 
-export function getPrevStep(currentStep: CutDeckStep): CutDeckStep {
+export function getPrevStep(currentStep: cut_deckStep): cut_deckStep {
   const currentIndex = CUT_DECK_STEPS.indexOf(currentStep);
   return currentIndex > 0 ? CUT_DECK_STEPS[currentIndex - 1] : currentStep;
 }
