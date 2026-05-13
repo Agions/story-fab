@@ -35,10 +35,6 @@ describe('aiModelAdapter', () => {
       expect(resolveLegacyModel('deepseek')).toBe('deepseek');
     });
 
-    it('should resolve azure to openai', () => {
-      expect(resolveLegacyModel('azure')).toBe('openai');
-    });
-
     it('should resolve local to openai', () => {
       expect(resolveLegacyModel('local')).toBe('openai');
     });
@@ -62,7 +58,7 @@ describe('aiModelAdapter', () => {
       const map = getLegacyModelCompatMap();
       const providers: ModelProvider[] = [
         'openai', 'anthropic', 'google', 'alibaba',
-        'zhipu', 'iflytek', 'deepseek', 'moonshot', 'azure', 'local', 'custom',
+        'zhipu', 'iflytek', 'deepseek', 'moonshot', 'local', 'custom',
       ];
       providers.forEach((p) => {
         expect(p in map).toBe(true);
@@ -73,7 +69,7 @@ describe('aiModelAdapter', () => {
       const map = getLegacyModelCompatMap();
       const providers: ModelProvider[] = [
         'openai', 'anthropic', 'google', 'alibaba',
-        'zhipu', 'iflytek', 'deepseek', 'moonshot', 'azure', 'local', 'custom',
+        'zhipu', 'iflytek', 'deepseek', 'moonshot', 'local', 'custom',
       ];
       providers.forEach((p) => {
         expect(map[p]).toBe(resolveLegacyModel(p));

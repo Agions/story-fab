@@ -223,7 +223,7 @@ export interface AIModel {
   recommended?: boolean;
 }
 
-export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'azure' | 'local' | 'custom' | 'alibaba' | 'iflytek' | 'zhipu' | 'moonshot' | 'deepseek';
+export type ModelProvider = 'openai' | 'anthropic' | 'google' | 'local' | 'custom' | 'alibaba' | 'iflytek' | 'zhipu' | 'moonshot' | 'deepseek';
 
 export type ModelCategory = 'video' | 'audio' | 'image' | 'text' | 'all';
 
