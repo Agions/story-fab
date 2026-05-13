@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, TauriCommand } from '../../core/tauri/TauriBridge';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, exists, mkdir } from '@tauri-apps/plugin-fs';
 import { appConfigDir } from '@tauri-apps/api/path';
@@ -104,5 +104,5 @@ export const fileExists = async (path: string): Promise<boolean> => {
  * @param path 文件路径
  */
 export const deleteFile = async (path: string): Promise<void> => {
-  await invoke('delete_file', { path });
+  await invoke(TauriCommand.FILE_DELETE, { path });
 };
