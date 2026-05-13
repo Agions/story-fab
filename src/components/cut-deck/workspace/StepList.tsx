@@ -4,7 +4,7 @@
  */
 import React, { memo } from 'react';
 import { Plus, Video, Cloud, FileText, Edit, Download, Check, Bolt } from 'lucide-react';
-import type { CutDeckStep } from '../context';
+import type { cut_deckStep } from '../context';
 import styles from './Workspace.module.less';
 
 // ============================================================================
@@ -12,15 +12,15 @@ import styles from './Workspace.module.less';
 // ============================================================================
 
 interface StepConfig {
-  key: CutDeckStep;
+  key: cut_deckStep;
   title: string;
   icon: React.ReactNode;
 }
 
 interface StepListProps {
-  currentStep: CutDeckStep;
-  stepStatus: Record<CutDeckStep, boolean>;
-  onStepClick: (step: CutDeckStep) => void;
+  currentStep: cut_deckStep;
+  stepStatus: Record<cut_deckStep, boolean>;
+  onStepClick: (step: cut_deckStep) => void;
   activeStepRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -43,21 +43,21 @@ const STEPS: StepConfig[] = [
 // ============================================================================
 
 const isStepCompleted = (
-  step: CutDeckStep,
-  stepStatus: Record<CutDeckStep, boolean>
+  step: cut_deckStep,
+  stepStatus: Record<cut_deckStep, boolean>
 ): boolean => stepStatus[step];
 
 const isStepAccessible = (
-  step: CutDeckStep,
-  currentStep: CutDeckStep,
-  stepStatus: Record<CutDeckStep, boolean>
+  step: cut_deckStep,
+  currentStep: cut_deckStep,
+  stepStatus: Record<cut_deckStep, boolean>
 ): boolean => {
   // 已完成的步骤可以点击跳转
   if (stepStatus[step]) return true;
   // 当前步骤可访问
   if (step === currentStep) return true;
   // 检查是否是下一步（允许直接进入下一步）
-  const STEP_ORDER: readonly CutDeckStep[] = [
+  const STEP_ORDER: readonly cut_deckStep[] = [
     'project-create',
     'video-upload',
     'ai-analyze',

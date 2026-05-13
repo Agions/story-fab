@@ -2,12 +2,12 @@
  * AI Editor Reducer
  * 从 AIEditorContext.tsx 提取的 reducer 逻辑
  */
-import type { CutDeckState, CutDeckAction, CutDeckStep } from './workflow';
+import type { cut_deckState, cut_deckAction, cut_deckStep } from './workflow';
 import { initialState } from './workflow';
 import { CUT_DECK_STEPS } from './workflow';
 
 // Reducer
-export function clipFlowReducer(state: CutDeckState, action: CutDeckAction): CutDeckState {
+export function clipFlowReducer(state: cut_deckState, action: cut_deckAction): cut_deckState {
   switch (action.type) {
     case 'SET_STEP':
       return { ...state, currentStep: action.payload };

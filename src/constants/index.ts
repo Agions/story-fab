@@ -4,11 +4,11 @@
 
 // 应用信息
 export const APP = {
-  name: 'CutDeck',
+  name: 'cut_deck',
   version: '1.0.0',
   description: 'AI 驱动的专业视频内容创作平台',
   author: 'Agions',
-  website: 'https://github.com/Agions/CutDeck',
+  website: 'https://github.com/Agions/cut_deck',
 };
 
 // 支持的视频格式

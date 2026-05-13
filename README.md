@@ -1,8 +1,8 @@
-# CutDeck
+# cut-deck
 
 <div align="center">
 
-<p><img src="./public/logo.svg" alt="CutDeck" width="120" /></p>
+<p><img src="./public/logo.svg" alt="cut-deck" width="120" /></p>
 
 <h1 style="
   font-family: 'Syne', system-ui, sans-serif;
@@ -14,7 +14,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0.5rem 0;
-">CutDeck</h1>
+">cut-deck</h1>
 
 <p style="font-size: 1.15rem; color: #94a3b8; margin: 0 0 2rem;">
   AI 驱动的专业视频剪辑工具 · 长视频一键智能剪辑 · 多平台分发
@@ -30,8 +30,8 @@
 [![Rust](https://img.shields.io/badge/Rust-1.75+-DEA584?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
 [![Zustand](https://img.shields.io/badge/Zustand-5-3F2E1E?style=flat-square&logo=zustand)](https://zustand-demo.pmnd.rs)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/Agions/CutDeck/main.yml?style=flat-square&logo=github)](https://github.com/Agions/CutDeck/actions)
-[![Stars](https://img.shields.io/github/stars/Agions/CutDeck?style=flat-square&logo=github&color=f59e0b)](https://github.com/Agions/CutDeck/stargazers)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/Agions/cut-deck/main.yml?style=flat-square&logo=github)](https://github.com/Agions/cut-deck/actions)
+[![Stars](https://img.shields.io/github/stars/Agions/cut-deck?style=flat-square&logo=github&color=f59e0b)](https://github.com/Agions/cut-deck/stargazers)
 
 </p>
 
@@ -43,7 +43,7 @@
 
 **传统视频剪辑的最大痛点**：一个长视频，想剪成多个精彩短片段分发到不同平台，需要人工反复观看、逐个标记、手动导出。
 
-CutDeck 用 AI 把这个过程自动化：
+cut-deck 用 AI 把这个过程自动化：
 
 ```
 长视频（直播回放 / 会议录像 / 讲座）
@@ -53,7 +53,7 @@ CutDeck 用 AI 把这个过程自动化：
     → 一键发布
 ```
 
-| 场景 | 传统方式 | CutDeck |
+| 场景 | 传统方式 | cut-deck |
 |------|---------|---------|
 | 抖音创作者 | 人工选段 + 导出 | AI 识别高光 + 一键 9:16 导出 |
 | 知识付费 | 逐帧标记 | AI 识别关键内容 + SEO 生成 |
@@ -102,7 +102,7 @@ faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，**
 │  Landing  ·  Dashboard  ·  Projects  ·  VideoEditor  ·  Settings       │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  组件层 (src/components/)                                               │
-│  AIClip · AIVideoPreview · CutDeck · Layout · ModelSelector ·          │
+│  AIClip · AIVideoPreview · cut-deck · Layout · ModelSelector ·          │
 │  ScriptEditor · Settings                                                │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  核心业务层 (src/core/)                                                 │
@@ -156,7 +156,7 @@ src/                              # React 前端
 │   └── tauri/                    # TauriBridge 封装
 ├── components/                   # React 组件
 │   ├── AIClip/                   # AI 剪辑面板
-│   ├── CutDeck/                  # 主工作流组件
+│   ├── cut-deck/                  # 主工作流组件
 │   ├── Layout/                   # 布局
 │   ├── ModelSelector/            # 模型选择器
 │   ├── ScriptEditor/             # 脚本编辑器
@@ -207,8 +207,8 @@ docs/                             # 项目文档
 ### 安装运行
 
 ```bash
-git clone https://github.com/Agions/CutDeck.git
-cd CutDeck
+git clone https://github.com/Agions/cut-deck.git
+cd cut-deck
 npm install
 npm run dev
 ```
@@ -272,18 +272,18 @@ npm run tauri build
 
 ## 📦 下载安装
 
-桌面应用预构建包在 [GitHub Releases](https://github.com/Agions/CutDeck/releases) 页面下载：
+桌面应用预构建包在 [GitHub Releases](https://github.com/Agions/cut-deck/releases) 页面下载：
 
 | 平台 | 文件名 |
 |------|--------|
-| Windows | `CutDeck-{version}-windows-x64-setup.exe` |
-| macOS (Apple Silicon) | `CutDeck-{version}-macos-arm64.dmg` |
-| macOS (Intel) | `CutDeck-{version}-macos-x64.dmg` |
-| Linux | `CutDeck-{version}-linux-x64.deb` |
+| Windows | `cut-deck-{version}-windows-x64-setup.exe` |
+| macOS (Apple Silicon) | `cut-deck-{version}-macos-arm64.dmg` |
+| macOS (Intel) | `cut-deck-{version}-macos-x64.dmg` |
+| Linux | `cut-deck-{version}-linux-x64.deb` |
 
 > **macOS 首次运行被拦截？** 右键 → **打开** → 确认。或运行：
 > ```bash
-> sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"
+> sudo xattr -rd com.apple.quarantine "/Applications/cut-deck.app"
 > ```
 
 ---
@@ -292,9 +292,9 @@ npm run tauri build
 
 | 方式 | 说明 |
 |------|------|
-| 🐛 报告 Bug | [GitHub Issues](https://github.com/Agions/CutDeck/issues) |
+| 🐛 报告 Bug | [GitHub Issues](https://github.com/Agions/cut-deck/issues) |
 | 📝 完善文档 | 直接提交 PR |
-| 💡 功能建议 | [GitHub Issues](https://github.com/Agions/CutDeck/issues) |
+| 💡 功能建议 | [GitHub Issues](https://github.com/Agions/cut-deck/issues) |
 | 🔧 提交代码 | Fork → 开发 → PR → Review |
 
 ---
