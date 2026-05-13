@@ -12,7 +12,7 @@
 
 import { visionService } from '../../services/ai/vision.service';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
-import type { CandidateClip } from '../../services/clip-pipeline/clipScorer';
+import type { CandidateClip } from '../../services/pipeline/clip-pipeline/clipScorer';
 import type { ASRSegment } from '../../services/asr/asr.service';
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
 import { logger } from '../../../shared/utils/logging';
