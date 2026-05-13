@@ -239,7 +239,7 @@ npm run tauri build
 | **DeepSeek** | V4-Pro（推荐）、V4-Flash | 🏆 性价比最高，Clip Script 生成、复杂推理 |
 | **OpenAI** | GPT-5.5（旗舰）、GPT-5.5-Pro、GPT-5.4-nano | 多模态视频理解、高质量脚本生成 |
 | **Anthropic** | Claude Opus 4.7（旗舰）、Claude Sonnet 4.6、Claude Haiku 4.5 | 长文本分析与脚本创作、风格稳定 |
-| **Google** | Gemini 2.5 Pro、Gemini 2.5 Flash（性价比） | 多模态理解、长上下文 |
+| **Google** | Gemini 3.1 Pro（旗舰）、Gemini 3.1 Flash、Gemini 3.1 Flash-Lite（性价比） | 多模态理解、超长上下文 |
 | **阿里云** | Qwen3.6-Max（旗舰）、Qwen3.6-Plus、Qwen3.6-Flash | 中文内容创作、编程能力 |
 | **月之暗面** | Kimi K2.6（推荐）、Kimi K2.5 | 中文长文本分析、视频语义 |
 | **智谱AI** | GLM-5（旗舰）、GLM-5-Turbo、GLM-4.7 | 中文多模态、高上下文 |
@@ -265,9 +265,10 @@ npm run tauri build
 - **Sonnet 4.6** — 长文本组织与风格润色
 - **Haiku 4.5** — 轻量高速，批量分析
 
-#### Google（旗舰：Gemini 2.5 Pro）
-- **Gemini 2.5 Pro** — 超长上下文（1M token），适合长视频分析
-- **Gemini 2.5 Flash** — 高性价比，多模态日常任务
+#### Google（旗舰：Gemini 3.1 Pro）
+- **Gemini 3.1 Pro** — 最新旗舰（2026-02），推理能力 2x+ 提升，1M token 上下文，适合超长视频分析
+- **Gemini 3.1 Flash** — 高性价比，多模态日常任务
+- **Gemini 3.1 Flash-Lite** — 最快最便宜的轻量选择
 
 #### 阿里云（旗舰：Qwen3.6-Max）
 - **Qwen3.6-Max** — 旗舰推理，中文创作能力最强
