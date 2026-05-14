@@ -137,7 +137,8 @@ export class VoiceSynthesisService {
    */
   async listBackends(): Promise<TtsBackend[]> {
     try {
-      return await tauri.listTTSBackends();
+      // Rust returns { id, name, voices } — map to TtsBackend shape
+      return await tauri.listTTSBackends() as unknown as Promise<TtsBackend[]>;
     } catch {
       return [];
     }
