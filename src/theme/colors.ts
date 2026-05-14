@@ -5,15 +5,16 @@
  * 提供 Ant Design 5 兼容的 Design Token
  *
  * 使用方式：
- *   import { colors, antdTokens } from './colors';
- *   // 或在 ConfigProvider 中使用 antdTokens
+ *   import { colors } from '@/theme';
+ *   // antdTokens: Ant Design 5 token 兼容层（antd 已移除，仅作参考）
  *
  * 收敛说明：
  * 架构说明：
  * - globals.css :root {} — 运行时 CSS 入口（main.tsx 已导入）
  * - colors.ts（TypeScript）— OKLCH 原始值 + antdTokens 兼容层
  * - variables.less — 被 _mixins.less 引用，编译时使用
- * - dashboardTokens / videoEditorTokens — 已废弃（0 usage），已移除
+ * - design-system.css — 已删除（从未作为 CSS 加载）
+ * - _film-variables.less — 已删除（从未被 @import）
  */
 
 // ThemeConfig type — previously from antd, now minimal for token shape compatibility
@@ -150,41 +151,6 @@ export const antdTokens: ThemeConfig['token'] = {
     0 4px 8px oklch(0% 0 0 / 0.4),
     0 2px 6px oklch(0% 0 0 / 0.3)
   `,
-};
-
-// =============================================
-// 组件级别 Token（Component Token）
-// =============================================
-
-export const antdComponentTokens: ThemeConfig['components'] = {
-  Button: {
-    primaryColor: '#0a0a0f',
-    borderRadius: 8,
-  },
-  Card: {
-    colorBgContainer: 'oklch(14% 0.02 70)',
-    borderRadiusLG: 12,
-  },
-  Input: {
-    colorBgContainer: 'oklch(18% 0.02 70)',
-    borderRadiusSM: 8,
-  },
-  Select: {
-    colorBgContainer: 'oklch(18% 0.02 70)',
-    borderRadiusSM: 8,
-  },
-  Modal: {
-    colorBgElevated: 'oklch(22% 0.02 70)',
-    borderRadiusLG: 16,
-  },
-  Slider: {
-    trackBg: '#d4a574',
-    trackHoverBg: '#e8c9a8',
-    handleColor: '#d4a574',
-    handleActiveColor: '#e8c9a8',
-    railBg: 'oklch(25% 0.02 70)',
-    railHoverBg: 'oklch(30% 0.02 70)',
-  },
 };
 
 // =============================================

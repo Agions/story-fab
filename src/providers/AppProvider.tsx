@@ -16,26 +16,17 @@ interface AppProviderProps {
  */
 
 /**
- * 全局主题配置获取器
- * NOTE: ConfigProvider 已移除 — CSS 变量在 globals.css 中定义
- * 如需额外主题配置，可通过 CSS 变量或 Tailwind 配置实现
- */
-const ThemeConfigurator: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // ThemeProvider handles dark/light mode via class on <html>
-  return <>{children}</>;
-};
-
-/**
  * 应用根Provider组件
  * 包含所有需要的Context Provider
  * antd ConfigProvider 已移除（theme tokens 在 globals.css）
+ * Dark mode 通过 Tailwind .dark class on <html> 由 ThemeProvider 处理
  */
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   return (
     <ThemeProvider>
       <SettingsProvider>
         <ToastProvider>
-          <ThemeConfigurator>{children}</ThemeConfigurator>
+          {children}
         </ToastProvider>
       </SettingsProvider>
     </ThemeProvider>
