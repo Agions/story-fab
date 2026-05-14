@@ -84,17 +84,6 @@ pub fn write_concat_file(entries: &[impl AsRef<std::path::Path>]) -> Result<std:
     Ok(concat_file)
 }
 
-/// Clean up a temp directory and all its contents.
-/// Silently ignores errors (for cleanup paths).
-pub fn cleanup_temp_dir(dir: &std::path::Path) {
-    if let Ok(entries) = std::fs::read_dir(dir) {
-        for entry in entries.flatten() {
-            let _ = std::fs::remove_file(entry.path());
-        }
-    }
-    let _ = std::fs::remove_dir(dir);
-}
-
 /// Convert s16le PCM bytes to normalized f32 samples.
 /// Uses `chunks(2)` (not `_exact`) to safely drop any trailing partial chunk.
 pub fn pcm_samples_from_wav(pcm_data: &[u8]) -> Vec<f32> {

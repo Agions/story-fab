@@ -6,8 +6,6 @@ use crate::highlight_detector::HighlightDetector;
 use crate::smart_segmenter::SmartSegmenter;
 use crate::utils::cmd_err;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
-use tokio::fs as tokio_fs;
 
 const DEFAULT_EDGE_TTS: &str = "/usr/bin/edge-tts";
 
