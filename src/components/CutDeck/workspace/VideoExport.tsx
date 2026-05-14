@@ -3,7 +3,7 @@
  */
 import React, { useState, useEffect, memo } from 'react';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '@/core/tauri/TauriBridge';
 import { useCutDeck } from '../context';
 import { notify } from '@/shared';
 import type { ExportSettings } from '@/core/types';
@@ -112,7 +112,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
       setProgressStage('正在编码...');
 
       // 实际调用 Rust render_autonomous_cut
-      const result = await invoke<string>('render_autonomous_cut', {
+      const result = await tauri.autonomousRender({
         input_path: state.synthesisData.finalVideoUrl ?? '',
         output_path: outputPath,
       });

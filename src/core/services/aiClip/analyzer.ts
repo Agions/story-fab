@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
 import { visionService } from '../ai/vision.service';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotionDetector';
@@ -146,22 +146,16 @@ async function detectSilenceSegments(
   config: AIClipConfig
 ): Promise<Array<{ start: number; end: number; duration: number }>> {
   try {
-    const rustSegments = await invoke<Array<{
+    const rustSegments = await tauri.detectSmartSegments(videoInfo.path, {
+      minDurationMs: 500,
+      maxDurationMs: 30000,
+    }) as Array<{
       start_ms: number;
       end_ms: number;
       segment_type: string;
       duration_ms: number;
       silence_ratio?: number;
-    }>>('detect_smart_segments', {
-      input: {
-        videoPath: videoInfo.path,
-        minDurationMs: 500,
-        maxDurationMs: 30000,
-        silenceThresholdDb: -40,
-        detectDialogue: false,
-        detectTransitions: false,
-      },
-    });
+    }>;
 
     return rustSegments
       .filter(seg => seg.segment_type === 'Silence' || (seg.silence_ratio ?? 0) > 0.3)
