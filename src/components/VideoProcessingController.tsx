@@ -179,7 +179,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
 
       const audioParams = { volume: audioVolume / 100, process: audioProcess };
 
-      await invoke(TauriCommand.CUT_VIDEO, {
+      await tauri.invoke(TauriCommand.CUT_VIDEO, {
         inputPath: videoPath,
         outputPath,
         segments: segmentsToProcess,

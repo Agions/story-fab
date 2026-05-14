@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Progress, ProgressTrack, ProgressIndicator } from './ui/progress';
 import { Video } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/core';
+import { tauri, TauriCommand } from '@/core/tauri/TauriBridge';
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoAnalysis, KeyMoment, Emotion } from '@/types';
 import VideoSelector from './VideoSelector';
@@ -53,9 +53,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
       setProgress(10);
 
-      const videoMetadata = await invoke<AnalyzeVideoResult>('analyze_video', {
-        path: selectedVideoUrl
-      }).catch(err => {
+      const videoMetadata = await tauri.analyzeVideo(selectedVideoUrl).catch(err => {
         logger.error('视频分析失败:', { error: err });
         throw new Error(`视频分析失败: ${err}`);
       });
@@ -63,7 +61,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       setProgress(40);
 
       const keyFrameCount = Math.min(5, Math.ceil(videoMetadata.duration / 60));
-      const keyFrames = await invoke<string[]>('extract_key_frames', {
+      const keyFrames = await tauri.invoke<string[]>('extract_key_frames', {
         path: selectedVideoUrl,
         count: keyFrameCount
       }).catch(err => {
@@ -73,7 +71,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
       setProgress(70);
 
-      const thumbnail = await invoke<string>('generate_thumbnail', {
+      const thumbnail = await tauri.invoke<string>('generate_thumbnail', {
         path: selectedVideoUrl
       }).catch(err => {
         logger.error('生成缩略图失败:', { error: err });

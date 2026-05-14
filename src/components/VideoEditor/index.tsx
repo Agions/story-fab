@@ -1,7 +1,7 @@
 import { logger } from '../../shared/utils/logging';
 import React, { useState, useCallback, useEffect, memo } from 'react';
 import { Card } from '../ui/card';
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '../../core/tauri/TauriBridge';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { save } from '@tauri-apps/plugin-dialog';
@@ -77,7 +77,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
   useEffect(() => {
     return () => {
       if (previewUrl && previewUrl.includes('temp')) {
-        invoke('clean_temp_file', { path: previewUrl }).catch((e) => logger.error('clean_temp_file error:', { error: e }));
+        tauri.cleanTempFile(previewUrl).catch((e) => logger.error('clean_temp_file error:', { error: e }));
       }
     };
   }, [previewUrl]);
@@ -110,17 +110,12 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     setShowPreviewModal(true);
 
     try {
-      const tempPath = await invoke<string>('generate_preview', {
+      const tempPath = await tauri.generatePreview({
         inputPath: videoPath,
         segment: {
           start: segment.startTime,
           end: segment.endTime,
-          type: segment.type,
         },
-        transition: exportSettings.transitionType,
-        transitionDuration: exportSettings.transitionDuration,
-        volume: exportSettings.audioVolume / 100,
-        addSubtitles: exportSettings.useSubtitles,
       });
 
       const fileUrl = convertFileSrc(tempPath);
@@ -131,7 +126,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     } finally {
       setPreviewLoading(false);
     }
-  }, [videoPath, exportSettings]);
+  }, [videoPath]);
 
   // 关闭预览
   const handleClosePreview = useCallback(() => {
@@ -177,21 +172,13 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
         }
       );
 
-      await invoke('cut_video', {
+      await tauri.cutVideo({
         inputPath: videoPath,
         outputPath: savePath,
         segments: editedSegments.map(s => ({
           start: s.startTime,
           end: s.endTime,
-          type: s.type,
-          content: s.content,
         })),
-        quality: exportSettings.videoQuality,
-        format: exportSettings.exportFormat,
-        transition: exportSettings.transitionType,
-        transitionDuration: exportSettings.transitionDuration,
-        volume: exportSettings.audioVolume / 100,
-        addSubtitles: exportSettings.useSubtitles,
       });
 
       unlistenHandler();

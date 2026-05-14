@@ -1,5 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
-import { tauri } from '../core/tauri/TauriBridge';
+import { invoke, tauri } from '../core/tauri/TauriBridge';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, BaseDirectory, mkdir, exists } from '@tauri-apps/plugin-fs';
 import { load } from '@tauri-apps/plugin-store';
@@ -74,7 +73,7 @@ export const ensureAppDataDir = async (): Promise<void> => {
 
   // 优先使用 Rust 函数检查目录
   try {
-    const dirPath = await invoke<string>('check_app_data_directory');
+    const dirPath = await tauri.checkAppDataDir();
     logger.info('Rust目录检查成功', { dirPath });
     return;
   } catch (rustError) {
@@ -166,7 +165,7 @@ export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string
     try {
       // 优先使用 Rust 命令读取，避免前端 fs 插件权限/路径配置差异导致失败
       try {
-        const content = await invoke<string>('load_project_file', { projectId: candidateId });
+        const content = await tauri.loadProject(candidateId);
         return JSON.parse(content) as T;
       } catch (rustError) {
         lastError = rustError;
@@ -404,7 +403,7 @@ export const listProjects = async (): Promise<ProjectFileData[]> => {
   try {
     // 尝试使用 Rust 函数列出项目
     try {
-      const projects = await invoke<unknown[]>('list_project_files');
+      const projects = await tauri.listProjects();
       const normalized = (Array.isArray(projects) ? projects : [])
         .map(normalizeListedProject)
         .filter((item): item is ProjectFileData => item !== null);
@@ -420,7 +419,7 @@ export const listProjects = async (): Promise<ProjectFileData[]> => {
     // 确保应用数据目录存在
     await ensureAppDataDir();
     const appDir = 'cut_deck';
-    const files = await invoke<string[]>('list_app_data_files', { directory: appDir });
+      const files = await tauri.listAppDataFiles(appDir) as string[];
 
     if (!files || !Array.isArray(files) || files.length === 0) {
       return [];
@@ -472,7 +471,7 @@ export const getFileSizeBytes = async (path: string): Promise<number> => {
     return 0;
   }
   try {
-    const bytes = await invoke<number>('get_file_size', { path });
+    const bytes = await tauri.getFileSize(path);
     return Number.isFinite(bytes) ? bytes : 0;
   } catch (error) {
     logger.warn('获取文件大小失败', { path, error });
@@ -491,7 +490,7 @@ export const getFileSizeMb = async (path: string): Promise<number> => {
  */
 export async function checkFFmpeg(): Promise<{installed: boolean, version?: string}> {
   try {
-    const result = await invoke<{installed: boolean, version?: string}>('check_ffmpeg');
+    const result = await tauri.checkFFmpeg();
     return result;
   } catch (error) {
     logger.error('检查FFmpeg失败:', error);
@@ -528,15 +527,13 @@ export async function transcodeWithCrop(
     throw new Error('不支持的宽高比，仅支持 9:16、1:1、16:9');
   }
 
-  return invoke<string>('transcode_with_crop', {
-    input: {
-      inputPath,
-      outputPath,
-      aspect,
-      startTime: startTime ?? null,
-      endTime: endTime ?? null,
-      quality,
-    },
+  return tauri.transcodeWithCrop({
+    inputPath,
+    outputPath,
+    aspect,
+    startTime: startTime ?? null,
+    endTime: endTime ?? null,
+    quality,
   });
 }
 
