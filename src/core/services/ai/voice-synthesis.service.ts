@@ -6,8 +6,7 @@
  * 通过 @tauri-apps/api/core 的 invoke 调用 Rust 后端，
  * 不使用任何 Node.js / child_process API。
  */
-
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '../../tauri/TauriBridge';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../../../shared/utils/logging';
 
@@ -138,7 +137,7 @@ export class VoiceSynthesisService {
    */
   async listBackends(): Promise<TtsBackend[]> {
     try {
-      return await invoke<TtsBackend[]>('list_tts_backends');
+      return await tauri.listTTSBackends();
     } catch {
       return [];
     }
@@ -149,7 +148,7 @@ export class VoiceSynthesisService {
    */
   async checkAvailable(): Promise<boolean> {
     try {
-      return await invoke<boolean>('check_tts_available');
+      return await tauri.checkTTSAvailable();
     } catch {
       return false;
     }
@@ -216,7 +215,7 @@ export class VoiceSynthesisService {
         backend: config.backend,
       };
 
-      const output = await invoke<TauriSynthesizeOutput>('synthesize_speech', { input });
+      const outputPath = await tauri.synthesizeSpeech(input as unknown as Record<string, unknown>);
 
       onProgress?.({ stage: 'encoding', progress: 90, message: '编码完成...' });
       onProgress?.({ stage: 'done', progress: 100 });
@@ -224,14 +223,13 @@ export class VoiceSynthesisService {
       logger.info('[VoiceSynthesis] Synthesized:', {
         id,
         voice: config.voice,
-        duration: output.duration_secs,
         textLength: text.length,
       });
 
       return {
         id,
-        audioPath: output.audio_path,
-        duration: output.duration_secs,
+        audioPath: outputPath,
+        duration: 0,
         text,
         config,
       };

@@ -16,7 +16,7 @@ import type { CandidateClip } from '../../services/pipeline/clip-pipeline/clipSc
 import type { ASRSegment } from '../../services/asr/asr.service';
 import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
 import { logger } from '../../../shared/utils/logging';
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '../../../core/tauri/TauriBridge';
 
 // ============================================================
 // Step Metadata
@@ -128,10 +128,10 @@ export const buildCandidatesStep: Step<BuildCandidatesInput, BuildCandidatesOutp
 /** 调用 Rust detect_smart_segments 获取静音区间（秒） */
 async function fetchSilenceSegments(videoPath: string): Promise<Array<{ start: number; end: number }>> {
   try {
-    const result = await invoke<{ silence_segments?: Array<{ start: number; end: number }> }>(
-      'detect_smart_segments',
-      { video_path: videoPath, min_silence_duration_ms: 500, threshold_db: -40 },
-    );
+    const result = await tauri.detectSmartSegments(videoPath, {
+      min_silence_duration_ms: 500,
+      threshold_db: -40,
+    }) as { silence_segments?: Array<{ start: number; end: number }> };
     return result.silence_segments ?? [];
   } catch {
     logger.debug('[BuildCandidatesStep] detect_smart_segments 不可用，返回空静音段');

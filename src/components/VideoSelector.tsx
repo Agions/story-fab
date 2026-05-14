@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Upload, Trash2, PlayCircle, Play } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
-import { invoke, convertFileSrc } from '@tauri-apps/api/core';
+import { convertFileSrc } from '@tauri-apps/api/core';
+import { tauri } from '@/core/tauri/TauriBridge';
 import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
 import { notify } from '@/shared';
 import { VIDEO_FORMATS } from '@/constants';
@@ -212,7 +213,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
 
     if (isTauri()) {
       try {
-        await invoke('open_file', { path: videoPath });
+        await tauri.openFile(videoPath);
       } catch (error) {
         logger.error('打开视频失败:', { error });
         notify.error(error, '无法打开视频，请确保系统有关联的视频播放器');

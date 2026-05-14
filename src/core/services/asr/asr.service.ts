@@ -6,7 +6,6 @@
 import { BaseService, ServiceError } from '../providers/base.service';
 import { logger } from '../../../shared/utils/logging';
 import { tauri } from '../../tauri/TauriBridge';
-import { invoke } from '@tauri-apps/api/core';
 import type { VideoInfo } from '@/core/types';
 
 // ============================================
@@ -265,16 +264,9 @@ export class ASRService extends BaseService {
       }
 
       // 调用 Rust ZCR 爆裂检测（过零率 → 音频能量指标）
-      const bursts = await invoke<Array<{ start_ms: number; end_ms: number; score: number }>>(
-        'detect_zcr_bursts',
-        {
-          input: {
-            audio_path: videoInfo.path,
-            window_ms: 50,
-            zcr_threshold_mult: 2.5,
-          },
-        }
-      );
+      const bursts = await tauri.detectZCRBursts(videoInfo.path, {
+        threshold: 2.5,
+      });
 
       // 将 ZCR burst 转换为峰值格式
       // score > 1 表示超过阈值（爆裂区域）；score 本身即为强度
@@ -383,11 +375,11 @@ export class ASRService extends BaseService {
         language: opts.language,
       });
 
-      const whisperResult = await invoke<RustWhisperResult>('transcribe_audio', {
-        audioPath: videoInfo.path,
-        model: 'base',
-        language: opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : null,
-      });
+      const whisperResult = await tauri.transcribeAudio(
+        videoInfo.path,
+        'base',
+        opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : undefined,
+      );
 
       if (!whisperResult || !whisperResult.segments || whisperResult.segments.length === 0) {
         logger.warn('[ASRService] Rust Whisper 返回空结果');
