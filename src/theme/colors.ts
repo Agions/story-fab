@@ -2,26 +2,17 @@
  * cut_deck 统一色彩系统 - TypeScript
  *
  * 基于 globals.css OKLCH 语义化分层（设计系统入口）
- * 提供 Ant Design 5 兼容的 Design Token
  *
  * 使用方式：
  *   import { colors } from '@/theme';
- *   // antdTokens: Ant Design 5 token 兼容层（antd 已移除，仅作参考）
  *
- * 收敛说明：
  * 架构说明：
  * - globals.css :root {} — 运行时 CSS 入口（main.tsx 已导入）
- * - colors.ts（TypeScript）— OKLCH 原始值 + antdTokens 兼容层
+ * - colors.ts（TypeScript）— OKLCH 原始值
  * - variables.less — 被 _mixins.less 引用，编译时使用
  * - design-system.css — 已删除（从未作为 CSS 加载）
  * - _film-variables.less — 已删除（从未被 @import）
  */
-
-// ThemeConfig type — previously from antd, now minimal for token shape compatibility
-type ThemeConfig = {
-  token?: Record<string, unknown>;
-  components?: Record<string, Record<string, unknown>>;
-};
 
 // =============================================
 // 🎨 色彩 Token（OKLCH 语义化分层）
@@ -96,62 +87,6 @@ export const colors = {
   glassBorder: 'oklch(100% 0 0 / 0.1)',
   glassBlur: 'blur(10px)',
 } as const;
-
-// =============================================
-// Ant Design 5 Design Token
-// =============================================
-
-export const antdTokens: ThemeConfig['token'] = {
-  // 色彩
-  colorPrimary: '#d4a574',           // 琥珀色 (film-amber) - 主要品牌色
-  colorSuccess: '#10b981',            // neon-green
-  colorWarning: '#f97316',             // neon-orange
-  colorError: '#f43f5e',              // accent-pink
-  colorInfo: '#3b82f6',               // accent-blue
-
-  // 文字
-  colorText: 'oklch(70% 0.02 70)',
-  colorTextSecondary: 'oklch(55% 0.02 70)',
-  colorTextTertiary: 'oklch(45% 0.01 70)',
-  colorTextQuaternary: 'oklch(35% 0.01 70)',
-
-  // 背景
-  colorBgBase: 'oklch(10% 0.02 70)',
-  colorBgContainer: 'oklch(14% 0.02 70)',
-  colorBgElevated: 'oklch(22% 0.02 70)',
-  colorBgLayout: 'oklch(8% 0.02 70)',
-  colorBgSpotlight: 'oklch(26% 0.02 70)',
-
-  // 边框
-  colorBorder: 'oklch(25% 0.02 70)',
-  colorBorderSecondary: 'oklch(20% 0.02 70)',
-
-  // 圆角
-  borderRadius: 8,
-  borderRadiusLG: 12,
-  borderRadiusSM: 4,
-
-  // 字体
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Noto Sans SC', Roboto, sans-serif",
-  fontFamilyCode: "'JetBrains Mono', 'Fira Code', monospace",
-  fontSize: 14,
-
-  // 间距
-  padding: 16,
-  paddingLG: 24,
-  paddingSM: 12,
-  paddingXS: 8,
-
-  // 阴影
-  boxShadow: `
-    0 1px 2px oklch(0% 0 0 / 0.3),
-    0 2px 4px oklch(0% 0 0 / 0.2)
-  `,
-  boxShadowSecondary: `
-    0 4px 8px oklch(0% 0 0 / 0.4),
-    0 2px 6px oklch(0% 0 0 / 0.3)
-  `,
-};
 
 // =============================================
 // 工具函数
