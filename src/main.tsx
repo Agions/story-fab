@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import 'antd/dist/reset.css';
 import './styles/globals.css';
 
 // 防止控制台出现错误消息
