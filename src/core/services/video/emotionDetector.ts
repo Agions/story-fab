@@ -81,6 +81,7 @@ export async function detectEmotionPeaks(
       }));
 
     // Merge ZCR bursts — they're sharp sudden events, boost energy for overlaps
+    if (!zcrBursts) return { peaks };
     for (const burst of zcrBursts) {
       // Only keep bursts with score > 1.2 (significant bursts)
       if (burst.score < 1.2) continue;

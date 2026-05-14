@@ -2,10 +2,21 @@
  * 日志工具
  * 统一的日志记录
  */
+/// <reference types="vite/client" />
+
+export {}; // make this file a module so ImportMeta global augmentation applies
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-const isDev = import.meta.env.MODE !== 'production';
+// Vite injects DEV as a boolean constant — no import.meta access needed at type-check time
+const isDev = (() => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (import.meta as any).env?.DEV ?? true;
+  } catch {
+    return true;
+  }
+})();
 
 const shouldLog = (level: LogLevel): boolean => {
   if (isDev) return true;
