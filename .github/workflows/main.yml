@@ -302,10 +302,10 @@ jobs:
         run: ls -la reports/
       - name: Run code quality dashboard
         run: |
-          if [ -f scripts/code-review-dashboard.ts ]; then
-            pnpm exec ts-node scripts/code-review-dashboard.ts --json
+          if [ -f scripts/code-review-dashboard.mjs ]; then
+            node scripts/code-review-dashboard.mjs --json
           else
-            echo "code-review-dashboard.ts not found, skipping dashboard generation"
+            echo "code-review-dashboard.mjs not found, skipping dashboard generation"
           fi
       - name: Upload all reports
         if: always()
