@@ -213,11 +213,11 @@ export const tauri = {
   async detectZCRBursts(
     videoPath: string,
     options: { threshold?: number; minDurationMs?: number; topN?: number } = {},
-  ) {
+  ): Promise<Array<{ start_ms: number; end_ms: number; score: number }>> {
     return invoke(TauriCommand.DETECT_ZCR_BURSTS, {
       video_path: videoPath,
       ...options,
-    });
+    }) as Promise<Array<{ start_ms: number; end_ms: number; score: number }>>;
   },
 
   /** 智能分段（场景检测 + 语义） */

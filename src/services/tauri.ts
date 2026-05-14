@@ -531,8 +531,8 @@ export async function transcodeWithCrop(
     inputPath,
     outputPath,
     aspect,
-    startTime: startTime ?? null,
-    endTime: endTime ?? null,
+    startTime: startTime ?? undefined,
+    endTime: endTime ?? undefined,
     quality,
   });
 }

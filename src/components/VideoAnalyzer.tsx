@@ -53,7 +53,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
       setProgress(10);
 
-      const videoMetadata = await tauri.analyzeVideo(selectedVideoUrl).catch(err => {
+      const videoMetadata = await (tauri.analyzeVideo(selectedVideoUrl) as Promise<AnalyzeVideoResult>).catch(err => {
         logger.error('视频分析失败:', { error: err });
         throw new Error(`视频分析失败: ${err}`);
       });
@@ -61,22 +61,22 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       setProgress(40);
 
       const keyFrameCount = Math.min(5, Math.ceil(videoMetadata.duration / 60));
-      const keyFrames = await invoke<string[]>('extract_key_frames', {
+      const keyFrames = (await invoke('extract_key_frames' as TauriCommand, {
         path: selectedVideoUrl,
         count: keyFrameCount
       }).catch(err => {
         logger.error('提取关键帧失败:', { error: err });
-        return [] as string[];
-      });
+        return [];
+      })) as string[];
 
       setProgress(70);
 
-      const thumbnail = await invoke<string>('generate_thumbnail', {
+      const thumbnail = (await invoke('generate_thumbnail' as TauriCommand, {
         path: selectedVideoUrl
       }).catch(err => {
         logger.error('生成缩略图失败:', { error: err });
         return '';
-      });
+      })) as string;
 
       const keyMoments: KeyMoment[] = [];
       const emotions: Emotion[] = [];
