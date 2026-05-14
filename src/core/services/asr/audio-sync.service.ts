@@ -2,7 +2,7 @@
  * 音画同步服务
  * 提供专业的音视频同步功能
  */
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
 
 
@@ -202,7 +202,7 @@ export class AudioVideoSyncService {
   }
 
   private async ffprobeOutput(args: string[]): Promise<string> {
-    return await invoke<string>('run_ffprobe', { args });
+    return await tauri.runFfprobe(args);
   }
 
   /**

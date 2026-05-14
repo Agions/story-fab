@@ -4,7 +4,7 @@
  * 笑声/掌声/情绪高潮片段得额外加分
  */
 
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '../../../core/tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
 
 /** ZCR burst entry from Rust backend */
@@ -60,24 +60,16 @@ export async function detectEmotionPeaks(
   options: { threshold?: number; minDurationMs?: number } = {}
 ): Promise<EmoPeakResult> {
   try {
-    const highlights = await invoke<RustHighlightSegment[]>('detect_highlights', {
-      input: {
-        video_path: videoPath,
-        threshold: options.threshold ?? 1.5,
-        min_duration_ms: options.minDurationMs ?? 500,
-        top_n: 20,
-        detect_scene: false,
-      },
-    });
+    const highlights = (await tauri.detectHighlights(videoPath, {
+      threshold: options.threshold ?? 1.5,
+      minDurationMs: options.minDurationMs ?? 500,
+      topN: 20,
+    })) as RustHighlightSegment[];
 
     // Also get ZCR burst segments for sharp audio events (applause, laughter)
-    const zcrBursts = await invoke<ZCRBurst[]>('detect_zcr_bursts', {
-      input: {
-        audio_path: videoPath,
-        window_ms: 50,
-        zcr_threshold_mult: 2.5,
-      },
-    }).catch(() => [] as ZCRBurst[]);
+    const zcrBursts = (await tauri.detectZCRBursts(videoPath, {
+      threshold: 2.5,
+    }).catch(() => null)) as ZCRBurst[] | null;
 
     const peaks: EmoPeak[] = highlights
       .filter((h) => h.reason === 'audio_energy' && h.audioScore != null)
