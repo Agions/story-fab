@@ -3,22 +3,19 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import { ToastProvider } from '@/components/ui/toast';
 
-// App Provider Props
 interface AppProviderProps {
   children: ReactNode;
 }
 
 /**
- * cut_deck Design System — antd removed
- * Theme tokens are now in globals.css CSS variables
- * Component-level antd theming has been removed
+ * cut_deck Design System
+ * Theme tokens are in globals.css CSS variables
  * Dark mode is handled via Tailwind .dark class on <html>
  */
 
 /**
  * 应用根Provider组件
  * 包含所有需要的Context Provider
- * antd ConfigProvider 已移除（theme tokens 在 globals.css）
  * Dark mode 通过 Tailwind .dark class on <html> 由 ThemeProvider 处理
  */
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
