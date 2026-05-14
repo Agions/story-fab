@@ -25,7 +25,7 @@ import {
   CheckCircle,
   Download,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/core';
+import { tauri, TauriCommand } from '@/core/tauri/TauriBridge';
 import { motion } from '../../common/motion-shim';
 import { ClipRepurposingPipeline } from '../../../core/services/pipeline/clip-pipeline/pipeline';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
@@ -163,7 +163,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
     const clipsToExport = results.filter(c => c.clip.id !== undefined && selectedClips.has(c.clip.id));
 
     // 动态获取导出目录
-    const exportDir = await invoke<string>('get_export_dir').catch(() => '/tmp/cut_deck');
+    const exportDir = await tauri.getExportDir().catch(() => '/tmp/cut_deck');
 
     try {
       for (const clip of clipsToExport) {
