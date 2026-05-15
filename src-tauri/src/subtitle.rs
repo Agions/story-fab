@@ -325,13 +325,13 @@ def normalize_text(text, segment_duration_ms=0):
     for chain in four_char_chains:
         text = re.sub(rf'{re.escape(chain)}{re.escape(chain)}?', r'。', text)
 
-    # ── 3. 3-char emotional fillers → preserve 2 + period ───────────────────
-    # "啊啊啊" → "啊啊。" (preserve emotional weight, add proper sentence end)
-    # "嗯嗯嗯" → "嗯嗯。" | "呃呃呃" → "呃呃。"  
-    # But avoid "好好好" type cases where it could be genuine repetition
+    // ── 3. 3-char emotional fillers → preserve 2 + period ───────────────────
+    // "啊啊啊" → "啊啊。" (preserve emotional weight, add proper sentence end)
+    // "嗯嗯嗯" → "嗯嗯。" | "呃呃呃" → "呃呃。"
+    // But avoid "好好好" type cases where it could be genuine repetition
     text = re.sub(r'^(.{1,2})(\1{2,})$', r'\1\1。', text)
-    # For 3-char repeats in body, keep 2 and end with punctuation if between sentences
-    text = re.sub(r'([啊呢哦呀嘛])(\1{2,})', lambda m: m.group(1) * 2 + '。', text)
+    // For 3-char repeats in body, keep 2 and end with punctuation if between sentences
+    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{2,})', lambda m: m.group(1) * 2 + '。', text)
 
     # ── 4. Remove common fillers (with word-boundary protection) ───────────────
     # Order: longest patterns first to avoid partial matches
