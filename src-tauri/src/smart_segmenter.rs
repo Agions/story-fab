@@ -263,7 +263,7 @@ impl SmartSegmenter {
                 "-i", video_path,
                 "-vn",
                 "-acodec", "pcm_s16le",
-                "-ar", "44100",
+                "-ar", "16000",
                 "-ac", "1",
                 &temp_audio.to_string_lossy(),
             ])
@@ -278,7 +278,7 @@ impl SmartSegmenter {
     }
 
     fn compute_energy_profile(&self, audio_path: &str, window_ms: u64) -> Result<Vec<(u64, f32)>, String> {
-        let sample_rate = 44100u32;
+        let sample_rate = 16000u32;
         let window_samples = (window_ms as f64 * sample_rate as f64 / 1000.0) as usize;
 
         // Extract PCM
