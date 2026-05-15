@@ -109,21 +109,37 @@ const allocateSegmentsToScenes = (
   if (!sortedScenes.length) return segments;
 
   const sceneCount = sortedScenes.length;
-  const segmentCount = segments.length;
+  const totalDuration = segments.reduce((sum, s) => sum + (s.endTime - s.startTime), 0);
+  if (totalDuration <= 0) return segments;
+
+  // ── Build cumulative timeline from segments ───────────────────────────────
+  // cumulativeEnd[i] = end time of segment i relative to video start
+  const cumulativeEnd: number[] = [];
+  let acc = 0;
+  for (const seg of segments) {
+    acc += seg.endTime - seg.startTime;
+    cumulativeEnd.push(acc);
+  }
+  const videoEnd = acc;
 
   return segments.map((segment, index) => {
+    // Proportional position in total video: [0, 1]
+    const segMid = segment.startTime + (segment.endTime - segment.startTime) / 2;
+    const videoPosition = videoEnd > 0 ? segMid / videoEnd : index / segments.length;
+
+    // Map to scene timeline
     const sceneIndex = Math.min(
       sceneCount - 1,
-      Math.floor((index / Math.max(segmentCount - 1, 1)) * (sceneCount - 1))
+      Math.floor(videoPosition * sceneCount)
     );
     const scene = sortedScenes[sceneIndex];
-    const baseStart = scene.startTime;
-    const baseEnd = scene.endTime;
+    const sceneDuration = Math.max(scene.endTime - scene.startTime, 0.1);
+    const segDuration = segment.endTime - segment.startTime;
 
     if (mode === 'ai-mixclip') {
-      const sceneDuration = Math.max(baseEnd - baseStart, 0.4);
-      const focusDuration = Math.min(sceneDuration, Math.max(sceneDuration * 0.7, 0.8));
-      const center = (baseStart + baseEnd) / 2;
+      // Focus on scene center, sized to segment
+      const focusDuration = Math.min(sceneDuration, Math.max(segDuration, sceneDuration * 0.6));
+      const center = (scene.startTime + scene.endTime) / 2;
       return {
         ...segment,
         startTime: Math.max(0, center - focusDuration / 2),
@@ -131,10 +147,12 @@ const allocateSegmentsToScenes = (
       };
     }
 
+    // Precise proportional mapping: fit segment within scene proportionally
+    const clampedDuration = Math.min(segDuration, sceneDuration);
     return {
       ...segment,
-      startTime: baseStart,
-      endTime: baseEnd,
+      startTime: scene.startTime,
+      endTime: scene.startTime + clampedDuration,
     };
   });
 };
