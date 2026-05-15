@@ -16,10 +16,22 @@ use tauri::Emitter;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct WhisperWord {
+    pub word: String,
+    pub start_ms: u64,
+    pub end_ms: u64,
+    pub probability: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubtitleSegment {
     pub start_ms: u64,
     pub end_ms: u64,
     pub text: String,
+    pub probability: Option<f32>,
+    #[serde(default)]
+    pub words: Vec<WhisperWord>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -399,10 +411,21 @@ def normalize_text(text, segment_duration_ms=0):
     return text
 
 for seg in segments:
+    # ── Per-segment confidence from word-level average ────────────────────────
+    seg_words = getattr(seg, 'words', []) or []
+    if seg_words:
+        seg_prob = sum(w.probability for w in seg_words) / len(seg_words)
+    else:
+        seg_prob = 0.95  # fallback when no word-level data
     result["segments"].append({
         "start_ms": int(seg.start * 1000),
         "end_ms": int(seg.end * 1000),
-        "text": normalize_text(seg.text)
+        "text": normalize_text(seg.text),
+        "words": [
+            {"word": w.word, "start_ms": int(w.start * 1000), "end_ms": int(w.end * 1000), "probability": w.probability}
+            for w in seg_words
+        ] if seg_words else [],
+        "probability": round(seg_prob, 4),
     })
 
 print(json.dumps(result, ensure_ascii=False))
