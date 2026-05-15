@@ -98,6 +98,7 @@ pub fn pcm_samples_from_wav(pcm_data: &[u8]) -> Vec<f32> {
 
     data
         .chunks(2)
+        .filter(|chunk| chunk.len() == 2)  // drop trailing partial chunk if odd byte count
         .map(|chunk| {
             let s16 = i16::from_le_bytes([chunk[0], chunk[1]]);
             s16 as f32 / 32768.0
