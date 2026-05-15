@@ -170,6 +170,8 @@ export interface SubtitleEntry {
   text: string;
   language?: string;
   confidence?: number;
+  /** 字幕质量等级：high（置信度>0.85）/ medium（>0.6）/ low */
+  quality?: 'high' | 'medium' | 'low';
 }
 
 export interface Subtitle {

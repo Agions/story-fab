@@ -124,6 +124,8 @@ export interface ASRFullResult {
 export interface ASROptions {
   /** 识别语言，默认为中文 */
   language?: 'zh_cn' | 'en_us' | 'ja_jp' | 'ko_kr';
+  /** Whisper 模型大小，默认 base；高精度场景可选 large-v3 */
+  model?: 'tiny' | 'base' | 'small' | 'medium' | 'large-v2' | 'large-v3';
   /** 是否启用时间戳 */
   enableTimestamp?: boolean;
   /** 是否启用标点 */
@@ -136,18 +138,11 @@ export interface ASROptions {
 
 const DEFAULT_ASR_OPTIONS: Required<ASROptions> = {
   language: 'zh_cn',
+  model: 'base',
   enableTimestamp: true,
   enablePunctuation: true,
   sampleRate: 16000,
   channels: 1,
-};
-
-// 语言代码映射
-const LANGUAGE_MAP: Record<string, string> = {
-  'zh_cn': 'Mandarin',
-  'en_us': 'English',
-  'ja_jp': ' Japanese',
-  'ko_kr': ' Korean',
 };
 
 // ============================================
@@ -387,7 +382,7 @@ export class ASRService extends BaseService {
 
       const whisperResult = await tauri.transcribeAudio(
         videoInfo.path,
-        'base',
+        opts.model,
         opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : undefined,
       );
 
