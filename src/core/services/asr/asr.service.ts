@@ -420,7 +420,7 @@ export class ASRService extends BaseService {
         text: segments.map(s => s.text).join(' '),
         segments,
         language: opts.language,
-        confidence: whisperResult.language_probability ?? 0.9,
+        confidence: whisperResult.language_probability ?? 0.9, // 用于整体识别质量评估
         fullResult: opts.enableTimestamp
           ? segments.map(s => ({
               start: s.startTime,
