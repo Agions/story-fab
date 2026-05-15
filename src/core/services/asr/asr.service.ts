@@ -272,14 +272,14 @@ export class ASRService extends BaseService {
       // score > 1 表示超过阈值（爆裂区域）；score 本身即为强度
       const peaks: Array<{ timestamp: number; intensity: number }> = [];
       for (const burst of bursts) {
-        // 用 burst 中间的 timestamp 作为峰值时间点
+        // burst.start_ms / end_ms 单位：毫秒（来自 Rust ZCR）
         const midMs = (burst.start_ms + burst.end_ms) / 2;
         // intensity = 归一化 score（最小为 1），转为 0~1 范围
         const intensity = Math.min((burst.score - 1) / (burst.score + 0.001), 1);
+        // minInterval 传进来时已经是毫秒，直接比较
         if (intensity >= (threshold - 0.3)) {
-          // 应用 minInterval 过滤（minInterval 单位是 ms）
           const lastPeak = peaks[peaks.length - 1];
-          if (!lastPeak || midMs - lastPeak.timestamp * 1000 >= minInterval) {
+          if (!lastPeak || midMs - lastPeak.timestamp >= minInterval) {
             peaks.push({ timestamp: midMs / 1000, intensity });
           }
         }
