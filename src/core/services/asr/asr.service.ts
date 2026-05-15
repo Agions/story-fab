@@ -279,7 +279,8 @@ export class ASRService extends BaseService {
         // minInterval 传进来时已经是毫秒，直接比较
         if (intensity >= (threshold - 0.3)) {
           const lastPeak = peaks[peaks.length - 1];
-          if (!lastPeak || midMs - lastPeak.timestamp >= minInterval) {
+          // midMs: ms, lastPeak.timestamp: 秒 → 转 ms 再比较, minInterval: ms
+          if (!lastPeak || midMs - lastPeak.timestamp * 1000 >= minInterval) {
             peaks.push({ timestamp: midMs / 1000, intensity });
           }
         }
@@ -392,7 +393,7 @@ export class ASRService extends BaseService {
           startTime: seg.start_ms / 1000,
           endTime: seg.end_ms / 1000,
           text: seg.text.trim(),
-          confidence: whisperResult.language_probability ?? 0.9,
+          confidence: 0.95,
         }),
       );
 
