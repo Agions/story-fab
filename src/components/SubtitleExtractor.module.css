@@ -256,6 +256,12 @@
   font-weight: 500;
 }
 
+.textLowQuality {
+  text-decoration: underline;
+  text-decoration-color: #ef4444;
+  text-underline-offset: 3px;
+}
+
 .editInput {
   font-size: 13px;
 }
