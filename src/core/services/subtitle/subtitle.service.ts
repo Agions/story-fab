@@ -287,27 +287,45 @@ export class SubtitleService {
         confidence: segment.confidence,
       }));
 
-      // ── 片段合并：合并时长 < 0.5s 的过短片段（人眼不可阅读）───────────
+      // ── 片段合并：合并时长 < 0.5s 的过短片段，同时保护句子边界 ───────────
       const MIN_SUBTITLE_DURATION = 0.5; // 秒
+      // 句子结尾标点（跨语言）：句子已以此结尾则不跨句合并
+      const SENTENCE_END_CHARS = new Set(['。', '！', '？', '…', '．', '!', '?', '～']);
       const merged = entries.reduce<SubtitleEntry[]>((acc, entry) => {
         const duration = entry.endTime - entry.startTime;
         if (duration < MIN_SUBTITLE_DURATION && acc.length > 0) {
-          // 合并到上一个片段
           const prev = acc[acc.length - 1];
-          prev.text = prev.text + (prev.text ? ' ' : '') + entry.text;
-          prev.endTime = entry.endTime;
-          prev.confidence = Math.min(prev.confidence ?? 1, entry.confidence ?? 1);
+          const prevEndsWithSentence = prev.text.length > 0 && SENTENCE_END_CHARS.has(prev.text[prev.text.length - 1]);
+          // 若前段已以句子标点结尾，不再跨句合并，保护语义完整性
+          if (!prevEndsWithSentence) {
+            prev.text = prev.text + (prev.text ? ' ' : '') + entry.text;
+            prev.endTime = entry.endTime;
+            prev.confidence = Math.min(prev.confidence ?? 1, entry.confidence ?? 1);
+          } else {
+            acc.push({ ...entry });
+          }
         } else {
           acc.push({ ...entry });
         }
         return acc;
       }, []);
 
-      let finalEntries = merged;
+      // ── 字幕质量分级：基于置信度计算质量等级 ─────────────────────
+      const HIGH_THRESHOLD = 0.85;
+      const LOW_THRESHOLD = 0.6;
+      const calcQuality = (confidence: number | undefined): 'high' | 'medium' | 'low' => {
+        if (confidence === undefined) return 'medium';
+        if (confidence >= HIGH_THRESHOLD) return 'high';
+        if (confidence < LOW_THRESHOLD) return 'low';
+        return 'medium';
+      };
+      const withQuality = merged.map(e => ({ ...e, quality: calcQuality(e.confidence) }));
+
+      let finalEntries = withQuality;
       if (maxDuration && entries.length > 0) {
         const lastValidIndex = entries.findIndex(e => e.endTime > maxDuration);
         if (lastValidIndex > 0) {
-          finalEntries = entries.slice(0, lastValidIndex);
+          finalEntries = withQuality.slice(0, lastValidIndex);
         }
       }
 
