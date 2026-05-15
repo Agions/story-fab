@@ -281,42 +281,24 @@ impl SmartSegmenter {
         let sample_rate = 16000u32;
         let window_samples = (window_ms as f64 * sample_rate as f64 / 1000.0) as usize;
 
-        // Extract PCM
-        let pcm_data = match self.extract_pcm(audio_path) {
+        // Read WAV PCM directly — no second FFmpeg pass needed
+        let pcm_data = match std::fs::read(audio_path) {
             Ok(d) => d,
-            Err(e) => return Err(e),
+            Err(e) => return Err(format!("Failed to read audio file '{}': {}", audio_path, e)),
         };
 
+        let samples = pcm_samples_from_wav(&pcm_data);
         let mut energies = Vec::new();
         let hop = window_samples;
 
-        for i in (0..pcm_data.len().saturating_sub(window_samples)).step_by(hop) {
-            let window = &pcm_data[i..i + window_samples];
+        for i in (0..samples.len().saturating_sub(window_samples)).step_by(hop) {
+            let window = &samples[i..i + window_samples];
             let energy: f32 = window.iter().map(|&s| s * s).sum::<f32>() / window_samples as f32;
             let time_ms = (i as f32 * 1000.0 / sample_rate as f32) as u64;
             energies.push((time_ms, energy));
         }
 
         Ok(energies)
-    }
-
-    fn extract_pcm(&self, audio_path: &str) -> Result<Vec<f32>, String> {
-        let pcm_data = Command::new(&self.ffmpeg_path)
-            .args(&[
-                "-y",
-                "-i", audio_path,
-                "-f", "s16le",
-                "-acodec", "pcm_s16le",
-                "-",
-            ])
-            .output()
-            .map_err(|e| format!("FFmpeg failed: {}", e))?;
-
-        if !pcm_data.status.success() {
-            return Err(cmd_err("FFmpeg failed", &pcm_data));
-        }
-
-        Ok(pcm_samples_from_wav(&pcm_data.stdout))
     }
 
     fn segment_by_energy(&self, energy_data: Vec<(u64, f32)>, min_duration_ms: u64, max_duration_ms: u64) -> Vec<(u64, u64)> {
