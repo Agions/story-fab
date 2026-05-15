@@ -4,7 +4,7 @@
 
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time, write_concat_file};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
