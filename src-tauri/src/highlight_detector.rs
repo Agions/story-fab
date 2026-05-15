@@ -71,8 +71,17 @@ impl HighlightSegment {
         self.end_ms = self.end_ms.max(other.end_ms);
         self.score = (self.score + other.score) / 2.0;
         self.reason = "combined".into();
-        self.audio_score = Some((self.audio_score.unwrap_or(other.score) + other.audio_score.unwrap_or(0.0)) / 2.0);
-        self.scene_score = Some((self.scene_score.unwrap_or(other.score) + other.scene_score.unwrap_or(0.0)) / 2.0);
+        // Correct averaging: only average when both have values, otherwise use the available one
+        self.audio_score = match (self.audio_score, other.audio_score) {
+            (Some(a), Some(b)) => Some((a + b) / 2.0),
+            (Some(a), None) | (None, Some(a)) => Some(a),
+            (None, None) => None,
+        };
+        self.scene_score = match (self.scene_score, other.scene_score) {
+            (Some(a), Some(b)) => Some((a + b) / 2.0),
+            (Some(a), None) | (None, Some(a)) => Some(a),
+            (None, None) => None,
+        };
     }
 }
 
