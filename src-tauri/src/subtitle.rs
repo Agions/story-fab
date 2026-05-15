@@ -13,7 +13,6 @@ use tauri::Emitter;
 // ============================================
 // Types
 // ============================================
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WhisperWord {
@@ -22,6 +21,7 @@ pub struct WhisperWord {
     pub end_ms: u64,
     pub probability: f32,
 }
+
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -259,7 +259,7 @@ import sys
 import json
 from faster_whisper import WhisperModel
 
-model_size = "{model}"
+model_size = "{{model}}"
 device = "cpu"
 compute_type = "int8"
 
@@ -276,7 +276,7 @@ except ImportError:
 model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
 segments, info = model.transcribe(
-    "{audio}",
+    "{{audio}}",
     language={lang_arg},
     word_timestamps=True,
     vad_filter=True,
@@ -325,7 +325,7 @@ def normalize_text(text, segment_duration_ms=0):
     # ── 1. Collapse repeated punctuation (≥3 → keep 2, keeps emotional weight) ──
     # e.g. "好！！" → "好！", "啊？？？" → "啊？"
     # Also handles 4+ repeats for both punctuation and emotional chars
-    text = re.sub(r'([。！？，、；：a-zA-Z])\1{2,}', r'\1\1', text)
+    text = re.sub(r'([。！？，、；：a-zA-Z])\1{{2,}}', r'\1\1', text)
 
     # ── 2. 4-char filler chain → single occurrence with proper ending ──────────
     # "然后然后然后然后" → "然后。"  |  "那个那个那个" → "那个。"
@@ -341,9 +341,9 @@ def normalize_text(text, segment_duration_ms=0):
     # "啊啊啊" → "啊啊。" (preserve emotional weight, add proper sentence end)
     # "嗯嗯嗯" → "嗯嗯。" | "呃呃呃" → "呃呃。"
     # But avoid "好好好" type cases where it could be genuine repetition
-    text = re.sub(r'^(.{1,2})(\1{2,})$', r'\1\1。', text)
+    text = re.sub(r'^(.{1,2})(\1{{2,}})$', r'\1\1。', text)
     # For 3-char repeats in body, keep 2 and end with punctuation if between sentences
-    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{2,})', lambda m: m.group(1) * 2 + '。', text)
+    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{{2,}})', lambda m: m.group(1) * 2 + '。', text)
 
     # ── 4. Remove common fillers (with word-boundary protection) ───────────────
     # Order: longest patterns first to avoid partial matches
@@ -363,8 +363,8 @@ def normalize_text(text, segment_duration_ms=0):
     # "，,。" → "。" | "。。。" → "。"
     text = re.sub(r'[，。．,]+([。.])', r'\1', text)
     text = re.sub(r'[。]{3,}', '。', text)
-    text = re.sub(r'[？]{2,}', '？', text)
-    text = re.sub(r'[！]{2,}', '！', text)
+    text = re.sub(r'[？]{{2,}}', '？', text)
+    text = re.sub(r'[！]{{2,}}', '！', text)
 
     # ── 7. Punctuation restoration (反提标点) ─────────────────────────────────
     # Whisper commonly strips punctuation. Detect sentences missing final punct.
@@ -411,10 +411,21 @@ def normalize_text(text, segment_duration_ms=0):
     return text
 
 for seg in segments:
+    # ── Per-segment confidence from word-level average ────────────────────────
+    seg_words = getattr(seg, 'words', []) or []
+    if seg_words:
+        seg_prob = sum(w.probability for w in seg_words) / len(seg_words)
+    else:
+        seg_prob = 0.95  # fallback when no word-level data
     result["segments"].append({
         "start_ms": int(seg.start * 1000),
         "end_ms": int(seg.end * 1000),
-        "text": normalize_text(seg.text)
+        "text": normalize_text(seg.text),
+        "words": [
+            {"word": w.word, "start_ms": int(w.start * 1000), "end_ms": int(w.end * 1000), "probability": w.probability}
+            for w in seg_words
+        ] if seg_words else [],
+        "probability": round(seg_prob, 4),
     })
 
 print(json.dumps(result, ensure_ascii=False))
