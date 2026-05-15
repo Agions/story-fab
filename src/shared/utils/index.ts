@@ -323,8 +323,9 @@ export async function concurrentMap<T, R>(
   let index = 0;
   const workers = Array.from({ length: Math.min(limit, items.length) }, () =>
     (async () => {
-      while (index < items.length) {
-        const i = index++;
+      while (true) {
+        const i = index++;  // atomic post-increment in JS is thread-safe for shared memory
+        if (i >= items.length) break;
         results[i] = await fn(items[i]);
       }
     })()
