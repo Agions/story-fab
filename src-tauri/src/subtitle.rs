@@ -335,7 +335,7 @@ def normalize_text(text, segment_duration_ms=0):
         '其实呃', '就是呃', '就是说呃',
     ]
     for chain in four_char_chains:
-        text = re.sub(rf'{re.escape(chain)}{re.escape(chain)}?', r'。', text)
+        text = re.sub(rf'{{{re.escape(chain)}{{{re.escape(chain)}?', r'。', text)
 
     # ── 3. 3-char emotional fillers → preserve 2 + period ───────────────────
     # "啊啊啊" → "啊啊。" (preserve emotional weight, add proper sentence end)
