@@ -45,10 +45,19 @@ interface SpeechRecognitionCtor {
 }
 
 // Rust Whisper ASR 响应类型（来自 src-tauri/src/asr.rs）
+interface RustWhisperWord {
+  word: string;
+  start_ms: number;
+  end_ms: number;
+  probability: number;
+}
+
 interface RustWhisperSegment {
   start_ms: number;
   end_ms: number;
   text: string;
+  probability?: number;
+  words?: RustWhisperWord[];
 }
 
 interface RustWhisperResult {
@@ -393,7 +402,13 @@ export class ASRService extends BaseService {
           startTime: seg.start_ms / 1000,
           endTime: seg.end_ms / 1000,
           text: seg.text.trim(),
-          confidence: 0.95,
+          confidence: seg.probability ?? 0.95,
+          words: seg.words?.map(w => ({
+            word: w.word,
+            startTime: w.start_ms / 1000,
+            endTime: w.end_ms / 1000,
+            confidence: w.probability,
+          })),
         }),
       );
 
