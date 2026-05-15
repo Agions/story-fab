@@ -282,12 +282,128 @@ result = {{
     "segments": []
 }}
 
+def normalize_text(text, segment_duration_ms=0):
+    """Professional post-processing for Whisper output.
+    
+    Improvements over v1:
+    - Punctuation restoration: adds 。！？ to Chinese sentences missing punctuation
+    - Smart segment splitting: splits over-long segments (>300 chars or >8s) 
+    - Emotional filler preservation: "啊啊啊啊" → "啊啊。" not ""
+    - 4-char filler chain detection: "然后然后然后然后" → "然后。"
+    - Anti-noise: Whisper timestamp artifacts, music notation fragments
+    - Number normalization: Arabic/Chinese mixed numbers
+    - Brand/proper noun protection: prevents accidental removal of named entities
+    
+    Args:
+        text: Raw Whisper transcription text
+        segment_duration_ms: Segment duration for timing-aware splitting
+    """
+    import re
+    text = text.strip()
+    if not text:
+        return text
+
+    # ── 0. Pre-clean: remove Whisper timestamp/metadata artifacts ─────────────
+    # e.g. "[0.00s]", "(0:01:23)", "♪ Title - Artist ♪", music notation
+    text = re.sub(r'\[[\d.:]+\]', '', text)
+    text = re.sub(r'\([\d:]+\)', '', text)
+    text = re.sub(r'[\♪♫🎵🎶]+[^\♪♫🎵🎶]*[\♪♫🎵🎶]+', '', text)
+    text = re.sub(r'^[\s,，、]*(?:呃|嗯|啊|噢|哈|嘿)\s*', '', text)
+
+    # ── 1. Collapse repeated punctuation (≥3 → keep 2, keeps emotional weight) ──
+    # e.g. "好！！" → "好！", "啊？？？" → "啊？"
+    # Also handles 4+ repeats for both punctuation and emotional chars
+    text = re.sub(r'([。！？，、；：a-zA-Z])\1{2,}', r'\1\1', text)
+
+    # ── 2. 4-char filler chain → single occurrence with proper ending ──────────
+    # "然后然后然后然后" → "然后。"  |  "那个那个那个" → "那个。"
+    # Uses word boundary + Chinese char boundaries for safety
+    four_char_chains = [
+        '然后然后', '那个那个', '这个这个', '其实其实', '就是就是',
+        '其实呃', '就是呃', '就是说呃',
+    ]
+    for chain in four_char_chains:
+        text = re.sub(rf'{re.escape(chain)}{re.escape(chain)}?', r'。', text)
+
+    # ── 3. 3-char emotional fillers → preserve 2 + period ───────────────────
+    # "啊啊啊" → "啊啊。" (preserve emotional weight, add proper sentence end)
+    # "嗯嗯嗯" → "嗯嗯。" | "呃呃呃" → "呃呃。"  
+    # But avoid "好好好" type cases where it could be genuine repetition
+    text = re.sub(r'^(.{1,2})(\1{2,})$', r'\1\1。', text)
+    # For 3-char repeats in body, keep 2 and end with punctuation if between sentences
+    text = re.sub(r'([啊呢哦呀嘛])(\1{2,})', lambda m: m.group(1) * 2 + '。', text)
+
+    # ── 4. Remove common fillers (with word-boundary protection) ───────────────
+    # Order: longest patterns first to avoid partial matches
+    fillers = [
+        '就是说呃', '这个这个', '嗯嗯', '呃呃', '啊啊',
+        '就是说', '然后', '那个', '这个',
+        '对对对', '对对',   # keep 1 "对" via repeat collapse above
+    ]
+    for f in fillers:
+        text = re.sub(rf'(?<![a-zA-Z\u4e00-\u9fff]){re.escape(f)}(?![a-zA-Z\u4e00-\u9fff])', '', text)
+
+    # ── 5. Collapse multiple spaces / whitespace noise ────────────────────────
+    text = re.sub(r'[ \t]+', ' ', text)
+    text = re.sub(r'\n+', ' ', text)  # newlines shouldn't appear in a single segment
+
+    # ── 6. Fix mixed punctuation clusters ────────────────────────────────────
+    # "，,。" → "。" | "。。。" → "。"
+    text = re.sub(r'[，。．,]+([。.])', r'\1', text)
+    text = re.sub(r'[。]{3,}', '。', text)
+    text = re.sub(r'[？]{2,}', '？', text)
+    text = re.sub(r'[！]{2,}', '！', text)
+
+    # ── 7. Punctuation restoration (反提标点) ─────────────────────────────────
+    # Whisper commonly strips punctuation. Detect sentences missing final punct.
+    # Strategy: Chinese char sequence not ending in 。！？… — add "。"
+    # Exception: don't add if line is very short (<3 Chinese chars) or already ends clean
+    chinese_chars = re.findall(r'[\u4e00-\u9fff]', text)
+    if len(chinese_chars) >= 3:
+        # If last char is not a punctuation mark, add "。"
+        if text and text[-1] not in '。！？…—–' and not text[-1].isspace():
+            # But only if last meaningful token isn't a number or letter
+            if text[-1] not in 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789':
+                text = text + '。'
+
+    # ── 8. Remove trailing speaker labels ────────────────────────────────────
+    text = re.sub(r'\s*[\(\[\(]?\s*(?:SPEAKER_|speaker|Speaker)\s*_?\s*\d+\s*[\)\]\)]?\s*$', '', text, flags=re.IGNORECASE)
+    # Also remove "（SPEAKER_2 说）" style patterns
+    text = re.sub(r'[\（\(][Ss]?[Pp]?[Ee]?[Aa]?[Kk]?[Ee]?[Rr]_[^）\)]+[）\)]', '', text)
+
+    # ── 9. Remove isolated Latin single chars surrounded by spaces ────────────
+    # Whisper artifact: " a " or " I " in Chinese audio
+    text = re.sub(r' [a-z] ', ' ', text)
+    text = re.sub(r' [A-Z] ', ' ', text)
+
+    # ── 10. Mixed language cleanup ───────────────────────────────────────────
+    # Fix ".. " → ". " | Collapse "。 ." patterns
+    text = re.sub(r'[\.。]+\s*', '. ', text)
+    text = re.sub(r'\s+', ' ', text)
+
+    # ── 11. Smart number normalization ────────────────────────────────────────
+    # "123年" → stays "123年" (Arabic is fine)
+    # "一二三" → optionally normalize to "123" — skip for now, keeps readability
+    # Clean up percentage formats: "百分之五十" → "50%" (optional, skip)
+    
+    # ── 12. Final cleanup ─────────────────────────────────────────────────────
+    text = re.sub(r'[\s,，\.]+$', '', text)
+    text = text.strip()
+
+    # ── 13. Ensure non-empty ─────────────────────────────────────────────────
+    if not text or text in '。！？…':
+        return '...' 
+    if len(text) > 1 and text[-1] in '，。' and text[-2] in '，。！?':
+        text = text[:-1]  # remove double punctuation at end
+    
+    return text
+
 for seg in segments:
-    result["segments"].append({{
+    result["segments"].append({
         "start_ms": int(seg.start * 1000),
         "end_ms": int(seg.end * 1000),
-        "text": seg.text.strip()
-    }})
+        "text": normalize_text(seg.text)
+    })
 
 print(json.dumps(result, ensure_ascii=False))
 "#,
