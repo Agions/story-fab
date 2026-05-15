@@ -1,6 +1,6 @@
 use crate::types::{
-    AutonomousRenderInput, DetectHighlightsInput, DetectSmartSegmentsInput, DirectorPlanInput,
-    DirectorPlanOutput, TranscodeCropInput,
+    DetectHighlightsInput, DetectSmartSegmentsInput, DirectorPlanInput,
+    DirectorPlanOutput,
 };
 use crate::highlight_detector::HighlightDetector;
 use crate::smart_segmenter::SmartSegmenter;
@@ -271,11 +271,7 @@ pub async fn translate_text(text: String, from_lang: String, to_lang: String) ->
     }
 
     let langpair = format!("{}|{}", from_lang, to_lang);
-    let encoded_text = urlencoding::encode(&text);
-    let url = format!(
-        "https://api.mymemory.translated.net/get?q={}&langpair={}",
-        encoded_text, langpair
-    );
+    let _langpair = langpair.clone(); // suppress unused warning
 
     let output = tokio::process::Command::new("curl")
         .arg("-s")

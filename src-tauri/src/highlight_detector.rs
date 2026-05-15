@@ -6,7 +6,7 @@
 use crate::binary::resolve_binary_path;
 use crate::utils::{cmd_err, chrono_like_timestamp, parse_scdet_output, pcm_samples_from_wav};
 use serde::{Deserialize, Serialize};
-use std::fs;
+
 use std::process::Command;
 
 /// Reason why a segment was identified as a highlight
