@@ -70,17 +70,22 @@ export class AIService extends BaseService {
       topic: string; style: string; tone: string; length: string;
       audience: string; language: string; keywords?: string[];
       requirements?: string; videoDuration?: number;
+      // v2 新增
+      scenes?: Array<{ startTime: number; endTime: number; description?: string; tags?: string[]; emotion?: string }>;
+      subtitles?: Array<{ start_ms: number; end_ms: number; text: string }>;
     }
   ): Promise<ScriptData> {
     return this.executeRequest(
       async () => {
         const prompt = buildScriptPrompt(params);
         const response = await this.callAPI(model, settings, prompt);
+        const segments = parseScriptSegments(response.content);
+
         return {
           id: `script_${Date.now()}`,
           title: params.topic,
           content: response.content,
-          segments: parseScriptSegments(response.content),
+          segments,
           metadata: {
             style: params.style,
             tone: params.tone,
@@ -247,15 +252,113 @@ export class AIService extends BaseService {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+// ─── Script segment parsing ────────────────────────────────────────────────────
+
+/** Try parse AI JSON output → timestamped segments; fallback to paragraph parsing */
 function parseScriptSegments(content: string): ScriptSegment[] {
-  const paragraphs = content.split('\n\n').filter((p) => p.trim());
+  // Strategy 1: parse JSON (v2 structured output from AI)
+  const segments = tryParseJsonSegments(content);
+  if (segments.length > 0) return segments;
+
+  // Strategy 2: parse timestamped lines like [0:00] or [00:00:00]
+  const timestamped = tryParseTimestampedLines(content);
+  if (timestamped.length > 0) return timestamped;
+
+  // Strategy 3: fallback — equal-duration paragraph split (v1 behavior)
+  const paragraphs = content.split(/\n{2,}/).filter((p) => p.trim());
   return paragraphs.map((p, index) => ({
     id: `seg_${index + 1}`,
     startTime: index * 30,
     endTime: (index + 1) * 30,
     content: p.trim(),
-    type: index === 0 || index === paragraphs.length - 1 ? 'narration' : 'dialogue',
+    type: index === 0 ? 'intro' : index === paragraphs.length - 1 ? 'outro' : 'narration',
   }));
+}
+
+interface JsonSegment {
+  start: number;
+  end: number;
+  type?: string;
+  content: string;
+}
+
+function tryParseJsonSegments(content: string): ScriptSegment[] {
+  try {
+    // Extract JSON block from AI response (might be wrapped in ```json ... ```)
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) ?? content.match(/(\[[\s\S]*\])/);
+    const jsonStr = jsonMatch ? (jsonMatch[1] ?? jsonMatch[0]) : content;
+    const trimmed = jsonStr.trim();
+    if (!trimmed.startsWith('[')) return [];
+
+    const parsed: JsonSegment[] = JSON.parse(trimmed);
+    if (!Array.isArray(parsed) || parsed.length === 0) return [];
+
+    return parsed.map((item, index) => ({
+      id: `seg_${index + 1}`,
+      startTime: typeof item.start === 'number' ? item.start : index * 30,
+      endTime: typeof item.end === 'number' ? item.end : (index + 1) * 30,
+      content: typeof item.content === 'string' ? item.content.trim() : String(item.content ?? '').trim(),
+      type: mapSegmentType(item.type),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** Parse lines like "[0:00] 开场白" or "[00:00:00] content" */
+function tryParseTimestampedLines(content: string): ScriptSegment[] {
+  // Match [M:SS], [M:SS.s], [HH:MM:SS], [HH:MM:SS.s] patterns
+  const timeTagRegex = /\[(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\.(\d+))?\]/g;
+  const lines = content.split('\n').filter((l) => l.trim());
+  const segments: ScriptSegment[] = [];
+
+  for (const line of lines) {
+    const matches = Array.from(line.matchAll(timeTagRegex));
+    if (matches.length === 0) continue;
+
+    const firstMatch = matches[0];
+    const startSec = parseTimeTag(firstMatch);
+    const text = line.replace(timeTagRegex, '').trim();
+    if (!text) continue;
+
+    // Estimate end from next line's start or assume 30s
+    segments.push({
+      id: `seg_${segments.length + 1}`,
+      startTime: startSec,
+      endTime: startSec + 30,
+      content: text,
+      type: 'narration',
+    });
+  }
+
+  // Fill in endTime from next segment's startTime
+  for (let i = 0; i < segments.length - 1; i++) {
+    segments[i].endTime = segments[i + 1].startTime;
+  }
+
+  return segments;
+}
+
+function parseTimeTag(match: RegExpMatchArray): number {
+  const parts = match.slice(1).filter(Boolean).map(Number);
+  if (parts.length === 3) {
+    // HH:MM:SS
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+  if (parts.length === 2) {
+    // M:SS.s or M:SS
+    return parts[0] * 60 + parts[1];
+  }
+  return 0;
+}
+
+function mapSegmentType(t?: string): ScriptSegment['type'] {
+  if (!t) return 'narration';
+  const lower = t.toLowerCase();
+  if (['intro', 'opening', '开场'].some((k) => lower.includes(k))) return 'intro';
+  if (['outro', 'ending', '结尾'].some((k) => lower.includes(k))) return 'outro';
+  if (['dialogue', 'dialog', '对话'].some((k) => lower.includes(k))) return 'dialogue';
+  return 'narration';
 }
 
 function estimateDuration(wordCount: number): number {
