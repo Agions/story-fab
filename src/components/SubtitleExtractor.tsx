@@ -49,6 +49,7 @@ interface SubtitleSegment {
   start: string;
   end: string;
   text: string;
+  quality?: 'high' | 'medium' | 'low';
 }
 
 function formatSRTTime(seconds: number): string {
@@ -137,6 +138,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
       const subs: SubtitleSegment[] = result.entries.map((entry: SubtitleEntry) => ({
         id: entry.id ?? crypto.randomUUID(), startTime: entry.startTime, endTime: entry.endTime,
         start: formatSRTTime(entry.startTime), end: formatSRTTime(entry.endTime), text: entry.text,
+        quality: entry.quality,
       }));
       setExtractedSubtitles(subs);
       if (onExtracted) onExtracted(subs);
@@ -277,7 +279,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
                             onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
                             onBlur={saveEdit} autoFocus onClick={e => e.stopPropagation()} />
                         ) : (
-                          <span className={`text-sm truncate ${isCurrent ? 'text-primary font-medium' : ''}`}>{sub.text}</span>
+                          <span className={`text-sm truncate ${isCurrent ? 'text-primary font-medium' : ''} ${sub.quality === 'low' ? styles.textLowQuality : ''}`}>{sub.text}</span>
                         )}
                       </div>
                       <Button variant="ghost" size="icon" onClick={e => { e.stopPropagation(); startEdit(sub); }} aria-label="编辑字幕">
