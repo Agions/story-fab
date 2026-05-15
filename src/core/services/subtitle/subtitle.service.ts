@@ -287,7 +287,23 @@ export class SubtitleService {
         confidence: segment.confidence,
       }));
 
-      let finalEntries = entries;
+      // ── 片段合并：合并时长 < 0.5s 的过短片段（人眼不可阅读）───────────
+      const MIN_SUBTITLE_DURATION = 0.5; // 秒
+      const merged = entries.reduce<SubtitleEntry[]>((acc, entry) => {
+        const duration = entry.endTime - entry.startTime;
+        if (duration < MIN_SUBTITLE_DURATION && acc.length > 0) {
+          // 合并到上一个片段
+          const prev = acc[acc.length - 1];
+          prev.text = prev.text + (prev.text ? ' ' : '') + entry.text;
+          prev.endTime = entry.endTime;
+          prev.confidence = Math.min(prev.confidence ?? 1, entry.confidence ?? 1);
+        } else {
+          acc.push({ ...entry });
+        }
+        return acc;
+      }, []);
+
+      let finalEntries = merged;
       if (maxDuration && entries.length > 0) {
         const lastValidIndex = entries.findIndex(e => e.endTime > maxDuration);
         if (lastValidIndex > 0) {
