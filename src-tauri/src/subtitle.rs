@@ -336,7 +336,7 @@ def normalize_text(text, segment_duration_ms=0):
     ]
     for chain in four_char_chains:
         escaped = re.escape(chain)
-        text = re.sub(r'\{' + escaped + r'\}?\{' + escaped + r'\}', r'。', text)
+        text = re.sub(r'\{{' + escaped + r'\}}?\{{' + escaped + r'\}}', r'。', text)
 
     # ── 3. 3-char emotional fillers → preserve 2 + period ───────────────────
     # "啊啊啊" → "啊啊。" (preserve emotional weight, add proper sentence end)
@@ -354,7 +354,7 @@ def normalize_text(text, segment_duration_ms=0):
         '对对对', '对对',   # keep 1 "对" via repeat collapse above
     ]
     for f in fillers:
-        text = re.sub(rf'(?<![a-zA-Z\u4e00-\u9fff]){re.escape(f)}(?![a-zA-Z\u4e00-\u9fff])', '', text)
+        text = re.sub(rf'(?<![a-zA-Z\u4e00-\u9fff]){{re.escape(f)}}(?![a-zA-Z\u4e00-\u9fff])', '', text)
 
     # ── 5. Collapse multiple spaces / whitespace noise ────────────────────────
     text = re.sub(r'[ \t]+', ' ', text)
@@ -363,7 +363,7 @@ def normalize_text(text, segment_duration_ms=0):
     # ── 6. Fix mixed punctuation clusters ────────────────────────────────────
     # "，,。" → "。" | "。。。" → "。"
     text = re.sub(r'[，。．,]+([。.])', r'\1', text)
-    text = re.sub(r'[。]{3,}', '。', text)
+    text = re.sub(r'[。]{{3,}}', '。', text)
     text = re.sub(r'[？]{{2,}}', '？', text)
     text = re.sub(r'[！]{{2,}}', '！', text)
 
@@ -418,16 +418,16 @@ for seg in segments:
         seg_prob = sum(w.probability for w in seg_words) / len(seg_words)
     else:
         seg_prob = 0.95  # fallback when no word-level data
-    result["segments"].append({
+    result["segments"].append({{
         "start_ms": int(seg.start * 1000),
         "end_ms": int(seg.end * 1000),
         "text": normalize_text(seg.text),
         "words": [
-            {"word": w.word, "start_ms": int(w.start * 1000), "end_ms": int(w.end * 1000), "probability": w.probability}
+            {{"word": w.word, "start_ms": int(w.start * 1000), "end_ms": int(w.end * 1000), "probability": w.probability}}
             for w in seg_words
         ] if seg_words else [],
         "probability": round(seg_prob, 4),
-    })
+    }})
 
 print(json.dumps(result, ensure_ascii=False))
 "#,
