@@ -14,9 +14,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind CSS v4 - use @import instead of @tailwind directives */
+@import "tailwindcss";
 
 @layer base {
   /* CutDeck design tokens — dark professional tool theme */
