@@ -106,7 +106,8 @@ export class ClipRepurposingPipeline {
     };
 
     const stepOptions: StepOptions = {
-      onProgress: opts.onProgress as unknown as (stage: string, progress: number, message?: string) => void
+      signal: ctx.signal,
+      onProgress: opts.onProgress as unknown as (stage: string, progress: number, message?: string) => void,
     };
 
     logger.info('[ClipRepurposingPipeline] 开始执行', {
