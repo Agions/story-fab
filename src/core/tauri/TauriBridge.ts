@@ -147,11 +147,16 @@ export async function invoke<C extends TauriCommand>(
   args?: Record<string, unknown>,
   options?: BridgeOptions,
 ): Promise<unknown> {
-  const { retries = 0 } = options ?? {};
+  const { retries = 0, signal } = options ?? {};
 
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
+    // 每次重试前检查 signal 状态
+    if (signal?.aborted) {
+      throw TauriBridgeError.fromInvoke(command, new Error('Request aborted'));
+    }
+
     try {
       return await tauriInvoke(command, args ?? {});
     } catch (error) {
