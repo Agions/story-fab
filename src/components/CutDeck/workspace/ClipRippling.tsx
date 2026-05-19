@@ -17,7 +17,7 @@ import { Button } from '../../ui/button';
 import { Progress } from '../../ui/progress';
 import { Badge } from '../../ui/badge';
 import { Checkbox } from '../../ui/checkbox';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '../../ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../ui/select';
 import { notify } from '@/shared';
 import { formatTime } from '../../../shared/utils/formatting';
 import {
@@ -220,14 +220,17 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
           <Select
             value={String(platform)}
             onValueChange={(v: string | null) => setPlatform(v as SocialPlatform)}
-            className={styles.select}
-           
           >
+            <SelectTrigger className={styles.select}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
             {PLATFORM_OPTIONS.map(o => (
               <SelectItem key={o.value} value={o.value}>
                 {o.emoji} {o.label}
               </SelectItem>
             ))}
+            </SelectContent>
           </Select>
         </div>
 
@@ -236,12 +239,15 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
           <Select
             value={String(targetCount)}
             onValueChange={(v: string | null) => setTargetCount(Number(v))}
-            className={styles.select}
-           
           >
+            <SelectTrigger className={styles.select}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
             {TARGET_CLIP_COUNTS.map(n => (
               <SelectItem key={n} value={String(n)}>{n} 个</SelectItem>
             ))}
+            </SelectContent>
           </Select>
         </div>
 
