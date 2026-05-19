@@ -6,8 +6,8 @@ import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cn } from '../../lib/utils'
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- base-ui primitive has complex generic types
-const Select: React.FC<any> = SelectPrimitive.Root
+// Properly typed Select root — generic Props from base-ui
+const Select = SelectPrimitive.Root;
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (

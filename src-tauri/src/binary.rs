@@ -24,7 +24,25 @@ pub(crate) fn resolve_binary_path(binary_name: &str) -> String {
         }
     }
 
-    let common_dirs = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"];
+    // Search all PATH directories for the binary
+    if let Some(path_var) = std::env::var_os("PATH") {
+        for dir in std::env::split_paths(&path_var) {
+            let candidate = dir.join(binary_name);
+            if candidate.exists() {
+                return candidate.display().to_string();
+            }
+        }
+    }
+
+    // Fallback to common system directories
+    let common_dirs = [
+        "/opt/homebrew/bin",
+        "/usr/local/bin",
+        "/usr/bin",
+        "/bin",
+        "/snap/bin",
+        "/home/linuxbrew/.linuxbrew/bin",
+    ];
     for dir in common_dirs {
         let candidate = Path::new(dir).join(binary_name);
         if candidate.exists() {

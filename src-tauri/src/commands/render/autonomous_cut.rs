@@ -14,6 +14,14 @@ use std::process::Command;
 use tokio::process::Command as TokioCommand;
 use tokio::fs as tokio_fs;
 
+// ─── Tuning Constants ─────────────────────────────────────────────────────────
+
+const DEFAULT_TRANSITION_DURATION: f64 = 0.35;
+const MAX_TRANSITION_DURATION: f64 = 1.5;
+const MIN_CLIP_DURATION: f64 = 0.1;
+const DEFAULT_OVERLAY_OPACITY: f64 = 0.72;
+const MIN_OVERLAY_OPACITY: f64 = 0.05;
+
 // ─── Public Command ─────────────────────────────────────────────────────────
 
 #[tauri::command]
@@ -38,7 +46,7 @@ async fn render_autonomous_cut_impl(
         .collect::<Vec<_>>();
 
     let transition = input.transition.as_ref().map(String::as_str).unwrap_or("cut");
-    let transition_duration = input.transition_duration.unwrap_or(0.35).clamp(0.0, 1.5);
+    let transition_duration = input.transition_duration.unwrap_or(DEFAULT_TRANSITION_DURATION).clamp(0.0, MAX_TRANSITION_DURATION);
 
     let temp_root = std::env::temp_dir().join(format!(
         "cutdeck_autocut_{}_{}",
@@ -195,7 +203,7 @@ fn apply_post_processing(
         .overlay_mix_mode
         .clone()
         .unwrap_or_else(|| "pip".to_string());
-    let overlay_opacity = input.overlay_opacity.unwrap_or(0.72).clamp(0.05, 1.0);
+    let overlay_opacity = input.overlay_opacity.unwrap_or(DEFAULT_OVERLAY_OPACITY).clamp(MIN_OVERLAY_OPACITY, 1.0);
     let subtitles = input.subtitles.clone().unwrap_or_default();
     let overlays = input.overlay_markers.clone().unwrap_or_default();
 
@@ -407,7 +415,7 @@ fn merge_with_transitions(
     for (index, next) in temp_files.iter().enumerate().skip(1) {
         let merged = temp_root.join(format!("xfade_{index}.mp4"));
         let current_duration = probe_duration(&current)?;
-        let offset = (current_duration - transition_duration).max(0.1);
+        let offset = (current_duration - transition_duration).max(MIN_CLIP_DURATION);
 
         let filter = format!(
             "[0:v][1:v]xfade=transition={}:duration={}:offset={}[v];[0:a][1:a]acrossfade=d={}[a]",
