@@ -342,9 +342,9 @@ def normalize_text(text, segment_duration_ms=0):
     # "啊啊啊" → "啊啊。" (preserve emotional weight, add proper sentence end)
     # "嗯嗯嗯" → "嗯嗯。" | "呃呃呃" → "呃呃。"
     # But avoid "好好好" type cases where it could be genuine repetition
-    text = re.sub(r'^(.{1,2})(\1{{2,}})$', r'\1\1。', text)
+    text = re.sub(r'^(.{1,2})(\\1{{{{2,}}}})$', r'\1\1。', text)
     # For 3-char repeats in body, keep 2 and end with punctuation if between sentences
-    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{{2,}})', lambda m: m.group(1) * 2 + '。', text)
+    text = re.sub(r'([啊呢哦呀嘛~￣])(\\1{{{{2,}}}})', lambda m: m.group(1) * 2 + '。', text)
 
     # ── 4. Remove common fillers (with word-boundary protection) ───────────────
     # Order: longest patterns first to avoid partial matches
@@ -363,9 +363,9 @@ def normalize_text(text, segment_duration_ms=0):
     # ── 6. Fix mixed punctuation clusters ────────────────────────────────────
     # "，,。" → "。" | "。。。" → "。"
     text = re.sub(r'[，。．,]+([。.])', r'\1', text)
-    text = re.sub(r'[。]{{3,}}', '。', text)
-    text = re.sub(r'[？]{{2,}}', '？', text)
-    text = re.sub(r'[！]{{2,}}', '！', text)
+    text = re.sub(r'[。]{{{{3,}}}}', '。', text)
+    text = re.sub(r'[？]{{{{2,}}}}', '？', text)
+    text = re.sub(r'[！]{{{{2,}}}}', '！', text)
 
     # ── 7. Punctuation restoration (反提标点) ─────────────────────────────────
     # Whisper commonly strips punctuation. Detect sentences missing final punct.
