@@ -186,10 +186,10 @@ impl VideoProcessor {
 
         // Hardware acceleration — auto-detect unless explicitly overridden
         let enc = match hw_accel {
-            Some(true) => hw_accel().h264_encoder(),
+            Some(true) => crate::binary::hw_accel().h264_encoder(),
             Some(false) => "libx264",
             None => {
-                let detected = hw_accel();
+                let detected = crate::binary::hw_accel();
                 if detected == HwAccel::Cpu { "libx264" } else { detected.h264_encoder() }
             }
         };
@@ -331,7 +331,7 @@ pub async fn cut_video(
 
     // ── Parallel segment cutting ───────────────────────────────────────────────
     let ffmpeg_bin = ffmpeg_binary();
-    let hw_accel = use_hw_accel.unwrap_or(false);
+    let use_hw = use_hw_accel.unwrap_or(false);
 
     let tasks: Vec<_> = segments
         .iter()
@@ -357,13 +357,9 @@ pub async fn cut_video(
                 ];
 
                 // Hardware acceleration — auto-detect unless explicitly overridden
-                let enc = match hw_accel {
-                    Some(true) => hw_accel().h264_encoder(),
-                    Some(false) => "libx264",
-                    None => {
-                        let detected = hw_accel();
-                        if detected == HwAccel::Cpu { "libx264" } else { detected.h264_encoder() }
-                    }
+                let enc = match use_hw {
+                    true => crate::binary::hw_accel().h264_encoder(),
+                    false => "libx264",
                 };
                 args.extend(&["-c:v", enc, "-preset", "fast"]);
 
