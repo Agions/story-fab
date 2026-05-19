@@ -2,7 +2,7 @@
 //!
 //! Extracted from render.rs (original lines 561-637).
 
-use crate::binary::ffmpeg_binary;
+use crate::binary::{ffmpeg_binary, hw_accel};
 use crate::utils::chrono_like_timestamp;
 use serde::Deserialize;
 
@@ -46,11 +46,12 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
     let duration = (input.segment.end - input.segment.start).max(0.1);
 
     let mut cmd = tokio::process::Command::new(ffmpeg_binary());
+    let hw = hw_accel();
     cmd.arg("-y")
         .arg("-ss").arg(input.segment.start.to_string())
         .arg("-t").arg(duration.to_string())
         .arg("-i").arg(&input.input_path)
-        .arg("-c:v").arg("libx264")
+        .arg("-c:v").arg(hw.h264_encoder())
         .arg("-preset").arg("ultrafast")
         .arg("-crf").arg("28")
         .arg("-c:a").arg("aac")

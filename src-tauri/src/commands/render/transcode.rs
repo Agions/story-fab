@@ -1,4 +1,4 @@
-use crate::binary::{ffmpeg_binary, ffprobe_binary};
+use crate::binary::{ffmpeg_binary, ffprobe_binary, hw_accel};
 use crate::types::{ExportVideoInput, TranscodeCropInput};
 use crate::utils::cmd_err;
 
@@ -36,8 +36,10 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
         _ => return Err("不支持的宽高比，仅支持 9:16、1:1、16:9".to_string()),
     };
     cmd.arg("-vf").arg(vf_filter);
+    let hw = hw_accel();
     let (crf, preset) = quality_params(input.quality.as_deref());
-    cmd.args(["-c:v", "libx264", "-crf", &crf.to_string(), "-preset", preset]);
+    let enc = if hw == crate::binary::HwAccel::Cpu { "libx264" } else { hw.h264_encoder() };
+    cmd.args(["-c:v", enc, "-crf", &crf.to_string(), "-preset", preset]);
     cmd.args(["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart"]);
     cmd.arg(&input.output_path);
     let output = cmd.output().map_err(|e| format!("FFmpeg 执行失败: {e}"))?;

@@ -5,7 +5,7 @@
 //! merge_by_concat, merge_with_transitions, probe_duration, escape_ffmpeg_path,
 //! build_overlay_enable_expr, OverlayLayout, pick_overlay_layout_for_marker.
 
-use crate::binary::{ffmpeg_binary, ffprobe_binary};
+use crate::binary::{ffmpeg_binary, ffprobe_binary, hw_accel, HwAccel};
 use crate::commands::export_state;
 use crate::types::{AutonomousRenderInput, AutonomousOverlayMarker};
 use crate::utils::{chrono_like_timestamp, cmd_err, format_srt_time};
@@ -74,6 +74,8 @@ async fn render_autonomous_cut_impl(
             async move {
                 let temp_file = temp_root.join(format!("seg_{index}.mp4"));
                 let duration = (segment.end - segment.start).max(0.1);
+                let hw = hw_accel();
+                let preset = if hw == HwAccel::Cpu { "veryfast" } else { "fast" };
                 let output = TokioCommand::new(&ffmpeg_bin)
                     .arg("-y")
                     .arg("-ss")
@@ -83,11 +85,11 @@ async fn render_autonomous_cut_impl(
                     .arg("-i")
                     .arg(&input_path)
                     .arg("-c:v")
-                    .arg("libx264")
+                    .arg(hw.h264_encoder())
+                    .arg("-preset")
+                    .arg(preset)
                     .arg("-c:a")
                     .arg("aac")
-                    .arg("-preset")
-                    .arg("veryfast")
                     .arg("-movflags")
                     .arg("+faststart")
                     .arg(temp_file.to_string_lossy().as_ref())
@@ -154,7 +156,8 @@ fn render_single_cut_sync(
     cmd.arg("-y");
     apply_time_segment(&mut cmd, start, end);
     cmd.arg("-i").arg(input_path);
-    cmd.arg("-c:v").arg("libx264");
+    let hw = hw_accel();
+    cmd.arg("-c:v").arg(hw.h264_encoder());
     cmd.arg("-c:a").arg("aac");
     cmd.arg("-movflags").arg("+faststart");
     cmd.arg(output_path);
@@ -249,7 +252,7 @@ fn apply_post_processing(
                 .arg("-map")
                 .arg("0:a?")
                 .arg("-c:v")
-                .arg("libx264")
+                .arg(hw_accel().h264_encoder())
                 .arg("-c:a")
                 .arg("copy")
                 .arg("-movflags")
@@ -303,7 +306,7 @@ fn apply_post_processing(
                 .arg("-map")
                 .arg("0:a?")
                 .arg("-c:v")
-                .arg("libx264")
+                .arg(hw_accel().h264_encoder())
                 .arg("-c:a")
                 .arg("copy")
                 .arg("-movflags")
@@ -424,7 +427,7 @@ fn merge_with_transitions(
             .arg("-map")
             .arg("[a]")
             .arg("-c:v")
-            .arg("libx264")
+            .arg(hw_accel().h264_encoder())
             .arg("-c:a")
             .arg("aac")
             .arg("-movflags")
