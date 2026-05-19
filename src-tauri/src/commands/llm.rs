@@ -169,7 +169,7 @@ const CONTEXT_LIMITS: &[(&str, usize)] = &[
 // ─── 辅助函数 ────────────────────────────────────────────────────────────────
 
 /// Provider 别名映射（前端 provider 名称 → Rust 内部 provider 名称）
-fn normalize_provider(provider: &str) -> &'static str {
+fn normalize_provider(provider: &str) -> &str {
     match provider {
         // 前端 alibaba (Qwen系列) → Rust qwen
         "alibaba" => "qwen",
@@ -340,12 +340,12 @@ async fn call_gemini(
         model, api_key
     );
 
-    #[derive(Serialize)]
+    #[derive(Serialize, Deserialize)]
     struct Content {
         parts: Vec<Part>,
     }
 
-    #[derive(Serialize)]
+    #[derive(Serialize, Deserialize)]
     struct Part {
         text: String,
     }
@@ -567,7 +567,7 @@ fn parse_script_output(output: &str, style: &ScriptStyle) -> Vec<ScriptSegment> 
     let mut segments = Vec::new();
     let mut current_time = 0.0;
 
-    for (i, para) in paragraphs.iter().enumerate() {
+    for (_i, para) in paragraphs.iter().enumerate() {
         let text = (*para).to_string();
         let char_count = text.chars().count() as f64;
         let duration = (char_count / 5.0).max(1.0); // 至少1秒
@@ -715,7 +715,7 @@ pub async fn analyze_video_for_narration(
             current_section = "highlights".to_string();
         } else if lower.contains("角度") || lower.contains("解说") {
             current_section = "angle".to_string();
-        } else if !current_section.is_empty() && !line.starts_with(|c: char| c.isdigit() || c == '：' || c == ':' || c == '.') {
+        } else if !current_section.is_empty() && !line.starts_with(|c: char| c.is_ascii_digit() || c == '：' || c == ':' || c == '.') {
             let cleaned = line.trim().trim_start_matches(|c: char| c == '-' || c == '•' || c == '*' || c == '·');
             if !cleaned.is_empty() {
                 if current_section == "highlights" {
