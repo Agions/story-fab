@@ -6,8 +6,8 @@ import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cn } from '../../lib/utils'
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
-// Properly typed Select root — generic Props from base-ui
-const Select = SelectPrimitive.Root;
+// Select root — explicitly typed as single-value string select (most common usage)
+const Select = SelectPrimitive.Root<string, false>;
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (

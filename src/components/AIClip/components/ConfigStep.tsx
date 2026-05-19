@@ -109,7 +109,7 @@ const ConfigStep: React.FC<ConfigStepProps> = ({
           <span className="text-sm font-medium block mb-2">转场效果</span>
           <Select
             value={config.transitionType}
-            onValueChange={(v: string) => onConfigChange({ transitionType: v as AIClipConfig['transitionType'] })}
+            onValueChange={(v: string | null) => onConfigChange({ transitionType: v as AIClipConfig['transitionType'] })}
           >
             <SelectTrigger className="w-full">
               {config.transitionType === 'fade' ? '淡入淡出' :

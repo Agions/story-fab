@@ -231,7 +231,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
               {isExtracting ? '识别中…' : '提取字幕'}
             </Button>
             {isExtracting && <Progress value={progress} className="w-32" aria-label={`提取进度 ${progress}%`} />}
-            <Select value={format} onValueChange={(v: string) => setFormat(v as 'srt' | 'vtt' | 'txt')}>
+            <Select value={format} onValueChange={(v: string | null) => setFormat(v as 'srt' | 'vtt' | 'txt')}>
               <SelectTrigger className="w-24"><span>{format.toUpperCase()}</span></SelectTrigger>
               <SelectContent>
                 <SelectItem value="srt">SRT</SelectItem>
