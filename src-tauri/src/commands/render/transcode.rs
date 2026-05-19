@@ -1,23 +1,15 @@
-use crate::binary::{ffmpeg_binary, ffprobe_binary, hw_accel};
+use crate::binary::ffprobe_binary;
 use crate::types::{ExportVideoInput, TranscodeCropInput};
 use crate::utils::cmd_err;
-
-/// Returns (crf, preset) for a quality tier.
-fn quality_params(quality: Option<&str>) -> (u32, &'static str) {
-    match quality {
-        Some("low") => (28, "veryfast"),
-        Some("medium") => (23, "fast"),
-        _ => (20, "medium"),
-    }
-}
+use super::ffmpeg_builder::{new_cmd, h264_encoder, h265_encoder, aac_encoder, quality_preset};
+use super::subtitle_burnin::{burn_subtitles, normalize_subtitle_file};
 
 #[tauri::command]
 pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> {
     if input.input_path.trim().is_empty() || input.output_path.trim().is_empty() {
         return Err("输入或输出路径不能为空".to_string());
     }
-    let mut cmd = std::process::Command::new(ffmpeg_binary());
-    cmd.arg("-y");
+    let mut cmd = new_cmd();
     if let (Some(s), Some(e)) = (input.start_time, input.end_time) {
         cmd.arg("-ss").arg(s.to_string());
         cmd.arg("-t").arg((e - s).max(0.1).to_string());
@@ -35,12 +27,12 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
         }
         _ => return Err("不支持的宽高比，仅支持 9:16、1:1、16:9".to_string()),
     };
-    cmd.arg("-vf").arg(vf_filter);
-    let hw = hw_accel();
-    let (crf, preset) = quality_params(input.quality.as_deref());
-    let enc = if hw == crate::binary::HwAccel::Cpu { "libx264" } else { hw.h264_encoder() };
-    cmd.args(["-c:v", enc, "-crf", &crf.to_string(), "-preset", preset]);
-    cmd.args(["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart"]);
+    cmd.arg("-vf").arg(&vf_filter);
+    let (crf, preset) = quality_preset(input.quality.as_deref().unwrap_or("medium"));
+    cmd.arg("-c:v").arg(h264_encoder());
+    cmd.arg("-crf").arg(crf.to_string());
+    cmd.arg("-preset").arg(preset);
+    cmd.args(["-c:a", aac_encoder(), "-b:a", "192k", "-movflags", "+faststart"]);
     cmd.arg(&input.output_path);
     let output = cmd.output().map_err(|e| format!("FFmpeg 执行失败: {e}"))?;
     if output.status.success() {
@@ -58,42 +50,39 @@ pub fn export_video(input: ExportVideoInput) -> Result<ExportVideoResult, String
         return Err("输入或输出路径不能为空".to_string());
     }
 
-    let mut cmd = std::process::Command::new(ffmpeg_binary());
-    cmd.arg("-y");
-
-    cmd.arg("-i").arg(&input.input_path);
-
-    // Video codec
-    let video_codec = input.video_codec.as_deref().unwrap_or("h264");
-    let crf = input.crf.unwrap_or(23);
-    cmd.args(["-c:v", video_codec, "-crf", &crf.to_string()]);
-
-    // Audio codec
-    let audio_codec = input.audio_codec.as_deref().unwrap_or("aac");
-    cmd.args(["-c:a", audio_codec, "-b:a", "192k"]);
-
-    // Subtitle burn-in
-    let mut vf_args: Vec<String> = Vec::new();
-    if input.burn_subtitles == Some(true) {
-        if let Some(sub_path) = &input.subtitle_path {
-            if !sub_path.is_empty() {
-                vf_args.push(format!("subtitles=filename='{}'", sub_path));
-            }
+    // Subtitle burn-in path — normalize then delegate to subtitle_burnin module
+    let sub_path_normalized = match &input.subtitle_path {
+        Some(p) if !p.is_empty() && input.burn_subtitles == Some(true) => {
+            Some(normalize_subtitle_file(p, &std::env::temp_dir())?)
         }
-    }
+        _ => None,
+    };
 
-    if !vf_args.is_empty() {
-        cmd.arg("-vf").arg(vf_args.join(","));
-    }
+    if let Some(ref norm_sub) = sub_path_normalized {
+        // Burn subtitles via dedicated module (handles its own FFmpeg invocation)
+        burn_subtitles(&input.input_path, &input.output_path, norm_sub, None)?;
+    } else {
+        // Plain encode — no subtitles
+        let mut cmd = new_cmd();
+        cmd.arg("-i").arg(&input.input_path);
 
-    // movflags for fast start (streaming)
-    cmd.args(["-movflags", "+faststart"]);
+        let video_codec = match input.video_codec.as_deref() {
+            Some("h265") | Some("hevc") => h265_encoder(),
+            Some("h264") | None => h264_encoder(),
+            Some(c) => c,
+        };
+        let crf = input.crf.unwrap_or(23);
+        cmd.args(["-c:v", video_codec, "-crf", &crf.to_string()]);
 
-    cmd.arg(&input.output_path);
+        let audio_codec = input.audio_codec.as_deref().unwrap_or("aac");
+        cmd.args(["-c:a", audio_codec, "-b:a", "192k"]);
+        cmd.args(["-movflags", "+faststart"]);
+        cmd.arg(&input.output_path);
 
-    let output = cmd.output().map_err(|e| format!("FFmpeg 执行失败: {e}"))?;
-    if !output.status.success() {
-        return Err(cmd_err("导出失败", &output));
+        let output = cmd.output().map_err(|e| format!("FFmpeg 执行失败: {e}"))?;
+        if !output.status.success() {
+            return Err(cmd_err("导出失败", &output));
+        }
     }
 
     // Get file size
