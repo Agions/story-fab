@@ -246,19 +246,16 @@ pub async fn transcribe_audio(
         total_segments: None,
     });
 
-    // Build faster-whisper Python command
-    // Pre-defined Python regex quantifier strings (avoids format! parsing {n,} as format spec)
-    const PY_REPEAT_2PLUS: &str = "{2,}";
-    const PY_REPEAT_3PLUS: &str = "{3,}";
-
     let lang_arg = if lang == "auto" {
         "None".to_string()
     } else {
         format!("'{lang}'")
     };
 
-    // Build Python code using concat! to avoid {n,} being parsed as format specifiers
-    let python_code = concat!(
+    // Build Python code using format! for model/audio/lang_arg only.
+    // Python regex quantifiers {2,} / {3,} are embedded as raw Rust string literals
+    // inside the format! body using {{2,}} / {{3,}} — Rust outputs {2,} / {3,} correctly.
+    let python_code = format!(
         r#"
 import sys
 import json
@@ -336,9 +333,7 @@ def normalize_text(text, segment_duration_ms=0):
     # ── 1. Collapse repeated punctuation (≥3 → keep 2, keeps emotional weight) ──
     # e.g. "好！！" → "好！", "啊？？？" → "啊？"
     # Also handles 4+ repeats for both punctuation and emotional chars
-    text = re.sub(r'([。！？，、；：a-zA-Z])\1"#,
-        PY_REPEAT_2PLUS,
-        r#"', r'\1\1', text)
+    text = re.sub(r'([。！？，、；：a-zA-Z])\1{2,}', r'\1\1', text)
 
     # ── 2. 4-char filler chain → single occurrence with proper ending ──────────
     # "然后然后然后然后" → "然后。"  |  "那个那个那个" → "那个。"
@@ -353,13 +348,9 @@ def normalize_text(text, segment_duration_ms=0):
     # ── 3. 3-char emotional fillers → preserve 2 + period ───────────────────
     # "啊啊啊" → "啊啊。" | "嗯嗯嗯" → "嗯嗯。"
     # But avoid "好好好" type cases where it could be genuine repetition
-    text = re.sub(r'^(.{1,2})(\1"#,
-        PY_REPEAT_2PLUS,
-        r#"')$', r'\1\1。', text)
+    text = re.sub(r'^(.{1,2})(\1{{2,}})$', r'\1\1。', text)
     # For 3-char repeats in body, keep 2 and end with punctuation if between sentences
-    text = re.sub(r'([啊呢哦呀嘛~￣])(\1"#,
-        PY_REPEAT_2PLUS,
-        r#"')', lambda m: m.group(1) * 2 + '。', text)
+    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{{2,}})', lambda m: m.group(1) * 2 + '。', text)
 
     # ── 4. Remove common fillers (with word-boundary protection) ───────────────
     # Order: longest patterns first to avoid partial matches
@@ -378,15 +369,9 @@ def normalize_text(text, segment_duration_ms=0):
     # ── 6. Fix mixed punctuation clusters ────────────────────────────────────
     # "，,。" → "。" | "。。。。" → "。"
     text = re.sub(r'[，。．,]+([。.])', r'\1', text)
-    text = re.sub(r'[。.]"#,
-        PY_REPEAT_3PLUS,
-        r#"', '。', text)
-    text = re.sub(r'[？]'"#,
-        PY_REPEAT_2PLUS,
-        r#"', '？', text)
-    text = re.sub(r'[！]'"#,
-        PY_REPEAT_2PLUS,
-        r#"', '！', text)
+    text = re.sub(r'[。.]{{3,}}', '。', text)
+    text = re.sub(r'[？]{{2,}}', '？', text)
+    text = re.sub(r'[！]{{2,}}', '！', text)
 
     # ── 7. Punctuation restoration (反提标点) ─────────────────────────────────
     # Whisper commonly strips punctuation. Detect sentences missing final punct.
