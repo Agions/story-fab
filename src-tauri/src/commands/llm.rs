@@ -705,11 +705,12 @@ pub async fn analyze_video_for_narration(
 
     // 解析分析结果（简单按行分割）
     let lines: Vec<&str> = summary.lines().filter(|l| !l.trim().is_empty()).collect();
+    let lines_for_loop = lines.clone();
     let mut highlights = Vec::new();
     let mut angle = String::new();
     let mut current_section = String::new();
 
-    for line in lines {
+    for line in lines_for_loop {
         let lower = line.to_lowercase();
         if lower.contains("看点") || lower.contains("亮点") || lower.contains("精彩") {
             current_section = "highlights".to_string();
