@@ -252,22 +252,20 @@ pub async fn transcribe_audio(
         format!("'{lang}'")
     };
 
-    // Build Python code using format! for model/audio/lang_arg only.
-    // Python regex quantifiers {2,} / {3,} are embedded as raw Rust string literals
-    // inside the format! body using {{2,}} / {{3,}} — Rust outputs {2,} / {3,} correctly.
-    let python_code = format!(
-        r#"
-import sys
+    // Build Python code using string concatenation — avoids Rust format! macro
+    // entirely so Python regex quantifiers {2,} / {3,} never conflict with {} placeholders.
+    let python_code = [
+        // Part 1: imports + model loading
+        r#"import sys
 import json
 from faster_whisper import WhisperModel
 
-model_size = ""#,
-        model,
+model_size = ""#.to_string(),
+        model.clone(),
         r#""
 device = "cpu"
 compute_type = "int8"
 
-# Use CUDA if available (better performance)
 try:
     import torch
     if torch.cuda.is_available():
@@ -280,10 +278,10 @@ except ImportError:
 model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
 segments, info = model.transcribe(
-    ""#,
+    ""#.to_string(),
         final_audio_path.replace('\\', "\\\\").replace('"', "\\\""),
         r#"",
-    language="#,
+    language="#.to_string(),
         lang_arg,
         r#"",
     word_timestamps=True,
@@ -304,19 +302,6 @@ result = {
 
 def normalize_text(text, segment_duration_ms=0):
     """Professional post-processing for Whisper output.
-    
-    Improvements over v1:
-    - Punctuation restoration: adds 。！？ to Chinese sentences missing punctuation
-    - Smart segment splitting: splits over-long segments (>300 chars or >8s) 
-    - Emotional filler preservation: "啊啊啊啊" → "啊啊。" not ""
-    - 4-char filler chain detection: "然后然后然后然后" → "然后。"
-    - Anti-noise: Whisper timestamp artifacts, music notation fragments
-    - Number normalization: Arabic/Chinese mixed numbers
-    - Brand/proper noun protection: prevents accidental removal of named entities
-    
-    Args:
-        text: Raw Whisper transcription text
-        segment_duration_ms: Segment duration for timing-aware splitting
     """
     import re
     text = text.strip()
@@ -324,87 +309,76 @@ def normalize_text(text, segment_duration_ms=0):
         return text
 
     # ── 0. Pre-clean: remove Whisper timestamp/metadata artifacts ─────────────
-    # e.g. "[0.00s]", "(0:01:23)", "♪ Title - Artist ♪", music notation
     text = re.sub(r'\[[\d.:]+\]', '', text)
     text = re.sub(r'\([\d:]+\)', '', text)
     text = re.sub(r'[\♪♫🎵🎶]+[^\♪♫🎵🎶]*[\♪♫🎵🎶]+', '', text)
     text = re.sub(r'^[\s,，、]*(?:呃|嗯|啊|噢|哈|嘿)\s*', '', text)
 
-    # ── 1. Collapse repeated punctuation (≥3 → keep 2, keeps emotional weight) ──
-    # e.g. "好！！" → "好！", "啊？？？" → "啊？"
-    # Also handles 4+ repeats for both punctuation and emotional chars
+    # ── 1. Collapse repeated punctuation (≥3 → keep 2) ──
     text = re.sub(r'([。！？，、；：a-zA-Z])\1{2,}', r'\1\1', text)
 
-    # ── 2. 4-char filler chain → single occurrence with proper ending ──────────
-    # "然后然后然后然后" → "然后。"  |  "那个那个那个" → "那个。"
+    # ── 2. 4-char filler chain ─
     four_char_chains = [
         '然后然后', '那个那个', '这个这个', '其实其实', '就是就是',
         '其实呃', '就是呃', '就是说呃',
     ]
     for chain in four_char_chains:
         escaped = re.escape(chain)
-        text = re.sub(r'\\B' + escaped + r'\B\B' + escaped + r'\B', r'。', text)
+        text = re.sub(r'\B' + escaped + r'\B\B' + escaped + r'\B', r'。', text)
 
-    # ── 3. 3-char emotional fillers → preserve 2 + period ───────────────────
-    # "啊啊啊" → "啊啊。" | "嗯嗯嗯" → "嗯嗯。"
-    # But avoid "好好好" type cases where it could be genuine repetition
-    text = re.sub(r'^(.{1,2})(\1{{2,}})$', r'\1\1。', text)
-    # For 3-char repeats in body, keep 2 and end with punctuation if between sentences
-    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{{2,}})', lambda m: m.group(1) * 2 + '。', text)
+    # ── 3. 3-char emotional fillers → preserve 2 + period ─
+    text = re.sub(r'^(.{1,2})(\1{2,})$', r'\1\1。', text)
+    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{2,})', lambda m: m.group(1) * 2 + '。', text)
 
-    # ── 4. Remove common fillers (with word-boundary protection) ───────────────
-    # Order: longest patterns first to avoid partial matches
+    # ── 4. Remove common fillers ─
     fillers = [
         '就是说呃', '这个这个', '嗯嗯', '呃呃', '啊啊',
         '就是说', '然后', '那个', '这个',
         '对对对', '对对',
     ]
     for f in fillers:
-        text = re.sub(rf'(?<![a-zA-Z\u4e00-\u9fff]){{re.escape(f)}}(?![a-zA-Z\u4e00-\u9fff])', '', text)
+        pat = r'(?<![a-zA-Z\u4e00-\u9fff])' + re.escape(f) + r'(?![a-zA-Z\u4e00-\u9fff])'
+        text = re.sub(pat, '', text)
 
-    # ── 5. Collapse multiple spaces / whitespace noise ───────────────────────
+    # ── 5. Collapse whitespace ─
     text = re.sub(r'[ \t]+', ' ', text)
     text = re.sub(r'\n+', ' ', text)
 
-    # ── 6. Fix mixed punctuation clusters ────────────────────────────────────
-    # "，,。" → "。" | "。。。。" → "。"
+    # ── 6. Fix mixed punctuation clusters ─
     text = re.sub(r'[，。．,]+([。.])', r'\1', text)
-    text = re.sub(r'[。.]{{3,}}', '。', text)
-    text = re.sub(r'[？]{{2,}}', '？', text)
-    text = re.sub(r'[！]{{2,}}', '！', text)
+    text = re.sub(r'[。.]{3,}', '。', text)
+    text = re.sub(r'[？]{2,}', '？', text)
+    text = re.sub(r'[！]{2,}', '！', text)
 
-    # ── 7. Punctuation restoration (反提标点) ─────────────────────────────────
-    # Whisper commonly strips punctuation. Detect sentences missing final punct.
+    # ── 7. Punctuation restoration ─
     chinese_chars = re.findall(r'[\u4e00-\u9fff]', text)
     if len(chinese_chars) >= 3:
         if text and text[-1] not in '。！？…—–' and not text[-1].isspace():
             if text[-1] not in 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789':
                 text = text + '。'
 
-    # ── 8. Remove trailing speaker labels ────────────────────────────────────
+    # ── 8. Remove trailing speaker labels ─
     text = re.sub(r'\s*[\(\[\(]?\s*(?:SPEAKER_|speaker|Speaker)\s*_?\s*\d+\s*[\)\]\)]?\s*$', '', text, flags=re.IGNORECASE)
     text = re.sub(r'[\（\(][Ss]?[Pp]?[Ee]?[Aa]?[Kk]?[Ee]?[Rr]_[^）\)]+[）\)]', '', text)
 
-    # ── 9. Remove isolated Latin single chars surrounded by spaces ────────────
+    # ── 9. Remove isolated Latin single chars ─
     text = re.sub(r' [a-z] ', ' ', text)
     text = re.sub(r' [A-Z] ', ' ', text)
 
-    # ── 10. Mixed language cleanup ───────────────────────────────────────────
+    # ── 10. Mixed language cleanup ─
     text = re.sub(r'[\.。]+\s*', '. ', text)
     text = re.sub(r'\s+', ' ', text)
 
-    # ── 11. Smart number normalization (skip for readability) ────────────────
-
-    # ── 12. Final cleanup ─────────────────────────────────────────────────────
+    # ── 11. Final cleanup ─
     text = re.sub(r'[\s,，\.]+$', '', text)
     text = text.strip()
 
-    # ── 13. Ensure non-empty ─────────────────────────────────────────────────
+    # ── 12. Ensure non-empty ─
     if not text or text in '。！？…':
-        return '...' 
-    if len(text) > 1 and text[-1] in '，。' and text[-2] in '，。！?':
+        return '...'
+    if len(text) > 1 and text[-1] in '，。，' and text[-2] in '，。！？':
         text = text[:-1]
-    
+
     return text
 
 for seg in segments:
@@ -426,7 +400,8 @@ for seg in segments:
 
 print(json.dumps(result, ensure_ascii=False))
 "#,
-    );
+    ]
+    .join("");
 
     let _ = app.emit("whisper-progress", TranscribeProgress {
         stage: format!("Whisper {} 模型推理中...", model),
