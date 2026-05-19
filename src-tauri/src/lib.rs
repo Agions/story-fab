@@ -13,7 +13,7 @@ pub mod subtitle;
 pub mod highlight_detector;
 pub mod smart_segmenter;
 
-pub use commands::{ai, ffprobe, project, render, export_state, file_ops};
+pub use commands::{ai, auto_save, ffprobe, project, render, export_state, file_ops};
 pub use types::*;
 
 // Re-export all commands so generate_handler! can find them at crate root
@@ -100,6 +100,12 @@ pub fn run() {
             list_tts_backends,
             translate_text,
             get_export_dir,
+            // Auto-save / crash recovery
+            auto_save::auto_save_project,
+            auto_save::clear_autosave,
+            auto_save::list_recoverable_projects,
+            auto_save::recover_autosave,
+            auto_save::preview_autosave,
         ])
         .setup(|app| {
             tracing::info!("[CutDeck] 应用初始化中...");
