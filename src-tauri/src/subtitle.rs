@@ -255,7 +255,6 @@ pub async fn transcribe_audio(
     // Build Python code using string concatenation — avoids Rust format! macro
     // entirely so Python regex quantifiers {2,} / {3,} never conflict with {} placeholders.
     let python_code = [
-        // Part 1: imports + model loading
         r#"import sys
 import json
 from faster_whisper import WhisperModel
@@ -399,7 +398,7 @@ for seg in segments:
     })
 
 print(json.dumps(result, ensure_ascii=False))
-"#,
+"#.to_string(),
     ]
     .join("");
 
