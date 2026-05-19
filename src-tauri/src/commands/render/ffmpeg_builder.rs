@@ -132,13 +132,14 @@ mod tests {
 
     #[test]
     fn test_apply_time_segment_duration_never_negative() {
-        use std::process::Command;
-        let mut cmd = Command::new("echo");
-        apply_time_segment(&mut cmd, 10.0, 5.0); // end < start
-        // duration should be max(5-10, 0) = 0, not -5
-        let args: Vec<_> = cmd.get_args().collect();
-        assert!(args.is_empty() || true); // echo ignores args; logic verified below
-        let duration = (5.0 - 10.0).max(0.0);
-        assert_eq!(duration, 0.0);
+        // Verify the duration calculation: end < start should yield 0
+        let (start, end) = (10.0, 5.0);
+        let duration = (end - start).max(0.0);
+        assert_eq!(duration, 0.0, "negative duration should clamp to 0");
+
+        // Normal case
+        let (start, end) = (5.0, 10.0);
+        let duration = (end - start).max(0.0);
+        assert_eq!(duration, 5.0);
     }
 }

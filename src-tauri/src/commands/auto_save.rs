@@ -35,16 +35,6 @@ async fn get_cutdeck_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
 }
 
 /// Write an autosave snapshot of the project.
-///
-```
-[command]
-async fn auto_save_project(
-    app: tauri::AppHandle,
-    project_id: String,
-    content: String,       // full project JSON
-) -> Result<(), String>
-```
-///
 /// The autosave file is stored as `{project_id}.autosave.json`.
 /// A successful "save_project_file" should be followed by "clear_autosave".
 #[tauri::command]
