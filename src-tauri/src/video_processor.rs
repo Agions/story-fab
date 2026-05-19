@@ -2,7 +2,7 @@
 // All commands create a fresh VideoProcessor instance per call to avoid
 // shared-state issues in a single-threaded Tauri handler environment.
 
-use crate::binary::{ffmpeg_binary, ffprobe_binary};
+use crate::binary::{ffmpeg_binary, ffprobe_binary, hw_accel, HwAccel};
 use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time, write_concat_file};
 use serde::Deserialize;
 use std::fs;
@@ -184,12 +184,16 @@ impl VideoProcessor {
             "-i", input,
         ];
 
-        // Hardware acceleration if enabled
-        if hw_accel.unwrap_or(false) {
-            args.extend(&["-c:v", "h264_nvenc", "-preset", "fast"]);
-        } else {
-            args.extend(&["-c:v", "libx264", "-preset", "fast", "-crf", "23"]);
-        }
+        // Hardware acceleration — auto-detect unless explicitly overridden
+        let enc = match hw_accel {
+            Some(true) => hw_accel().h264_encoder(),
+            Some(false) => "libx264",
+            None => {
+                let detected = hw_accel();
+                if detected == HwAccel::Cpu { "libx264" } else { detected.h264_encoder() }
+            }
+        };
+        args.extend(&["-c:v", enc, "-preset", "fast"]);
 
         args.extend(&["-c:a", "aac", "-movflags", "+faststart", output]);
 
@@ -352,11 +356,16 @@ pub async fn cut_video(
                     &input_path,
                 ];
 
-                if hw_accel {
-                    args.extend(&["-c:v", "h264_nvenc", "-preset", "fast"]);
-                } else {
-                    args.extend(&["-c:v", "libx264", "-preset", "fast", "-crf", "23"]);
-                }
+                // Hardware acceleration — auto-detect unless explicitly overridden
+                let enc = match hw_accel {
+                    Some(true) => hw_accel().h264_encoder(),
+                    Some(false) => "libx264",
+                    None => {
+                        let detected = hw_accel();
+                        if detected == HwAccel::Cpu { "libx264" } else { detected.h264_encoder() }
+                    }
+                };
+                args.extend(&["-c:v", enc, "-preset", "fast"]);
 
                 args.extend(&["-c:a", "aac", "-movflags", "+faststart"]);
                 let temp_file_str = temp_file.to_string_lossy();

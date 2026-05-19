@@ -81,10 +81,8 @@ pub fn list_whisper_models() -> Vec<WhisperModelInfo> {
         ("base", "74M", "base.en", "base"),
         ("small", "244M", "small.en", "small"),
         ("medium", "769M", "medium.en", "medium"),
-        ("large-v1", "1550M", "large-v1", "large-v1"),
-        ("large-v2", "1550M", "large-v2", "large-v2"),
         ("large-v3", "1550M", "large-v3", "large-v3"),
-        ("distil-large-v2", "820M", "distil-large-v2", "distil-large-v2"),
+        ("distil-large-v3", "820M", "distil-large-v3", "distil-large-v3"),
         ("distil-medium.en", "448M", "distil-medium.en", "distil-medium.en"),
         ("distil-small.en", "140M", "distil-small.en", "distil-small.en"),
     ];
@@ -264,17 +262,40 @@ model_size = ""#.to_string(),
         r#""
 device = "cpu"
 compute_type = "int8"
+batch_size = 8
 
 try:
     import torch
     if torch.cuda.is_available():
         device = "cuda"
         compute_type = "float16"
-        print("Using CUDA", file=sys.stderr)
+        print("Using CUDA with float16", file=sys.stderr)
+    else:
+        # Check for Intel GPU via OpenVINO
+        try:
+            import openvino
+            openvino_available = True
+        except ImportError:
+            openvino_available = False
+        if openvino_available:
+            device = "cpu"
+            compute_type = "int8"
+            # OpenVINO is auto-activated when installed
+            print("Using OpenVINO (Intel GPU/CPU)", file=sys.stderr)
+        else:
+            # CPU with larger batch
+            batch_size = 16
+            print("Using CPU with batch_size=16", file=sys.stderr)
 except ImportError:
     pass
 
-model = WhisperModel(model_size, device=device, compute_type=compute_type)
+model = WhisperModel(
+    model_size,
+    device=device,
+    compute_type=compute_type,
+    num_workers=4,
+    batch_size=batch_size,
+)
 
 segments, info = model.transcribe(
     ""#.to_string(),
