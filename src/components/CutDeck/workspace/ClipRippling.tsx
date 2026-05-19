@@ -218,7 +218,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
         <div className={styles.controlRow}>
           <label className={styles.label}>目标平台</label>
           <Select
-            value={platform}
+            value={String(platform)}
             onValueChange={(v: string | null) => setPlatform(v as SocialPlatform)}
             className={styles.select}
            
