@@ -277,7 +277,7 @@ model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
 segments, info = model.transcribe(
     "{{audio}}",
-    language={lang_arg},
+    language={{lang_arg}},
     word_timestamps=True,
     vad_filter=True,
     vad_parameters={{"min_silence_duration_ms": 500}},
