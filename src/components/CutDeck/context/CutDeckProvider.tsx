@@ -64,6 +64,16 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     }
   }, []);
 
+  // 确保组件卸载时也清理 blob URL
+  React.useEffect(() => {
+    return () => {
+      if (videoBlobUrlRef.current) {
+        URL.revokeObjectURL(videoBlobUrlRef.current);
+        videoBlobUrlRef.current = null;
+      }
+    };
+  }, []);
+
   // 便捷方法 - 使用 useCallback 稳定函数引用
   const setStep = useCallback((step: cut_deckStep) => {
     dispatch({ type: 'SET_STEP', payload: step });

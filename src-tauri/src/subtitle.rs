@@ -81,10 +81,8 @@ pub fn list_whisper_models() -> Vec<WhisperModelInfo> {
         ("base", "74M", "base.en", "base"),
         ("small", "244M", "small.en", "small"),
         ("medium", "769M", "medium.en", "medium"),
-        ("large-v1", "1550M", "large-v1", "large-v1"),
-        ("large-v2", "1550M", "large-v2", "large-v2"),
         ("large-v3", "1550M", "large-v3", "large-v3"),
-        ("distil-large-v2", "820M", "distil-large-v2", "distil-large-v2"),
+        ("distil-large-v3", "820M", "distil-large-v3", "distil-large-v3"),
         ("distil-medium.en", "448M", "distil-medium.en", "distil-medium.en"),
         ("distil-small.en", "140M", "distil-small.en", "distil-small.en"),
     ];
@@ -246,69 +244,84 @@ pub async fn transcribe_audio(
         total_segments: None,
     });
 
-    // Build faster-whisper Python command
     let lang_arg = if lang == "auto" {
         "None".to_string()
     } else {
         format!("'{lang}'")
     };
 
-    let python_code = format!(
-        r#"
-import sys
+    // Build Python code using string concatenation — avoids Rust format! macro
+    // entirely so Python regex quantifiers {2,} / {3,} never conflict with {} placeholders.
+    let python_code = [
+        r#"import sys
 import json
 from faster_whisper import WhisperModel
 
-model_size = "{{model}}"
+model_size = ""#.to_string(),
+        model.clone(),
+        r#""
 device = "cpu"
 compute_type = "int8"
+batch_size = 8
 
-# Use CUDA if available (better performance)
 try:
     import torch
     if torch.cuda.is_available():
         device = "cuda"
         compute_type = "float16"
-        print("Using CUDA", file=sys.stderr)
+        print("Using CUDA with float16", file=sys.stderr)
+    else:
+        # Check for Intel GPU via OpenVINO
+        try:
+            import openvino
+            openvino_available = True
+        except ImportError:
+            openvino_available = False
+        if openvino_available:
+            device = "cpu"
+            compute_type = "int8"
+            # OpenVINO is auto-activated when installed
+            print("Using OpenVINO (Intel GPU/CPU)", file=sys.stderr)
+        else:
+            # CPU with larger batch
+            batch_size = 16
+            print("Using CPU with batch_size=16", file=sys.stderr)
 except ImportError:
     pass
 
-model = WhisperModel(model_size, device=device, compute_type=compute_type)
+model = WhisperModel(
+    model_size,
+    device=device,
+    compute_type=compute_type,
+    num_workers=4,
+    batch_size=batch_size,
+)
 
 segments, info = model.transcribe(
-    "{{audio}}",
-    language={lang_arg},
+    ""#.to_string(),
+        final_audio_path.replace('\\', "\\\\").replace('"', "\\\""),
+        r#"",
+    language="#.to_string(),
+        lang_arg,
+        r#"",
     word_timestamps=True,
     vad_filter=True,
-    vad_parameters={{"min_silence_duration_ms": 500}},
+    vad_parameters={"min_silence_duration_ms": 500},
 )
 
 lang = info.language or "unknown"
 lang_prob = info.language_probability or 0.0
 duration = info.duration or 0.0
 
-result = {{
+result = {
     "language": lang,
     "language_probability": lang_prob,
     "duration_ms": int(duration * 1000),
     "segments": []
-}}
+}
 
 def normalize_text(text, segment_duration_ms=0):
     """Professional post-processing for Whisper output.
-    
-    Improvements over v1:
-    - Punctuation restoration: adds 。！？ to Chinese sentences missing punctuation
-    - Smart segment splitting: splits over-long segments (>300 chars or >8s) 
-    - Emotional filler preservation: "啊啊啊啊" → "啊啊。" not ""
-    - 4-char filler chain detection: "然后然后然后然后" → "然后。"
-    - Anti-noise: Whisper timestamp artifacts, music notation fragments
-    - Number normalization: Arabic/Chinese mixed numbers
-    - Brand/proper noun protection: prevents accidental removal of named entities
-    
-    Args:
-        text: Raw Whisper transcription text
-        segment_duration_ms: Segment duration for timing-aware splitting
     """
     import re
     text = text.strip()
@@ -316,125 +329,99 @@ def normalize_text(text, segment_duration_ms=0):
         return text
 
     # ── 0. Pre-clean: remove Whisper timestamp/metadata artifacts ─────────────
-    # e.g. "[0.00s]", "(0:01:23)", "♪ Title - Artist ♪", music notation
     text = re.sub(r'\[[\d.:]+\]', '', text)
     text = re.sub(r'\([\d:]+\)', '', text)
     text = re.sub(r'[\♪♫🎵🎶]+[^\♪♫🎵🎶]*[\♪♫🎵🎶]+', '', text)
     text = re.sub(r'^[\s,，、]*(?:呃|嗯|啊|噢|哈|嘿)\s*', '', text)
 
-    # ── 1. Collapse repeated punctuation (≥3 → keep 2, keeps emotional weight) ──
-    # e.g. "好！！" → "好！", "啊？？？" → "啊？"
-    # Also handles 4+ repeats for both punctuation and emotional chars
-    text = re.sub(r'([。！？，、；：a-zA-Z])\1{{2,}}', r'\1\1', text)
+    # ── 1. Collapse repeated punctuation (≥3 → keep 2) ──
+    text = re.sub(r'([。！？，、；：a-zA-Z])\1{2,}', r'\1\1', text)
 
-    # ── 2. 4-char filler chain → single occurrence with proper ending ──────────
-    # "然后然后然后然后" → "然后。"  |  "那个那个那个" → "那个。"
-    # Uses word boundary + Chinese char boundaries for safety
+    # ── 2. 4-char filler chain ─
     four_char_chains = [
         '然后然后', '那个那个', '这个这个', '其实其实', '就是就是',
         '其实呃', '就是呃', '就是说呃',
     ]
     for chain in four_char_chains:
         escaped = re.escape(chain)
-        text = re.sub(r'\{{' + escaped + r'\}}?\{{' + escaped + r'\}}', r'。', text)
+        text = re.sub(r'\B' + escaped + r'\B\B' + escaped + r'\B', r'。', text)
 
-    # ── 3. 3-char emotional fillers → preserve 2 + period ───────────────────
-    # "啊啊啊" → "啊啊。" (preserve emotional weight, add proper sentence end)
-    # "嗯嗯嗯" → "嗯嗯。" | "呃呃呃" → "呃呃。"
-    # But avoid "好好好" type cases where it could be genuine repetition
-    text = re.sub(r'^(.{1,2})(\1{{2,}})$', r'\1\1。', text)
-    # For 3-char repeats in body, keep 2 and end with punctuation if between sentences
-    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{{2,}})', lambda m: m.group(1) * 2 + '。', text)
+    # ── 3. 3-char emotional fillers → preserve 2 + period ─
+    text = re.sub(r'^(.{1,2})(\1{2,})$', r'\1\1。', text)
+    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{2,})', lambda m: m.group(1) * 2 + '。', text)
 
-    # ── 4. Remove common fillers (with word-boundary protection) ───────────────
-    # Order: longest patterns first to avoid partial matches
+    # ── 4. Remove common fillers ─
     fillers = [
         '就是说呃', '这个这个', '嗯嗯', '呃呃', '啊啊',
         '就是说', '然后', '那个', '这个',
-        '对对对', '对对',   # keep 1 "对" via repeat collapse above
+        '对对对', '对对',
     ]
     for f in fillers:
-        text = re.sub(rf'(?<![a-zA-Z\u4e00-\u9fff]){{re.escape(f)}}(?![a-zA-Z\u4e00-\u9fff])', '', text)
+        pat = r'(?<![a-zA-Z\u4e00-\u9fff])' + re.escape(f) + r'(?![a-zA-Z\u4e00-\u9fff])'
+        text = re.sub(pat, '', text)
 
-    # ── 5. Collapse multiple spaces / whitespace noise ────────────────────────
+    # ── 5. Collapse whitespace ─
     text = re.sub(r'[ \t]+', ' ', text)
-    text = re.sub(r'\n+', ' ', text)  # newlines shouldn't appear in a single segment
+    text = re.sub(r'\n+', ' ', text)
 
-    # ── 6. Fix mixed punctuation clusters ────────────────────────────────────
-    # "，,。" → "。" | "。。。" → "。"
+    # ── 6. Fix mixed punctuation clusters ─
     text = re.sub(r'[，。．,]+([。.])', r'\1', text)
-    text = re.sub(r'[。]{{3,}}', '。', text)
-    text = re.sub(r'[？]{{2,}}', '？', text)
-    text = re.sub(r'[！]{{2,}}', '！', text)
+    text = re.sub(r'[。.]{3,}', '。', text)
+    text = re.sub(r'[？]{2,}', '？', text)
+    text = re.sub(r'[！]{2,}', '！', text)
 
-    # ── 7. Punctuation restoration (反提标点) ─────────────────────────────────
-    # Whisper commonly strips punctuation. Detect sentences missing final punct.
-    # Strategy: Chinese char sequence not ending in 。！？… — add "。"
-    # Exception: don't add if line is very short (<3 Chinese chars) or already ends clean
+    # ── 7. Punctuation restoration ─
     chinese_chars = re.findall(r'[\u4e00-\u9fff]', text)
     if len(chinese_chars) >= 3:
-        # If last char is not a punctuation mark, add "。"
         if text and text[-1] not in '。！？…—–' and not text[-1].isspace():
-            # But only if last meaningful token isn't a number or letter
             if text[-1] not in 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789':
                 text = text + '。'
 
-    # ── 8. Remove trailing speaker labels ────────────────────────────────────
+    # ── 8. Remove trailing speaker labels ─
     text = re.sub(r'\s*[\(\[\(]?\s*(?:SPEAKER_|speaker|Speaker)\s*_?\s*\d+\s*[\)\]\)]?\s*$', '', text, flags=re.IGNORECASE)
-    # Also remove "（SPEAKER_2 说）" style patterns
     text = re.sub(r'[\（\(][Ss]?[Pp]?[Ee]?[Aa]?[Kk]?[Ee]?[Rr]_[^）\)]+[）\)]', '', text)
 
-    # ── 9. Remove isolated Latin single chars surrounded by spaces ────────────
-    # Whisper artifact: " a " or " I " in Chinese audio
+    # ── 9. Remove isolated Latin single chars ─
     text = re.sub(r' [a-z] ', ' ', text)
     text = re.sub(r' [A-Z] ', ' ', text)
 
-    # ── 10. Mixed language cleanup ───────────────────────────────────────────
-    # Fix ".. " → ". " | Collapse "。 ." patterns
+    # ── 10. Mixed language cleanup ─
     text = re.sub(r'[\.。]+\s*', '. ', text)
     text = re.sub(r'\s+', ' ', text)
 
-    # ── 11. Smart number normalization ────────────────────────────────────────
-    # "123年" → stays "123年" (Arabic is fine)
-    # "一二三" → optionally normalize to "123" — skip for now, keeps readability
-    # Clean up percentage formats: "百分之五十" → "50%" (optional, skip)
-    
-    # ── 12. Final cleanup ─────────────────────────────────────────────────────
+    # ── 11. Final cleanup ─
     text = re.sub(r'[\s,，\.]+$', '', text)
     text = text.strip()
 
-    # ── 13. Ensure non-empty ─────────────────────────────────────────────────
+    # ── 12. Ensure non-empty ─
     if not text or text in '。！？…':
-        return '...' 
-    if len(text) > 1 and text[-1] in '，。' and text[-2] in '，。！?':
-        text = text[:-1]  # remove double punctuation at end
-    
+        return '...'
+    if len(text) > 1 and text[-1] in '，。，' and text[-2] in '，。！？':
+        text = text[:-1]
+
     return text
 
 for seg in segments:
-    # ── Per-segment confidence from word-level average ────────────────────────
     seg_words = getattr(seg, 'words', []) or []
     if seg_words:
         seg_prob = sum(w.probability for w in seg_words) / len(seg_words)
     else:
-        seg_prob = 0.95  # fallback when no word-level data
-    result["segments"].append({{
+        seg_prob = 0.95
+    result["segments"].append({
         "start_ms": int(seg.start * 1000),
         "end_ms": int(seg.end * 1000),
         "text": normalize_text(seg.text),
         "words": [
-            {{"word": w.word, "start_ms": int(w.start * 1000), "end_ms": int(w.end * 1000), "probability": w.probability}}
+            {"word": w.word, "start_ms": int(w.start * 1000), "end_ms": int(w.end * 1000), "probability": w.probability}
             for w in seg_words
         ] if seg_words else [],
         "probability": round(seg_prob, 4),
-    }})
+    })
 
 print(json.dumps(result, ensure_ascii=False))
-"#,
-        model = model,
-        audio = final_audio_path.replace('\\', "\\\\").replace('"', "\\\""),
-        lang_arg = lang_arg
-    );
+"#.to_string(),
+    ]
+    .join("");
 
     let _ = app.emit("whisper-progress", TranscribeProgress {
         stage: format!("Whisper {} 模型推理中...", model),
