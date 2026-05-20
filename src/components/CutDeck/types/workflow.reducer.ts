@@ -28,7 +28,7 @@ export function clipFlowReducer(state: cut_deckState, action: cut_deckAction): c
       // 深拷贝project对象，防止外部mutation影响state
       return { 
         ...state, 
-        project: action.payload ? JSON.parse(JSON.stringify(action.payload)) : null,
+        project: action.payload ? structuredClone(action.payload) : null,
         stepStatus: action.payload ? { ...state.stepStatus, 'project-create': true } : state.stepStatus,
         currentStep: action.payload ? 'video-upload' : state.currentStep,
       };
@@ -37,7 +37,7 @@ export function clipFlowReducer(state: cut_deckState, action: cut_deckAction): c
       // 深拷贝video对象及其thumbnail，防止Blob URL泄漏
       return { 
         ...state, 
-        currentVideo: action.payload ? JSON.parse(JSON.stringify(action.payload)) : null,
+        currentVideo: action.payload ? structuredClone(action.payload) : null,
         duration: action.payload?.duration || 0,
         stepStatus: action.payload ? { ...state.stepStatus, 'video-upload': true } : state.stepStatus,
       };
@@ -46,7 +46,7 @@ export function clipFlowReducer(state: cut_deckState, action: cut_deckAction): c
       // 深拷贝analysis，防止外部mutation
       return { 
         ...state, 
-        analysis: action.payload ? JSON.parse(JSON.stringify(action.payload)) : null,
+        analysis: action.payload ? structuredClone(action.payload) : null,
         stepStatus: action.payload ? { ...state.stepStatus, 'ai-analyze': true } : state.stepStatus,
       };
     

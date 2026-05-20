@@ -2,8 +2,12 @@
  * SettingsDialog — 设置对话框
  * shadcn Dialog, 640px wide
  * 4 tabs: AI | Appearance | Shortcuts | Export
+ *
+ * AI Tab 内包含:
+ *   - AISettings        — 默认模型选择 + API Key 快速验证
+ *   - ApiKeysPanel      — 多 Provider API Keys 管理（增删改查）
  */
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,9 +15,15 @@ import {
   DialogTitle,
 } from '../ui/dialog';
 import { AISettings } from './AISettings';
+import ApiKeysPanel from './ApiKeysPanel';
 import { AppearanceSettings } from './AppearanceSettings';
 import { ShortcutSettings } from './ShortcutSettings';
 import { ExportSettings } from './ExportSettings';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { AI_MODELS } from '@/core/config/aiModels.config';
+import type { ModelProvider } from '@/core/types';
+import { notify } from '@/shared';
+import { validateApiKey } from '@/core/services/providers/apiKeyService';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -29,6 +39,85 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'export', label: 'Export' },
 ];
 
+// ─── AI Tab 内容 ───────────────────────────────────────────────
+interface ApiKeyConfig { key: string; isValid?: boolean; }
+
+const AITabContent: React.FC = () => {
+  const [apiKeys, setApiKeys] = useLocalStorage<Partial<Record<ModelProvider, ApiKeyConfig>>>(
+    'api_keys', {}
+  );
+  const [defaultModel, setDefaultModel] = useLocalStorage<string>('default_model', 'gpt-5.5');
+
+  // 当前选中模型对应的 provider 和 apiKey
+  const selectedModel = AI_MODELS.find(m => m.id === defaultModel);
+  const selectedProvider = selectedModel?.provider as ModelProvider | undefined;
+  const currentApiKey = selectedProvider ? apiKeys[selectedProvider]?.key ?? '' : '';
+
+  // 更新单个 provider 的 API Key（含验证）
+  const handleUpdateKey = useCallback(async (provider: ModelProvider, key: string) => {
+    const newKeys = { ...apiKeys };
+
+    if (!key.trim()) {
+      delete newKeys[provider];
+    } else {
+      // 先设为无效状态，再异步验证
+      newKeys[provider] = { key, isValid: undefined };
+    }
+    setApiKeys(newKeys);
+
+    // 异步验证
+    if (key.trim()) {
+      const result = await validateApiKey(provider, key);
+      setApiKeys(prev => ({
+        ...prev,
+        [provider]: { key, isValid: result.isValid },
+      }));
+      if (!result.isValid) {
+        notify.error(null, `${provider} 密钥验证失败：${result.error}`);
+      }
+    }
+  }, [apiKeys, setApiKeys]);
+
+  // 删除某个 provider 的 API Key
+  const handleDeleteKey = useCallback((provider: ModelProvider) => {
+    setApiKeys(prev => {
+      const next = { ...prev };
+      delete next[provider];
+      return next;
+    });
+    notify.success('已删除该 API Key');
+  }, [setApiKeys]);
+
+  // 默认模型切换时，同步 API Key 输入框显示对应的 key
+  const handleModelChange = useCallback((modelId: string) => {
+    setDefaultModel(modelId);
+  }, [setDefaultModel]);
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* 默认模型 + 快速验证 */}
+      <AISettings
+        apiKey={currentApiKey}
+        model={defaultModel}
+        onApiKeyChange={(key) => {
+          if (selectedProvider) {
+            handleUpdateKey(selectedProvider, key);
+          }
+        }}
+        onModelChange={handleModelChange}
+      />
+
+      {/* 多 Provider API Keys 完整管理 */}
+      <ApiKeysPanel
+        apiKeys={apiKeys}
+        onUpdateKey={handleUpdateKey}
+        onDeleteKey={handleDeleteKey}
+      />
+    </div>
+  );
+};
+
+// ─── 主组件 ───────────────────────────────────────────────────
 export const SettingsDialog = memo<SettingsDialogProps>(({ open, onOpenChange }) => {
   const [activeTab, setActiveTab] = useState<TabKey>('ai');
 
@@ -62,7 +151,7 @@ export const SettingsDialog = memo<SettingsDialogProps>(({ open, onOpenChange })
 
         {/* Tab content */}
         <div className="max-h-[60vh] overflow-y-auto pr-2">
-          {activeTab === 'ai' && <AISettings />}
+          {activeTab === 'ai' && <AITabContent />}
           {activeTab === 'appearance' && <AppearanceSettings />}
           {activeTab === 'shortcuts' && <ShortcutSettings />}
           {activeTab === 'export' && <ExportSettings />}

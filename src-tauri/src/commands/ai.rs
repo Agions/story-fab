@@ -5,13 +5,17 @@ use crate::types::{
 use crate::highlight_detector::HighlightDetector;
 use crate::smart_segmenter::SmartSegmenter;
 use crate::utils::cmd_err;
+use crate::binary::resolve_binary_path;
 use serde::{Deserialize, Serialize};
 
-const DEFAULT_EDGE_TTS: &str = "/usr/bin/edge-tts";
-
-/// Resolve edge-tts path: CUTDECK_EDGE_TTS_PATH env > DEFAULT_EDGE_TTS
+/// Resolve edge-tts path: CUTDECK_EDGE_TTS_PATH env > search PATH > "edge-tts"
 fn edge_tts_path() -> String {
-    std::env::var("CUTDECK_EDGE_TTS_PATH").unwrap_or_else(|_| DEFAULT_EDGE_TTS.to_string())
+    if let Ok(path) = std::env::var("CUTDECK_EDGE_TTS_PATH") {
+        if !path.trim().is_empty() {
+            return path;
+        }
+    }
+    resolve_binary_path("edge-tts")
 }
 
 /// Compute mean of an iterator of f64, returning 0.0 for empty input.
