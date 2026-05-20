@@ -1,0 +1,2 @@
+src/components/CutDeck/workspace/ClipRippling.tsx(223,13): error TS2322: Type '{ children: Element[]; value: string; onValueChange: (v: string | null) => void; className: string; }' is not assignable to type 'IntrinsicAttributes & Props<string, false>'.
+src/components/CutDeck/workspace/ClipRippling.tsx(239,13): error TS2322: Type '{ children: Element[]; value: string; onValueChange: (v: string | null) => void; className: string; }' is not assignable to type 'IntrinsicAttributes & Props<string, false>'.

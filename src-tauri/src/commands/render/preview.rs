@@ -2,11 +2,10 @@
 //!
 //! Extracted from render.rs (original lines 561-637).
 
-use crate::binary::ffmpeg_binary;
 use crate::utils::chrono_like_timestamp;
-use serde::Deserialize;
+use super::ffmpeg_builder::{new_cmd, apply_time_segment, h264_encoder};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GeneratePreviewInput {
     pub input_path: String,
@@ -21,7 +20,7 @@ pub struct GeneratePreviewInput {
     pub add_subtitles: Option<bool>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PreviewSegment {
     pub start: f64,
@@ -45,17 +44,16 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
 
     let duration = (input.segment.end - input.segment.start).max(0.1);
 
-    let mut cmd = tokio::process::Command::new(ffmpeg_binary());
-    cmd.arg("-y")
-        .arg("-ss").arg(input.segment.start.to_string())
-        .arg("-t").arg(duration.to_string())
-        .arg("-i").arg(&input.input_path)
-        .arg("-c:v").arg("libx264")
-        .arg("-preset").arg("ultrafast")
-        .arg("-crf").arg("28")
-        .arg("-c:a").arg("aac")
-        .arg("-b:a").arg("128k")
-        .arg("-movflags").arg("+faststart");
+    let mut cmd = new_cmd();
+    cmd.arg("-ss").arg(input.segment.start.to_string());
+    cmd.arg("-t").arg(duration.to_string());
+    cmd.arg("-i").arg(&input.input_path);
+    cmd.arg("-c:v").arg(h264_encoder());
+    cmd.arg("-preset").arg("ultrafast");
+    cmd.arg("-crf").arg("28");
+    cmd.arg("-c:a").arg("aac");
+    cmd.arg("-b:a").arg("128k");
+    cmd.arg("-movflags").arg("+faststart");
 
     if let Some(vol) = input.volume {
         if (0.0..=2.0).contains(&vol) {

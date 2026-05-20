@@ -29,7 +29,7 @@ export const ProjectEditHeader = React.memo<ProjectEditHeaderProps>(({
     <div className="flex items-center gap-4">
       <div className={styles.saveBehaviorControl}>
         <span className={styles.saveBehaviorLabel}>保存后：</span>
-        <Select value={saveBehavior} onValueChange={(v: string) => onSaveBehaviorChange(v as ProjectSaveBehavior)}>
+        <Select value={saveBehavior} onValueChange={(v: string | null) => onSaveBehaviorChange(v as ProjectSaveBehavior)}>
           <SelectTrigger size="sm" className="w-36">
             <SelectValue />
           </SelectTrigger>
