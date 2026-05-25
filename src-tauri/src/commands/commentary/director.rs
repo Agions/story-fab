@@ -210,7 +210,7 @@ pub struct DirectorStatusResponse {
 
 /// 获取或创建 Director 状态机
 pub fn get_or_create_state(session_id: &str) -> DirectorStateMachine {
-    let mut states = DIRECTOR_STATES.lock().unwrap();
+    let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
     states
         .entry(session_id.to_string())
         .or_insert_with(|| DirectorStateMachine {
@@ -229,7 +229,7 @@ pub fn get_or_create_state(session_id: &str) -> DirectorStateMachine {
 
 /// 更新 Director 状态
 pub fn update_state(session_id: &str, new_state: DirectorState) {
-    let mut states = DIRECTOR_STATES.lock().unwrap();
+    let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
     if let Some(machine) = states.get_mut(session_id) {
         machine.state = new_state;
         machine.updated_at = unix_timestamp();
@@ -238,7 +238,7 @@ pub fn update_state(session_id: &str, new_state: DirectorState) {
 
 /// 清除 Director 状态
 pub fn clear_state(session_id: &str) {
-    let mut states = DIRECTOR_STATES.lock().unwrap();
+    let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
     states.remove(session_id);
 }
 
@@ -269,7 +269,7 @@ pub fn create_director_session(
         .unwrap_or_default();
 
     let machine = get_or_create_state(&session_id);
-    let mut states = DIRECTOR_STATES.lock().unwrap();
+    let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
     if let Some(m) = states.get_mut(&session_id) {
         m.style = style;
         m.state = DirectorState::Idle;
