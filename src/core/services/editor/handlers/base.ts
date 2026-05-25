@@ -10,7 +10,7 @@ import type { EditorAction, Timeline } from '../../../types/timeline';
 export abstract class BaseActionHandler implements IActionHandler {
   abstract readonly actionType: EditorAction['type'];
   
-  handle(timeline: Timeline, _action: EditorAction): Timeline {
+  handle(_timeline: Timeline, _action: EditorAction): Timeline {
     throw new Error(`Handler ${this.actionType} must implement handle()`);
   }
   

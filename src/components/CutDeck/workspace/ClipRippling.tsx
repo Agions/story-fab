@@ -11,7 +11,7 @@
  *   bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
  */
 
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, useMemo } from 'react';
 import { useCutDeck } from '../context';
 import { Button } from '../../ui/button';
 import { Progress } from '../../ui/progress';
@@ -25,7 +25,7 @@ import {
   CheckCircle,
   Download,
 } from 'lucide-react';
-import { tauri, TauriCommand } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri/TauriBridge';
 import { motion } from '../../common/motion-shim';
 import { ClipRepurposingPipeline } from '../../../core/services/pipeline/clip-pipeline/pipeline';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
@@ -78,19 +78,21 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
   const { state } = useCutDeck();
   const { currentVideo, analysis } = state;
   const videoPath = currentVideo?.path ?? '';
-  const videoInfo: VideoInfo = currentVideo
-    ? {
-        id: currentVideo.id || `video_${Date.now()}`,
-        name: currentVideo.name || 'video',
-        path: currentVideo.path,
-        duration: currentVideo.duration,
-        width: currentVideo.width ?? 1920,
-        height: currentVideo.height ?? 1080,
-        size: currentVideo.size || 0,
-        fps: DEFAULT_FPS,
-        format: 'mp4',
-      }
-    : { id: '', name: '', path: '', duration: 0, width: 1920, height: 1080, size: 0, fps: DEFAULT_FPS, format: 'mp4' };
+  const videoInfo = useMemo<VideoInfo>(() => (
+    currentVideo
+      ? {
+          id: currentVideo.id || `video_${Date.now()}`,
+          name: currentVideo.name || 'video',
+          path: currentVideo.path,
+          duration: currentVideo.duration,
+          width: currentVideo.width ?? 1920,
+          height: currentVideo.height ?? 1080,
+          size: currentVideo.size || 0,
+          fps: DEFAULT_FPS,
+          format: 'mp4',
+        }
+      : { id: '', name: '', path: '', duration: 0, width: 1920, height: 1080, size: 0, fps: DEFAULT_FPS, format: 'mp4' }
+  ), [currentVideo]);
   const [platform, setPlatform] = useState<SocialPlatform>('douyin');
   const [selectedFormats, setSelectedFormats] = useState<AspectRatio[]>(['9:16', '1:1']);
   const [targetCount, setTargetCount] = useState(5);

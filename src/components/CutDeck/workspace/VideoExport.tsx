@@ -58,7 +58,6 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
   useEffect(() => {
     let unlisten: UnlistenFn | null = null;
     if (exporting) {
-      const startTime = Date.now();
       listen<{ stage: string; progress: number; time_remaining_secs?: number }>(
         'processing-progress',
         (event) => {
@@ -105,14 +104,11 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     setExportError(null);
 
     try {
-      // 获取当前视频时长用于输出文件名
-      const duration = state.currentVideo?.duration ?? 0;
       const outputPath = `/tmp/cut_deck/export_${Date.now()}.mp4`;
 
       setProgressStage('正在编码...');
 
-      // 实际调用 Rust render_autonomous_cut
-      const result = await tauri.autonomousRender({
+      await tauri.autonomousRender({
         input_path: state.synthesisData.finalVideoUrl ?? '',
         output_path: outputPath,
       });

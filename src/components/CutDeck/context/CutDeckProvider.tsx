@@ -97,14 +97,18 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     dispatch({ type: 'SET_DURATION', payload: duration });
   }, []);
 
+  // 使用 useRef 存储 currentVideo 避免 stale closure，同时保持函数签名稳定
+  const currentVideoRef = React.useRef(state.currentVideo);
+  currentVideoRef.current = state.currentVideo;
+
   const updateVideo = useCallback((updates: Partial<VideoInfo>) => {
-    if (state.currentVideo) {
+    if (currentVideoRef.current) {
       dispatch({
         type: 'SET_VIDEO',
-        payload: { ...state.currentVideo, ...updates },
+        payload: { ...currentVideoRef.current, ...updates },
       });
     }
-  }, [state.currentVideo]);
+  }, []);
 
   const setPlaying = useCallback((playing: boolean) => {
     dispatch({ type: 'SET_PLAYING', payload: playing });
@@ -166,21 +170,21 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     dispatch({ type: 'RESET_STEP', payload: step });
   }, []);
 
-  // 计算属性
-  const canProceed = useCallback((): boolean => {
-    const { currentStep, stepStatus } = state;
-    return stepStatus[currentStep] || currentStep === 'project-create';
-  }, [state.currentStep, state.stepStatus]);
-
   const completedSteps = useMemo(() => {
     return Object.values(state.stepStatus).filter(Boolean).length;
   }, [state.stepStatus]);
 
   const totalSteps = CUT_DECK_STEPS.length;
 
-  // 使用 useMemo 稳定化 context value，避免不必要的重渲染
-  const value = useMemo<CutDeckContextType>(() => ({
-    state,
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- 依赖子字段已充分
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- 只读子字段，state 整体变化不需重新创建
+  const canProceed = useCallback((): boolean => {
+    const { currentStep, stepStatus } = state;
+    return stepStatus[currentStep] || currentStep === 'project-create';
+  }, [state.currentStep, state.stepStatus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 静态方法集合（dispatch 稳定，useReducer 保证），从不因 state 变化而重建
+  const staticValue = useMemo(() => ({
     dispatch,
     setStep,
     setFeature,
@@ -203,11 +207,10 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     goToPrevStep,
     reset,
     resetStep,
-    canProceed,
     completedSteps,
     totalSteps,
   }), [
-    state,
+    dispatch,
     setStep,
     setFeature,
     setProject,
@@ -229,9 +232,15 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     goToPrevStep,
     reset,
     resetStep,
-    canProceed,
     completedSteps,
+    totalSteps,
   ]);
+
+  // 动态 value：每次 state 变化时重建，但静态方法引用不变
+  const value = useMemo<CutDeckContextType>(
+    () => ({ state, ...staticValue, canProceed }),
+    [state, staticValue, canProceed]
+  );
 
   return (
     <CutDeckContext.Provider value={value}>

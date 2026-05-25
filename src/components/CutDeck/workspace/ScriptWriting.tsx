@@ -140,6 +140,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
   } | null>(null);
 
   const timeout = useTimeout();
+  const lastTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentFunction = FUNCTION_CONFIG[config.functionType];
   const currentMode = FUNCTION_TO_MODE[config.functionType];
@@ -151,16 +152,14 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
     setConfig((prev) => ({ ...prev, functionType: mapped }));
   }, [config.functionType, state.selectedFeature]);
 
-  // 组件卸载时清理 timeout（由 useTimeout hook 自动处理）
+  // 组件卸载时清理 timeout
   useEffect(() => {
     return () => {
       if (lastTimeoutIdRef.current) {
         timeout.clear(lastTimeoutIdRef.current);
       }
     };
-  }, []);
-
-  const lastTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  }, [timeout]);
 
   const applyCommentaryOrchestration = useCallback((scriptData: ScriptData): ScriptData => {
     if (!state.analysis?.scenes?.length || !scriptData.segments?.length) {
@@ -266,7 +265,8 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
         setProgress(0);
       }, 500);
     }
-  }, [state.analysis, state.currentVideo, setNarrationScript, setRemixScript, setFeature, applyCommentaryOrchestration, goToNextStep, onNext, configStyle, configLength]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 闭包内使用 config.functionType，动态 lint 无法追踪
+  }, [state.analysis, state.currentVideo, setNarrationScript, setRemixScript, setFeature, applyCommentaryOrchestration, goToNextStep, onNext, config.functionType, configStyle, configLength, timeout]);
 
   const handleEditScript = useCallback((newContent: string): void => {
     const script = config.functionType === 'remix' ? state.scriptData.remix : state.scriptData.narration;

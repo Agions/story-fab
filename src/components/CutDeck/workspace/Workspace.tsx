@@ -16,7 +16,6 @@ import {
   FileText,
   Edit,
   Download,
-  Check,
   Bolt,
 } from 'lucide-react';
 import { useCutDeck, type cut_deckStep, CUT_DECK_STEPS } from '../context';
@@ -61,11 +60,6 @@ const STEP_ORDER: readonly cut_deckStep[] = CUT_DECK_STEPS;
 // ============================================================================
 
 const getStepIndex = (step: cut_deckStep): number => STEP_ORDER.indexOf(step);
-
-const isStepCompleted = (
-  step: cut_deckStep,
-  stepStatus: Record<cut_deckStep, boolean>
-): boolean => stepStatus[step];
 
 const isStepAccessible = (
   step: cut_deckStep,
