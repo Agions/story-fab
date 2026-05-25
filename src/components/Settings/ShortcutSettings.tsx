@@ -5,7 +5,6 @@
  */
 import React, { memo, useState } from 'react';
 import { Input } from '../ui/input';
-import { Button } from '../ui/button';
 
 interface Shortcut {
   action: string;

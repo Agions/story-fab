@@ -4,12 +4,6 @@
  */
 import React, { CSSProperties } from 'react';
 
-// 动画配置
-const defaultTransition = {
-  duration: 0.3,
-  ease: [0.4, 0, 0.2, 1], // cubic-bezier
-};
-
 // 基础动画组件
 interface MotionProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
@@ -133,7 +127,7 @@ export const variants = {
 export const MotionDiv: React.FC<MotionProps> = ({ 
   children, 
   initial, 
-  animate, 
+  animate: _animate, 
   transition,
   className,
   style,
@@ -165,7 +159,7 @@ export const AnimatePresence: React.FC<{
   children?: React.ReactNode;
   mode?: 'sync' | 'wait';
   initial?: boolean;
-}> = ({ children, mode = 'sync', initial = true }) => {
+}> = ({ children, mode: _mode, initial = true }) => {
   if (!initial) return <>{children}</>;
   
   // 简单的进入动画

@@ -34,7 +34,6 @@ import {
   type ProjectData,
   normalizeProjectData,
   createDefaultProjectName,
-  buildDraftFingerprint,
   parseScriptText,
 } from './projectEditUtils';
 import {
@@ -148,7 +147,8 @@ const ProjectEdit: React.FC = () => {
     } finally {
       persistLockRef.current = false;
     }
-  }, [addRecentProject, getProjectData, videoPath]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- notify 单例稳定但 lint 误判
+  }, [addRecentProject, getProjectData, videoPath, notify, formName]);
 
   const { autoSaveState, lastAutoSaveAt, scheduleAutoSave, setAutoSaveState } = useProjectAutoSave({
     enabled: autoSaveEnabled,
@@ -348,7 +348,7 @@ const ProjectEdit: React.FC = () => {
 
   const handleExportScript = (format: string) => notify.info(`导出脚本为 ${format.toUpperCase()} 格式`);
 
-  const handleFormValuesChange = () => scheduleAutoSave();
+  const _handleFormValuesChange = () => scheduleAutoSave();
 
   // ─── Render ────────────────────────────────────────────────────────────────
   if (error) {

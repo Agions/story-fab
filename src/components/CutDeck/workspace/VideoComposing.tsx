@@ -3,15 +3,14 @@
  * 数据输入: video, script, voice
  * 数据输出: synthesis (最终合成视频)
  */
-import React, { useState, useCallback, useMemo, memo, useEffect } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { useCutDeck } from '../context';
 import { voiceSynthesisService } from '../../../core/services/ai/voice-synthesis.service';
-import { videoEffectService } from '../../../core/services/video/video-effect.service';
-import { audioVideoSyncService } from '../../../core/services/asr/audio-sync.service';
-import { orchestrateCommentaryAgents } from '../../../core/services/workflow/commentaryAgents';
-import { ALIGNMENT_GATE_THRESHOLD, isAlignmentGatePassed } from '../../../core/workflow/alignmentGate';
-import { FEATURE_TO_FUNCTION, FUNCTION_TO_MODE } from './functionModeMap';
+import { videoEffectService } from '../../../core/services/video/videoEffectService';
+import { audioVideoSyncService } from '../../../core/services/asr/audioSyncService';
+import { mixTtsWithVideo } from '../../../core/services/video/audio-mix.service';
 import { notify } from '@/shared';
+import { invoke } from '@tauri-apps/api/core';
 import { useTimeout } from '../../../hooks/useTimeout';
 import styles from './VideoComposing.module.less';
 
@@ -77,7 +76,6 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
   const [synthesizing, setSynthesizing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeTab, setActiveTab] = useState<'voice' | 'subtitle' | 'effect'>('voice');
-
   const [config, setConfig] = useState<SynthesizeConfig>({
     voiceId: 'female_zh',
     voiceSpeed: DEFAULT_VOICE_SPEED,
@@ -90,51 +88,26 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
     syncAudioVideo: true,
   });
 
-  const getCurrentScriptContent = (): string => {
+  const getCurrentScriptContent = useCallback((): string => {
     return state.scriptData.narration?.content || state.scriptData.remix?.content || '';
-  };
-
-  const alignmentQuality = useMemo(() => {
-    if (!state.analysis?.scenes?.length) return null;
-    const activeFunction = state.selectedFeature !== 'none'
-      ? FEATURE_TO_FUNCTION[state.selectedFeature as 'smartClip' | 'voiceover' | 'subtitle']
-      : undefined;
-    const script =
-      activeFunction === 'remix'
-        ? state.scriptData.remix
-        : state.scriptData.narration || state.scriptData.remix;
-    if (!script?.segments?.length) return null;
-
-    const mode = activeFunction ? FUNCTION_TO_MODE[activeFunction] : 'ai-commentary';
-    const orchestration = orchestrateCommentaryAgents({
-      mode,
-      analysis: state.analysis,
-      segments: script.segments,
-    });
-    const passed = isAlignmentGatePassed(orchestration.alignmentSummary);
-    return {
-      passed,
-      averageConfidence: orchestration.alignmentSummary.averageConfidence,
-      maxDriftSeconds: orchestration.alignmentSummary.maxDriftSeconds,
-      overlayCount: orchestration.overlayPlan.length,
-    };
-  }, [state.analysis, state.scriptData.narration, state.scriptData.remix, state.selectedFeature]);
+  }, [state.scriptData]);
 
   const handleGenerateVoice = useCallback(async () => {
     const scriptContent = getCurrentScriptContent();
     if (!scriptContent) {
       notify.warning('请先生成文案');
-      return;
+      return null;
     }
 
-    setSynthesizing(true);
-    setProgress(0);
-
     try {
-      setProgress(30);
-      const voiceResult = await voiceSynthesisService.synthesize(scriptContent);
+      const voiceResult = await voiceSynthesisService.synthesize(scriptContent, {
+        voice: config.voiceId,
+        rate: config.voiceSpeed / 100,
+        volume: config.voiceVolume / 100,
+      }, (p) => {
+        setProgress(Math.round(p.progress));
+      });
 
-      setProgress(60);
       if (voiceResult.audioPath) {
         setVoice(voiceResult.audioPath, {
           voiceId: config.voiceId,
@@ -143,14 +116,13 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
         });
       }
 
-      setProgress(100);
-      notify.success('配音生成功能待实现');
+      notify.success('配音生成成功！');
+      return voiceResult;
     } catch (error) {
       notify.error(error, '配音生成失败');
-    } finally {
-      setSynthesizing(false);
+      return null;
     }
-  }, [config.voiceId, config.voiceSpeed, config.voiceVolume, setVoice]);
+  }, [config.voiceId, config.voiceSpeed, config.voiceVolume, setVoice, getCurrentScriptContent]);
 
   // ==== 辅助函数：校验合成输入 ====
   const validateSynthesizeInput = (): boolean => {
@@ -167,50 +139,94 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
   };
 
   // ==== 辅助函数：确保语音已生成 ====
-  const ensureVoiceGenerated = async (onProgress: (p: number) => void): Promise<void> => {
-    if (config.enableVoice && !state.voiceData.audioUrl) {
-      onProgress(20);
-      await handleGenerateVoice();
-    }
-  };
+  const ensureVoiceGenerated = useCallback(async (onProgress: (p: number) => void): Promise<boolean> => {
+    if (!config.enableVoice) return true;
+    if (state.voiceData.audioUrl) return true;
+    onProgress(20);
+    const result = await handleGenerateVoice();
+    return result !== null;
+  }, [config.enableVoice, state.voiceData.audioUrl, handleGenerateVoice]);
 
   // ==== 辅助函数：应用视频特效 ====
-  const applyVideoEffect = (onProgress: (p: number) => void): void => {
-    if (config.enableEffect) {
-      onProgress(60);
-      const presetId = EFFECT_PRESET_MAP[config.effectStyle];
-      if (presetId) {
-        videoEffectService.applyPreset(presetId);
-      } else {
-        videoEffectService.reset();
-      }
+  const applyVideoEffect = useCallback(async (onProgress: (p: number) => void): Promise<void> => {
+    if (!config.enableEffect) return;
+    onProgress(60);
+    const presetId = EFFECT_PRESET_MAP[config.effectStyle];
+    if (presetId) {
+      await videoEffectService.applyPreset(presetId);
+    } else {
+      await videoEffectService.reset();
     }
-  };
+  }, [config.enableEffect, config.effectStyle]);
 
-  // ==== 辅助函数：同步音视频 ====
-  const syncAudioVideoIfNeeded = async (onProgress: (p: number) => void): Promise<void> => {
-    if (config.syncAudioVideo && state.currentVideo) {
-      onProgress(80);
-      await audioVideoSyncService.autoSync(state.currentVideo.path, state.voiceData.audioUrl || undefined);
+  // ==== 辅助函数：混音 TTS 配音到视频 ====
+  const mixAudioIfNeeded = useCallback(async (onProgress: (p: number) => void): Promise<string | null> => {
+    if (!config.enableVoice || !state.voiceData.audioUrl || !state.currentVideo) {
+      return null;
     }
-  };
+    onProgress(75);
+
+    const outputDir = await invoke<string>('get_export_dir').catch(() => '');
+    const outputPath = outputDir
+      ? `${outputDir}/mix_${Date.now()}.mp4`
+      : `${state.currentVideo.path.replace(/\.[^.]+$/, '')}_mixed.mp4`;
+
+    const syncResult = await audioVideoSyncService.autoSync(
+      state.currentVideo.path,
+      state.voiceData.audioUrl
+    );
+
+    if (!syncResult) {
+      notify.warning('音视频同步检测失败，将使用默认偏移');
+    }
+
+    const offsetSeconds = syncResult?.offset ? syncResult.offset / 1000 : 0;
+
+    const mixed = await mixTtsWithVideo({
+      ttsAudioPath: state.voiceData.audioUrl,
+      videoPath: state.currentVideo.path,
+      outputPath,
+      ttsVolume: config.voiceVolume / 100,
+      backgroundVolume: 0.3,
+      offset: offsetSeconds,
+    });
+
+    return mixed.outputPath;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- notify 是稳定单例
+  }, [config.enableVoice, state.voiceData.audioUrl, state.currentVideo, config.voiceVolume]);
+
 
   // ==== 主合成函数 ====
-  const handleSynthesize = async () => {
+  const handleSynthesize = useCallback(async () => {
     if (!validateSynthesizeInput()) return;
 
     setSynthesizing(true);
     setProgress(0);
 
     try {
-      await ensureVoiceGenerated(setProgress);
-      if (config.enableSubtitle) setProgress(40);
-      applyVideoEffect(setProgress);
-      await syncAudioVideoIfNeeded(setProgress);
+      // 确保语音已生成（synthesizing 状态由 handleSynthesize 统一管理）
+      const voiceReady = await ensureVoiceGenerated(setProgress);
+      if (!voiceReady) {
+        setSynthesizing(false);
+        return;
+      }
 
-      if (!state.currentVideo) return;
+      if (config.enableSubtitle) setProgress(40);
+      await applyVideoEffect(setProgress); // 等待特效应用完成
+
+      // 混音：TTS 配音 + 原视频音轨 → 合成视频
+      const mixedVideoPath = await mixAudioIfNeeded(setProgress);
+
+      if (!state.currentVideo) {
+        setSynthesizing(false);
+        return;
+      }
+
       setProgress(100);
-      setSynthesis(`${state.currentVideo.path}?synthesized=${Date.now()}`, {
+      const finalVideoPath = mixedVideoPath
+        || `${state.currentVideo.path}?synthesized=${Date.now()}`;
+
+      setSynthesis(finalVideoPath, {
         syncAudioVideo: config.syncAudioVideo,
         addSubtitles: config.enableSubtitle,
         addWatermark: false,
@@ -228,7 +244,12 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
     } finally {
       setSynthesizing(false);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- enableVoice/audioUrl 经 ensureVoiceGenerated 间接使用，lint 盲区
+  }, [config.enableVoice, config.enableSubtitle, config.syncAudioVideo,
+      state.currentVideo, state.voiceData.audioUrl,
+      ensureVoiceGenerated, applyVideoEffect, mixAudioIfNeeded,
+      setSynthesis, validateSynthesizeInput,
+      goToNextStep, onNext, timeout]);
 
   // ==== 前置条件检查 ====
   const hasVideo = !!state.currentVideo;
@@ -363,26 +384,6 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
           <h2><span aria-hidden="true">⚙️</span> 视频合成配置</h2>
         </div>
       </div>
-
-      {alignmentQuality && (
-        <div className={`${styles.alignmentAlert} ${alignmentQuality.passed ? styles.alertSuccess : styles.alertWarning}`}>
-          <svg className={styles.alertIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            {alignmentQuality.passed
-              ? <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></>
-              : <><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></>}
-          </svg>
-          <div>
-            <div className={styles.alertTitle}>
-              {alignmentQuality.passed ? '✓ 音画对齐质量通过' : '⚠ 音画对齐建议优化'}
-            </div>
-            <div>
-              平均置信度 {alignmentQuality.averageConfidence.toFixed(2)}（阈值 {ALIGNMENT_GATE_THRESHOLD.minConfidence}），
-              最大漂移 {alignmentQuality.maxDriftSeconds.toFixed(2)}s（阈值 {ALIGNMENT_GATE_THRESHOLD.maxDriftSeconds}s），
-              原画覆盖建议 {alignmentQuality.overlayCount} 段。
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 预览播放器 */}
       <div className={styles.previewSection}>

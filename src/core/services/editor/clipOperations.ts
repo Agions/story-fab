@@ -10,12 +10,11 @@ import type {
 } from '../../types/timeline';
 import { syncLegacyTracks } from '../../types/timeline';
 import {
-  findTrackIndex,
   findClipInTracks,
   updateClipInTrack,
   calculateDuration,
 } from './timelineHelpers';
-import { lookupTrack, updateTrackClips } from './operationBase';
+import { lookupTrack } from './operationBase';
 
 /** 添加片段到轨道 */
 export function addClip(

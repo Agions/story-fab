@@ -1,5 +1,5 @@
 import React, { useCallback, memo } from 'react';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
+import { Tooltip } from '../ui/tooltip';
 
 import { ScriptSegment } from '@/types';
 import { formatTime } from '@/shared';

@@ -9,7 +9,7 @@ import {
   Scissors,
 } from 'lucide-react';
 import { CutDeckProvider, useCutDeck } from '@/components/CutDeck/context';
-import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from '../../hooks/useKeyboardShortcuts';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useEditorStore } from '../../store/editorStore';
 import { useTimelineStore } from '../../store/timelineStore';
@@ -25,6 +25,7 @@ const ScriptWriting = lazy(() => import('@/components/CutDeck/workspace/ScriptWr
 const VideoComposing = lazy(() => import('@/components/CutDeck/workspace/VideoComposing'));
 const VideoExport = lazy(() => import('@/components/CutDeck/workspace/VideoExport'));
 const ClipRippling = lazy(() => import('@/components/CutDeck/workspace/ClipRippling'));
+const CommentaryPanel = lazy(() => import('@/components/CommentaryPanel'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
@@ -164,7 +165,15 @@ const AIVideoEditorContent: React.FC = () => {
       case 'clip-repurpose':
         return <ClipRippling onNext={goToNextStep} />;
       case 'script-generate':
-        return <ScriptWriting onNext={goToNextStep} />;
+        return activeTab === 'commentary' ? (
+          <CommentaryPanel
+            videoPath={state.currentVideo?.path || ''}
+            subtitles={state.subtitleData.asr?.map(s => s.text).join('\n') || state.subtitleData.ocr?.map(s => s.text).join('\n') || ''}
+            durationSecs={state.currentVideo?.duration}
+          />
+        ) : (
+          <ScriptWriting onNext={goToNextStep} />
+        );
       case 'video-synthesize':
         return <VideoComposing onNext={goToNextStep} />;
       case 'export':

@@ -3,14 +3,12 @@
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';
-import { Button } from '../../../components/ui/button';
 import { logger } from '../../../shared/utils/logging';
 import {
   listProjects,
-  deleteProject as deleteProjectFile,
   getFileSizeMb,
   PROJECTS_CHANGED_EVENT,
+  deleteProject,
 } from '../../../services/tauri';
 import { useSettings } from '../../../context/SettingsContext';
 import {
@@ -21,7 +19,6 @@ import {
   resolveProjectVideoPath,
   concurrentMap,
 } from '@/shared';
-import { preloadProjectEditPage } from '../../../core/utils/route-preload';
 import { Project, DashboardStats } from '../types';
 
 export interface UseDashboardReturn {
@@ -40,7 +37,7 @@ export function useDashboard(): UseDashboardReturn {
   const { addRecentProject } = useSettings();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [_deleteConfirmId, _setDeleteConfirmId] = useState<string | null>(null);
 
   const loadProjects = useCallback(async () => {
     try {
@@ -96,9 +93,9 @@ export function useDashboard(): UseDashboardReturn {
     setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, starred: !p.starred } : p)));
   }, []);
 
-  const confirmDelete = async (id: string) => {
+  const _confirmDelete = async (id: string) => {
     try {
-      const ok = await deleteProjectFile(id);
+      const ok = await deleteProject(id);
       if (ok) {
         notify.success('项目已删除');
         await loadProjects();
@@ -108,13 +105,10 @@ export function useDashboard(): UseDashboardReturn {
     } catch (error) {
       logger.error('删除项目失败:', { error });
       notify.error(error, '删除项目失败，请稍后重试');
+    } finally {
+      _setDeleteConfirmId(null);
     }
-    setDeleteConfirmId(null);
   };
-
-  const deleteProject = useCallback((id: string) => {
-    setDeleteConfirmId(id);
-  }, []);
 
   const createNewProject = useCallback(() => { navigate('/project/new'); }, [navigate]);
 

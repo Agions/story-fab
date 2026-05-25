@@ -5,7 +5,6 @@
  */
 
 import type {
-  Timeline,
   TimelineTrack,
   TimelineClip,
 } from '../../types/timeline';

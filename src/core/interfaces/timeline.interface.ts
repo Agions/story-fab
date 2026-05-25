@@ -8,13 +8,11 @@ import type {
   Timeline,
   TimelineTrack,
   TimelineClip,
-  TimelineState,
   TimelineSelection,
   TimelineMarker,
   TimelineTool,
   ClipProperties,
   TrackType,
-  EditorAction,
 } from '../types/timeline';
 
 // ============================================================

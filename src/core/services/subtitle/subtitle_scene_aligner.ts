@@ -119,7 +119,7 @@ function computeSimilarity(text1: string, text2: string): number {
 /**
  * 在时间线上找到与给定时间最接近的 Whisper 片段索引
  */
-function findClosestWhisperSegmentIndex(
+function _findClosestWhisperSegmentIndex(
   scriptSegment: ScriptSegment,
   whisperSegments: WhisperSegment[],
   timeTolerance: number

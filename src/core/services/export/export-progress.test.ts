@@ -19,7 +19,7 @@ describe('exportProgress', () => {
   describe('reset', () => {
     it('should reset to idle stage', () => {
       emitter.reset();
-      let lastProgress = { stage: '', progress: 0 };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number } = { stage: '', progress: 0 };
       emitter.subscribe(p => { lastProgress = p; });
       expect(lastProgress.stage).toBe('idle');
       expect(lastProgress.progress).toBe(0);
@@ -29,7 +29,7 @@ describe('exportProgress', () => {
   describe('start', () => {
     it('should transition to preparing stage', () => {
       emitter.start();
-      let lastProgress = { stage: '', progress: 0 };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number } = { stage: '', progress: 0 };
       emitter.subscribe(p => { lastProgress = p; });
       emitter.start(); // start resets and emits preparing
       expect(lastProgress.stage).toBe('preparing');
@@ -39,7 +39,7 @@ describe('exportProgress', () => {
 
   describe('preparing', () => {
     it('should emit preparing stage', () => {
-      let lastProgress = { stage: '', progress: 0 };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number } = { stage: '', progress: 0 };
       emitter.subscribe(p => { lastProgress = p; });
       emitter.preparing('正在加载视频...');
       expect(lastProgress.stage).toBe('preparing');
@@ -50,7 +50,7 @@ describe('exportProgress', () => {
 
   describe('encoding', () => {
     it('should emit encoding with progress', () => {
-      let lastProgress = { stage: '', progress: 0, elapsedTime: 0, estimatedTimeRemaining: 0 };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number; elapsedTime?: number; estimatedTimeRemaining?: number } = { stage: '', progress: 0, elapsedTime: 0, estimatedTimeRemaining: 0 };
       emitter.subscribe(p => { lastProgress = p; });
       emitter.start();
       emitter.encoding(50, 100);
@@ -62,7 +62,7 @@ describe('exportProgress', () => {
     });
 
     it('should calculate 100% correctly', () => {
-      let lastProgress = { progress: 0 };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number; elapsedTime?: number; estimatedTimeRemaining?: number } = { stage: '', progress: 0 };
       emitter.subscribe(p => { lastProgress = p; });
       emitter.start();
       emitter.encoding(100, 100);
@@ -72,7 +72,7 @@ describe('exportProgress', () => {
 
   describe('muxing', () => {
     it('should emit muxing at 95%', () => {
-      let lastProgress = { stage: '', progress: 0 };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number } = { stage: '', progress: 0 };
       emitter.subscribe(p => { lastProgress = p; });
       emitter.muxing('正在合成...');
       expect(lastProgress.stage).toBe('muxing');
@@ -83,7 +83,7 @@ describe('exportProgress', () => {
 
   describe('complete', () => {
     it('should emit complete at 100%', () => {
-      let lastProgress = { stage: '', progress: 0, outputPath: '', fileSize: 0 };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number; outputPath?: string; fileSize?: number } = { stage: '', progress: 0, outputPath: '', fileSize: 0 };
       emitter.subscribe(p => { lastProgress = p; });
       emitter.complete('/output/video.mp4', 1024000);
       expect(lastProgress.stage).toBe('complete');
@@ -95,7 +95,7 @@ describe('exportProgress', () => {
 
   describe('error', () => {
     it('should emit error stage', () => {
-      let lastProgress = { stage: '', progress: 0, message: '' };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number } = { stage: '', progress: 0, message: '' };
       emitter.subscribe(p => { lastProgress = p; });
       emitter.error('编码失败');
       expect(lastProgress.stage).toBe('error');
@@ -106,7 +106,7 @@ describe('exportProgress', () => {
 
   describe('cancel', () => {
     it('should emit cancelled stage', () => {
-      let lastProgress = { stage: '', progress: 0 };
+      let lastProgress: { stage: string; progress: number; message?: string; currentFrame?: number; totalFrames?: number } = { stage: '', progress: 0 };
       emitter.subscribe(p => { lastProgress = p; });
       emitter.cancel();
       expect(lastProgress.stage).toBe('cancelled');

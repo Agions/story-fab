@@ -2,8 +2,7 @@
  * 视频预览区 + 时间轴
  * 简化的 AI 剪辑专用时间轴
  */
-import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Upload } from 'lucide-react';
+import React, { useRef, useEffect, useState, useCallback, useMemo, memo } from 'react';
 import { Slider } from './ui/slider';
 import { Button } from './ui/button';
 import {
@@ -62,13 +61,17 @@ const Text = ({
   );
 };
 
-const AIVideoPreview: React.FC = () => {
+const AIVideoPreviewComponent: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { state, setVideo, setPlaying, setCurrentTime, dispatch } = useCutDeck();
   const { isPlaying, currentTime, duration, currentVideo, analysis } = state;
-  
+
   const [isDragging, setIsDragging] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  // 跟踪最新 isPlaying，避免键盘监听器因播放状态变化而重绑定
+  const isPlayingRef = useRef(isPlaying);
+  isPlayingRef.current = isPlaying;
 
   const clipResult = useMemo<ClipResultCompat>(() => {
     const scenes = analysis?.scenes || [];
@@ -94,17 +97,17 @@ const AIVideoPreview: React.FC = () => {
     };
   }, [analysis]);
 
-  const handleLoadedMetadata = () => {
+  const handleLoadedMetadata = useCallback(() => {
     if (videoRef.current) {
       dispatch({ type: 'SET_DURATION', payload: videoRef.current.duration });
     }
-  };
+  }, [dispatch]);
 
-  const handleTimeUpdate = () => {
+  const handleTimeUpdate = useCallback(() => {
     if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
     }
-  };
+  }, [setCurrentTime]);
 
   const togglePlay = useCallback(() => {
     if (!videoRef.current || !currentVideo) return;
@@ -116,26 +119,26 @@ const AIVideoPreview: React.FC = () => {
     setPlaying(!isPlaying);
   }, [isPlaying, currentVideo, setPlaying]);
 
-  const seekTo = (time: number) => {
+  const seekTo = useCallback((time: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime = time;
       setCurrentTime(time);
     }
-  };
+  }, [setCurrentTime]);
 
-  const skip = (seconds: number) => {
+  const skip = useCallback((seconds: number) => {
     if (videoRef.current) {
       const newTime = Math.max(0, Math.min(videoRef.current.currentTime + seconds, duration));
       seekTo(newTime);
     }
-  };
+  }, [duration, seekTo]);
 
-  const handleProgressChange = (value: number | readonly number[]) => {
+  const handleProgressChange = useCallback((value: number | readonly number[]) => {
     const resolvedValue = Array.isArray(value) ? value[0] : value;
     seekTo(resolvedValue);
-  };
+  }, [seekTo]);
 
-  const handleUploadFile = (file: File) => {
+  const handleUploadFile = useCallback((file: File) => {
     if (!file.type.startsWith('video/')) {
       notify.error(null, '请上传视频文件');
       return false;
@@ -161,13 +164,9 @@ const AIVideoPreview: React.FC = () => {
     setVideo(videoInfo);
     notify.success(`已加载视频: ${file.name}`);
     return false;
-  };
+  }, [setVideo]);
 
-  const handleUpload = (file: File) => {
-    void handleUploadFile(file);
-  };
-
-  const handleVideoLoaded = () => {
+  const handleVideoLoaded = useCallback(() => {
     if (videoRef.current && currentVideo) {
       const videoInfo: VideoInfo = {
         ...currentVideo,
@@ -177,7 +176,7 @@ const AIVideoPreview: React.FC = () => {
       };
       setVideo(videoInfo);
     }
-  };
+  }, [currentVideo, setVideo]);
 
   const handleClearVideo = useCallback(() => {
     if (videoUrl) {
@@ -200,30 +199,43 @@ const AIVideoPreview: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!currentVideo) return;
+      const videoEl = videoRef.current;
+      if (!videoEl) return;
       switch (e.key) {
         case ' ':
           e.preventDefault();
-          togglePlay();
+          if (isPlayingRef.current) {
+            videoEl.pause();
+          } else {
+            videoEl.play();
+          }
+          setPlaying(!isPlayingRef.current);
           break;
         case 'ArrowLeft':
-          skip(-5);
+          videoEl.currentTime = Math.max(0, videoEl.currentTime - 5);
+          setCurrentTime(videoEl.currentTime);
           break;
         case 'ArrowRight':
-          skip(5);
+          videoEl.currentTime = Math.min(videoEl.duration, videoEl.currentTime + 5);
+          setCurrentTime(videoEl.currentTime);
           break;
         case 'Home':
-          seekTo(0);
+          videoEl.currentTime = 0;
+          setCurrentTime(0);
           break;
         case 'End':
-          seekTo(duration);
+          videoEl.currentTime = videoEl.duration;
+          setCurrentTime(videoEl.duration);
           break;
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentVideo, duration, togglePlay]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- 键盘处理仅需 currentVideo，setCurrentTime/setPlaying 稳定由 context 管理
+  }, [currentVideo]);
 
-  const renderAISuggestions = () => {
+  // 提取的建议列表渲染（useCallback 避免每次重渲染）
+  const renderAISuggestions = useCallback(() => {
     if (!currentVideo) {
       return (
         <div className={styles.suggestionsList}>
@@ -256,7 +268,36 @@ const AIVideoPreview: React.FC = () => {
         </Text>
       </div>
     );
-  };
+  }, [currentVideo, clipResult.suggestions]);
+
+  // 文件上传触发（提取避免内联创建 input）
+  const triggerFileInput = useCallback(() => {
+    const input = window.document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) void handleUploadFile(file);
+    };
+    input.click();
+  }, [handleUploadFile]);
+
+  // 拖拽处理器
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleFileDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) void handleUploadFile(file);
+  }, [handleUploadFile]);
 
   return (
     <div className={styles.container}>
@@ -276,34 +317,15 @@ const AIVideoPreview: React.FC = () => {
           ) : (
             <div 
               className={`${styles.placeholder} ${isDragging ? styles.dragging : ''}`}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragging(false);
-                const file = e.dataTransfer.files[0];
-                if (file) {
-                  void handleUploadFile(file);
-                }
-              }}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleFileDrop}
             >
               <UploadIcon className={styles.uploadIcon} />
               <Text>拖拽视频文件到此处或点击上传</Text>
               <Button
                 variant="link"
-                onClick={() => {
-                  const input = window.document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'video/*';
-                  input.onchange = (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) void handleUploadFile(file);
-                  };
-                  input.click();
-                }}
+                onClick={triggerFileInput}
               >
                 <CloudUpload className="mr-1" size={14} />
                 选择文件
@@ -416,4 +438,4 @@ const AIVideoPreview: React.FC = () => {
   );
 };
 
-export default AIVideoPreview;
+export default memo(AIVideoPreviewComponent);

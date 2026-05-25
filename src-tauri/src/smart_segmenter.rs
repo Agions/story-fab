@@ -59,11 +59,16 @@ pub struct VideoSegment {
     /// Silence ratio within segment (0.0-1.0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub silence_ratio: Option<f32>,
+    /// Suggested playback speed for this segment (1.0=normal, 2.0=2x, 6.0=6x fast-forward)
+    /// Boring/low-energy segments get high speed to compress dead time;
+    /// high-energy/action segments stay at 1.0x
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suggested_speed: Option<f32>,
 }
 
 impl VideoSegment {
     /// Factory: segment with given start/end, type, and optional overrides.
-    fn new(start_ms: u64, end_ms: u64, segment_type: impl Into<String>, confidence: f32, is_scene_change: Option<bool>) -> Self {
+    fn new(start_ms: u64, end_ms: u64, segment_type: impl Into<String>, confidence: f32, is_scene_change: Option<bool>, suggested_speed: f32) -> Self {
         Self {
             start_ms,
             end_ms,
@@ -73,6 +78,7 @@ impl VideoSegment {
             is_scene_change,
             peak_energy: None,
             silence_ratio: None,
+            suggested_speed: Some(suggested_speed),
         }
     }
 }
@@ -170,13 +176,22 @@ impl SmartSegmenter {
         };
 
         // Step 5: Segment based on energy profile
-        let segments = self.segment_by_energy(energy_data, min_duration_ms, max_duration_ms);
+        let segments = self.segment_by_energy(energy_data.clone(), min_duration_ms, max_duration_ms);
 
-        // Step 6: Classify each segment
+        // Step 6: Compute global statistics for speed assignment
+        let energies: Vec<f32> = energy_data.iter().map(|(_, e)| *e).collect();
+        let mean_energy = if energies.is_empty() {
+            0.0
+        } else {
+            energies.iter().sum::<f32>() / energies.len() as f32
+        };
+
+        // Step 7: Classify each segment and assign suggested playback speed
         let classified_segments: Vec<VideoSegment> = segments
             .into_iter()
             .map(|seg| {
-                let seg_type = self.classify_segment(&seg, &scene_changes, &audio_path);
+                let seg_type = self.classify_segment(&seg, &scene_changes, &energy_data, mean_energy);
+                let suggested_speed = self.derive_suggested_speed(&seg, &energy_data, mean_energy);
                 VideoSegment {
                     start_ms: seg.0,
                     end_ms: seg.1,
@@ -186,6 +201,7 @@ impl SmartSegmenter {
                     is_scene_change: Some(self.is_scene_at(&scene_changes, seg.0)),
                     peak_energy: None,
                     silence_ratio: None,
+                    suggested_speed: Some(suggested_speed),
                 }
             })
             .filter(|s| s.duration_ms >= min_duration_ms)
@@ -210,7 +226,7 @@ impl SmartSegmenter {
             let mut current = 0u64;
             while current < duration_ms {
                 let end = (current + max_duration_ms).min(duration_ms);
-                segments.push(VideoSegment::new(current, end, "content", 0.5, Some(false)));
+                segments.push(VideoSegment::new(current, end, "content", 0.5, Some(false), 1.0));
                 current = end;
             }
             return segments;
@@ -222,14 +238,14 @@ impl SmartSegmenter {
 
         for change_time in scene_changes {
             if change_time > prev_end && change_time - prev_end >= min_duration_ms {
-                segments.push(VideoSegment::new(prev_end, change_time, "content", 0.7, Some(false)));
+                segments.push(VideoSegment::new(prev_end, change_time, "content", 0.7, Some(false), 1.0));
             }
             prev_end = change_time;
         }
 
         // Final segment
         if prev_end < duration_ms {
-            segments.push(VideoSegment::new(prev_end, duration_ms, "content", 0.7, Some(false)));
+            segments.push(VideoSegment::new(prev_end, duration_ms, "content", 0.7, Some(false), 1.0));
         }
 
         segments
@@ -298,6 +314,17 @@ impl SmartSegmenter {
             energies.push((time_ms, energy));
         }
 
+        // 处理尾部残余样本（不足一个 window_samples 的末尾部分）
+        let total_processed = (samples.len() / window_samples) * window_samples;
+        if total_processed < samples.len() {
+            let remaining = &samples[total_processed..];
+            if !remaining.is_empty() {
+                let energy: f32 = remaining.iter().map(|&s| s * s).sum::<f32>() / remaining.len() as f32;
+                let time_ms = (total_processed as f32 * 1000.0 / sample_rate as f32) as u64;
+                energies.push((time_ms, energy));
+            }
+        }
+
         Ok(energies)
     }
 
@@ -350,7 +377,13 @@ impl SmartSegmenter {
         segments
     }
 
-    fn classify_segment(&self, seg: &(u64, u64), scene_changes: &[u64], _audio_path: &str) -> (String, f32) {
+    fn classify_segment(
+        &self,
+        seg: &(u64, u64),
+        scene_changes: &[u64],
+        energy_data: &[(u64, f32)],
+        mean_energy: f32,
+    ) -> (String, f32) {
         let duration = seg.1.saturating_sub(seg.0);
         let _mid_point = seg.0 + duration / 2;
 
@@ -376,6 +409,59 @@ impl SmartSegmenter {
         }
 
         ("content".to_string(), 0.65)
+    }
+
+    /// Derive suggested playback speed (1.0–6.0x) based on segment energy profile.
+    ///
+    /// Speed tiers — aligned with the ai-video-editor pipeline:
+    ///   1.0x  — High energy, dialogue/action, scene changes (keep original pacing)
+    ///   2.0x  — Moderate energy (slightly below mean)
+    ///   4.0x  — Low energy / setup / transitions (skip dead time)
+    ///   6.0x  — Very low energy / silence (maximum compression; optional skip)
+    fn derive_suggested_speed(
+        &self,
+        seg: &(u64, u64),
+        energy_data: &[(u64, f32)],
+        mean_energy: f32,
+    ) -> f32 {
+        if mean_energy <= 0.0 || energy_data.is_empty() {
+            return 1.0;
+        }
+
+        // Compute average energy within this segment's time window
+        let seg_energies: Vec<f32> = energy_data
+            .iter()
+            .filter(|(t, _)| *t >= seg.0 && *t <= seg.1)
+            .map(|(_, e)| *e)
+            .collect();
+
+        if seg_energies.is_empty() {
+            return 1.0;
+        }
+
+        let seg_mean: f32 = seg_energies.iter().sum::<f32>() / seg_energies.len() as f32;
+        let ratio = seg_mean / mean_energy;
+
+        // Transition segments get a small boost only if they have enough content
+        let duration_ms = seg.1.saturating_sub(seg.0);
+        if duration_ms < 3000 {
+            // Very short segments — keep at normal speed to avoid jarring jumps
+            return 1.0;
+        }
+
+        if ratio > 1.1 {
+            // Segment is above average energy — high pacing, keep full speed
+            1.0
+        } else if ratio > 0.85 {
+            // Slightly below average — mild slowdown of "dead time"
+            2.0
+        } else if ratio > 0.5 {
+            // Well below average — significant dead time
+            4.0
+        } else {
+            // Near silence — maximum compression
+            6.0
+        }
     }
 
     fn is_scene_at(&self, scene_changes: &[u64], time_ms: u64) -> bool {

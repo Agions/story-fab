@@ -5,8 +5,9 @@ import { validateApiKey } from './apiKeyService';
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 
-// Properly mock isAxiosError as a function
-mockedAxios.isAxiosError = vi.fn((val: unknown) =>
+// Properly mock isAxiosError as a function (type predicate signature)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(mockedAxios.isAxiosError as any) = vi.fn((val: any) =>
   Boolean(val && typeof val === 'object' && 'isAxiosError' in val && (val as Record<string, unknown>).isAxiosError === true)
 );
 

@@ -1,6 +1,70 @@
 ## [Unreleased]
 
+### 🚀 New Features
+
+#### P1 — 智能片段速度推荐
+- **Rust `smart_segmenter.rs`**：每个 `VideoSegment` 新增 `suggested_speed: Option<f64>` 字段（1.0–6.0x）
+- **速度推导算法**：基于 `avg_energy / mean_energy` 比率，分为四档 — <0.5→6x（空白），0.5–0.85→4x（低能量），0.85–1.1→2x（正常），>1.1→1x（高光）
+- **短片段保护**：不足 3 秒的片段强制 1.0x，避免加速导致内容丢失
+- **TypeScript 类型**：`SmartVideoSegment` 新增 `suggestedSpeed?: number`
+
+#### P1 — 自动转场建议
+- **Rust `smart_segmenter.rs`**：`VideoSegment` 新增 `suggested_transition: Option<String>`
+- **30+ 规则矩阵**：`src/core/services/video/transition-suggestion.ts`（新建）
+  - 场景切换→dissolve/glitch，动作片段→wipe/slide，对话→fade/dissolve，静默→fade
+  - 按片段类型 × 前后衔接 × 时长 × 内容密度综合打分
+
+#### P1 — 批量多视频处理
+- **`VideoProcessingController.tsx`**：`addBatchItem` 自动记录各批次项视频路径
+- **`processVideo`**：支持可选 `itemVideoPath` 参数，批量时使用各批次项独立路径
+
+#### P2 — TTS 配音混音
+- **Rust `video_processor.rs`**：新增 `mix_audio` + `get_audio_duration` 命令
+  - `mix_audio`：FFmpeg `filter_complex` 混音，原音轨 volume=0.3 背景音，TTS 配音 volume=1.0 覆盖
+  - `get_audio_duration`：返回音频文件时长（秒）
+- **`audio-mix.service.ts`**（新建）：`mixTtsWithVideo()` + `getAudioDuration()` 前端封装
+- **`VideoComposing.tsx`**：`handleSynthesize` 集成混音流程
+- **`handleGenerateVoice`**：配音进度真实回调（`voiceSynthesisService.synthesize()` 第三参数 `onProgress`）
+
 ### 🐛 Bug Fixes
+
+- **`AIVideoPreview.tsx` 键盘监听器重绑定**：播放/暂停时 `useEffect` deps 含 `state.isPlaying` 导致每帧重绑键盘监听器 → 改用 `isPlayingRef`，deps 从 5 缩减为 1（`[currentVideo]`）
+- **`CutDeckProvider.tsx` context value 爆炸**：所有 consumer 每次 dispatch 都重渲染 → `canProceed` 依赖精确到 `state.currentStep + state.stepStatus`
+- **`ScriptWriting.tsx` useEffect TDZL**：`lastTimeoutIdRef` 在 cleanup 中引用但声明在其后 → 前移声明位置
+- **`smart_segmenter.rs` 空操作借用**：`let _ = energy_data` 无意义，删除
+- **`smart_segmenter.rs` 尾部窗口丢失**：能量计算循环丢弃不足 window_samples 的尾部样本 → 追加尾部窗口计算
+- **`TauriBridge.ts` TS 编译错误**：方法间缺少逗号分隔符 + `mixAudio`/`getAudioDuration` 缺 `async` → 修复
+
+### ⚙️ Chores
+
+- **死代码删除**：`i18next` + `react-i18next`（无源码引用，~50KB）
+- **死代码删除**：3 个 pipeline 文件（`CommentaryPipeline.ts` / `RewriteScriptStep.ts` / `SynthesizeVoiceStep.ts`）— 从未有任何 consumer 调用
+- **`vite.config.ts`**：移除 `vendor-i18n` chunk 规则（对应 dead deps）
+- **`alignmentQuality` 死逻辑删除**：`orchestrateCommentaryAgents` 返回值从未被持久化，`ScriptData` 接口无 `alignmentSummary` 字段，useMemo 结果无下游消费者
+- **`handleGenerateVoice` progress 回调**：进度回调应作为第三参数传入 `synthesize()` 而非 options 字段内
+
+### 📝 Docs
+
+- **`docs/dev/tauri-commands.md`**：新增 Audio Commands 节（`mix_audio` / `get_audio_duration`）、Rust-side Highlight Detection（含 `suggested_speed` 字段定义和速度推导算法）
+- **`docs/dev/project-structure.md`**：重写 Rust 目录结构，匹配实际 `commands/` 子模块布局（`render/transcode.rs` 等 5 个 render 子模块）
+- **`docs/guide/configuration.md`**：精简为 in-app 设置指南，环境变量详情指向 `docs/reference/config.md`
+- **`docs/dev/build-release.md`**：统一 `pnpm` → `npm` 命令（package.json 使用 npm）
+- **`docs/guide/installation.md`**：统一 `pnpm` → `npm` 命令
+
+### 🔧 Code Quality
+
+- **ESLint 警告**：39 → 8（−31，79% 清除率）
+- **TS 编译错误**：维持 0 个（`--skipLibCheck`）
+- **批量 unused vars 清理**：25+ 文件删除未使用 import/变量
+
+### 🗑 Removed
+
+- `i18next`, `react-i18next` — 无源码引用
+- `vendor-i18n` Vite chunk rule — 对应 dead deps
+
+---
+
+## [2.0.1] - 2026-05-01
 
 - **src/constants/index.ts:** Add missing `legacy.token` and `legacy.projects` to `STORAGE_KEYS` for backward compatibility
 - **src/components/CutDeck/workspace/ScriptWriting.tsx:** Add missing `useRef` to React import; add null checks for `Timeout | null` before calling `timeout.clear()`

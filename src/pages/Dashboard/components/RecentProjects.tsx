@@ -5,15 +5,13 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Card } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
-import { Badge } from '../../../components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../../components/ui/tooltip';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '../../../components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../../components/ui/dropdown-menu';
 import {
   Plus,
   Clock,
   Video,
   MoreHorizontal,
-  CloudUpload,
   Trash2,
   Edit3,
   Copy,
@@ -160,7 +158,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = React.memo(({
   ], [onOpenProject, onDeleteProject]);
 
   const ListItem: React.FC<{ project: Project }> = React.memo(({ project: projectProp }) => {
-    const menuItems = useMemo(() => getProjectMenuItems(projectProp.id), [getProjectMenuItems, projectProp.id]);
+    const menuItems = useMemo(() => getProjectMenuItems(projectProp.id), [projectProp.id]);
     return (
       <div className="flex items-center gap-4 p-4 border-b last:border-b-0 hover:bg-accent/50 transition-colors">
         <img

@@ -51,6 +51,18 @@ export interface SmartVideoSegment {
   isSceneChange?: boolean;
   peakEnergy?: number;
   silenceRatio?: number;
+  /** Suggested playback speed (1.0=normal, 2.0=2x, 4.0=4x, 6.0=6x fast-forward).
+   *  Low/transition segments get accelerated to compress dead time;
+   *  high-energy/action segments stay at 1.0x. */
+  suggestedSpeed?: number;
+  /** Recommended transition effect to apply before this segment.
+   *  Computed by transition-suggestion.ts based on prev/curr/next segment types. */
+  suggestedTransition?: {
+    type: 'none' | 'fade' | 'dissolve' | 'wipe' | 'slide' | 'zoom' | 'glitch';
+    duration: number;
+    reason: string;
+    confidence: number;
+  };
 }
 
 export interface SegmentOptions {

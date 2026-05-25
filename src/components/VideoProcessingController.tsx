@@ -1,24 +1,10 @@
 import { logger } from '../shared/utils/logging';
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
-import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
-import { Input } from './ui/input';
-import { Switch } from './ui/switch';
-import { Slider } from './ui/slider';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Button } from './ui/button';
-import { Progress, ProgressTrack, ProgressIndicator } from './ui/progress';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
-import { Badge } from './ui/badge';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 import {
   Settings,
-  Plus,
-  Trash2,
-  Play,
   Scissors,
-  Volume2,
-  VolumeX,
-  CheckCircle,
 } from 'lucide-react';
 import { invoke, TauriCommand } from '@/core/tauri/TauriBridge';
 import { notify } from '@/shared';
@@ -68,6 +54,7 @@ interface VideoProcessingControllerProps {
 
 interface BatchItem {
   id: string;
+  videoPath: string;
   segments: Array<{ start: number; end: number; type?: string; content?: string }>;
   name: string;
   completed: boolean;
@@ -132,12 +119,13 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     }
     const newBatchItem: BatchItem = {
       id: Date.now().toString(),
+      videoPath,
       segments: [...segments],
       name: `批处理 ${batchItems.length + 1}`,
       completed: false
     };
     setBatchItems(prev => [...prev, newBatchItem]);
-  }, [segments, batchItems.length]);
+  }, [segments, batchItems.length, videoPath]);
 
   const removeBatchItem = useCallback((id: string) => {
     setBatchItems(prev => prev.filter(item => item.id !== id));
@@ -147,7 +135,9 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
     setCustomSettings(prev => ({ ...prev, ...patch }));
   }, []);
 
-  const processVideo = useCallback(async (segmentsToProcess: VideoSegment[], itemName?: string): Promise<string> => {
+  const processVideo = useCallback(async (segmentsToProcess: VideoSegment[], itemName?: string, itemVideoPath?: string): Promise<string> => {
+    // Use the per-batch video path if provided (multi-video batch), otherwise fall back to the current video
+    const inputPath = itemVideoPath ?? videoPath;
     try {
       const fileName = itemName ?
         `${itemName.replace(/[^\w\s-]/gi, '')}_${new Date().toISOString().split('T')[0]}` :
@@ -167,20 +157,10 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       });
       const outputPath = saveHandle.name;
 
-      let qualityParams: Record<string, unknown> = {};
-      if (videoQuality === 'custom') {
-        qualityParams = {
-          resolution: customSettings.resolution,
-          bitrate: customSettings.bitrate,
-          framerate: customSettings.framerate,
-          useHardwareAccel: customSettings.useHardwareAcceleration
-        };
-      }
-
       const audioParams = { volume: audioVolume / 100, process: audioProcess };
 
       await invoke(TauriCommand.CUT_VIDEO, {
-        inputPath: videoPath,
+        inputPath,
         outputPath,
         segments: segmentsToProcess,
         quality: videoQuality,
@@ -200,7 +180,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       notify.error(error, '视频处理失败');
       throw error;
     }
-  }, [exportFormat, videoQuality, customSettings, audioVolume, audioProcess, transitionType, transitionDuration, useSubtitles, videoPath, onProcessingComplete]);
+  }, [exportFormat, videoQuality, audioVolume, audioProcess, transitionType, transitionDuration, useSubtitles, videoPath, onProcessingComplete]);
 
   const startBatchProcessing = useCallback(async () => {
     if (batchItems.length === 0) {
@@ -226,7 +206,7 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
           endTime: s.end,
           duration: s.end - s.start,
         }));
-        const outputPath = await processVideo(segmentsToProcess, item.name);
+        const outputPath = await processVideo(segmentsToProcess, item.name, item.videoPath);
         newOutputPaths.push(outputPath);
 
         setBatchItems(prevItems => prevItems.map((prevItem, index) =>

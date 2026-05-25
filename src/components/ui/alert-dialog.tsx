@@ -9,7 +9,7 @@ interface AlertDialogProps {
   children?: React.ReactNode
 }
 
-const AlertDialog: React.FC<AlertDialogProps> = ({ open, onOpenChange, children }) => {
+const AlertDialog: React.FC<AlertDialogProps> = ({ open: _open, onOpenChange: _onOpenChange, children }) => {
   return <>{children}</>
 }
 
@@ -34,7 +34,7 @@ interface AlertDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: () => void
 }
 
-const AlertDialogContent: React.FC<AlertDialogContentProps> = ({ className, children, onClose, onClick, ...props }) => {
+const AlertDialogContent: React.FC<AlertDialogContentProps> = ({ className, children, onClose, onClick: _onClick, ...props }) => {
   return (
     <div
       className={cn(

@@ -1,40 +1,56 @@
-# Environment Variables
+# 配置参考
 
-CutDeck can be configured via environment variables for advanced use cases, CI/CD, or self-hosting scenarios.
+## 应用内设置
 
-## Variables
+应用内设置优先级高于环境变量。详见[配置指南](/guide/configuration)。
 
-| Variable | Default | Description |
+|| 设置路径 | 字段 | 默认值 |
 |---|---|---|
-| `CUTDECK_FFMPEG_PATH` | `ffmpeg` (system PATH) | Path to FFmpeg executable |
-| `CUTDECK_FFPROBE_PATH` | `ffprobe` (system PATH) | Path to FFprobe executable |
-| `CUTDECK_EDGE_TTS_PATH` | `/usr/bin/edge-tts` | Path to Edge TTS script |
-| `RUST_LOG` | `CutDeck=info,warn` | Rust tracing log level |
+| AI → Whisper 模型 | `whisperModel` | `base` |
+| AI → 默认 Provider | `defaultProvider` | `deepseek` |
+| AI → 高光灵敏度 | `highlightSensitivity` | `medium` |
+| AI → 最大片段数 | `maxClips` | `10` |
+| AI → 最小片段时长 | `minClipDuration` | `15` |
+| 导出 → 默认比例 | `defaultAspectRatio` | `9:16` |
+| 导出 → 默认质量 | `defaultQuality` | `medium` |
+| 外观 → 主题 | `theme` | `system` |
+| 外观 → 自动保存 | `autoSave` | `true` |
 
-## Setting Variables
+## 环境变量
+
+高级用户或 CI/CD 场景可使用环境变量覆盖应用内设置。
+
+|| 变量 | 默认值 | 说明 |
+|---|---|---|
+| `CUTDECK_FFMPEG_PATH` | `ffmpeg`（系统 PATH） | FFmpeg 可执行文件路径 |
+| `CUTDECK_FFPROBE_PATH` | `ffprobe`（系统 PATH） | FFprobe 可执行文件路径 |
+| `CUTDECK_EDGE_TTS_PATH` | `/usr/bin/edge-tts` | Edge TTS 脚本路径 |
+| `RUST_LOG` | `CutDeck=info,warn` | Rust tracing 日志级别 |
+
+## 设置环境变量
 
 ### Linux / macOS
 
 ```bash
-# Temporary (for current session)
+# 临时（当前会话）
 export CUTDECK_FFMPEG_PATH=/usr/local/bin/ffmpeg
 export RUST_LOG=CutDeck=debug
 
-# Permanent — add to ~/.bashrc or ~/.zshrc
+# 永久 — 添加到 ~/.bashrc 或 ~/.zshrc
 echo 'export CUTDECK_FFMPEG_PATH=/usr/local/bin/ffmpeg' >> ~/.bashrc
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-# Temporary
+# 临时
 $env:CUTDECK_FFMPEG_PATH = "C:\ffmpeg\bin\ffmpeg.exe"
 
-# Permanent
+# 永久
 [System.Environment]::SetEnvironmentVariable("CUTDECK_FFMPEG_PATH", "C:\ffmpeg\bin\ffmpeg.exe", "User")
 ```
 
-### Docker / Container
+### Docker / 容器
 
 ```yaml
 environment:
@@ -43,25 +59,25 @@ environment:
   - RUST_LOG=CutDeck=debug
 ```
 
-## Log Levels
+## 日志级别
 
-`RUST_LOG` uses the [tracing subscriber format](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/struct.EnvFilter.html):
+`RUST_LOG` 使用 [tracing subscriber 格式](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/struct.EnvFilter.html)：
 
-- `error` — Errors only
-- `warn` — Warnings and errors
-- `info` — Info, warnings, errors (default)
-- `debug` — Debug, info, warnings, errors
-- `trace` — Trace (very verbose)
+- `error` — 仅错误
+- `warn` — 警告和错误
+- `info` — 信息、警告、错误（默认）
+- `debug` — 调试、信息、警告、错误
+- `trace` — 跟踪（非常详细）
 
-Module-specific filters: `CutDeck=debug,tauri=info,warn`
+模块级过滤器：`CutDeck=debug,tauri=info,warn`
 
-## FFmpeg Installation
+## FFmpeg 安装
 
 ### Ubuntu/Debian
 
 ```bash
 sudo apt update && sudo apt install ffmpeg
-ffmpeg -version  # confirm installation
+ffmpeg -version  # 确认安装
 ```
 
 ### macOS
@@ -72,7 +88,7 @@ brew install ffmpeg
 
 ### Windows
 
-Download from [ffmpeg.org](https://ffmpeg.org/download.html) or use winget:
+从 [ffmpeg.org](https://ffmpeg.org/download.html) 下载或使用 winget：
 
 ```powershell
 winget install ffmpeg

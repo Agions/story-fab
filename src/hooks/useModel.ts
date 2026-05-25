@@ -145,7 +145,7 @@ export function useModel(): UseModelReturn {
   const configureAPI = useCallback(async (
     provider: ModelProvider,
     apiKey: string,
-    apiSecret?: string
+    _apiSecret?: string
   ): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
@@ -199,7 +199,7 @@ export function useModel(): UseModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedModel, isConfigured, modelSettings]);
+  }, [selectedModel, isConfigured]);
   
   // 按分类过滤
   const filterByCategory = useCallback((category: ModelCategory): AIModel[] => {
@@ -253,7 +253,7 @@ export function useRecommendedModel(task: 'script' | 'analysis' | 'code' | 'fast
 
 // 使用模型成本估算
 export function useModelCost() {
-  const { selectedModel, modelSettings } = useModel();
+  const { selectedModel, modelSettings: _modelSettings } = useModel();
   
   const estimateCost = useCallback((inputTokens: number, outputTokens: number): number => {
     if (!selectedModel?.pricing) return 0;

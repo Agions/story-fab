@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * projectStore 过滤和排序逻辑测试
  */
@@ -7,9 +8,9 @@ import type { Project } from '../core/types';
 
 // 测试数据：每个字段值都不同，避免意外的 tie-breaking
 const mockProjects: Project[] = [
-  { id: '1', title: 'Zebra',   status: 'draft',     createdAt: '1970-01-01T00:00:09.000Z', updatedAt: '1970-01-01T00:00:09.000Z', duration: 30  },
-  { id: '2', title: 'Apple',   status: 'completed', createdAt: '1970-01-01T00:00:08.000Z', updatedAt: '1970-01-01T00:00:07.000Z', duration: 60  },
-  { id: '3', title: 'Banana',  status: 'draft',     createdAt: '1970-01-01T00:00:10.000Z', updatedAt: '1970-01-01T00:00:08.000Z', duration: 120 },
+  { id: '1', title: 'Zebra',   status: 'draft',     createdAt: '1970-01-01T00:00:09.000Z', updatedAt: '1970-01-01T00:00:09.000Z', duration: 30,  size: 100, tags: ['animal'], starred: true  },
+  { id: '2', title: 'Apple',   status: 'completed', createdAt: '1970-01-01T00:00:08.000Z', updatedAt: '1970-01-01T00:00:07.000Z', duration: 60,  size: 200, tags: ['fruit'], starred: false },
+  { id: '3', title: 'Banana',  status: 'draft',     createdAt: '1970-01-01T00:00:10.000Z', updatedAt: '1970-01-01T00:00:08.000Z', duration: 120, size: 300, tags: ['fruit'], starred: false },
 ];
 
 describe('filterProjects', () => {

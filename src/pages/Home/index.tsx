@@ -5,10 +5,10 @@ import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Row, Col } from '../../components/ui/grid';
 import { Badge } from '../../components/ui/badge';
-import { Skeleton } from '../../components/ui/skeleton';
+
 import {
   Video, Plus, Play, Rocket, Zap, FileText, Clock, CheckCircle, ArrowRight,
-  FlaskConical, Scissors, VolumeX, Download, Folder, TrendingUp, Loader2,
+  FlaskConical, Scissors, Download, Folder, Loader2,
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { useSettings } from '@/context/SettingsContext';

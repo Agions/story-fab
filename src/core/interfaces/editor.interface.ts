@@ -4,7 +4,7 @@
  * 定义编辑器核心操作的接口契约
  */
 
-import type { Timeline, EditorAction, EditorConfig, EditorExportSettings } from '../types/timeline';
+import type { Timeline, EditorAction, EditorExportSettings } from '../types/timeline';
 
 // ============================================================
 // 订阅者模式

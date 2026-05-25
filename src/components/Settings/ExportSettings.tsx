@@ -4,7 +4,7 @@
  * Default quality: shadcn Select (High/Medium/Low)
  * Output folder: shadcn Input + button to browse
  */
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { FolderOpen } from 'lucide-react';
