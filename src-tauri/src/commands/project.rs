@@ -180,12 +180,18 @@ pub async fn read_text_file(path: String) -> Result<String, String> {
     let allowed_dirs = ["/tmp/cutdeck", "/tmp/CutDeck", ".cutdeck"];
     let is_allowed = allowed_dirs
         .iter()
-        .any(|dir| canonical.starts_with(dir));
-    if !is_allowed && !path.starts_with("/tmp/") && !path.starts_with(".") {
+        .map(|d| PathBuf::from(d).canonicalize())
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| format!("无法解析允许目录: {e}"))?
+        .into_iter()
+        .any(|dir| canonical.starts_with(&dir));
+
+    if !is_allowed && !canonical.starts_with("/tmp/") && !canonical.starts_with(".") {
         return Err("禁止读取此路径".to_string());
     }
 
-    tokio_fs::read_to_string(path)
+    // 使用 canonical 路径读取，防止路径穿越
+    tokio_fs::read_to_string(&canonical)
         .await
         .map_err(|e| format!("读取文件失败: {e}"))
 }
@@ -198,12 +204,18 @@ pub async fn get_file_size(path: String) -> Result<u64, String> {
     let allowed_prefixes = ["/tmp/cutdeck", "/tmp/CutDeck"];
     let is_allowed = allowed_prefixes
         .iter()
-        .any(|prefix| canonical.starts_with(prefix));
-    if !is_allowed && !path.starts_with("/tmp/") && !path.contains("cutdeck") {
+        .map(|d| PathBuf::from(d).canonicalize())
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| format!("无法解析允许目录: {e}"))?
+        .into_iter()
+        .any(|prefix| canonical.starts_with(&prefix));
+
+    if !is_allowed && !canonical.starts_with("/tmp/") {
         return Err("禁止获取此文件的信息".to_string());
     }
 
-    let metadata = tokio_fs::metadata(&path)
+    // 使用 canonical 路径获取元数据，防止路径穿越
+    let metadata = tokio_fs::metadata(&canonical)
         .await
         .map_err(|e| format!("读取文件信息失败: {e}"))?;
     Ok(metadata.len())

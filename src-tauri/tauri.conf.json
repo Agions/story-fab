@@ -7,13 +7,14 @@
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
     "devUrl": "http://localhost:1430",
-    "frontendDist": "../dist"
+    "frontendDist": "../dist",
+    "devtools": true
   },
   "app": {
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "CutDeck - AI \u89c6\u9891\u521b\u4f5c\u5e73\u53f0",
+        "title": "CutDeck - AI 视音创作平台",
         "label": "main",
         "width": 1200,
         "height": 800,
@@ -29,7 +30,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*; font-src 'self' data:; frame-src 'none'; object-src 'none';"
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.openai.com https://*.googleapis.com https://*.deepseek.com https://*.qwen.com https://api.mymemory.translated.net https://*.anthropic.com; font-src 'self' data:; frame-src 'none'; object-src 'none';"
     }
   },
   "bundle": {

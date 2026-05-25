@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import {
   Edit,
   Save,
-  FileText,
   Clock,
 } from 'lucide-react';
 import type { ScriptData, Scene, ScriptSegment } from '@/core/types';

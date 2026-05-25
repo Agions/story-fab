@@ -46,6 +46,8 @@ export const TauriCommand = {
   SYNTHESIZE_SPEECH:       'synthesize_speech',
   LIST_TTS_BACKENDS:       'list_tts_backends',
   CHECK_TTS_AVAILABLE:     'check_tts_available',
+  MIX_AUDIO:               'mix_audio',
+  GET_AUDIO_DURATION:      'get_audio_duration',
 
   // AI Director
   RUN_AI_DIRECTOR_PLAN:   'run_ai_director_plan',
@@ -133,7 +135,8 @@ export interface BridgeOptions {
   signal?: AbortSignal;
 }
 
-const DEFAULT_TIMEOUT = 60_000; // 60s — 视频处理可能较长
+// Note: DEFAULT_TIMEOUT is reserved for future timeout configuration
+// const DEFAULT_TIMEOUT = 60_000; // 60s — 视频处理可能较长
 
 // ============================================================
 // 核心调用函数
@@ -378,6 +381,17 @@ export const tauri = {
   async checkTTSAvailable() {
     return invoke(TauriCommand.CHECK_TTS_AVAILABLE, {}) as Promise<boolean>;
   },
+
+  async mixAudio(options: {
+    videoPath: string;
+    ttsAudioPath: string;
+    outputPath: string;
+    ttsVolume?: number;
+    backgroundVolume?: number;
+    offsetSeconds?: number;
+  }): Promise<string> { return invoke(TauriCommand.MIX_AUDIO, options) as Promise<string>; },
+
+  async getAudioDuration(audioPath: string): Promise<number> { return invoke(TauriCommand.GET_AUDIO_DURATION, { audioPath }) as Promise<number>; },
 
   // ── AI Director ────────────────────────────────────────────────
 

@@ -13,7 +13,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 
-import type { EditorStore, EditorState, VideoData, ScriptData, VoiceData, VideoSegment, EditorPanel } from './editorTypes';
+import type { EditorStore, VideoData, ScriptData, VoiceData, VideoSegment, EditorPanel } from './editorTypes';
 import {
   MAX_HISTORY_SIZE,
   DEFAULT_ZOOM,
@@ -22,23 +22,6 @@ import {
   VOLUME_MIN,
   VOLUME_MAX,
 } from './editorTypes';
-
-// =========================================
-// RAF Throttle for high-frequency updates
-// =========================================
-/** 防止每帧都触发 Zustand 状态更新，只在每帧结束时同步最新值 */
-function rafThrottle<T extends (...args: unknown[]) => void>(fn: T): T {
-  let rafId: number | null = null;
-  let lastArgs: Parameters<T> | null = null;
-  return ((...args: Parameters<T>) => {
-    lastArgs = args;
-    if (rafId !== null) return;
-    rafId = requestAnimationFrame(() => {
-      fn(...lastArgs!);
-      rafId = null;
-    });
-  }) as T;
-}
 
 // =========================================
 // Initial state

@@ -6,7 +6,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '../../ui/card';
 import { Badge } from '../../ui/badge';
-import { Separator } from '../../ui/separator';
 import {
   FileText,
   Mic,
@@ -14,7 +13,6 @@ import {
   Pause,
   Copy,
   Check,
-  X,
   Download,
   File,
 } from 'lucide-react';

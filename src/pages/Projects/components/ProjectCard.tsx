@@ -10,7 +10,6 @@ import {
   AlertDialogTitle,
   AlertDialogFooter,
   AlertDialogCancel,
-  AlertDialogAction,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
@@ -49,7 +48,7 @@ interface ProjectCardProps {
 
 export const ProjectCard = React.memo<ProjectCardProps>(({
   project, uiStatus, statusConfig, formatDate,
-  onOpen, onDelete, onPreload, projectActions,
+  onOpen,  onDelete: _onDelete,onPreload, projectActions,
 }) => (
   <Card
     className="cursor-pointer overflow-hidden"

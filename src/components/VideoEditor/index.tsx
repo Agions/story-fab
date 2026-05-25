@@ -28,9 +28,9 @@ interface VideoEditorProps {
 
 const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditComplete }) => {
   // 播放器状态
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [, _setCurrentTime] = useState(0);
+  const [duration, _setDuration] = useState(0);
+  const [isPlaying, _setIsPlaying] = useState(false);
 
   // 处理状态
   const [processing, setProcessing] = useState(false);
@@ -82,24 +82,14 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     };
   }, [previewUrl]);
 
-  // 处理时长变化
-  const handleDurationChange = useCallback((newDuration: number) => {
-    setDuration(newDuration);
-  }, []);
-
   // 处理时间更新
   const handleTimeUpdate = useCallback((time: number) => {
-    setCurrentTime(time);
-  }, []);
-
-  // 处理播放状态变化
-  const handlePlayStateChange = useCallback((playing: boolean) => {
-    setIsPlaying(playing);
+    _setCurrentTime(time);
   }, []);
 
   // 点击片段
   const handleSegmentClick = useCallback((segment: ScriptSegment) => {
-    setCurrentTime(segment.startTime);
+    _setCurrentTime(segment.startTime);
     setSelectedSegment(segment);
   }, []);
 

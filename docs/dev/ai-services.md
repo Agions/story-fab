@@ -1,22 +1,22 @@
-# AI Services
+# AI 服务
 
-CutDeck uses a **provider abstraction** to support multiple AI backends without code changes.
+CutDeck 通过** Provider 抽象层**支持多个 AI 后端，无需修改业务代码即可切换模型。
 
-## Provider Architecture
+## Provider 架构
 
 ```
 src/core/services/providers/
-├── base.service.ts       # BaseProvider abstract class
-├── openai.service.ts     # OpenAI GPT-4o
+├── base.service.ts       # BaseProvider 抽象类
+├── openai.service.ts     # OpenAI GPT-4o / GPT-5
 ├── anthropic.service.ts  # Anthropic Claude
 ├── deepseek.service.ts   # DeepSeek V4 / Chat
-├── siliconflow.service.ts # SiliconFlow (OpenAI-compatible)
-└── index.ts              # Provider registry
+├── siliconflow.service.ts # SiliconFlow（OpenAI 兼容）
+└── index.ts              # Provider 注册表
 ```
 
-## Base Provider Interface
+## Base Provider 接口
 
-All providers implement:
+所有 Provider 必须实现：
 
 ```typescript
 interface AIProvider {
@@ -26,26 +26,26 @@ interface AIProvider {
 }
 ```
 
-## Adding a New Provider
+## 新增 Provider
 
-1. Create `src/core/services/providers/myprovider.service.ts`
-2. Extend `BaseProvider` and implement the interface
-3. Register in `src/core/services/providers/index.ts`
-4. Add config UI in Settings page
+1. 创建 `src/core/services/providers/myprovider.service.ts`
+2. 继承 `BaseProvider` 并实现接口
+3. 在 `src/core/services/providers/index.ts` 注册
+4. 在 Settings 页面添加配置 UI
 
-## Whisper (Local)
+## Whisper（本地）
 
-Whisper runs entirely locally via `src-tauri/src/subtitle.rs`:
+Whisper 通过 `src-tauri/src/subtitle.rs` 完全本地运行：
 
-- Powered by `faster-whisper` (CTranslate2 implementation)
-- Models downloaded on-demand to `~/.cache/whisper/`
-- Supports CPU and CUDA inference
+- 基于 `faster-whisper`（CTranslate2 实现）
+- 模型按需下载到 `~/.cache/whisper/`
+- 支持 CPU 和 CUDA 推理
 
-## Edge TTS (Local Voice Synthesis)
+## Edge TTS（本地语音合成）
 
-Edge TTS is used for local voice-over synthesis:
+Edge TTS 用于本地语音旁白合成：
 
-- No API key required
-- Runs as a subprocess calling `edge-tts` CLI
-- Communicates via stdin/stdout
-- Voices: Any [Microsoft Edge TTS voice](https://speech.platform.bing.com/consumer/sapi/voices)
+- 无需 API Key
+- 通过子进程调用 `edge-tts` CLI
+- 通过 stdin/stdout 通信
+- 语音库：[Microsoft Edge TTS 语音](https://speech.platform.bing.com/consumer/sapi/voices)

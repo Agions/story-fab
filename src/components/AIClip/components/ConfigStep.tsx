@@ -4,7 +4,6 @@ import { Button } from '../../ui/button';
 import { Switch } from '../../ui/switch';
 import { Slider } from '../../ui/slider';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '../../ui/select';
-import { Badge } from '../../ui/badge';
 import {
   Bot,
   FlaskConical,

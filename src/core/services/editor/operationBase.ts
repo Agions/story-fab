@@ -32,7 +32,7 @@ export interface TrackLookupResult {
 export function lookupTrack(
   timeline: Timeline,
   trackId: string,
-  onNotFound?: () => Timeline
+  _onNotFound?: () => Timeline
 ): TrackLookupResult | null {
   const trackIndex = findTrackIndex(timeline.tracks, trackId);
   if (trackIndex === -1) {

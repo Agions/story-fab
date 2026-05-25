@@ -108,14 +108,14 @@ const storage = {
   }
 };
 
-export function useProject(projectId?: string): UseProjectReturn {
+export function useProject(_projectId?: string): UseProjectReturn {
   const [project, setProject] = useState<ProjectData | null>(null);
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [taskStatus, setTaskStatus] = useState<TaskStatus | null>(null);
+  const [taskStatus, _setTaskStatus] = useState<TaskStatus | null>(null);
   
   // 最近项目
   const recentProjects = useMemo(() => {

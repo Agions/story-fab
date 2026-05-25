@@ -153,7 +153,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
     } else {
       setVisibleTasks([]);
     }
-  }, [analyzing]);
+  }, [analyzing, timeout]);
 
   // 切换配置
   const toggleConfig = (key: string) => {

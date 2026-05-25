@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateJianYingClip, generateJianYingDraft } from './jianying-exporter';
+import { generateJianYingClip, generateJianYingDraft } from './jianyingExporter';
 
 describe('JianYingDraftExporter', () => {
   it('should generate clip with correct ms fields', () => {

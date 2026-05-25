@@ -21,7 +21,6 @@ import {
   callAlibaba,
   callZhipu,
   callMoonshot,
-  callBaidu,
   mockCall,
 } from '@/core/services/providers';
 

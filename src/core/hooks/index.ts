@@ -5,4 +5,4 @@
  */
 
 export { useVideo } from './useVideo';
-export { useEditor } from './use-editor-state';
+export { useEditor } from './useEditorState';

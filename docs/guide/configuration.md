@@ -1,46 +1,39 @@
-# Configuration
+# 配置
 
-Customize CutDeck's behavior via settings or environment variables.
+通过应用内设置或环境变量自定义 CutDeck 的行为。
 
-## In-App Settings
+## 应用内设置
 
-Open **Settings** via `Ctrl/Cmd + ,` or the gear icon.
+通过 `Ctrl/Cmd + ,` 或齿轮图标打开**设置**。
 
-### AI Settings
+### AI 设置
 
-| Setting | Description | Default |
+|| 设置 | 说明 | 默认值 |
 |---|---|---|
-| Whisper Model | Model size for local transcription | `base` |
-| Default AI Provider | AI service for script generation | `DeepSeek` |
-| API Key | Your API key for the selected provider | — |
-| Highlight Sensitivity | Low / Medium / High | `Medium` |
-| Max Clips | Maximum clips per video | `10` |
-| Min Clip Duration | Minimum clip length in seconds | `15` |
+| Whisper 模型 | 本地转录的模型大小 | `base` |
+| 默认 AI Provider | 脚本生成的 AI 服务 | `DeepSeek` |
+| API Key | 所选 Provider 的密钥 | — |
+| 高光灵敏度 | 低 / 中 / 高 | `中` |
+| 最大片段数 | 每个视频最多片段数 | `10` |
+| 最小片段时长 | 最短片段长度（秒） | `15` |
 
-### Export Settings
+### 导出设置
 
-| Setting | Description | Default |
+|| 设置 | 说明 | 默认值 |
 |---|---|---|
-| Default Aspect Ratio | Preset for new exports | `9:16` |
-| Default Quality | CRF preset | `Medium` |
-| Default Output Directory | Where clips are saved | `~/Videos/CutDeck` |
-| Burn Subtitles by Default | Auto-enable subtitle burn-in | `false` |
+| 默认比例 | 新导出的预设 | `9:16` |
+| 默认质量 | CRF 预设 | `中` |
+| 默认输出目录 | 片段保存位置 | `~/Videos/CutDeck` |
+| 默认烧录字幕 | 自动启用字幕烧录 | `false` |
 
-### Appearance
+### 外观
 
-| Setting | Description | Default |
+|| 设置 | 说明 | 默认值 |
 |---|---|---|
-| Theme | Dark / Light / System | `System` |
-| Compact Mode | Denser UI layout | `false` |
-| Auto-save | Automatically save project changes | `true` |
+| 主题 | 深色 / 浅色 / 跟随系统 | `跟随系统` |
+| 紧凑模式 | 更密集的 UI 布局 | `false` |
+| 自动保存 | 自动保存项目更改 | `true` |
 
-## Environment Variables
+## 环境变量
 
-For advanced users or CI/CD setups:
-
-| Variable | Default | Description |
-|---|---|---|
-| `CUTDECK_FFMPEG_PATH` | `ffmpeg` | Path to FFmpeg binary |
-| `CUTDECK_FFPROBE_PATH` | `ffprobe` | Path to FFprobe binary |
-| `CUTDECK_EDGE_TTS_PATH` | `/usr/bin/edge-tts` | Path to Edge TTS script |
-| `RUST_LOG` | `CutDeck=info,warn` | Tracing subscriber filter |
+高级用户或 CI/CD 场景可使用环境变量。详情见[环境变量参考](/reference/config)。

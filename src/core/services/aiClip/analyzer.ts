@@ -143,7 +143,7 @@ function calculateKeyframeImportance(
 
 async function detectSilenceSegments(
   videoInfo: VideoInfo,
-  config: AIClipConfig
+  _config: AIClipConfig
 ): Promise<Array<{ start: number; end: number; duration: number }>> {
   try {
     const rustSegments = await tauri.detectSmartSegments(videoInfo.path, {

@@ -31,7 +31,7 @@ interface SpeechRecognitionResultList {
   [Symbol.iterator](): Iterator<SpeechRecognitionResult>;
 }
 
-interface SpeechRecognitionEventMap {
+interface _SpeechRecognitionEventMap {
   'result': SpeechRecognitionEvent;
 }
 
@@ -60,7 +60,7 @@ interface RustWhisperSegment {
   words?: RustWhisperWord[];
 }
 
-interface RustWhisperResult {
+interface _RustWhisperResult {
   segments: RustWhisperSegment[];
   language?: string;
   language_probability?: number;

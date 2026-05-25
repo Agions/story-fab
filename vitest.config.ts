@@ -30,17 +30,15 @@ export default defineConfig({
       exclude: ['node_modules', 'src/test', 'src/_DEAD/**', '**/*.d.ts', '**/*.config.*', '**/vite-env.d.ts', 'src/_DEAD/__tests__/common.test.ts', 'src/_DEAD/__tests__/format.test.ts', 'src/_DEAD/__tests__/logger.test.ts', 'src/_DEAD/__tests__/model-availability.test.ts', 'src/_DEAD/__tests__/project-id.test.ts', 'src/_DEAD/__tests__/route-preload.test.ts'],
       include: ['src/**/*.{ts,tsx}'],
       thresholds: {
-        // TODO: raise to 50% once component coverage is improved
-        lines: 0,
-        functions: 0,
-        branches: 0,
-        statements: 0,
+        lines: 20,
+        functions: 20,
+        branches: 15,
+        statements: 20,
       },
     },
     mockReset: true,
     restoreMocks: true,
     clearMocks: true,
-    environmentMatchGlobs: [['**/*.test.{ts,tsx}', 'jsdom']],
   },
   resolve: {
     alias: {

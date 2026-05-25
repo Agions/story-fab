@@ -11,7 +11,7 @@ import {
   getModelsByCategory,
   DEFAULT_MODEL_ID,
 } from './aiModels.config';
-import type { ModelProvider, ModelCategory } from '../types';
+import type { ModelCategory } from '../types';
 
 describe('AI_MODELS', () => {
   it('should have at least one model', () => {
@@ -34,7 +34,7 @@ describe('MODEL_PROVIDERS', () => {
   });
 
   it('each provider should have name and website', () => {
-    Object.entries(MODEL_PROVIDERS).forEach(([key, provider]) => {
+    Object.entries(MODEL_PROVIDERS).forEach(([_key, provider]) => {
       expect(provider.name).toBeDefined();
       expect(provider.website).toBeDefined();
     });
@@ -57,7 +57,7 @@ describe('getModelById', () => {
 
 describe('getModelsByProvider', () => {
   it('should filter models by provider', () => {
-    const provider = AI_MODELS[0].provider;
+    const provider = AI_MODELS[0].provider!;
     const models = getModelsByProvider(provider);
     models.forEach(m => {
       expect(m.provider).toBe(provider);
@@ -67,7 +67,7 @@ describe('getModelsByProvider', () => {
 
 describe('getModelsByCategory', () => {
   it('should filter models by category', () => {
-    const models = getModelsByCategory('general');
+    const models = getModelsByCategory('general' as ModelCategory);
     models.forEach(m => {
       expect(m.category).toContain('general');
     });

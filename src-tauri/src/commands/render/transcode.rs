@@ -1,4 +1,5 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
+use crate::commands::render::ffmpeg_builder::quality_preset;
 use crate::types::{ExportVideoInput, TranscodeCropInput};
 use crate::utils::cmd_err;
 
@@ -40,16 +41,6 @@ pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> 
         Ok(input.output_path)
     } else {
         Err(cmd_err("裁切导出失败", &output))
-    }
-}
-
-/// Quality presets keyed by name string.
-fn quality_preset(name: &str) -> (u8, &'static str) {
-    match name {
-        "low"    => (28, "veryfast"),
-        "medium" => (23, "fast"),
-        "high"   => (18, "medium"),
-        _        => (23, "fast"),
     }
 }
 

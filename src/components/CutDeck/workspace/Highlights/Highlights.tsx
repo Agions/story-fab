@@ -15,7 +15,6 @@ import { Zap, Crosshair, Lightbulb } from 'lucide-react';
 import { visionService } from '../../../../core/services/ai/vision.service';
 import { useTimelineStore } from '../../../../store/timelineStore';
 import { notify } from '../../../../shared/utils/notify';
-import { formatDuration } from '../../../../shared/utils/formatting';
 import type { VideoInfo } from '@/core/types';
 import styles from './Highlights.module.css';
 import { formatTime } from '@/shared/utils/format';

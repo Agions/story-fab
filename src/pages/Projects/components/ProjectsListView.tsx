@@ -6,17 +6,6 @@ import { Progress, ProgressTrack, ProgressIndicator } from '../../../components/
 import { Button } from '../../../components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../../components/ui/dropdown-menu';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../../components/ui/tooltip';
-interface MenuItem {
-  key?: string;
-  label?: React.ReactNode;
-  danger?: boolean;
-  onClick?: () => void;
-}
-
-interface MenuProps {
-  items?: MenuItem[];
-}
-
 import type { ProjectUIStatus, ProjectView, ProjectUIStats } from '../types';
 
 interface ActionItem {
