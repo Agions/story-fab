@@ -27,7 +27,9 @@ import { saveFile } from '@/services/file/fileOperations';
 
 const makeScript = (segments: Array<{ startTime: number; endTime: number; content: string }>) => ({
   id: 'test-script-001',
-  content: segments,
+  projectId: 'test-project-001',
+  content: segments.map((s, i) => ({ id: `segment-${i}`, ...s })),
+  fullText: segments.map((s) => s.content).join(' '),
   createdAt: '2026-04-19T10:00:00Z',
   updatedAt: '2026-04-19T12:00:00Z',
 });

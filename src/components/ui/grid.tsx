@@ -51,7 +51,6 @@ const Row: React.FC<RowProps> = ({ className, align = 'start', justify = 'start'
     evenly: 'justify-evenly',
   }
   const gutterStyle = gutter ? { marginLeft: `-${gutter[0]}px`, marginRight: `-${gutter[0]}px`, marginTop: `-${gutter[1]}px`, marginBottom: `-${gutter[1]}px` } : {}
-  const childrenStyle = gutter ? { paddingLeft: `${gutter[0]}px`, paddingRight: `${gutter[0]}px`, paddingTop: `${gutter[1]}px`, paddingBottom: `${gutter[1]}px` } : {}
   
   return (
     <div 

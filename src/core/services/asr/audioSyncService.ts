@@ -73,7 +73,7 @@ export class AudioVideoSyncService {
   /**
    * 分析音视频同步状态
    */
-  async analyzeSync(videoPath: string, audioPath?: string): Promise<SyncResult> {
+  async analyzeSync(videoPath: string, _audioPath?: string): Promise<SyncResult> {
     // 模拟分析过程
     // 实际实现需要调用 FFmpeg 或其他视频处理库
     

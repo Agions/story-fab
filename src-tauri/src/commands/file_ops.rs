@@ -23,15 +23,18 @@ pub async fn clean_temp_file(path: String) -> Result<(), String> {
         return Err("路径不能为空".to_string());
     }
 
-    let temp_dir = std::env::temp_dir();
     let file_path = PathBuf::from(&path);
+    let canonical = file_path.canonicalize().map_err(|e| format!("路径无效或不存在: {e}"))?;
 
-    if !file_path.starts_with(&temp_dir) {
+    // 统一使用 canonical 路径检查，防止符号链接穿越
+    let canonical_temp = std::env::temp_dir().canonicalize()
+        .map_err(|e| format!("无法解析临时目录: {e}"))?;
+    if !canonical.starts_with(&canonical_temp) {
         return Err("只能删除临时目录下的文件".to_string());
     }
 
-    if file_path.exists() {
-        tokio::fs::remove_file(&path)
+    if canonical.exists() {
+        tokio::fs::remove_file(&canonical)
             .await
             .map_err(|e| format!("删除临时文件失败: {e}"))?;
     }

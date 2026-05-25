@@ -65,7 +65,7 @@ interface TauriSynthesizeInput {
   backend: string;
 }
 
-interface TauriSynthesizeOutput {
+interface _TauriSynthesizeOutput {
   audio_path: string;
   duration_secs: number;
 }

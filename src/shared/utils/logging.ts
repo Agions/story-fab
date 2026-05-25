@@ -50,8 +50,10 @@ const write = (level: LogLevel, message: string, context?: unknown) => {
   // 输出
   const prefix = `[${level.toUpperCase()}]`;
   if (context) {
+    // eslint-disable-next-line no-console
     console[level](prefix, message, context);
   } else {
+    // eslint-disable-next-line no-console
     console[level](prefix, message);
   }
 };

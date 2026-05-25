@@ -9,14 +9,13 @@ import { formatDurationChinese } from '../../../shared/utils/format';
 import type {
   VideoInfo,
   Scene,
-  Keyframe,
   VideoAnalysis,
   ObjectDetection,
   EmotionAnalysis,
 } from '@/core/types';
 import type { HighlightSegment, DetectOptions, HighlightReason } from '@/core/interfaces';
-import type { SceneType, SceneFeatureSet } from './types';
 import { SCENE_TYPES, EMOTION_DIMENSIONS, OBJECT_CATEGORIES } from './types';
+import type { SceneFeatureSet } from './types';
 
 export class VisionService {
   /**
@@ -58,7 +57,7 @@ export class VisionService {
   }> {
     const {
       minSceneDuration = 3,
-      threshold = 0.3,
+      threshold: _threshold = 0.3,
       detectObjects = true,
       detectEmotions = true
     } = options;
@@ -174,10 +173,10 @@ export class VisionService {
     videoInfo: VideoInfo
   ): Promise<Scene[]> {
     return Promise.all(
-      scenes.map(async (scene, index) => {
+      scenes.map(async (scene, _index) => {
         // 基于场景位置和内容进行分类
         const position = scene.startTime / videoInfo.duration;
-        const duration = scene.endTime - scene.startTime;
+        const _duration = scene.endTime - scene.startTime;
 
         // 分析场景特征
         const features = await this.analyzeSceneFeatures(scene, videoInfo);
@@ -308,7 +307,7 @@ export class VisionService {
    */
   private async detectObjectsInScenes(
     scenes: Scene[],
-    videoInfo: VideoInfo
+    _videoInfo: VideoInfo
   ): Promise<ObjectDetection[]> {
     const objects: ObjectDetection[] = [];
 
@@ -343,7 +342,7 @@ export class VisionService {
    */
   private async analyzeEmotions(
     scenes: Scene[],
-    videoInfo: VideoInfo
+    _videoInfo: VideoInfo
   ): Promise<EmotionAnalysis[]> {
     return scenes.map(scene => {
       const baseEmotions = [...EMOTION_DIMENSIONS];

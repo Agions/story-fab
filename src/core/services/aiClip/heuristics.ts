@@ -46,7 +46,7 @@ export function generateTrimStrategy(
   profile: AIClipContentProfile,
   targetDuration?: number,
 ): TrimStrategy {
-  const { duration, audioEnergy, complexity, emotionPeakCount, sceneCount } = profile;
+  const { duration, complexity, emotionPeakCount, sceneCount } = profile;
 
   // 短视频不 trim
   if (duration < 60) {
@@ -60,7 +60,7 @@ export function generateTrimStrategy(
 
   // 长视频强制 trim
   if (duration > 300) {
-    const peakBonus = emotionPeakCount > 10 ? 30 : emotionPeakCount > 5 ? 15 : 0;
+    const _peakBonus = emotionPeakCount > 10 ? 30 : emotionPeakCount > 5 ? 15 : 0;
     return {
       maxDuration: targetDuration ?? Math.min(duration, 180),
       minDuration: 20,

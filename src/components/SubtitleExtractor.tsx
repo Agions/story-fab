@@ -14,13 +14,12 @@ import React, { useState, useCallback, useRef } from 'react';
 // ── Progress animation constants ──────────────────────────────────────────────
 const PROGRESS_UPDATE_INTERVAL_MS = 250;
 const PROGRESS_CAP = 88;
-import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Switch } from './ui/switch';
-import { Slider } from './ui/slider';
 import { Progress } from './ui/progress';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
+import { Tooltip } from './ui/tooltip';
+import { TooltipProvider } from './ui/tooltip';
 import { Badge } from './ui/badge';
 import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
 import { ScrollArea } from './ui/scroll-area';
@@ -30,7 +29,6 @@ import {
   Download,
   Play,
   Pause,
-  RefreshCw,
   Target,
   Mic,
 } from 'lucide-react';
@@ -91,9 +89,9 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     const video = videoRef.current;
     if (!video) return;
     setPlayheadMs(video.currentTime * MS_PER_SECOND);
-  }, []);
+  }, [setPlayheadMs]);
 
-  const handleVideoEnded = useCallback(() => { setPreviewPlaying(false); }, []);
+  const handleVideoEnded = useCallback(() => { setPreviewPlaying(false); }, [setPreviewPlaying]);
 
   const handleVideoMetadata = useCallback(() => {
     const video = videoRef.current;
@@ -108,10 +106,13 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
       video.pause();
       setPreviewPlaying(false);
     } else {
-      video.play().catch((e) => { console.warn('[SubtitleExtractor] 播放失败:', e); });
+      video.play().catch((e) => {
+        // eslint-disable-next-line no-console
+        console.warn('[SubtitleExtractor] 播放失败:', e);
+      });
       setPreviewPlaying(true);
     }
-  }, [previewPlaying]);
+  }, [previewPlaying, setPreviewPlaying]);
 
   const seekTo = useCallback((timeSec: number) => {
     const video = videoRef.current;
@@ -120,9 +121,12 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     setPlayheadMs(timeSec * MS_PER_SECOND);
     if (!previewPlaying) {
       setPreviewPlaying(true);
-      video.play().catch((e) => { console.warn('[SubtitleExtractor] 播放失败:', e); });
+      video.play().catch((e) => {
+        // eslint-disable-next-line no-console
+        console.warn('[SubtitleExtractor] 播放失败:', e);
+      });
     }
-  }, [previewPlaying]);
+  }, [previewPlaying, setPreviewPlaying, setPlayheadMs]);
 
   const handleExtract = useCallback(async () => {
     if (!videoUrl) { notify.error(null, '未检测到视频源'); return; }

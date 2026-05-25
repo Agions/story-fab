@@ -6,7 +6,6 @@
 
 import { logger } from '../../../shared/utils/logging';
 import { formatSrtTime } from '../../../shared/utils/formatting';
-import tauri from '../../tauri/TauriBridge';
 import type { SubtitleEntry, VideoInfo } from '@/core/types';
 
 // ============================================
@@ -470,7 +469,7 @@ export class SubtitleService {
     videoPath: string,
     subtitlePath: string,
     outputPath: string,
-    style?: Partial<SubtitleStyle>
+    _style?: Partial<SubtitleStyle>
   ): Promise<string> {
     logger.info('[SubtitleService] 烧录字幕:', { video: videoPath, subtitle: subtitlePath, output: outputPath });
     const { invoke } = await import('@tauri-apps/api/core');

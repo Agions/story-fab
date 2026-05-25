@@ -1,13 +1,12 @@
 import { logger } from '../../shared/utils/logging';
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Card, CardHeader, CardTitle } from '../ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Button } from '../ui/button';
 import {
   Edit3,
   Save,
-  Download,
   ChevronDown,
   Plus,
 } from 'lucide-react';

@@ -14,7 +14,7 @@ import { visionService } from '../../services/ai/vision.service';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import type { CandidateClip } from '../../services/pipeline/clip-pipeline/clipScorer';
 import type { ASRSegment } from '../../services/asr/asr.service';
-import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
+import { createStep, type Step, reportProgress } from '../Step';
 import { logger } from '../../../shared/utils/logging';
 import { tauri } from '../../../core/tauri/TauriBridge';
 

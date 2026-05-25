@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toJianYingSubtitleTrack } from './jianying-adapter';
+import { toJianYingSubtitleTrack } from './jianyingAdapter';
 
 describe('JianYingSubtitleAdapter', () => {
   it('should convert subtitle segments to JianYing track', () => {

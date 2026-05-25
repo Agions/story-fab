@@ -9,6 +9,7 @@ window.addEventListener('error', (e) => {
   if (e.message && (e.message.includes('@tauri-apps/api') || e.message.includes('Tauri'))) {
     e.preventDefault();
     if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console -- DEV-only diagnostic
       console.warn('[cut_deck] Tauri API error suppressed:', e.message);
     }
   }

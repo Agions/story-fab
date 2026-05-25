@@ -7,9 +7,9 @@
 import { invoke, TauriCommand } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
 
-import type { ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, ExportResult } from '../../export/types';
+import type { ExportFormat, ExportQuality, ExportResolution, ExportConfig, ExportResult } from '../../export/types';
 import { EXPORT_PRESETS, FORMAT_INFO } from '../../export/types';
-export type { ExportFormat, ExportQuality, ExportResolution, EncoderSettings, ExportConfig, ExportResult };
+export type { ExportFormat, ExportQuality, ExportResolution, ExportConfig, ExportResult };
 export { EXPORT_PRESETS, FORMAT_INFO };
 
 export const FORMAT_MIME_TYPES: Record<ExportFormat, string> = {
@@ -64,7 +64,7 @@ export class ExportService {
     inputPath: string,
     outputPath: string,
     config: Partial<ExportConfig>,
-    onProgress?: (percent: number) => void
+    _onProgress?: (percent: number) => void
   ): Promise<ExportResult> {
     const fullConfig = this._buildConfig(config, true);
 

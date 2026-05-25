@@ -134,7 +134,7 @@ export class ClipWorkflowService {
     videoInfo: VideoInfo,
     scriptSegments?: ScriptSegment[]
   ): Promise<ClipResult> {
-    const startTime = Date.now();
+    const _startTime = Date.now();
     
     // Step 1: 视频分析
     const analysis = await this.analyzeVideo(videoInfo);

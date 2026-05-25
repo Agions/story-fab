@@ -4,8 +4,7 @@
  */
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
+import { Card, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Alert, AlertDescription } from '../ui/alert';
 import {
   Settings,

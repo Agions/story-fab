@@ -7,7 +7,7 @@
  * 支持平台：YouTube / TikTok / Instagram / 抖音 / 小红书 / B站
  */
 
-import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
+import { createStep, type Step, reportProgress } from '../Step';
 import type { ClipScore } from '../../services/pipeline/clip-pipeline/clipScorer';
 import { SEOGenerator } from '../../services/pipeline/clip-pipeline/seoGenerator';
 import type { SEOMetadata, SocialPlatform } from '../../services/pipeline/clip-pipeline/seoGenerator';

@@ -2,7 +2,6 @@
  * useProjectAutoSave — auto-save logic hook
  */
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { notify } from '@/shared';
 import { logger } from '../../../shared/utils/logging';
 import { buildDraftFingerprint, type ProjectData } from '../projectEditUtils';
 
@@ -87,12 +86,14 @@ export function useProjectAutoSave({
         if (isStale()) return;
         logger.error('自动保存草稿失败:', { error: e });
         setAutoSaveState('error');
+        return;
       }
+      setAutoSaveState('idle');
     }, 900);
-  }, [enabled, getCurrentFingerprint, initialLoading, loading, onPersist, saving, videoPath]);
+  }, [enabled, initialLoading, loading, saving, videoPath, getCurrentFingerprint, onPersist]);
 
   // Sync fingerprint when project changes externally (e.g., after save)
-  const syncFingerprint = useCallback((data: ProjectData) => {
+  const _syncFingerprint = useCallback((data: ProjectData) => {
     lastFingerprintRef.current = buildDraftFingerprint({
       id: data.id,
       name: data.name,
@@ -111,3 +112,5 @@ export function useProjectAutoSave({
     setAutoSaveState,
   };
 }
+
+// end of file

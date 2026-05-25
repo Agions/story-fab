@@ -52,7 +52,7 @@ const VideoEditorPage: React.FC = () => {
     analyzing,
     currentTime,
     duration,
-    isPlaying,
+    isPlaying: _isPlaying,
     segments,
     keyframes,
     selectedSegmentIndex,
@@ -65,8 +65,8 @@ const VideoEditorPage: React.FC = () => {
 
     // 状态设置器
     setCurrentTime,
-    setDuration,
-    setIsPlaying,
+    setDuration: _setDuration,
+    setIsPlaying: _setIsPlaying,
     setIsSaving,
     setIsExporting,
     setOutputFormat,
@@ -95,7 +95,7 @@ const VideoEditorPage: React.FC = () => {
       await saveProjectToFile(projectId || 'new', projectToSave);
       notify.success('项目保存成功');
     });
-  }, [isSaving, projectId, segments]);
+  }, [projectId, segments, isSaving, setIsSaving]);
 
   // 导出视频
   const handleExportVideo = useCallback(async () => {
@@ -111,13 +111,13 @@ const VideoEditorPage: React.FC = () => {
       notify.success(`视频导出成功: ${result.outputPath}`);
       logger.info('导出成功', { result });
     });
-  }, [isExporting, videoSrc, segments, outputFormat]);
+  }, [videoSrc, segments, outputFormat, isExporting, setIsExporting]);
 
   // AI 分析完成
   const handleAnalysisComplete = useCallback((result: ClipAnalysisResult) => {
     logger.info('AI 剪辑分析完成', { result });
     notify.success(`检测到 ${result.cutPoints.length} 个剪辑点`);
-  }, [logger, notify]);
+  }, []);
 
   return (
     <div className={styles.editorLayout}>

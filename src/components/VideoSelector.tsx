@@ -2,7 +2,7 @@ import { logger } from '../shared/utils/logging';
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Upload, Trash2, PlayCircle, Play } from 'lucide-react';
+import { Upload, Trash2, PlayCircle } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { tauri } from '@/core/tauri/TauriBridge';

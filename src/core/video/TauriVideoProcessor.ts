@@ -45,7 +45,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
     options: ExtractKeyFramesOptions,
     duration?: number,
   ): Promise<KeyFrame[]> {
-    const { maxFrames = 10, sceneThreshold = 0.3 } = options ?? {};
+    const { maxFrames: _maxFrames = 10, sceneThreshold: _sceneThreshold = 0.3 } = options ?? {};
     // extract_key_frames not exposed as tauri command — skip for now, return empty
     const framePaths: string[] = [];
     const totalDuration = duration ?? 0;
@@ -58,7 +58,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
     }));
   }
 
-  protected async doGenerateThumbnail(videoPath: string, time: number): Promise<string> {
+  protected async doGenerateThumbnail(_videoPath: string, _time: number): Promise<string> {
     // generate_thumbnail is a VideoProcessor internal method, not a tauri command
     return '';
   }

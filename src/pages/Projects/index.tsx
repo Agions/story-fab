@@ -28,7 +28,6 @@ const ProjectManager: React.FC = () => {
     deleteConfirmId,
     filteredProjects,
     statusFilters,
-    loadProjectData,
     setViewMode,
     setSearchText,
     setStatusFilter,

@@ -6,7 +6,6 @@ import axios from 'axios';
 import { getApiKey } from '@/services/tauri';
 import type { VideoMetadata } from '@/core/video';
 import { logger } from '@/shared/utils/logging';
-import { formatTimestamp } from '@/shared/utils/formatting';
 import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
 
 // ============================================

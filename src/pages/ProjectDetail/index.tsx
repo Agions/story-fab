@@ -3,11 +3,9 @@ import React, { useState, useEffect, lazy, Suspense, useRef, useMemo, useCallbac
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
-import { Separator } from '../../components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '../../components/ui/drawer';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../components/ui/tooltip';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
 import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scissors, LayoutDashboard } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useModelStore } from '@/store';
@@ -77,16 +75,21 @@ const ProjectDetail: React.FC = () => {
   const navigate = useNavigate();
   const { addRecentProject } = useSettings();
   const { selectedAIModel, aiModelsSettings } = useModelStore();
+  // Note: loading/currentStep 等变量解构后未直接读取（由 state 或事件回调使用），setter 在函数体内被调用
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState<string>('analyze');
   const [project, setProject] = useState<ProjectData | null>(null);
-  const projectRef = useRef<ProjectData | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [loadError, setLoadError] = useState<string>('');
   const [activeScript, setActiveScript] = useState<Script | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [loadError, setLoadError] = useState<string>('');
-  const [reloadToken, setReloadToken] = useState(0);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [currentStep, setCurrentStep] = useState<'analyze' | 'script' | 'voice' | 'video'>('analyze');
+  const [_reloadToken, _setReloadToken] = useState(0);
+  const projectRef = useRef<ProjectData | null>(null);
   const loadRequestSeqRef = useRef(0);
   const mountedRef = useRef(true);
   const scriptPersistTimerRef = useRef<number | null>(null);
@@ -143,7 +146,7 @@ const ProjectDetail: React.FC = () => {
         notify.error(error, '加载项目失败，请重试');
       })
       .finally(() => { if (isStale()) return; setLoading(false); });
-  }, [addRecentProject, projectId, reloadToken]);
+  }, [addRecentProject, projectId, _reloadToken]);
 
   const handleDeleteProject = useCallback(() => { setDeleteConfirmOpen(true); }, []);
 

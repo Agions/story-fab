@@ -19,11 +19,6 @@ interface AISettingsProps {
   onModelChange?: (model: string) => void;
 }
 
-// 支持验证的 provider 列表
-const VALIDATABLE_PROVIDERS: ModelProvider[] = [
-  'openai', 'anthropic', 'google', 'deepseek', 'alibaba', 'zhipu', 'moonshot',
-];
-
 // 获取 provider 对应的 model id 前缀（用于 Test 时猜 provider）
 function inferProvider(apiKey: string): ModelProvider | null {
   if (!apiKey) return null;

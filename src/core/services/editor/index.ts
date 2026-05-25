@@ -1,13 +1,9 @@
 export * from './types';
 export * from './timelineOperations';
 export * from './history';
-export * from './trackManager';
 export * from './export';
 export * from './storage';
 export * from './operationBase';
-
-// Handlers (策略模式)
-export * from '@/core/services/editor/handlers';
 
 import {
   createEmptyTimeline,
@@ -27,9 +23,9 @@ import {
   findTrackByClipId,
 } from './timelineOperations';
 import { createHistory, pushHistory, undo, redo, canUndo, canRedo } from './history';
-import { createTrack } from './trackManager';
 import { exportTimeline, getExportPreview } from './export';
 import { saveToStorage, loadFromStorage, clearStorage } from './storage';
+import { logger } from '@/shared/utils/logging';
 import {
   DEFAULT_EDITOR_CONFIG,
   type EditorAction,
@@ -224,10 +220,11 @@ export class EditorService {
   }
 
   createTrack(type: 'video' | 'audio' | 'text' | 'effect'): string {
-    const result = createTrack(this.history.present, type, this.config);
-    this.history = pushHistory(this.history, result.timeline);
+    const newTimeline = addTrack(this.history.present, type);
+    this.history = pushHistory(this.history, newTimeline);
     this.notify();
-    return result.trackId;
+    const newTrack = newTimeline.tracks[newTimeline.tracks.length - 1];
+    return newTrack?.id ?? '';
   }
 
   /**

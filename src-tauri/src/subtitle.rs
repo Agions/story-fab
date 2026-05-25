@@ -127,14 +127,18 @@ pub fn check_faster_whisper() -> Result<bool, String> {
 pub async fn download_whisper_model(model_size: String) -> Result<String, String> {
     log::info!("[CutDeck] Model download requested: {}", model_size);
 
-    // faster-whisper auto-downloads models on first use
-    // Trigger a small test to kick off the download
-    let model_arg = model_size.clone();
+    // Validate model name to prevent Python code injection
+    if !model_size.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.') {
+        return Err(format!("无效的模型名称: {}", model_size));
+    }
+
+    // Use Debug format (repr) to safely escape the model name — avoids manual escaping bugs
+    let model_repr = format!("{:?}", model_size);
     let output = tokio::process::Command::new("python3")
         .arg("-c")
         .arg(format!(
-            "from faster_whisper import WhisperModel; m = WhisperModel('{}', device='cpu', compute_type='int8'); del m; print('ok')",
-            model_arg
+            "from faster_whisper import WhisperModel; m = WhisperModel({}, device='cpu', compute_type='int8'); del m; print('ok')",
+            model_repr
         ))
         .output()
         .await
@@ -250,8 +254,8 @@ pub async fn transcribe_audio(
         format!("'{lang}'")
     };
 
-    // Build Python code using string concatenation — avoids Rust format! macro
-    // entirely so Python regex quantifiers {2,} / {3,} never conflict with {} placeholders.
+    // Use Python repr() to safely escape the audio path — avoids manual escaping bugs
+    let audio_path_repr = format!("{:?}", &final_audio_path);
     let python_code = [
         r#"import sys
 import json
@@ -298,8 +302,8 @@ model = WhisperModel(
 )
 
 segments, info = model.transcribe(
-    ""#.to_string(),
-        final_audio_path.replace('\\', "\\\\").replace('"', "\\\""),
+    r#"#.to_string(),
+        audio_path_repr,
         r#"",
     language="#.to_string(),
         lang_arg,
@@ -424,7 +428,7 @@ print(json.dumps(result, ensure_ascii=False))
     .join("");
 
     let _ = app.emit("whisper-progress", TranscribeProgress {
-        stage: format!("Whisper {} 模型推理中...", model),
+        stage: format!("Whisper {} 模型推理中... (这可能需要几分钟)", model),
         progress: 0.25,
         current_segment: None,
         total_segments: None,
@@ -432,13 +436,16 @@ print(json.dumps(result, ensure_ascii=False))
 
     // Use tokio::process::Command with kill_on_drop=true so the Python child
     // is killed when the async task is cancelled (client disconnect).
-    let output = tokio::process::Command::new("python3")
-        .arg("-c")
-        .arg(&python_code)
-        .kill_on_drop(true)
-        .output()
-        .await
-        .map_err(|e| format!("执行 faster-whisper 失败: {}", e))?;
+    // Wrap in spawn_blocking to avoid blocking the async executor on long-running process.
+    let output = tokio::task::spawn_blocking(move || {
+        std::process::Command::new("python3")
+            .arg("-c")
+            .arg(&python_code)
+            .output()
+    })
+    .await
+    .map_err(|e| format!("执行 faster-whisper 失败: {}", e))?
+    .map_err(|e| format!("执行 faster-whisper 失败: {}", e))?;
 
     // Cleanup temp wav
     if let Some(ref wav) = temp_wav {

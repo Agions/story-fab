@@ -133,15 +133,16 @@ export function useVideo(): UseVideoReturn {
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [taskStatus, setTaskStatus] = useState<TaskStatusInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, _setIsLoading] = useState(false);
   
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // 组件卸载时清理 AbortController
   useEffect(() => {
+    const controller = abortControllerRef.current;
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+      if (controller) {
+        controller.abort();
       }
     };
   }, []);

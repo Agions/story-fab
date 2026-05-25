@@ -1,12 +1,12 @@
-import { invoke, tauri } from '../core/tauri/TauriBridge';
-import { open, save } from '@tauri-apps/plugin-dialog';
+import { tauri } from '../core/tauri/TauriBridge';
+import { save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile, BaseDirectory, mkdir, exists } from '@tauri-apps/plugin-fs';
 import { load } from '@tauri-apps/plugin-store';
 import { open as openExternal } from '@tauri-apps/plugin-shell';
 import { normalizeProjectId, buildProjectIdCandidates } from '../core/utils/project-id';
 import { logger } from '../shared/utils/logging';
 import { formatTime } from '../shared/utils/formatting';
-import { getConfigDir, selectFile, saveFile } from './file/fileOperations';
+import { getConfigDir } from './file/fileOperations';
 
 const errMsg = (err: unknown): string =>
   err instanceof Error ? err.message : String(err);
@@ -138,7 +138,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
 
   // JS API 备选方案
   await writeTextFile(projectPath, projectData, { baseDir: BaseDirectory.AppData })
-    .catch(async (writeErr) => {
+    .catch(async () => {
       // 备用路径
       const configDir = await getConfigDir();
       const backupPath = `${configDir}${normalizedProjectId}.json`;

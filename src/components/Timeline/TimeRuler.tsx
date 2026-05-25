@@ -9,7 +9,7 @@ interface TimeRulerProps {
   width: number;
 }
 
-export const TimeRuler = memo<TimeRulerProps>(({ duration, zoom, scrollX, width }) => {
+export const TimeRuler = memo<TimeRulerProps>(({ duration: _duration, zoom, scrollX, width }) => {
   const msPerPixel = 1000 / zoom;
   let majorInterval = 1000;
   let minorDivisions = 4;
@@ -22,7 +22,6 @@ export const TimeRuler = memo<TimeRulerProps>(({ duration, zoom, scrollX, width 
   else { majorInterval = 50; minorDivisions = 5; }
 
   const minorInterval = majorInterval / minorDivisions;
-  const totalMs = Math.max(duration, 60000);
   const visibleStartMs = scrollX * msPerPixel;
   const visibleEndMs = visibleStartMs + width * msPerPixel;
 

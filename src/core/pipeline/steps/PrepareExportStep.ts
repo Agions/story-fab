@@ -8,7 +8,7 @@
  * 为每个片段准备多格式导出任务（9:16 / 1:1 / 16:9）
  */
 
-import { createStep, type Step, type PipelineContext, type StepOptions, reportProgress } from '../Step';
+import { createStep, type Step, reportProgress } from '../Step';
 import type { ClipScore } from '../../services/pipeline/clip-pipeline/clipScorer';
 import type { AspectRatio } from '../../services/pipeline/clip-pipeline/multiExport';
 import type { ExportTask } from '../../services/pipeline/clip-pipeline/multiExport';

@@ -4,6 +4,7 @@
  * @version 2.0 - 2026-05-03
  */
 
+import { findClipInTracks } from './timelineHelpers';
 import type {
   Timeline,
   TimelineClip,
@@ -12,7 +13,6 @@ import type {
 import { syncLegacyTracks } from '../../types/timeline';
 import {
   findTrackIndex,
-  findClipInTracks,
   updateClipInTrack,
   calculateDuration,
 } from './timelineHelpers';

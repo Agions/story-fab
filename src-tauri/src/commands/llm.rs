@@ -3,7 +3,23 @@
 
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use std::sync::OnceLock;
 use std::time::Duration;
+
+// Reusable HTTP client with connection pooling - avoids creating new client per request
+static HTTP_CLIENT: OnceLock<Client> = OnceLock::new();
+
+fn get_http_client() -> &'static Client {
+    HTTP_CLIENT.get_or_init(|| {
+        Client::builder()
+            .pool_max_idle_per_host(16)
+            .tcp_keepalive(std::time::Duration::from_secs(60))
+            // Prevent infinite hangs — LLM API calls need a sane timeout
+            .timeout(Duration::from_secs(180))
+            .build()
+            .expect("Failed to create HTTP client")
+    })
+}
 
 // ─── 类型定义 ────────────────────────────────────────────────────────────────
 
@@ -619,28 +635,24 @@ pub async fn generate_narration_script(
 
     let user_prompt = build_user_prompt(&input.subtitles, input.duration_secs, input.target_duration_secs);
 
-    let client = Client::builder()
-        .timeout(Duration::from_secs(120))
-        .build()
-        .map_err(|e| format!("创建 HTTP 客户端失败: {}", e))?;
-
+    let client = get_http_client();
     let full_script = match provider {
         "google" => {
-            call_gemini(&client, &model, &api_key, &system_prompt, &user_prompt).await?
+            call_gemini(client, &model, &api_key, &system_prompt, &user_prompt).await?
         }
         "deepseek" => {
-            call_deepseek(&client, &model, &api_key, &system_prompt, &user_prompt).await?
+            call_deepseek(client, &model, &api_key, &system_prompt, &user_prompt).await?
         }
         "qwen" => {
-            call_qwen(&client, &model, &api_key, &system_prompt, &user_prompt).await?
+            call_qwen(client, &model, &api_key, &system_prompt, &user_prompt).await?
         }
         "anthropic" => {
-            call_anthropic(&client, &model, &api_key, &system_prompt, &user_prompt).await?
+            call_anthropic(client, &model, &api_key, &system_prompt, &user_prompt).await?
         }
         _ => {
             // OpenAI 及兼容接口
             let base_url = input.base_url.clone().unwrap_or_else(|| "https://api.openai.com/v1".to_string());
-            call_openai_compatible(&client, &base_url, &model, &api_key, &system_prompt, &user_prompt).await?
+            call_openai_compatible(client, &base_url, &model, &api_key, &system_prompt, &user_prompt).await?
         }
     };
 
@@ -666,10 +678,7 @@ pub async fn analyze_video_for_narration(
     let api_key = input.api_key.clone().ok_or_else(|| "API Key 未提供".to_string())?;
     let style = input.style.clone().unwrap_or_default();
 
-    let client = Client::builder()
-        .timeout(Duration::from_secs(180))
-        .build()
-        .map_err(|e| format!("创建 HTTP 客户端失败: {}", e))?;
+    let client = get_http_client();
 
     // 1. 先做视频内容理解
     let analysis_prompt = format!(

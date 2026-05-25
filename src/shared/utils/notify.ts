@@ -64,7 +64,7 @@ export const notify = {
     emitToast({ type: 'loading', content, duration: 0, key });
   },
 
-  destroy: (key?: string) => {
+  destroy: (_key?: string) => {
     // For destroy without key, we'd need a more complex system
     // For now, individual toasts handle their own removal via duration
   },

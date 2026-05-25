@@ -17,7 +17,7 @@
 ">CutDeck</h1>
 
 <p style="font-size: 1.15rem; color: #94a3b8; margin: 0 0 2rem;">
-  AI 驱动的专业视频剪辑工具 · 长视频一键智能剪辑 · 多平台分发
+  AI 驱动的专业视频剪辑工具 · 长视频一键智能剪辑 · AI 影视解说创作
 </p>
 
 <p>
@@ -39,25 +39,28 @@
 
 ---
 
-## 🎯 解决的问题
+## 🎯 两种工作模式
 
-**传统视频剪辑的最大痛点**：一个长视频，想剪成多个精彩短片段分发到不同平台，需要人工反复观看、逐个标记、手动导出。
-
-CutDeck 用 AI 把这个过程自动化：
+### Clip Mode — 快速剪辑（原有）
+长视频 → AI 分析 → 高光检测 → 多格式导出，适合直播回放、会议记录等。
 
 ```
-长视频（直播回放 / 会议录像 / 讲座）
-    → AI 智能分析
-    → 精彩短片段
-    → 多格式导出
-    → 一键发布
+视频 → AI 分析 → 高光检测 → 片段选择 → 多格式导出
 ```
 
-| 场景 | 传统方式 | CutDeck |
-|------|---------|---------|
-| 抖音创作者 | 人工选段 + 导出 | AI 识别高光 + 一键 9:16 导出 |
-| 知识付费 | 逐帧标记 | AI 识别关键内容 + SEO 生成 |
-| 会议记录 | 手动截取 | AI 自动分段 + 多格式输出 |
+### Commentary Mode — AI 影视解说（🆕 v3.0）
+视频 → 完整解说视频（带文案、配音、字幕），适合短剧、电影、综艺解说。
+
+```
+视频 → AI 分析 → 语义分段 → AI Director → 解说词生成 → TTS 配音 → 渲染成片
+```
+
+| 场景 | 传统方式 | CutDeck Clip Mode | CutDeck Commentary Mode |
+|------|---------|-------------------|------------------------|
+| 抖音创作者 | 人工选段 + 导出 | AI 识别高光 + 一键 9:16 | AI 理解剧情 + 生成解说 + 配音 |
+| 知识付费 | 逐帧标记 | AI 识别关键内容 + SEO 生成 | — |
+| 短剧解说 | 手动剪辑 + 写文案 + 配音 | — | 全自动解说创作 |
+| 会议记录 | 手动截取 | AI 自动分段 + 多格式输出 | — |
 
 ---
 
@@ -72,6 +75,20 @@ CutDeck 用 AI 把这个过程自动化：
 - **6 维 AI 评分**：笑声密度 / 情感峰值 / 内容完整度 / 静默比 / 节奏感 / 关键词权重
 - **Rust 高光检测**：音频能量峰值 + 场景切换联合识别
 - **多平台 SEO 元数据**：自动生成标题 / 描述 / Hashtags，平台原生适配
+- **智能速度推荐**：基于音频能量比率自动推荐 1x–6x 播放速度（空白/过渡→6x，低能量→4x，正常→2x，高光→1x）
+- **自动转场建议**：30+ 规则矩阵根据片段类型 + 时长 + 内容密度推荐最佳转场特效
+
+### 🎙️ 本地 Whisper 字幕
+
+faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，**断网可用**。
+
+> 未安装 faster-whisper 时自动降级为模拟结果，不影响使用流程。
+
+### 🎤 TTS 配音混音
+
+- **多音轨合成**：TTS 配音（volume=1.0）叠加原音轨背景音（volume=0.3）
+- **FFmpeg filter_complex 混音**：专业级音频处理
+- **实时进度反馈**：配音合成实时进度回调
 
 ### 🎬 多格式导出
 
@@ -80,33 +97,65 @@ CutDeck 用 AI 把这个过程自动化：
 - **16:9** 横屏（YouTube / B站）
 - 一键批量导出，自定义分辨率、帧率、码率
 
-### 🎙️ 本地 Whisper 字幕
-
-faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，**断网可用**。
-
-> 未安装 faster-whisper 时自动降级为模拟结果，不影响使用流程。
-
 ### ⌨️ 专业剪辑体验
 
 - 多轨道时间轴（视频 / 音频 / 字幕独立轨道）
 - 20+ 全局快捷键（`空格` 播放 / `I`/`O` 入出点 / `J`-`K`-`L` 逐帧 / `⌘Z` 撤销）
 - Timeline 虚拟化（100+ clips 无卡顿）
 
+### 📦 批量多视频处理
+
+支持多视频批量工作流，各视频独立路径、独立参数，批量导入→分析→导出一次完成。
+
 ---
 
-## 🏗️ 系统架构
+## 🆕 Commentary Mode（解说模式）详解
+
+### AI Director Agent
+
+多轮状态机，管理从视频分析到成片输出的全流程，支持用户审核和修改。
+
+```
+分析 → 规划 → 审核 → 修改 → 执行 → 完成
+```
+
+### 解说风格预设
+
+| 风格 | 描述 | 适用场景 |
+|------|------|---------|
+| 幽默版 | 诙谐有趣，添加网络梗 | 喜剧/搞笑视频 |
+| 接地气版 | 口语化，像和朋友聊天 | 情感/生活类 |
+| 震惊版 | 夸张震惊，制造悬念 | 悬疑/复仇类短剧 |
+| 感动版 | 温情脉脉，情感共鸣 | 爱情/亲情类 |
+| 专业版 | 客观冷静，纪录片风格 | 纪录片/科教类 |
+
+### LLM 解说词生成
+
+基于语义理解生成文案，支持：
+- 开场抓眼球（悬念/震惊/好奇）
+- 全局连贯性（角色不重复介绍）
+- 朗读时长约束（自动适配视频片段）
+- 质量检查（重复/偏离/时长偏差）
+
+---
+
+## 🏗️ 系统架构 v3.0
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           UI 层 (React 18)                              │
-│  Landing  ·  Dashboard  ·  Projects  ·  VideoEditor  ·  Settings       │
+│  Landing  ·  Dashboard  ·  Projects  ·  VideoEditor  ·  Settings         │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  组件层 (src/components/)                                               │
 │  AIClip · AIVideoPreview · CutDeck · Layout · ModelSelector ·          │
-│  ScriptEditor · Settings                                                │
+│  CommentaryPanel · ScriptEditor                                        │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  核心业务层 (src/core/)                                                 │
-│  services/ · pipeline/ · hooks/ · video/ · config/ · types/           │
+│  services/ · pipeline/ · hooks/ · video/ · config/ · types/            │
+│  ├── commentary/（🆕 解说服务）                                         │
+│  │   ├── DirectorAgent.ts     AI 导演状态机                            │
+│  │   ├── ScriptGenerator.ts    LLM 解说词生成                          │
+│  │   └── CommentarySynth.ts    TTS 配音合成                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  状态层 (src/store/)                                                    │
 │  Zustand v5 持久化 stores（app · project · editor · timeline）          │
@@ -116,7 +165,7 @@ faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，**
 ├─────────────────────────────────────────────────────────────────────────┤
 │  Rust 后端层 (src-tauri/src/)                                           │
 │  commands/ · highlight_detector · smart_segmenter · subtitle ·         │
-│  video_processor · lib_optimized                                        │
+│  llm_proxy.rs（🆕 LLM 代理） · commentary.rs（🆕 解说命令）             │
 └─────────────────────────────────────────────────────────────────────────┘
                               ↕ FFmpeg / Whisper / TTS / 文件系统
 ```
@@ -133,64 +182,6 @@ faster-whisper 本地推理，精准语音识别 + 毫秒级时间轴对齐，**
 | 视频处理 | FFmpeg | 编解码 / 裁剪 / 转码 |
 | 语音识别 | faster-whisper | 本地 ASR，断网可用 |
 | AI 模型 | OpenAI 兼容 API | 多提供商统一抽象 |
-
-### 目录结构
-
-```
-src/                              # React 前端
-├── core/                         # 核心业务逻辑
-│   ├── services/                 # 服务层
-│   │   ├── ai/                   # AI 模型适配（多提供商）
-│   │   ├── aiClip/               # AI 剪辑分析
-│   │   ├── clip-pipeline/       # 剪辑管道（7步）
-│   │   ├── editor/               # 编辑器操作
-│   │   ├── export/               # 导出服务（剪映/Jianying）
-│   │   ├── subtitle/             # 字幕服务
-│   │   ├── providers/            # API 提供商（OpenAI/Anthropic/...）
-│   │   └── video/                # 视频处理
-│   ├── pipeline/                 # Step 模式管道
-│   ├── hooks/                    # React Hooks
-│   ├── config/                   # AI 模型 / 平台预设配置
-│   ├── types/                    # 共享类型（Jianying/Timeline）
-│   ├── video/                    # 视频抽象层（TauriVideoProcessor）
-│   └── tauri/                    # TauriBridge 封装
-├── components/                   # React 组件
-│   ├── AIClip/                   # AI 剪辑面板
-│   ├── CutDeck/                  # 主工作流组件
-│   ├── Layout/                   # 布局
-│   ├── ModelSelector/            # 模型选择器
-│   ├── ScriptEditor/             # 脚本编辑器
-│   ├── Settings/                 # 设置页
-│   └── common/                   # 通用组件
-├── pages/                        # 路由页面
-│   ├── Projects/                 # 项目列表
-│   ├── ScriptDetail/             # 脚本详情
-│   ├── Settings/                 # 设置页
-│   └── VideoEditor/              # 视频编辑器
-├── store/                        # Zustand 状态管理
-├── shared/                       # 跨层共享工具
-│   ├── types/                    # 共享类型
-│   └── utils/                    # 工具函数
-└── theme/                        # 主题色彩
-
-src-tauri/src/                    # Rust 后端
-├── commands/                     # Tauri IPC 命令
-│   ├── ai.rs                     # AI 高光检测 / TTS / 翻译
-│   ├── ffprobe.rs                # 视频元数据分析
-│   ├── project.rs                # 项目文件 CRUD
-│   └── render.rs                 # 渲染 / 导出 / 预览
-├── highlight_detector.rs         # 高光检测（音频能量）
-├── smart_segmenter.rs            # 智能分段（场景/静默/对话）
-├── subtitle.rs                   # Whisper 字幕转录
-├── video_processor.rs            # 视频裁剪处理
-├── binary.rs                     # FFmpeg/FFprobe 路径解析
-├── utils.rs                      # 工具函数
-└── lib.rs                        # Tauri 应用入口 + 命令注册
-
-docs/                             # 项目文档
-├── ARCHITECTURE.md               # 深度架构文档
-└── DEVELOPER_GUIDE.md            # 开发者指南
-```
 
 ---
 
@@ -232,6 +223,15 @@ npm run tauri build
 
 只需配置**一个** API Key 即可使用全部 AI 功能。所有模型数据由 `src/core/config/aiModels.config.ts` 统一维护（验证日期：2026-05）。
 
+### Commentary Mode 推荐模型
+
+| 场景 | 推荐模型 | 理由 |
+|------|---------|------|
+| 解说词生成 | **DeepSeek V4-Pro** | 性价比最高，中文创作能力强 |
+| 语义分段 | DeepSeek V4-Flash | 速度快，批量处理 |
+| 高质量创作 | GPT-5.5 | 推理能力最强 |
+| 中文长文本 | Qwen3.6-Max | 中文创作最佳 |
+
 ### 按提供商
 
 | 提供商 | 推荐模型 | 适用场景 |
@@ -244,49 +244,6 @@ npm run tauri build
 | **月之暗面** | Kimi K2.6（推荐）、Kimi K2.5 | 中文长文本分析、视频语义 |
 | **智谱AI** | GLM-5（旗舰）、GLM-5-Turbo、GLM-4.7 | 中文多模态、高上下文 |
 | **科大讯飞** | Spark 4.0、Spark 3.5 | 语音相关任务、TTS 前置处理 |
-
-### 模型速查
-
-#### OpenAI（旗舰：GPT-5.5）
-- 🏆 **GPT-5.5** — 最新旗舰（2026-04），最强多模态，支持视频理解与 agentic 工作流
-- **GPT-5.5-Pro** — 高端推理版，最复杂决策与规划
-- **GPT-5.4-nano** — 轻量高速，性价比最高，适合批量脚本生成
-- **GPT-4o** — 成熟旗舰（2024），多模态均衡
-- **o3/o3-mini** — 推理专项，适合镜头匹配、时间轴修正
-
-#### DeepSeek（旗舰：V4-Pro）
-- **V4-Pro** — 复杂推理与代码任务首选
-- **V4-Flash** — 高性价比，快速响应
-- **R1 / R1-0528** — 推理模型，适合判别类任务
-
-#### Anthropic（旗舰：Claude Opus 4.7）
-- **Opus 4.7** — 最高智能（2026-04），复杂视频语义分析与高质量脚本
-- **Sonnet 4.6** — 长文本组织与风格润色
-- **Haiku 4.5** — 轻量高速，批量分析
-
-#### Google（旗舰：Gemini 3.1 Pro）
-- **Gemini 3.1 Pro** — 最新旗舰（2026-02），1M token 上下文，推理能力 2x+ 提升，适合超长视频分析
-- **Gemini 3.1 Flash** — 高性价比，多模态日常任务
-- **Gemini 3.1 Flash-Lite** — 最快最便宜的轻量选择
-
-#### 阿里云（旗舰：Qwen3.6-Max）
-- **Qwen3.6-Max** — 旗舰推理，中文创作能力最强
-- **Qwen3.6-Plus** — 高性价比均衡选择
-- **Qwen3.6-Flash** — 快速响应，批量脚本改写
-
-#### 月之暗面（旗舰：Kimi K2.6）
-- **Kimi K2.6**（2026-04）— 当前旗舰，开源模型中 SWE-Bench 顶级，262K 上下文
-- ⚠️ Kimi K2 系列将于 2026-05-25 停止维护，推荐迁移至 K2.6
-
-#### 智谱AI（旗舰：GLM-5）
-- **GLM-5** — 旗舰模型，中文多模态与长上下文
-- **GLM-5-Turbo** — 高性价比均衡选择
-
-#### 讯飞 Spark
-- **Spark 4.0** — 最新语音相关任务
-- **Spark 3.5** — 成熟稳定选项
-
-> 📝 模型列表由 `src/core/config/aiModels.config.ts` 统一管理，每次版本更新后请同步该文件。
 
 ---
 
@@ -305,6 +262,17 @@ npm run tauri build
 > ```bash
 > sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"
 > ```
+
+---
+
+## 📚 文档
+
+| 文档 | 说明 |
+|------|------|
+| [用户指南](./docs/guide/) | 快速开始、AI 分析、导出等 |
+| [开发者文档](./docs/dev/) | 架构、命令、API 等 |
+| [Commentary Mode](./docs/guide/commentary-mode.md) | 解说模式完整指南 |
+| [Script Generation](./docs/guide/script-generation.md) | 解说词生成详解 |
 
 ---
 

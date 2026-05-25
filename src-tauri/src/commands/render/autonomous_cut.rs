@@ -8,11 +8,13 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary, hw_accel, HwAccel};
 use crate::commands::export_state;
 use crate::types::{AutonomousRenderInput, AutonomousOverlayMarker};
-use crate::utils::{chrono_like_timestamp, cmd_err, format_srt_time};
+use crate::utils::{chrono_like_timestamp, cmd_err, format_srt_time, write_concat_file};
 use std::path::PathBuf;
 use std::process::Command;
+use std::sync::Arc;
 use tokio::process::Command as TokioCommand;
 use tokio::fs as tokio_fs;
+use tokio::sync::Semaphore;
 
 // ─── Tuning Constants ─────────────────────────────────────────────────────────
 
@@ -21,6 +23,8 @@ const MAX_TRANSITION_DURATION: f64 = 1.5;
 const MIN_CLIP_DURATION: f64 = 0.1;
 const DEFAULT_OVERLAY_OPACITY: f64 = 0.72;
 const MIN_OVERLAY_OPACITY: f64 = 0.05;
+// Limit concurrent FFmpeg processes to avoid overwhelming the system
+const MAX_CONCURRENT_SEGMENTS: usize = 8;
 
 // ─── Public Command ─────────────────────────────────────────────────────────
 
@@ -39,7 +43,7 @@ async fn render_autonomous_cut_impl(
 ) -> Result<String, String> {
     let segments = input
         .segments
-        .clone()
+        .take()
         .unwrap_or_default()
         .into_iter()
         .filter(|segment| segment.end > segment.start)
@@ -67,10 +71,11 @@ async fn render_autonomous_cut_impl(
         return Ok(input.output_path);
     }
 
-    // ── Parallel segment cutting via Tokio ──────────────────────────────────
+    // ── Parallel segment cutting via Tokio (bounded concurrency) ────────────────
     let ffmpeg_bin = ffmpeg_binary();
     let input_path = input.input_path.clone();
     let temp_root_clone = temp_root.clone();
+    let sem = Arc::new(Semaphore::new(MAX_CONCURRENT_SEGMENTS));
 
     let tasks: Vec<_> = segments
         .iter()
@@ -79,7 +84,10 @@ async fn render_autonomous_cut_impl(
             let ffmpeg_bin = ffmpeg_bin.clone();
             let input_path = input_path.clone();
             let temp_root = temp_root_clone.clone();
+            let sem = Arc::clone(&sem);
             async move {
+                // Acquire permit before starting FFmpeg — bounds parallelism to MAX_CONCURRENT_SEGMENTS
+                let _permit = sem.acquire_owned().await.expect("semaphore closed");
                 let temp_file = temp_root.join(format!("seg_{index}.mp4"));
                 let duration = (segment.end - segment.start).max(0.1);
                 let hw = hw_accel();
@@ -201,11 +209,11 @@ fn apply_post_processing(
     let apply_overlay = input.apply_overlay_markers.unwrap_or(false);
     let overlay_mix_mode = input
         .overlay_mix_mode
-        .clone()
-        .unwrap_or_else(|| "pip".to_string());
+        .as_deref()
+        .unwrap_or("pip");
     let overlay_opacity = input.overlay_opacity.unwrap_or(DEFAULT_OVERLAY_OPACITY).clamp(MIN_OVERLAY_OPACITY, 1.0);
-    let subtitles = input.subtitles.clone().unwrap_or_default();
-    let overlays = input.overlay_markers.clone().unwrap_or_default();
+    let subtitles = input.subtitles.take().unwrap_or_default();
+    let overlays = input.overlay_markers.take().unwrap_or_default();
 
     if (!burn_subtitles || subtitles.is_empty()) && (!apply_overlay || overlays.is_empty()) {
         std::fs::copy(merged_input, final_output_path)
@@ -369,13 +377,8 @@ fn merge_by_concat(
         return Ok(());
     }
 
-    let concat_file = temp_root.join("concat.txt");
-    let list = temp_files
-        .iter()
-        .map(|p| format!("file '{}'", p.to_string_lossy()))
-        .collect::<Vec<_>>()
-        .join("\n");
-    std::fs::write(&concat_file, list).map_err(|e| format!("写入 concat 文件失败: {e}"))?;
+    // Use the safe write_concat_file helper which properly escapes paths
+    let concat_file = write_concat_file(temp_files)?;
 
     let output = Command::new(ffmpeg_binary())
         .arg("-y")

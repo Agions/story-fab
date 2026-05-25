@@ -381,7 +381,6 @@ export function useEditor(_config?: Partial<EditorConfig>): {
         setState(prev => ({ ...prev, exportProgress: i }));
       }
 
-      const timeline = editorService.getTimeline();
       const blob = await editorService.exportTimeline(settings as Partial<EditorExportSettings>);
       return blob;
     } finally {

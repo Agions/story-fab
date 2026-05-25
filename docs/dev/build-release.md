@@ -1,100 +1,100 @@
-# Build & Release
+# 构建与发布
 
-## Development Build
+## 开发构建
 
 ```bash
-# Install dependencies
-pnpm install
+# 安装依赖
+npm install
 
-# Run in development mode (hot reload)
-pnpm tauri dev
+# 开发模式运行（热重载）
+npm run dev
 
-# Type-check only
-pnpm type-check
+# 类型检查
+npm run type-check
 
-# Lint
-pnpm lint
+# Lint 检查
+npm run lint
 ```
 
-## Production Build
+## 生产构建
 
-### Frontend Only
+### 仅前端构建
 
 ```bash
-pnpm build
+npm run build
 ```
 
-Output goes to `dist/`.
+产物输出到 `dist/`。
 
-### Full Tauri App
+### 完整 Tauri 应用
 
 ```bash
-# Build the Tauri app for current platform
-pnpm tauri build
+# 为当前平台构建 Tauri 应用
+npm run tauri build
 
-# For a specific platform (Linux)
-pnpm tauri build --target x86_64-unknown-linux-gnu
+# 指定平台（Linux）
+npm run tauri build -- --target x86_64-unknown-linux-gnu
 ```
 
-Output goes to `src-tauri/target/release/bundle/`.
+产物输出到 `src-tauri/target/release/bundle/`。
 
-## Release Pipeline (CI/CD)
+## 发布流水线（CI/CD）
 
-Releases are automated via GitHub Actions. On every tag matching `v*`:
+发布通过 GitHub Actions 全自动触发。每次匹配 `v*` 的 tag 推送都会：
 
-1. **Rust Check** — `cargo check` with Rust 1.88.0
-2. **TypeScript Check** — `pnpm type-check`
-3. **Frontend Build** — `pnpm build`
-4. **Tauri Build** — Builds for all platforms (Windows, macOS x64 + ARM, Linux)
-5. **Create Release** — Attaches `.exe`, `.dmg`, `.deb` artifacts
+1. **Rust 检查** — `cargo check`（Rust 1.88.0）
+2. **TypeScript 检查** — `npm run type-check`
+3. **前端构建** — `npm run build`
+4. **Tauri 构建** — 全平台构建（Windows、macOS x64 + ARM、Linux）
+5. **创建 Release** — 上传 `.exe`、`.dmg`、`.deb` 安装包
 
-### Triggering a Release
+### 触发发布
 
 ```bash
-# Create a version tag
+# 创建版本标签
 git tag v2.0.0
 git push origin v2.0.0
 ```
 
-The GitHub Actions workflow will automatically build and create a GitHub Release.
+GitHub Actions 会自动构建并创建 GitHub Release。
 
-## Version Management
+## 版本管理
 
-| File | Version Field |
+|| 文件 | 版本字段 |
 |---|---|
 | `package.json` | `version` |
 | `src-tauri/Cargo.toml` | `version` |
 | `src-tauri/tauri.conf.json` | `version` |
 
-All three must be kept in sync. Use `scripts/bump-version.mjs` to update all at once.
+三者必须保持同步。使用 `scripts/bump-version.mjs` 一次更新全部。
 
-## Code Signing
+## 代码签名
 
 ### macOS
 
-Code signing and notarization are configured in `.github/workflows/release.yml`. You need:
+代码签名和公证在 `.github/workflows/release.yml` 中配置，需要：
 
-- `CODESIGN_CERT` — Code signing certificate (GitHub Actions secret)
-- `APPLE_SIGNING_IDENTITY` — Certificate name (e.g., `Developer ID Application: Your Name (TEAMID)`)
+- `CODESIGN_CERT` — 代码签名证书（GitHub Actions secret）
+- `APPLE_SIGNING_IDENTITY` — 证书名称（如 `Developer ID Application: Your Name (TEAMID)`）
 
 ### Windows
 
-Windows code signing is configured via:
+Windows 代码签名配置：
 
-- `CUTDECK_CERT_PATH` — Path to `.pfx` certificate
-- `CUTDECK_CERT_PASSWORD` — Certificate password
+- `CUTDECK_CERT_PATH` — `.pfx` 证书路径
+- `CUTDECK_CERT_PASSWORD` — 证书密码
 
-## Troubleshooting
+## 故障排除
 
-### FFmpeg Not Found
+### FFmpeg 未找到
 
-Ensure FFmpeg is in your system PATH, or set `CUTDECK_FFMPEG_PATH` environment variable.
+确保 FFmpeg 在系统 PATH 中，或设置 `CUTDECK_FFMPEG_PATH` 环境变量。
 
-### Rust Compilation Fails
+### Rust 编译失败
 
-Make sure you have Rust 1.80+ installed:
+确保已安装 Rust 1.80+：
 
 ```bash
 rustup update
-rustc --version  # should be 1.80.0+
+rustc --version  # 应为 1.80.0+
 ```

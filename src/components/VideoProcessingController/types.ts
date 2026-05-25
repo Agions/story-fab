@@ -2,10 +2,11 @@
  * VideoProcessingController Types
  * Shared types for the VideoProcessingController module
  */
-import type { VideoSegment } from '@/core/types';
 
 export interface BatchItem {
   id: string;
+  /** 视频文件路径（支持多视频导入） */
+  videoPath: string;
   segments: Array<{ start: number; end: number; type?: string; content?: string; duration?: number }>;
   name: string;
   completed: boolean;

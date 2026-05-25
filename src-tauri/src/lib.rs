@@ -13,10 +13,11 @@ pub mod subtitle;
 pub mod highlight_detector;
 pub mod smart_segmenter;
 
-pub use commands::{ai, auto_save, ffprobe, llm, project, render, export_state, file_ops};
+pub use commands::{
+    ai, auto_save, commentary, ffprobe, llm, project, render, export_state, file_ops,
+};
 pub use types::*;
 
-// Re-export all commands so generate_handler! can find them at crate root
 pub use commands::ffprobe::{analyze_video, check_ffmpeg, run_ffprobe};
 pub use commands::ai::{
     detect_highlights, detect_zcr_bursts, detect_smart_segments,
@@ -81,6 +82,8 @@ pub fn run() {
             open_file,
             voice_discovery,
             cut_video,
+            mix_audio,
+            get_audio_duration,
             check_ffmpeg,
             analyze_video,
             run_ffprobe,
@@ -110,6 +113,18 @@ pub fn run() {
             llm::generate_narration_script,
             llm::analyze_video_for_narration,
             llm::list_available_models,
+            // Commentary Mode (AI 影视解说)
+            commentary::create_director_session,
+            commentary::get_director_status,
+            commentary::start_director_analysis,
+            commentary::generate_director_plan,
+            commentary::approve_director_plan,
+            commentary::revise_director_plan,
+            commentary::complete_director_render,
+            commentary::destroy_director_session,
+            commentary::generate_commentary_script,
+            commentary::synthesize_commentary_audio,
+            commentary::list_commentary_voices,
         ])
         .setup(|app| {
             tracing::info!("[CutDeck] 应用初始化中...");

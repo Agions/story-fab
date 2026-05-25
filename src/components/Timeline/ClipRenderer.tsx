@@ -8,7 +8,6 @@ interface ClipRendererProps {
   track: TimelineTrack;
   zoom: number;
   scrollX: number;
-  duration: number;
   selectedClipId?: string;
   onClipClick: (clipId: string, trackId: string, e: React.MouseEvent) => void;
   onClipDoubleClick: (clip: TimelineClip) => void;
@@ -20,7 +19,6 @@ export const ClipRenderer = memo<ClipRendererProps>(({
   track,
   zoom,
   scrollX,
-  duration,
   selectedClipId,
   onClipClick,
   onClipDoubleClick,

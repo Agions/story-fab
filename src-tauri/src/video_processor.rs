@@ -269,16 +269,10 @@ impl VideoProcessor {
         }
 
         // Move thumb.jpg out of temp_dir before cleanup
-        // temp_dir is deleted, so we must extract the file first
-        let thumb_data = fs::read(&output)
-            .map_err(|e| {
-                let _ = fs::remove_dir_all(&temp_dir);
-                format!("读取缩略图失败: {}", e)
-            })?;
-
+        // Use fs::copy for efficiency instead of read+write
         let final_path = std::env::temp_dir()
             .join(format!("cutdeck_thumb_{}.jpg", chrono_like_timestamp()));
-        fs::write(&final_path, &thumb_data)
+        fs::copy(&output, &final_path)
             .map_err(|e| {
                 let _ = fs::remove_dir_all(&temp_dir);
                 format!("保存缩略图失败: {}", e)
@@ -400,3 +394,140 @@ pub async fn cut_video(
 
     Ok(output_path)
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// mix_audio — 混音 TTS 配音 + 原视频音轨
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MixAudioInput {
+    pub video_path: String,
+    pub tts_audio_path: String,
+    pub output_path: String,
+    /// TTS 配音音量（0.0–1.0）
+    #[serde(default = "default_one")]
+    pub tts_volume: f32,
+    /// 原视频背景音量（0.0–1.0）
+    #[serde(default = "default_three_tenths")]
+    pub background_volume: f32,
+    /// TTS 音频在视频中的起始偏移（秒）
+    #[serde(default)]
+    pub offset_seconds: f64,
+}
+
+fn default_one() -> f32 { 1.0 }
+fn default_three_tenths() -> f32 { 0.3 }
+
+#[tauri::command]
+pub async fn mix_audio(input: MixAudioInput) -> Result<String, String> {
+    let ffmpeg_bin = crate::binary::ffmpeg_binary();
+
+    // 检查原视频是否有音轨
+    let has_audio_track = check_video_has_audio(&ffmpeg_bin, &input.video_path)
+        .await
+        .unwrap_or(false);
+
+    let mut cmd = TokioCommand::new(&ffmpeg_bin);
+
+    if has_audio_track {
+        // 策略：原视频音轨 volume 降低作为背景，TTS 配音覆盖其上
+        // filter_complex:
+        //   [0:a]volume=bg_vol[bg]; [1:a]volume=tts_vol[tts]; [bg][tts]amix=inputs=2:duration=first[mixed]
+        let bg_vol = input.background_volume;
+        let tts_vol = input.tts_volume;
+        let offset = input.offset_seconds;
+
+        cmd.arg("-i").arg(&input.video_path);
+        cmd.arg("-i").arg(&input.tts_audio_path);
+
+        if offset > 0.0 {
+            // 用 adelay 延迟 TTS 音频
+            let delay_ms = (offset * 1000.0) as i64;
+            cmd.args(&["-filter_complex",
+                &format!(
+                    "[0:a]volume={bg_vol}[bg];[1:a]volume={tts_vol},adelay={delay_ms}|{delay_ms}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
+                    bg = bg_vol, tts = tts_vol, delay_ms = delay_ms
+                ),
+                "-map", "0:v",
+                "-map", "[mixed]",
+            ]);
+        } else {
+            cmd.args(&["-filter_complex",
+                &format!(
+                    "[0:a]volume={bg_vol}[bg];[1:a]volume={tts_vol}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
+                    bg = bg_vol, tts = tts_vol
+                ),
+                "-map", "0:v",
+                "-map", "[mixed]",
+            ]);
+        }
+    } else {
+        // 无原音轨：直接用 TTS 音频替换视频的静音轨
+        cmd.arg("-i").arg(&input.video_path);
+        cmd.arg("-i").arg(&input.tts_audio_path);
+        cmd.args(&["-map", "0:v", "-map", "1:a", "-c:v", "copy"]);
+    }
+
+    // 编码参数
+    cmd.args(&["-c:a", "aac", "-movflags", "+faststart", "-y"]);
+
+    if !has_audio_track {
+        // 已有 c:v copy，只需要指定输出
+    }
+
+    cmd.arg(&input.output_path);
+
+    let output = cmd
+        .output()
+        .await
+        .map_err(|e| format!("混音命令执行失败: {e}"))?;
+
+    if !output.status.success() {
+        return Err(cmd_err("mix_audio failed", &output));
+    }
+
+    Ok(input.output_path)
+}
+
+/// 检查视频是否包含音轨
+async fn check_video_has_audio(ffmpeg_bin: &str, video_path: &str) -> Result<bool, String> {
+    let output = TokioCommand::new(ffmpeg_bin)
+        .args(&["-i", video_path, "-t", "0", "-f", "null", "-"])
+        .output()
+        .await
+        .map_err(|e| format!("ffprobe check failed: {e}"))?;
+
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    // FFmpeg 在无音轨时会输出 "Stream #0:X: Audio: none"
+    Ok(!stderr.contains("Audio: none"))
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// get_audio_duration — 获取音频/视频文件的时长
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[tauri::command]
+pub async fn get_audio_duration(audio_path: String) -> Result<f64, String> {
+    let ffprobe_bin = crate::binary::ffprobe_binary();
+
+    let output = TokioCommand::new(&ffprobe_bin)
+        .args(&[
+            "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            &audio_path,
+        ])
+        .output()
+        .await
+        .map_err(|e| format!("ffprobe failed: {e}"))?;
+
+    if !output.status.success() {
+        return Err(String::from_utf8_lossy(&output.stderr).to_string());
+    }
+
+    let duration_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    duration_str.parse::<f64>()
+        .map_err(|e| format!("failed to parse duration '{duration_str}': {e}"))
+}
+

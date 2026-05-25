@@ -12,7 +12,7 @@ interface WelcomeHeaderProps {
 }
 
 const WelcomeHeader: React.FC<WelcomeHeaderProps> = React.memo(({ onCreateProject }) => {
-  const user = useAppStore((state) => state.user);
+  const _user = useAppStore((state) => state.user);
 
   const handleMouseEnter = () => {
     void preloadProjectEditPage();
