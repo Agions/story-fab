@@ -1,5 +1,5 @@
 /**
- * storyfab Workflow — unified types, constants, initial state, helpers
+ * story-fab Workflow — unified types, constants, initial state, helpers
  * Previously split across: workflow.types.ts / workflow.constants.ts / workflow.initialState.ts
  * All content now in one self-contained file, zero circular imports.
  */

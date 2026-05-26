@@ -225,7 +225,7 @@ pub async fn transcribe_audio(
         if !audio_exts.contains(&input_ext.as_str()) {
             // It's a video file — extract audio
             let wav_path = std::env::temp_dir().join(format!(
-                "storyfab_whisper_{}.wav",
+                "story-fab_whisper_{}.wav",
                 std::process::id()
             ));
             extract_audio_to_wav(&audio_path, &wav_path)

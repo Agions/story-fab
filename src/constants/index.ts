@@ -4,11 +4,11 @@
 
 // 应用信息
 export const APP = {
-  name: 'storyfab',
+  name: 'story-fab',
   version: '1.0.0',
   description: 'AI 驱动的专业视频内容创作平台',
   author: 'Agions',
-  website: 'https://github.com/Agions/storyfab',
+  website: 'https://github.com/Agions/story-fab',
 };
 
 // 支持的视频格式

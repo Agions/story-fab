@@ -1,5 +1,5 @@
 /**
- * storyfab 统一色彩系统 - TypeScript
+ * story-fab 统一色彩系统 - TypeScript
  *
  * 基于 globals.css OKLCH 语义化分层（设计系统入口）
  *
