@@ -64,11 +64,12 @@ async fn render_autonomous_cut_impl(
 
     if segments.len() <= 1 {
         let fallback_output = merged_output.to_string_lossy().to_string();
+        let output_path = input.output_path.clone();
         render_single_cut_sync(&input.input_path, &fallback_output, input.start_time, input.end_time)?;
-        apply_post_processing(&merged_output, &mut input.clone(), &temp_root, &input.output_path)?;
+        apply_post_processing(&merged_output, &mut input.clone(), &temp_root, &output_path)?;
         let _ = tokio_fs::remove_file(&merged_output).await;
         let _ = tokio_fs::remove_dir(&temp_root).await;
-        return Ok(input.output_path);
+        return Ok(output_path);
     }
 
     // ── Parallel segment cutting via Tokio (bounded concurrency) ────────────────
@@ -151,14 +152,15 @@ async fn render_autonomous_cut_impl(
         return Err(format!("自动出片合并失败: {e}"));
     }
 
+    let output_path = input.output_path.clone();
     let post_result =
-        apply_post_processing(&merged_output, &mut input, &temp_root, &input.output_path);
+        apply_post_processing(&merged_output, &mut input, &temp_root, &output_path);
 
     // Cleanup
     let _ = tokio_fs::remove_file(&merged_output).await;
     let _ = tokio_fs::remove_dir(&temp_root).await;
 
-    post_result.map(|_| input.output_path)
+    post_result.map(|_| output_path)
 }
 
 /// Synchronous single-cut fallback (keeps existing logic, no async needed)
@@ -202,7 +204,7 @@ fn apply_time_segment(cmd: &mut std::process::Command, start: Option<f64>, end: 
 fn apply_post_processing(
     merged_input: &PathBuf,
     input: &mut AutonomousRenderInput,
-    _temp_root: &PathBuf,
+    temp_root: &PathBuf,
     final_output_path: &str,
 ) -> Result<(), String> {
     let burn_subtitles = input.burn_subtitles.unwrap_or(false);
