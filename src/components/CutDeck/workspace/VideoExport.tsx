@@ -102,6 +102,23 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
   const [_exportError, setExportError] = useState<string | null>(null);
   const [_startTime, _setStartTime] = useState<number>(Date.now());
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+  const [currentExportId, setCurrentExportId] = useState<string | null>(null);
+
+  // 取消导出
+  const handleCancel = async () => {
+    if (!currentExportId) return;
+    try {
+      await tauri.cancel_export(currentExportId);
+      notify.info('导出已取消');
+    } catch {
+      notify.error('取消失败');
+    }
+    setExporting(false);
+    setProgress(0);
+    setProgressStage('');
+    setEtaSeconds(null);
+    setCurrentExportId(null);
+  };
 
 
   // 监听 Rust processing-progress 事件，驱动真实进度
@@ -173,6 +190,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
 
     try {
       const outputPath = `/tmp/cut_deck/export_${Date.now()}.mp4`;
+      setCurrentExportId(outputPath);
 
       setProgressStage('正在编码...');
 
@@ -306,6 +324,10 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
               ? `预计剩余: ${etaSeconds}s`
               : etaSeconds === 0 ? '导出完成！' : '请耐心等待...'}
           </div>
+
+          <button className={styles.cancelBtn} onClick={handleCancel}>
+            取消导出
+          </button>
 
           {/* 进度条 */}
           <div className={styles.progressBarSection}>
