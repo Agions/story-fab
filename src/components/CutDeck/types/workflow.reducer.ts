@@ -2,13 +2,24 @@
  * AI Editor Reducer
  * 从 AIEditorContext.tsx 提取的 reducer 逻辑
  */
-import type { cut_deckState, cut_deckAction } from './workflow';
-import { initialState } from './workflow';
-import { CUT_DECK_STEPS } from './workflow';
+import type { cut_deckState, cut_deckAction, cut_deckMode } from './workflow';
+import { initialState, getStepsForMode } from './workflow';
+import { getTotalSteps } from './workflow';
 
 // Reducer
 export function clipFlowReducer(state: cut_deckState, action: cut_deckAction): cut_deckState {
   switch (action.type) {
+    case 'SET_MODE':
+      return {
+        ...state,
+        mode: action.payload,
+        currentStep: 'project-create',
+        stepStatus: { ...initialState.stepStatus },
+        semanticSegments: [],
+        directorPhase: 'pending',
+        commentaryPlan: null,
+      };
+    
     case 'SET_STEP':
       return { ...state, currentStep: action.payload };
     
@@ -140,7 +151,7 @@ export function clipFlowReducer(state: cut_deckState, action: cut_deckAction): c
         isExporting: action.payload.isExporting,
         exportProgress: action.payload.progress ?? state.exportProgress,
         stepStatus: action.payload.isExporting === false && state.exportSettings
-          ? { ...state.stepStatus, 'export': true }
+          ? { ...state.stepStatus, 'video-export': true }
           : state.stepStatus,
       };
     
@@ -160,10 +171,11 @@ export function clipFlowReducer(state: cut_deckState, action: cut_deckAction): c
       return { ...initialState };
     
     case 'RESET_STEP': {
-      const resetIndex = CUT_DECK_STEPS.indexOf(action.payload);
+      const steps = getStepsForMode(state.mode);
+      const resetIndex = steps.indexOf(action.payload);
       const newStepStatus = { ...initialState.stepStatus };
-      for (let i = resetIndex; i < CUT_DECK_STEPS.length; i++) {
-        newStepStatus[CUT_DECK_STEPS[i]] = false;
+      for (let i = resetIndex; i < steps.length; i++) {
+        newStepStatus[steps[i]] = false;
       }
       return {
         ...state,

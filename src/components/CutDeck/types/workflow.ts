@@ -14,20 +14,37 @@ export type cut_deckStep =
   | 'video-upload'
   | 'ai-analyze'
   | 'clip-repurpose'
+  | 'semantic-segment'
+  | 'director-review'
   | 'script-generate'
-  | 'video-synthesize'
-  | 'export';
+  | 'video-synth'
+  | 'voice-synth'
+  | 'video-export';
+
+export type cut_deckMode = 'clip' | 'commentary';
+
+export interface SemanticSegment {
+  id: string;
+  startTime: number;
+  endTime: number;
+  label: string;
+  description?: string;
+}
 
 export interface cut_deckState {
+  mode: cut_deckMode;
   currentStep: cut_deckStep;
   stepStatus: {
     'project-create': boolean;
     'video-upload': boolean;
     'ai-analyze': boolean;
     'clip-repurpose': boolean;
+    'semantic-segment': boolean;
+    'director-review': boolean;
     'script-generate': boolean;
-    'video-synthesize': boolean;
-    'export': boolean;
+    'video-synth': boolean;
+    'voice-synth': boolean;
+    'video-export': boolean;
   };
   selectedFeature: cut_deckFeatureType;
   project: ProjectData | null;
@@ -57,10 +74,18 @@ export interface cut_deckState {
   currentTime: number;
   duration: number;
   error: string | null;
+  // Commentary mode specific
+  commentaryPlan: {
+    segments: SemanticSegment[];
+    totalDuration: number;
+  } | null;
+  directorPhase: 'pending' | 'reviewing' | 'approved';
+  semanticSegments: SemanticSegment[];
 }
 
 // cut_deckAction discriminated union
 export type cut_deckAction =
+  | { type: 'SET_MODE'; payload: cut_deckMode }
   | { type: 'SET_STEP'; payload: cut_deckStep }
   | { type: 'SET_STEP_COMPLETE'; payload: { step: cut_deckStep; complete: boolean } }
   | { type: 'SET_FEATURE'; payload: cut_deckFeatureType }
@@ -89,24 +114,39 @@ export type cut_deckAction =
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-export const CUT_DECK_STEPS = [
+export const CLIP_STEPS = [
   'project-create',
   'video-upload',
   'ai-analyze',
   'clip-repurpose',
-  'script-generate',
-  'video-synthesize',
-  'export',
+  'video-export',
 ] as const;
+
+export const COMMENTARY_STEPS = [
+  'project-create',
+  'video-upload',
+  'ai-analyze',
+  'semantic-segment',
+  'director-review',
+  'script-generate',
+  'video-synth',
+  'voice-synth',
+  'video-export',
+] as const;
+
+export const CUT_DECK_STEPS = CLIP_STEPS;
 
 export const INITIAL_STEP_STATUS = {
   'project-create': false,
   'video-upload': false,
   'ai-analyze': false,
   'clip-repurpose': false,
+  'semantic-segment': false,
+  'director-review': false,
   'script-generate': false,
-  'video-synthesize': false,
-  'export': false,
+  'video-synth': false,
+  'voice-synth': false,
+  'video-export': false,
 } as const;
 
 export const DEFAULT_VOICE_SETTINGS = {
@@ -124,6 +164,7 @@ export const DEFAULT_SYNTHESIS_SETTINGS = {
 // ─── Initial State ────────────────────────────────────────────────────────────
 
 export const initialState: cut_deckState = {
+  mode: 'clip',
   currentStep: 'project-create',
   stepStatus: { ...INITIAL_STEP_STATUS },
   selectedFeature: 'none',
@@ -151,16 +192,29 @@ export const initialState: cut_deckState = {
   currentTime: 0,
   duration: 0,
   error: null,
+  commentaryPlan: null,
+  directorPhase: 'pending',
+  semanticSegments: [],
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function getNextStep(currentStep: cut_deckStep): cut_deckStep {
-  const currentIndex = CUT_DECK_STEPS.indexOf(currentStep);
-  return currentIndex < CUT_DECK_STEPS.length - 1 ? CUT_DECK_STEPS[currentIndex + 1] : currentStep;
+export function getStepsForMode(mode: cut_deckMode): readonly cut_deckStep[] {
+  return mode === 'clip' ? CLIP_STEPS : COMMENTARY_STEPS;
 }
 
-export function getPrevStep(currentStep: cut_deckStep): cut_deckStep {
-  const currentIndex = CUT_DECK_STEPS.indexOf(currentStep);
-  return currentIndex > 0 ? CUT_DECK_STEPS[currentIndex - 1] : currentStep;
+export function getNextStep(currentStep: cut_deckStep, mode: cut_deckMode = 'clip'): cut_deckStep {
+  const steps = getStepsForMode(mode);
+  const currentIndex = steps.indexOf(currentStep);
+  return currentIndex < steps.length - 1 ? steps[currentIndex + 1] : currentStep;
+}
+
+export function getPrevStep(currentStep: cut_deckStep, mode: cut_deckMode = 'clip'): cut_deckStep {
+  const steps = getStepsForMode(mode);
+  const currentIndex = steps.indexOf(currentStep);
+  return currentIndex > 0 ? steps[currentIndex - 1] : currentStep;
+}
+
+export function getTotalSteps(mode: cut_deckMode): number {
+  return getStepsForMode(mode).length;
 }
