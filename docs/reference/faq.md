@@ -86,7 +86,7 @@ Check the logs at:
 - **macOS:** `~/Library/Application Support/StoryFab/logs/`
 - **Linux:** `~/.local/share/StoryFab/logs/`
 
-File a bug report at [GitHub Issues](https://github.com/Agions/CutDeck/issues) with the log output.
+File a bug report at [GitHub Issues](https://github.com/Agions/story-fab/issues) with the log output.
 
 ### Video processing is very slow
 
