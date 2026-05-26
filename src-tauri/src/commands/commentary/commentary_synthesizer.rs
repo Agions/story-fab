@@ -300,5 +300,5 @@ fn edge_tts_path() -> String {
             return path;
         }
     }
-    super::super::binary::resolve_binary_path("edge-tts")
+    crate::binary::resolve_binary_path("edge-tts")
 }
