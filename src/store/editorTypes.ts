@@ -34,6 +34,23 @@ export interface ScriptData {
   content: string;
 }
 
+/** AI 解说脚本（Commentary Mode 输出） */
+export interface CommentaryScriptData {
+  fullScript: string;
+  segments: CommentarySegmentData[];
+  estimatedDurationSecs: number;
+  modelUsed: string;
+  provider: string;
+}
+
+/** 解说片段数据（可编辑） */
+export interface CommentarySegmentData {
+  startTime: number;
+  endTime: number;
+  text: string;
+  emotion?: string;
+}
+
 export interface VoiceData {
   id: string;
   url: string;
