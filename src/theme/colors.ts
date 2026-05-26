@@ -1,5 +1,5 @@
 /**
- * clipflow 统一色彩系统 - TypeScript
+ * storyfab 统一色彩系统 - TypeScript
  *
  * 基于 globals.css OKLCH 语义化分层（设计系统入口）
  *
@@ -34,7 +34,7 @@ export const colors = {
   errorBg: 'oklch(60% 0.22 25 / 0.12)',
   info: 'oklch(70% 0.14 200)',
 
-  // --- 科技霓虹色（ClipFlow 特色保留）---
+  // --- 科技霓虹色（StoryFab 特色保留）---
   neonBlue: '#00d2ff',
   neonPurple: '#a855f7',
   neonPink: '#ec4899',

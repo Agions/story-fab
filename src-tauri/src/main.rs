@@ -5,5 +5,5 @@
 )]
 
 fn main() {
-    ClipFlow_lib::run();
+    StoryFab_lib::run();
 }

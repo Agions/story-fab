@@ -49,7 +49,7 @@ export const useModelStore = create<AppState>()(
         })),
     }),
     {
-      name: 'ClipFlow-app-settings',
+      name: 'StoryFab-app-settings',
       partialize: (state) => ({
         selectedAIModel: state.selectedAIModel,
         aiModelsSettings: state.aiModelsSettings,

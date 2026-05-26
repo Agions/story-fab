@@ -406,7 +406,7 @@ export const useTimelineStore = create<TimelineStore>()(
       canRedoTrack: () => get().trackHistory.future.length > 0,
     }),
     {
-      name: 'ClipFlow-timeline',
+      name: 'StoryFab-timeline',
       storage: createJSONStorage(() => localStorage),
       // Don't persist timeline data - it's project-specific
       partialize: (state) => ({

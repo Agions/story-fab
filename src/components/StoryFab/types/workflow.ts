@@ -1,5 +1,5 @@
 /**
- * clipflow Workflow — unified types, constants, initial state, helpers
+ * storyfab Workflow — unified types, constants, initial state, helpers
  * Previously split across: workflow.types.ts / workflow.constants.ts / workflow.initialState.ts
  * All content now in one self-contained file, zero circular imports.
  */
@@ -7,9 +7,9 @@ import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type clipflowFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
+export type storyfabFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
 
-export type clipflowStep =
+export type storyfabStep =
   | 'project-create'
   | 'video-upload'
   | 'ai-analyze'
@@ -21,7 +21,7 @@ export type clipflowStep =
   | 'voice-synth'
   | 'video-export';
 
-export type clipflowMode = 'clip' | 'commentary';
+export type storyfabMode = 'clip' | 'commentary';
 
 export interface SemanticSegment {
   id: string;
@@ -31,9 +31,9 @@ export interface SemanticSegment {
   description?: string;
 }
 
-export interface clipflowState {
-  mode: clipflowMode;
-  currentStep: clipflowStep;
+export interface storyfabState {
+  mode: storyfabMode;
+  currentStep: storyfabStep;
   stepStatus: {
     'project-create': boolean;
     'video-upload': boolean;
@@ -46,7 +46,7 @@ export interface clipflowState {
     'voice-synth': boolean;
     'video-export': boolean;
   };
-  selectedFeature: clipflowFeatureType;
+  selectedFeature: storyfabFeatureType;
   project: ProjectData | null;
   currentVideo: VideoInfo | null;
   analysis: VideoAnalysis | null;
@@ -83,12 +83,12 @@ export interface clipflowState {
   semanticSegments: SemanticSegment[];
 }
 
-// clipflowAction discriminated union
-export type clipflowAction =
-  | { type: 'SET_MODE'; payload: clipflowMode }
-  | { type: 'SET_STEP'; payload: clipflowStep }
-  | { type: 'SET_STEP_COMPLETE'; payload: { step: clipflowStep; complete: boolean } }
-  | { type: 'SET_FEATURE'; payload: clipflowFeatureType }
+// storyfabAction discriminated union
+export type storyfabAction =
+  | { type: 'SET_MODE'; payload: storyfabMode }
+  | { type: 'SET_STEP'; payload: storyfabStep }
+  | { type: 'SET_STEP_COMPLETE'; payload: { step: storyfabStep; complete: boolean } }
+  | { type: 'SET_FEATURE'; payload: storyfabFeatureType }
   | { type: 'SET_PROJECT'; payload: ProjectData | null }
   | { type: 'SET_VIDEO'; payload: VideoInfo | null }
   | { type: 'SET_ANALYSIS'; payload: VideoAnalysis | null }
@@ -110,7 +110,7 @@ export type clipflowAction =
   | { type: 'SET_DURATION'; payload: number }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' }
-  | { type: 'RESET_STEP'; payload: clipflowStep };
+  | { type: 'RESET_STEP'; payload: storyfabStep };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -134,7 +134,7 @@ export const COMMENTARY_STEPS = [
   'video-export',
 ] as const;
 
-export const CLIPFLOW_STEPS = CLIP_STEPS;
+export const STORYFAB_STEPS = CLIP_STEPS;
 
 export const INITIAL_STEP_STATUS = {
   'project-create': false,
@@ -163,7 +163,7 @@ export const DEFAULT_SYNTHESIS_SETTINGS = {
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 
-export const initialState: clipflowState = {
+export const initialState: storyfabState = {
   mode: 'clip',
   currentStep: 'project-create',
   stepStatus: { ...INITIAL_STEP_STATUS },
@@ -199,22 +199,22 @@ export const initialState: clipflowState = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function getStepsForMode(mode: clipflowMode): readonly clipflowStep[] {
+export function getStepsForMode(mode: storyfabMode): readonly storyfabStep[] {
   return mode === 'clip' ? CLIP_STEPS : COMMENTARY_STEPS;
 }
 
-export function getNextStep(currentStep: clipflowStep, mode: clipflowMode = 'clip'): clipflowStep {
+export function getNextStep(currentStep: storyfabStep, mode: storyfabMode = 'clip'): storyfabStep {
   const steps = getStepsForMode(mode);
   const currentIndex = steps.indexOf(currentStep);
   return currentIndex < steps.length - 1 ? steps[currentIndex + 1] : currentStep;
 }
 
-export function getPrevStep(currentStep: clipflowStep, mode: clipflowMode = 'clip'): clipflowStep {
+export function getPrevStep(currentStep: storyfabStep, mode: storyfabMode = 'clip'): storyfabStep {
   const steps = getStepsForMode(mode);
   const currentIndex = steps.indexOf(currentStep);
   return currentIndex > 0 ? steps[currentIndex - 1] : currentStep;
 }
 
-export function getTotalSteps(mode: clipflowMode): number {
+export function getTotalSteps(mode: storyfabMode): number {
   return getStepsForMode(mode).length;
 }

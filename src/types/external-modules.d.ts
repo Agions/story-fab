@@ -1,4 +1,4 @@
-// clipflow external module type declarations
+// storyfab external module type declarations
 
 declare module 'jspdf' {
   export class jsPDF {

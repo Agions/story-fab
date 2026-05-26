@@ -1,12 +1,12 @@
 # Script Generation
 
-ClipFlow uses AI to generate narration scripts for your video clips. In **Commentary Mode** (v3.0), this becomes a full narrative generation pipeline with style presets, coherence tracking, and quality control.
+StoryFab uses AI to generate narration scripts for your video clips. In **Commentary Mode** (v3.0), this becomes a full narrative generation pipeline with style presets, coherence tracking, and quality control.
 
 ## Two Modes of Script Generation
 
 ### Clip Mode — Narration for Highlights（快速解说）
 
-For Clip Mode, ClipFlow generates short narration scripts for individual highlight segments.
+For Clip Mode, StoryFab generates short narration scripts for individual highlight segments.
 
 **Workflow**:
 1. AI analyzes the selected clip's transcript
@@ -16,7 +16,7 @@ For Clip Mode, ClipFlow generates short narration scripts for individual highlig
 
 ### Commentary Mode — Full Narrative Generation（🆕 v3.0）
 
-For Commentary Mode, ClipFlow generates a complete narrative structure with multiple acts.
+For Commentary Mode, StoryFab generates a complete narrative structure with multiple acts.
 
 **Workflow**:
 1. **Semantic Understanding** — LLM understands plot, characters, emotional tone
@@ -30,7 +30,7 @@ For Commentary Mode, ClipFlow generates a complete narrative structure with mult
 
 ## AI Providers
 
-ClipFlow supports multiple AI providers through a unified provider interface:
+StoryFab supports multiple AI providers through a unified provider interface:
 
 | Provider | Recommended Model | API Required |
 |---|---|---|
@@ -71,7 +71,7 @@ You can customize:
 
 ### 1. Context Building
 
-For each segment, ClipFlow builds a context that includes:
+For each segment, StoryFab builds a context that includes:
 
 ```typescript
 interface SegmentContext {
@@ -84,7 +84,7 @@ interface SegmentContext {
 
 ### 2. Prompt Engineering
 
-ClipFlow uses structured prompts for different parts of the narrative:
+StoryFab uses structured prompts for different parts of the narrative:
 
 **Intro Template** — Opening hook (first 3 seconds must grab attention)
 **Act Template** — Main story segments with coherence
@@ -105,7 +105,7 @@ The LLM generates JSON-structured output:
 
 ### 4. Quality Check
 
-Before finalizing, ClipFlow validates:
+Before finalizing, StoryFab validates:
 
 | Check | Criteria | Action if Failed |
 |-------|----------|-----------------|
@@ -115,7 +115,7 @@ Before finalizing, ClipFlow validates:
 
 ### 5. Coherence Tracking
 
-Across multiple segments, ClipFlow maintains:
+Across multiple segments, StoryFab maintains:
 - **Previous Script** — Passed to LLM for context
 - **Character Track** — Avoids re-introducing characters
 - **Story Arc** — Maintains narrative flow
@@ -163,6 +163,6 @@ Script generation is optional. You can export clips with:
 - **Subtitles only** — Burn-in text without voice
 - **Full Commentary** — Narration + original + subtitles
 
-In Commentary Mode, if TTS fails, ClipFlow will:
+In Commentary Mode, if TTS fails, StoryFab will:
 1. Retry up to 2 times
 2. If still failing, skip audio and export video-only with subtitles

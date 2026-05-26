@@ -1,15 +1,15 @@
 ---
 title: 用户指南
-description: ClipFlow 是一款本地 AI 驱动的视频剪辑与解说创作工具，支持剪辑模式和解说模式两种工作流程。
+description: StoryFab 是一款本地 AI 驱动的视频剪辑与解说创作工具，支持剪辑模式和解说模式两种工作流程。
 ---
 
 # 用户指南
 
-## 什么是 ClipFlow？
+## 什么是 StoryFab？
 
-ClipFlow 是一款本地 AI 驱动的视频剪辑与解说创作工具，基于 Tauri 2.x（Rust + React + TypeScript）构建。用户无需上传视频到云端，所有 AI 处理均在本地完成，保护隐私的同时确保流畅体验。
+StoryFab 是一款本地 AI 驱动的视频剪辑与解说创作工具，基于 Tauri 2.x（Rust + React + TypeScript）构建。用户无需上传视频到云端，所有 AI 处理均在本地完成，保护隐私的同时确保流畅体验。
 
-ClipFlow 支持两种工作模式：**剪辑模式（Clip Mode）** 和 **解说模式（Commentary Mode）**，可满足直播回放剪辑、短剧电影解说等多种创作需求。
+StoryFab 支持两种工作模式：**剪辑模式（Clip Mode）** 和 **解说模式（Commentary Mode）**，可满足直播回放剪辑、短剧电影解说等多种创作需求。
 
 ## 两种工作模式
 
@@ -54,7 +54,7 @@ ClipFlow 支持两种工作模式：**剪辑模式（Clip Mode）** 和 **解说
 
 ## 快速导航
 
-- [安装指南](/guide/installation) — 快速上手安装 ClipFlow
+- [安装指南](/guide/installation) — 快速上手安装 StoryFab
 - [快速开始](/guide/quick-start) — 5 分钟创建你的第一个项目
 - [解说模式详解](/guide/commentary-mode) — 完整解说模式操作流程
 - [键盘快捷键](/guide/keyboard-shortcuts) — 高效剪辑必备

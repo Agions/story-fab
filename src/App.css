@@ -1,4 +1,4 @@
-/* ClipFlow App-level Styles
+/* StoryFab App-level Styles
  * 仅放全局级别的布局、字体、选择器样式
  * 设计 token 统一在 globals.css CSS variables 中定义
  */
@@ -81,7 +81,7 @@ video {
   50%       { transform: scale(1.05); }
 }
 
-@keyframes clipflow-spin {
+@keyframes storyfab-spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }

@@ -3,7 +3,7 @@
  * 三大核心功能：AI视频解说 / AI第一人称 / AI混剪
  */
 import React, { useState, useCallback, useEffect, memo, useMemo, useRef } from 'react';
-import { useClipFlow } from '../context';
+import { useStoryFab } from '../context';
 import { aiService } from '../../../core/services/ai/ai.service';
 import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '../../../core/config/aiModels.config';
@@ -145,7 +145,7 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
     setFeature,
     goToNextStep,
     dispatch,
-  } = useClipFlow();
+  } = useStoryFab();
 
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);

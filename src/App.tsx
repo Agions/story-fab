@@ -39,7 +39,7 @@ const PageLoader = () => (
         border: '3px solid rgba(255, 159, 67, 0.25)',
         borderTopColor: '#FF9F43',
         borderRadius: '50%',
-        animation: 'ClipFlow-spin 0.9s linear infinite',
+        animation: 'StoryFab-spin 0.9s linear infinite',
       }}
     />
   </div>

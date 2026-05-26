@@ -44,7 +44,7 @@ export interface PipelineCheckpoint {
   timestamp: number;
 }
 
-const CHECKPOINT_PREFIX = 'ClipFlow_checkpoint_';
+const CHECKPOINT_PREFIX = 'StoryFab_checkpoint_';
 
 /** 清理 videoId 中可能污染 localStorage key 的字符 */
 function sanitizeKey(id: string): string {

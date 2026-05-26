@@ -3,19 +3,19 @@
  * 从 AIEditorContext.tsx 提取的 Provider 组件
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
-import type { clipflowState, clipflowStep, clipflowFeatureType, clipflowAction, clipflowMode } from '../types/workflow';
+import type { storyfabState, storyfabStep, storyfabFeatureType, storyfabAction, storyfabMode } from '../types/workflow';
 import { initialState, getNextStep, getPrevStep, getStepsForMode, getTotalSteps } from '../types/workflow';
-import { clipFlowReducer } from '../types/workflow.reducer';
+import { storyFabReducer } from '../types/workflow.reducer';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
 
 // 上下文类型
-interface ClipFlowContextType {
-  state: clipflowState;
-  dispatch: React.Dispatch<clipflowAction>;
+interface StoryFabContextType {
+  state: storyfabState;
+  dispatch: React.Dispatch<storyfabAction>;
   // 便捷方法
-  setMode: (mode: clipflowMode) => void;
-  setStep: (step: clipflowStep) => void;
-  setFeature: (feature: clipflowFeatureType) => void;
+  setMode: (mode: storyfabMode) => void;
+  setStep: (step: storyfabStep) => void;
+  setFeature: (feature: storyfabFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
   setPlaying: (playing: boolean) => void;
@@ -36,7 +36,7 @@ interface ClipFlowContextType {
   goToNextStep: () => void;
   goToPrevStep: () => void;
   reset: () => void;
-  resetStep: (step: clipflowStep) => void;
+  resetStep: (step: storyfabStep) => void;
   // 计算属性
   canProceed: () => boolean;
   completedSteps: number;
@@ -44,15 +44,15 @@ interface ClipFlowContextType {
 }
 
 // 创建上下文
-export const ClipFlowContext = createContext<ClipFlowContextType | undefined>(undefined);
+export const StoryFabContext = createContext<StoryFabContextType | undefined>(undefined);
 
 // Provider 组件
-interface ClipFlowProviderProps {
+interface StoryFabProviderProps {
   children: ReactNode;
 }
 
-export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(clipFlowReducer, initialState);
+export const StoryFabProvider: React.FC<StoryFabProviderProps> = ({ children }) => {
+  const [state, dispatch] = useReducer(storyFabReducer, initialState);
 
   // 追踪当前 blob URL，用于清理
   const videoBlobUrlRef = React.useRef<string | null>(null);
@@ -76,15 +76,15 @@ export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) 
   }, []);
 
   // 便捷方法 - 使用 useCallback 稳定函数引用
-  const setMode = useCallback((mode: clipflowMode) => {
+  const setMode = useCallback((mode: storyfabMode) => {
     dispatch({ type: 'SET_MODE', payload: mode });
   }, []);
 
-  const setStep = useCallback((step: clipflowStep) => {
+  const setStep = useCallback((step: storyfabStep) => {
     dispatch({ type: 'SET_STEP', payload: step });
   }, []);
 
-  const setFeature = useCallback((feature: clipflowFeatureType) => {
+  const setFeature = useCallback((feature: storyfabFeatureType) => {
     dispatch({ type: 'SET_FEATURE', payload: feature });
   }, []);
 
@@ -171,7 +171,7 @@ export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) 
     dispatch({ type: 'RESET' });
   }, [revokeVideoBlobUrl]);
 
-  const resetStep = useCallback((step: clipflowStep) => {
+  const resetStep = useCallback((step: storyfabStep) => {
     dispatch({ type: 'RESET_STEP', payload: step });
   }, []);
 
@@ -246,30 +246,30 @@ export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) 
   ]);
 
   // 动态 value：每次 state 变化时重建，但静态方法引用不变
-  const value = useMemo<ClipFlowContextType>(
+  const value = useMemo<StoryFabContextType>(
     () => ({ state, ...staticValue, canProceed }),
     [state, staticValue, canProceed]
   );
 
   return (
-    <ClipFlowContext.Provider value={value}>
+    <StoryFabContext.Provider value={value}>
       {children}
-    </ClipFlowContext.Provider>
+    </StoryFabContext.Provider>
   );
 };
 
 // 使用上下文的 Hook
-export const useClipFlow = (): ClipFlowContextType => {
-  const context = useContext(ClipFlowContext);
+export const useStoryFab = (): StoryFabContextType => {
+  const context = useContext(StoryFabContext);
   if (!context) {
-    throw new Error('useClipFlow must be used within ClipFlowProvider');
+    throw new Error('useStoryFab must be used within StoryFabProvider');
   }
   return context;
 };
 
 // 导出上下文类型
-export type { ClipFlowContextType };
+export type { StoryFabContextType };
 
 // 旧版兼容 Hook（别名）
-/** @deprecated 请使用 useClipFlow 代替 */
-export const useAIEditor = useClipFlow;
+/** @deprecated 请使用 useStoryFab 代替 */
+export const useAIEditor = useStoryFab;

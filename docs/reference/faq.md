@@ -2,21 +2,21 @@
 
 ## General
 
-### What is ClipFlow?
+### What is StoryFab?
 
-ClipFlow is an AI-powered desktop video editing application that automatically transforms long videos into short, shareable clips optimized for social media platforms like TikTok, YouTube Shorts, and Instagram Reels.
+StoryFab is an AI-powered desktop video editing application that automatically transforms long videos into short, shareable clips optimized for social media platforms like TikTok, YouTube Shorts, and Instagram Reels.
 
-### Is ClipFlow free?
+### Is StoryFab free?
 
-Yes. ClipFlow is open-source under the MIT License and is free to use for personal and commercial purposes.
+Yes. StoryFab is open-source under the MIT License and is free to use for personal and commercial purposes.
 
-### What platforms does ClipFlow support?
+### What platforms does StoryFab support?
 
-ClipFlow runs on Windows 10/11, macOS 12+ (both Apple Silicon and Intel), and Linux.
+StoryFab runs on Windows 10/11, macOS 12+ (both Apple Silicon and Intel), and Linux.
 
-### Does ClipFlow require an internet connection?
+### Does StoryFab require an internet connection?
 
-**No.** ClipFlow is designed to work fully offline. The only optional online features are AI script generation (which requires an API key from OpenAI, Anthropic, or DeepSeek). Whisper transcription and voice synthesis run entirely locally.
+**No.** StoryFab is designed to work fully offline. The only optional online features are AI script generation (which requires an API key from OpenAI, Anthropic, or DeepSeek). Whisper transcription and voice synthesis run entirely locally.
 
 ---
 
@@ -27,12 +27,12 @@ ClipFlow runs on Windows 10/11, macOS 12+ (both Apple Silicon and Intel), and Li
 macOS may block apps from unidentified developers. Right-click the `.dmg` file and select **Open**, then click **Open** in the dialog. Or run:
 
 ```bash
-sudo xattr -rd com.apple.quarantine "/Applications/ClipFlow.app"
+sudo xattr -rd com.apple.quarantine "/Applications/StoryFab.app"
 ```
 
 ### FFmpeg not found
 
-ClipFlow requires FFmpeg to be installed. See [Installation → FFmpeg](/reference/config#ffmpeg-installation) for installation instructions.
+StoryFab requires FFmpeg to be installed. See [Installation → FFmpeg](/reference/config#ffmpeg-installation) for installation instructions.
 
 If FFmpeg is installed but in a non-standard location, set the `CUTDECK_FFMPEG_PATH` environment variable.
 
@@ -42,7 +42,7 @@ If FFmpeg is installed but in a non-standard location, set the `CUTDECK_FFMPEG_P
 
 ### How does highlight detection work?
 
-ClipFlow analyzes audio energy, visual scene changes, and speech patterns to score segments. Higher-scoring segments are more likely to be engaging moments. See [AI Analysis](/guide/ai-analysis) for details.
+StoryFab analyzes audio energy, visual scene changes, and speech patterns to score segments. Higher-scoring segments are more likely to be engaging moments. See [AI Analysis](/guide/ai-analysis) for details.
 
 ### Which AI provider should I use?
 
@@ -52,7 +52,7 @@ ClipFlow analyzes audio energy, visual scene changes, and speech patterns to sco
 | OpenAI GPT-4o | Highest quality | High |
 | Anthropic Claude | Balanced quality/safety | Medium |
 
-All three are free to set up with your own API key. ClipFlow does not charge for AI usage.
+All three are free to set up with your own API key. StoryFab does not charge for AI usage.
 
 ### Can I run Whisper without an internet connection?
 
@@ -79,14 +79,14 @@ Yes. In the export dialog, leave **Script** disabled and enable **Burn Subtitles
 
 ## Troubleshooting
 
-### ClipFlow crashes on startup
+### StoryFab crashes on startup
 
 Check the logs at:
-- **Windows:** `%APPDATA%\ClipFlow\logs\`
-- **macOS:** `~/Library/Application Support/ClipFlow/logs/`
-- **Linux:** `~/.local/share/ClipFlow/logs/`
+- **Windows:** `%APPDATA%\StoryFab\logs\`
+- **macOS:** `~/Library/Application Support/StoryFab/logs/`
+- **Linux:** `~/.local/share/StoryFab/logs/`
 
-File a bug report at [GitHub Issues](https://github.com/Agions/ClipFlow/issues) with the log output.
+File a bug report at [GitHub Issues](https://github.com/Agions/StoryFab/issues) with the log output.
 
 ### Video processing is very slow
 

@@ -1,4 +1,4 @@
-//! ClipFlow — AI-driven professional video editing desktop app
+//! StoryFab — AI-driven professional video editing desktop app
 //! Tauri 2.x backend entry point
 
 use tauri::Manager;
@@ -46,12 +46,12 @@ pub fn run() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "clipflow=info,warn".into()),
+                .unwrap_or_else(|_| "storyfab=info,warn".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    tracing::info!("ClipFlow 启动中...");
+    tracing::info!("StoryFab 启动中...");
 
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
@@ -127,24 +127,24 @@ pub fn run() {
             commentary::list_commentary_voices,
         ])
         .setup(|app| {
-            tracing::info!("[ClipFlow] 应用初始化中...");
+            tracing::info!("[StoryFab] 应用初始化中...");
 
             let app_data_dir = app.path().app_data_dir().unwrap_or_default();
-            tracing::info!("[ClipFlow] App数据目录: {:?}", app_data_dir);
+            tracing::info!("[StoryFab] App数据目录: {:?}", app_data_dir);
 
             // macOS / Windows / Linux 平台日志路径
             if let Ok(log_dir) = app_data_dir.join("logs").canonicalize() {
-                tracing::info!("[ClipFlow] 日志目录: {:?}", log_dir);
+                tracing::info!("[StoryFab] 日志目录: {:?}", log_dir);
             }
 
             if let Some(window) = app.get_webview_window("main") {
-                tracing::info!("[ClipFlow] 主窗口已获取");
+                tracing::info!("[StoryFab] 主窗口已获取");
 
                 // 确保窗口标题正确
-                let _ = window.set_title("ClipFlow - AI 视频创作平台");
+                let _ = window.set_title("StoryFab - AI 视频创作平台");
             }
 
-            tracing::info!("[ClipFlow] 启动完成");
+            tracing::info!("[StoryFab] 启动完成");
             Ok(())
         })
         .run(tauri::generate_context!())
