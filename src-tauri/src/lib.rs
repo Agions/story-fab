@@ -114,18 +114,19 @@ pub fn run() {
             llm::generate_narration_script,
             llm::analyze_video_for_narration,
             llm::list_available_models,
-            // Commentary Mode (AI 影视解说)
-            commentary::create_director_session,
-            commentary::get_director_status,
-            commentary::start_director_analysis,
-            commentary::generate_director_plan,
-            commentary::approve_director_plan,
-            commentary::revise_director_plan,
-            commentary::complete_director_render,
-            commentary::destroy_director_session,
-            commentary::generate_commentary_script,
-            commentary::synthesize_commentary_audio,
-            commentary::list_commentary_voices,
+            // Commentary Mode (AI 影视解说) — 直接引用子模块，避免 re-export 导致 Tauri 宏无法解析
+            commentary::director::create_director_session,
+            commentary::director::get_director_status,
+            commentary::director::start_director_analysis,
+            commentary::director::generate_director_plan,
+            commentary::director::approve_director_plan,
+            commentary::director::revise_director_plan,
+            commentary::director::complete_director_render,
+            commentary::director::destroy_director_session,
+            commentary::script_generator::generate_commentary_script,
+            commentary::commentary_synthesizer::synthesize_commentary_audio,
+            commentary::commentary_synthesizer::estimate_tts_duration,
+            commentary::commentary_synthesizer::list_commentary_voices,
         ])
         .setup(|app| {
             tracing::info!("[StoryFab] 应用初始化中...");

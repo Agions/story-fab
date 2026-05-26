@@ -419,19 +419,26 @@ pub fn revise_director_plan(
         return Err(format!("当前状态不允许修正：{:?}", machine.state));
     }
 
-    // 应用用户修正
+    // 应用用户修正 — 用临时变量避免 modifications 字段被 move 后又被引用
+    let (target_duration, angle, segment_mode, voice) = (
+        modifications.target_duration_secs,
+        modifications.angle,
+        modifications.segment_mode,
+        modifications.recommended_voice,
+    );
+
     if let Some(plan) = &mut machine.plan {
-        if let Some(duration) = modifications.target_duration_secs {
+        if let Some(duration) = target_duration {
             plan.target_duration_secs = duration;
         }
-        if let Some(angle) = modifications.angle {
-            plan.angle = angle;
+        if let Some(a) = angle {
+            plan.angle = a;
         }
-        if let Some(segments) = modifications.segment_mode {
+        if let Some(segments) = segment_mode {
             plan.segment_mode = segments;
         }
-        if let Some(voice) = modifications.recommended_voice {
-            plan.recommended_voice = voice;
+        if let Some(v) = voice {
+            plan.recommended_voice = v;
         }
         plan.confidence = (plan.confidence + 0.05).min(0.95);
     }
@@ -439,9 +446,8 @@ pub fn revise_director_plan(
     machine.updated_at = unix_timestamp();
 
     tracing::info!(
-        "[Director] Plan 修正: session_id={}, modifications={:?}",
-        session_id,
-        &modifications
+        "[Director] Plan 修正: session_id={}",
+        session_id
     );
 
     machine
