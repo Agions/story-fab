@@ -1,5 +1,5 @@
 /**
- * cut_deck Dashboard — re-export from Dashboard.tsx
+ * clipflow Dashboard — re-export from Dashboard.tsx
  */
 export { default } from './Dashboard';
 export * from './types';

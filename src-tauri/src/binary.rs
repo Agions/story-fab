@@ -166,7 +166,7 @@ pub fn detect_hw_accel() -> HwAccel {
         .map(|o| o.status.success())
         .unwrap_or(false)
     {
-        log::info!("[CutDeck] Detected NVIDIA GPU — using NVENC/NVDEC");
+        log::info!("[ClipFlow] Detected NVIDIA GPU — using NVENC/NVDEC");
         return HwAccel::Nvidia;
     }
 
@@ -177,7 +177,7 @@ pub fn detect_hw_accel() -> HwAccel {
         .map(|o| o.status.success())
         .unwrap_or(false)
     {
-        log::info!("[CutDeck] Detected Intel GPU — using Quick Sync Video");
+        log::info!("[ClipFlow] Detected Intel GPU — using Quick Sync Video");
         return HwAccel::IntelQsv;
     }
 
@@ -189,18 +189,18 @@ pub fn detect_hw_accel() -> HwAccel {
             .map(|o| o.status.success())
             .unwrap_or(false)
     {
-        log::info!("[CutDeck] Detected AMD GPU — using VAAPI");
+        log::info!("[ClipFlow] Detected AMD GPU — using VAAPI");
         return HwAccel::AmdVaapi;
     }
 
     // Apple VideoToolbox: check for macOS
     #[cfg(target_os = "macos")]
     {
-        log::info!("[CutDeck] Detected macOS — using VideoToolbox");
+        log::info!("[ClipFlow] Detected macOS — using VideoToolbox");
         return HwAccel::VideoToolbox;
     }
 
-    log::info!("[CutDeck] No GPU detected — using CPU encoding");
+    log::info!("[ClipFlow] No GPU detected — using CPU encoding");
     HwAccel::Cpu
 }
 

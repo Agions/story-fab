@@ -49,7 +49,7 @@ export const useModelStore = create<AppState>()(
         })),
     }),
     {
-      name: 'CutDeck-app-settings',
+      name: 'ClipFlow-app-settings',
       partialize: (state) => ({
         selectedAIModel: state.selectedAIModel,
         aiModelsSettings: state.aiModelsSettings,

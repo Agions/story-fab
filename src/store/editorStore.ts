@@ -139,7 +139,7 @@ export const useEditorStore = create<EditorStore>()(
       reset: () => set({ video: null, script: null, voice: null, segments: [], activePanel: 'video', previewPlaying: false, currentTime: 0, volume: 1, muted: false, selection: { segmentId: undefined, multipleIds: [] }, zoom: DEFAULT_ZOOM, scrollPosition: 0, history: { past: [], future: [] } }),
     }),
     {
-      name: 'CutDeck-editor',
+      name: 'ClipFlow-editor',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         video: state.video,

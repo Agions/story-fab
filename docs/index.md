@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: CutDeck
+  name: ClipFlow
   text: 智能视频剪辑与解说创作平台
   tagline: 本地 AI 驱动 · 隐私优先 · 一键生成解说视频
   image:
     src: /logo.svg
-    alt: CutDeck
+    alt: ClipFlow
   actions:
     - theme: brand
       text: 剪辑模式

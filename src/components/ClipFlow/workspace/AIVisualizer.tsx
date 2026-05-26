@@ -3,7 +3,7 @@
  * 神经网络可视化 + 进度大数字 + 逐项 stagger 动画
  */
 import React, { useState, useEffect, memo } from 'react';
-import { useCutDeck } from '../context';
+import { useClipFlow } from '../context';
 import { visionService } from '../../../core/services/ai/vision.service';
 import { notify } from '@/shared';
 import { logger } from '../../../shared/utils/logging';
@@ -122,7 +122,7 @@ const CheckIcon = () => (
 );
 
 const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
-  const { state, setAnalysis, goToNextStep, dispatch } = useCutDeck();
+  const { state, setAnalysis, goToNextStep, dispatch } = useClipFlow();
   const timeout = useTimeout();
 
   const [analyzing, setAnalyzing] = useState(false);

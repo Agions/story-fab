@@ -1,5 +1,5 @@
 /**
- * cut_deck 类型统一出口
+ * clipflow 类型统一出口
  * 
  * 注意：core/types.ts 是 canonical 类型定义来源
  * 此文件主要用于：

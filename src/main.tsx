@@ -10,7 +10,7 @@ window.addEventListener('error', (e) => {
     e.preventDefault();
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console -- DEV-only diagnostic
-      console.warn('[cut_deck] Tauri API error suppressed:', e.message);
+      console.warn('[clipflow] Tauri API error suppressed:', e.message);
     }
   }
 });

@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'CutDeck',
+  title: 'ClipFlow',
   description: 'AI-Driven Professional Video Editing Desktop Application',
   lang: 'en-US',
   cleanUrls: true,
@@ -11,12 +11,12 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#00d4ff' }],
     ['meta', { name: 'og:type', content: 'website' }],
-    ['meta', { name: 'og:site_name', content: 'CutDeck Docs' }],
+    ['meta', { name: 'og:site_name', content: 'ClipFlow Docs' }],
   ],
 
   themeConfig: {
     logo: '/logo.svg',
-    siteTitle: 'CutDeck Docs',
+    siteTitle: 'ClipFlow Docs',
 
     nav: [
       { text: 'Guide', link: '/guide/', activeMatch: '/guide/' },
@@ -85,17 +85,17 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/Agions/CutDeck/edit/main/docs/:path',
+      pattern: 'https://github.com/Agions/ClipFlow/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Agions/CutDeck' },
+      { icon: 'github', link: 'https://github.com/Agions/ClipFlow' },
     ],
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-present CutDeck',
+      copyright: 'Copyright © 2024-present ClipFlow',
     },
 
     search: {

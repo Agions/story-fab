@@ -12,7 +12,7 @@ title: 安装指南
 
 ## Windows
 
-- 从 [GitHub Releases](https://github.com/Agions/CutDeck/releases) 下载预构建安装包（`.exe`）
+- 从 [GitHub Releases](https://github.com/Agions/ClipFlow/releases) 下载预构建安装包（`.exe`）
 - 或通过 npm 构建：
 
 ```bash
@@ -22,16 +22,16 @@ npm run tauri build
 
 ## macOS
 
-- 从 [GitHub Releases](https://github.com/Agions/CutDeck/releases) 下载 `.dmg` 文件
+- 从 [GitHub Releases](https://github.com/Agions/ClipFlow/releases) 下载 `.dmg` 文件
 - 如果提示被拦截：右键→打开，或运行以下命令解除隔离：
 
 ```bash
-sudo xattr -rd com.apple.quarantine "/Applications/CutDeck.app"
+sudo xattr -rd com.apple.quarantine "/Applications/ClipFlow.app"
 ```
 
 ## Linux
 
-- 从 [GitHub Releases](https://github.com/Agions/CutDeck/releases) 下载 `.deb` 或 `.AppImage`
+- 从 [GitHub Releases](https://github.com/Agions/ClipFlow/releases) 下载 `.deb` 或 `.AppImage`
 
 ## 从源码构建
 

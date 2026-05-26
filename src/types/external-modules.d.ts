@@ -1,4 +1,4 @@
-// cut_deck external module type declarations
+// clipflow external module type declarations
 
 declare module 'jspdf' {
   export class jsPDF {

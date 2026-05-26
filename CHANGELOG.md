@@ -29,7 +29,7 @@
 ### 🐛 Bug Fixes
 
 - **`AIVideoPreview.tsx` 键盘监听器重绑定**：播放/暂停时 `useEffect` deps 含 `state.isPlaying` 导致每帧重绑键盘监听器 → 改用 `isPlayingRef`，deps 从 5 缩减为 1（`[currentVideo]`）
-- **`CutDeckProvider.tsx` context value 爆炸**：所有 consumer 每次 dispatch 都重渲染 → `canProceed` 依赖精确到 `state.currentStep + state.stepStatus`
+- **`ClipFlowProvider.tsx` context value 爆炸**：所有 consumer 每次 dispatch 都重渲染 → `canProceed` 依赖精确到 `state.currentStep + state.stepStatus`
 - **`ScriptWriting.tsx` useEffect TDZL**：`lastTimeoutIdRef` 在 cleanup 中引用但声明在其后 → 前移声明位置
 - **`smart_segmenter.rs` 空操作借用**：`let _ = energy_data` 无意义，删除
 - **`smart_segmenter.rs` 尾部窗口丢失**：能量计算循环丢弃不足 window_samples 的尾部样本 → 追加尾部窗口计算
@@ -67,7 +67,7 @@
 ## [2.0.1] - 2026-05-01
 
 - **src/constants/index.ts:** Add missing `legacy.token` and `legacy.projects` to `STORAGE_KEYS` for backward compatibility
-- **src/components/CutDeck/workspace/ScriptWriting.tsx:** Add missing `useRef` to React import; add null checks for `Timeout | null` before calling `timeout.clear()`
+- **src/components/ClipFlow/workspace/ScriptWriting.tsx:** Add missing `useRef` to React import; add null checks for `Timeout | null` before calling `timeout.clear()`
 - **src/components/editor/Timeline/TimelinePanel.tsx:** Add `return undefined` in useEffect for non-isPlaying code path (TS7030)
 - **src/core/services/providers/base.service.ts:** Rename `delay` parameter to `delayMs` to avoid shadowing imported `delay()` function
 - **src/shared/utils/pipeline-checkpoint.ts:** Replace `new Promise(resolve => setTimeout(resolve, 1000))` with `delay(1000)`
@@ -78,7 +78,7 @@
 - **docs:** Add `docs/ARCHITECTURE.md` (depth architecture doc) and `docs/DEVELOPER_GUIDE.md` (developer guide)
 - **README:** Add AI model table (9 providers), update directory structure, fix docs navigation
 - **workflow:** Consolidate `workflow.types.ts`, `workflow.constants.ts`, `workflow.initialState.ts` → `workflow.ts` (eliminate circular imports)
-- **dead code:** Remove ScriptGenerator, MenuBar, appConfig.ts, templates/dedup/, CutDeck/modes/, and orphaned LESS/CSS files
+- **dead code:** Remove ScriptGenerator, MenuBar, appConfig.ts, templates/dedup/, ClipFlow/modes/, and orphaned LESS/CSS files
 
 ---
 
@@ -350,7 +350,7 @@ src-tauri/src/
 - **Layout**：全新侧栏（琥珀光强调）+ 顶栏（用户信息）
 - **Dashboard**：玻璃拟态卡片 + 状态 Badge（琥珀/电青/灰）
 - **Landing**：Canvas 粒子 Hero + 3步骤流 + 4列特性网格
-- **CutDeck 工作流**：垂直步骤列表 + 四态动画（完成/进行/等待）
+- **ClipFlow 工作流**：垂直步骤列表 + 四态动画（完成/进行/等待）
 - **VideoUpload**：拖拽脉冲动画 + 琥珀光进度条
 - **AIAnalyze**：神经网络可视化（电青脉冲点阵）
 - **ProjectCreate / ScriptGenerate / VideoSynthesize / VideoExport**：全组件重设计
@@ -428,7 +428,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - WorkflowMonitor：移除 eslint-disable，Timeline items 添加 key
 - TimelineClip：移除未使用 Badge import，修复 handleDoubleClick 依赖
 - ai.service：移除废弃的 generateMockScenes/generateMockKeyframes
-- CutDeck.tsx / VideoExport.tsx：移除未使用 import
+- ClipFlow.tsx / VideoExport.tsx：移除未使用 import
 
 ### 📖 文档更新
 
@@ -474,8 +474,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 项目重命名
 
-- **旧名称**: CutDeck (126+ 同名项目，侵权风险)
-- **新名称**: CutDeck
+- **旧名称**: ClipFlow (126+ 同名项目，侵权风险)
+- **新名称**: ClipFlow
 - 体现"AI视频创作 + 故事叙事"的核心价值
 
 ### 📚 文档更新
@@ -585,4 +585,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 旧版本
 
-- 查看 [GitHub Releases](https://github.com/agions/CutDeck/releases)
+- 查看 [GitHub Releases](https://github.com/agions/ClipFlow/releases)

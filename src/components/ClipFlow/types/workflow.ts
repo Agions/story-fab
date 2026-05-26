@@ -1,5 +1,5 @@
 /**
- * cut_deck Workflow — unified types, constants, initial state, helpers
+ * clipflow Workflow — unified types, constants, initial state, helpers
  * Previously split across: workflow.types.ts / workflow.constants.ts / workflow.initialState.ts
  * All content now in one self-contained file, zero circular imports.
  */
@@ -7,9 +7,9 @@ import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type cut_deckFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
+export type clipflowFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
 
-export type cut_deckStep =
+export type clipflowStep =
   | 'project-create'
   | 'video-upload'
   | 'ai-analyze'
@@ -21,7 +21,7 @@ export type cut_deckStep =
   | 'voice-synth'
   | 'video-export';
 
-export type cut_deckMode = 'clip' | 'commentary';
+export type clipflowMode = 'clip' | 'commentary';
 
 export interface SemanticSegment {
   id: string;
@@ -31,9 +31,9 @@ export interface SemanticSegment {
   description?: string;
 }
 
-export interface cut_deckState {
-  mode: cut_deckMode;
-  currentStep: cut_deckStep;
+export interface clipflowState {
+  mode: clipflowMode;
+  currentStep: clipflowStep;
   stepStatus: {
     'project-create': boolean;
     'video-upload': boolean;
@@ -46,7 +46,7 @@ export interface cut_deckState {
     'voice-synth': boolean;
     'video-export': boolean;
   };
-  selectedFeature: cut_deckFeatureType;
+  selectedFeature: clipflowFeatureType;
   project: ProjectData | null;
   currentVideo: VideoInfo | null;
   analysis: VideoAnalysis | null;
@@ -83,12 +83,12 @@ export interface cut_deckState {
   semanticSegments: SemanticSegment[];
 }
 
-// cut_deckAction discriminated union
-export type cut_deckAction =
-  | { type: 'SET_MODE'; payload: cut_deckMode }
-  | { type: 'SET_STEP'; payload: cut_deckStep }
-  | { type: 'SET_STEP_COMPLETE'; payload: { step: cut_deckStep; complete: boolean } }
-  | { type: 'SET_FEATURE'; payload: cut_deckFeatureType }
+// clipflowAction discriminated union
+export type clipflowAction =
+  | { type: 'SET_MODE'; payload: clipflowMode }
+  | { type: 'SET_STEP'; payload: clipflowStep }
+  | { type: 'SET_STEP_COMPLETE'; payload: { step: clipflowStep; complete: boolean } }
+  | { type: 'SET_FEATURE'; payload: clipflowFeatureType }
   | { type: 'SET_PROJECT'; payload: ProjectData | null }
   | { type: 'SET_VIDEO'; payload: VideoInfo | null }
   | { type: 'SET_ANALYSIS'; payload: VideoAnalysis | null }
@@ -110,7 +110,7 @@ export type cut_deckAction =
   | { type: 'SET_DURATION'; payload: number }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' }
-  | { type: 'RESET_STEP'; payload: cut_deckStep };
+  | { type: 'RESET_STEP'; payload: clipflowStep };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -134,7 +134,7 @@ export const COMMENTARY_STEPS = [
   'video-export',
 ] as const;
 
-export const CUT_DECK_STEPS = CLIP_STEPS;
+export const CLIPFLOW_STEPS = CLIP_STEPS;
 
 export const INITIAL_STEP_STATUS = {
   'project-create': false,
@@ -163,7 +163,7 @@ export const DEFAULT_SYNTHESIS_SETTINGS = {
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 
-export const initialState: cut_deckState = {
+export const initialState: clipflowState = {
   mode: 'clip',
   currentStep: 'project-create',
   stepStatus: { ...INITIAL_STEP_STATUS },
@@ -199,22 +199,22 @@ export const initialState: cut_deckState = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function getStepsForMode(mode: cut_deckMode): readonly cut_deckStep[] {
+export function getStepsForMode(mode: clipflowMode): readonly clipflowStep[] {
   return mode === 'clip' ? CLIP_STEPS : COMMENTARY_STEPS;
 }
 
-export function getNextStep(currentStep: cut_deckStep, mode: cut_deckMode = 'clip'): cut_deckStep {
+export function getNextStep(currentStep: clipflowStep, mode: clipflowMode = 'clip'): clipflowStep {
   const steps = getStepsForMode(mode);
   const currentIndex = steps.indexOf(currentStep);
   return currentIndex < steps.length - 1 ? steps[currentIndex + 1] : currentStep;
 }
 
-export function getPrevStep(currentStep: cut_deckStep, mode: cut_deckMode = 'clip'): cut_deckStep {
+export function getPrevStep(currentStep: clipflowStep, mode: clipflowMode = 'clip'): clipflowStep {
   const steps = getStepsForMode(mode);
   const currentIndex = steps.indexOf(currentStep);
   return currentIndex > 0 ? steps[currentIndex - 1] : currentStep;
 }
 
-export function getTotalSteps(mode: cut_deckMode): number {
+export function getTotalSteps(mode: clipflowMode): number {
   return getStepsForMode(mode).length;
 }

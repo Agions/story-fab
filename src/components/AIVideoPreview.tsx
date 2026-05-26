@@ -15,7 +15,7 @@ import {
   CloudUpload,
   Trash2,
 } from 'lucide-react';
-import { useCutDeck } from '@/components/CutDeck/context';
+import { useClipFlow } from '@/components/ClipFlow/context';
 import type { VideoInfo } from '@/core/types';
 import type { CutPoint, ClipSuggestion } from '@/core/interfaces';
 import { notify, formatTime } from '@/shared';
@@ -63,7 +63,7 @@ const Text = ({
 
 const AIVideoPreviewComponent: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { state, setVideo, setPlaying, setCurrentTime, dispatch } = useCutDeck();
+  const { state, setVideo, setPlaying, setCurrentTime, dispatch } = useClipFlow();
   const { isPlaying, currentTime, duration, currentVideo, analysis } = state;
 
   const [isDragging, setIsDragging] = useState(false);
