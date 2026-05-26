@@ -244,8 +244,9 @@ async fn call_openai_compatible(
         .map_err(|e| format!("请求失败: {}", e))?;
 
     if !resp.status().is_success() {
+        let status = resp.status();
         let body = resp.text().await.unwrap_or_default();
-        return Err(format!("API 错误 [{}]: {}", resp.status(), body));
+        return Err(format!("API 错误 [{}]: {}", status, body));
     }
 
     #[derive(Deserialize)]
@@ -301,8 +302,9 @@ async fn call_gemini(
         .map_err(|e| format!("Gemini 请求失败: {}", e))?;
 
     if !resp.status().is_success() {
+        let status = resp.status();
         let body = resp.text().await.unwrap_or_default();
-        return Err(format!("Gemini API 错误 [{}]: {}", resp.status(), body));
+        return Err(format!("Gemini API 错误 [{}]: {}", status, body));
     }
 
     #[derive(Deserialize)]
@@ -350,8 +352,9 @@ async fn call_anthropic(
         .map_err(|e| format!("Anthropic 请求失败: {}", e))?;
 
     if !resp.status().is_success() {
+        let status = resp.status();
         let body = resp.text().await.unwrap_or_default();
-        return Err(format!("Anthropic API 错误 [{}]: {}", resp.status(), body));
+        return Err(format!("Anthropic API 错误 [{}]: {}", status, body));
     }
 
     #[derive(Deserialize)]
