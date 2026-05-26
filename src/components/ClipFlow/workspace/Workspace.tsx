@@ -18,7 +18,7 @@ import {
   Download,
   Bolt,
 } from 'lucide-react';
-import { useCutDeck, type cut_deckStep, CUT_DECK_STEPS } from '../context';
+import { useClipFlow, type clipflowStep, CLIPFLOW_STEPS } from '../context';
 import styles from './Workspace.module.less';
 import StepList from './StepList';
 
@@ -26,10 +26,10 @@ import StepList from './StepList';
 // 类型定义
 // ============================================================================
 
-export type { cut_deckStep };
+export type { clipflowStep };
 
 interface StepConfig {
-  key: cut_deckStep;
+  key: clipflowStep;
   title: string;
   icon: React.ReactNode;
 }
@@ -53,18 +53,18 @@ const STEPS: StepConfig[] = [
 ];
 
 // 正确的顺序映射（按照任务描述的视觉顺序）
-const STEP_ORDER: readonly cut_deckStep[] = CUT_DECK_STEPS;
+const STEP_ORDER: readonly clipflowStep[] = CLIPFLOW_STEPS;
 
 // ============================================================================
 // 辅助函数
 // ============================================================================
 
-const getStepIndex = (step: cut_deckStep): number => STEP_ORDER.indexOf(step);
+const getStepIndex = (step: clipflowStep): number => STEP_ORDER.indexOf(step);
 
 const isStepAccessible = (
-  step: cut_deckStep,
-  currentStep: cut_deckStep,
-  stepStatus: Record<cut_deckStep, boolean>
+  step: clipflowStep,
+  currentStep: clipflowStep,
+  stepStatus: Record<clipflowStep, boolean>
 ): boolean => {
   // 已完成的步骤可以点击跳转
   if (stepStatus[step]) return true;
@@ -81,7 +81,7 @@ const isStepAccessible = (
 // ============================================================================
 
 const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
-  const { state, setStep } = useCutDeck();
+  const { state, setStep } = useClipFlow();
   const { currentStep, stepStatus } = state;
   const activeStepRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -106,7 +106,7 @@ const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
     }
   }, [currentStep]);
 
-  const handleStepClick = (step: cut_deckStep) => {
+  const handleStepClick = (step: clipflowStep) => {
     if (isStepAccessible(step, currentStep, stepStatus)) {
       setStep(step);
     }

@@ -1,4 +1,4 @@
-# CutDeck 🎬
+# ClipFlow 🎬
 
 > AI 影视/短剧解说创作工具 — 智能拆条 + 解说生成 + 配音合成
 
@@ -7,7 +7,7 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 
-**CutDeck** 是一款本地 AI 驱动的视频创作工具，基于 Tauri 2.x（Rust + React + TypeScript）构建。支持**剪辑模式**和**解说模式**两种工作流，可满足从直播回放剪辑到电影解说等各种场景需求。
+**ClipFlow** 是一款本地 AI 驱动的视频创作工具，基于 Tauri 2.x（Rust + React + TypeScript）构建。支持**剪辑模式**和**解说模式**两种工作流，可满足从直播回放剪辑到电影解说等各种场景需求。
 
 ---
 
@@ -75,8 +75,8 @@
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/Agions/CutDeck.git
-cd CutDeck
+git clone https://github.com/Agions/ClipFlow.git
+cd ClipFlow
 
 # 2. 安装依赖
 npm install
@@ -124,10 +124,10 @@ npm run tauri build
 ### 项目结构
 
 ```
-CutDeck/
+ClipFlow/
 ├── src/                        # 前端源码
 │   ├── components/              # React 组件
-│   │   ├── CutDeck/            # 工作流核心组件
+│   │   ├── ClipFlow/            # 工作流核心组件
 │   │   └── CommentaryPanel/    # 解说模式面板
 │   ├── core/                   # 核心业务逻辑
 │   │   ├── services/           # 视频/音频服务
@@ -154,7 +154,7 @@ npm run lint             # 代码检查
 
 ## 📚 文档
 
-完整文档请访问 [CutDeck Docs](https://github.com/Agions/CutDeck/tree/main/docs)。
+完整文档请访问 [ClipFlow Docs](https://github.com/Agions/ClipFlow/tree/main/docs)。
 
 | 文档 | 说明 |
 |------|------|

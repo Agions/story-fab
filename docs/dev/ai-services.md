@@ -1,6 +1,6 @@
 # AI 服务
 
-CutDeck 通过** Provider 抽象层**支持多个 AI 后端，无需修改业务代码即可切换模型。
+ClipFlow 通过** Provider 抽象层**支持多个 AI 后端，无需修改业务代码即可切换模型。
 
 ## Provider 架构
 

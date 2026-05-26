@@ -1,5 +1,5 @@
 /**
- * cut_deck 核心类型定义
+ * clipflow 核心类型定义
  * 集中管理项目通用类型
  */
 import type { ReactNode } from 'react';

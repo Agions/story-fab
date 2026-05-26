@@ -4,11 +4,11 @@
 
 // 应用信息
 export const APP = {
-  name: 'cut_deck',
+  name: 'clipflow',
   version: '1.0.0',
   description: 'AI 驱动的专业视频内容创作平台',
   author: 'Agions',
-  website: 'https://github.com/Agions/cut_deck',
+  website: 'https://github.com/Agions/clipflow',
 };
 
 // 支持的视频格式
@@ -127,30 +127,30 @@ export const HOTKEYS = {
 
 // 存储键名
 export const STORAGE_KEYS = {
-  user: 'CutDeck_user',
-  projects: 'CutDeck_projects',
-  settings: 'CutDeck_settings',
-  theme: 'CutDeck_theme',
-  language: 'CutDeck_language',
-  recentFiles: 'CutDeck_recent_files',
+  user: 'ClipFlow_user',
+  projects: 'ClipFlow_projects',
+  settings: 'ClipFlow_settings',
+  theme: 'ClipFlow_theme',
+  language: 'ClipFlow_language',
+  recentFiles: 'ClipFlow_recent_files',
   // 认证相关
-  authToken: 'CutDeck_auth_token',
+  authToken: 'ClipFlow_auth_token',
   // 时间线
-  timeline: 'CutDeck_timeline',
+  timeline: 'ClipFlow_timeline',
   // 项目设置
-  projectSaveBehavior: 'CutDeck-project-save-behavior',
-  projectAutoSave: 'CutDeck-project-auto-save-enabled',
+  projectSaveBehavior: 'ClipFlow-project-save-behavior',
+  projectAutoSave: 'ClipFlow-project-auto-save-enabled',
   // 兼容旧版存储键名
   legacy: {
-    token: 'CutDeck_token_v1',
-    projects: 'CutDeck_projects_v1',
+    token: 'ClipFlow_token_v1',
+    projects: 'ClipFlow_projects_v1',
   },
 };
 
 // 项目保存行为
 export type ProjectSaveBehavior = 'stay' | 'detail';
-export const PROJECT_SAVE_BEHAVIOR_KEY = 'CutDeck-project-save-behavior' as const;
-export const PROJECT_AUTO_SAVE_KEY = 'CutDeck-project-auto-save-enabled';
+export const PROJECT_SAVE_BEHAVIOR_KEY = 'ClipFlow-project-save-behavior' as const;
+export const PROJECT_AUTO_SAVE_KEY = 'ClipFlow-project-auto-save-enabled';
 
 // API 端点
 export const API_ENDPOINTS = {

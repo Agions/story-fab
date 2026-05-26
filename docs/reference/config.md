@@ -25,7 +25,7 @@
 | `CUTDECK_FFMPEG_PATH` | `ffmpeg`（系统 PATH） | FFmpeg 可执行文件路径 |
 | `CUTDECK_FFPROBE_PATH` | `ffprobe`（系统 PATH） | FFprobe 可执行文件路径 |
 | `CUTDECK_EDGE_TTS_PATH` | `/usr/bin/edge-tts` | Edge TTS 脚本路径 |
-| `RUST_LOG` | `CutDeck=info,warn` | Rust tracing 日志级别 |
+| `RUST_LOG` | `ClipFlow=info,warn` | Rust tracing 日志级别 |
 
 ## 设置环境变量
 
@@ -34,7 +34,7 @@
 ```bash
 # 临时（当前会话）
 export CUTDECK_FFMPEG_PATH=/usr/local/bin/ffmpeg
-export RUST_LOG=CutDeck=debug
+export RUST_LOG=ClipFlow=debug
 
 # 永久 — 添加到 ~/.bashrc 或 ~/.zshrc
 echo 'export CUTDECK_FFMPEG_PATH=/usr/local/bin/ffmpeg' >> ~/.bashrc
@@ -56,7 +56,7 @@ $env:CUTDECK_FFMPEG_PATH = "C:\ffmpeg\bin\ffmpeg.exe"
 environment:
   - CUTDECK_FFMPEG_PATH=/usr/bin/ffmpeg
   - CUTDECK_FFPROBE_PATH=/usr/bin/ffprobe
-  - RUST_LOG=CutDeck=debug
+  - RUST_LOG=ClipFlow=debug
 ```
 
 ## 日志级别
@@ -69,7 +69,7 @@ environment:
 - `debug` — 调试、信息、警告、错误
 - `trace` — 跟踪（非常详细）
 
-模块级过滤器：`CutDeck=debug,tauri=info,warn`
+模块级过滤器：`ClipFlow=debug,tauri=info,warn`
 
 ## FFmpeg 安装
 

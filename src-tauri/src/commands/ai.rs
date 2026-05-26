@@ -70,10 +70,10 @@ pub fn run_ai_director_plan(input: DirectorPlanInput) -> DirectorPlanOutput {
 #[tauri::command]
 pub fn get_export_dir() -> String {
     if let Some(download_dir) = dirs::download_dir() {
-        let export_dir = download_dir.join("CutDeck");
+        let export_dir = download_dir.join("ClipFlow");
         return export_dir.display().to_string();
     }
-    let temp_dir = std::env::temp_dir().join("CutDeck");
+    let temp_dir = std::env::temp_dir().join("ClipFlow");
     temp_dir.display().to_string()
 }
 

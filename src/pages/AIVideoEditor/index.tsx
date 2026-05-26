@@ -8,23 +8,23 @@ import {
   User,
   Scissors,
 } from 'lucide-react';
-import { CutDeckProvider, useCutDeck } from '@/components/CutDeck/context';
+import { ClipFlowProvider, useClipFlow } from '@/components/ClipFlow/context';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useEditorStore } from '../../store/editorStore';
 import { useTimelineStore } from '../../store/timelineStore';
 import { notify } from '@/shared';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/CutDeck/workspace/functionModeMap';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/ClipFlow/workspace/functionModeMap';
 import styles from '@/pages/AIVideoEditor/index.module.less';
 
-const Workspace = lazy(() => import('@/components/CutDeck/workspace/Workspace'));
-const ProjectSetup = lazy(() => import('@/components/CutDeck/workspace/ProjectSetup'));
-const VideoUpload = lazy(() => import('@/components/CutDeck/workspace/VideoUpload'));
-const AIVisualizer = lazy(() => import('@/components/CutDeck/workspace/AIVisualizer'));
-const ScriptWriting = lazy(() => import('@/components/CutDeck/workspace/ScriptWriting'));
-const VideoComposing = lazy(() => import('@/components/CutDeck/workspace/VideoComposing'));
-const VideoExport = lazy(() => import('@/components/CutDeck/workspace/VideoExport'));
-const ClipRippling = lazy(() => import('@/components/CutDeck/workspace/ClipRippling'));
+const Workspace = lazy(() => import('@/components/ClipFlow/workspace/Workspace'));
+const ProjectSetup = lazy(() => import('@/components/ClipFlow/workspace/ProjectSetup'));
+const VideoUpload = lazy(() => import('@/components/ClipFlow/workspace/VideoUpload'));
+const AIVisualizer = lazy(() => import('@/components/ClipFlow/workspace/AIVisualizer'));
+const ScriptWriting = lazy(() => import('@/components/ClipFlow/workspace/ScriptWriting'));
+const VideoComposing = lazy(() => import('@/components/ClipFlow/workspace/VideoComposing'));
+const VideoExport = lazy(() => import('@/components/ClipFlow/workspace/VideoExport'));
+const ClipRippling = lazy(() => import('@/components/ClipFlow/workspace/ClipRippling'));
 const CommentaryPanel = lazy(() => import('@/components/CommentaryPanel'));
 
 // 三个核心功能配置
@@ -70,7 +70,7 @@ const AI_FUNCTIONS = [
 const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
   const [shortcutsHelpVisible, setShortcutsHelpVisible] = useState(false);
-  const { state, goToNextStep, setFeature } = useCutDeck();
+  const { state, goToNextStep, setFeature } = useClipFlow();
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
   // Avoids N separate selector calls (each triggers re-render)
@@ -250,9 +250,9 @@ const AIVideoEditorContent: React.FC = () => {
 
 const AIVideoEditor: React.FC = () => {
   return (
-    <CutDeckProvider>
+    <ClipFlowProvider>
       <AIVideoEditorContent />
-    </CutDeckProvider>
+    </ClipFlowProvider>
   );
 };
 

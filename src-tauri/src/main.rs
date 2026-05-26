@@ -5,5 +5,5 @@
 )]
 
 fn main() {
-    CutDeck_lib::run();
+    ClipFlow_lib::run();
 }

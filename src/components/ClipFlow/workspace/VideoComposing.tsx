@@ -4,7 +4,7 @@
  * 数据输出: synthesis (最终合成视频)
  */
 import React, { useState, useCallback, memo } from 'react';
-import { useCutDeck } from '../context';
+import { useClipFlow } from '../context';
 import { voiceSynthesisService } from '../../../core/services/ai/voice-synthesis.service';
 import { videoEffectService } from '../../../core/services/video/videoEffectService';
 import { audioVideoSyncService } from '../../../core/services/asr/audioSyncService';
@@ -82,7 +82,7 @@ const SUBTITLE_POSITIONS = [
 ];
 
 const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
-  const { state, setVoice, setSynthesis, goToNextStep, dispatch } = useCutDeck();
+  const { state, setVoice, setSynthesis, goToNextStep, dispatch } = useClipFlow();
   const timeout = useTimeout();
   const [synthesizing, setSynthesizing] = useState(false);
   const [progress, setProgress] = useState(0);

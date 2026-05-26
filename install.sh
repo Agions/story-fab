@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# CutDeck One-Line Installer
+# ClipFlow One-Line Installer
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/CutDeck/CutDeck/main/install.sh | bash -s -- 1.9.8
+#   curl -fsSL https://raw.githubusercontent.com/ClipFlow/ClipFlow/main/install.sh | bash -s -- 1.9.8
 #
 # Works on: macOS, Linux, Windows (Git Bash / WSL)
 
@@ -11,12 +11,12 @@ set -e
 VERSION="${1:-}"
 if [ -z "$VERSION" ]; then
   echo "❌ 请指定版本号，例如:"
-  echo "   curl -fsSL https://raw.githubusercontent.com/CutDeck/CutDeck/main/install.sh | bash -s -- 1.9.8"
+  echo "   curl -fsSL https://raw.githubusercontent.com/ClipFlow/ClipFlow/main/install.sh | bash -s -- 1.9.8"
   exit 1
 fi
 
-REPO="CutDeck/CutDeck"
-INSTALL_DIR="${HOME}/Applications/CutDeck.app"
+REPO="ClipFlow/ClipFlow"
+INSTALL_DIR="${HOME}/Applications/ClipFlow.app"
 TMPDIR="${TMPDIR:-/tmp}"
 ARTIFACT_DIR="${TMPDIR}/cutdeck-install"
 
@@ -46,19 +46,19 @@ download() {
 }
 
 install_macos() {
-  local dmg="${ARTIFACT_DIR}/CutDeck.dmg"
-  download "CutDeck-macos-dmg/CutDeck.dmg" "CutDeck.dmg"
+  local dmg="${ARTIFACT_DIR}/ClipFlow.dmg"
+  download "ClipFlow-macos-dmg/ClipFlow.dmg" "ClipFlow.dmg"
 
   echo "📦 挂载 DMG..."
-  hdiutil attach "$dmg" -mountpoint /Volumes/CutDeck -nobrowse
+  hdiutil attach "$dmg" -mountpoint /Volumes/ClipFlow -nobrowse
 
   echo "🧹 移除旧版..."
   rm -rf "$INSTALL_DIR"
 
   echo "📦 复制到 Applications..."
-  cp -r /Volumes/CutDeck/CutDeck.app "$INSTALL_DIR"
+  cp -r /Volumes/ClipFlow/ClipFlow.app "$INSTALL_DIR"
 
-  hdiutil detach /Volumes/CutDeck
+  hdiutil detach /Volumes/ClipFlow
   rm -f "$dmg"
 
   echo "✅ 安装完成: ${INSTALL_DIR}"
@@ -66,17 +66,17 @@ install_macos() {
 }
 
 install_linux_appimage() {
-  local appimage="${ARTIFACT_DIR}/CutDeck.AppImage"
-  download "CutDeck-linux-appimage/CutDeck.AppImage" "CutDeck.AppImage"
+  local appimage="${ARTIFACT_DIR}/ClipFlow.AppImage"
+  download "ClipFlow-linux-appimage/ClipFlow.AppImage" "ClipFlow.AppImage"
 
   chmod +x "$appimage"
 
   BIN_DIR="${HOME}/.local/bin"
   mkdir -p "$BIN_DIR"
-  mv "$appimage" "${BIN_DIR}/CutDeck"
+  mv "$appimage" "${BIN_DIR}/ClipFlow"
 
-  echo "✅ 安装完成: ${BIN_DIR}/CutDeck"
-  echo "   运行: ${BIN_DIR}/CutDeck"
+  echo "✅ 安装完成: ${BIN_DIR}/ClipFlow"
+  echo "   运行: ${BIN_DIR}/ClipFlow"
 }
 
 install_linux_deb() {
@@ -112,7 +112,7 @@ main() {
   case "$os" in
     macos)  install_macos ;;
     linux)
-      if curl -sfI "https://github.com/${REPO}/releases/download/${VERSION}/CutDeck-linux-appimage/CutDeck.AppImage" > /dev/null 2>&1; then
+      if curl -sfI "https://github.com/${REPO}/releases/download/${VERSION}/ClipFlow-linux-appimage/ClipFlow.AppImage" > /dev/null 2>&1; then
         install_linux_appimage
       else
         install_linux_deb
