@@ -446,8 +446,8 @@ pub async fn mix_audio(input: MixAudioInput) -> Result<String, String> {
             let delay_ms = (offset * 1000.0) as i64;
             cmd.args(&["-filter_complex",
                 &format!(
-                    "[0:a]volume={bg_vol}[bg];[1:a]volume={tts_vol},adelay={delay_ms}|{delay_ms}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
-                    bg = bg_vol, tts = tts_vol, delay_ms = delay_ms
+                    "[0:a]volume={bg}[bg];[1:a]volume={tts},adelay={delay}|{delay}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
+                    bg = bg_vol, tts = tts_vol, delay = delay_ms
                 ),
                 "-map", "0:v",
                 "-map", "[mixed]",
@@ -455,7 +455,7 @@ pub async fn mix_audio(input: MixAudioInput) -> Result<String, String> {
         } else {
             cmd.args(&["-filter_complex",
                 &format!(
-                    "[0:a]volume={bg_vol}[bg];[1:a]volume={tts_vol}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
+                    "[0:a]volume={bg}[bg];[1:a]volume={tts}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
                     bg = bg_vol, tts = tts_vol
                 ),
                 "-map", "0:v",
