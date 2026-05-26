@@ -441,7 +441,7 @@ pub fn revise_director_plan(
     tracing::info!(
         "[Director] Plan 修正: session_id={}, modifications={:?}",
         session_id,
-        modifications
+        &modifications
     );
 
     machine
