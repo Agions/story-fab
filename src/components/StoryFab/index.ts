@@ -1,5 +1,5 @@
 /**
- * storyfab — AI 视频剪辑工作台导出
+ * story-fab — AI 视频剪辑工作台导出
  */
 
 // Context exports

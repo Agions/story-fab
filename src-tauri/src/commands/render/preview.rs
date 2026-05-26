@@ -36,7 +36,7 @@ pub async fn generate_preview(input: GeneratePreviewInput) -> Result<String, Str
     }
 
     let output_path = std::env::temp_dir().join(format!(
-        "storyfab_preview_{}_{}.mp4",
+        "story-fab_preview_{}_{}.mp4",
         std::process::id(),
         chrono_like_timestamp()
     ));

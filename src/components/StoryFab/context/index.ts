@@ -1,5 +1,5 @@
 /**
- * storyfab context — context barrel export
+ * story-fab context — context barrel export
  */
 export { StoryFabProvider, useStoryFab, StoryFabContext } from './StoryFabContext';
 export type { StoryFabContextType } from './StoryFabContext';

@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "StoryFab",
   "version": "2.0.0",
-  "identifier": "com.storyfab.desktop",
+  "identifier": "com.story-fab.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -107,7 +107,7 @@
     "deep-link": {
       "desktop": {
         "schemes": [
-          "storyfab"
+          "story-fab"
         ]
       }
     }
