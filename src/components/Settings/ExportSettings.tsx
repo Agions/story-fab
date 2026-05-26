@@ -93,7 +93,7 @@ export const ExportSettings = memo<ExportSettingsProps>(({
           <Input
             value={outputPath}
             onChange={(e) => onOutputPathChange?.(e.target.value)}
-            placeholder="/Users/.../cut_deck Exports"
+            placeholder="/Users/.../clipflow Exports"
             className="flex-1 h-8 text-xs bg-bg-tertiary border-border-subtle text-text-primary"
           />
           <Button

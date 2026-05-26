@@ -4,7 +4,7 @@
  */
 
 import React, { memo, useState } from 'react';
-import { notify } from '@/components/ui/sonner';
+import { toast } from '@/components/ui/sonner';
 import styles from './SubtitleStyler.module.less';
 
 // ─── 预设类型 ────────────────────────────────────────────────────────────────
@@ -271,7 +271,7 @@ const SubtitleStyler: React.FC<SubtitleStylerProps> = ({ value, onChange }) => {
             className={styles.copyBtn}
             onClick={() => {
               navigator.clipboard.writeText(styleToASS(value));
-              notify.success('已复制 ASS 样式');
+              toast.success('已复制 ASS 样式');
             }}
           >
             复制 ASS 样式

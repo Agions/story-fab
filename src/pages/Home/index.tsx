@@ -160,7 +160,7 @@ const Home = () => {
         <div className={styles.heroGlow} />
         <Row align="center" justify="between">
           <Col>
-            <h2 className={styles.heroTitle}>{greeting}，欢迎使用 cut_deck</h2>
+            <h2 className={styles.heroTitle}>{greeting}，欢迎使用 clipflow</h2>
             <p className={styles.heroParagraph}>AI 驱动的专业视频内容创作平台</p>
             <div className="flex gap-3">
               <Button

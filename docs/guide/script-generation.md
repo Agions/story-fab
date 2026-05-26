@@ -1,12 +1,12 @@
 # Script Generation
 
-CutDeck uses AI to generate narration scripts for your video clips. In **Commentary Mode** (v3.0), this becomes a full narrative generation pipeline with style presets, coherence tracking, and quality control.
+ClipFlow uses AI to generate narration scripts for your video clips. In **Commentary Mode** (v3.0), this becomes a full narrative generation pipeline with style presets, coherence tracking, and quality control.
 
 ## Two Modes of Script Generation
 
 ### Clip Mode — Narration for Highlights（快速解说）
 
-For Clip Mode, CutDeck generates short narration scripts for individual highlight segments.
+For Clip Mode, ClipFlow generates short narration scripts for individual highlight segments.
 
 **Workflow**:
 1. AI analyzes the selected clip's transcript
@@ -16,7 +16,7 @@ For Clip Mode, CutDeck generates short narration scripts for individual highligh
 
 ### Commentary Mode — Full Narrative Generation（🆕 v3.0）
 
-For Commentary Mode, CutDeck generates a complete narrative structure with multiple acts.
+For Commentary Mode, ClipFlow generates a complete narrative structure with multiple acts.
 
 **Workflow**:
 1. **Semantic Understanding** — LLM understands plot, characters, emotional tone
@@ -30,7 +30,7 @@ For Commentary Mode, CutDeck generates a complete narrative structure with multi
 
 ## AI Providers
 
-CutDeck supports multiple AI providers through a unified provider interface:
+ClipFlow supports multiple AI providers through a unified provider interface:
 
 | Provider | Recommended Model | API Required |
 |---|---|---|
@@ -71,7 +71,7 @@ You can customize:
 
 ### 1. Context Building
 
-For each segment, CutDeck builds a context that includes:
+For each segment, ClipFlow builds a context that includes:
 
 ```typescript
 interface SegmentContext {
@@ -84,7 +84,7 @@ interface SegmentContext {
 
 ### 2. Prompt Engineering
 
-CutDeck uses structured prompts for different parts of the narrative:
+ClipFlow uses structured prompts for different parts of the narrative:
 
 **Intro Template** — Opening hook (first 3 seconds must grab attention)
 **Act Template** — Main story segments with coherence
@@ -105,7 +105,7 @@ The LLM generates JSON-structured output:
 
 ### 4. Quality Check
 
-Before finalizing, CutDeck validates:
+Before finalizing, ClipFlow validates:
 
 | Check | Criteria | Action if Failed |
 |-------|----------|-----------------|
@@ -115,7 +115,7 @@ Before finalizing, CutDeck validates:
 
 ### 5. Coherence Tracking
 
-Across multiple segments, CutDeck maintains:
+Across multiple segments, ClipFlow maintains:
 - **Previous Script** — Passed to LLM for context
 - **Character Track** — Avoids re-introducing characters
 - **Story Arc** — Maintains narrative flow
@@ -163,6 +163,6 @@ Script generation is optional. You can export clips with:
 - **Subtitles only** — Burn-in text without voice
 - **Full Commentary** — Narration + original + subtitles
 
-In Commentary Mode, if TTS fails, CutDeck will:
+In Commentary Mode, if TTS fails, ClipFlow will:
 1. Retry up to 2 times
 2. If still failing, skip audio and export video-only with subtitles

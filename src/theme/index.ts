@@ -1,5 +1,5 @@
 /**
- * cut_deck Theme System
+ * clipflow Theme System
  *
  * 统一色彩管理
  *

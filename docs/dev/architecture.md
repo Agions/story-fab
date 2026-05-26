@@ -5,17 +5,17 @@ categories:
   - 开发文档
   - 架构设计
 tags:
-  - CutDeck
+  - ClipFlow
   - Commentary Mode
   - Tauri
   - React
   - 架构设计
-description: CutDeck Commentary Mode AI 影视/短剧解说创作工具系统架构文档
+description: ClipFlow Commentary Mode AI 影视/短剧解说创作工具系统架构文档
 ---
 
 # 系统架构 v3.0
 
-> CutDeck Commentary Mode — AI 影视/短剧解说创作工具
+> ClipFlow Commentary Mode — AI 影视/短剧解说创作工具
 
 ---
 
@@ -23,7 +23,7 @@ description: CutDeck Commentary Mode AI 影视/短剧解说创作工具系统架
 
 ### 1.1 从"剪辑工具"到"解说创作工具"的演进
 
-CutDeck 经历了从 **Clip Mode（剪辑模式）** 到 **Commentary Mode（解说模式）** 的重大升级。这一转变不仅是功能层面的扩展，更是产品定位的根本性变革。
+ClipFlow 经历了从 **Clip Mode（剪辑模式）** 到 **Commentary Mode（解说模式）** 的重大升级。这一转变不仅是功能层面的扩展，更是产品定位的根本性变革。
 
 | 维度 | 旧定位（v2 Clip Mode） | 新定位（v3 Commentary Mode） |
 |------|----------------------|------------------------------|
@@ -134,7 +134,7 @@ CutDeck 经历了从 **Clip Mode（剪辑模式）** 到 **Commentary Mode（解
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              CutDeck Application                                  │
+│                              ClipFlow Application                                  │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                  │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
@@ -142,7 +142,7 @@ CutDeck 经历了从 **Clip Mode（剪辑模式）** 到 **Commentary Mode（解
 │  │                                                                              │  │
 │  │   Landing · Dashboard · Projects · Settings （通用页面）                      │  │
 │  │   ─────────────────────────────────────────────────────────────────          │  │
-│  │   CutDeck Provider（工作流编排）                                              │  │
+│  │   ClipFlow Provider（工作流编排）                                              │  │
 │  │     ├── StepList · Workspace · AIVisualizer （剪辑模式）                     │  │
 │  │     └── CommentaryPanel · ScriptEditor · CommentaryPreview （解说模式）       │  │
 │  └────────────────────────────────────────────────────────────────────────────┘  │
@@ -270,7 +270,7 @@ src/
 
 ### 4.2 状态管理
 
-CutDeck 使用 **Zustand** 进行状态管理，主要状态包括：
+ClipFlow 使用 **Zustand** 进行状态管理，主要状态包括：
 
 #### 4.2.1 项目状态（projectStore）
 
@@ -1022,7 +1022,7 @@ ffmpeg -i video.mp4 -i commentary.wav -i original_audio.wav \
 │                      Clip Mode 与 Commentary Mode 关系                            │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                  │
-│                    CutDeck 工作流入口（CutDeckProvider）                           │
+│                    ClipFlow 工作流入口（ClipFlowProvider）                           │
 │                                 │                                                │
 │                                 ▼                                                │
 │                    ┌──────────────────────┐                                      │

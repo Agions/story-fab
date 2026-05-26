@@ -271,7 +271,7 @@ impl SmartSegmenter {
 
     fn extract_audio(&self, video_path: &str) -> Result<String, String> {
         let temp_audio = std::env::temp_dir()
-            .join(format!("cutdeck_seg_audio_{}.wav", chrono_like_timestamp()));
+            .join(format!("clipflow_seg_audio_{}.wav", chrono_like_timestamp()));
 
         let output = Command::new(&self.ffmpeg_path)
             .args(&[

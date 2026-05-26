@@ -1,6 +1,6 @@
 ---
 title: 项目结构
-description: CutDeck 项目目录结构与模块说明
+description: ClipFlow 项目目录结构与模块说明
 ---
 
 # 项目结构
@@ -8,7 +8,7 @@ description: CutDeck 项目目录结构与模块说明
 ## 目录概览
 
 ```
-CutDeck/
+ClipFlow/
 ├── src/                    # React 前端
 ├── src-tauri/              # Rust 后端（Tauri）
 ├── docs/                   # VitePress 文档
@@ -24,7 +24,7 @@ CutDeck/
 ```
 src/
 ├── components/             # React UI 组件
-│   ├── CutDeck/            # 工作流组件（workspace/）
+│   ├── ClipFlow/            # 工作流组件（workspace/）
 │   ├── AIClip/             # AI 剪辑面板
 │   ├── ModelSelector/      # 模型选择器
 │   ├── CommentaryPanel/    # 解说模式面板
@@ -160,7 +160,7 @@ docs/
 | `src/core/services/commentary/DirectorAgent.ts` | Commentary Mode 状态机 |
 | `src/core/services/commentary/ScriptGenerator.ts` | LLM 解说词生成 |
 | `src/core/services/providers/` | AI 提供商抽象（OpenAI / Anthropic / DeepSeek 等） |
-| `src/components/CutDeck/context/CutDeckProvider.tsx` | 主工作流状态管理 |
+| `src/components/ClipFlow/context/ClipFlowProvider.tsx` | 主工作流状态管理 |
 | `src/components/CommentaryPanel/` | 解说模式 UI 组件 |
 | `src-tauri/src/lib.rs` | Tauri 应用配置、命令注册 |
 | `src-tauri/src/llm_proxy.rs` | LLM API 代理（隐藏密钥） |

@@ -112,11 +112,11 @@ pub fn check_faster_whisper() -> Result<bool, String> {
     match output {
         Ok(result) if result.status.success() => {
             let version = String::from_utf8_lossy(&result.stdout).trim().to_string();
-            log::info!("[CutDeck] faster-whisper version: {}", version);
+            log::info!("[ClipFlow] faster-whisper version: {}", version);
             Ok(true)
         }
         _ => {
-            log::warn!("[CutDeck] faster-whisper not installed");
+            log::warn!("[ClipFlow] faster-whisper not installed");
             Ok(false)
         }
     }
@@ -125,7 +125,7 @@ pub fn check_faster_whisper() -> Result<bool, String> {
 /// Download a whisper model (placeholder — faster-whisper auto-downloads on first use)
 #[tauri::command]
 pub async fn download_whisper_model(model_size: String) -> Result<String, String> {
-    log::info!("[CutDeck] Model download requested: {}", model_size);
+    log::info!("[ClipFlow] Model download requested: {}", model_size);
 
     // Validate model name to prevent Python code injection
     if !model_size.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.') {
@@ -199,7 +199,7 @@ pub async fn transcribe_audio(
     let lang = language.unwrap_or_else(|| "auto".into());
 
     log::info!(
-        "[CutDeck] Starting transcription: path={}, model={}, lang={}",
+        "[ClipFlow] Starting transcription: path={}, model={}, lang={}",
         audio_path,
         model,
         lang
@@ -225,7 +225,7 @@ pub async fn transcribe_audio(
         if !audio_exts.contains(&input_ext.as_str()) {
             // It's a video file — extract audio
             let wav_path = std::env::temp_dir().join(format!(
-                "cutdeck_whisper_{}.wav",
+                "clipflow_whisper_{}.wav",
                 std::process::id()
             ));
             extract_audio_to_wav(&audio_path, &wav_path)
@@ -454,7 +454,7 @@ print(json.dumps(result, ensure_ascii=False))
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        log::error!("[CutDeck] Whisper transcription failed: {}", stderr);
+        log::error!("[ClipFlow] Whisper transcription failed: {}", stderr);
 
         // Provide helpful error message
         if stderr.contains("No module named") || stderr.contains("ModuleNotFoundError") {
@@ -475,7 +475,7 @@ print(json.dumps(result, ensure_ascii=False))
 
     let seg_count = result.segments.len();
     log::info!(
-        "[CutDeck] Transcription complete: {} segments, lang={} ({:.2})",
+        "[ClipFlow] Transcription complete: {} segments, lang={} ({:.2})",
         seg_count,
         result.language,
         result.language_probability

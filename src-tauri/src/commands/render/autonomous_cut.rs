@@ -53,7 +53,7 @@ async fn render_autonomous_cut_impl(
     let transition_duration = input.transition_duration.unwrap_or(DEFAULT_TRANSITION_DURATION).clamp(0.0, MAX_TRANSITION_DURATION);
 
     let temp_root = std::env::temp_dir().join(format!(
-        "cutdeck_autocut_{}_{}",
+        "clipflow_autocut_{}_{}",
         std::process::id(),
         chrono_like_timestamp()
     ));

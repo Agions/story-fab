@@ -166,7 +166,7 @@ export const useProjectStore = create<ProjectState>()(
       },
     }),
     {
-      name: 'CutDeck-projects',
+      name: 'ClipFlow-projects',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         projects: state.projects,

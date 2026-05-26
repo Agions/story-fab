@@ -344,7 +344,7 @@ impl HighlightDetector {
 
     fn extract_audio_pcm(&self, audio_path: &str) -> Result<Vec<f32>, String> {
         let temp_wav = std::env::temp_dir()
-            .join(format!("cutdeck_pcm_{}.wav", chrono_like_timestamp()));
+            .join(format!("clipflow_pcm_{}.wav", chrono_like_timestamp()));
 
         let output = Command::new(&self.ffmpeg_path)
             .args(&[
@@ -443,7 +443,7 @@ impl HighlightDetector {
 
     fn extract_audio_path(&self, video_path: &str) -> Result<String, String> {
         let temp_audio = std::env::temp_dir()
-            .join(format!("cutdeck_audio_{}.wav", chrono_like_timestamp()));
+            .join(format!("clipflow_audio_{}.wav", chrono_like_timestamp()));
 
         let output = Command::new(&self.ffmpeg_path)
             .args(&[

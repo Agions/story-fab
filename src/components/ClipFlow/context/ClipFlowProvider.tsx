@@ -3,19 +3,19 @@
  * 从 AIEditorContext.tsx 提取的 Provider 组件
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
-import type { cut_deckState, cut_deckStep, cut_deckFeatureType, cut_deckAction, cut_deckMode } from '../types/workflow';
+import type { clipflowState, clipflowStep, clipflowFeatureType, clipflowAction, clipflowMode } from '../types/workflow';
 import { initialState, getNextStep, getPrevStep, getStepsForMode, getTotalSteps } from '../types/workflow';
 import { clipFlowReducer } from '../types/workflow.reducer';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
 
 // 上下文类型
-interface CutDeckContextType {
-  state: cut_deckState;
-  dispatch: React.Dispatch<cut_deckAction>;
+interface ClipFlowContextType {
+  state: clipflowState;
+  dispatch: React.Dispatch<clipflowAction>;
   // 便捷方法
-  setMode: (mode: cut_deckMode) => void;
-  setStep: (step: cut_deckStep) => void;
-  setFeature: (feature: cut_deckFeatureType) => void;
+  setMode: (mode: clipflowMode) => void;
+  setStep: (step: clipflowStep) => void;
+  setFeature: (feature: clipflowFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
   setPlaying: (playing: boolean) => void;
@@ -36,7 +36,7 @@ interface CutDeckContextType {
   goToNextStep: () => void;
   goToPrevStep: () => void;
   reset: () => void;
-  resetStep: (step: cut_deckStep) => void;
+  resetStep: (step: clipflowStep) => void;
   // 计算属性
   canProceed: () => boolean;
   completedSteps: number;
@@ -44,14 +44,14 @@ interface CutDeckContextType {
 }
 
 // 创建上下文
-export const CutDeckContext = createContext<CutDeckContextType | undefined>(undefined);
+export const ClipFlowContext = createContext<ClipFlowContextType | undefined>(undefined);
 
 // Provider 组件
-interface CutDeckProviderProps {
+interface ClipFlowProviderProps {
   children: ReactNode;
 }
 
-export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) => {
+export const ClipFlowProvider: React.FC<ClipFlowProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(clipFlowReducer, initialState);
 
   // 追踪当前 blob URL，用于清理
@@ -76,15 +76,15 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
   }, []);
 
   // 便捷方法 - 使用 useCallback 稳定函数引用
-  const setMode = useCallback((mode: cut_deckMode) => {
+  const setMode = useCallback((mode: clipflowMode) => {
     dispatch({ type: 'SET_MODE', payload: mode });
   }, []);
 
-  const setStep = useCallback((step: cut_deckStep) => {
+  const setStep = useCallback((step: clipflowStep) => {
     dispatch({ type: 'SET_STEP', payload: step });
   }, []);
 
-  const setFeature = useCallback((feature: cut_deckFeatureType) => {
+  const setFeature = useCallback((feature: clipflowFeatureType) => {
     dispatch({ type: 'SET_FEATURE', payload: feature });
   }, []);
 
@@ -171,7 +171,7 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     dispatch({ type: 'RESET' });
   }, [revokeVideoBlobUrl]);
 
-  const resetStep = useCallback((step: cut_deckStep) => {
+  const resetStep = useCallback((step: clipflowStep) => {
     dispatch({ type: 'RESET_STEP', payload: step });
   }, []);
 
@@ -246,30 +246,30 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
   ]);
 
   // 动态 value：每次 state 变化时重建，但静态方法引用不变
-  const value = useMemo<CutDeckContextType>(
+  const value = useMemo<ClipFlowContextType>(
     () => ({ state, ...staticValue, canProceed }),
     [state, staticValue, canProceed]
   );
 
   return (
-    <CutDeckContext.Provider value={value}>
+    <ClipFlowContext.Provider value={value}>
       {children}
-    </CutDeckContext.Provider>
+    </ClipFlowContext.Provider>
   );
 };
 
 // 使用上下文的 Hook
-export const useCutDeck = (): CutDeckContextType => {
-  const context = useContext(CutDeckContext);
+export const useClipFlow = (): ClipFlowContextType => {
+  const context = useContext(ClipFlowContext);
   if (!context) {
-    throw new Error('useCutDeck must be used within CutDeckProvider');
+    throw new Error('useClipFlow must be used within ClipFlowProvider');
   }
   return context;
 };
 
 // 导出上下文类型
-export type { CutDeckContextType };
+export type { ClipFlowContextType };
 
 // 旧版兼容 Hook（别名）
-/** @deprecated 请使用 useCutDeck 代替 */
-export const useAIEditor = useCutDeck;
+/** @deprecated 请使用 useClipFlow 代替 */
+export const useAIEditor = useClipFlow;

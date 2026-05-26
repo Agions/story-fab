@@ -1,10 +1,10 @@
 # AI Analysis
 
-CutDeck uses multiple AI models to analyze your video: **Whisper** for transcription, **SmartSegmenter** for scene understanding, and in Commentary Mode, **LLM** for semantic understanding.
+ClipFlow uses multiple AI models to analyze your video: **Whisper** for transcription, **SmartSegmenter** for scene understanding, and in Commentary Mode, **LLM** for semantic understanding.
 
 ## Transcription (Whisper)
 
-CutDeck runs [OpenAI Whisper](https://github.com/openai/whisper) entirely locally. No audio is ever sent to the cloud.
+ClipFlow runs [OpenAI Whisper](https://github.com/openai/whisper) entirely locally. No audio is ever sent to the cloud.
 
 ### Supported Models
 
@@ -26,7 +26,7 @@ The default model is `base`. You can change it in **Settings → AI → Whisper 
 
 ## Smart Segmentation（智能分段）
 
-After transcription, CutDeck analyzes the audio energy, visual scene changes, and speech activity to segment the video into meaningful chunks.
+After transcription, ClipFlow analyzes the audio energy, visual scene changes, and speech activity to segment the video into meaningful chunks.
 
 ### Scoring Factors
 
@@ -60,7 +60,7 @@ In **Settings → AI → Highlight Detection**, you can tune:
 
 > Available in **Commentary Mode** only
 
-In Commentary Mode, after Smart Segmentation, CutDeck uses an LLM to add semantic understanding to each segment.
+In Commentary Mode, after Smart Segmentation, ClipFlow uses an LLM to add semantic understanding to each segment.
 
 ### What It Does
 

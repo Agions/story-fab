@@ -1,8 +1,9 @@
 {
-  "name": "CutDeck",
+  "name": "clipflow",
+  "productName": "ClipFlow",
   "private": true,
   "version": "2.0.0",
-  "description": "开源自研AI视频剪辑工具。长视频一键智能剪辑为爆款短片段 · 9:16/1:1/16:9多格式导出 · 本地Whisper字幕 · Rust渲染管线 · 无需上传",
+  "description": "开源自研AI视频创作工具 · 智能拆条+解说生成+配音合成 · 9:16/1:1/16:9多格式导出 · 本地Whisper字幕 · Rust渲染管线 · 无需上传",
   "author": "Agions <agions@qq.com>",
   "license": "MIT",
   "type": "module",

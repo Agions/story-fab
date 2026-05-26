@@ -1,11 +1,11 @@
 ---
 title: Tauri 命令参考
-description: CutDeck 所有 Tauri IPC 命令的完整参考文档
+description: ClipFlow 所有 Tauri IPC 命令的完整参考文档
 ---
 
 # Tauri 命令参考
 
-本文档描述 CutDeck 后端（Rust）暴露给前端（TypeScript）的所有 Tauri IPC 命令。前端通过 `TauriBridge.ts` 调用这些命令。
+本文档描述 ClipFlow 后端（Rust）暴露给前端（TypeScript）的所有 Tauri IPC 命令。前端通过 `TauriBridge.ts` 调用这些命令。
 
 ## 命令概述
 

@@ -22,13 +22,13 @@ export interface AppSettings {
  * 设置状态 Hook (兼容 SettingsContext)
  */
 export function useSettingsStore() {
-  const [autoSave, setAutoSave] = useLocalStorage('CutDeck-autosave', true);
-  const [compactMode, setCompactMode] = useLocalStorage('CutDeck-compact', false);
-  const [theme, setTheme] = useLocalStorage('CutDeck-theme', 'light');
-  const [defaultModel, setDefaultModel] = useLocalStorage('CutDeck-default-model', 'deepseek-v4-flash');
+  const [autoSave, setAutoSave] = useLocalStorage('ClipFlow-autosave', true);
+  const [compactMode, setCompactMode] = useLocalStorage('ClipFlow-compact', false);
+  const [theme, setTheme] = useLocalStorage('ClipFlow-theme', 'light');
+  const [defaultModel, setDefaultModel] = useLocalStorage('ClipFlow-default-model', 'deepseek-v4-flash');
   const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
-  const [outputPath, setOutputPath] = useLocalStorage('CutDeck-output-path', '');
-  const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('CutDeck-recent-projects', []);
+  const [outputPath, setOutputPath] = useLocalStorage('ClipFlow-output-path', '');
+  const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('ClipFlow-recent-projects', []);
 
   const settings = useMemo<AppSettings>(() => ({
     autoSave,

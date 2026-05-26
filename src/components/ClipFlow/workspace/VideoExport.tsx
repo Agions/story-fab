@@ -4,7 +4,7 @@
 import React, { useState, useEffect, memo } from 'react';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
-import { useCutDeck } from '../context';
+import { useClipFlow } from '../context';
 import { notify } from '@/shared';
 import type { ExportSettings } from '@/core/types';
 import styles from './VideoExport.module.less';
@@ -92,7 +92,7 @@ const FPS_OPTIONS = [
 ] as const;
 
 const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
-  const { state, setExportSettings, setStep } = useCutDeck();
+  const { state, setExportSettings, setStep } = useClipFlow();
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressStage, setProgressStage] = useState('');
@@ -189,7 +189,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     setExportError(null);
 
     try {
-      const outputPath = `/tmp/cut_deck/export_${Date.now()}.mp4`;
+      const outputPath = `/tmp/clipflow/export_${Date.now()}.mp4`;
       setCurrentExportId(outputPath);
 
       setProgressStage('正在编码...');
