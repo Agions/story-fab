@@ -1,5 +1,9 @@
 //! Commentary 子模块统一导出
 
+pub mod director;
+pub mod script_generator;
+pub mod commentary_synthesizer;
+
 pub use crate::commands::commentary::director::{
     create_director_session, get_director_status, start_director_analysis,
     generate_director_plan, approve_director_plan, revise_director_plan,
