@@ -174,9 +174,9 @@ const AIVideoEditorContent: React.FC = () => {
         ) : (
           <ScriptWriting onNext={goToNextStep} />
         );
-      case 'video-synthesize':
+      case 'video-synth':
         return <VideoComposing onNext={goToNextStep} />;
-      case 'export':
+      case 'video-export':
         return <VideoExport onComplete={() => {}} />;
       default:
         return <ProjectSetup onNext={goToNextStep} />;

@@ -1,100 +1,61 @@
-# Introduction
+---
+title: 用户指南
+description: CutDeck 是一款本地 AI 驱动的视频剪辑与解说创作工具，支持剪辑模式和解说模式两种工作流程。
+---
 
-CutDeck is an **AI-driven professional video editing desktop application** built with Tauri 2.x (Rust + React + TypeScript). It transforms long videos into engaging short clips or full narration commentary videos — driven by local AI models, no uploads required.
+# 用户指南
 
-## Two Modes: Clip Mode & Commentary Mode
+## 什么是 CutDeck？
 
-CutDeck supports two distinct workflows:
+CutDeck 是一款本地 AI 驱动的视频剪辑与解说创作工具，基于 Tauri 2.x（Rust + React + TypeScript）构建。用户无需上传视频到云端，所有 AI 处理均在本地完成，保护隐私的同时确保流畅体验。
 
-### Clip Mode — 快速剪辑（原有）
-将长视频自动剪辑成多个精彩片段，适合直播回放、会议记录等场景。
+CutDeck 支持两种工作模式：**剪辑模式（Clip Mode）** 和 **解说模式（Commentary Mode）**，可满足直播回放剪辑、短剧电影解说等多种创作需求。
 
-```
-视频 → AI 分析 → 高光检测 → 片段选择 → 多格式导出
-```
+## 两种工作模式
 
-### Commentary Mode — AI 影视解说（🆕 v3.0）
-将视频自动转化为完整的解说视频（带文案、配音、字幕），适合短剧、电影、综艺解说。
+### 剪辑模式 Clip Mode
 
-```
-视频 → AI 分析 → 语义分段 → AI Director → 解说词生成 → 配音合成 → 渲染成片
-```
+剪辑模式将长视频快速转化为多个精彩片段，适合以下场景：
 
-## Why CutDeck?
+- 直播回放精华剪辑
+- 会议记录重点提取
+- 游戏高光时刻收集
 
-| Scenario | Traditional Workflow | CutDeck Clip Mode | CutDeck Commentary Mode |
-|---|---|---|---|
-| Find highlights | Watch entire video manually | AI detects top moments automatically | AI understands plot, selects best segments |
-| Create script | Write manually | — | LLM generates engaging commentary |
-| Add narration | Record yourself | — | Edge TTS synthesizes voice-over |
-| Create subtitles | Upload to cloud service | Local Whisper, zero upload | Local Whisper, zero upload |
-| Format for social | Manual aspect ratio editing | One-click 9:16 / 1:1 / 16:9 | One-click 9:16 / 1:1 / 16:9 |
-
-## Core Features
-
-### 🤖 AI Analysis
-Upload a long video, CutDeck uses **OpenAI Whisper** (running locally) to transcribe audio, then applies highlight detection algorithms to identify the most engaging segments.
-
-### 🎬 Commentary Mode（🆕 v3.0）
-
-**AI Director** — Multi-round agent that plans the narration structure, allows user review and modification.
-
-**Script Generation** — LLM generates engaging commentary scripts based on plot understanding. Supports multiple styles (幽默/接地气/震惊/感动/专业).
-
-**Commentary Synthesis** — Edge TTS synthesizes voice-over narration, automatically aligned with video timeline.
-
-### ✍️ Script Generation
-CutDeck generates concise, engaging scripts for each detected highlight using AI, and can synthesize voice-over narration via **Edge TTS**.
-
-### 📐 Multi-Format Export
-Export your clips in any aspect ratio optimized for each platform:
-
-- **9:16** — TikTok, Instagram Reels, YouTube Shorts
-- **1:1** — Instagram Feed
-- **16:9** — YouTube, Twitter/X
-
-### 🔤 Subtitle Burn-in
-Burn accurate, synced subtitles directly into the exported video. All processing is local.
-
-## Architecture
+**工作流程：**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│            WebView (React 18 SPA)                   │
-│                                                     │
-│  UI Layer → State (Zustand) → Services → IPC Bridge │
-│                                                     │
-│  Services:                                         │
-│  ├── Clip Pipeline（7步剪辑，已有）                  │
-│  └── Commentary Pipeline（🆕 解说管道）              │
-│       ├── DirectorAgent（状态机）                   │
-│       ├── ScriptGenerator（LLM 文案）               │
-│       └── CommentarySynth（TTS 配音）               │
-└──────────────────────┬──────────────────────────────┘
-                       │ Tauri IPC
-┌──────────────────────▼──────────────────────────────┐
-│              Tauri Backend (Rust)                   │
-│                                                     │
-│  FFmpeg · Whisper · Edge TTS · LLM Proxy            │
-└─────────────────────────────────────────────────────┘
+长视频 → AI 分析 → 高光检测 → 片段选择 → 多格式导出
 ```
 
-## Supported Platforms
+### 解说模式 Commentary Mode
 
-- **Windows** 10/11 (x64)
-- **macOS** 12+ (Apple Silicon & Intel)
-- **Linux** (AppImage / .deb)
+解说模式将视频自动转化为完整的配音解说视频，适合以下场景：
 
-## Commentary Style Examples
+- 短剧解说（如复仇、情感类）
+- 电影解说
+- 综艺解说
 
-| Style | Description | Best For |
-|-------|-------------|----------|
-| 幽默版 | 诙谐有趣，添加网络梗 | 喜剧/搞笑视频 |
-| 接地气版 | 口语化，像和朋友聊天 | 情感/生活类视频 |
-| 震惊版 | 夸张震惊，制造悬念 | 悬疑/复仇类短剧 |
-| 感动版 | 温情脉脉，情感共鸣 | 爱情/亲情类视频 |
-| 专业版 | 客观冷静，纪录片风格 | 纪录片/科教类 |
+**工作流程：**
 
-## License
+```
+视频 → AI 分析 → 语义分段 → AI Director → 解说词生成 → TTS 配音 → 渲染成片
+```
 
-CutDeck is open-source under the [MIT License](https://github.com/Agions/CutDeck/blob/main/LICENSE).
+## 核心功能概览
+
+| 功能 | 说明 |
+|------|------|
+| **智能拆条** | AI 自动识别高光片段，精准切分 |
+| **AI 解说** | LLM 理解剧情，生成吸引人的解说文案 |
+| **本地 Whisper 字幕** | 无需上传，本地完成语音转文字 |
+| **多格式导出** | 支持 9:16、1:1、16:9 等多种比例 |
+| **导演 Agent** | 多轮交互式策划解说结构与风格 |
+| **TTS 配音** | Edge TTS 本地合成自然流畅的配音 |
+
+## 快速导航
+
+- [安装指南](/guide/installation) — 快速上手安装 CutDeck
+- [快速开始](/guide/quick-start) — 5 分钟创建你的第一个项目
+- [解说模式详解](/guide/commentary-mode) — 完整解说模式操作流程
+- [键盘快捷键](/guide/keyboard-shortcuts) — 高效剪辑必备
+- [导出设置](/guide/export) — 多平台格式配置指南

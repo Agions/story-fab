@@ -310,6 +310,83 @@
 }
 
 // ============================================================================
+// Platform Preset Section
+// ============================================================================
+
+.platformSection {
+  margin-bottom: 24px;
+}
+
+.platformGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.platformItem {
+  padding: 12px 6px 10px;
+  border-radius: @radius-sm;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.04);
+    transform: translateY(-1px);
+  }
+
+  &.platformActive {
+    border-color: @amber;
+    background: rgba(255, 159, 67, 0.08);
+    box-shadow: 0 0 12px @amber-glow;
+  }
+}
+
+.platformEmoji {
+  display: block;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.platformName {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: @text-primary;
+}
+
+.platformTip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 159, 67, 0.06);
+  border: 1px solid rgba(255, 159, 67, 0.15);
+  border-radius: @radius-sm;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: @amber;
+    margin-top: 1px;
+  }
+}
+
+// ============================================================================
 // Quality Selection (1080p / 720p / 480p)
 // ============================================================================
 
