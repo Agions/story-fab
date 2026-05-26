@@ -437,7 +437,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
             {multiStyleMode && scripts.size > 0 && activeScriptStyle ? (
               <div className={styles.multiScriptTabs}>
                 <div className={styles.multiScriptStyleTabs}>
-                  {Array.from(scripts.entries()).map(([style, s]) => (
+                  {Array.from(scripts.entries()).map(([style, _s]) => (
                     <button
                       key={style}
                       className={`${styles.multiScriptStyleTab} ${activeScriptStyle === style ? styles.multiScriptStyleTabActive : ''}`}
