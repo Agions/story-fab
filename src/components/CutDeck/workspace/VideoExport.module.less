@@ -1018,6 +1018,39 @@
 }
 
 // ============================================================================
+// Cancel Button
+// ============================================================================
+
+.cancelBtn {
+  margin-top: 12px;
+  height: 36px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  color: #FF6B6B;
+
+  &:hover {
+    background: rgba(255, 80, 80, 0.12);
+    border-color: rgba(255, 80, 80, 0.6);
+    color: #FF8A8A;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+// ============================================================================
 // Warning Alert
 // ============================================================================
 
