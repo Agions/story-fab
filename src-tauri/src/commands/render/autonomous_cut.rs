@@ -39,7 +39,7 @@ pub async fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<Strin
 // ─── Inner Implementation ─────────────────────────────────────────────────────
 
 async fn render_autonomous_cut_impl(
-    input: AutonomousRenderInput,
+    mut input: AutonomousRenderInput,
 ) -> Result<String, String> {
     let segments = input
         .segments
@@ -65,7 +65,7 @@ async fn render_autonomous_cut_impl(
     if segments.len() <= 1 {
         let fallback_output = merged_output.to_string_lossy().to_string();
         render_single_cut_sync(&input.input_path, &fallback_output, input.start_time, input.end_time)?;
-        apply_post_processing(&merged_output, &input, &temp_root, &input.output_path)?;
+        apply_post_processing(&merged_output, &mut input.clone(), &temp_root, &input.output_path)?;
         let _ = tokio_fs::remove_file(&merged_output).await;
         let _ = tokio_fs::remove_dir(&temp_root).await;
         return Ok(input.output_path);
@@ -152,7 +152,7 @@ async fn render_autonomous_cut_impl(
     }
 
     let post_result =
-        apply_post_processing(&merged_output, &input, &temp_root, &input.output_path);
+        apply_post_processing(&merged_output, &mut input, &temp_root, &input.output_path);
 
     // Cleanup
     let _ = tokio_fs::remove_file(&merged_output).await;
@@ -201,8 +201,8 @@ fn apply_time_segment(cmd: &mut std::process::Command, start: Option<f64>, end: 
 
 fn apply_post_processing(
     merged_input: &PathBuf,
-    input: &AutonomousRenderInput,
-    temp_root: &PathBuf,
+    input: &mut AutonomousRenderInput,
+    _temp_root: &PathBuf,
     final_output_path: &str,
 ) -> Result<(), String> {
     let burn_subtitles = input.burn_subtitles.unwrap_or(false);
