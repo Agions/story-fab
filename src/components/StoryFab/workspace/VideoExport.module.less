@@ -198,6 +198,17 @@
   color: @text-secondary;
   margin-bottom: 12px;
   display: block;
+
+  .sectionHeaderRow & {
+    margin-bottom: 0;
+  }
+}
+
+.sectionHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
 .formatGrid {
@@ -348,6 +359,50 @@
     background: rgba(255, 159, 67, 0.08);
     box-shadow: 0 0 12px @amber-glow;
   }
+}
+
+.platformCheck {
+  display: block;
+  font-size: 14px;
+  color: @amber;
+  margin-top: 2px;
+}
+
+.batchModeToggle {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Figtree', sans-serif;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  color: @text-secondary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: @amber;
+    color: @amber;
+  }
+
+  &.batchModeActive {
+    background: rgba(255, 159, 67, 0.12);
+    border-color: @amber;
+    color: @amber;
+    box-shadow: 0 0 8px @amber-glow;
+  }
+}
+
+.batchTip {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 212, 255, 0.06);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-radius: @radius-sm;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  color: @cyan;
 }
 
 .platformEmoji {

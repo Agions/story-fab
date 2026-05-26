@@ -42,6 +42,7 @@ import {
   destroyCommentarySession,
   generateCommentaryScript,
   synthesizeCommentaryAudio,
+  estimateTTSDuration,
   listCommentaryVoices,
   type DirectorStatusResponse,
   type DirectorState,
@@ -113,6 +114,12 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
   // 选中的音色
   const [selectedVoice, setSelectedVoice] = useState('zh-CN-XiaoxiaoNeural');
   const [selectedStyle, setSelectedStyle] = useState<ScriptStylePreset>('conversational');
+
+  // 多风格批量生成
+  const [multiStyleMode, setMultiStyleMode] = useState(false);
+  const [selectedStyles, setSelectedStyles] = useState<ScriptStylePreset[]>(['conversational']);
+  const [scripts, setScripts] = useState<Map<ScriptStylePreset, CommentaryScriptOutput>>(new Map());
+  const [activeScriptStyle, setActiveScriptStyle] = useState<ScriptStylePreset | null>(null);
 
   // 弹窗
   const [planConfirmOpen, setPlanConfirmOpen] = useState(false);
@@ -209,6 +216,122 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
       setIsGenerating(false);
     }
   }, [sessionId, subtitles, apiKey, selectedStyle, durationSecs]);
+
+  /** 段落文本变更（增量编辑） */
+  const handleSegmentChange = useCallback((index: number, text: string) => {
+    // 多风格模式：更新对应风格的 script
+    if (multiStyleMode && activeScriptStyle) {
+      setScripts(prev => {
+        const next = new Map(prev);
+        const current = next.get(activeScriptStyle!);
+        if (current) {
+          next.set(activeScriptStyle!, {
+            ...current,
+            segments: current.segments.map((seg, i) =>
+              i === index ? { ...seg, text } : seg
+            ),
+          });
+        }
+        return next;
+      });
+      // 同时更新当前显示的 script
+      setScript(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          segments: prev.segments.map((seg, i) =>
+            i === index ? { ...seg, text } : seg
+          ),
+        };
+      });
+    } else {
+      // 单风格模式
+      setScript((prev) => {
+        if (!prev) return prev;
+        const segments = prev.segments.map((seg, i) =>
+          i === index ? { ...seg, text } : seg
+        );
+        return { ...prev, segments };
+      });
+    }
+  }, [multiStyleMode, activeScriptStyle]);
+
+  /** 用真实 TTS 时长校准时间轴 */
+  const calibrateTimelineWithTTS = useCallback(async (
+    targetScript: CommentaryScriptOutput,
+    voice: string,
+  ): Promise<CommentaryScriptOutput> => {
+    try {
+      const segmentsWithDuration = await Promise.all(
+        targetScript.segments.map(async (seg) => {
+          const duration = await estimateTTSDuration(seg.text, voice);
+          return { ...seg, endTime: seg.startTime + duration };
+        })
+      );
+      // 重新计算每段的 startTime 和 endTime
+      let cumulativeStart = 0;
+      const calibrated = segmentsWithDuration.map(seg => {
+        const dur = seg.endTime - seg.startTime;
+        const start = cumulativeStart;
+        cumulativeStart += dur;
+        return { ...seg, startTime: start, endTime: cumulativeStart };
+      });
+      const totalDuration = calibrated.reduce((sum, seg) => sum + (seg.endTime - seg.startTime), 0);
+      return {
+        ...targetScript,
+        segments: calibrated,
+        estimatedDurationSecs: totalDuration,
+      };
+    } catch (e) {
+      logger.warn('[CommentaryPanel] TTS 时长校准失败，使用原始估算:', e);
+      return targetScript;
+    }
+  }, []);
+
+  /** 批量生成多风格脚本 */
+  const handleMultiStyleGenerate = useCallback(async () => {
+    if (!sessionId || !subtitles.trim()) {
+      toast.error('请先导入字幕文件');
+      return;
+    }
+    if (!apiKey.trim()) {
+      toast.error('请先填写 API Key');
+      return;
+    }
+    if (selectedStyles.length === 0) {
+      toast.error('请至少选择一个风格');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const newScripts = new Map<ScriptStylePreset, CommentaryScriptOutput>();
+      for (let i = 0; i < selectedStyles.length; i++) {
+        const style = selectedStyles[i];
+        setActiveScriptStyle(style);
+
+        const result = await generateCommentaryScript({
+          subtitles,
+          durationSecs,
+          targetDurationSecs: durationSecs,
+          style,
+          apiKey,
+          provider: 'openai',
+        });
+        newScripts.set(style, result);
+      }
+      setScripts(newScripts);
+      setScript(newScripts.get(selectedStyles[0]) ?? null);
+      setActiveScriptStyle(selectedStyles[0]);
+      toast.success(`批量生成完成！共 ${newScripts.size} 个版本 🎉`);
+      setActiveTab('script');
+    } catch (e) {
+      logger.error('[CommentaryPanel] 批量生成失败:', e);
+      toast.error(`生成失败: ${e}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [sessionId, subtitles, apiKey, selectedStyles, durationSecs]);
 
   /** 生成 Director Plan */
   const handleGeneratePlan = useCallback(async () => {
@@ -311,20 +434,52 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
 
           {/* 脚本编辑 */}
           <TabsContent value="script" className={styles.tabContent}>
-            <CommentaryScriptEditor
-              script={script}
-              isGenerating={isGenerating}
-              onGenerate={handleGenerateScript}
-              apiKey={apiKey}
-              onApiKeyChange={setApiKey}
-            />
+            {multiStyleMode && scripts.size > 0 && activeScriptStyle ? (
+              <div className={styles.multiScriptTabs}>
+                <div className={styles.multiScriptStyleTabs}>
+                  {Array.from(scripts.entries()).map(([style, s]) => (
+                    <button
+                      key={style}
+                      className={`${styles.multiScriptStyleTab} ${activeScriptStyle === style ? styles.multiScriptStyleTabActive : ''}`}
+                      onClick={() => setActiveScriptStyle(style)}
+                    >
+                      {_STYLE_PRESET_LABELS[style]}
+                    </button>
+                  ))}
+                </div>
+                <CommentaryScriptEditor
+                  script={scripts.get(activeScriptStyle) ?? null}
+                  isGenerating={isGenerating}
+                  onGenerate={() => {}}
+                  apiKey={apiKey}
+                  onApiKeyChange={setApiKey}
+                  onSegmentChange={handleSegmentChange}
+                />
+              </div>
+            ) : (
+              <CommentaryScriptEditor
+                script={script}
+                isGenerating={isGenerating}
+                onGenerate={handleGenerateScript}
+                apiKey={apiKey}
+                onApiKeyChange={setApiKey}
+                onSegmentChange={handleSegmentChange}
+              />
+            )}
           </TabsContent>
 
           {/* 风格选择 */}
           <TabsContent value="style" className={styles.tabContent}>
             <CommentaryStyleSelector
-              selected={selectedStyle}
-              onChange={setSelectedStyle}
+              selected={multiStyleMode ? selectedStyles : selectedStyle}
+              onChange={(s: ScriptStylePreset | ScriptStylePreset[]) => {
+                if (multiStyleMode) {
+                  setSelectedStyles(s as ScriptStylePreset[]);
+                } else {
+                  setSelectedStyle(s as ScriptStylePreset);
+                }
+              }}
+              multiSelect={multiStyleMode}
             />
           </TabsContent>
 
@@ -362,11 +517,11 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
           <Button
             variant="default"
             size="sm"
-            onClick={handleGenerateScript}
+            onClick={multiStyleMode ? handleMultiStyleGenerate : handleGenerateScript}
             disabled={disabled || isGenerating || !subtitles.trim() || !apiKey.trim()}
           >
             {isGenerating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-            生成脚本
+            {multiStyleMode ? `批量生成 (${selectedStyles.length})` : '生成脚本'}
           </Button>
 
           <Button
@@ -379,7 +534,21 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
             AI 导演规划
           </Button>
 
-          {script && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setMultiStyleMode(prev => !prev);
+              if (!multiStyleMode) {
+                setSelectedStyles([selectedStyle]);
+              }
+            }}
+          >
+            <Sparkles size={14} />
+            {multiStyleMode ? '退出批量' : '多风格'}
+          </Button>
+
+          {script && !multiStyleMode && (
             <Button
               variant="outline"
               size="sm"

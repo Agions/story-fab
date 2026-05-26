@@ -252,6 +252,21 @@ export async function synthesizeCommentaryAudio(
 }
 
 /**
+ * 估算 TTS 音频时长（通过真实合成 + ffprobe 获取精确时长）
+ */
+export async function estimateTTSDuration(
+  text: string,
+  voice: string,
+  speed?: number,
+): Promise<number> {
+  return invoke('estimate_tts_duration', {
+    text,
+    voice,
+    speed: speed ?? 1.0,
+  });
+}
+
+/**
  * 获取推荐音色列表
  * @param style 过滤风格（可选）
  */

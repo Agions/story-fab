@@ -11,6 +11,6 @@ pub use super::script_generator::{
     generate_commentary_script, ScriptGeneratorInput, ScriptGeneratorOutput, ScriptSegment, ScriptStyle,
 };
 pub use super::commentary_synthesizer::{
-    synthesize_commentary_audio, list_commentary_voices,
+    synthesize_commentary_audio, estimate_tts_duration, list_commentary_voices,
     CommentarySynthesizer, SynthesizeOptions, SynthesizeResult, VoiceInfo,
 };

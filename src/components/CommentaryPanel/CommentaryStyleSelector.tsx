@@ -50,23 +50,48 @@ const STYLE_OPTIONS: Array<{
 ];
 
 interface Props {
-  selected: ScriptStylePreset;
-  onChange: (style: ScriptStylePreset) => void;
+  selected: ScriptStylePreset | ScriptStylePreset[];
+  onChange: (style: ScriptStylePreset | ScriptStylePreset[]) => void;
+  multiSelect?: boolean;
 }
 
-const CommentaryStyleSelector: React.FC<Props> = ({ selected, onChange }) => {
+const CommentaryStyleSelector: React.FC<Props> = ({ selected, onChange, multiSelect = false }) => {
+  const isSelected = (value: ScriptStylePreset) => {
+    if (multiSelect && Array.isArray(selected)) {
+      return selected.includes(value);
+    }
+    return selected === value;
+  };
+
+  const handleSelect = (value: ScriptStylePreset) => {
+    if (multiSelect) {
+      const arr = Array.isArray(selected) ? selected : [selected];
+      if (arr.includes(value)) {
+        onChange(arr.filter(v => v !== value));
+      } else {
+        onChange([...arr, value]);
+      }
+    } else {
+      onChange(value);
+    }
+  };
+
   return (
     <div className={styles.styleSelector}>
-      <p className={styles.styleHint}>选择解说风格，系统将据此调整文案语气和节奏</p>
+      <p className={styles.styleHint}>
+        {multiSelect
+          ? '选择多个风格，系统将分别为每种风格生成一个版本'
+          : '选择解说风格，系统将据此调整文案语气和节奏'}
+      </p>
       <div className={styles.styleGrid}>
         {STYLE_OPTIONS.map((opt) => (
           <Card
             key={opt.value}
             className={cn(
               styles.styleCard,
-              selected === opt.value && styles.styleCardSelected,
+              isSelected(opt.value) && styles.styleCardSelected,
             )}
-            onClick={() => onChange(opt.value)}
+            onClick={() => handleSelect(opt.value)}
           >
             <CardContent className={styles.styleCardContent}>
               <span className={styles.styleEmoji}>{opt.emoji}</span>
@@ -74,8 +99,10 @@ const CommentaryStyleSelector: React.FC<Props> = ({ selected, onChange }) => {
                 <span className={styles.styleLabel}>{opt.label}</span>
                 <span className={styles.styleDesc}>{opt.description}</span>
               </div>
-              {selected === opt.value && (
-                <Badge variant="default" className={styles.styleSelectedBadge}>已选</Badge>
+              {isSelected(opt.value) && (
+                <Badge variant="default" className={styles.styleSelectedBadge}>
+                  {multiSelect ? '✓' : '已选'}
+                </Badge>
               )}
             </CardContent>
           </Card>
