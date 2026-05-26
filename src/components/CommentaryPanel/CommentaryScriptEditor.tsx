@@ -24,6 +24,8 @@ interface Props {
   onGenerate: () => void;
   apiKey: string;
   onApiKeyChange: (key: string) => void;
+  /** 段落文本变更回调（用于增量编辑） */
+  onSegmentChange?: (index: number, text: string) => void;
 }
 
 // ─── 单段编辑 ───────────────────────────────────────────────────────────
@@ -31,7 +33,7 @@ interface Props {
 const SegmentRow: React.FC<{
   segment: CommentarySegment;
   index: number;
-  onChange?: (text: string) => void;
+  onChange?: (index: number, text: string) => void;
 }> = ({ segment, index, onChange }) => {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(segment.text);
@@ -39,9 +41,9 @@ const SegmentRow: React.FC<{
   const handleBlur = useCallback(() => {
     setEditing(false);
     if (text !== segment.text) {
-      onChange?.(text);
+      onChange?.(index, text);
     }
-  }, [text, segment.text, onChange]);
+  }, [text, segment.text, onChange, index]);
 
   return (
     <div className={styles.segmentRow}>
@@ -83,6 +85,7 @@ const CommentaryScriptEditor: React.FC<Props> = ({
   onGenerate: _onGenerate,
   apiKey,
   onApiKeyChange,
+  onSegmentChange,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -137,7 +140,7 @@ const CommentaryScriptEditor: React.FC<Props> = ({
           <CardTitle className="text-sm mb-2">分段解说（{script.segments.length} 段）</CardTitle>
           <div className={styles.segmentsList}>
             {script.segments.map((seg, i) => (
-              <SegmentRow key={i} segment={seg} index={i} />
+              <SegmentRow key={i} segment={seg} index={i} onChange={onSegmentChange} />
             ))}
           </div>
         </div>

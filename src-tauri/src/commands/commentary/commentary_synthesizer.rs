@@ -124,6 +124,70 @@ impl CommentarySynthesizer {
         }
         results
     }
+
+    /// 估算 TTS 音频时长（不生成文件，只合成后取 ffprobe 时长）
+    pub async fn estimate_duration(
+        text: &str,
+        voice: &str,
+        speed: f32,
+    ) -> Result<f64, String> {
+        if text.trim().is_empty() {
+            return Err("文本不能为空".to_string());
+        }
+
+        let mut tmp_audio = std::env::temp_dir();
+        tmp_audio.push(format!("edge_tts_estim_{}.mp3", std::process::id()));
+        let tmp_audio_path = tmp_audio.display().to_string();
+
+        let rate = {
+            let pct = ((speed - 1.0) * 100.0).round() as i32;
+            if pct > 0 {
+                format!("+{pct}%")
+            } else {
+                format!("{pct}%")
+            }
+        };
+
+        let output = tokio::process::Command::new(edge_tts_path())
+            .arg("--text")
+            .arg(text)
+            .arg("--voice")
+            .arg(voice)
+            .arg("--rate")
+            .arg(&rate)
+            .arg("--write-media")
+            .arg(&tmp_audio_path)
+            .output()
+            .await
+            .map_err(|e| format!("edge-tts 启动失败: {}", e))?;
+
+        let _ = tokio::fs::remove_file(&tmp_audio_path).await;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("edge-tts 失败: {}", stderr));
+        }
+
+        // 用 ffprobe 读取真实时长
+        let duration = tokio::process::Command::new("ffprobe")
+            .args([
+                "-v", "quiet",
+                "-show_entries", "format=duration",
+                "-of", "csv=p=0",
+                &tmp_audio_path,
+            ])
+            .output()
+            .await
+            .map_err(|e| format!("ffprobe 执行失败: {}", e))?;
+
+        let _ = tokio::fs::remove_file(&tmp_audio_path).await;
+
+        let stdout = String::from_utf8_lossy(&duration.stdout);
+        stdout
+            .trim()
+            .parse::<f64>()
+            .map_err(|e| format!("解析时长失败: {}", e))
+    }
 }
 
 // ─── Tauri 命令 ─────────────────────────────────────────────────────────
@@ -154,6 +218,16 @@ pub async fn synthesize_commentary_audio(
     }
 
     Ok(result)
+}
+
+/// 估算 TTS 音频时长
+#[tauri::command]
+pub async fn estimate_tts_duration(
+    text: String,
+    voice: String,
+    speed: f32,
+) -> Result<f64, String> {
+    CommentarySynthesizer::estimate_duration(&text, &voice, speed).await
 }
 
 /// 获取推荐音色列表
