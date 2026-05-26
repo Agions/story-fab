@@ -110,7 +110,7 @@ impl VideoProcessor {
 
     pub fn extract_keyframes(&self, path: &str, max_frames: u32, scene_threshold: f64) -> Result<Vec<String>, String> {
         let temp_dir = std::env::temp_dir()
-            .join(format!("storyfab_frames_{}_{}", std::process::id(), chrono_like_timestamp()));
+            .join(format!("story-fab_frames_{}_{}", std::process::id(), chrono_like_timestamp()));
 
         fs::create_dir_all(&temp_dir)
             .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -243,7 +243,7 @@ impl VideoProcessor {
 
     pub fn generate_thumbnail(&self, path: &str, time: f64) -> Result<String, String> {
         let temp_dir = std::env::temp_dir()
-            .join(format!("storyfab_thumb_{}_{}", std::process::id(), chrono_like_timestamp()));
+            .join(format!("story-fab_thumb_{}_{}", std::process::id(), chrono_like_timestamp()));
 
         fs::create_dir_all(&temp_dir)
             .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -271,7 +271,7 @@ impl VideoProcessor {
         // Move thumb.jpg out of temp_dir before cleanup
         // Use fs::copy for efficiency instead of read+write
         let final_path = std::env::temp_dir()
-            .join(format!("storyfab_thumb_{}.jpg", chrono_like_timestamp()));
+            .join(format!("story-fab_thumb_{}.jpg", chrono_like_timestamp()));
         fs::copy(&output, &final_path)
             .map_err(|e| {
                 let _ = fs::remove_dir_all(&temp_dir);
@@ -317,7 +317,7 @@ pub async fn cut_video(
     use_hw_accel: Option<bool>,
 ) -> Result<String, String> {
     let temp_dir = std::env::temp_dir()
-        .join(format!("storyfab_cut_{}", chrono_like_timestamp()));
+        .join(format!("story-fab_cut_{}", chrono_like_timestamp()));
 
     tokio_fs::create_dir_all(&temp_dir)
         .await

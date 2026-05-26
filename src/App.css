@@ -81,7 +81,7 @@ video {
   50%       { transform: scale(1.05); }
 }
 
-@keyframes storyfab-spin {
+@keyframes story-fab-spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }

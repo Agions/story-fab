@@ -1,4 +1,4 @@
-// storyfab Workflow — re-exports for convenient imports
+// story-fab Workflow — re-exports for convenient imports
 export type {
   storyfabFeatureType,
   storyfabStep,

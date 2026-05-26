@@ -1,4 +1,4 @@
-// storyfab external module type declarations
+// story-fab external module type declarations
 
 declare module 'jspdf' {
   export class jsPDF {

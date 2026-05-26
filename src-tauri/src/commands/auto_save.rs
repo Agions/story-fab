@@ -12,26 +12,26 @@ use tauri::Manager;
 use tokio::fs as tokio_fs;
 
 /// Returns the autosave path for a given project_id.
-fn autosave_path(storyfab_dir: &PathBuf, project_id: &str) -> PathBuf {
-    storyfab_dir.join(format!("{}.autosave.json", project_id))
+fn autosave_path(story_fab_dir: &PathBuf, project_id: &str) -> PathBuf {
+    story_fab_dir.join(format!("{}.autosave.json", project_id))
 }
 
 /// Returns the main project file path for a given project_id.
-fn project_path(storyfab_dir: &PathBuf, project_id: &str) -> PathBuf {
-    storyfab_dir.join(format!("{}.json", project_id))
+fn project_path(story_fab_dir: &PathBuf, project_id: &str) -> PathBuf {
+    story_fab_dir.join(format!("{}.json", project_id))
 }
 
-/// Returns the storyfab_dir (shared with project.rs storage).
-async fn get_storyfab_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+/// Returns the story-fab_dir (shared with project.rs storage).
+async fn get_story_fab_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let app_dir = app
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let storyfab_dir = app_dir.join("StoryFab");
-    tokio_fs::create_dir_all(&storyfab_dir)
+    let story_fab_dir = app_dir.join("StoryFab");
+    tokio_fs::create_dir_all(&story_fab_dir)
         .await
         .map_err(|e| format!("创建目录失败: {e}"))?;
-    Ok(storyfab_dir)
+    Ok(story_fab_dir)
 }
 
 /// Write an autosave snapshot of the project.
@@ -43,8 +43,8 @@ pub async fn auto_save_project(
     project_id: String,
     content: String,
 ) -> Result<(), String> {
-    let storyfab_dir = get_storyfab_dir(&app).await?;
-    let target_path = autosave_path(&storyfab_dir, &project_id);
+    let story_fab_dir = get_story_fab_dir(&app).await?;
+    let target_path = autosave_path(&story_fab_dir, &project_id);
 
     tokio_fs::write(&target_path, &content)
         .await
@@ -60,8 +60,8 @@ pub async fn clear_autosave(
     app: tauri::AppHandle,
     project_id: String,
 ) -> Result<(), String> {
-    let storyfab_dir = get_storyfab_dir(&app).await?;
-    let autosave = autosave_path(&storyfab_dir, &project_id);
+    let story_fab_dir = get_story_fab_dir(&app).await?;
+    let autosave = autosave_path(&story_fab_dir, &project_id);
 
     if autosave.exists() {
         tokio_fs::remove_file(&autosave)
@@ -78,10 +78,10 @@ pub async fn clear_autosave(
 pub async fn list_recoverable_projects(
     app: tauri::AppHandle,
 ) -> Result<Vec<String>, String> {
-    let storyfab_dir = get_storyfab_dir(&app).await?;
+    let story_fab_dir = get_story_fab_dir(&app).await?;
     let mut recoverable = Vec::new();
 
-    let mut entries = tokio_fs::read_dir(&storyfab_dir)
+    let mut entries = tokio_fs::read_dir(&story_fab_dir)
         .await
         .map_err(|e| format!("读取项目目录失败: {e}"))?;
 
@@ -115,9 +115,9 @@ pub async fn recover_autosave(
     app: tauri::AppHandle,
     project_id: String,
 ) -> Result<String, String> {
-    let storyfab_dir = get_storyfab_dir(&app).await?;
-    let autosave = autosave_path(&storyfab_dir, &project_id);
-    let main_file = project_path(&storyfab_dir, &project_id);
+    let story_fab_dir = get_story_fab_dir(&app).await?;
+    let autosave = autosave_path(&story_fab_dir, &project_id);
+    let main_file = project_path(&story_fab_dir, &project_id);
 
     if !autosave.exists() {
         return Err(format!("没有找到项目 {} 的自动保存", project_id));
@@ -150,8 +150,8 @@ pub async fn preview_autosave(
     app: tauri::AppHandle,
     project_id: String,
 ) -> Result<String, String> {
-    let storyfab_dir = get_storyfab_dir(&app).await?;
-    let autosave = autosave_path(&storyfab_dir, &project_id);
+    let story_fab_dir = get_story_fab_dir(&app).await?;
+    let autosave = autosave_path(&story_fab_dir, &project_id);
 
     if !autosave.exists() {
         return Err(format!("没有找到项目 {} 的自动保存", project_id));
@@ -168,23 +168,23 @@ mod tests {
 
     #[test]
     fn test_autosave_path_format() {
-        let dir = std::path::PathBuf::from("/data/storyfab");
+        let dir = std::path::PathBuf::from("/data/story-fab");
         let id = "my-project";
         let result = autosave_path(&dir, id);
-        assert_eq!(result, std::path::PathBuf::from("/data/storyfab/my-project.autosave.json"));
+        assert_eq!(result, std::path::PathBuf::from("/data/story-fab/my-project.autosave.json"));
     }
 
     #[test]
     fn test_project_path_format() {
-        let dir = std::path::PathBuf::from("/data/storyfab");
+        let dir = std::path::PathBuf::from("/data/story-fab");
         let id = "my-project";
         let result = project_path(&dir, id);
-        assert_eq!(result, std::path::PathBuf::from("/data/storyfab/my-project.json"));
+        assert_eq!(result, std::path::PathBuf::from("/data/story-fab/my-project.json"));
     }
 
     #[test]
     fn test_autosave_path_strips_suffix_correctly() {
-        let dir = std::path::PathBuf::from("/data/storyfab");
+        let dir = std::path::PathBuf::from("/data/story-fab");
         // Test that autosave file with project_id "proj" becomes "proj.autosave.json"
         let result = autosave_path(&dir, "proj");
         assert!(result.to_str().unwrap().contains(".autosave.json"));
@@ -192,7 +192,7 @@ mod tests {
 
     #[test]
     fn test_autosave_path_unique_per_id() {
-        let dir = std::path::PathBuf::from("/data/storyfab");
+        let dir = std::path::PathBuf::from("/data/story-fab");
         let p1 = autosave_path(&dir, "project-a");
         let p2 = autosave_path(&dir, "project-b");
         assert_ne!(p1, p2);

@@ -1,5 +1,5 @@
 /**
- * storyfab Theme System
+ * story-fab Theme System
  *
  * 统一色彩管理
  *

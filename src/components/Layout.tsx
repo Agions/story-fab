@@ -1,5 +1,5 @@
 /**
- * storyfab Layout — AI Cinema Studio Design
+ * story-fab Layout — AI Cinema Studio Design
  * 三区制布局：AI工作流侧栏 | 预览区 | 片段卡片流
  *
  * Redesigned per frontend-design-pro principles:
@@ -37,7 +37,7 @@ const usePageInfo = (pathname: string) => {
       return { selectedKey: '/projects', pageTitle: '我的项目' };
     }
     if (pathname.startsWith('/settings')) return { selectedKey: '/settings', pageTitle: '设置' };
-    return { selectedKey: '/', pageTitle: 'storyfab' };
+    return { selectedKey: '/', pageTitle: 'Story-Fab' };
   }, [pathname]);
 };
 
@@ -81,7 +81,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff"/><stop offset="1" stopColor="#d4a574"/></linearGradient></defs>
             </svg>
           </div>
-          {!sidebarCollapsed && <span className={styles.logoText}>storyfab</span>}
+          {!sidebarCollapsed && <span className={styles.logoText}>Story-Fab</span>}
         </div>
 
         {/* New Project Button */}
