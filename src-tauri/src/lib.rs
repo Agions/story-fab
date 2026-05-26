@@ -4,7 +4,7 @@
 use tauri::Manager;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod binary;
+pub mod binary;
 pub mod commands;
 pub mod video_processor;
 pub mod types;
