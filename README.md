@@ -75,7 +75,7 @@
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/Agions/StoryFab.git
+git clone https://github.com/Agions/CutDeck.git
 cd StoryFab
 
 # 2. 安装依赖
@@ -154,7 +154,7 @@ npm run lint             # 代码检查
 
 ## 📚 文档
 
-完整文档请访问 [StoryFab Docs](https://github.com/Agions/StoryFab/tree/main/docs)。
+完整文档请访问 [StoryFab Docs](https://github.com/Agions/CutDeck/tree/main/docs)。
 
 | 文档 | 说明 |
 |------|------|

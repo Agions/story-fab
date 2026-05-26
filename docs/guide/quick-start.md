@@ -13,7 +13,7 @@ title: 快速开始
 ## 安装运行
 
 ```bash
-git clone https://github.com/Agions/StoryFab.git
+git clone https://github.com/Agions/CutDeck.git
 cd StoryFab
 npm install
 npm run dev
