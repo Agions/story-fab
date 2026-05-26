@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
-  "productName": "ClipFlow",
+  "productName": "StoryFab",
   "version": "2.0.0",
-  "identifier": "com.clipflow.desktop",
+  "identifier": "com.storyfab.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -14,7 +14,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "ClipFlow — AI 智能视频创作",
+        "title": "StoryFab — AI 智能视频创作",
         "label": "main",
         "width": 1200,
         "height": 800,
@@ -55,9 +55,9 @@
     ],
 "category": "Video",
     "shortDescription": "AI-powered video creation tool",
-    "longDescription": "ClipFlow is an AI-driven video creation tool supporting dual-mode workflows: clip mode for smart segmentation and highlight extraction, and commentary mode for automatic narration with TTS synthesis.",
-    "publisher": "ClipFlow",
-    "copyright": "Copyright © 2024-2025 ClipFlow",
+    "longDescription": "StoryFab is an AI-driven video creation tool supporting dual-mode workflows: clip mode for smart segmentation and highlight extraction, and commentary mode for automatic narration with TTS synthesis.",
+    "publisher": "StoryFab",
+    "copyright": "Copyright © 2024-2025 StoryFab",
     "windows": {
       "nsis": {
         "installMode": "currentUser",
@@ -107,7 +107,7 @@
     "deep-link": {
       "desktop": {
         "schemes": [
-          "clipflow"
+          "storyfab"
         ]
       }
     }

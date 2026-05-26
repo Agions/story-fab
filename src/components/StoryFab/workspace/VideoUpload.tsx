@@ -5,7 +5,7 @@
  * 流转到: AIAnalyze
  */
 import React, { useState, useCallback, useRef, useEffect, memo } from 'react';
-import { useClipFlow } from '../context';
+import { useStoryFab } from '../context';
 import { logger } from '../../../shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
 import { MAX_FILE_SIZE } from '@/shared/constants';
@@ -48,7 +48,7 @@ interface VideoUploadProps {
 }
 
 const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
-  const { state, setVideo, goToNextStep } = useClipFlow();
+  const { state, setVideo, goToNextStep } = useStoryFab();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dragActive, setDragActive] = useState(false);

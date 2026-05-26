@@ -1,5 +1,5 @@
 import type { WorkflowMode } from '../../../core/workflow/featureBlueprint';
-import type { clipflowFeatureType } from '../context';
+import type { storyfabFeatureType } from '../context';
 
 export type AIFunctionType = 'video-narration' | 'first-person' | 'remix';
 export type AIFunctionTabKey = 'commentary-first' | 'commentary' | 'mix';
@@ -22,7 +22,7 @@ export const FUNCTION_TO_FEATURE: Record<AIFunctionType, 'smartClip' | 'voiceove
   'video-narration': 'subtitle',
 };
 
-export const TAB_TO_FEATURE: Record<AIFunctionTabKey, clipflowFeatureType> = {
+export const TAB_TO_FEATURE: Record<AIFunctionTabKey, storyfabFeatureType> = {
   'commentary-first': 'voiceover',
   commentary: 'subtitle',
   mix: 'smartClip',

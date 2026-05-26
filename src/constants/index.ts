@@ -4,11 +4,11 @@
 
 // 应用信息
 export const APP = {
-  name: 'clipflow',
+  name: 'storyfab',
   version: '1.0.0',
   description: 'AI 驱动的专业视频内容创作平台',
   author: 'Agions',
-  website: 'https://github.com/Agions/clipflow',
+  website: 'https://github.com/Agions/storyfab',
 };
 
 // 支持的视频格式
@@ -127,30 +127,30 @@ export const HOTKEYS = {
 
 // 存储键名
 export const STORAGE_KEYS = {
-  user: 'ClipFlow_user',
-  projects: 'ClipFlow_projects',
-  settings: 'ClipFlow_settings',
-  theme: 'ClipFlow_theme',
-  language: 'ClipFlow_language',
-  recentFiles: 'ClipFlow_recent_files',
+  user: 'StoryFab_user',
+  projects: 'StoryFab_projects',
+  settings: 'StoryFab_settings',
+  theme: 'StoryFab_theme',
+  language: 'StoryFab_language',
+  recentFiles: 'StoryFab_recent_files',
   // 认证相关
-  authToken: 'ClipFlow_auth_token',
+  authToken: 'StoryFab_auth_token',
   // 时间线
-  timeline: 'ClipFlow_timeline',
+  timeline: 'StoryFab_timeline',
   // 项目设置
-  projectSaveBehavior: 'ClipFlow-project-save-behavior',
-  projectAutoSave: 'ClipFlow-project-auto-save-enabled',
+  projectSaveBehavior: 'StoryFab-project-save-behavior',
+  projectAutoSave: 'StoryFab-project-auto-save-enabled',
   // 兼容旧版存储键名
   legacy: {
-    token: 'ClipFlow_token_v1',
-    projects: 'ClipFlow_projects_v1',
+    token: 'StoryFab_token_v1',
+    projects: 'StoryFab_projects_v1',
   },
 };
 
 // 项目保存行为
 export type ProjectSaveBehavior = 'stay' | 'detail';
-export const PROJECT_SAVE_BEHAVIOR_KEY = 'ClipFlow-project-save-behavior' as const;
-export const PROJECT_AUTO_SAVE_KEY = 'ClipFlow-project-auto-save-enabled';
+export const PROJECT_SAVE_BEHAVIOR_KEY = 'StoryFab-project-save-behavior' as const;
+export const PROJECT_AUTO_SAVE_KEY = 'StoryFab-project-auto-save-enabled';
 
 // API 端点
 export const API_ENDPOINTS = {

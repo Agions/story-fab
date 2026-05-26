@@ -166,7 +166,7 @@ export const useProjectStore = create<ProjectState>()(
       },
     }),
     {
-      name: 'ClipFlow-projects',
+      name: 'StoryFab-projects',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         projects: state.projects,

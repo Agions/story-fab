@@ -2,12 +2,12 @@
  * AI Editor Reducer
  * 从 AIEditorContext.tsx 提取的 reducer 逻辑
  */
-import type { clipflowState, clipflowAction, clipflowMode } from './workflow';
+import type { storyfabState, storyfabAction, storyfabMode } from './workflow';
 import { initialState, getStepsForMode } from './workflow';
 import { getTotalSteps } from './workflow';
 
 // Reducer
-export function clipFlowReducer(state: clipflowState, action: clipflowAction): clipflowState {
+export function storyFabReducer(state: storyfabState, action: storyfabAction): storyfabState {
   switch (action.type) {
     case 'SET_MODE':
       return {

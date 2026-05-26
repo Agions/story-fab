@@ -18,7 +18,7 @@
 @import "tailwindcss";
 
 @layer base {
-  /* ClipFlow design tokens — dark professional tool theme */
+  /* StoryFab design tokens — dark professional tool theme */
   :root {
     --bg-primary: #0d0d0f;
     --bg-secondary: #141418;
@@ -118,7 +118,7 @@
 
 /* ─── Light theme ─────────────────────────────────────────── */
 .light {
-  /* ClipFlow design tokens — light professional tool theme */
+  /* StoryFab design tokens — light professional tool theme */
   --bg-primary: #ffffff;
   --bg-secondary: #f4f4f5;
   --bg-tertiary: #fafafa;

@@ -1,5 +1,5 @@
 /**
- * clipflow Dashboard — re-export from Dashboard.tsx
+ * storyfab Dashboard — re-export from Dashboard.tsx
  */
 export { default } from './Dashboard';
 export * from './types';
