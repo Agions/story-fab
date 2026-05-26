@@ -22,13 +22,13 @@ export interface AppSettings {
  * 设置状态 Hook (兼容 SettingsContext)
  */
 export function useSettingsStore() {
-  const [autoSave, setAutoSave] = useLocalStorage('ClipFlow-autosave', true);
-  const [compactMode, setCompactMode] = useLocalStorage('ClipFlow-compact', false);
-  const [theme, setTheme] = useLocalStorage('ClipFlow-theme', 'light');
-  const [defaultModel, setDefaultModel] = useLocalStorage('ClipFlow-default-model', 'deepseek-v4-flash');
+  const [autoSave, setAutoSave] = useLocalStorage('StoryFab-autosave', true);
+  const [compactMode, setCompactMode] = useLocalStorage('StoryFab-compact', false);
+  const [theme, setTheme] = useLocalStorage('StoryFab-theme', 'light');
+  const [defaultModel, setDefaultModel] = useLocalStorage('StoryFab-default-model', 'deepseek-v4-flash');
   const [projectSaveBehavior, setProjectSaveBehavior] = useLocalStorage<ProjectSaveBehavior>(PROJECT_SAVE_BEHAVIOR_KEY, 'stay');
-  const [outputPath, setOutputPath] = useLocalStorage('ClipFlow-output-path', '');
-  const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('ClipFlow-recent-projects', []);
+  const [outputPath, setOutputPath] = useLocalStorage('StoryFab-output-path', '');
+  const [recentProjects, setRecentProjects] = useLocalStorage<string[]>('StoryFab-recent-projects', []);
 
   const settings = useMemo<AppSettings>(() => ({
     autoSave,

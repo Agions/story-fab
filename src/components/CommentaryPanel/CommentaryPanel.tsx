@@ -1,7 +1,7 @@
 /**
  * CommentaryPanel — AI 影视解说模式主面板
  *
- * 集成到 ClipFlow 工作流，提供：
+ * 集成到 StoryFab 工作流，提供：
  * - Step 3 模式切换（Clip Mode / Commentary Mode）
  * - AI Director Agent 状态展示
  * - 解说脚本编辑

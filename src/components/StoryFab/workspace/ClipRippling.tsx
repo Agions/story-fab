@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useCallback, memo, useMemo } from 'react';
-import { useClipFlow } from '../context';
+import { useStoryFab } from '../context';
 import { Button } from '../../ui/button';
 import { Progress } from '../../ui/progress';
 import { Badge } from '../../ui/badge';
@@ -75,7 +75,7 @@ interface ClipRepurposeProps {
 }
 
 const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
-  const { state } = useClipFlow();
+  const { state } = useStoryFab();
   const { currentVideo, analysis } = state;
   const videoPath = currentVideo?.path ?? '';
   const videoInfo = useMemo<VideoInfo>(() => (
@@ -165,7 +165,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
     const clipsToExport = results.filter(c => c.clip.id !== undefined && selectedClips.has(c.clip.id));
 
     // 动态获取导出目录
-    const exportDir = await tauri.getExportDir().catch(() => '/tmp/clipflow');
+    const exportDir = await tauri.getExportDir().catch(() => '/tmp/storyfab');
 
     try {
       for (const clip of clipsToExport) {

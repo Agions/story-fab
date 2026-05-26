@@ -1,5 +1,5 @@
 /**
- * clipflow Theme System
+ * storyfab Theme System
  *
  * 统一色彩管理
  *

@@ -196,11 +196,11 @@ const Settings: React.FC = () => {
           <TabsContent value="about">
             <Card>
               <CardHeader>
-                <CardTitle>clipflow</CardTitle>
+                <CardTitle>storyfab</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="mb-2">
-                  clipflow{' '}
+                  storyfab{' '}
                   是一款专业的短视频剪辑工具，集成了AI技术，帮助创作者更高效地创建优质内容。
                 </p>
                 <p>版本: {packageJson.version} | 作者: Agions</p>
@@ -214,7 +214,7 @@ const Settings: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <p>
-                  clipflow
+                  storyfab
                   高度重视您的隐私。所有API密钥和个人设置仅存储在您的本地设备上，没有任何数据会传输到我们的服务器。
                 </p>
               </CardContent>

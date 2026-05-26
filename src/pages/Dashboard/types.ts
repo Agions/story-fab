@@ -1,5 +1,5 @@
 /**
- * clipflow Dashboard 类型定义
+ * storyfab Dashboard 类型定义
  * Project / ProjectStatus 从 @/core/types 统一导出，避免重复定义。
  */
 import type { Project, ProjectStatus } from '@/core/types';

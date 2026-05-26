@@ -1,5 +1,5 @@
 [package]
-name = "clipflow"
+name = "storyfab"
 version = "2.0.0"
 description = "cut-deck - AI 驱动的专业智能视频剪辑工具"
 authors = ["Agions <agions@qq.com>"]
@@ -7,7 +7,7 @@ license = "MIT"
 edition = "2021"
 
 [lib]
-name = "clipflow_lib"
+name = "storyfab_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

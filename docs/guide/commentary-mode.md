@@ -1,7 +1,7 @@
 # Commentary Mode Guide
 # 解说模式使用指南
 
-> Commentary Mode 是 ClipFlow v3.0 的核心新功能，将视频自动转化为完整的解说视频（带文案、配音、字幕）。
+> Commentary Mode 是 StoryFab v3.0 的核心新功能，将视频自动转化为完整的解说视频（带文案、配音、字幕）。
 
 ---
 
@@ -29,7 +29,7 @@ Commentary Mode 通过 AI 将视频创作转化为一个完整的解说视频：
 
 ### 2.1 创建新项目
 
-1. 打开 ClipFlow，点击 **新建项目**
+1. 打开 StoryFab，点击 **新建项目**
 2. 选择 **解说模式（Commentary Mode）**
 3. 选择视频文件（支持 MP4/MOV/AVI/MKV）
 4. 设置项目名称和目标时长

@@ -2,23 +2,23 @@ use std::path::PathBuf;
 use tauri::Manager;
 use tokio::fs as tokio_fs;
 
-/// Returns (app_data_dir, clipflow_dir). Creates ClipFlow subdir if needed.
-async fn get_clipflow_dir(app: &tauri::AppHandle) -> Result<(PathBuf, PathBuf), String> {
+/// Returns (app_data_dir, storyfab_dir). Creates StoryFab subdir if needed.
+async fn get_storyfab_dir(app: &tauri::AppHandle) -> Result<(PathBuf, PathBuf), String> {
     let app_dir = app
         .path()
         .app_data_dir()
         .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let clipflow_dir = app_dir.join("ClipFlow");
-    tokio_fs::create_dir_all(&clipflow_dir)
+    let storyfab_dir = app_dir.join("StoryFab");
+    tokio_fs::create_dir_all(&storyfab_dir)
         .await
         .map_err(|e| format!("创建目录失败: {e}"))?;
-    Ok((app_dir, clipflow_dir))
+    Ok((app_dir, storyfab_dir))
 }
 
 #[tauri::command]
 pub async fn check_app_data_directory(app: tauri::AppHandle) -> Result<String, String> {
-    let (_, clipflow_dir) = get_clipflow_dir(&app).await?;
-    Ok(clipflow_dir.to_string_lossy().to_string())
+    let (_, storyfab_dir) = get_storyfab_dir(&app).await?;
+    Ok(storyfab_dir.to_string_lossy().to_string())
 }
 
 #[tauri::command]
@@ -27,8 +27,8 @@ pub async fn save_project_file(
     project_id: String,
     content: String,
 ) -> Result<(), String> {
-    let (_, clipflow_dir) = get_clipflow_dir(&app).await?;
-    let target_path = clipflow_dir.join(format!("{project_id}.json"));
+    let (_, storyfab_dir) = get_storyfab_dir(&app).await?;
+    let target_path = storyfab_dir.join(format!("{project_id}.json"));
     tokio_fs::write(&target_path, content)
         .await
         .map_err(|e| format!("写入项目文件失败: {e}"))?;
@@ -40,8 +40,8 @@ pub async fn load_project_file(
     app: tauri::AppHandle,
     project_id: String,
 ) -> Result<String, String> {
-    let (_, clipflow_dir) = get_clipflow_dir(&app).await?;
-    let target_path = clipflow_dir.join(format!("{project_id}.json"));
+    let (_, storyfab_dir) = get_storyfab_dir(&app).await?;
+    let target_path = storyfab_dir.join(format!("{project_id}.json"));
     tokio_fs::read_to_string(&target_path)
         .await
         .map_err(|e| format!("读取项目文件失败: {e}"))
@@ -52,8 +52,8 @@ pub async fn delete_project_file(
     app: tauri::AppHandle,
     project_id: String,
 ) -> Result<(), String> {
-    let (_, clipflow_dir) = get_clipflow_dir(&app).await?;
-    let target_path = clipflow_dir.join(format!("{project_id}.json"));
+    let (_, storyfab_dir) = get_storyfab_dir(&app).await?;
+    let target_path = storyfab_dir.join(format!("{project_id}.json"));
     if target_path.exists() {
         tokio_fs::remove_file(&target_path)
             .await
@@ -66,11 +66,11 @@ pub async fn delete_project_file(
 pub async fn list_project_files(
     app: tauri::AppHandle,
 ) -> Result<Vec<serde_json::Value>, String> {
-    let (_, clipflow_dir) = get_clipflow_dir(&app).await?;
+    let (_, storyfab_dir) = get_storyfab_dir(&app).await?;
 
     let mut result: Vec<serde_json::Value> = Vec::new();
     let mut entries =
-        tokio_fs::read_dir(&clipflow_dir).await.map_err(|e| format!("读取项目目录失败: {e}"))?;
+        tokio_fs::read_dir(&storyfab_dir).await.map_err(|e| format!("读取项目目录失败: {e}"))?;
     let mut dir_entry = entries
         .next_entry()
         .await
@@ -125,7 +125,7 @@ pub async fn list_app_data_files(
     app: tauri::AppHandle,
     directory: String,
 ) -> Result<Vec<String>, String> {
-    let (app_dir, _) = get_clipflow_dir(&app).await?;
+    let (app_dir, _) = get_storyfab_dir(&app).await?;
     let target_dir = app_dir.join(directory);
     tokio_fs::create_dir_all(&target_dir)
         .await
@@ -158,7 +158,7 @@ pub async fn delete_file(path: String) -> Result<(), String> {
     let forbidden = ["/", "/home", "/root", "/tmp", "/var", "/etc", "/usr", "/opt"];
     for dir in forbidden {
         if canonical.starts_with(dir) && canonical != PathBuf::from(dir) {
-            if !canonical.starts_with("/tmp/clipflow") && !canonical.starts_with("/tmp/ClipFlow") {
+            if !canonical.starts_with("/tmp/storyfab") && !canonical.starts_with("/tmp/StoryFab") {
                 return Err("禁止删除此路径".to_string());
             }
         }
@@ -177,7 +177,7 @@ pub async fn read_text_file(path: String) -> Result<String, String> {
     let target = PathBuf::from(&path);
     let canonical = target.canonicalize().map_err(|e| format!("路径无效: {e}"))?;
 
-    let allowed_dirs = ["/tmp/clipflow", "/tmp/ClipFlow", ".clipflow"];
+    let allowed_dirs = ["/tmp/storyfab", "/tmp/StoryFab", ".storyfab"];
     let is_allowed = allowed_dirs
         .iter()
         .map(|d| PathBuf::from(d).canonicalize())
@@ -201,7 +201,7 @@ pub async fn get_file_size(path: String) -> Result<u64, String> {
     let target = PathBuf::from(&path);
     let canonical = target.canonicalize().map_err(|e| format!("路径无效: {e}"))?;
 
-    let allowed_prefixes = ["/tmp/clipflow", "/tmp/ClipFlow"];
+    let allowed_prefixes = ["/tmp/storyfab", "/tmp/StoryFab"];
     let is_allowed = allowed_prefixes
         .iter()
         .map(|d| PathBuf::from(d).canonicalize())

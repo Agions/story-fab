@@ -5,8 +5,8 @@
 ```
 src/
 ├── components/          # React UI 组件
-│   └── ClipFlow/          # 主编辑器工作区
-│       ├── context/       # React Context（ClipFlowProvider）
+│   └── StoryFab/          # 主编辑器工作区
+│       ├── context/       # React Context（StoryFabProvider）
 │       ├── workspace/     # 步骤式编辑器 UI
 │       └── types/         # 工作流状态类型
 ├── core/                 # 核心业务逻辑层
@@ -22,9 +22,9 @@ src/
 
 ## 状态管理
 
-ClipFlow 采用**双状态**架构：
+StoryFab 采用**双状态**架构：
 
-1. **React Context**（`ClipFlowProvider`）— 管理主编辑器工作流状态（步骤、当前视频、片段、导出设置）。基于步骤，可预测的流转。
+1. **React Context**（`StoryFabProvider`）— 管理主编辑器工作流状态（步骤、当前视频、片段、导出设置）。基于步骤，可预测的流转。
 2. **Zustand Stores** — 跨领域独立 store：
    - `appStore` — 应用级状态（主题、设置）
    - `projectStore` — 项目元数据和文件管理

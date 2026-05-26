@@ -31,7 +31,7 @@ type ExportScriptData = {
   segments: ExportScriptSegment[];
 };
 
-export const PROJECTS_CHANGED_EVENT = 'ClipFlow:projects:changed';
+export const PROJECTS_CHANGED_EVENT = 'StoryFab:projects:changed';
 
 const emitProjectsChanged = (): void => {
   if (typeof window !== 'undefined') {
@@ -69,7 +69,7 @@ const normalizeListedProject = (value: unknown): ProjectFileData | null => {
 
 // 确保应用数据目录
 export const ensureAppDataDir = async (): Promise<void> => {
-  const appDir = 'clipflow';
+  const appDir = 'storyfab';
 
   // 优先使用 Rust 函数检查目录
   try {
@@ -124,7 +124,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
   const projectData = JSON.stringify(cleanProject, null, 2);
   if (!projectData) throw new Error('项目数据序列化为空');
 
-  const projectPath = `clipflow/${normalizedProjectId}.json`;
+  const projectPath = `storyfab/${normalizedProjectId}.json`;
 
   // 优先使用 Rust 函数写入
   try {
@@ -172,7 +172,7 @@ export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string
         logger.warn(`通过 Rust 加载项目失败(${candidateId})，尝试使用 JS API 兜底:`, rustError);
       }
 
-      const projectPath = `clipflow/${candidateId}.json`;
+      const projectPath = `storyfab/${candidateId}.json`;
       const existsFile = await exists(projectPath, { baseDir: BaseDirectory.AppData });
       if (!existsFile) {
         lastError = new Error(`项目文件不存在: ${candidateId}.json`);
@@ -192,7 +192,7 @@ export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string
     for (const candidateId of candidates) {
       const legacyPaths = [
         `${configDir}${candidateId}.json`,
-        `${configDir}clipflow/${candidateId}.json`,
+        `${configDir}storyfab/${candidateId}.json`,
       ];
 
       for (const legacyPath of legacyPaths) {
@@ -418,7 +418,7 @@ export const listProjects = async (): Promise<ProjectFileData[]> => {
 
     // 确保应用数据目录存在
     await ensureAppDataDir();
-    const appDir = 'clipflow';
+    const appDir = 'storyfab';
       const files = await tauri.listAppDataFiles(appDir) as string[];
 
     if (!files || !Array.isArray(files) || files.length === 0) {

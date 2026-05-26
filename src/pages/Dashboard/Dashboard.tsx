@@ -1,5 +1,5 @@
 /**
- * clipflow Dashboard — AI Cinema Studio
+ * storyfab Dashboard — AI Cinema Studio
  * 全新视觉系统：深炭底 + 琥珀光 + 电青色
  */
 import React from 'react';

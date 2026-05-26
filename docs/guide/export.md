@@ -1,6 +1,6 @@
 # Export
 
-ClipFlow supports multiple aspect ratios, subtitle styles, and quality presets.
+StoryFab supports multiple aspect ratios, subtitle styles, and quality presets.
 
 ## Aspect Ratios
 

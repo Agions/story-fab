@@ -1,17 +1,17 @@
-// clipflow Workflow — re-exports for convenient imports
+// storyfab Workflow — re-exports for convenient imports
 export type {
-  clipflowFeatureType,
-  clipflowStep,
-  clipflowState,
-  clipflowAction,
-  clipflowMode,
+  storyfabFeatureType,
+  storyfabStep,
+  storyfabState,
+  storyfabAction,
+  storyfabMode,
   SemanticSegment,
 } from './workflow';
 export {
   initialState,
   getNextStep,
   getPrevStep,
-  CLIPFLOW_STEPS,
+  STORYFAB_STEPS,
   INITIAL_STEP_STATUS,
   DEFAULT_VOICE_SETTINGS,
   DEFAULT_SYNTHESIS_SETTINGS,
