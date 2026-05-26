@@ -189,7 +189,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     setExportError(null);
 
     try {
-      const outputPath = `/tmp/storyfab/export_${Date.now()}.mp4`;
+      const outputPath = `/tmp/story-fab/export_${Date.now()}.mp4`;
       setCurrentExportId(outputPath);
 
       setProgressStage('正在编码...');
