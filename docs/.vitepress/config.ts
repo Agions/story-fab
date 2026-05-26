@@ -87,12 +87,12 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/Agions/CutDeck/edit/main/docs/:path',
+      pattern: 'https://github.com/Agions/story-fab/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Agions/CutDeck' },
+      { icon: 'github', link: 'https://github.com/Agions/story-fab' },
     ],
 
     footer: {
