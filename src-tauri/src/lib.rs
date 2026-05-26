@@ -33,6 +33,7 @@ pub use commands::render::{
 pub use commands::export_state::cancel_export;
 pub use commands::file_ops::{clean_temp_file, open_file, voice_discovery};
 pub use video_processor::cut_video;
+pub use video_processor::{mix_audio, get_audio_duration};
 
 // Subtitle re-exports
 pub use subtitle::{
