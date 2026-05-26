@@ -102,6 +102,8 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
   const [_exportError, setExportError] = useState<string | null>(null);
   const [_startTime, _setStartTime] = useState<number>(Date.now());
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+  const [batchMode, setBatchMode] = useState(false);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [currentExportId, setCurrentExportId] = useState<string | null>(null);
 
   // 取消导出
@@ -216,6 +218,67 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     } finally {
       setExporting(false);
     }
+  };
+
+  /** 批量导出（多平台同时） */
+  const handleBatchExport = async () => {
+    if (!state.synthesisData?.finalVideoUrl) {
+      notify.warning('请先完成视频合成');
+      return;
+    }
+    if (selectedPlatforms.length === 0) {
+      notify.warning('请至少选择一个发布平台');
+      return;
+    }
+
+    setExporting(true);
+    setProgress(0);
+    setEtaSeconds(null);
+
+    try {
+      for (let i = 0; i < selectedPlatforms.length; i++) {
+        const platform = PLATFORM_PRESETS.find(p => p.value === selectedPlatforms[i]);
+        if (!platform) continue;
+
+        const outputPath = `/tmp/story-fab/export_${platform.value}_${Date.now()}.mp4`;
+        setCurrentExportId(outputPath);
+        setProgressStage(`${platform.emoji} ${platform.label} 导出中... (${i + 1}/${selectedPlatforms.length})`);
+
+        // 临时应用平台预设
+        const exportConfig = {
+          ...config,
+          resolution: platform.resolution as ExportSettings['resolution'],
+        };
+        setExportSettings(exportConfig);
+
+        await invoke<{ output_path: string }>('render_autonomous_cut', {
+          input_path: state.synthesisData.finalVideoUrl ?? '',
+          output_path: outputPath,
+        });
+
+        setProgress(Math.round(((i + 1) / selectedPlatforms.length) * 100));
+      }
+
+      setProgress(100);
+      setProgressStage('全部导出完成');
+      setEtaSeconds(0);
+      setExported(true);
+      notify.success(`批量导出完成！共 ${selectedPlatforms.length} 个平台`);
+      onComplete?.();
+
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      setExportError(msg);
+      notify.error(msg, '批量导出失败');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const togglePlatformSelection = (value: string) => {
+    setSelectedPlatforms(prev =>
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+    );
   };
 
   const hasSynthesis = !!state.synthesisData?.finalVideoUrl;
@@ -372,22 +435,38 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
           <div className={styles.cardBody}>
             {/* 平台预设选择 */}
             <div className={styles.platformSection}>
-              <span className={styles.sectionLabel}>发布平台</span>
+              <div className={styles.sectionHeaderRow}>
+                <span className={styles.sectionLabel}>发布平台</span>
+                <button
+                  className={`${styles.batchModeToggle} ${batchMode ? styles.batchModeActive : ''}`}
+                  onClick={() => setBatchMode(prev => !prev)}
+                >
+                  {batchMode ? '取消批量' : '批量导出'}
+                </button>
+              </div>
               <div className={styles.platformGrid}>
                 {PLATFORM_PRESETS.map(platform => (
                   <div
                     key={platform.value}
-                    className={`${styles.platformItem} ${selectedPlatform === platform.value ? styles.platformActive : ''}`}
-                    onClick={() => applyPlatformPreset(platform)}
+                    className={`${styles.platformItem} ${selectedPlatform === platform.value || (batchMode && selectedPlatforms.includes(platform.value)) ? styles.platformActive : ''}`}
+                    onClick={() => batchMode ? togglePlatformSelection(platform.value) : applyPlatformPreset(platform)}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && applyPlatformPreset(platform)}
+                    onKeyDown={(e) => e.key === 'Enter' && (batchMode ? togglePlatformSelection(platform.value) : applyPlatformPreset(platform))}
                   >
                     <span className={styles.platformEmoji}>{platform.emoji}</span>
                     <span className={styles.platformName}>{platform.label}</span>
+                    {batchMode && selectedPlatforms.includes(platform.value) && (
+                      <span className={styles.platformCheck}>✓</span>
+                    )}
                   </div>
                 ))}
               </div>
+              {batchMode && selectedPlatforms.length > 0 && (
+                <div className={styles.batchTip}>
+                  已选择 {selectedPlatforms.length} 个平台，点击「批量导出」开始
+                </div>
+              )}
               {selectedPlatform && (
                 <div className={styles.platformTip}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -563,14 +642,14 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
               {/* 一键导出 */}
               <button
                 className={`${styles.exportBtn} ${styles.exportBtnPrimary}`}
-                onClick={handleExport}
+                onClick={batchMode ? handleBatchExport : handleExport}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="7 10 12 15 17 10" />
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
-                一键导出
+                {batchMode ? `批量导出 (${selectedPlatforms.length})` : '一键导出'}
               </button>
 
               {/* 自定义导出 */}
