@@ -1,69 +1,99 @@
-# Quick Start
+---
+title: 快速开始
+---
 
-Get from video to viral clip in 5 minutes.
+# 快速开始
 
-## Step 1 — Launch & Create Project
+## 环境要求
 
-Open CutDeck and click **New Project**. Give your project a name and select an output directory.
+- **Node.js** 18+
+- **Rust** 1.75+（用于 Tauri 后端）
+- **FFmpeg**（系统安装）
 
-## Step 2 — Upload Video
+## 安装运行
 
-Drag and drop (or click to browse) your long video file. Supported formats:
+```bash
+git clone https://github.com/Agions/CutDeck.git
+cd CutDeck
+npm install
+npm run dev
+```
 
-- `.mp4`, `.mov`, `.avi`, `.mkv`, `.webm`
-- Max file size: Limited only by disk space
+访问 http://localhost:1430
 
-The video will be analyzed automatically once uploaded.
+## 构建桌面应用
 
-## Step 3 — AI Analysis
+```bash
+npm run tauri build
+```
 
-CutDeck runs two AI processes in parallel:
+## 快速上手流程（5步）
 
-1. **Whisper Transcription** — Full audio transcription, stored locally
-2. **Highlight Detection** — Identifies the most engaging segments based on audio energy, visual change, and speech activity
+### 1. 新建项目
 
-Progress is shown in real-time. This step usually takes 1-2x the video duration.
+打开 CutDeck，点击 **新建项目**，为项目命名并选择输出目录。
 
-## Step 4 — Review & Edit Clips
+### 2. 上传视频
 
-Review the detected highlight clips in the timeline. You can:
+拖拽或点击上传长视频文件，支持格式：
 
-- Adjust clip boundaries by dragging the edges
-- Delete unwanted clips
-- Reorder clips
-- Preview each clip individually
+- `.mp4`、`.mov`、`.avi`、`.mkv`、`.webm`
+- 最大文件大小：2GB
 
-## Step 5 — Generate Script (Optional)
+上传完成后，视频将自动开始分析。
 
-For each selected clip, click **Generate Script** to let AI write a concise narration script. You can:
+### 3. AI 分析视频
 
-- Edit the generated script manually
-- Preview TTS voice synthesis
-- Regenerate if unsatisfied
+CutDeck 并行运行两个 AI 进程：
 
-## Step 6 — Export
+- **Whipser 语音转录** — 完整音频转录，本地存储
+- **高光检测** — 基于音频能量、画面变化和语音活动识别精彩片段
 
-Click **Export** and choose your target platform:
+进度实时显示，分析时间约为视频时长的 1-2 倍。
 
-| Platform | Aspect Ratio | Resolution |
-|---|---|---|
+### 4. 根据模式选择操作
+
+**剪辑模式：**
+
+- 在时间轴上查看检测到的高光片段
+- 拖拽边缘调整片段边界
+- 删除不需要的片段
+- 预览每个片段
+
+**解说模式：**
+
+- 选择片段后，点击 **生成解说词**
+- AI 自动生成简洁的配音脚本
+- 可手动编辑脚本内容
+- 预览 TTS 语音合成效果
+- 如不满意可重新生成
+
+### 5. 导出成片
+
+点击 **导出**，选择目标平台：
+
+| 平台 | 比例 | 分辨率 |
+|------|------|--------|
 | TikTok / Shorts | 9:16 | 1080×1920 |
 | Instagram Reels | 9:16 | 1080×1920 |
 | Instagram Feed | 1:1 | 1080×1080 |
 | YouTube | 16:9 | 1920×1080 |
 | Twitter/X | 16:9 | 1920×1080 |
 
-Toggle **Burn Subtitles** to embed subtitles directly into the video.
+开启 **烧录字幕** 可将字幕直接嵌入视频。点击导出并等待渲染完成。
 
-Click **Export** and wait for the render to complete.
+## 键盘快捷键
 
-## Result
+| 快捷键 | 功能 |
+|--------|------|
+| 空格 | 播放 / 暂停 |
+| I / O | 设置入点 / 出点 |
+| J / K / L | 逐帧控制（后退 / 暂停 / 前进） |
+| ⌘Z | 撤销 |
 
-Your exported clips are saved to the output directory you selected. Upload directly to your platform of choice!
+## 下一步
 
-## What's Next?
-
-- [AI Analysis Deep Dive](/guide/ai-analysis) — Understand how highlight detection works
-- [Script Generation](/guide/script-generation) — Customize AI-generated scripts
-- [Export Settings](/guide/export) — Advanced export options
-- [Keyboard Shortcuts](/guide/keyboard-shortcuts) — Speed up your workflow
+- [AI 分析详解](/guide/ai-analysis) — 了解高光检测原理
+- [脚本生成](/guide/script-generation) — 自定义 AI 生成脚本
+- [导出设置](/guide/export) — 高级导出选项
+- [快捷键列表](/guide/keyboard-shortcuts) — 提升工作效率

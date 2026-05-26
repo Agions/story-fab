@@ -22,6 +22,8 @@ interface SynthesizeConfig {
   voiceId: string;
   voiceSpeed: number;
   voiceVolume: number;
+  originalAudioVolume: number;
+  voicePreset: string;
   enableVoice: boolean;
   enableSubtitle: boolean;
   subtitlePosition: 'bottom' | 'center' | 'top';
@@ -44,6 +46,15 @@ const VOICE_OPTIONS = [
   { value: 'female_zh', label: '女声 (中文)', desc: '温柔甜美', emoji: '🎤' },
   { value: 'male_zh', label: '男声 (中文)', desc: '成熟稳重', emoji: '🎙️' },
   { value: 'neutral', label: '中性声音', desc: '通用场景', emoji: '🔊' },
+];
+
+// Azure Neural Voice 预设
+const VOICE_PRESETS = [
+  { value: 'XiaoxiaoNeural', label: '晓晓', desc: '青春活力', region: 'zh-CN', emoji: '🌟' },
+  { value: 'YunxiNeural', label: '云希', desc: '低沉磁性', region: 'zh-CN', emoji: '🎭' },
+  { value: 'YunyangNeural', label: '云扬', desc: '新闻播报', region: 'zh-CN', emoji: '📢' },
+  { value: 'XiaoyiNeural', label: '晓伊', desc: '温柔甜美', region: 'zh-CN', emoji: '💕' },
+  { value: 'XiaobaiNeural', label: '小白', desc: '轻松活泼', region: 'zh-CN', emoji: '😄' },
 ];
 
 // 特效风格
@@ -80,6 +91,8 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
     voiceId: 'female_zh',
     voiceSpeed: DEFAULT_VOICE_SPEED,
     voiceVolume: DEFAULT_VOICE_VOLUME,
+    originalAudioVolume: 30,
+    voicePreset: 'XiaoxiaoNeural',
     enableVoice: true,
     enableSubtitle: true,
     subtitlePosition: 'bottom',
@@ -87,6 +100,9 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
     effectStyle: 'cinematic',
     syncAudioVideo: true,
   });
+
+  const [isMixPreviewPlaying, setIsMixPreviewPlaying] = useState(false);
+  const [waveformData, setWaveformData] = useState<number[]>([]);
 
   const getCurrentScriptContent = useCallback((): string => {
     return state.scriptData.narration?.content || state.scriptData.remix?.content || '';
@@ -333,7 +349,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
   }
 
   // ==== 已合成完成 ====
-  if (state.synthesisData?.finalVideoUrl && state.stepStatus['video-synthesize']) {
+  if (state.synthesisData?.finalVideoUrl && state.stepStatus['video-synth']) {
     return (
       <div className={styles.stepContent}>
         <div className={styles.stepTitle}>
@@ -493,6 +509,25 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
                   ))}
                 </div>
 
+                {/* Voice Preset selector */}
+                <div className={styles.sliderLabel} style={{ marginBottom: '10px', display: 'block' }}>语音风格预设</div>
+                <div className={styles.voicePresetGrid}>
+                  {VOICE_PRESETS.map(preset => (
+                    <div
+                      key={preset.value}
+                      className={`${styles.voicePresetItem} ${config.voicePreset === preset.value ? styles.voicePresetActive : ''}`}
+                      onClick={() => setConfig({ ...config, voicePreset: preset.value })}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, voicePreset: preset.value })}
+                    >
+                      <span className={styles.voicePresetIcon}>{preset.emoji}</span>
+                      <span className={styles.voicePresetName}>{preset.label}</span>
+                      <span className={styles.voicePresetDesc}>{preset.desc}</span>
+                    </div>
+                  ))}
+                </div>
+
                 {/* 语速滑块 */}
                 <div className={styles.sliderGroup}>
                   <div className={styles.sliderHeader}>
@@ -520,7 +555,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
                 {/* 音量滑块 */}
                 <div className={styles.sliderGroup}>
                   <div className={styles.sliderHeader}>
-                    <span className={styles.sliderLabel}>音量</span>
+                    <span className={styles.sliderLabel}>配音音量</span>
                     <span className={styles.sliderValue}>{config.voiceVolume}%</span>
                   </div>
                   <div className={styles.sliderTrack}>
@@ -536,10 +571,71 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
                       max={100}
                       value={config.voiceVolume}
                       onChange={(e) => setConfig({ ...config, voiceVolume: Number(e.target.value) })}
-                      aria-label="音量"
+                      aria-label="配音音量"
                     />
                   </div>
                 </div>
+
+                {/* 原音频音量滑块 */}
+                <div className={styles.sliderGroup}>
+                  <div className={styles.sliderHeader}>
+                    <span className={styles.sliderLabel}>原音频音量</span>
+                    <span className={styles.sliderValue}>{config.originalAudioVolume}%</span>
+                  </div>
+                  <div className={styles.sliderTrack}>
+                    <div
+                      className={styles.sliderFill}
+                      style={{ width: `${config.originalAudioVolume}%`, background: 'linear-gradient(90deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.8))' }}
+                    />
+                    <div className={styles.sliderThumb} style={{ left: `${config.originalAudioVolume}%` }} />
+                    <input
+                      type="range"
+                      className={styles.sliderInput}
+                      min={0}
+                      max={100}
+                      value={config.originalAudioVolume}
+                      onChange={(e) => setConfig({ ...config, originalAudioVolume: Number(e.target.value) })}
+                      aria-label="原音频音量"
+                    />
+                  </div>
+                </div>
+
+                {/* 音频波形指示器 */}
+                {state.voiceData.audioUrl && (
+                  <div className={styles.waveformSection}>
+                    <div className={styles.waveformLabel}>音频波形</div>
+                    <div className={styles.waveformContainer}>
+                      <div className={styles.waveformBars}>
+                        {Array.from({ length: 40 }).map((_, i) => (
+                          <div
+                            key={i}
+                            className={styles.waveformBar}
+                            style={{
+                              height: `${Math.random() * 60 + 20}%`,
+                              animationDelay: `${i * 0.05}s`,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 混音预览按钮 */}
+                <button
+                  className={styles.mixPreviewBtn}
+                  onClick={() => setIsMixPreviewPlaying(!isMixPreviewPlaying)}
+                  disabled={!state.voiceData.audioUrl}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {isMixPreviewPlaying ? (
+                      <rect x="6" y="4" width="4" height="16" />
+                    ) : (
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    )}
+                  </svg>
+                  {isMixPreviewPlaying ? '停止预览' : '混音预览'}
+                </button>
 
                 {/* 生成配音按钮 */}
                 <div className={styles.statusRow}>

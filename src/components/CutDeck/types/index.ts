@@ -4,6 +4,8 @@ export type {
   cut_deckStep,
   cut_deckState,
   cut_deckAction,
+  cut_deckMode,
+  SemanticSegment,
 } from './workflow';
 export {
   initialState,
