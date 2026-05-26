@@ -48,8 +48,8 @@ const STEPS: StepConfig[] = [
   { key: 'ai-analyze', title: 'AI 分析', icon: <Cloud /> },
   { key: 'clip-repurpose', title: 'AI 拆条', icon: <Bolt /> },
   { key: 'script-generate', title: '生成文案', icon: <FileText /> },
-  { key: 'video-synthesize', title: '视频合成', icon: <Edit /> },
-  { key: 'export', title: '导出', icon: <Download /> },
+  { key: 'video-synth', title: '视频合成', icon: <Edit /> },
+  { key: 'video-export', title: '导出', icon: <Download /> },
 ];
 
 // 正确的顺序映射（按照任务描述的视觉顺序）
@@ -124,6 +124,7 @@ const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
         </div>
 
         <StepList
+          mode={state.mode}
           currentStep={currentStep}
           stepStatus={stepStatus}
           onStepClick={handleStepClick}

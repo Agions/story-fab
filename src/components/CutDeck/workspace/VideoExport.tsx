@@ -20,6 +20,55 @@ const FORMAT_OPTIONS = [
   { value: 'gif', label: 'GIF', desc: '动画格式', emoji: '🎞️' },
 ] as const;
 
+// 平台预设
+const PLATFORM_PRESETS = [
+  { 
+    value: 'douyin', 
+    label: '抖音', 
+    emoji: '🎵',
+    aspectRatio: '9:16',
+    resolution: '1080p',
+    bitrate: 10,
+    tips: '竖屏短视频，建议 9:16，推荐高清画质',
+  },
+  { 
+    value: 'xiaohongshu', 
+    label: '小红书', 
+    emoji: '📕',
+    aspectRatio: '3:4',
+    resolution: '1080p',
+    bitrate: 8,
+    tips: '图文/视频混合，注意封面设计',
+  },
+  { 
+    value: 'bilibili', 
+    label: 'B站', 
+    emoji: '📺',
+    aspectRatio: '16:9',
+    resolution: '1080p',
+    bitrate: 12,
+    tips: '横屏为主，支持高码率，推荐 1080p 高清',
+  },
+  { 
+    value: 'youtube_shorts', 
+    label: 'YouTube Shorts', 
+    emoji: '▶️',
+    aspectRatio: '9:16',
+    resolution: '1080p',
+    bitrate: 10,
+    tips: '竖屏短视频，≤60秒，配字幕更佳',
+  },
+  { 
+    value: 'tiktok', 
+    label: 'TikTok', 
+    emoji: '🌐',
+    aspectRatio: '9:16',
+    resolution: '1080p',
+    bitrate: 10,
+    tips: '竖屏优先，建议添加字幕和特效',
+  },
+];
+
 // 质量选项
 const QUALITY_OPTIONS = [
   { value: '1080p', label: 'Full HD' },
@@ -52,6 +101,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
   const [_exportedFile, setExportedFile] = useState<string | null>(null);
   const [_exportError, setExportError] = useState<string | null>(null);
   const [_startTime, _setStartTime] = useState<number>(Date.now());
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
 
 
   // 监听 Rust processing-progress 事件，驱动真实进度
@@ -87,6 +137,24 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     if (!state.currentVideo?.duration) return '0 MB';
     const bitrateMap: Record<string, number> = { low: 1.5, medium: 4, high: 10, ultra: 30 };
     const bitrate = bitrateMap[config.quality] || 5;
+    const sizeMB = (bitrate * state.currentVideo.duration) / 8;
+    return sizeMB > 1000 ? `${(sizeMB / 1000).toFixed(1)} GB` : `${sizeMB.toFixed(1)} MB`;
+  };
+
+  // Platform preset handler
+  const applyPlatformPreset = (platform: typeof PLATFORM_PRESETS[number]) => {
+    setSelectedPlatform(platform.value);
+    setConfig(prev => ({
+      ...prev,
+      resolution: platform.resolution as ExportSettings['resolution'],
+    }));
+  };
+
+  // Calculate estimated file size with platform bitrate
+  const getEstimatedFileSize = () => {
+    if (!state.currentVideo?.duration) return '0 MB';
+    const platform = PLATFORM_PRESETS.find(p => p.value === selectedPlatform);
+    const bitrate = platform?.bitrate || (config.quality === 'low' ? 1.5 : config.quality === 'medium' ? 4 : config.quality === 'high' ? 10 : 30);
     const sizeMB = (bitrate * state.currentVideo.duration) / 8;
     return sizeMB > 1000 ? `${(sizeMB / 1000).toFixed(1)} GB` : `${sizeMB.toFixed(1)} MB`;
   };
@@ -147,7 +215,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
           ⚠️ 请先完成视频合成
           <button
             className={styles.warningAlertBtn}
-            onClick={() => setStep('video-synthesize')}
+            onClick={() => setStep('video-synth')}
           >
             去合成
           </button>
@@ -280,6 +348,36 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
           </div>
 
           <div className={styles.cardBody}>
+            {/* 平台预设选择 */}
+            <div className={styles.platformSection}>
+              <span className={styles.sectionLabel}>发布平台</span>
+              <div className={styles.platformGrid}>
+                {PLATFORM_PRESETS.map(platform => (
+                  <div
+                    key={platform.value}
+                    className={`${styles.platformItem} ${selectedPlatform === platform.value ? styles.platformActive : ''}`}
+                    onClick={() => applyPlatformPreset(platform)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && applyPlatformPreset(platform)}
+                  >
+                    <span className={styles.platformEmoji}>{platform.emoji}</span>
+                    <span className={styles.platformName}>{platform.label}</span>
+                  </div>
+                ))}
+              </div>
+              {selectedPlatform && (
+                <div className={styles.platformTip}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  {PLATFORM_PRESETS.find(p => p.value === selectedPlatform)?.tips}
+                </div>
+              )}
+            </div>
+
             {/* 格式选择 */}
             <div className={styles.formatSection}>
               <span className={styles.sectionLabel}>输出格式</span>
@@ -436,7 +534,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
 
             <div className={styles.sizeEstimate}>
               <span className={styles.sizeLabel}>预估大小</span>
-              <span className={styles.sizeValue}>{estimateFileSize()}</span>
+              <span className={styles.sizeValue}>{getEstimatedFileSize()}</span>
             </div>
 
             <div className={styles.exportActions}>

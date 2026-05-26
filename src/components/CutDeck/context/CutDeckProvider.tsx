@@ -3,8 +3,8 @@
  * 从 AIEditorContext.tsx 提取的 Provider 组件
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
-import type { cut_deckState, cut_deckStep, cut_deckFeatureType, cut_deckAction } from '../types/workflow';
-import { initialState, getNextStep, getPrevStep, CUT_DECK_STEPS } from '../types/workflow';
+import type { cut_deckState, cut_deckStep, cut_deckFeatureType, cut_deckAction, cut_deckMode } from '../types/workflow';
+import { initialState, getNextStep, getPrevStep, getStepsForMode, getTotalSteps } from '../types/workflow';
 import { clipFlowReducer } from '../types/workflow.reducer';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
 
@@ -13,6 +13,7 @@ interface CutDeckContextType {
   state: cut_deckState;
   dispatch: React.Dispatch<cut_deckAction>;
   // 便捷方法
+  setMode: (mode: cut_deckMode) => void;
   setStep: (step: cut_deckStep) => void;
   setFeature: (feature: cut_deckFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
@@ -75,6 +76,10 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
   }, []);
 
   // 便捷方法 - 使用 useCallback 稳定函数引用
+  const setMode = useCallback((mode: cut_deckMode) => {
+    dispatch({ type: 'SET_MODE', payload: mode });
+  }, []);
+
   const setStep = useCallback((step: cut_deckStep) => {
     dispatch({ type: 'SET_STEP', payload: step });
   }, []);
@@ -152,14 +157,14 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
 
   // 流程控制
   const goToNextStep = useCallback(() => {
-    const nextStep = getNextStep(state.currentStep);
+    const nextStep = getNextStep(state.currentStep, state.mode);
     dispatch({ type: 'SET_STEP', payload: nextStep });
-  }, [state.currentStep]);
+  }, [state.currentStep, state.mode]);
 
   const goToPrevStep = useCallback(() => {
-    const prevStep = getPrevStep(state.currentStep);
+    const prevStep = getPrevStep(state.currentStep, state.mode);
     dispatch({ type: 'SET_STEP', payload: prevStep });
-  }, [state.currentStep]);
+  }, [state.currentStep, state.mode]);
 
   const reset = useCallback(() => {
     revokeVideoBlobUrl();
@@ -174,7 +179,9 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     return Object.values(state.stepStatus).filter(Boolean).length;
   }, [state.stepStatus]);
 
-  const totalSteps = CUT_DECK_STEPS.length;
+  const totalSteps = useMemo(() => {
+    return getTotalSteps(state.mode);
+  }, [state.mode]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- 依赖子字段已充分
   // eslint-disable-next-line react-hooks/exhaustive-deps -- 只读子字段，state 整体变化不需重新创建
@@ -186,6 +193,7 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
   // 静态方法集合（dispatch 稳定，useReducer 保证），从不因 state 变化而重建
   const staticValue = useMemo(() => ({
     dispatch,
+    setMode,
     setStep,
     setFeature,
     setProject,
@@ -211,6 +219,7 @@ export const CutDeckProvider: React.FC<CutDeckProviderProps> = ({ children }) =>
     totalSteps,
   }), [
     dispatch,
+    setMode,
     setStep,
     setFeature,
     setProject,
