@@ -83,6 +83,47 @@ const SCRIPT_STYLES = [
   { value: 'casual', label: '轻松' },
   { value: 'humor', label: '幽默' },
   { value: 'emotional', label: '情感' },
+  { value: 'shocking', label: '震惊' },
+  { value: 'professional', label: '专业' },
+];
+
+// 解说风格预设 (用于解说模式)
+const COMMENTARY_STYLES = [
+  { 
+    value: 'humor', 
+    label: '幽默风趣', 
+    desc: '轻松诙谐，吸引眼球',
+    icon: '😄',
+    color: '#FF9F43',
+  },
+  { 
+    value: 'casual', 
+    label: '自然随意', 
+    desc: '口语化表达，贴近生活',
+    icon: '🎯',
+    color: '#52c41a',
+  },
+  { 
+    value: 'shocking', 
+    label: '震惊吸引', 
+    desc: '制造悬念，引发好奇',
+    icon: '⚡',
+    color: '#f5222d',
+  },
+  { 
+    value: 'emotional', 
+    label: '情感共鸣', 
+    desc: '讲故事，打动人心',
+    icon: '💖',
+    color: '#eb2f96',
+  },
+  { 
+    value: 'professional', 
+    label: '专业深度', 
+    desc: '分析解读，树立权威',
+    icon: '📚',
+    color: '#1890ff',
+  },
 ];
 
 // 文案长度选项
@@ -115,7 +156,10 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
     functionType: 'video-narration' as AIFunctionType,
     style: 'casual',
     length: 'medium',
+    commentaryStyle: 'casual',
   });
+
+  const [showScriptPreview, setShowScriptPreview] = useState(false);
 
   // Extract style and length to separate useMemo to prevent handleGenerate recreation
   const configStyle = useMemo(() => config.style, [config.style]);
@@ -452,6 +496,35 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
               </div>
             </div>
 
+            {/* 解说风格选择器 - 仅解说模式显示 */}
+            {config.functionType === 'video-narration' && (
+              <div className={styles.commentaryStyleSection}>
+                <span className={styles.commentaryStyleLabel}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  解说风格
+                </span>
+                <div className={styles.commentaryStyleGrid}>
+                  {COMMENTARY_STYLES.map(style => (
+                    <div
+                      key={style.value}
+                      className={`${styles.commentaryStyleItem} ${config.commentaryStyle === style.value ? styles.commentaryStyleActive : ''}`}
+                      onClick={() => setConfig({ ...config, commentaryStyle: style.value })}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, commentaryStyle: style.value })}
+                      style={{ '--style-color': style.color } as React.CSSProperties}
+                    >
+                      <span className={styles.commentaryStyleIcon}>{style.icon}</span>
+                      <span className={styles.commentaryStyleName}>{style.label}</span>
+                      <span className={styles.commentaryStyleDesc}>{style.desc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* 功能特点 */}
             <div className={styles.featuresSection}>
               <span className={styles.featuresLabel}>功能特点</span>
@@ -512,7 +585,46 @@ const ScriptGenerate: React.FC<ScriptGenerateProps> = memo(({ onNext }) => {
                 重新生成
               </button>
             </div>
+
+            {/* 预览脚本按钮 */}
+            {currentScript && (
+              <button
+                className={styles.previewScriptBtn}
+                onClick={() => setShowScriptPreview(true)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                预览脚本
+              </button>
+            )}
           </div>
+
+          {/* 脚本预览弹窗 */}
+          {showScriptPreview && currentScript && (
+            <div className={styles.scriptPreviewModal} onClick={() => setShowScriptPreview(false)}>
+              <div className={styles.scriptPreviewContent} onClick={e => e.stopPropagation()}>
+                <div className={styles.scriptPreviewHeader}>
+                  <h3>脚本预览</h3>
+                  <button className={styles.scriptPreviewClose} onClick={() => setShowScriptPreview(false)}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+                <div className={styles.scriptPreviewBody}>
+                  <div className={styles.scriptMeta}>
+                    <span>风格: {COMMENTARY_STYLES.find(s => s.value === config.commentaryStyle)?.label || config.style}</span>
+                    <span>字数: {wordCount}</span>
+                    <span>预计: ~{estimatedDuration}秒</span>
+                  </div>
+                  <pre className={styles.scriptPreviewText}>{currentScript.content}</pre>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 进度动画 */}
           {generating && (
