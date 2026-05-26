@@ -1,10 +1,12 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/story-fab/',
   title: 'StoryFab',
   description: 'AI-Driven Professional Video Editing Desktop Application',
   lang: 'en-US',
   cleanUrls: true,
+  ignoreDeadLinks: true,
   lastUpdated: true,
 
   head: [
