@@ -1,66 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="CutDeck logo">
-  <title>CutDeck</title>
-  <desc>AI-powered professional video editing tool logo — film frame with play button and lightning bolt</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="ClipFlow logo">
+  <title>ClipFlow</title>
   <defs>
-    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f97316"/>
-      <stop offset="100%" stop-color="#ea580c"/>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0C0D14"/>
+      <stop offset="100%" stop-color="#1A1B2E"/>
     </linearGradient>
-    <linearGradient id="darkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#1e1e2e"/>
-      <stop offset="100%" stop-color="#0f0f17"/>
+    <linearGradient id="film" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9F43"/>
+      <stop offset="100%" stop-color="#FFB06B"/>
     </linearGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
+    <linearGradient id="spark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00D4FF"/>
+      <stop offset="100%" stop-color="#00F5E4"/>
+    </linearGradient>
   </defs>
-
-  <!-- Dark rounded square background -->
-  <rect width="512" height="512" rx="96" fill="url(#darkGrad)"/>
-
-  <!-- Timeline grid lines (subtle) -->
-  <g stroke="#2a2a3e" stroke-width="1" fill="none" opacity="0.6">
-    <line x1="80" y1="420" x2="432" y2="420"/>
-    <line x1="80" y1="388" x2="432" y2="388"/>
-    <line x1="80" y1="356" x2="432" y2="356"/>
-    <line x1="80" y1="324" x2="432" y2="324"/>
-    <line x1="80" y1="292" x2="432" y2="292"/>
-    <line x1="80" y1="260" x2="432" y2="260"/>
-  </g>
-
-  <!-- Film frame with orange stroke -->
-  <g filter="url(#glow)">
-    <rect x="120" y="118" width="272" height="200" rx="16"
-          fill="#1a1a2e" stroke="url(#brandGrad)" stroke-width="8"/>
-    
-    <!-- Top sprocket holes -->
-    <rect x="148" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-    <rect x="193" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-    <rect x="238" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-    <rect x="283" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-    <rect x="328" y="134" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-
-    <!-- Bottom sprocket holes -->
-    <rect x="148" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-    <rect x="193" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-    <rect x="238" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-    <rect x="283" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-    <rect x="328" y="284" width="18" height="22" rx="4" fill="url(#brandGrad)" opacity="0.85"/>
-
-    <!-- Play button -->
-    <path d="M218 186 L316 218 L218 250 Z" fill="url(#brandGrad)"/>
-  </g>
-
-  <!-- AI lightning bolt -->
-  <g filter="url(#glow)">
-    <path d="M362 218 L330 266 L356 266 L332 338 L392 258 L360 258 Z"
-          fill="#fb923c" stroke="#fdba74" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-
-  <!-- Accent dot -->
-  <circle cx="382" cy="138" r="9" fill="#fb923c" opacity="0.75" filter="url(#glow)"/>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="72" y="112" width="88" height="288" rx="16" fill="url(#film)" opacity="0.9"/>
+  <rect x="84" y="136" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="84" y="176" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="84" y="216" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="84" y="256" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="84" y="296" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="84" y="336" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="84" y="376" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="352" y="112" width="88" height="288" rx="16" fill="url(#film)" opacity="0.9"/>
+  <rect x="364" y="136" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="364" y="176" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="364" y="216" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="364" y="256" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="364" y="296" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="364" y="336" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <rect x="364" y="376" width="64" height="24" rx="6" fill="#0C0D14" opacity="0.55"/>
+  <polygon points="200,160 200,352 368,256" fill="url(#spark)" opacity="0.95"/>
+  <g transform="translate(392,80)"><path d="M32,0 L37,24 L62,32 L37,40 L32,64 L27,40 L2,32 L27,24 Z" fill="#00D4FF" opacity="0.85"/></g>
+  <g transform="translate(32,384)"><path d="M24,0 L28,18 L46,24 L28,30 L24,48 L20,30 L2,24 L20,18 Z" fill="#FF9F43" opacity="0.75"/></g>
 </svg>

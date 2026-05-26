@@ -4,7 +4,7 @@
  * 流转到: VideoUpload
  */
 import React, { useState, memo } from 'react';
-import { useCutDeck } from '../context';
+import { useClipFlow } from '../context';
 import type { ProjectData } from '@/core/types';
 import { saveProjectToFile } from '../../../services/tauri';
 import { notify } from '@/shared';
@@ -75,7 +75,7 @@ const createDefaultProjectName = () => {
 };
 
 const ProjectCreate: React.FC<ProjectCreateProps> = memo(({ onNext }) => {
-  const { state, setProject, goToNextStep } = useCutDeck();
+  const { state, setProject, goToNextStep } = useClipFlow();
   const { addRecentProject } = useSettings();
   const [loading, setLoading] = useState(false);
   const [selectedMode, setSelectedMode] = useState<string>('first-person');

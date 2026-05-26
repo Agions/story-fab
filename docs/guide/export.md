@@ -1,6 +1,6 @@
 # Export
 
-CutDeck supports multiple aspect ratios, subtitle styles, and quality presets.
+ClipFlow supports multiple aspect ratios, subtitle styles, and quality presets.
 
 ## Aspect Ratios
 

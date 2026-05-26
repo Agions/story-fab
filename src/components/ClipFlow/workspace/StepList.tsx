@@ -4,7 +4,7 @@
  */
 import React, { memo } from 'react';
 import { Plus, Video, Cloud, FileText, Edit, Download, Check, Bolt, Brain, Eye, PenTool, Mic } from 'lucide-react';
-import type { cut_deckStep, cut_deckMode } from '../context';
+import type { clipflowStep, clipflowMode } from '../context';
 import styles from './Workspace.module.less';
 
 // ============================================================================
@@ -12,16 +12,16 @@ import styles from './Workspace.module.less';
 // ============================================================================
 
 interface StepConfig {
-  key: cut_deckStep;
+  key: clipflowStep;
   title: string;
   icon: React.ReactNode;
 }
 
 interface StepListProps {
-  mode: cut_deckMode;
-  currentStep: cut_deckStep;
-  stepStatus: Record<cut_deckStep, boolean>;
-  onStepClick: (step: cut_deckStep) => void;
+  mode: clipflowMode;
+  currentStep: clipflowStep;
+  stepStatus: Record<clipflowStep, boolean>;
+  onStepClick: (step: clipflowStep) => void;
   activeStepRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -48,7 +48,7 @@ const COMMENTARY_STEPS_CONFIG: StepConfig[] = [
   { key: 'video-export', title: '导出', icon: <Download /> },
 ];
 
-const STEP_ORDER: Record<cut_deckMode, readonly cut_deckStep[]> = {
+const STEP_ORDER: Record<clipflowMode, readonly clipflowStep[]> = {
   clip: ['project-create', 'video-upload', 'ai-analyze', 'clip-repurpose', 'video-export'],
   commentary: ['project-create', 'video-upload', 'ai-analyze', 'semantic-segment', 'director-review', 'script-generate', 'voice-synth', 'video-export'],
 };
@@ -57,20 +57,20 @@ const STEP_ORDER: Record<cut_deckMode, readonly cut_deckStep[]> = {
 // 辅助函数
 // ============================================================================
 
-const getStepsConfig = (mode: cut_deckMode): StepConfig[] => {
+const getStepsConfig = (mode: clipflowMode): StepConfig[] => {
   return mode === 'clip' ? CLIP_STEPS_CONFIG : COMMENTARY_STEPS_CONFIG;
 };
 
 const isStepCompleted = (
-  step: cut_deckStep,
-  stepStatus: Record<cut_deckStep, boolean>
+  step: clipflowStep,
+  stepStatus: Record<clipflowStep, boolean>
 ): boolean => stepStatus[step];
 
 const isStepAccessible = (
-  step: cut_deckStep,
-  currentStep: cut_deckStep,
-  stepStatus: Record<cut_deckStep, boolean>,
-  mode: cut_deckMode
+  step: clipflowStep,
+  currentStep: clipflowStep,
+  stepStatus: Record<clipflowStep, boolean>,
+  mode: clipflowMode
 ): boolean => {
   // 已完成的步骤可以点击跳转
   if (stepStatus[step]) return true;
