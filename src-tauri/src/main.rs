@@ -5,5 +5,5 @@
 )]
 
 fn main() {
-    StoryFab_lib::run();
+    story_fab_lib::run();
 }
