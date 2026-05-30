@@ -66,6 +66,10 @@ pub fn open_file(path: String) -> Result<(), String> {
     }
     #[cfg(target_os = "linux")]
     {
+        // 检查文件是否存在，避免 xdg-open 给出误导性错误
+        if !std::path::Path::new(&path).exists() {
+            return Err("文件不存在或路径无效".to_string());
+        }
         std::process::Command::new("xdg-open")
             .arg(&path)
             .spawn()
