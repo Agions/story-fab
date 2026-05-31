@@ -15,7 +15,6 @@ import { Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import { videoProcessor, VideoMetadata } from '@/core/video';
-import { analyzeVideo } from '@/core/services';
 import type { ScriptSegment } from '@/core/types';
 import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/ai/scriptService';
 import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
@@ -349,7 +348,8 @@ const ProjectEdit: React.FC = () => {
 
   const handleExportScript = (format: string) => notify.info(`导出脚本为 ${format.toUpperCase()} 格式`);
 
-  const _handleFormValuesChange = () => scheduleAutoSave();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _handleFormValuesChange = () => scheduleAutoSave();
 
   // ─── Render ────────────────────────────────────────────────────────────────
   if (error) {

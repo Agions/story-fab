@@ -2,8 +2,11 @@ import type { EditorExportSettings, Timeline } from './types';
 import { formatFileSize } from '../../../shared/utils/format';
 
 export async function exportTimeline(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   timeline: Timeline,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   settings?: Partial<EditorExportSettings>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   defaultSettings?: EditorExportSettings
 ): Promise<Blob> {
   const _exportSettings = { ...defaultSettings, ...settings };
