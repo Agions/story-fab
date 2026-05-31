@@ -14,7 +14,8 @@ import { Steps } from '@/components/ui/steps';
 import { Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
-import { VideoMetadata, analyzeVideo, extractKeyFrames } from '@/core/video';
+import { videoProcessor, VideoMetadata } from '@/core/video';
+import { analyzeVideo } from '@/core/services';
 import type { ScriptSegment } from '@/core/types';
 import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/ai/scriptService';
 import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
@@ -262,7 +263,7 @@ const ProjectEdit: React.FC = () => {
 
       stage = 'keyframes';
       notify.info('正在提取关键帧...');
-      const frames = await extractKeyFrames(videoPath, {}, meta.duration);
+      const frames = await videoProcessor.extractKeyFrames(videoPath, {}, meta.duration);
       const paths = frames.map((f) => f.path);
       if (paths.length === 0) throw new Error('未提取到关键帧，请尝试更换视频或检查视频时长');
       setKeyFrames(paths);
