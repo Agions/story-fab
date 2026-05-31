@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { VideoSegment, videoProcessor } from '@/core/video';
-import { analyzeVideo } from '@/core/services';
 import { clipWorkflowService } from '../../../core/services/pipeline/clip-pipeline/clipWorkflow';
 import type { VideoInfo } from '@/core/types';
 import type { ClipSegment } from '../../../core/services/aiClip';
@@ -73,7 +72,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
       try {
         setVideoSrc(`file://${selected}`);
 
-        const metadata = await analyzeVideo(selected);
+        const metadata = await videoProcessor.analyze(selected);
         setDuration(metadata.duration);
 
         const newSegment: VideoSegment = {

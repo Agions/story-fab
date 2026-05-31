@@ -2,9 +2,8 @@
  * AI Editor Reducer
  * 从 AIEditorContext.tsx 提取的 reducer 逻辑
  */
-import type { storyfabState, storyfabAction, storyfabMode } from './workflow';
+import type { storyfabState, storyfabAction } from './workflow';
 import { initialState, getStepsForMode } from './workflow';
-import { getTotalSteps } from './workflow';
 
 // Reducer
 export function storyFabReducer(state: storyfabState, action: storyfabAction): storyfabState {

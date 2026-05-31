@@ -192,7 +192,7 @@ function getCachedTranscript(
 function splitLongScene(
   start: number,
   end: number,
-  minPart: number,
+  _minPart: number,
   maxPart: number,
 ): CandidateClip[] {
   const clips: CandidateClip[] = [];

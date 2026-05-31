@@ -2,7 +2,7 @@
  * AppearanceSettings — 外观设置
  * Theme toggle: shadcn Switch — "Dark" / "Light"
  */
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 interface AppearanceSettingsProps {
   theme?: 'light' | 'dark' | 'auto';
