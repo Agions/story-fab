@@ -41,7 +41,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
   // ---------- Extraction ----------
 
   protected async doExtractKeyFrames(
-    videoPath: string,
+    _videoPath: string,
     options: ExtractKeyFramesOptions,
     duration?: number,
   ): Promise<KeyFrame[]> {
