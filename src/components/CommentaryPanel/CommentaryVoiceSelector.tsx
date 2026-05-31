@@ -5,9 +5,9 @@
  */
 
 import React, { memo } from 'react';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { VoiceInfo } from '@/core/services/commentary';

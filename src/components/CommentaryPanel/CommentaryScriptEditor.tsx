@@ -8,11 +8,11 @@
  */
 
 import React, { useState, useCallback, memo } from 'react';
-import { CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { Badge } from '../ui/badge';
+import { CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { Copy, Check, Wand2 } from 'lucide-react';
 import type { CommentaryScriptOutput, CommentarySegment } from '@/core/services/commentary';
 import { formatDuration } from '@/core/video';

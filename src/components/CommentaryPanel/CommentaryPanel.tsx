@@ -14,16 +14,15 @@
  * - 五种风格预设：幽默 / 严肃 / 接地气 / 悬疑 / 温情
  */
 
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
-import { CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
-import { Separator } from '../ui/separator';
+import React, { useState, useCallback, memo } from 'react';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/sonner';
-import { logger } from '@/shared/utils/logging';
 import {
   Sparkles,
   Play,
@@ -35,41 +34,23 @@ import {
   Loader2,
 } from 'lucide-react';
 import {
-  createCommentarySession,
-  getCommentaryStatus,
   generateCommentaryPlan,
   approveCommentaryPlan,
-  destroyCommentarySession,
-  generateCommentaryScript,
-  synthesizeCommentaryAudio,
-  estimateTTSDuration,
-  listCommentaryVoices,
-  type DirectorStatusResponse,
-  type DirectorState,
   type ScriptStylePreset,
-  type VoiceInfo,
-  type CommentaryScriptOutput,
 } from '@/core/services/commentary';
+import { useDirectorStatus } from '@/hooks/useDirectorStatus';
+import { useCommentarySession } from '@/hooks/useCommentarySession';
+import { useCommentaryScript } from '@/hooks/useCommentaryScript';
+import { useCommentaryVoice } from '@/hooks/useCommentaryVoice';
 import styles from './CommentaryPanel.module.less';
 import CommentaryScriptEditor from './CommentaryScriptEditor';
 import CommentaryStyleSelector from './CommentaryStyleSelector';
 import CommentaryVoiceSelector from './CommentaryVoiceSelector';
 import CommentaryTimeline from './CommentaryTimeline';
 
-interface CommentaryPanelProps {
-  /** 视频路径 */
-  videoPath: string;
-  /** 字幕内容 */
-  subtitles: string;
-  /** 视频时长（秒） */
-  durationSecs?: number;
-  /** 是否可用 */
-  disabled?: boolean;
-}
-
 // ─── 状态映射 ───────────────────────────────────────────────────────────
 
-const STATE_LABELS: Record<DirectorState, string> = {
+const STATE_LABELS: Record<string, string> = {
   idle: '就绪',
   analyzing: '分析中',
   planning: '规划中',
@@ -78,7 +59,7 @@ const STATE_LABELS: Record<DirectorState, string> = {
   done: '已完成',
 };
 
-const STATE_COLORS: Record<DirectorState, string> = {
+const STATE_COLORS: Record<string, string> = {
   idle: 'bg-slate-400',
   analyzing: 'bg-blue-500 animate-pulse',
   planning: 'bg-amber-500 animate-pulse',
@@ -95,6 +76,13 @@ const _STYLE_PRESET_LABELS: Record<ScriptStylePreset, string> = {
   warm: '温情治愈',
 };
 
+interface CommentaryPanelProps {
+  videoPath: string;
+  subtitles: string;
+  durationSecs?: number;
+  disabled?: boolean;
+}
+
 // ─── 主组件 ─────────────────────────────────────────────────────────────
 
 const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
@@ -103,298 +91,102 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
   durationSecs,
   disabled = false,
 }) => {
-  // 状态
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const sessionIdRef = useRef<string | null>(null);
-  const [directorStatus, setDirectorStatus] = useState<DirectorStatusResponse | null>(null);
-  const [script, setScript] = useState<CommentaryScriptOutput | null>(null);
-  const [voices, setVoices] = useState<VoiceInfo[]>([]);
+  // ── UI 状态 ──────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState<'script' | 'style' | 'voice' | 'timeline'>('script');
-
-  // 选中的音色
-  const [selectedVoice, setSelectedVoice] = useState('zh-CN-XiaoxiaoNeural');
-  const [selectedStyle, setSelectedStyle] = useState<ScriptStylePreset>('conversational');
-
-  // 多风格批量生成
-  const [multiStyleMode, setMultiStyleMode] = useState(false);
-  const [selectedStyles, setSelectedStyles] = useState<ScriptStylePreset[]>(['conversational']);
-  const [scripts, setScripts] = useState<Map<ScriptStylePreset, CommentaryScriptOutput>>(new Map());
-  const [activeScriptStyle, setActiveScriptStyle] = useState<ScriptStylePreset | null>(null);
-
-  // 弹窗
   const [planConfirmOpen, setPlanConfirmOpen] = useState(false);
   const [_reviseOpen, _setReviseOpen] = useState(false);
-
-  // 加载状态
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isSynthesizing, setIsSynthesizing] = useState(false);
-
-  // API Key（从环境变量或配置获取）
   const [apiKey, setApiKey] = useState('');
 
-  // ─── 副作用 ───────────────────────────────────────────────────────────
+  // ── 风格选择状态 ──────────────────────────────────────────────────────
+  const [selectedStyle, setSelectedStyle] = useState<ScriptStylePreset>('conversational');
 
-  // 创建会话
-  useEffect(() => {
-    if (!videoPath || disabled) return;
+  // ── Hooks ────────────────────────────────────────────────────────────
+  const { sessionId, directorStatus, isReady } = useCommentarySession(
+    videoPath,
+    selectedStyle,
+    disabled,
+  );
 
-    const init = async () => {
-      try {
-        const sid = await createCommentarySession(videoPath, selectedStyle);
-        setSessionId(sid);
-        sessionIdRef.current = sid;
-      } catch (e) {
-        logger.error('[CommentaryPanel] 创建会话失败:', e);
-      }
-    };
+  const { currentState, progressPct } = useDirectorStatus(sessionId);
 
-    init();
+  const {
+    script,
+    scripts,
+    activeScriptStyle,
+    multiStyleMode,
+    isGenerating,
+    generate,
+    multiGenerate,
+    setMultiStyleMode,
+    setSelectedStyles,
+    setActiveScriptStyle,
+    updateSegment,
+  } = useCommentaryScript();
 
-    return () => {
-      const sid = sessionIdRef.current;
-      if (sid) {
-        destroyCommentarySession(sid).catch(logger.error);
-      }
-    };
-  }, [videoPath, disabled, selectedStyle]);
+  const {
+    voices,
+    selectedVoice,
+    setSelectedVoice,
+    previewVoice,
+    isPreviewing,
+    stopPreview,
+  } = useCommentaryVoice();
 
-  // 加载音色列表
-  useEffect(() => {
-    listCommentaryVoices()
-      .then(setVoices)
-      .catch(logger.error);
-  }, []);
-
-  // 轮询状态
-  useEffect(() => {
-    if (!sessionId) return;
-
-    const poll = async () => {
-      try {
-        const status = await getCommentaryStatus(sessionId);
-        setDirectorStatus(status);
-      } catch (e) {
-        logger.error('[CommentaryPanel] 轮询状态失败:', e);
-      }
-    };
-
-    poll();
-    const interval = setInterval(poll, 2000);
-    return () => clearInterval(interval);
-  }, [sessionId]);
-
-  // ─── 操作 ────────────────────────────────────────────────────────────
-
-  /** 生成解说脚本 */
+  // ── 脚本生成 ──────────────────────────────────────────────────────────
   const handleGenerateScript = useCallback(async () => {
-    if (!sessionId || !subtitles.trim()) {
-      toast.error('请先导入字幕文件');
-      return;
-    }
-    if (!apiKey.trim()) {
-      toast.error('请先填写 API Key');
-      return;
-    }
+    if (!sessionId) return;
+    await generate({ sessionId, subtitles, apiKey, selectedStyle, durationSecs });
+    setActiveTab('script');
+  }, [sessionId, subtitles, apiKey, selectedStyle, durationSecs, generate, setActiveTab]);
 
-    setIsGenerating(true);
-    try {
-      const result = await generateCommentaryScript({
-        subtitles,
-        durationSecs,
-        targetDurationSecs: durationSecs,
-        style: selectedStyle,
-        apiKey,
-        provider: 'openai',
-      });
-      setScript(result);
-      toast.success('解说脚本生成成功 🎉');
-      setActiveTab('script');
-    } catch (e) {
-      logger.error('[CommentaryPanel] 生成脚本失败:', e);
-      toast.error(`生成失败: ${e}`);
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [sessionId, subtitles, apiKey, selectedStyle, durationSecs]);
-
-  /** 段落文本变更（增量编辑） */
-  const handleSegmentChange = useCallback((index: number, text: string) => {
-    // 多风格模式：更新对应风格的 script
-    if (multiStyleMode && activeScriptStyle) {
-      setScripts(prev => {
-        const next = new Map(prev);
-        const current = next.get(activeScriptStyle!);
-        if (current) {
-          next.set(activeScriptStyle!, {
-            ...current,
-            segments: current.segments.map((seg, i) =>
-              i === index ? { ...seg, text } : seg
-            ),
-          });
-        }
-        return next;
-      });
-      // 同时更新当前显示的 script
-      setScript(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          segments: prev.segments.map((seg, i) =>
-            i === index ? { ...seg, text } : seg
-          ),
-        };
-      });
-    } else {
-      // 单风格模式
-      setScript((prev) => {
-        if (!prev) return prev;
-        const segments = prev.segments.map((seg, i) =>
-          i === index ? { ...seg, text } : seg
-        );
-        return { ...prev, segments };
-      });
-    }
-  }, [multiStyleMode, activeScriptStyle]);
-
-  /**
-   * @deprecated Use useTimelineStore + commentary/calibrationService.calibrateScriptWithDuration instead
-   * (Phase 6: 解说流程优化)
-   */
-  const calibrateTimelineWithTTS = useCallback(async (
-    targetScript: CommentaryScriptOutput,
-    voice: string,
-  ): Promise<CommentaryScriptOutput> => {
-    try {
-      const segmentsWithDuration = await Promise.all(
-        targetScript.segments.map(async (seg) => {
-          const duration = await estimateTTSDuration(seg.text, voice);
-          return { ...seg, endTime: seg.startTime + duration };
-        })
-      );
-      // 重新计算每段的 startTime 和 endTime
-      let cumulativeStart = 0;
-      const calibrated = segmentsWithDuration.map(seg => {
-        const dur = seg.endTime - seg.startTime;
-        const start = cumulativeStart;
-        cumulativeStart += dur;
-        return { ...seg, startTime: start, endTime: cumulativeStart };
-      });
-      const totalDuration = calibrated.reduce((sum, seg) => sum + (seg.endTime - seg.startTime), 0);
-      return {
-        ...targetScript,
-        segments: calibrated,
-        estimatedDurationSecs: totalDuration,
-      };
-    } catch (e) {
-      logger.warn('[CommentaryPanel] TTS 时长校准失败，使用原始估算:', e);
-      return targetScript;
-    }
-  }, []);
-
-  /** 批量生成多风格脚本 */
   const handleMultiStyleGenerate = useCallback(async () => {
-    if (!sessionId || !subtitles.trim()) {
-      toast.error('请先导入字幕文件');
-      return;
-    }
-    if (!apiKey.trim()) {
-      toast.error('请先填写 API Key');
-      return;
-    }
-    if (selectedStyles.length === 0) {
-      toast.error('请至少选择一个风格');
-      return;
-    }
+    if (!sessionId) return;
+    await multiGenerate({ sessionId, subtitles, apiKey, selectedStyles: [selectedStyle], durationSecs });
+    setActiveTab('script');
+  }, [sessionId, subtitles, apiKey, selectedStyle, durationSecs, multiGenerate, setActiveTab]);
 
-    setIsGenerating(true);
-    try {
-      const newScripts = new Map<ScriptStylePreset, CommentaryScriptOutput>();
-      for (let i = 0; i < selectedStyles.length; i++) {
-        const style = selectedStyles[i];
-        setActiveScriptStyle(style);
+  const handleSegmentChange = useCallback((index: number, text: string) => {
+    updateSegment(index, text);
+  }, [updateSegment]);
 
-        const result = await generateCommentaryScript({
-          subtitles,
-          durationSecs,
-          targetDurationSecs: durationSecs,
-          style,
-          apiKey,
-          provider: 'openai',
-        });
-        newScripts.set(style, result);
-      }
-      setScripts(newScripts);
-      setScript(newScripts.get(selectedStyles[0]) ?? null);
-      setActiveScriptStyle(selectedStyles[0]);
-      toast.success(`批量生成完成！共 ${newScripts.size} 个版本 🎉`);
-      setActiveTab('script');
-    } catch (e) {
-      logger.error('[CommentaryPanel] 批量生成失败:', e);
-      toast.error(`生成失败: ${e}`);
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [sessionId, subtitles, apiKey, selectedStyles, durationSecs]);
-
-  /** 生成 Director Plan */
+  // ── Director Plan ────────────────────────────────────────────────────
   const handleGeneratePlan = useCallback(async () => {
     if (!sessionId) return;
-
-    setIsGenerating(true);
     try {
       await generateCommentaryPlan(sessionId, selectedStyle, durationSecs);
       toast.success('AI 导演计划已生成 ✨');
       setPlanConfirmOpen(true);
     } catch (e) {
-      logger.error('[CommentaryPanel] 生成 Plan 失败:', e);
       toast.error(`生成失败: ${e}`);
-    } finally {
-      setIsGenerating(false);
     }
   }, [sessionId, selectedStyle, durationSecs]);
 
-  /** 确认 Plan 并渲染 */
   const handleApprovePlan = useCallback(async () => {
     if (!sessionId) return;
-
     try {
       await approveCommentaryPlan(sessionId);
       setPlanConfirmOpen(false);
       toast.success('渲染已启动，请耐心等待 🎬');
       setActiveTab('timeline');
     } catch (e) {
-      logger.error('[CommentaryPanel] 确认 Plan 失败:', e);
       toast.error(`启动失败: ${e}`);
     }
   }, [sessionId]);
 
-  /** 合成配音预览 */
+  // ── 预览 ─────────────────────────────────────────────────────────────
   const handlePreviewVoice = useCallback(async () => {
-    if (!script?.fullScript) return;
+    await previewVoice(script?.fullScript ?? '', selectedVoice);
+  }, [script, selectedVoice, previewVoice]);
 
-    setIsSynthesizing(true);
-    try {
-      const result = await synthesizeCommentaryAudio(
-        script.fullScript.slice(0, 200), // 只合成前 200 字预览
-        selectedVoice,
-      );
-      // 播放音频（通过 Audio 元素）
-      const audio = new Audio(`file://${result.audioPath}`);
-      audio.play();
-      toast.success('配音预览已播放 🔊');
-    } catch (e) {
-      logger.error('[CommentaryPanel] 配音预览失败:', e);
-      toast.error(`预览失败: ${e}`);
-    } finally {
-      setIsSynthesizing(false);
-    }
-  }, [script, selectedVoice]);
+  // ── 批量模式切换 ──────────────────────────────────────────────────────
+  const toggleMultiStyleMode = useCallback(() => {
+    setMultiStyleMode((prev) => {
+      if (!prev) setSelectedStyles([selectedStyle]);
+      return !prev;
+    });
+  }, [setMultiStyleMode, setSelectedStyles, selectedStyle]);
 
-  // ─── 渲染 ────────────────────────────────────────────────────────────
-
-  const currentState = directorStatus?.state ?? 'idle';
-  const progressPct = directorStatus?.progressPct ?? 0;
-
+  // ── 渲染 ─────────────────────────────────────────────────────────────
   return (
     <div className={styles.commentaryPanel}>
       <CardHeader className={styles.header}>
@@ -421,18 +213,10 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
           <TabsList className={styles.tabsList}>
-            <TabsTrigger value="script">
-              <FileText size={14} /> 脚本
-            </TabsTrigger>
-            <TabsTrigger value="style">
-              <Sparkles size={14} /> 风格
-            </TabsTrigger>
-            <TabsTrigger value="voice">
-              <Mic size={14} /> 音色
-            </TabsTrigger>
-            <TabsTrigger value="timeline">
-              <Volume2 size={14} /> 时间线
-            </TabsTrigger>
+            <TabsTrigger value="script"><FileText size={14} /> 脚本</TabsTrigger>
+            <TabsTrigger value="style"><Sparkles size={14} /> 风格</TabsTrigger>
+            <TabsTrigger value="voice"><Mic size={14} /> 音色</TabsTrigger>
+            <TabsTrigger value="timeline"><Volume2 size={14} /> 时间线</TabsTrigger>
           </TabsList>
 
           {/* 脚本编辑 */}
@@ -440,7 +224,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
             {multiStyleMode && scripts.size > 0 && activeScriptStyle ? (
               <div className={styles.multiScriptTabs}>
                 <div className={styles.multiScriptStyleTabs}>
-                  {Array.from(scripts.entries()).map(([style, _s]) => (
+                  {Array.from(scripts.entries()).map(([style]) => (
                     <button
                       key={style}
                       className={`${styles.multiScriptStyleTab} ${activeScriptStyle === style ? styles.multiScriptStyleTabActive : ''}`}
@@ -474,7 +258,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
           {/* 风格选择 */}
           <TabsContent value="style" className={styles.tabContent}>
             <CommentaryStyleSelector
-              selected={multiStyleMode ? selectedStyles : selectedStyle}
+              selected={multiStyleMode ? [selectedStyle] : selectedStyle}
               onChange={(s: ScriptStylePreset | ScriptStylePreset[]) => {
                 if (multiStyleMode) {
                   setSelectedStyles(s as ScriptStylePreset[]);
@@ -493,7 +277,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
               selected={selectedVoice}
               onChange={setSelectedVoice}
               onPreview={handlePreviewVoice}
-              isPreviewing={isSynthesizing}
+              isPreviewing={isPreviewing}
             />
           </TabsContent>
 
@@ -524,7 +308,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
             disabled={disabled || isGenerating || !subtitles.trim() || !apiKey.trim()}
           >
             {isGenerating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-            {multiStyleMode ? `批量生成 (${selectedStyles.length})` : '生成脚本'}
+            {multiStyleMode ? `批量生成 (1)` : '生成脚本'}
           </Button>
 
           <Button
@@ -540,12 +324,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              setMultiStyleMode(prev => !prev);
-              if (!multiStyleMode) {
-                setSelectedStyles([selectedStyle]);
-              }
-            }}
+            onClick={toggleMultiStyleMode}
           >
             <Sparkles size={14} />
             {multiStyleMode ? '退出批量' : '多风格'}
@@ -556,9 +335,9 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
               variant="outline"
               size="sm"
               onClick={handlePreviewVoice}
-              disabled={isSynthesizing}
+              disabled={isPreviewing}
             >
-              {isSynthesizing ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
+              {isPreviewing ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
               预览配音
             </Button>
           )}
