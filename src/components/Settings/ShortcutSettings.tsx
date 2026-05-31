@@ -3,7 +3,7 @@
  * Table: Action | Shortcut (editable)
  * 20+ shortcuts with editable bindings
  */
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { Input } from '../ui/input';
 
 interface Shortcut {

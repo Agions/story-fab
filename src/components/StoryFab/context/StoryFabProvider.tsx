@@ -4,7 +4,7 @@
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
 import type { storyfabState, storyfabStep, storyfabFeatureType, storyfabAction, storyfabMode } from '../types/workflow';
-import { initialState, getNextStep, getPrevStep, getStepsForMode, getTotalSteps } from '../types/workflow';
+import { initialState, getNextStep, getPrevStep, getTotalSteps } from '../types/workflow';
 import { storyFabReducer } from '../types/workflow.reducer';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
 

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { formatTimecodeMs } from '@/shared/utils';
 import styles from '@/components/Timeline/Timeline.module.less';
 

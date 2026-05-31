@@ -101,7 +101,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
   const [selectedStyle, setSelectedStyle] = useState<ScriptStylePreset>('conversational');
 
   // ── Hooks ────────────────────────────────────────────────────────────
-  const { sessionId, directorStatus, isReady } = useCommentarySession(
+  const { sessionId, directorStatus } = useCommentarySession(
     videoPath,
     selectedStyle,
     disabled,
@@ -129,7 +129,6 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
     setSelectedVoice,
     previewVoice,
     isPreviewing,
-    stopPreview,
   } = useCommentaryVoice();
 
   // ── 脚本生成 ──────────────────────────────────────────────────────────

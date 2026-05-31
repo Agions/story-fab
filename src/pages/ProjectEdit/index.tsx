@@ -257,7 +257,7 @@ const ProjectEdit: React.FC = () => {
       if (!meta) {
         stage = 'metadata';
         notify.info('正在分析视频元数据...');
-        meta = await analyzeVideo(videoPath);
+        meta = await videoProcessor.analyze(videoPath);
         setVideoMetadata(meta);
       }
 
