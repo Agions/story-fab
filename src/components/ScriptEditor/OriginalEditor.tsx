@@ -11,7 +11,8 @@ import {
   Plus,
 } from 'lucide-react';
 import type { ScriptSegment } from '@/core/types';
-import { VideoSegment, formatDuration, previewSegment } from '../../services/videoFacade';
+import type { VideoSegment } from '@/core/video';
+import { videoProcessor, formatDuration } from '@/core/video';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { notify } from '@/shared';
 import SegmentTable from './SegmentTable';
@@ -147,7 +148,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
       setPreviewLoading(true);
       const segment = segments[index];
       const videoSegment: VideoSegment = { start: segment.startTime, end: segment.endTime };
-      const previewPath = await previewSegment(videoPath, videoSegment);
+      const previewPath = await videoProcessor.preview(videoPath, videoSegment);
       setPreviewSrc(convertFileSrc(previewPath));
       setPreviewVisible(true);
     } catch (error) {

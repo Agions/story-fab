@@ -14,10 +14,10 @@ import { Steps } from '@/components/ui/steps';
 import { Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
-import { VideoMetadata, analyzeVideo, extractKeyFrames } from '../../services/videoFacade';
+import { VideoMetadata, analyzeVideo, extractKeyFrames } from '@/core/video';
 import type { ScriptSegment } from '@/core/types';
 import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/ai/scriptService';
-import { loadProjectWithRetry, saveProjectToFile } from '../../services/tauri';
+import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
 import { v4 as uuid } from 'uuid';

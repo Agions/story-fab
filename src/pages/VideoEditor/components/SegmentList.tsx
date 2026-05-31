@@ -3,7 +3,7 @@ import { Card, CardContent } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { Plus, Trash2 } from 'lucide-react';
-import { VideoSegment } from '../../../services/videoFacade';
+import { VideoSegment } from '@/core/video';
 import { formatDuration } from '../../../shared/utils/formatting';
 import styles from '@/pages/VideoEditor/index.module.less';
 
