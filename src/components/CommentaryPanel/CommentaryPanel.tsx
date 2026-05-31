@@ -179,11 +179,8 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
 
   // ── 批量模式切换 ──────────────────────────────────────────────────────
   const toggleMultiStyleMode = useCallback(() => {
-    setMultiStyleMode((prev) => {
-      if (!prev) setSelectedStyles([selectedStyle]);
-      return !prev;
-    });
-  }, [setMultiStyleMode, setSelectedStyles, selectedStyle]);
+    setMultiStyleMode(!multiStyleMode);
+  }, [multiStyleMode, setMultiStyleMode]);
 
   // ── 渲染 ─────────────────────────────────────────────────────────────
   return (

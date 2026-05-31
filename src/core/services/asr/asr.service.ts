@@ -31,6 +31,7 @@ interface SpeechRecognitionResultList {
   [Symbol.iterator](): Iterator<SpeechRecognitionResult>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface _SpeechRecognitionEventMap {
   'result': SpeechRecognitionEvent;
 }
@@ -60,6 +61,7 @@ interface RustWhisperSegment {
   words?: RustWhisperWord[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface _RustWhisperResult {
   segments: RustWhisperSegment[];
   language?: string;
@@ -150,7 +152,7 @@ const DEFAULT_ASR_OPTIONS: Required<ASROptions> = {
 // ============================================
 
 export class ASRService extends BaseService {
-  private isInitialized = false;
+  private _isInitialized = false;
 
   constructor() {
     super('ASRService', { timeout: 60000, retries: 2 });

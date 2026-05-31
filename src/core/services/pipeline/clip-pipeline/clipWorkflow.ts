@@ -130,6 +130,7 @@ export class ClipWorkflowService {
    *
    * @see processVideoWithPipeline 完整路径（多维评分 + SEO）
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async processVideo(
     videoInfo: VideoInfo,
     scriptSegments?: ScriptSegment[]
