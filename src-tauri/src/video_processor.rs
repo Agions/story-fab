@@ -110,7 +110,7 @@ impl VideoProcessor {
 
     pub fn extract_keyframes(&self, path: &str, max_frames: u32, scene_threshold: f64) -> Result<Vec<String>, String> {
         let temp_dir = std::env::temp_dir()
-            .join(format!("story-fab_frames_{}_{}", std::process::id(), chrono_like_timestamp()));
+            .join(format!("clipflow_frames_{}_{}", std::process::id(), chrono_like_timestamp()));
 
         fs::create_dir_all(&temp_dir)
             .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -243,7 +243,7 @@ impl VideoProcessor {
 
     pub fn generate_thumbnail(&self, path: &str, time: f64) -> Result<String, String> {
         let temp_dir = std::env::temp_dir()
-            .join(format!("story-fab_thumb_{}_{}", std::process::id(), chrono_like_timestamp()));
+            .join(format!("clipflow_thumb_{}_{}", std::process::id(), chrono_like_timestamp()));
 
         fs::create_dir_all(&temp_dir)
             .map_err(|e| format!("创建临时目录失败: {}", e))?;
@@ -271,7 +271,7 @@ impl VideoProcessor {
         // Move thumb.jpg out of temp_dir before cleanup
         // Use fs::copy for efficiency instead of read+write
         let final_path = std::env::temp_dir()
-            .join(format!("story-fab_thumb_{}.jpg", chrono_like_timestamp()));
+            .join(format!("clipflow_thumb_{}.jpg", chrono_like_timestamp()));
         fs::copy(&output, &final_path)
             .map_err(|e| {
                 let _ = fs::remove_dir_all(&temp_dir);
@@ -317,7 +317,7 @@ pub async fn cut_video(
     use_hw_accel: Option<bool>,
 ) -> Result<String, String> {
     let temp_dir = std::env::temp_dir()
-        .join(format!("story-fab_cut_{}", chrono_like_timestamp()));
+        .join(format!("clipflow_cut_{}", chrono_like_timestamp()));
 
     tokio_fs::create_dir_all(&temp_dir)
         .await
@@ -446,8 +446,8 @@ pub async fn mix_audio(input: MixAudioInput) -> Result<String, String> {
             let delay_ms = (offset * 1000.0) as i64;
             cmd.args(&["-filter_complex",
                 &format!(
-                    "[0:a]volume={bg}[bg];[1:a]volume={tts},adelay={delay}|{delay}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
-                    bg = bg_vol, tts = tts_vol, delay = delay_ms
+                    "[0:a]volume={bg_vol}[bg];[1:a]volume={tts_vol},adelay={delay_ms}|{delay_ms}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
+                    bg = bg_vol, tts = tts_vol, delay_ms = delay_ms
                 ),
                 "-map", "0:v",
                 "-map", "[mixed]",
@@ -455,7 +455,7 @@ pub async fn mix_audio(input: MixAudioInput) -> Result<String, String> {
         } else {
             cmd.args(&["-filter_complex",
                 &format!(
-                    "[0:a]volume={bg}[bg];[1:a]volume={tts}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
+                    "[0:a]volume={bg_vol}[bg];[1:a]volume={tts_vol}[tts];[bg][tts]amix=inputs=2:duration=first[mixed]",
                     bg = bg_vol, tts = tts_vol
                 ),
                 "-map", "0:v",

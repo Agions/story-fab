@@ -1,0 +1,267 @@
+/**
+ * SubtitleStyler.module.less
+ * 字幕样式编辑器样式
+ */
+
+@bg-deep: #0C0D14;
+@amber: #FF9F43;
+@cyan: #00D4FF;
+@text-primary: #FFFFFF;
+@text-secondary: rgba(255, 255, 255, 0.65);
+@text-muted: rgba(255, 255, 255, 0.38);
+@glass-bg: rgba(20, 21, 32, 0.8);
+@glass-border: rgba(255, 255, 255, 0.07);
+@radius-lg: 16px;
+@radius-md: 12px;
+@radius-sm: 8px;
+
+// ─── 容器 ─────────────────────────────────────────────────────────────────
+
+.container {
+  display: flex;
+  gap: 20px;
+  min-height: 420px;
+}
+
+// ─── 左侧预设栏 ─────────────────────────────────────────────────────────────
+
+.presetList {
+  width: 360px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: @text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+}
+
+// ─── 预设卡片 ───────────────────────────────────────────────────────────────
+
+.presets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.presetCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 4px;
+  border-radius: @radius-md;
+  background: @glass-bg;
+  border: 1px solid @glass-border;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.presetCardActive {
+  background: rgba(255, 159, 67, 0.1) !important;
+  border-color: rgba(255, 159, 67, 0.4) !important;
+
+  .presetName {
+    color: @amber;
+  }
+}
+
+.presetIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.presetName {
+  font-size: 11px;
+  color: @text-secondary;
+  text-align: center;
+  line-height: 1.2;
+}
+
+// ─── 精细调节 ───────────────────────────────────────────────────────────────
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: @text-secondary;
+
+  span:first-child {
+    width: 68px;
+    flex-shrink: 0;
+    color: @text-muted;
+  }
+
+  input[type="range"] {
+    flex: 1;
+    height: 4px;
+    accent-color: @amber;
+  }
+
+  input[type="color"] {
+    width: 32px;
+    height: 24px;
+    border: 1px solid @glass-border;
+    border-radius: 4px;
+    background: @glass-bg;
+    cursor: pointer;
+    padding: 1px;
+  }
+}
+
+.fieldValue {
+  width: 38px;
+  text-align: right;
+  font-size: 11px;
+  color: @text-muted;
+  flex-shrink: 0;
+}
+
+.colorInput {
+  flex-shrink: 0;
+}
+
+.selectInput {
+  flex: 1;
+  height: 28px;
+  padding: 0 8px;
+  background: @glass-bg;
+  border: 1px solid @glass-border;
+  border-radius: 6px;
+  color: @text-primary;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: rgba(255, 159, 67, 0.4);
+  }
+}
+
+// ─── ASS 导出 ───────────────────────────────────────────────────────────────
+
+.assExport {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.assCode {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 10px;
+  line-height: 1.6;
+  color: @cyan;
+  background: rgba(0, 212, 255, 0.06);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.copyBtn {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  color: @cyan;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 212, 255, 0.15);
+    border-color: rgba(0, 212, 255, 0.5);
+  }
+}
+
+// ─── 右侧预览 ───────────────────────────────────────────────────────────────
+
+.preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.previewScreen {
+  flex: 1;
+  background: @glass-bg;
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  overflow: hidden;
+}
+
+.previewVideoArea {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  background: linear-gradient(135deg, #1a1b26 0%, #0f1018 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.previewHint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.15);
+  user-select: none;
+}
+
+.subtitleWrapper {
+  display: flex;
+  width: 100%;
+  padding: 0 16px 16px;
+  box-sizing: border-box;
+}
+
+.previewSubtitle {
+  display: inline-block;
+  max-width: 80%;
+  word-break: break-all;
+  line-height: 1.4;
+  user-select: none;
+}
+
+.previewInfo {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: @text-muted;
+
+  span {
+    background: @glass-bg;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid @glass-border;
+  }
+}

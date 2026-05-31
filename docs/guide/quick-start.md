@@ -13,8 +13,8 @@ title: 快速开始
 ## 安装运行
 
 ```bash
-git clone https://github.com/Agions/story-fab.git
-cd story-fab
+git clone https://github.com/Agions/ClipFlow.git
+cd ClipFlow
 npm install
 npm run dev
 ```
@@ -31,7 +31,7 @@ npm run tauri build
 
 ### 1. 新建项目
 
-打开 StoryFab，点击 **新建项目**，为项目命名并选择输出目录。
+打开 ClipFlow，点击 **新建项目**，为项目命名并选择输出目录。
 
 ### 2. 上传视频
 
@@ -44,7 +44,7 @@ npm run tauri build
 
 ### 3. AI 分析视频
 
-StoryFab 并行运行两个 AI 进程：
+ClipFlow 并行运行两个 AI 进程：
 
 - **Whipser 语音转录** — 完整音频转录，本地存储
 - **高光检测** — 基于音频能量、画面变化和语音活动识别精彩片段
