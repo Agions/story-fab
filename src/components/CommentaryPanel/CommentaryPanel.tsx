@@ -256,7 +256,10 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
     }
   }, [multiStyleMode, activeScriptStyle]);
 
-  /** 用真实 TTS 时长校准时间轴 */
+  /**
+   * @deprecated Use useTimelineStore + commentary/calibrationService.calibrateScriptWithDuration instead
+   * (Phase 6: 解说流程优化)
+   */
   const calibrateTimelineWithTTS = useCallback(async (
     targetScript: CommentaryScriptOutput,
     voice: string,
