@@ -13,12 +13,13 @@
     "jsx": "react-jsx",
     "strict": true,
     "strictNullChecks": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
     "types": ["vite/client"],
     "paths": {
       "@/*": ["./src/*"],
@@ -32,7 +33,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "src/_DEAD",
     "**/__snapshots__/**"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
