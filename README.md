@@ -1,14 +1,24 @@
 # StoryFab 🎬
 
-> AI 影视/短剧解说创作工具 — 智能拆条 + 解说生成 + 配音合成，一站式本地完成
+```
+ _____ __                   ______      __
+ / ___// /_____  _______  __/ ____/___ _/ /_
+ \__ \/ __/ __ \/ ___/ / / / /_  / __ `/ __/
+ ___/ / /_/ /_/ / /  / /_/ / __/ / /_/ / /_/ /
+/____/\__/\____/_/   \__, /_/    \__,_/_.___/
+                    /____/
+```
+
+> **AI 影视/短剧解说创作工具** — 智能拆条 · 解说生成 · 配音合成，一站式本地完成
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Tauri](https://img.shields.io/badge/Tauri-2.x-FFC131?style=flat-square&logo=tauri)](https://tauri.app/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-gray?style=flat-square)]()
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-gray?style=flat-square)]()
 
-**StoryFab** 是一款本地 AI 驱动的视频创作工具，基于 Tauri 2.x（Rust + React + TypeScript）构建。支持**剪辑模式**和**解说模式**两种工作流，帮你从直播回放、游戏高光一路搞定到电影解说。
+**StoryFab** 是一款本地 AI 驱动的视频创作工具，基于 Tauri 2.x（Rust + React + TypeScript）构建。
+支持**剪辑模式**和**解说模式**两种工作流，帮你从直播回放、游戏高光一路搞定到电影解说。
 
 ---
 
@@ -79,7 +89,7 @@ npm run tauri build
 ┌──────────────────────────────────────────────────────┐
 │                    前端 (Web)                        │
 │              React 18 + TypeScript                   │
-│           React Context 状态管理 · Vite               │
+│           React Context 状态管理 · Vite              │
 └───────────────────────┬──────────────────────────────┘
                         │ Tauri IPC (invoke)
 ┌───────────────────────▼──────────────────────────────┐
