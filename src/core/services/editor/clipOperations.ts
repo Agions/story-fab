@@ -73,7 +73,9 @@ export function removeClip(timeline: Timeline, trackId: string, clipId: string):
 
 /** 移动片段 */
 export function moveClip(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   timeline: Timeline,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   trackId: string,
   clipId: string,
   newPosition: number

@@ -283,9 +283,11 @@ export class ClipScorer {
     return Math.min(100, hits * 15);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private buildReasons(
     laughter: number, emotion: number, completeness: number,
     silence: number, pace: number, keywords: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     transcript: string, duration: number,
   ): string[] {
     const reasons: string[] = [];
