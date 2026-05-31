@@ -3,7 +3,7 @@
  * 展示 AI 剪辑流程的步骤进度，支持点击跳转
  */
 import React, { memo } from 'react';
-import { Plus, Video, Cloud, FileText, Edit, Download, Check, Bolt, Brain, Eye, PenTool, Mic } from 'lucide-react';
+import { Plus, Video, Cloud, Download, Check, Bolt, Brain, Eye, PenTool, Mic } from 'lucide-react';
 import type { storyfabStep, storyfabMode } from '../context';
 import styles from './Workspace.module.less';
 
