@@ -27,6 +27,7 @@ export interface VoiceConfig {
 
 /**
  * 音色信息（统一类型，合并了 commentary/VoiceInfo 和 voice-synthesis/VoiceItem）
+ * style/description 在 commentary 上下文 required，voice 上下文 optional
  */
 export interface VoiceInfo {
   id: string;
@@ -35,6 +36,9 @@ export interface VoiceInfo {
   style?: string;
   description?: string;
   lang?: string;
+  /** 评论/解说音色专用字段（commentary 上下文下 required） */
+  commentaryStyle?: string;
+  commentaryDescription?: string;
 }
 
 export interface SynthesisResult {
