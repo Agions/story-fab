@@ -1,7 +1,7 @@
 /**
  * ProjectEdit 纯工具函数
  */
-import type { VideoMetadata } from '../../services/videoFacade';
+import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment } from '@/core/types';
 import type { ProjectFileLike } from '../../core/utils/project-file';
 import { normalizeProjectFile } from '../../core/utils/project-file';

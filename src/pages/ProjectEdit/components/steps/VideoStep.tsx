@@ -7,7 +7,7 @@ import { Video } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { cn } from '../../../../lib/utils';
 import VideoSelector from '../../../../components/VideoSelector';
-import type { VideoMetadata } from '../../../../services/videoFacade';
+import type { VideoMetadata } from '@/core/video';
 import styles from '@/pages/ProjectEdit/index.module.less';
 
 interface VideoStepProps {
