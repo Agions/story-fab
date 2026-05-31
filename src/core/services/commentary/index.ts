@@ -10,101 +10,27 @@
  */
 
 import { invoke } from '@tauri-apps/api/core';
+import type {
+  ScriptStylePreset,
+  SegmentMode,
+  DirectorState,
+  CommentarySegment,
+  CommentaryScriptOutput,
+  DirectorPlan,
+  DirectorStatusResponse,
+  PlanModifications,
+  SynthesizeOptions,
+  SynthesizeResult,
+  GenerateScriptInput,
+} from '@/core/types/commentary';
+import type { VoiceInfo as CanonicalVoiceInfo } from '@/core/types/voice';
 
-// ─── 类型定义 ────────────────────────────────────────────────────────────
-
-/** 脚本风格预设 */
-export type ScriptStylePreset =
-  | 'humorous'
-  | 'serious'
-  | 'conversational'
-  | 'suspense'
-  | 'warm';
-
-/** 片段模式 */
-export type SegmentMode = 'silent_only' | 'original_audio' | 'montage';
-
-/** Director 状态 */
-export type DirectorState =
-  | 'idle'
-  | 'analyzing'
-  | 'planning'
-  | 'ready'
-  | 'rendering'
-  | 'done';
-
-/** 解说片段 */
-export interface CommentarySegment {
-  startTime: number;
-  endTime: number;
-  text: string;
-  emotion?: string;
-}
-
-/** 解说脚本输出 */
-export interface CommentaryScriptOutput {
-  fullScript: string;
-  segments: CommentarySegment[];
-  estimatedDurationSecs: number;
-  modelUsed: string;
-  provider: string;
-}
-
-/** Director Plan */
-export interface DirectorPlan {
-  id: string;
-  summary: string;
-  angle: string;
-  targetAudience?: string;
-  targetDurationSecs: number;
-  estimatedSegments: number;
-  segmentMode: SegmentMode;
-  recommendedVoice: string;
-  keyPoints: string[];
-  warnings: string[];
-  confidence: number;
-}
-
-/** Director 状态响应 */
-export interface DirectorStatusResponse {
-  sessionId: string;
-  state: DirectorState;
-  plan?: DirectorPlan;
-  error?: string;
-  progressPct: number;
-}
-
-/** Plan 修正 */
-export interface PlanModifications {
-  targetDurationSecs?: number;
-  angle?: string;
-  segmentMode?: SegmentMode;
-  recommendedVoice?: string;
-}
-
-/** 合成选项 */
-export interface SynthesizeOptions {
-  text: string;
-  voice: string;
-  speed: number;
-  format?: 'mp3' | 'wav' | 'ogg';
-  outputPath?: string;
-}
-
-/** 合成结果 */
-export interface SynthesizeResult {
-  audioPath: string;
-  durationSecs: number;
-}
-
-/** 音色信息 */
-export interface VoiceInfo {
-  id: string;
-  name: string;
-  gender: 'male' | 'female';
+/** 音色信息（commentary 上下文专用，style/description required） */
+export interface VoiceInfo extends CanonicalVoiceInfo {
   style: string;
   description: string;
 }
+export type { CanonicalVoiceInfo as VoiceCatalogInfo } from '@/core/types/voice';
 
 // ─── Director Agent ─────────────────────────────────────────────────────
 
