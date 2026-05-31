@@ -1,0 +1,480 @@
+/**
+ * story-fab Layout — Redesigned per frontend-design-pro
+ *
+ * Design tokens (OKLCH-aware):
+ * - Dark bg uses warm-tinted #0f0f0f (not pure black)
+ * - Accent amber OKLCH-based with glow
+ * - 8px base spacing grid
+ * - cubic-bezier(0.16, 1, 0.3, 1) easing for all transitions
+ * - Micro-interactions: max 200ms / Page transitions: max 300ms
+ * - prefers-reduced-motion respected (no decorative animations)
+ */
+
+// ─── Design Tokens ────────────────────────────────────────────────
+@bg-base: #0f0f12;          // warm-tinted dark (not pure #000)
+@bg-surface: #16161d;        // slightly lighter surface
+@bg-elevated: #1e1e28;      // elevated / hover
+@bg-overlay: #28283a;       // overlay / active
+
+@border-subtle: #22222e;
+@border-default: #2e2e3e;
+@border-strong: #3e3e52;
+
+@accent: #d4a574;           // unified amber (OKLCH 65% 0.18 70)
+@accent-light: #e8c9a8;
+@accent-dark: #c49660;
+@accent-glow: color-mix(in oklch, @accent 20%, transparent);
+
+@text-primary: #eeeef2;
+@text-secondary: #8888a2;
+@text-tertiary: #55556e;
+
+@font-display: 'Outfit', system-ui, sans-serif;
+@font-body: 'Figtree', system-ui, sans-serif;
+
+@radius-sm: 4px;
+@radius-md: 8px;
+@radius-lg: 12px;
+@radius-xl: 16px;
+@radius-full: 9999px;
+
+@ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+@ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+@transition-fast: 120ms;
+@transition-default: 200ms;
+@transition-slow: 300ms;
+
+@sidebar-width: 220px;
+@sidebar-collapsed-width: 64px;
+@topbar-height: 56px;
+
+// ─── Layout Shell ─────────────────────────────────────────────────
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: @bg-base;
+}
+
+// ─── Left Sidebar ─────────────────────────────────────────────────
+.sidebar {
+  width: @sidebar-width;
+  min-height: 100vh;
+  background: @bg-surface;
+  border-right: 1px solid @border-subtle;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 200;
+  transition:
+    width @transition-slow @ease-out,
+    background @transition-default;
+  overflow: hidden;
+
+  &.collapsed {
+    width: @sidebar-collapsed-width;
+
+    .logo { justify-content: center; padding: 0; }
+    .nav { padding: 0; }
+    .navItem {
+      justify-content: center;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: @radius-md;
+      margin: 2px auto;
+    }
+    .sidebarBottom { justify-content: center; }
+  }
+}
+
+// Logo
+.logo {
+  height: @topbar-height;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  border-bottom: 1px solid @border-subtle;
+  cursor: pointer;
+  transition: background @transition-default @ease-out;
+  flex-shrink: 0;
+
+  &:hover { background: @bg-elevated; }
+  &:focus-visible {
+    outline: 2px solid @accent;
+    outline-offset: -2px;
+    border-radius: @radius-sm;
+  }
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: @radius-md;
+  overflow: hidden;
+}
+
+.logoText {
+  font-family: @font-display;
+  font-size: 16px;
+  font-weight: 700;
+  color: @text-primary;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  background: linear-gradient(135deg, @accent 0%, @accent-light 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// New Project Button
+.newProjectBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, @accent 0%, @accent-dark 100%);
+  color: @bg-base;
+  border: none;
+  border-radius: @radius-md;
+  font-family: @font-body;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform @transition-default @ease-out,
+    box-shadow @transition-default @ease-out;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px @accent-glow;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid @accent;
+    outline-offset: 2px;
+  }
+}
+
+.newProjectBtnIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 12px auto;
+  background: linear-gradient(135deg, @accent 0%, @accent-dark 100%);
+  color: @bg-base;
+  border: none;
+  border-radius: @radius-md;
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    box-shadow @transition-default @ease-out,
+    transform @transition-default @ease-out;
+  flex-shrink: 0;
+
+  &:hover {
+    box-shadow: 0 4px 16px @accent-glow;
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid @accent;
+    outline-offset: 2px;
+  }
+}
+
+// Navigation
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  height: 40px;
+  border-radius: @radius-md;
+  background: transparent;
+  border: none;
+  color: @text-secondary;
+  font-family: @font-body;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background @transition-default @ease-out,
+    color @transition-default;
+  position: relative;
+  text-align: left;
+  width: 100%;
+
+  &:hover {
+    background: @bg-elevated;
+    color: @text-primary;
+  }
+
+  &.active {
+    background: color-mix(in oklch, @accent 10%, transparent);
+    color: @accent;
+
+    .navIcon { color: @accent; }
+  }
+
+  &:focus-visible {
+    outline: 2px solid @accent;
+    outline-offset: -2px;
+  }
+}
+
+.navIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+  color: @text-tertiary;
+  transition: color @transition-default;
+}
+
+.navLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Active indicator — no bounce animation, respects reduced-motion
+.navIndicator {
+  position: absolute;
+  right: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: @accent;
+  box-shadow: 0 0 8px @accent;
+  // No animation — decorative only, hidden when reduced-motion
+
+  @media (prefers-reduced-motion: reduce) {
+    display: none;
+  }
+}
+
+// Sidebar Bottom
+.sidebarBottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  border-top: 1px solid @border-subtle;
+  flex-shrink: 0;
+}
+
+.collapseBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid @border-default;
+  border-radius: @radius-md;
+  color: @text-tertiary;
+  cursor: pointer;
+  transition:
+    background @transition-default @ease-out,
+    color @transition-default,
+    border-color @transition-default;
+  font-size: 14px;
+
+  &:hover {
+    background: @bg-elevated;
+    color: @text-primary;
+    border-color: @border-strong;
+  }
+
+  &:focus-visible {
+    outline: 2px solid @accent;
+    outline-offset: 2px;
+  }
+}
+
+// ─── Top Bar ──────────────────────────────────────────────────────
+.topbar {
+  height: @topbar-height;
+  background: @bg-surface;
+  border-bottom: 1px solid @border-subtle;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: fixed;
+  top: 0;
+  left: @sidebar-width;
+  right: 0;
+  z-index: 100;
+  transition: left @transition-slow @ease-out;
+}
+
+.pageTitle {
+  font-family: @font-display;
+  font-size: 15px;
+  font-weight: 600;
+  color: @text-primary;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.iconBtn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: @radius-md;
+  color: @text-tertiary;
+  cursor: pointer;
+  transition:
+    background @transition-fast,
+    color @transition-fast;
+
+  &:hover {
+    background: @bg-elevated;
+    color: @text-primary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid @accent;
+    outline-offset: 2px;
+  }
+}
+
+.userBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  background: transparent;
+  border: 1px solid @border-default;
+  border-radius: @radius-full;
+  cursor: pointer;
+  transition:
+    background @transition-default @ease-out,
+    border-color @transition-default;
+  margin-left: 4px;
+
+  &:hover {
+    background: @bg-elevated;
+    border-color: @border-strong;
+  }
+
+  &:focus-visible {
+    outline: 2px solid @accent;
+    outline-offset: 2px;
+  }
+}
+
+.avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, @accent 0%, @accent-dark 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: @bg-base;
+  font-family: @font-display;
+}
+
+.userName {
+  font-family: @font-body;
+  font-size: 12px;
+  font-weight: 500;
+  color: @text-secondary;
+}
+
+// ─── Main Content ─────────────────────────────────────────────────
+.content {
+  flex: 1;
+  margin-left: @sidebar-width;
+  margin-top: @topbar-height;
+  padding: 24px;
+  min-height: calc(100vh - @topbar-height);
+  background: @bg-base;
+  transition: margin-left @transition-slow @ease-out;
+
+  &.contentExpanded {
+    margin-left: @sidebar-collapsed-width;
+  }
+}
+
+// ─── Responsive ────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .sidebar {
+    width: @sidebar-collapsed-width;
+
+    .logo { justify-content: center; padding: 0; }
+    .logoText { display: none; }
+    .newProjectBtn { display: none; }
+    .navItem {
+      justify-content: center;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: @radius-md;
+      margin: 2px auto;
+    }
+    .navLabel { display: none; }
+    .navIndicator { display: none; }
+    .sidebarBottom { justify-content: center; }
+  }
+
+  .topbar { left: @sidebar-collapsed-width; }
+
+  .content {
+    margin-left: @sidebar-collapsed-width;
+
+    &.contentExpanded { margin-left: @sidebar-collapsed-width; }
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    left: 0;
+    padding: 0 16px;
+  }
+
+  .content {
+    margin-left: 0;
+    padding: 16px;
+  }
+
+  .userName { display: none; }
+}

@@ -1,0 +1,134 @@
+/**
+ * AI 视频预览样式
+ * 使用项目设计系统变量
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: @bg-primary;
+}
+
+/* 视频预览区 */
+.preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.videoArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: @black;
+  position: relative;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px;
+  border: 2px dashed @border-secondary;
+  border-radius: @radius-md;
+  cursor: pointer;
+  transition:
+    border-color @duration-base @ease-out,
+    background @duration-base @ease-out;
+
+  &:hover {
+    border-color: @accent-color;
+    background: @bg-hover;
+  }
+}
+
+.playIcon {
+  font-size: 48px;
+  color: @text-tertiary;
+}
+
+/* 播放控制 */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: @bg-secondary;
+  border-top: 1px solid @border-primary;
+}
+
+.controls .ant-btn {
+  color: @text-secondary !important;
+}
+
+.playBtn {
+  font-size: 24px !important;
+  color: @accent-color !important;
+}
+
+.progress {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.progress .ant-slider {
+  margin: 0;
+}
+
+.progress .ant-slider-track {
+  background: @accent-color;
+}
+
+.progress .ant-slider-handle {
+  border-color: @accent-color;
+}
+
+/* 时间轴 */
+.timeline {
+  height: 200px;
+  background: @bg-tertiary;
+  border-top: 1px solid @border-primary;
+  display: flex;
+  flex-direction: column;
+}
+
+.timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid @border-primary;
+}
+
+.timelineContent {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 8px 16px;
+}
+
+.emptyTimeline {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed @border-secondary;
+  border-radius: @radius-sm;
+}
+
+/* AI 建议区 */
+.aiSuggestions {
+  padding: 8px 16px;
+  background: @info-bg;
+  border-top: 1px solid @primary-color;
+}
+
+.suggestionsList {
+  margin-top: 8px;
+  min-height: 24px;
+}
