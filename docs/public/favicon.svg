@@ -1,15 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="ClipFlow favicon">
-  <title>ClipFlow</title>
-  <rect width="32" height="32" rx="7" fill="#0C0D14"/>
-  <rect x="4" y="7" width="5.5" height="18" rx="1.5" fill="#FF9F43" opacity="0.9"/>
-  <rect x="4.75" y="8.5" width="4" height="2" rx="0.5" fill="#0C0D14" opacity="0.55"/>
-  <rect x="4.75" y="12" width="4" height="2" rx="0.5" fill="#0C0D14" opacity="0.55"/>
-  <rect x="4.75" y="15.5" width="4" height="2" rx="0.5" fill="#0C0D14" opacity="0.55"/>
-  <rect x="4.75" y="19" width="4" height="2" rx="0.5" fill="#0C0D14" opacity="0.55"/>
-  <rect x="22.5" y="7" width="5.5" height="18" rx="1.5" fill="#FF9F43" opacity="0.9"/>
-  <rect x="23.25" y="8.5" width="4" height="2" rx="0.5" fill="#0C0D14" opacity="0.55"/>
-  <rect x="23.25" y="12" width="4" height="2" rx="0.5" fill="#0C0D14" opacity="0.55"/>
-  <rect x="23.25" y="15.5" width="4" height="2" rx="0.5" fill="#0C0D14" opacity="0.55"/>
-  <rect x="23.25" y="19" width="4" height="2" rx="0.5" fill="#0C0D14" opacity="0.55"/>
-  <polygon points="12.5,10 12.5,22 23,16" fill="#00D4FF" opacity="0.95"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" aria-label="StoryFab favicon" role="img" viewBox="0 0 32 32"><title>StoryFab</title><rect width="32" height="32" fill="#0C0D14" rx="7"/><rect width="5.5" height="18" x="4" y="7" fill="#FF9F43" opacity=".9" rx="1.5"/><rect width="4" height="2" x="4.75" y="8.5" fill="#0C0D14" opacity=".55" rx=".5"/><rect width="4" height="2" x="4.75" y="12" fill="#0C0D14" opacity=".55" rx=".5"/><rect width="4" height="2" x="4.75" y="15.5" fill="#0C0D14" opacity=".55" rx=".5"/><rect width="4" height="2" x="4.75" y="19" fill="#0C0D14" opacity=".55" rx=".5"/><rect width="5.5" height="18" x="22.5" y="7" fill="#FF9F43" opacity=".9" rx="1.5"/><rect width="4" height="2" x="23.25" y="8.5" fill="#0C0D14" opacity=".55" rx=".5"/><rect width="4" height="2" x="23.25" y="12" fill="#0C0D14" opacity=".55" rx=".5"/><rect width="4" height="2" x="23.25" y="15.5" fill="#0C0D14" opacity=".55" rx=".5"/><rect width="4" height="2" x="23.25" y="19" fill="#0C0D14" opacity=".55" rx=".5"/><polygon fill="#00D4FF" points="12.5 10 12.5 22 23 16" opacity=".95"/></svg>
