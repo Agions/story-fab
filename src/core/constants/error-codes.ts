@@ -135,6 +135,6 @@ export const ErrorMessages: Record<ErrorCode, string> = {
 /**
  * 快速创建错误
  */
-export function createError(code: ErrorCode, message?: string, originalError?: Error): Error {
+export function createError(code: ErrorCode, message?: string, _originalError?: Error): Error {
   return new Error(message || ErrorMessages[code] || '未知错误');
 }

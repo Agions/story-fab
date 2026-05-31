@@ -4,7 +4,7 @@
  * Model selector: shadcn Select (DeepSeek/OpenAI/Claude/Qwen/Kimi)
  * Test connection button (真正调用 apiKeyService.validateApiKey)
  */
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';

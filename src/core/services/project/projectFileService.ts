@@ -7,6 +7,7 @@ import { tauri } from '@/core/tauri/TauriBridge';
 import { readTextFile, writeTextFile, BaseDirectory, exists, mkdir } from '@tauri-apps/plugin-fs';
 import { normalizeProjectId, buildProjectIdCandidates } from '@/core/utils/project-id';
 import { logger } from '@/shared/utils/logging';
+import { getConfigDir } from '@/services/file/fileOperations';
 
 const errMsg = (err: unknown): string =>
   err instanceof Error ? err.message : String(err);

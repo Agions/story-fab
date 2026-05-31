@@ -102,7 +102,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
   });
 
   const [isMixPreviewPlaying, setIsMixPreviewPlaying] = useState(false);
-  const [waveformData, setWaveformData] = useState<number[]>([]);
+  const [_waveformData, _setWaveformData] = useState<number[]>([]);
 
   const getCurrentScriptContent = useCallback((): string => {
     return state.scriptData.narration?.content || state.scriptData.remix?.content || '';
