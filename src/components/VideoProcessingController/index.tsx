@@ -1,7 +1,7 @@
-import { logger } from '../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
-import { Button } from './ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   Settings,
   Scissors,
@@ -10,8 +10,8 @@ import { invoke, TauriCommand } from '@/core/tauri/TauriBridge';
 import { notify } from '@/shared';
 import type { VideoSegment } from '@/core/types';
 import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/mods';
-import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from './VideoProcessingController/constants';
-import styles from '@/components/VideoProcessingController.module.less';
+import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from '@/components/VideoProcessingController/constants';
+import styles from '@/components/VideoProcessingController/index.module.less';
 
 const QUALITY_OPTIONS = [
   { value: 'low', label: '低质量 (720p)', description: '适合快速预览或网络分享' },

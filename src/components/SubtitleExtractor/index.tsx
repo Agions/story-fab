@@ -14,15 +14,15 @@ import React, { useState, useCallback, useRef } from 'react';
 // ── Progress animation constants ──────────────────────────────────────────────
 const PROGRESS_UPDATE_INTERVAL_MS = 250;
 const PROGRESS_CAP = 88;
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Switch } from './ui/switch';
-import { Progress } from './ui/progress';
-import { Tooltip } from './ui/tooltip';
-import { TooltipProvider } from './ui/tooltip';
-import { Badge } from './ui/badge';
-import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
-import { ScrollArea } from './ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Progress } from '@/components/ui/progress';
+import { Tooltip } from '@/components/ui/tooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   FileText,
   Edit,
@@ -33,11 +33,11 @@ import {
   Mic,
 } from 'lucide-react';
 import { notify } from '@/shared';
-import { subtitleService } from '../core/services/subtitle/subtitle.service';
-import { useEditorStore } from '../store/editorStore';
-import { useTimelineStore } from '../store/timelineStore';
+import { subtitleService } from '@/core/services/subtitle/subtitle.service';
+import { useEditorStore } from '@/store/editorStore';
+import { useTimelineStore } from '@/store/timelineStore';
 import type { SubtitleEntry } from '@/core/types';
-import styles from '@/components/SubtitleExtractor.module.css';
+import styles from './index.module.css';
 import { formatTime } from '@/shared/utils/format';
 
 interface SubtitleSegment {

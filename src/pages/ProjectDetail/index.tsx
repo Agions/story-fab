@@ -21,11 +21,11 @@ import type { ScriptSegment } from '@/core/types';
 import type { VideoAnalysis } from '@/types';
 import styles from '@/pages/ProjectDetail/index.module.less';
 
-const loadVideoInfo = () => import('../../components/VideoInfo');
-const loadScriptEditor = () => import('../../components/ScriptEditor');
-const loadVideoProcessingController = () => import('../../components/VideoProcessingController');
-const loadVideoAnalyzer = () => import('../../components/VideoAnalyzer');
-const loadSubtitleExtractor = () => import('../../components/SubtitleExtractor');
+const loadVideoInfo = () => import('@/components/VideoInfo');
+const loadScriptEditor = () => import('@/components/ScriptEditor');
+const loadVideoProcessingController = () => import('@/components/VideoProcessingController');
+const loadVideoAnalyzer = () => import('@/components/VideoAnalyzer');
+const loadSubtitleExtractor = () => import('@/components/SubtitleExtractor');
 
 const VideoInfo = lazy(loadVideoInfo);
 const ScriptEditor = lazy(loadScriptEditor);
