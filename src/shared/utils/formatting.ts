@@ -20,7 +20,7 @@ export function formatTime(seconds: number): string {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Alias for AI service compatibility (defined locally to avoid circular re-export)
+// Alias for AI service compatibility
 export const formatTimestamp = formatTime;
 
 /**
@@ -174,7 +174,7 @@ export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// ─── Time conversion constants ───────────────────────────────────────────────
+// ─── Time conversion constants ─────────────────────────────────────────────
 /** 毫秒每秒（用于 ms ↔ seconds 互转） */
 export const MS_PER_SECOND = 1000;
 
