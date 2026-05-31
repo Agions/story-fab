@@ -6,8 +6,8 @@
  */
 
 import React, { useState, memo } from 'react';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
 import type { CommentarySegment } from '@/core/services/commentary';
 import { formatDuration } from '@/core/video';
