@@ -1,6 +1,5 @@
 /* Google Fonts removed - using local Geist font for better performance */
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 /* Geist Latin-only — removes cyrillic + latin-ext fonts (~30KB savings) */
 @font-face {
