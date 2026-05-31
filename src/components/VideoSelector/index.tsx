@@ -1,7 +1,7 @@
-import { logger } from '../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Upload, Trash2, PlayCircle } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc } from '@tauri-apps/api/core';
@@ -9,7 +9,7 @@ import { tauri } from '@/core/tauri/TauriBridge';
 import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
 import { notify } from '@/shared';
 import { VIDEO_FORMATS } from '@/constants';
-import styles from '@/components/VideoSelector.module.less';
+import styles from './index.module.less';
 
 interface VideoSelectorProps {
   initialVideoPath?: string;
