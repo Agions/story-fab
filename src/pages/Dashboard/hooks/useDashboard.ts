@@ -93,22 +93,7 @@ export function useDashboard(): UseDashboardReturn {
     setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, starred: !p.starred } : p)));
   }, []);
 
-  const _confirmDelete = async (id: string) => {
-    try {
-      const ok = await deleteProject(id);
-      if (ok) {
-        notify.success('项目已删除');
-        await loadProjects();
-      } else {
-        notify.error(null, '删除项目失败');
-      }
-    } catch (error) {
-      logger.error('删除项目失败:', { error });
-      notify.error(error, '删除项目失败，请稍后重试');
-    } finally {
-      _setDeleteConfirmId(null);
-    }
-  };
+  void _confirmDelete;
 
   const createNewProject = useCallback(() => { navigate('/project/new'); }, [navigate]);
 

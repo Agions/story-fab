@@ -24,14 +24,13 @@ export type {
   CommentaryScriptOutput,
 } from '@/core/types/commentary';
 import type { VoiceInfo as CanonicalVoiceInfo } from '@/core/types/voice';
-export type { CanonicalVoiceInfo as VoiceCatalogInfo } from '@/core/types/voice';
+export type { VoiceInfo as VoiceCatalogInfo } from '@/core/types/voice';
 
 /** 音色信息（commentary 上下文专用，style/description required） */
 export interface VoiceInfo extends CanonicalVoiceInfo {
   style: string;
   description: string;
 }
-export type { CanonicalVoiceInfo as VoiceCatalogInfo } from '@/core/types/voice';
 
 // ─── Director Agent ─────────────────────────────────────────────────────
 

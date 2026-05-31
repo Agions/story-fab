@@ -1,5 +1,5 @@
 import { logger } from '../../shared/utils/logging';
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, lazy, Suspense, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';

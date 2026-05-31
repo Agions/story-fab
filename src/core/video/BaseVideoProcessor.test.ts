@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   VideoProcessingError,
   normalizeVideoError,

@@ -86,7 +86,7 @@ export async function calibrateTimelineWithTTS(
 export function useCommentaryScript(): UseCommentaryScriptResult {
   const [script, setScript] = useState<CommentaryScriptOutput | null>(null);
   const [multiStyleMode, setMultiStyleMode] = useState(false);
-  const [selectedStyles, setSelectedStyles] = useState<ScriptStylePreset[]>(['conversational']);
+  void selectedStyles;
   const [scripts, setScripts] = useState<Map<ScriptStylePreset, CommentaryScriptOutput>>(new Map());
   const [activeScriptStyle, setActiveScriptStyle] = useState<ScriptStylePreset | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
