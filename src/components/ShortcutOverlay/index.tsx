@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from './ui/dialog';
+} from '@/components/ui/dialog';
 import { useTheme } from '@/context/ThemeContext';
 
 export interface ShortcutOverlayProps {

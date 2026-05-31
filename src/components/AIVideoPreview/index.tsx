@@ -3,8 +3,8 @@
  * 简化的 AI 剪辑专用时间轴
  */
 import React, { useRef, useEffect, useState, useCallback, useMemo, memo } from 'react';
-import { Slider } from './ui/slider';
-import { Button } from './ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 import {
   Play,
   Pause,
@@ -19,7 +19,7 @@ import { useStoryFab } from '@/components/StoryFab/context';
 import type { VideoInfo } from '@/core/types';
 import type { CutPoint, ClipSuggestion } from '@/core/interfaces';
 import { notify, formatTime } from '@/shared';
-import styles from '@/components/AIVideoPreview.module.less';
+import styles from './index.module.less';
 
 // Re-expose compat aliases for consumers that reference them by that name
 export type ClipSuggestionCompat = ClipSuggestion;
