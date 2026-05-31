@@ -6,5 +6,7 @@
  * 其他类型: ../types.ts
  */
 export * from '@/core/types';
+export * from './commentary';
+export * from './voice';
 export * from './jianying';
 export * from './timeline';
