@@ -74,7 +74,7 @@ const AIVideoEditorContent: React.FC = () => {
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
   // Avoids N separate selector calls (each triggers re-render)
-  const editorStore = useEditorStore(
+  const _editorStore = useEditorStore(
     useCallback((s) => ({
       previewPlaying: s.previewPlaying,
       setPreviewPlaying: s.setPreviewPlaying,

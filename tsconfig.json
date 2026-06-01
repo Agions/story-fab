@@ -21,6 +21,8 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["vite/client"],
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
     "paths": {
       "@/*": ["./src/*"],
       "@/core/*": ["./src/core/*"],
