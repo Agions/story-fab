@@ -12,7 +12,7 @@ import { MAX_FILE_SIZE } from '@/shared/constants';
 import type { VideoInfo } from '@/core/types';
 import styles from './VideoUpload.module.css';
 
-import { VIDEO_FORMATS } from '@/constants';
+import { VIDEO_FORMATS } from '@/shared/constants';
 
 // 支持的视频格式
 const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map(f => `.${f}`);

@@ -1,9 +1,14 @@
 /**
- * 共享常量定义
- *
- * 单一来源：各业务常量分散在 src/constants/、src/core/constants/
- * 本文件作为统一出口，重导出所有共享常量
+ * 共享常量统一出口
+ * 单一代谢来源
  */
+
+// ─── 应用层常量（从 settings.ts 重导出）──────────────────────────────
+export {
+  PROJECT_SAVE_BEHAVIOR_KEY,
+  PROJECT_AUTO_SAVE_KEY,
+  type ProjectSaveBehavior,
+} from '@/shared/constants/settings';
 
 export {
   APP,
@@ -23,13 +28,9 @@ export {
   API_ENDPOINTS,
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
-  PROJECT_SAVE_BEHAVIOR_KEY,
-  PROJECT_AUTO_SAVE_KEY,
-} from '@/constants';
+} from '@/shared/constants/constants';
 
-export type { ProjectSaveBehavior } from '@/constants';
-
-// ─── AI / Video 配置常量（从 core/constants 移入）───────────────────────────────
+// ─── AI / Video 配置常量 ───────────────────────────────────────────
 
 // AI 服务配置
 export { AI_CONFIG, AI_PROVIDERS, WORKFLOW_MODES } from '@/core/constants/ai-config';
