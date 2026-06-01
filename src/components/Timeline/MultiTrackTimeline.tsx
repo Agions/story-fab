@@ -120,6 +120,8 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
   // Track initialization to handle prop changes after mount
   // (e.g., project switch — parent changes initialTracks but component stays mounted)
   const initializedRef = useRef(false);
+  const onTracksChangeRef = useRef(onTracksChange);
+  onTracksChangeRef.current = onTracksChange;
   useEffect(() => {
     if (!initializedRef.current) {
       // First mount: seed all local state from props
@@ -165,10 +167,10 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
         const changes = typeof updates === 'function' ? (updates as (t: TimelineTrack) => Partial<TimelineTrack>)(t) : updates;
         return { ...t, ...changes };
       });
-      onTracksChange?.(updated);
+      onTracksChangeRef.current?.(updated);
       return updated;
     });
-  }, [onTracksChange]);
+  }, []);
 
   // 键盘快捷键
   useEffect(() => {
@@ -252,18 +254,18 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
         color: TRACK_COLORS[type],
       };
       const updated = [...prev, newTrack];
-      onTracksChange?.(updated);
+      onTracksChangeRef.current?.(updated);
       return updated;
     });
-  }, [onTracksChange]);
+  }, []);
 
   const handleDeleteTrack = useCallback((trackId: string) => {
     setTracks((prev) => {
       const updated = prev.filter((t) => t.id !== trackId);
-      onTracksChange?.(updated);
+      onTracksChangeRef.current?.(updated);
       return updated;
     });
-  }, [onTracksChange]);
+  }, []);
 
   const handleAddClip = useCallback((trackId: string) => {
     setTracks((prev) => {
