@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import { delay } from '@/shared';
 import {
   editorService,

@@ -2,7 +2,7 @@ import { memo, useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Slider } from '../ui/slider';
 import { Input } from '../ui/input';
-import { cn } from '../../lib/utils';
+import { cn } from '@/shared/utils/cn';
 import type { TimelineClip } from './types';
 import { formatTimecodeMs, MS_PER_SECOND } from '@/shared/utils';
 import { MIN_CLIP_DURATION } from './constants';

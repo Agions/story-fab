@@ -12,3 +12,7 @@ export { useKeyboardShortcuts, KEYBOARD_SHORTCUTS_HELP } from './useKeyboardShor
 // 统一超时管理
 export { useTimeout } from './useTimeout';
 export { useInterval } from './useInterval';
+
+// 编辑器状态 & 视频（从 core/hooks 迁移）
+export { useEditor } from './useEditorState';
+export { useVideo } from './useVideo';
