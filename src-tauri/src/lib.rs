@@ -6,7 +6,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 pub mod binary;
 pub mod commands;
-pub mod video_processor;
+pub mod video;
 pub mod types;
 pub mod utils;
 pub mod subtitle;
@@ -32,8 +32,10 @@ pub use commands::render::{
 };
 pub use commands::export_state::cancel_export;
 pub use commands::file_ops::{clean_temp_file, open_file, voice_discovery};
-pub use video_processor::cut_video;
-pub use video_processor::{mix_audio, get_audio_duration};
+pub use video::processor::VideoProcessor;
+pub use video::ffmpeg_cmd::cut_video;
+pub use video::mix_audio::{mix_audio, MixAudioInput};
+pub use video::audio_duration::get_audio_duration;
 
 // Subtitle re-exports
 pub use subtitle::{
