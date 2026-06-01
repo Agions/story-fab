@@ -6,7 +6,7 @@
  */
 
 import type { ScriptSegment } from '@/core/types';
-import type { WhisperResult, WhisperSegment } from './subtitle.service';
+import type { WhisperResult, WhisperSegment } from './subtitleService';
 
 // ============================================
 // 类型定义

@@ -5,10 +5,10 @@
  */
 import React, { useState, useCallback, memo } from 'react';
 import { useStoryFab } from '../context';
-import { voiceSynthesisService } from '../../../core/services/ai/voice-synthesis.service';
+import { voiceSynthesisService } from '../../../core/services/ai/voiceSynthesisService';
 import { videoEffectService } from '../../../core/services/video/videoEffectService';
 import { audioVideoSyncService } from '../../../core/services/asr/audioSyncService';
-import { mixTtsWithVideo } from '../../../core/services/video/audio-mix.service';
+import { mixTtsWithVideo } from '../../../core/services/video/audioMixService';
 import { notify } from '@/shared';
 import { invoke } from '@tauri-apps/api/core';
 import { useTimeout } from '../../../hooks/useTimeout';

@@ -8,9 +8,9 @@ export { BaseService, ServiceError } from './providers/base.service';
 export * from './providers';
 
 // AI 服务（ai/ 子目录 — 模型调用层）
-export { aiService } from './ai/ai.service';
-export { visionService } from './ai/vision.service';
-export { voiceSynthesisService, VoiceSynthesisService } from './ai/voice-synthesis.service';
+export { aiService } from './ai/aiService';
+export { visionService } from './ai/visionService';
+export { voiceSynthesisService, VoiceSynthesisService } from './ai/voiceSynthesisService';
 export { scriptGenerationService } from './ai/scriptService';
 export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './ai/sceneCommentaryService';
 export { resolveLegacyModel, getLegacyModelCompatMap } from './ai/aiModelAdapter';
@@ -32,11 +32,11 @@ export { editorService, EditorService } from './editor';
 export * from './editor';
 
 // 导出服务（export/ 子目录）
-export { exportService, ExportService } from './export/export.service';
+export { exportService, ExportService } from './export/exportService';
 export { exportProgress } from './export/exportProgress';
 
 // 字幕服务（subtitle/ 子目录）
-export { subtitleService, SubtitleService } from './subtitle/subtitle.service';
+export { subtitleService, SubtitleService } from './subtitle/subtitleService';
 
 // 视频特效 & 信号（video/ 子目录）
 export { videoEffectService, VideoEffectService } from './video/videoEffectService';

@@ -12,7 +12,7 @@ import { MS_PER_SECOND } from '@/shared/utils';
 import React, { useState, useCallback } from 'react';
 import { Slider } from '../../../ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
-import { visionService } from '../../../../core/services/ai/vision.service';
+import { visionService } from '../../../../core/services/ai/visionService';
 import { useTimelineStore } from '../../../../store/timelineStore';
 import { notify } from '../../../../shared/utils/notify';
 import type { VideoInfo } from '@/core/types';

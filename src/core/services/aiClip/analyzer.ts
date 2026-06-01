@@ -1,6 +1,6 @@
 import { tauri } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
-import { visionService } from '../ai/vision.service';
+import { visionService } from '../ai/visionService';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotionDetector';
 import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
 import { DEFAULT_CLIP_CONFIG } from './types';

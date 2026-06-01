@@ -1,6 +1,6 @@
 /**
  * AI Services Shared Types
- * Consolidated from vision.service.ts, useVideo.ts, and aiClip/types.ts
+ * Consolidated from visionService.ts, useVideo.ts, and aiClip/types.ts
  */
 
 // ============================================

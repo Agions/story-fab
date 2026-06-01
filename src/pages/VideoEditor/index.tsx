@@ -8,7 +8,7 @@ import { notify, withLock } from '@/shared';
 import type { ClipAnalysisResult } from '../../core/services/aiClip';
 import { logger } from '../../shared/utils/logging';
 import { useVideoEditor } from './hooks/useVideoEditor';
-import { exportService } from '../../core/services/export/export.service';
+import { exportService } from '../../core/services/export/exportService';
 
 import Toolbar from './components/Toolbar';
 import VideoPlayer from '@/components/VideoPlayer';
