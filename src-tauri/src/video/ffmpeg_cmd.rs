@@ -85,6 +85,7 @@ pub async fn cut_video(
 
     let processor = VideoProcessor::new();
     processor.concat_segments(&temp_files, &output_path)
+        .await
         .map_err(|e| format!("合并失败: {}", e))?;
 
     for f in temp_files {
