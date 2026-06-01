@@ -1,7 +1,6 @@
-//! Google Gemini API calls
+//! Gemini API 调用
 
 use reqwest::Client;
-use serde::{Deserialize, Serialize};
 
 pub async fn call_gemini(
     client: &Client,
@@ -53,12 +52,13 @@ pub async fn call_gemini(
     #[derive(Deserialize)]
     struct Candidate { content: Option<Content> }
 
-    let resp: Response = response.json().await
-        .map_err(|e| format!("解析 Gemini 响应失败: {}", e))?;
+    let resp: Response = response.json().await.map_err(|e| format!("解析 Gemini 响应失败: {}", e))?;
 
     resp.candidates
         .and_then(|c| c.into_iter().next())
         .and_then(|c| c.content)
-        .map(|content| content.parts.into_iter().map(|p| p.text).collect::<Vec<_>>().join(""))
+        .map(|content| {
+            content.parts.into_iter().map(|p| p.text).collect::<Vec<_>>().join("")
+        })
         .ok_or_else(|| "Gemini 响应为空".to_string())
 }
