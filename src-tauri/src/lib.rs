@@ -10,7 +10,7 @@ pub mod video;
 pub mod types;
 pub mod utils;
 pub mod subtitle;
-pub mod highlight_detector;
+pub mod highlight;
 pub mod smart_segmenter;
 
 pub use commands::{
