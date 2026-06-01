@@ -10,10 +10,10 @@
  * 3. 过长的场景自动拆分
  */
 
-import { visionService } from '../../services/ai/vision.service';
+import { visionService } from '../../services/ai/visionService';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import type { CandidateClip } from '../../services/pipeline/clip-pipeline/clipScorer';
-import type { ASRSegment } from '../../services/asr/asr.service';
+import type { ASRSegment } from '../../services/asr/asrService';
 import { createStep, type Step, reportProgress } from '../Step';
 import { logger } from '../../../shared/utils/logging';
 import { tauri } from '../../../core/tauri/TauriBridge';
