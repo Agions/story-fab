@@ -2,9 +2,9 @@
 /**
  * projectStore 过滤和排序逻辑测试
  */
-// @ts-ignore
+// @ts-ignore - types imported only for documentation, not consumed
 import { describe, it, expect } from 'vitest';
-// @ts-ignore
+// @ts-ignore - types imported only for documentation, not consumed
 import { filterProjects, sortProjects, type ProjectSortBy, type SortOrder } from './projectStore';
 import type { Project } from '../core/types';
 

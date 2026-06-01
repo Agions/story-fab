@@ -277,7 +277,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
 
     document.removeEventListener('mousemove', handleDragMove);
     document.removeEventListener('mouseup', handleDragEnd);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleDragMove]);
 
   // 开始拖拽 — 稳定函数
   const handleDragStart = useCallback((segmentId: string, type: 'move' | 'start' | 'end', e: React.MouseEvent) => {
@@ -288,7 +289,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
 
     document.addEventListener('mousemove', handleDragMove);
     document.addEventListener('mouseup', handleDragEnd);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleDragMove, handleDragEnd]);
 
   return (
     <div className={styles.editorContainer}>

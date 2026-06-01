@@ -61,7 +61,7 @@ export function generateTrimStrategy(
   // 长视频强制 trim
   if (duration > 300) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // @ts-ignore
+    // @ts-ignore - reserved heuristic score reserved for future scoring model
     const _peakBonus = emotionPeakCount > 10 ? 30 : emotionPeakCount > 5 ? 15 : 0;
     return {
       maxDuration: targetDuration ?? Math.min(duration, 180),

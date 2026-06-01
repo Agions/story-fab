@@ -85,7 +85,7 @@ describe('timelineStore', () => {
 
     it('should add an audio track with correct name', () => {
       const store = useTimelineStore.getState();
-      // @ts-ignore
+      // @ts-ignore - intentionally unused return value captured for side effects
   const _trackId = store.addTimelineTrack('audio');
 
       const { timelineTracks } = useTimelineStore.getState();

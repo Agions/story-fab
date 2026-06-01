@@ -65,13 +65,6 @@ interface TauriSynthesizeInput {
   backend: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// @ts-ignore
-interface TauriSynthesizeOutput_ {
-  audio_path: string;
-  duration_secs: number;
-}
-
 // ============================================
 // 内置音色映射（Edge TTS voices，中文优先，供 UI 下拉使用）
 // ============================================

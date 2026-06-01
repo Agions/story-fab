@@ -135,7 +135,7 @@ export class ClipWorkflowService {
     videoInfo: VideoInfo,
     scriptSegments?: ScriptSegment[]
   ): Promise<ClipResult> {
-    // @ts-ignore
+    // @ts-ignore - _startTime reserved for future workflow timing metrics collection
     const _startTime = Date.now();
     
     // Step 1: 视频分析
