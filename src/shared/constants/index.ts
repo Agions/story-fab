@@ -1,8 +1,8 @@
 /**
  * 共享常量定义
- * 
- * 注意：此文件从 src/constants 重新导出所有共享常量
- * 以保持常量定义的单一来源
+ *
+ * 单一来源：各业务常量分散在 src/constants/、src/core/constants/
+ * 本文件作为统一出口，重导出所有共享常量
  */
 
 export {
@@ -23,9 +23,31 @@ export {
   API_ENDPOINTS,
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
+  PROJECT_SAVE_BEHAVIOR_KEY,
+  PROJECT_AUTO_SAVE_KEY,
 } from '@/constants';
 
-// 路由路径（仅在 shared 中定义）
+export type { ProjectSaveBehavior } from '@/constants';
+
+// ─── AI / Video 配置常量（从 core/constants 移入）───────────────────────────────
+
+// AI 服务配置
+export { AI_CONFIG, AI_PROVIDERS, WORKFLOW_MODES } from '@/core/constants/ai-config';
+
+// 视频配置
+export {
+  VIDEO_CONFIG,
+  EXPORT_FORMATS,
+  QUALITY_PRESETS,
+  ENCODER_PRESETS,
+} from '@/core/constants/video-config';
+
+// 统一错误码
+export { ErrorCodes, ErrorMessages, createError } from '@/core/constants/error-codes';
+
+// ─── 独立常量（本地定义）────────────────────────────────────────────────────
+
+// 路由路径
 export const ROUTES = {
   HOME: '/',
   DASHBOARD: '/dashboard',
@@ -39,8 +61,8 @@ export const ROUTES = {
 
 // 默认配置
 export const DEFAULTS = {
-  AUTO_SAVE_INTERVAL: 30, // 秒
-  MAX_FILE_SIZE: 2 * 1024 * 1024 * 1024, // 2GB
+  AUTO_SAVE_INTERVAL: 30,
+  MAX_FILE_SIZE: 2 * 1024 * 1024 * 1024,
   MAX_PROJECTS: 100,
   MAX_RECENT_FILES: 20,
   DEFAULT_VIDEO_QUALITY: 'high',
@@ -52,10 +74,8 @@ export const DEFAULTS = {
   PAGE_SIZE_OPTIONS: [10, 20, 50, 100]
 } as const;
 
-// 独立常量（从 DEFAULTS 中提取，方便按名导入）
 export const MAX_FILE_SIZE = DEFAULTS.MAX_FILE_SIZE;
 
-// 质量选项
 export const QUALITY_OPTIONS = [
   { value: 'low', label: '低 (480p)', desc: '文件小，加载快' },
   { value: 'medium', label: '中 (720p)', desc: '平衡质量和大小' },
@@ -63,7 +83,6 @@ export const QUALITY_OPTIONS = [
   { value: 'ultra', label: '超清 (4K)', desc: '最高质量' }
 ] as const;
 
-// 分辨率选项
 export const RESOLUTION_OPTIONS = [
   { value: '720p', label: '720p', width: 1280, height: 720 },
   { value: '1080p', label: '1080p', width: 1920, height: 1080 },
@@ -71,10 +90,8 @@ export const RESOLUTION_OPTIONS = [
   { value: '4k', label: '4K', width: 3840, height: 2160 }
 ] as const;
 
-// 帧率选项
 export const FRAME_RATE_OPTIONS = [24, 30, 60] as const;
 
-// 语气选项
 export const TONE_OPTIONS = [
   { value: 'friendly', label: '友好亲切' },
   { value: 'authoritative', label: '权威专业' },
@@ -83,7 +100,6 @@ export const TONE_OPTIONS = [
   { value: 'humorous', label: '幽默诙谐' }
 ] as const;
 
-// 目标受众
 export const TARGET_AUDIENCES = [
   { value: 'general', label: '普通大众' },
   { value: 'professional', label: '专业人士' },
@@ -93,14 +109,12 @@ export const TARGET_AUDIENCES = [
   { value: 'elderly', label: '中老年群体' }
 ] as const;
 
-// 主题模式
 export const THEME_MODES = [
   { value: 'light', label: '亮色' },
   { value: 'dark', label: '暗色' },
   { value: 'auto', label: '自动' }
 ] as const;
 
-// 允许的文件扩展名
 export const ALLOWED_EXTENSIONS = {
   VIDEO: ['mp4', 'mov', 'webm', 'mkv', 'avi', 'flv', 'wmv'],
   AUDIO: ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'],
