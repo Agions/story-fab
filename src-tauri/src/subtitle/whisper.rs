@@ -1,98 +1,114 @@
-//! Whisper model management — split from subtitle.rs
+//! faster-whisper Python 代码片段 — normalize_text + transcribe 逻辑
 
-use crate::subtitle::types::WhisperModelInfo;
-use crate::utils::cmd_err;
-use std::process::Command;
+/// 运行 faster-whisper 转录并返回 JSON 结果
+/// 返回的 Python 代码片段会被 Rust 的 spawn_blocking 执行
+pub fn whisper_python_code(model: &str, audio_path: &str, lang_arg: &str) -> String {
+    let audio_path_repr = format!("{:?}", audio_path);
+    [
+        r#"import sys
+import json
+from faster_whisper import WhisperModel
 
-/// Returns the default model directory (~/.cache/whisper)
-fn whisper_cache_dir() -> std::path::PathBuf {
-    dirs::cache_dir()
-        .unwrap_or_else(|| std::path::PathBuf::from("."))
-        .join("whisper")
-}
+model_size=""#.to_string(),
+        model.to_string(),
+        r#"
+device = "cpu"
+compute_type = "int8"
+batch_size = 8
 
-/// Lists available/found whisper models
-#[tauri::command]
-pub fn list_whisper_models() -> Vec<WhisperModelInfo> {
-    let cache_dir = whisper_cache_dir();
-    let known = vec![
-        ("tiny", "39M", "tiny.en", "tiny"),
-        ("base", "74M", "base.en", "base"),
-        ("small", "244M", "small.en", "small"),
-        ("medium", "769M", "medium.en", "medium"),
-        ("large-v3", "1550M", "large-v3", "large-v3"),
-        ("distil-large-v3", "820M", "distil-large-v3", "distil-large-v3"),
-        ("distil-medium.en", "448M", "distil-medium.en", "distil-medium.en"),
-        ("distil-small.en", "140M", "distil-small.en", "distil-small.en"),
-    ];
+try:
+    import torch
+    if torch.cuda.is_available():
+        device = "cuda"
+        compute_type = "float16"
+        print("Using CUDA with float16", file=sys.stderr)
+    else:
+        try:
+            import openvino
+            openvino_available = True
+        except ImportError:
+            openvino_available = False
+        if openvino_available:
+            device = "cpu"
+            compute_type = "int8"
+            print("Using OpenVINO (Intel GPU/CPU)", file=sys.stderr)
+        else:
+            batch_size = 16
+            print("Using CPU with batch_size=16", file=sys.stderr)
+except ImportError:
+    pass
 
-    known
-        .into_iter()
-        .map(|(name, size, file, _)| {
-            let path = cache_dir.join(file);
-            WhisperModelInfo {
-                name: name.to_string(),
-                size: size.to_string(),
-                is_downloaded: path.exists(),
-                path: path.exists().then(|| path.display().to_string()),
-            }
-        })
-        .collect()
-}
+model = WhisperModel(model_size, device=device, compute_type=compute_type, num_workers=4, batch_size=batch_size)
 
-/// Check if faster-whisper Python package is available
-#[tauri::command]
-pub fn check_faster_whisper() -> Result<bool, String> {
-    let output = Command::new("python3")
-        .arg("-c")
-        .arg("import faster_whisper; print(faster_whisper.__version__)")
-        .output();
+segments, info = model.transcribe("#.to_string(),
+        audio_path_repr,
+        r#"", language="#.to_string(),
+        lang_arg,
+        r#"", word_timestamps=True, vad_filter=True, vad_parameters={"min_silence_duration_ms": 500})
 
-    match output {
-        Ok(result) if result.status.success() => {
-            let version = String::from_utf8_lossy(&result.stdout).trim().to_string();
-            log::info!("[StoryFab] faster-whisper version: {}", version);
-            Ok(true)
-        }
-        _ => {
-            log::warn!("[StoryFab] faster-whisper not installed");
-            Ok(false)
-        }
-    }
-}
+lang = info.language or "unknown"
+lang_prob = info.language_probability or 0.0
+duration = info.duration or 0.0
 
-/// Download a whisper model (placeholder — faster-whisper auto-downloads on first use)
-#[tauri::command]
-pub async fn download_whisper_model(model_size: String) -> Result<String, String> {
-    log::info!("[StoryFab] Model download requested: {}", model_size);
+result = {"language": lang, "language_probability": lang_prob, "duration_ms": int(duration * 1000), "segments": []}
 
-    if !model_size.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.') {
-        return Err(format!("无效的模型名称: {}", model_size));
-    }
+def normalize_text(text, segment_duration_ms=0):
+    import re
+    text = text.strip()
+    if not text:
+        return text
+    text = re.sub(r'\[[\d.:]+\]', '', text)
+    text = re.sub(r'\([\d:]+\)', '', text)
+    text = re.sub(r'[\u266a\u266b\u266c\u266d]+[^\u266a\u266b\u266c\u266d]*[\u266a\u266b\u266c\u266d]+', '', text)
+    text = re.sub(r'^[\s,，、]*(?:呃|嗯|啊|噢|哈|嘿)\s*', '', text)
+    text = re.sub(r'([。！？，、；：a-zA-Z])\1{2,}', r'\1\1', text)
+    four_char_chains = ['然后然后', '那个那个', '这个这个', '其实其实', '就是就是', '其实呃', '就是呃', '就是说呃']
+    for chain in four_char_chains:
+        escaped = re.escape(chain)
+        text = re.sub(r'\B' + escaped + r'\B\B' + escaped + r'\B', r'。', text)
+    text = re.sub(r'^(.{1,2})(\1{2,})$', r'\1\1。', text)
+    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{2,})', lambda m: m.group(1) * 2 + '。', text)
+    fillers = ['就是说呃', '这个这个', '嗯嗯', '呃呃', '啊啊', '就是说', '然后', '那个', '这个', '对对对', '对对']
+    for f in fillers:
+        pat = r'(?<![a-zA-Z\u4e00-\u9fff])' + re.escape(f) + r'(?![a-zA-Z\u4e00-\u9fff])'
+        text = re.sub(pat, '', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    text = re.sub(r'\n+', ' ', text)
+    text = re.sub(r'[，。．,]+([。.])', r'\1', text)
+    text = re.sub(r'[。.]{3,}', '。', text)
+    text = re.sub(r'[？]{2,}', '？', text)
+    text = re.sub(r'[！]{2,}', '！', text)
+    chinese_chars = re.findall(r'[\u4e00-\u9fff]', text)
+    if len(chinese_chars) >= 3:
+        if text and text[-1] not in '。！？…—–' and not text[-1].isspace():
+            if text[-1] not in 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789':
+                text = text + '。'
+    text = re.sub(r'\s*[\(\[\(]?\s*(?:SPEAKER_|speaker|Speaker)\s*_?\s*\d+\s*[\)\]\)]?\s*$', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'[\（\(][Ss]?[Pp]?[Ee]?[Aa]?[Kk]?[Ee]?[Rr]_[^）\)]+[）\)]', '', text)
+    text = re.sub(r' [a-z] ', ' ', text)
+    text = re.sub(r' [A-Z] ', ' ', text)
+    text = re.sub(r'[\.。]+\s*', '. ', text)
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'[\s,，\.]+$', '', text)
+    text = text.strip()
+    if not text or text in '。！？…':
+        return '...'
+    if len(text) > 1 and text[-1] in '，。，' and text[-2] in '，。！？':
+        text = text[:-1]
+    return text
 
-    let model_repr = format!("{:?}", model_size);
-    let output = tokio::process::Command::new("python3")
-        .arg("-c")
-        .arg(format!(
-            "from faster_whisper import WhisperModel; m = WhisperModel({}, device='cpu', compute_type='int8'); del m; print('ok')",
-            model_repr
-        ))
-        .output()
-        .await
-        .map_err(|e| format!("启动下载进程失败: {}", e))?;
+for seg in segments:
+    seg_words = getattr(seg, 'words', []) or []
+    seg_prob = sum(w.probability for w in seg_words) / len(seg_words) if seg_words else 0.95
+    result["segments"].append({
+        "start_ms": int(seg.start * 1000), "end_ms": int(seg.end * 1000),
+        "text": normalize_text(seg.text),
+        "words": [{"word": w.word, "start_ms": int(w.start * 1000), "end_ms": int(w.end * 1000), "probability": w.probability} for w in seg_words] if seg_words else [],
+        "probability": round(seg_prob, 4),
+    })
 
-    if output.status.success() {
-        Ok(format!("模型 {} 下载完成", model_size))
-    } else {
-        Err(cmd_err("模型下载失败", &output))
-    }
-}
-
-/// Get supported languages for whisper transcription
-#[tauri::command]
-pub fn get_whisper_supported_languages() -> Vec<serde_json::Value> {
-    WHISPER_LANGS
-        .iter()
-        .map(|(code, name)| serde_json::json!({"code": code, "name": name}))
-        .collect()
+print(json.dumps(result, ensure_ascii=False))
+"#.to_string(),
+    ]
+    .join("")
 }
