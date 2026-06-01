@@ -80,6 +80,12 @@ export const STORAGE_KEYS = {
   auth: 'storyfab_auth',
   projectSaveBehavior: 'storyfab_project_save_behavior',
   projectAutoSave: 'storyfab_project_autosave',
+  authToken: 'storyfab_auth_token',  // Added for auth token storage
+  // Legacy keys for backward compatibility
+  legacy: {
+    token: 'storyfab_legacy_token',
+    projects: 'storyfab_legacy_projects',
+  },
 };
 
 export const API_ENDPOINTS = {

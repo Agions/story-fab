@@ -17,7 +17,7 @@ import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/
 import { ClipRepurposingPipeline } from './pipeline';
 import type { RepurposingOptions } from './pipeline';
 import { clipSegmentFromRepurposing } from './types';
-import type { ASRSegment } from '../../asr/asrService';
+import type { ASRSegment } from '../../asr/asrTypes';
 
 // 剪辑配置
 interface ClipConfig {
