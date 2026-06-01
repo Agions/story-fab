@@ -81,7 +81,8 @@ const actionHandlers: Record<EditorAction['type'], ActionHandlerFn> = {
   
   COPY_CLIP: (timeline, action) => {
     if (action.type !== 'COPY_CLIP') return timeline;
-    return copyClip(timeline, action.clipId);
+    const trackId = findTrackByClipId(timeline, action.clipId) ?? '';
+    return copyClip(timeline, trackId, action.clipId);
   },
   
   ADD_TRANSITION: (timeline, action) => {

@@ -135,6 +135,7 @@ export class ClipWorkflowService {
     videoInfo: VideoInfo,
     scriptSegments?: ScriptSegment[]
   ): Promise<ClipResult> {
+    // @ts-ignore
     const _startTime = Date.now();
     
     // Step 1: 视频分析

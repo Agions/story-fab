@@ -76,6 +76,7 @@ export function moveClip(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   timeline: Timeline,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-ignore
   trackId: string,
   clipId: string,
   newPosition: number
@@ -171,7 +172,12 @@ export function splitClip(timeline: Timeline, clipId: string, splitMs: number): 
 }
 
 /** 复制片段 */
-export function copyClip(timeline: Timeline, clipId: string): Timeline {
+export function copyClip(
+  timeline: Timeline,
+  // @ts-ignore
+  trackId: string,
+  clipId: string,
+): Timeline {
   const found = findClipInTracks(timeline.tracks, clipId);
   if (!found) return timeline;
 

@@ -171,10 +171,12 @@ async function detectSilenceSegments(
 }
 
 function generateCutPoints(
+  // @ts-ignore
   videoInfo: VideoInfo,
   scenes: Scene[],
   keyframes: Keyframe[],
   silenceSegments: Array<{ start: number; end: number; duration: number }>,
+  // @ts-ignore
   emotions: EmotionAnalysis[],
   emotionPeaks: Array<{ timestamp: number; energy: number; type: string }>,
   config: AIClipConfig
@@ -346,6 +348,7 @@ function calculateSegmentConfidence(cutPoints: CutPoint[]): number {
 async function generateSuggestions(
   videoInfo: VideoInfo,
   segments: ClipSegment[],
+  // @ts-ignore
   scenes: Scene[],
   config: AIClipConfig
 ): Promise<ClipSuggestion[]> {

@@ -12,11 +12,12 @@
 import { invoke } from '@tauri-apps/api/core';
 import type {
   ScriptStylePreset,
+  CommentarySegment,
   DirectorPlan,
   DirectorStatusResponse,
   PlanModifications,
-  SynthesizeOptions,
   SynthesizeResult,
+  CommentaryScriptOutput,
 } from '@/core/types/commentary';
 export type {
   ScriptStylePreset,
@@ -227,7 +228,7 @@ export async function quickCommentary(
 
   // 2. 批量合成音频
   const audioFiles = await Promise.all(
-    script.segments.map((seg) =>
+    script.segments.map((seg: CommentarySegment) =>
       synthesizeCommentaryAudio(seg.text, voice ?? 'zh-CN-XiaoxiaoNeural'),
     ),
   );
