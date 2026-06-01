@@ -4,25 +4,31 @@
 //! - `auto_save_project` writes a `{project_id}.autosave.json` next to the project file.
 //!   This is the "in-progress" copy that survives crashes.
 //! - After a successful full save, frontend calls `clear_autosave` to remove it.
-//! - `list_autosaves` returns any recoverable autosave files for startup recovery UI.
+//! - `list_recoverable_projects` returns any recoverable autosave files for startup recovery UI.
 //! - `recover_autosave` renames the autosave back to the main project file.
 
 use std::path::PathBuf;
 use tauri::Manager;
 use tokio::fs as tokio_fs;
 
+mod tests;
+
+// ─── Path helpers ─────────────────────────────────────────────────────────────
+
 /// Returns the autosave path for a given project_id.
-fn autosave_path(story_fab_dir: &PathBuf, project_id: &str) -> PathBuf {
+pub fn autosave_path(story_fab_dir: &PathBuf, project_id: &str) -> PathBuf {
     story_fab_dir.join(format!("{}.autosave.json", project_id))
 }
 
 /// Returns the main project file path for a given project_id.
-fn project_path(story_fab_dir: &PathBuf, project_id: &str) -> PathBuf {
+pub fn project_path(story_fab_dir: &PathBuf, project_id: &str) -> PathBuf {
     story_fab_dir.join(format!("{}.json", project_id))
 }
 
+// ─── Directory resolution ─────────────────────────────────────────────────────
+
 /// Returns the story-fab_dir (shared with project.rs storage).
-async fn get_story_fab_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+pub async fn get_story_fab_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let app_dir = app
         .path()
         .app_data_dir()
@@ -34,9 +40,9 @@ async fn get_story_fab_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     Ok(story_fab_dir)
 }
 
+// ─── Tauri Commands ────────────────────────────────────────────────────────────
+
 /// Write an autosave snapshot of the project.
-/// The autosave file is stored as `{project_id}.autosave.json`.
-/// A successful "save_project_file" should be followed by "clear_autosave".
 #[tauri::command]
 pub async fn auto_save_project(
     app: tauri::AppHandle,
@@ -73,7 +79,6 @@ pub async fn clear_autosave(
 }
 
 /// List all projects that have a pending autosave (for crash-recovery UI).
-/// Returns project_ids that have a `.autosave.json` but no corresponding `.json`.
 #[tauri::command]
 pub async fn list_recoverable_projects(
     app: tauri::AppHandle,
@@ -123,19 +128,16 @@ pub async fn recover_autosave(
         return Err(format!("没有找到项目 {} 的自动保存", project_id));
     }
 
-    // Read content first (so we can return it)
     let content = tokio_fs::read_to_string(&autosave)
         .await
         .map_err(|e| format!("读取自动保存失败: {e}"))?;
 
-    // Remove old main file if it exists
     if main_file.exists() {
         tokio_fs::remove_file(&main_file)
             .await
             .map_err(|e| format!("删除旧项目文件失败: {e}"))?;
     }
 
-    // Rename autosave → main project file
     tokio_fs::rename(&autosave, &main_file)
         .await
         .map_err(|e| format!("恢复自动保存失败: {e}"))?;
@@ -160,41 +162,4 @@ pub async fn preview_autosave(
     tokio_fs::read_to_string(&autosave)
         .await
         .map_err(|e| format!("读取自动保存失败: {e}"))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_autosave_path_format() {
-        let dir = std::path::PathBuf::from("/data/story-fab");
-        let id = "my-project";
-        let result = autosave_path(&dir, id);
-        assert_eq!(result, std::path::PathBuf::from("/data/story-fab/my-project.autosave.json"));
-    }
-
-    #[test]
-    fn test_project_path_format() {
-        let dir = std::path::PathBuf::from("/data/story-fab");
-        let id = "my-project";
-        let result = project_path(&dir, id);
-        assert_eq!(result, std::path::PathBuf::from("/data/story-fab/my-project.json"));
-    }
-
-    #[test]
-    fn test_autosave_path_strips_suffix_correctly() {
-        let dir = std::path::PathBuf::from("/data/story-fab");
-        // Test that autosave file with project_id "proj" becomes "proj.autosave.json"
-        let result = autosave_path(&dir, "proj");
-        assert!(result.to_str().unwrap().contains(".autosave.json"));
-    }
-
-    #[test]
-    fn test_autosave_path_unique_per_id() {
-        let dir = std::path::PathBuf::from("/data/story-fab");
-        let p1 = autosave_path(&dir, "project-a");
-        let p2 = autosave_path(&dir, "project-b");
-        assert_ne!(p1, p2);
-    }
 }
