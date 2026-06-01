@@ -70,8 +70,7 @@ export default defineConfig({
           if (/node_modules\/@tauri-apps\//.test(id)) return 'vendor-tauri'
 
           // UI library — antd icons share modules with rc-* packages, keep them together
-          if (/node_modules\/antd\//.test(id)) return 'vendor-antd'
-          if (/node_modules\/@ant-design\//.test(id) || /node_modules\/rc-[a-z-]+\//.test(id)) return 'vendor-antd-icons'
+          if (/node_modules\/(?:antd|@ant-design)\//.test(id)) return 'vendor-antd'
 
           // Utilities
           if (/node_modules\/dayjs\//.test(id)) return 'vendor-dayjs'
@@ -91,7 +90,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'axios', 'dayjs', 'zustand', 'antd', '@ant-design/icons'],
+    include: ['react', 'react-dom', 'react-router-dom', 'axios', 'dayjs', 'zustand'],
   },
   // Only drop console/debugger in production builds for easier debugging
   esbuild: {
