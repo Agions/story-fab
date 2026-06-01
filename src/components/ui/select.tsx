@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 
-import { cn } from '../../lib/utils'
+import { cn } from '@/shared/utils/cn'
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
 // Select root — explicitly typed as single-value string select (most common usage)

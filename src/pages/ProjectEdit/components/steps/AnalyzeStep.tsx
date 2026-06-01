@@ -5,7 +5,7 @@ import React from 'react';
 import { Card } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { cn } from '../../../../lib/utils';
+import { cn } from '@/shared/utils/cn';
 import VideoSelector from '@/components/VideoSelector';
 import styles from '@/pages/ProjectEdit/index.module.less';
 

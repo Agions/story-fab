@@ -5,7 +5,7 @@ import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area"
 // styles imported for future use
 import * as _styles from './scroll-area.module.css';
 
-import { cn } from '../../lib/utils'
+import { cn } from '@/shared/utils/cn'
 
 function ScrollArea({
   className,
