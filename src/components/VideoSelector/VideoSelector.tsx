@@ -8,7 +8,7 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { tauri } from '@/core/tauri/TauriBridge';
 import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
 import { notify } from '@/shared';
-import { VIDEO_FORMATS } from '@/constants';
+import { VIDEO_FORMATS } from '@/shared/constants';
 import styles from './VideoSelector.module.less';
 
 interface VideoSelectorProps {

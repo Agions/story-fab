@@ -1,5 +1,5 @@
 import { logger } from '../../shared/utils/logging';
-import { STORAGE_KEYS } from '@/constants';
+import { STORAGE_KEYS } from '@/shared/constants';
 /**
  * API 客户端
  * 统一的 HTTP 请求管理
