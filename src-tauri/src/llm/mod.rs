@@ -3,7 +3,8 @@
 mod constants;
 mod helpers;
 mod parsing;
-mod providers;
+pub mod providers;
 mod types;
 
 pub use types::*;
+pub use providers::*;
