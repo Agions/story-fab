@@ -1,7 +1,9 @@
-//! OpenAI-compatible API calls (OpenAI / DeepSeek / Qwen / etc.)
+//! OpenAI API 调用（OpenAI 官方 + OpenAI 兼容接口）
 
+use crate::llm::constants::{get_context_limit, get_default_model, normalize_provider};
+use crate::llm::helpers::{build_system_prompt, build_user_prompt};
+use crate::llm::types::ScriptStyle;
 use reqwest::Client;
-use serde::{Deserialize, Serialize};
 
 pub async fn call_openai_compatible(
     client: &Client,
@@ -11,12 +13,21 @@ pub async fn call_openai_compatible(
     system_prompt: &str,
     user_prompt: &str,
 ) -> Result<String, String> {
-    let url = format!("{}/chat/completions", base_url.trim_end_matches('/'));
+    let url = format!("/chat/completions", base_url.trim_end_matches('/'));
 
     #[derive(Serialize)]
-    struct Message { role: &'static str, content: String }
+    struct Message {
+        role: &'static str,
+        content: String,
+    }
+
     #[derive(Serialize)]
-    struct Request { model: String, messages: [Message; 2], temperature: f32, max_tokens: usize }
+    struct Request {
+        model: String,
+        messages: [Message; 2],
+        temperature: f32,
+        max_tokens: usize,
+    }
 
     let request = Request {
         model: model.to_string(),
@@ -50,30 +61,11 @@ pub async fn call_openai_compatible(
     #[derive(Deserialize)]
     struct ResponseMessage { content: String }
 
-    let resp: Response = response.json().await
-        .map_err(|e| format!("解析响应失败: {}", e))?;
+    let resp: Response = response.json().await.map_err(|e| format!("解析响应失败: {}", e))?;
 
-    resp.choices.into_iter().next()
+    resp.choices
+        .into_iter()
+        .next()
         .map(|c| c.message.content)
         .ok_or_else(|| "响应为空".to_string())
-}
-
-pub async fn call_deepseek(
-    client: &Client,
-    model: &str,
-    api_key: &str,
-    system_prompt: &str,
-    user_prompt: &str,
-) -> Result<String, String> {
-    call_openai_compatible(client, "https://api.deepseek.com", model, api_key, system_prompt, user_prompt).await
-}
-
-pub async fn call_qwen(
-    client: &Client,
-    model: &str,
-    api_key: &str,
-    system_prompt: &str,
-    user_prompt: &str,
-) -> Result<String, String> {
-    call_openai_compatible(client, "https://dashscope.aliyuncs.com/compatible-mode/v1", model, api_key, system_prompt, user_prompt).await
 }

@@ -1,8 +1,12 @@
-//! LLM Provider dispatcher — routes to the right API implementation
+//! LLM Provider 调度器 — call_llm_provider
 
-use crate::llm::constants::{get_default_model, normalize_provider};
-use super::{call_anthropic, call_deepseek, call_gemini, call_openai_compatible, call_qwen};
 use reqwest::Client;
+
+use super::openai::call_openai_compatible;
+use super::deepseek_qwen::{call_deepseek, call_qwen};
+use super::gemini::call_gemini;
+use super::anthropic::call_anthropic;
+use crate::llm::constants::{get_default_model, normalize_provider};
 
 pub async fn call_llm_provider(
     provider: &str,

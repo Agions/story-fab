@@ -1,7 +1,6 @@
-//! Anthropic Claude API calls
+//! Anthropic Claude API 调用
 
 use reqwest::Client;
-use serde::{Deserialize, Serialize};
 
 pub async fn call_anthropic(
     client: &Client,
@@ -13,7 +12,12 @@ pub async fn call_anthropic(
     let url = "https://api.anthropic.com/v1/messages";
 
     #[derive(Serialize)]
-    struct Request { model: String, max_tokens: usize, system: String, messages: Vec<Message> }
+    struct Request {
+        model: String,
+        max_tokens: usize,
+        system: String,
+        messages: Vec<Message>,
+    }
     #[derive(Serialize)]
     struct Message { role: String, content: String }
 
@@ -25,7 +29,7 @@ pub async fn call_anthropic(
     };
 
     let response = client
-        .post(url)
+        .post(&url)
         .header("x-api-key", api_key)
         .header("anthropic-version", "2023-06-01")
         .header("Content-Type", "application/json")
@@ -45,10 +49,11 @@ pub async fn call_anthropic(
     #[derive(Deserialize)]
     struct ContentBlock { text: String }
 
-    let resp: Response = response.json().await
-        .map_err(|e| format!("解析 Anthropic 响应失败: {}", e))?;
+    let resp: Response = response.json().await.map_err(|e| format!("解析 Anthropic 响应失败: {}", e))?;
 
-    resp.content.into_iter().next()
+    resp.content
+        .into_iter()
+        .next()
         .map(|c| c.text)
         .ok_or_else(|| "Anthropic 响应为空".to_string())
 }
