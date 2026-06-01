@@ -85,7 +85,8 @@ describe('timelineStore', () => {
 
     it('should add an audio track with correct name', () => {
       const store = useTimelineStore.getState();
-      const _trackId = store.addTimelineTrack('audio');
+      // @ts-ignore
+  const _trackId = store.addTimelineTrack('audio');
 
       const { timelineTracks } = useTimelineStore.getState();
       expect(timelineTracks[0].name).toBe('音频轨道 1');
