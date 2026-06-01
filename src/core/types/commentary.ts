@@ -1,7 +1,7 @@
 /**
  * Commentary Domain Types
  * Canonical source for all commentary-related type definitions.
- * Replaces inline types in commentary/index.ts and voice-synthesis.service.ts.
+ * Replaces inline types in commentary/index.ts and voiceSynthesisService.ts.
  */
 
 /** 脚本风格预设 */

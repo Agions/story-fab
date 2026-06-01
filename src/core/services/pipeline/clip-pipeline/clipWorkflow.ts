@@ -10,14 +10,14 @@
  * 类型定义见 clipRepurposing/types.ts
  */
 
-import { visionService } from '../../ai/vision.service';
-import { asrService } from '../../asr/asr.service';
+import { visionService } from '../../ai/visionService';
+import { asrService } from '../../asr/asrService';
 import { logger } from '../../../../shared/utils/logging';
 import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
 import { ClipRepurposingPipeline } from './pipeline';
 import type { RepurposingOptions } from './pipeline';
 import { clipSegmentFromRepurposing } from './types';
-import type { ASRSegment } from '../../asr/asr.service';
+import type { ASRSegment } from '../../asr/asrService';
 
 // 剪辑配置
 interface ClipConfig {

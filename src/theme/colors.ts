@@ -9,7 +9,7 @@
  * 架构说明：
  * - globals.css :root {} — 运行时 CSS 入口（main.tsx 已导入）
  * - colors.ts（TypeScript）— OKLCH 原始值
- * - variables.less — 被 _mixins.less 引用，编译时使用
+ * - variables.less — 被 mixins.less 引用，编译时使用
  * - design-system.css — 已删除（从未作为 CSS 加载）
  * - _film-variables.less — 已删除（从未被 @import）
  */
