@@ -7,9 +7,9 @@ import { Video } from 'lucide-react';
 import { tauri, invoke, TauriCommand } from '@/core/tauri/TauriBridge';
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoAnalysis, KeyMoment, Emotion } from '@/types';
-import VideoSelector from '@/components/VideoSelector';
+import VideoSelector from '@/components/VideoSelector/VideoSelector';
 import { notify } from '@/shared';
-import styles from './index.module.less';
+import styles from './VideoAnalyzer.module.less';
 
 const Title = ({ level = 4, children }: { level?: number; children: React.ReactNode }) => {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
