@@ -5,7 +5,7 @@ import { Badge } from '../../../components/ui/badge';
 import { Plus, Trash2 } from 'lucide-react';
 import { VideoSegment } from '@/core/video';
 import { formatDuration } from '../../../shared/utils/formatting';
-import styles from '@/pages/VideoEditor/index.module.less';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface SegmentItemProps {
   index: number;

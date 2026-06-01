@@ -10,7 +10,7 @@ import {
   Save,
   Download,
 } from 'lucide-react';
-import styles from '@/pages/VideoEditor/index.module.less';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface ToolbarProps {
   loading: boolean;
