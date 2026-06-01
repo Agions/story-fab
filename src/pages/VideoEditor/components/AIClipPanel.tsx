@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { Bot } from 'lucide-react';
-import { AIClipAssistant } from '@/components/AIClip';
+import { AIClipAssistant } from '@/components/AIClip/AIClip';
 import type { ClipAnalysisResult, ClipSegment } from '../../../core/services/aiClip';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
