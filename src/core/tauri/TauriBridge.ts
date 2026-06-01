@@ -74,6 +74,10 @@ export const TauriCommand = {
   GENERATE_NARRATION_SCRIPT:   'generate_narration_script',
   ANALYZE_VIDEO_FOR_NARRATION: 'analyze_video_for_narration',
   LIST_AVAILABLE_MODELS:       'list_available_models',
+
+  // Video operations (from VideoAnalyzer direct invoke)
+  EXTRACT_KEY_FRAMES:    'extract_key_frames',
+  GENERATE_THUMBNAIL:    'generate_thumbnail',
 } as const;
 
 export type TauriCommand = typeof TauriCommand[keyof typeof TauriCommand];

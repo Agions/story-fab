@@ -8,6 +8,7 @@ import { fileOperations } from './methods/fileOperations';
 import { project } from './methods/project';
 import { aiScript } from './methods/aiScript';
 import { commentary } from './methods/commentary';
+import { videoOperations } from './methods/videoOperations';
 
 // ─── Tauri API Surface ─────────────────────────────────────────────────────────
 // Explicitly declared so TypeScript knows every method without relying on inference
@@ -79,6 +80,10 @@ export const tauri = {
   estimateTTSDuration: commentary.estimateTTSDuration,
   listVoices: commentary.listVoices,
   cancelExport: commentary.cancelExport,
+
+  // Video operations (from VideoAnalyzer direct invoke)
+  extractKeyFrames: videoOperations.extractKeyFrames,
+  generateThumbnail: videoOperations.generateThumbnail,
 } as const;
 
 export default tauri;
