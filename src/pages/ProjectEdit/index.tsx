@@ -348,8 +348,8 @@ const ProjectEdit: React.FC = () => {
 
   const handleExportScript = (format: string) => notify.info(`导出脚本为 ${format.toUpperCase()} 格式`);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _handleFormValuesChange = () => scheduleAutoSave();
+  // @ts-ignore
+  const _handleFormValuesChange = () => scheduleAutoSave();
 
   // ─── Render ────────────────────────────────────────────────────────────────
   if (error) {

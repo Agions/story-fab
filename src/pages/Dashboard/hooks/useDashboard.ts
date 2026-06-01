@@ -93,8 +93,6 @@ export function useDashboard(): UseDashboardReturn {
     setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, starred: !p.starred } : p)));
   }, []);
 
-  void _confirmDelete;
-
   const createNewProject = useCallback(() => { navigate('/project/new'); }, [navigate]);
 
   const openProject = useCallback((id: string) => {

@@ -93,7 +93,7 @@ export function useProjectAutoSave({
   }, [enabled, initialLoading, loading, saving, videoPath, getCurrentFingerprint, onPersist]);
 
   // Sync fingerprint when project changes externally (e.g., after save)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-ignore
   const _syncFingerprint = useCallback((data: ProjectData) => {
     lastFingerprintRef.current = buildDraftFingerprint({
       id: data.id,

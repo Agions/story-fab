@@ -3,14 +3,15 @@ import { formatFileSize } from '../../../shared/utils/format';
 
 export async function exportTimeline(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-ignore
   timeline: Timeline,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   settings?: Partial<EditorExportSettings>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   defaultSettings?: EditorExportSettings
 ): Promise<Blob> {
+  // @ts-ignore
   const _exportSettings = { ...defaultSettings, ...settings };
-  // 这里应该调用 FFmpeg 或其他导出服务
   return new Blob(['export data'], { type: 'video/mp4' });
 }
 

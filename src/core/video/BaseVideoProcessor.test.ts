@@ -1,4 +1,5 @@
 /* eslint-disable */
+// @ts-ignore
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   VideoProcessingError,

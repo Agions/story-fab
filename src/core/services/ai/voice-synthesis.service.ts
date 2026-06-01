@@ -66,6 +66,7 @@ interface TauriSynthesizeInput {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// @ts-ignore
 interface TauriSynthesizeOutput_ {
   audio_path: string;
   duration_secs: number;

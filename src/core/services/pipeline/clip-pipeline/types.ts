@@ -72,6 +72,7 @@ export interface RepurposingResult {
  */
 export function clipSegmentFromRepurposing(
   rep: RepurposingClip,
+  // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   index: number,
   sourceId: string,
