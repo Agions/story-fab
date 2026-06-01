@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
 import { Video } from 'lucide-react';
-import { tauri, invoke, TauriCommand } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri/TauriBridge';
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoAnalysis, KeyMoment, Emotion } from '@/types';
 import VideoSelector from '@/components/VideoSelector/VideoSelector';
@@ -61,22 +61,17 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       setProgress(40);
 
       const keyFrameCount = Math.min(5, Math.ceil(videoMetadata.duration / 60));
-      const keyFrames = (await invoke('extract_key_frames' as TauriCommand, {
-        path: selectedVideoUrl,
-        count: keyFrameCount
-      }).catch(err => {
+      const keyFrames = await tauri.extractKeyFrames(selectedVideoUrl, keyFrameCount).catch(err => {
         logger.error('提取关键帧失败:', { error: err });
         return [];
-      })) as string[];
+      });
 
       setProgress(70);
 
-      const thumbnail = (await invoke('generate_thumbnail' as TauriCommand, {
-        path: selectedVideoUrl
-      }).catch(err => {
+      const thumbnail = await tauri.generateThumbnail(selectedVideoUrl).catch(err => {
         logger.error('生成缩略图失败:', { error: err });
         return '';
-      })) as string;
+      });
 
       const keyMoments: KeyMoment[] = [];
       const emotions: Emotion[] = [];
