@@ -3,7 +3,7 @@ use crate::types::{
     DirectorPlanOutput,
 };
 use crate::highlight::HighlightDetector;
-use crate::smart_segmenter::SmartSegmenter;
+use crate::segment::SmartSegmenter;
 use crate::utils::cmd_err;
 use crate::binary::resolve_binary_path;
 use serde::{Deserialize, Serialize};
@@ -133,12 +133,12 @@ pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::high
 #[tauri::command]
 pub fn detect_smart_segments(
     input: DetectSmartSegmentsInput,
-) -> Result<Vec<crate::smart_segmenter::VideoSegment>, String> {
+) -> Result<Vec<crate::segment::VideoSegment>, String> {
     if input.video_path.trim().is_empty() {
         return Err("视频路径不能为空".to_string());
     }
     let segmenter = SmartSegmenter::new();
-    let options = crate::smart_segmenter::SegmentOptions {
+    let options = crate::segment::SegmentOptions {
         min_duration_ms: input.min_duration_ms,
         max_duration_ms: input.max_duration_ms,
         scene_threshold: input.scene_threshold.map(|v| v as f32),
