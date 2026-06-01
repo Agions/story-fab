@@ -12,7 +12,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import type { ClipAnalysisResult } from '../../../core/services/aiClip';
-import styles from '@/components/AIClip/index.module.less';
+import styles from '@/components/AIClip/AIClip.module.less';
 
 interface SuggestionsStepProps {
   analysisResult: ClipAnalysisResult | null;

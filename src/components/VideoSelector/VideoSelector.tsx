@@ -9,7 +9,7 @@ import { tauri } from '@/core/tauri/TauriBridge';
 import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
 import { notify } from '@/shared';
 import { VIDEO_FORMATS } from '@/constants';
-import styles from './index.module.less';
+import styles from './VideoSelector.module.less';
 
 interface VideoSelectorProps {
   initialVideoPath?: string;

@@ -9,7 +9,7 @@ import {
   Volume2,
   Maximize,
 } from 'lucide-react';
-import styles from '@/components/VideoPlayer/index.module.less';
+import styles from '@/components/VideoPlayer/VideoPlayer.module.less';
 
 interface VideoPlayerProps {
   src: string;

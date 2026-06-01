@@ -11,7 +11,7 @@ import { notify } from '@/shared';
 import type { VideoSegment } from '@/core/types';
 import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/mods';
 import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from '@/components/VideoProcessingController/constants';
-import styles from '@/components/VideoProcessingController/index.module.less';
+import styles from '@/components/VideoProcessingController/VideoProcessingController.module.less';
 
 const QUALITY_OPTIONS = [
   { value: 'low', label: '低质量 (720p)', description: '适合快速预览或网络分享' },

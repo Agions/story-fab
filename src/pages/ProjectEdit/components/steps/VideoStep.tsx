@@ -6,7 +6,7 @@ import { Card } from '../../../../components/ui/card';
 import { Video } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { cn } from '@/shared/utils/cn';
-import VideoSelector from '@/components/VideoSelector';
+import VideoSelector from '@/components/VideoSelector/VideoSelector';
 import type { VideoMetadata } from '@/core/video';
 import styles from '@/pages/ProjectEdit/index.module.less';
 

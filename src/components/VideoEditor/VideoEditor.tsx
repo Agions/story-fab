@@ -8,7 +8,7 @@ import { save } from '@tauri-apps/plugin-dialog';
 import { ScriptSegment } from '@/types';
 import { notify } from '@/shared';
 
-import VideoPlayer from '@/components/VideoPlayer';
+import VideoPlayer from '@/components/VideoPlayer/VideoPlayer';
 import Timeline from './Timeline';
 import SegmentDetails from './SegmentDetails';
 import EditorControls from './EditorControls';
