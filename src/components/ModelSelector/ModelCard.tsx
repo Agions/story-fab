@@ -3,7 +3,7 @@
  * 展示单个模型的详细信息
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
@@ -24,7 +24,17 @@ interface ModelCardProps {
   onSelect: (model: AIModel) => void;
 }
 
-export const ModelCard: React.FC<ModelCardProps> = ({
+const getProviderName = (providerId: ModelProvider | undefined): string => {
+  const config = MODEL_PROVIDERS[providerId ?? 'custom'];
+  return config?.name || providerId || 'Unknown';
+};
+
+const getProviderIcon = (providerId: ModelProvider | undefined): string => {
+  const config = MODEL_PROVIDERS[providerId ?? 'custom'];
+  return config?.icon || '';
+};
+
+const ModelCardBase: React.FC<ModelCardProps> = memo(({
   model,
   isSelected,
   isAvailable,
@@ -33,20 +43,6 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   estimatedCost,
   onSelect
 }) => {
-  const getProviderName = (providerId: ModelProvider | undefined): string => {
-    const config = MODEL_PROVIDERS[providerId ?? 'custom'];
-    return config?.name || providerId || 'Unknown';
-  };
-
-  const getProviderIcon = (providerId: ModelProvider | undefined): string => {
-    const config = MODEL_PROVIDERS[providerId ?? 'custom'];
-    return config?.icon || '';
-  };
-
-  const handleClick = () => {
-    if (isAvailable) onSelect(model);
-  };
-
   const cardClassName = useMemo(() => {
     const classes = [styles.modelCard];
     if (isSelected) classes.push(styles.selected);
@@ -65,7 +61,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
     >
       <Card
         className={cardClassName}
-        onClick={handleClick}
+        onClick={() => isAvailable && onSelect(model)}
         size="sm"
       >
         <div className={styles.cardHeader}>
@@ -144,6 +140,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
       </Card>
     </motion.div>
   );
-};
+});
 
+export const ModelCard = ModelCardBase;
 export default ModelCard;
