@@ -3,23 +3,86 @@ import { highlightDetection } from './methods/highlightDetection';
 import { renderTranscode } from './methods/renderTranscode';
 import { subtitleAsr } from './methods/subtitleAsr';
 import { tts } from './methods/tts';
+import { mixAudio } from './methods/mixAudio';
 import { fileOperations } from './methods/fileOperations';
 import { project } from './methods/project';
 import { aiScript } from './methods/aiScript';
+import { commentary } from './methods/commentary';
 
+// ─── Tauri API Surface ─────────────────────────────────────────────────────────
+// Explicitly declared so TypeScript knows every method without relying on inference
 export const tauri = {
-  ...videoAnalysis,
-  ...highlightDetection,
-  ...renderTranscode,
-  ...subtitleAsr,
-  ...tts,
-  ...fileOperations,
-  ...project,
-  ...aiScript,
-};
+  // FFmpeg / Video analysis
+  checkFFmpeg: videoAnalysis.checkFFmpeg,
+  analyzeVideo: videoAnalysis.analyzeVideo,
+  runFfprobe: videoAnalysis.runFfprobe,
+
+  // Highlight detection
+  detectHighlights: highlightDetection.detectHighlights,
+  detectZCRBursts: highlightDetection.detectZCRBursts,
+  detectSmartSegments: highlightDetection.detectSmartSegments,
+
+  // Render / Transcode
+  transcodeWithCrop: renderTranscode.transcodeWithCrop,
+  autonomousRender: renderTranscode.autonomousRender,
+  generatePreview: renderTranscode.generatePreview,
+  cutVideo: renderTranscode.cutVideo,
+  exportVideo: renderTranscode.exportVideo,
+  extractSubtitle: subtitleAsr.extractSubtitle,
+  burnSubtitle: subtitleAsr.burnSubtitle,
+  transcribeAudio: subtitleAsr.transcribeAudio,
+  listWhisperModels: subtitleAsr.listWhisperModels,
+  checkFasterWhisper: subtitleAsr.checkFasterWhisper,
+  downloadWhisperModel: subtitleAsr.downloadWhisperModel,
+  getWhisperLanguages: subtitleAsr.getWhisperLanguages,
+
+  // TTS
+  synthesizeSpeech: tts.synthesizeSpeech,
+  listTTSBackends: tts.listTTSBackends,
+  checkTTSAvailable: tts.checkTTSAvailable,
+  mixAudio: mixAudio,
+
+  // File operations
+  readTextFile: fileOperations.readTextFile,
+  writeTextFile: fileOperations.writeTextFile,
+  deleteFile: fileOperations.deleteFile,
+  cleanTempFile: fileOperations.cleanTempFile,
+  openFile: fileOperations.openFile,
+  getFileSize: fileOperations.getFileSize,
+  voiceDiscovery: fileOperations.voiceDiscovery,
+
+  // Project
+  getExportDir: project.getExportDir,
+  saveProject: project.saveProject,
+  loadProject: project.loadProject,
+  deleteProject: project.deleteProject,
+  listProjects: project.listProjects,
+  listAppDataFiles: project.listAppDataFiles,
+  checkAppDataDir: project.checkAppDataDir,
+
+  // AI Script
+  generateNarrationScript: aiScript.generateNarrationScript,
+  analyzeVideoForNarration: aiScript.analyzeVideoForNarration,
+  listAvailableModels: aiScript.listAvailableModels,
+
+  // Commentary / Director
+  createSession: commentary.createSession,
+  getStatus: commentary.getStatus,
+  startAnalysis: commentary.startAnalysis,
+  generatePlan: commentary.generatePlan,
+  approvePlan: commentary.approvePlan,
+  revisePlan: commentary.revisePlan,
+  completeRender: commentary.completeRender,
+  destroySession: commentary.destroySession,
+  generateScript: commentary.generateScript,
+  synthesizeAudio: commentary.synthesizeAudio,
+  estimateTTSDuration: commentary.estimateTTSDuration,
+  listVoices: commentary.listVoices,
+  cancelExport: commentary.cancelExport,
+} as const;
 
 export default tauri;
 
 // Re-export types and invoke from TauriBridge for barrel import from index
-export { TauriCommand, TauriBridgeError, invoke } from './TauriBridge';
+export { TauriCommand, TauriBridgeError, invoke, rawInvoke } from './TauriBridge';
 export type { BridgeOptions } from './TauriBridge';

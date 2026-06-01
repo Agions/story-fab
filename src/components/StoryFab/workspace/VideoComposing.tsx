@@ -9,8 +9,8 @@ import { voiceSynthesisService } from '../../../core/services/ai/voiceSynthesisS
 import { videoEffectService } from '../../../core/services/video/videoEffectService';
 import { audioVideoSyncService } from '../../../core/services/asr/audioSyncService';
 import { mixTtsWithVideo } from '../../../core/services/video/audioMixService';
+import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
-import { invoke } from '@tauri-apps/api/core';
 import { useTimeout } from '../../../hooks/useTimeout';
 import styles from './VideoComposing.module.less';
 
@@ -182,7 +182,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
     }
     onProgress(75);
 
-    const outputDir = await invoke<string>('get_export_dir').catch(() => '');
+    const outputDir = await tauri.getExportDir().catch(() => '');
     const outputPath = outputDir
       ? `${outputDir}/mix_${Date.now()}.mp4`
       : `${state.currentVideo.path.replace(/\.[^.]+$/, '')}_mixed.mp4`;
