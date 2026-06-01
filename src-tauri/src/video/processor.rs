@@ -4,7 +4,6 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary, hw_accel, HwAccel};
 use crate::utils::{cmd_err, cmd_first_line, format_time, write_concat_file};
 use crate::video::{extract_keyframes_impl, generate_thumbnail_impl, probe_metadata};
-use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -74,19 +73,19 @@ impl VideoProcessor {
         Ok(())
     }
 
-    pub fn concat_segments(&self, inputs: &[PathBuf], output: &str) -> Result<(), String> {
+    pub async fn concat_segments(&self, inputs: &[PathBuf], output: &str) -> Result<(), String> {
         if inputs.is_empty() {
             return Err("没有输入片段".to_string());
         }
 
         if inputs.len() == 1 {
-            fs::copy(&inputs[0], output).map_err(|e| format!("复制失败: {}", e))?;
+            tokio::fs::copy(&inputs[0], output).await.map_err(|e| format!("复制失败: {}", e))?;
             return Ok(());
         }
 
         let concat_file = write_concat_file(inputs)?;
 
-        let result = Command::new(&self.ffmpeg_path)
+        let result = tokio::process::Command::new(&self.ffmpeg_path)
             .args(&[
                 "-y", "-f", "concat", "-safe", "0",
                 "-i", &concat_file.to_string_lossy(),
@@ -94,9 +93,10 @@ impl VideoProcessor {
                 output,
             ])
             .output()
+            .await
             .map_err(|e| format!("合并失败: {}", e))?;
 
-        let _ = fs::remove_file(&concat_file);
+        let _ = tokio::fs::remove_file(&concat_file).await;
 
         if !result.status.success() {
             return Err(cmd_err("合并失败", &result));
