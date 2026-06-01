@@ -3,7 +3,7 @@
  */
 import React, { useState, useEffect, memo } from 'react';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '@/core/tauri';
 import { useStoryFab } from '../context';
 import { notify } from '@/shared';
 import type { ExportSettings } from '@/core/types';
@@ -110,7 +110,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
   const handleCancel = async () => {
     if (!currentExportId) return;
     try {
-      await invoke('cancel_export', { export_id: currentExportId });
+      await tauri.cancelExport(currentExportId);
       notify.info('导出已取消');
     } catch {
       notify.error(new Error('取消导出失败'), '取消失败');
@@ -196,7 +196,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
 
       setProgressStage('正在编码...');
 
-      await invoke<{ output_path: string }>('render_autonomous_cut', {
+      await tauri.autonomousRender({
         input_path: state.synthesisData.finalVideoUrl ?? '',
         output_path: outputPath,
       });
@@ -251,7 +251,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
         };
         setExportSettings(exportConfig);
 
-        await invoke<{ output_path: string }>('render_autonomous_cut', {
+        await tauri.autonomousRender({
           input_path: state.synthesisData.finalVideoUrl ?? '',
           output_path: outputPath,
         });
