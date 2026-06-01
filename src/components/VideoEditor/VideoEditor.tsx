@@ -1,5 +1,5 @@
 import { logger } from '../../shared/utils/logging';
-import React, { useState, useCallback, useEffect, memo } from 'react';
+import React, { useState, useCallback, useEffect, memo, useRef } from 'react';
 import { Card } from '../ui/card';
 import { tauri } from '../../core/tauri/TauriBridge';
 import { convertFileSrc } from '@tauri-apps/api/core';
@@ -62,6 +62,14 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
   const [isDragging, setIsDragging] = useState(false);
   const [dragType, setDragType] = useState<'move' | 'start' | 'end' | null>(null);
   const [dragSegmentId, setDragSegmentId] = useState<string | null>(null);
+
+  // 拖拽状态用 ref 存储，避免 useCallback 依赖导致重新绑定
+  const dragStateRef = useRef({ isDragging: false, dragSegmentId: null as string | null, dragType: null as 'move' | 'start' | 'end' | null, duration: 0 });
+
+  // 同步 dragStateRef
+  useEffect(() => {
+    dragStateRef.current = { isDragging, dragSegmentId, dragType, duration };
+  }, [isDragging, dragSegmentId, dragType, duration]);
 
   // 同步传入的 segments
   useEffect(() => {
@@ -206,11 +214,19 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
     return percentage * duration;
   }, [duration]);
 
-  // 拖拽移动
+  // 拖拽时间线 ref，避免 useCallback 依赖
+  const timelineStateRef = useRef({ duration: 0 });
+  useEffect(() => {
+    timelineStateRef.current.duration = duration;
+  }, [duration]);
+
+  // 拖拽移动 — 从 ref 读取状态，避免闭包陷阱
   const handleDragMove = useCallback((e: MouseEvent) => {
+    const { isDragging, dragSegmentId, dragType } = dragStateRef.current;
     if (!isDragging || !dragSegmentId || !dragType) return;
 
     const timelineTime = getTimeFromPosition(e.clientX);
+    const dur = timelineStateRef.current.duration;
 
     setEditedSegments(prev =>
       prev.map(segment => {
@@ -243,7 +259,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
           }
           case 'end': {
             newEnd = Math.max(timelineTime, original.startTime + 0.5);
-            newEnd = Math.min(duration, newEnd);
+            newEnd = Math.min(dur, newEnd);
             break;
           }
         }
@@ -251,9 +267,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
         return { ...segment, startTime: newStart, endTime: newEnd };
       })
     );
-  }, [isDragging, dragSegmentId, dragType, getTimeFromPosition, duration]);
+  }, [getTimeFromPosition]);
 
-  // 结束拖拽
+  // 结束拖拽 — 重置状态
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
     setDragType(null);
@@ -261,9 +277,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
 
     document.removeEventListener('mousemove', handleDragMove);
     document.removeEventListener('mouseup', handleDragEnd);
-  }, [handleDragMove]);
+  }, []);
 
-  // 开始拖拽
+  // 开始拖拽 — 稳定函数
   const handleDragStart = useCallback((segmentId: string, type: 'move' | 'start' | 'end', e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDragging(true);
@@ -272,7 +288,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoPath, segments, onEditCo
 
     document.addEventListener('mousemove', handleDragMove);
     document.addEventListener('mouseup', handleDragEnd);
-  }, [handleDragMove, handleDragEnd]);
+  }, []);
 
   return (
     <div className={styles.editorContainer}>
