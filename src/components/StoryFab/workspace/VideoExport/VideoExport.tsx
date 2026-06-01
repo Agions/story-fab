@@ -1,289 +1,60 @@
 /**
  * 步骤6: 导出视频 — AI Cinema Studio Redesign
+ * Split into: exportConfig.ts (constants), useExportHandlers.ts (state/logic), VideoExport.tsx (render)
  */
-import React, { useState, useEffect, memo } from 'react';
-import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import { tauri } from '@/core/tauri';
-import { useStoryFab } from '../context';
-import { notify } from '@/shared';
-import type { ExportSettings } from '@/core/types';
-import styles from './VideoExport.module.less';
+import React, { memo } from 'react';
+import { useStoryFab } from '@/components/StoryFab/context';
+import styles from '../VideoExport.module.less';
+import { useExportHandlers } from './useExportHandlers';
+import {
+  FORMAT_OPTIONS,
+  QUALITY_OPTIONS,
+  RESOLUTION_OPTIONS,
+  FPS_OPTIONS,
+  PLATFORM_PRESETS,
+} from './exportConfig';
 
 interface VideoExportProps {
   onComplete?: () => void;
 }
 
-// 导出格式
-const FORMAT_OPTIONS = [
-  { value: 'mp4', label: 'MP4', desc: '通用格式', emoji: '🎬' },
-  { value: 'mov', label: 'MOV', desc: 'Apple 高质量', emoji: '🍎' },
-  { value: 'gif', label: 'GIF', desc: '动画格式', emoji: '🎞️' },
-] as const;
-
-// 平台预设
-const PLATFORM_PRESETS = [
-  { 
-    value: 'douyin', 
-    label: '抖音', 
-    emoji: '🎵',
-    aspectRatio: '9:16',
-    resolution: '1080p',
-    bitrate: 10,
-    tips: '竖屏短视频，建议 9:16，推荐高清画质',
-  },
-  { 
-    value: 'xiaohongshu', 
-    label: '小红书', 
-    emoji: '📕',
-    aspectRatio: '3:4',
-    resolution: '1080p',
-    bitrate: 8,
-    tips: '图文/视频混合，注意封面设计',
-  },
-  { 
-    value: 'bilibili', 
-    label: 'B站', 
-    emoji: '📺',
-    aspectRatio: '16:9',
-    resolution: '1080p',
-    bitrate: 12,
-    tips: '横屏为主，支持高码率，推荐 1080p 高清',
-  },
-  { 
-    value: 'youtube_shorts', 
-    label: 'YouTube Shorts', 
-    emoji: '▶️',
-    aspectRatio: '9:16',
-    resolution: '1080p',
-    bitrate: 10,
-    tips: '竖屏短视频，≤60秒，配字幕更佳',
-  },
-  { 
-    value: 'tiktok', 
-    label: 'TikTok', 
-    emoji: '🌐',
-    aspectRatio: '9:16',
-    resolution: '1080p',
-    bitrate: 10,
-    tips: '竖屏优先，建议添加字幕和特效',
-  },
-];
-
-// 质量选项
-const QUALITY_OPTIONS = [
-  { value: '1080p', label: 'Full HD' },
-  { value: '720p', label: 'HD' },
-  { value: '480p', label: 'SD' },
-] as const;
-
-// 分辨率选项
-const RESOLUTION_OPTIONS = [
-  { value: '1080p', label: '1080p Full HD', res: '1920×1080' },
-  { value: '720p', label: '720p HD', res: '1280×720' },
-  { value: '480p', label: '480p SD', res: '854×480' },
-  { value: '2k', label: '2K QHD', res: '2560×1440' },
-] as const;
-
-// 帧率选项
-const FPS_OPTIONS = [
-  { value: 24, label: '24 fps' },
-  { value: 30, label: '30 fps' },
-  { value: 60, label: '60 fps' },
-] as const;
-
 const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
   const { state, setExportSettings, setStep } = useStoryFab();
-  const [exporting, setExporting] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [progressStage, setProgressStage] = useState('');
-  const [etaSeconds, setEtaSeconds] = useState<number | null>(null);
-  const [exported, setExported] = useState(false);
-  const [_exportedFile, setExportedFile] = useState<string | null>(null);
-  const [_exportError, setExportError] = useState<string | null>(null);
-  const [_startTime, _setStartTime] = useState<number>(Date.now());
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
-  const [batchMode, setBatchMode] = useState(false);
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [currentExportId, setCurrentExportId] = useState<string | null>(null);
 
-  // 取消导出
-  const handleCancel = async () => {
-    if (!currentExportId) return;
-    try {
-      await tauri.cancelExport(currentExportId);
-      notify.info('导出已取消');
-    } catch {
-      notify.error(new Error('取消导出失败'), '取消失败');
-    }
-    setExporting(false);
-    setProgress(0);
-    setProgressStage('');
-    setEtaSeconds(null);
-    setCurrentExportId(null);
-  };
-
-
-  // 监听 Rust processing-progress 事件，驱动真实进度
-  useEffect(() => {
-    let unlisten: UnlistenFn | null = null;
-    if (exporting) {
-      listen<{ stage: string; progress: number; time_remaining_secs?: number }>(
-        'processing-progress',
-        (event) => {
-          const { stage, progress, time_remaining_secs } = event.payload;
-          setProgress(Math.round(progress * 100));
-          setProgressStage(stage);
-          if (time_remaining_secs !== undefined) {
-            setEtaSeconds(Math.round(time_remaining_secs));
-          }
-        }
-      ).then((fn) => { unlisten = fn; });
-    }
-    return () => { unlisten?.(); };
-  }, [exporting]);
-
-  const [config, setConfig] = useState<ExportSettings>({
-    format: state.exportSettings?.format || 'mp4',
-    quality: state.exportSettings?.quality || 'high',
-    resolution: state.exportSettings?.resolution || '1080p',
-    fps: state.exportSettings?.fps || 30,
-    includeSubtitles: state.exportSettings?.includeSubtitles ?? true,
-    burnSubtitles: state.exportSettings?.burnSubtitles ?? true,
-    includeWatermark: state.exportSettings?.includeWatermark ?? false,
-  });
-
-  const estimateFileSize = () => {
-    if (!state.currentVideo?.duration) return '0 MB';
-    const bitrateMap: Record<string, number> = { low: 1.5, medium: 4, high: 10, ultra: 30 };
-    const bitrate = bitrateMap[config.quality] || 5;
-    const sizeMB = (bitrate * state.currentVideo.duration) / 8;
-    return sizeMB > 1000 ? `${(sizeMB / 1000).toFixed(1)} GB` : `${sizeMB.toFixed(1)} MB`;
-  };
+  const {
+    exporting,
+    progress,
+    progressStage,
+    etaSeconds,
+    exported,
+    selectedPlatform,
+    batchMode,
+    selectedPlatforms,
+    config,
+    estimateFileSize,
+    getEstimatedFileSize,
+    setConfig,
+    setSelectedPlatform,
+    setBatchMode,
+    setSelectedPlatforms,
+    handleExport,
+    handleBatchExport,
+    handleCancel,
+    togglePlatformSelection,
+  } = useExportHandlers({ state: state as any, onExportSettingsChange: setExportSettings, onComplete });
 
   // Platform preset handler
-  const applyPlatformPreset = (platform: typeof PLATFORM_PRESETS[number]) => {
+  const applyPlatformPreset = (platform: (typeof PLATFORM_PRESETS)[number]) => {
     setSelectedPlatform(platform.value);
     setConfig(prev => ({
       ...prev,
-      resolution: platform.resolution as ExportSettings['resolution'],
+      resolution: platform.resolution as typeof config.resolution,
     }));
-  };
-
-  // Calculate estimated file size with platform bitrate
-  const getEstimatedFileSize = () => {
-    if (!state.currentVideo?.duration) return '0 MB';
-    const platform = PLATFORM_PRESETS.find(p => p.value === selectedPlatform);
-    const bitrate = platform?.bitrate || (config.quality === 'low' ? 1.5 : config.quality === 'medium' ? 4 : config.quality === 'high' ? 10 : 30);
-    const sizeMB = (bitrate * state.currentVideo.duration) / 8;
-    return sizeMB > 1000 ? `${(sizeMB / 1000).toFixed(1)} GB` : `${sizeMB.toFixed(1)} MB`;
-  };
-
-  const handleExport = async () => {
-    if (!state.synthesisData?.finalVideoUrl) {
-      notify.warning('请先完成视频合成');
-      return;
-    }
-
-    setExporting(true);
-    setProgress(0);
-    setProgressStage('准备导出...');
-    setEtaSeconds(null);
-    setExportError(null);
-
-    try {
-      const outputPath = `/tmp/story-fab/export_${Date.now()}.mp4`;
-      setCurrentExportId(outputPath);
-
-      setProgressStage('正在编码...');
-
-      await tauri.autonomousRender({
-        input_path: state.synthesisData.finalVideoUrl ?? '',
-        output_path: outputPath,
-      });
-
-      setProgress(100);
-      setProgressStage('导出完成');
-      setEtaSeconds(0);
-
-      setExportSettings(config);
-      setExportedFile(outputPath);
-      setExported(true);
-      notify.success('视频导出完成！');
-      onComplete?.();
-
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      setExportError(msg);
-      notify.error(msg, '导出失败');
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  /** 批量导出（多平台同时） */
-  const handleBatchExport = async () => {
-    if (!state.synthesisData?.finalVideoUrl) {
-      notify.warning('请先完成视频合成');
-      return;
-    }
-    if (selectedPlatforms.length === 0) {
-      notify.warning('请至少选择一个发布平台');
-      return;
-    }
-
-    setExporting(true);
-    setProgress(0);
-    setEtaSeconds(null);
-
-    try {
-      for (let i = 0; i < selectedPlatforms.length; i++) {
-        const platform = PLATFORM_PRESETS.find(p => p.value === selectedPlatforms[i]);
-        if (!platform) continue;
-
-        const outputPath = `/tmp/story-fab/export_${platform.value}_${Date.now()}.mp4`;
-        setCurrentExportId(outputPath);
-        setProgressStage(`${platform.emoji} ${platform.label} 导出中... (${i + 1}/${selectedPlatforms.length})`);
-
-        // 临时应用平台预设
-        const exportConfig = {
-          ...config,
-          resolution: platform.resolution as ExportSettings['resolution'],
-        };
-        setExportSettings(exportConfig);
-
-        await tauri.autonomousRender({
-          input_path: state.synthesisData.finalVideoUrl ?? '',
-          output_path: outputPath,
-        });
-
-        setProgress(Math.round(((i + 1) / selectedPlatforms.length) * 100));
-      }
-
-      setProgress(100);
-      setProgressStage('全部导出完成');
-      setEtaSeconds(0);
-      setExported(true);
-      notify.success(`批量导出完成！共 ${selectedPlatforms.length} 个平台`);
-      onComplete?.();
-
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      setExportError(msg);
-      notify.error(msg, '批量导出失败');
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const togglePlatformSelection = (value: string) => {
-    setSelectedPlatforms(prev =>
-      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
-    );
   };
 
   const hasSynthesis = !!state.synthesisData?.finalVideoUrl;
 
-  // 前置检查
+  // ── 前置条件检查 ──────────────────────────────────────────────
   if (!hasSynthesis) {
     return (
       <div className={styles.stepContent}>
@@ -305,7 +76,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     );
   }
 
-  // 导出完成
+  // ── 导出完成 ─────────────────────────────────────────────────
   if (exported) {
     return (
       <div className={styles.stepContent}>
@@ -353,7 +124,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     );
   }
 
-  // 导出中
+  // ── 导出中 ──────────────────────────────────────────────────
   if (exporting) {
     const circumference = 2 * Math.PI * 45;
     const offset = circumference - (progress / 100) * circumference;
@@ -375,24 +146,21 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
             <div className={styles.progressPercent}>{progress}%</div>
           </div>
           <div className={styles.progressLabel}>
-            {progressStage || (() => {
-              if (progress < 30) return <><span aria-hidden="true">🎬</span> 视频编码中...</>;
-              if (progress < 60) return <><span aria-hidden="true">🔊</span> 音频编码中...</>;
-              if (progress < 90) return <><span aria-hidden="true">💾</span> 生成文件...</>;
-              return <><span aria-hidden="true">✨</span> 导出完成！</>;
-            })()}
+            {progressStage || (
+              progress < 30 ? <>🎬 视频编码中...</> :
+              progress < 60 ? <>🔊 音频编码中...</> :
+              progress < 90 ? <>💾 生成文件...</> :
+              <>✨ 导出完成！</>
+            )}
           </div>
           <div className={styles.progressSub}>
             {etaSeconds !== null && etaSeconds > 0
               ? `预计剩余: ${etaSeconds}s`
               : etaSeconds === 0 ? '导出完成！' : '请耐心等待...'}
           </div>
-
           <button className={styles.cancelBtn} onClick={handleCancel}>
             取消导出
           </button>
-
-          {/* 进度条 */}
           <div className={styles.progressBarSection}>
             <div className={styles.progressBarTrack}>
               <div
@@ -407,7 +175,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     );
   }
 
-  // 配置界面
+  // ── 配置界面 ─────────────────────────────────────────────────
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepTitle}>
@@ -422,7 +190,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
       </div>
 
       <div className={styles.columns}>
-        {/* ====== 左侧：设置面板 ====== */}
+        {/* Left: Settings panel */}
         <div className={styles.settingsCard}>
           <div className={styles.cardHeader}>
             <svg className={styles.cardHeaderIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -433,7 +201,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
           </div>
 
           <div className={styles.cardBody}>
-            {/* 平台预设选择 */}
+            {/* Platform presets */}
             <div className={styles.platformSection}>
               <div className={styles.sectionHeaderRow}>
                 <span className={styles.sectionLabel}>发布平台</span>
@@ -479,7 +247,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
               )}
             </div>
 
-            {/* 格式选择 */}
+            {/* Format */}
             <div className={styles.formatSection}>
               <span className={styles.sectionLabel}>输出格式</span>
               <div className={styles.formatGrid}>
@@ -487,10 +255,10 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                   <div
                     key={fmt.value}
                     className={`${styles.formatItem} ${config.format === fmt.value ? styles.formatActive : ''}`}
-                    onClick={() => setConfig({ ...config, format: fmt.value as ExportSettings['format'] })}
+                    onClick={() => setConfig({ ...config, format: fmt.value as typeof config.format })}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, format: fmt.value as ExportSettings['format'] })}
+                    onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, format: fmt.value as typeof config.format })}
                   >
                     <div className={styles.formatCheck}>
                       <div className={styles.formatCheckDot} />
@@ -503,7 +271,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
               </div>
             </div>
 
-            {/* 质量选择 */}
+            {/* Quality */}
             <div className={styles.qualitySection}>
               <span className={styles.sectionLabel}>输出质量</span>
               <div className={styles.qualityGrid}>
@@ -511,10 +279,10 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                   <div
                     key={q.value}
                     className={`${styles.qualityItem} ${config.resolution === q.value ? styles.qualityActive : ''}`}
-                    onClick={() => setConfig({ ...config, resolution: q.value as ExportSettings['resolution'] })}
+                    onClick={() => setConfig({ ...config, resolution: q.value as typeof config.resolution })}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, resolution: q.value as ExportSettings['resolution'] })}
+                    onKeyDown={(e) => e.key === 'Enter' && setConfig({ ...config, resolution: q.value as typeof config.resolution })}
                   >
                     <span className={styles.qualityValue}>{q.value}</span>
                     <span className={styles.qualityLabel}>{q.label}</span>
@@ -523,7 +291,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
               </div>
             </div>
 
-            {/* 分辨率和帧率 */}
+            {/* Resolution & FPS */}
             <div className={styles.rowGroup}>
               <div className={styles.optionGroup}>
                 <label htmlFor="resolutionSelect">分辨率</label>
@@ -532,7 +300,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                     id="resolutionSelect"
                     className={styles.optionSelect}
                     value={config.resolution}
-                    onChange={(e) => setConfig({ ...config, resolution: e.target.value as ExportSettings['resolution'] })}
+                    onChange={(e) => setConfig({ ...config, resolution: e.target.value as typeof config.resolution })}
                   >
                     {RESOLUTION_OPTIONS.map(r => (
                       <option key={r.value} value={r.value}>{r.label} ({r.res})</option>
@@ -550,7 +318,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                     id="fpsSelect"
                     className={styles.optionSelect}
                     value={config.fps}
-                    onChange={(e) => setConfig({ ...config, fps: Number(e.target.value) as ExportSettings['fps'] })}
+                    onChange={(e) => setConfig({ ...config, fps: Number(e.target.value) as typeof config.fps })}
                   >
                     {FPS_OPTIONS.map(f => (
                       <option key={f.value} value={f.value}>{f.label}</option>
@@ -563,7 +331,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
               </div>
             </div>
 
-            {/* 字幕选项 */}
+            {/* Toggle options */}
             <div className={styles.toggleSection}>
               <div className={styles.toggleRow}>
                 <div className={styles.toggleLabelGroup}>
@@ -593,7 +361,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
           </div>
         </div>
 
-        {/* ====== 右侧：导出信息 ====== */}
+        {/* Right: Export info */}
         <div className={styles.infoCard}>
           <div className={styles.infoHeader}>
             <svg className={styles.cardHeaderIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -639,7 +407,6 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
             </div>
 
             <div className={styles.exportActions}>
-              {/* 一键导出 */}
               <button
                 className={`${styles.exportBtn} ${styles.exportBtnPrimary}`}
                 onClick={batchMode ? handleBatchExport : handleExport}
@@ -651,8 +418,6 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                 </svg>
                 {batchMode ? `批量导出 (${selectedPlatforms.length})` : '一键导出'}
               </button>
-
-              {/* 自定义导出 */}
               <button
                 className={`${styles.exportBtn} ${styles.exportBtnSecondary}`}
                 onClick={handleExport}
@@ -673,4 +438,3 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
 
 VideoExport.displayName = 'VideoExport';
 export default VideoExport;
-
