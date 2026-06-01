@@ -2,7 +2,7 @@ use crate::types::{
     DetectHighlightsInput, DetectSmartSegmentsInput, DirectorPlanInput,
     DirectorPlanOutput,
 };
-use crate::highlight_detector::HighlightDetector;
+use crate::highlight::HighlightDetector;
 use crate::smart_segmenter::SmartSegmenter;
 use crate::utils::cmd_err;
 use crate::binary::resolve_binary_path;
@@ -113,12 +113,12 @@ pub fn detect_zcr_bursts(input: DetectZCRBurstsInput) -> Result<Vec<ZCRBurstResu
 }
 
 #[tauri::command]
-pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::highlight_detector::HighlightSegment>, String> {
+pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::highlight::HighlightSegment>, String> {
     if input.video_path.trim().is_empty() {
         return Err("视频路径不能为空".to_string());
     }
     let detector = HighlightDetector::new();
-    let options = crate::highlight_detector::HighlightOptions {
+    let options = crate::highlight::HighlightOptions {
         threshold: input.threshold.map(|v| v as f32),
         min_duration_ms: input.min_duration_ms,
         top_n: input.top_n,
