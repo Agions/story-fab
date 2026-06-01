@@ -8,6 +8,7 @@
 
 mod detection;
 mod director_plan;
+pub mod tts_core;
 pub mod types;
 mod tts;
 
