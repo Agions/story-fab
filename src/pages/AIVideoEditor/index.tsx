@@ -78,8 +78,6 @@ const AIVideoEditorContent: React.FC = () => {
     useCallback((s) => ({
       previewPlaying: s.previewPlaying,
       setPreviewPlaying: s.setPreviewPlaying,
-      undo: s.undo,
-      redo: s.redo,
     }), [])
   );
   const timelineStore = useTimelineStore(
@@ -133,11 +131,9 @@ const AIVideoEditorContent: React.FC = () => {
       timelineStore.selectAllClips();
     },
     onUndo: () => {
-      editorStore.undo();
       timelineStore.undoTrack();
     },
     onRedo: () => {
-      editorStore.redo();
       timelineStore.redoTrack();
     },
     onExport: () => {

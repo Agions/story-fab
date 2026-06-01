@@ -14,7 +14,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '../core/types/timeline';
-import { MAX_HISTORY_SIZE, DEFAULT_SNAP_THRESHOLD_MS } from './editorTypes';
+import { DEFAULT_SNAP_THRESHOLD_MS } from './editorTypes';
+// Note: MAX_HISTORY_SIZE is defined locally in timelineStore
+const MAX_HISTORY_SIZE = 19;
 
 // =========================================
 // Types
@@ -85,7 +87,7 @@ export interface TimelineActions {
 export type TimelineStore = TimelineState & TimelineActions;
 
 // Constants (imported from ./editorTypes to avoid duplication)
-// MAX_HISTORY_SIZE, DEFAULT_SNAP_THRESHOLD_MS
+// DEFAULT_SNAP_THRESHOLD_MS
 
 // =========================================
 // Helper functions
