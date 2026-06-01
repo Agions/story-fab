@@ -12,7 +12,7 @@ interface WelcomeHeaderProps {
 }
 
 const WelcomeHeader: React.FC<WelcomeHeaderProps> = React.memo(({ onCreateProject }) => {
-  // @ts-ignore
+  // @ts-ignore - user is read from store by descendants; kept for header personalization hook
   const _user = useAppStore((state) => state.user);
 
   const handleMouseEnter = () => {

@@ -286,9 +286,9 @@ export class ClipScorer {
   private buildReasons(
     laughter: number, emotion: number, completeness: number,
     silence: number, 
-    // @ts-ignore
+    // @ts-ignore - pace/keywords reserved for future scoring rubric expansion
     pace: number, keywords: number,
-    // @ts-ignore
+    // @ts-ignore - transcript reserved for future evidence-based reason generation
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     transcript: string, duration: number,
   ): string[] {

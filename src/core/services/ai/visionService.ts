@@ -176,7 +176,7 @@ export class VisionService {
       scenes.map(async (scene, _index) => {
         // 基于场景位置和内容进行分类
         const position = scene.startTime / videoInfo.duration;
-        // @ts-ignore
+        // @ts-ignore - scene duration metric reserved for future scene-quality scoring
         const _duration = scene.endTime - scene.startTime; // scene analysis
 
         // 分析场景特征

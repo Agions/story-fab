@@ -12,8 +12,6 @@ import {
   MODEL_PROVIDERS,
   getModelsByProvider,
 } from '@/core/config/aiModels.config';
-// @ts-ignore
-import type { ModelProvider } from '@/core/types';
 import type {
   VideoAnalysis,
   KeyMoment,
