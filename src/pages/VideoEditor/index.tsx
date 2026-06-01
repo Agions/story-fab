@@ -15,7 +15,7 @@ import VideoPlayer from '@/components/VideoPlayer';
 import Timeline from './components/Timeline';
 import SegmentList from './components/SegmentList';
 
-import styles from '@/pages/VideoEditor/index.module.less';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 const loadKeyframePanel = () => import('./components/KeyframePanel');
 const loadAIClipPanel = () => import('./components/AIClipPanel');
