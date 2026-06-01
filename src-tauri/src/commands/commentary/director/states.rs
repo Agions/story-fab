@@ -1,18 +1,17 @@
-//! Director State Management — 全局状态管理
+//! Director State Management — global state table
 
 use std::collections::HashMap;
 use std::sync::Mutex;
 use once_cell::sync::Lazy;
 
-use super::types::*;
+use super::types::{DirectorStateMachine, DirectorState, ScriptStylePreset};
 
-/// Director 全局状态表（thread-safe）
 static DIRECTOR_STATES: Lazy<Mutex<HashMap<String, DirectorStateMachine>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 
-/// 获取或创建 Director 状态机
-pub fn get_or_create_state(session_id: &str) -> DirectorStateMachine {
-    let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
+/// Get a clone of the DirectorStateMachine (creates if absent)
+pub fn get_state(session_id: &str) -> DirectorStateMachine {
+    let states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
     states
         .entry(session_id.to_string())
         .or_insert_with(|| DirectorStateMachine {
@@ -29,7 +28,13 @@ pub fn get_or_create_state(session_id: &str) -> DirectorStateMachine {
         .clone()
 }
 
-/// 更新 Director 状态
+/// Persist a modified DirectorStateMachine back to the global table
+pub fn update_state_from(session_id: &str, machine: DirectorStateMachine) {
+    let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
+    states.insert(session_id.to_string(), machine);
+}
+
+/// Update Director state
 pub fn update_state(session_id: &str, new_state: DirectorState) {
     let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
     if let Some(machine) = states.get_mut(session_id) {
@@ -38,7 +43,7 @@ pub fn update_state(session_id: &str, new_state: DirectorState) {
     }
 }
 
-/// 清除 Director 状态
+/// Clear Director state
 pub fn clear_state(session_id: &str) {
     let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
     states.remove(session_id);
@@ -51,7 +56,7 @@ fn unix_timestamp() -> i64 {
         .unwrap_or(0)
 }
 
-/// 辅助函数：根据风格返回默认音色
+/// Helper: default voice for a given style
 pub fn default_voice_for_style(style: ScriptStylePreset) -> String {
     match style {
         ScriptStylePreset::Humorous => "zh-CN-XiaoxiaoNeural".to_string(),

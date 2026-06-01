@@ -1,7 +1,9 @@
-// Video processor core — VideoProcessor struct
+// Video processor core — delegates to submodules
+// Submodules: metadata, keyframes, thumbnail, ffmpeg_cmd, mix_audio, audio_duration
 
 use crate::binary::{ffmpeg_binary, ffprobe_binary, hw_accel, HwAccel};
-use crate::utils::{cmd_err, cmd_first_line, chrono_like_timestamp, parse_fraction, format_time, write_concat_file};
+use crate::utils::{cmd_err, cmd_first_line, format_time, write_concat_file};
+use crate::video::{extract_keyframes_impl, generate_thumbnail_impl, probe_metadata};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -27,113 +29,11 @@ impl VideoProcessor {
     }
 
     pub fn get_metadata(&self, path: &str) -> Result<serde_json::Value, String> {
-        let output = Command::new(&self.ffprobe_path)
-            .args(&[
-                "-v", "error",
-                "-show_format", "-show_streams",
-                "-of", "json",
-                path
-            ])
-            .output()
-            .map_err(|e| format!("运行 ffprobe 失败: {}", e))?;
-
-        if !output.status.success() {
-            return Err(cmd_err("ffprobe 失败", &output));
-        }
-
-        let data: serde_json::Value = serde_json::from_slice(&output.stdout)
-            .map_err(|e| format!("解析 JSON 失败: {}", e))?;
-
-        let video_stream = data["streams"]
-            .as_array()
-            .and_then(|arr| arr.iter().find(|s| s["codec_type"] == "video"))
-            .ok_or("未找到视频流")?;
-
-        let width = video_stream["width"].as_u64().unwrap_or(0) as u32;
-        let height = video_stream["height"].as_u64().unwrap_or(0) as u32;
-        let codec = video_stream["codec_name"].as_str().unwrap_or("unknown").to_string();
-        let fps = parse_fraction(video_stream["r_frame_rate"].as_str().unwrap_or("0/1"));
-
-        let audio_stream = data["streams"]
-            .as_array()
-            .and_then(|arr| arr.iter().find(|s| s["codec_type"] == "audio"));
-
-        let duration = data["format"]["duration"]
-            .as_str()
-            .and_then(|s| s.parse::<f64>().ok())
-            .unwrap_or(0.0);
-
-        let bitrate = data["format"]["bit_rate"]
-            .as_str()
-            .and_then(|s| s.parse::<u64>().ok())
-            .or(video_stream["bit_rate"].as_str().and_then(|s| s.parse::<u64>().ok()))
-            .unwrap_or(0);
-
-        let file_size = data["format"]["size"]
-            .as_str()
-            .and_then(|s| s.parse::<u64>().ok())
-            .unwrap_or(0);
-
-        Ok(serde_json::json!({
-            "duration": duration,
-            "width": width,
-            "height": height,
-            "fps": fps,
-            "codec": codec,
-            "bitrate": bitrate,
-            "fileSize": file_size,
-            "audioChannels": audio_stream.and_then(|s| s["channels"].as_u64()).map(|v| v as u32),
-            "audioSampleRate": audio_stream.and_then(|s| s["sample_rate"].as_str()).and_then(|s| s.parse::<u32>().ok()),
-        }))
+        probe_metadata(path, &self.ffprobe_path)
     }
 
     pub fn extract_keyframes(&self, path: &str, max_frames: u32, scene_threshold: f64) -> Result<Vec<String>, String> {
-        let temp_dir = std::env::temp_dir()
-            .join(format!("story-fab_frames_{}_{}", std::process::id(), chrono_like_timestamp()));
-
-        fs::create_dir_all(&temp_dir)
-            .map_err(|e| format!("创建临时目录失败: {}", e))?;
-
-        let pattern = temp_dir.join("frame_%04d.jpg");
-
-        let output = Command::new(&self.ffmpeg_path)
-            .args(&[
-                "-y", "-i", path,
-                "-vf", &format!("select='gt(scene\\,{:.2})',scale=iw:-1,qscale=v(2)", scene_threshold),
-                "-frames:v", &max_frames.to_string(),
-                "-vsync", "vfr",
-                &pattern.to_string_lossy()
-            ])
-            .output()
-            .map_err(|e| format!("提取关键帧失败: {}", e))?;
-
-        if !output.status.success() {
-            let _ = fs::remove_dir_all(&temp_dir);
-            return Err(cmd_err("提取失败", &output));
-        }
-
-        let mut frames: Vec<_> = fs::read_dir(&temp_dir)
-            .ok()
-            .map(|d| d.filter_map(|e| e.ok()).filter_map(|e| {
-                let p = e.path();
-                if p.extension().and_then(|e| e.to_str()) == Some("jpg") {
-                    Some(p)
-                } else {
-                    None
-                }
-            }).collect())
-            .unwrap_or_default();
-
-        frames.sort();
-
-        let result: Vec<String> = frames
-            .into_iter()
-            .take(max_frames as usize)
-            .map(|p| p.display().to_string())
-            .collect();
-
-        let _ = fs::remove_dir_all(&temp_dir);
-        Ok(result)
+        extract_keyframes_impl(path, max_frames, scene_threshold, &self.ffmpeg_path)
     }
 
     pub fn cut_video_segment(
@@ -191,7 +91,7 @@ impl VideoProcessor {
                 "-y", "-f", "concat", "-safe", "0",
                 "-i", &concat_file.to_string_lossy(),
                 "-c", "copy",
-                output
+                output,
             ])
             .output()
             .map_err(|e| format!("合并失败: {}", e))?;
@@ -205,38 +105,7 @@ impl VideoProcessor {
     }
 
     pub fn generate_thumbnail(&self, path: &str, time: f64) -> Result<String, String> {
-        let temp_dir = std::env::temp_dir()
-            .join(format!("story-fab_thumb_{}_{}", std::process::id(), chrono_like_timestamp()));
-
-        fs::create_dir_all(&temp_dir)
-            .map_err(|e| format!("创建临时目录失败: {}", e))?;
-
-        let output = temp_dir.join("thumb.jpg");
-
-        let result = Command::new(&self.ffmpeg_path)
-            .args(&[
-                "-y", "-ss", &format_time(time.max(0.0)), "-i", path,
-                "-frames:v", "1", "-q:v", "2", "-vf", "scale=320:-1",
-                &output.to_string_lossy()
-            ])
-            .output()
-            .map_err(|e| format!("生成缩略图失败: {}", e))?;
-
-        if !result.status.success() {
-            let _ = fs::remove_dir_all(&temp_dir);
-            return Err(cmd_err("生成失败", &result));
-        }
-
-        let final_path = std::env::temp_dir()
-            .join(format!("story-fab_thumb_{}.jpg", chrono_like_timestamp()));
-        fs::copy(&output, &final_path)
-            .map_err(|e| {
-                let _ = fs::remove_dir_all(&temp_dir);
-                format!("保存缩略图失败: {}", e)
-            })?;
-
-        let _ = fs::remove_dir_all(&temp_dir);
-        Ok(final_path.display().to_string())
+        generate_thumbnail_impl(path, time, &self.ffmpeg_path)
     }
 
     pub fn detect_hw_accel(&self) -> Option<String> {
