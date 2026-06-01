@@ -19,7 +19,7 @@ import { useStoryFab } from '@/components/StoryFab/context';
 import type { VideoInfo } from '@/core/types';
 import type { CutPoint, ClipSuggestion } from '@/core/interfaces';
 import { notify, formatTime } from '@/shared';
-import styles from './index.module.less';
+import styles from './AIVideoPreview.module.less';
 
 // Re-expose compat aliases for consumers that reference them by that name
 export type ClipSuggestionCompat = ClipSuggestion;

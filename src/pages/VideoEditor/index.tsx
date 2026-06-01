@@ -11,7 +11,7 @@ import { useVideoEditor } from './hooks/useVideoEditor';
 import { exportService } from '../../core/services/export/exportService';
 
 import Toolbar from './components/Toolbar';
-import VideoPlayer from '@/components/VideoPlayer';
+import VideoPlayer from '@/components/VideoPlayer/VideoPlayer';
 import Timeline from './components/Timeline';
 import SegmentList from './components/SegmentList';
 

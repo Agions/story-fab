@@ -5,7 +5,7 @@ import './App.css';
 
 import ErrorBoundary from './components/common/ErrorBoundary';
 const loadAppProvider = () => import('./providers/AppProvider');
-const loadLayout = () => import('./components/Layout');
+const loadLayout = () => import('./components/Layout/Layout');
 const AppProvider = lazy(loadAppProvider);
 const Layout = lazy(loadLayout);
 
