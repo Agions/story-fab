@@ -1,10 +1,12 @@
 // Highlight detection module — split from highlight_detector.rs
-// Files: types.rs, audio_analysis.rs, scene_detect.rs, combiner.rs, mod.rs
+// Files: types.rs, audio_analysis.rs, scene_detect.rs, combiner.rs, energy.rs, zcr.rs, mod.rs
 
 mod types;
 mod audio_analysis;
 mod scene_detect;
 mod combiner;
+mod energy;
+mod zcr;
 
 pub mod combiner;
 
