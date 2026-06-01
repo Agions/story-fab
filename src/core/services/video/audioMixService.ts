@@ -7,8 +7,7 @@
  * - TTS 配音：作为主音轨，覆盖在原音轨上方
  * - 如果原视频无音轨：直接使用 TTS 音频
  */
-import { invoke } from '@tauri-apps/api/core';
-import { TauriCommand } from '../../tauri/TauriBridge';
+import { tauri } from '../../tauri';
 import { logger } from '../../../shared/utils/logging';
 
 export interface MixAudioOptions {
@@ -62,7 +61,7 @@ export async function mixTtsWithVideo(
   });
 
   try {
-    const result = await invoke<string>(TauriCommand.MIX_AUDIO, {
+    const result = await tauri.mixAudio.mix({
       videoPath,
       ttsAudioPath,
       outputPath,
@@ -84,9 +83,7 @@ export async function mixTtsWithVideo(
  */
 export async function getAudioDuration(audioPath: string): Promise<number> {
   try {
-    const duration = await invoke<number>(TauriCommand.GET_AUDIO_DURATION, {
-      audioPath,
-    });
+    const duration = await tauri.mixAudio.getDuration(audioPath);
     return duration;
   } catch (error) {
     logger.warn('[AudioMix] getAudioDuration failed:', error);

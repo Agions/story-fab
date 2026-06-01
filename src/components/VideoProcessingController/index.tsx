@@ -6,7 +6,7 @@ import {
   Settings,
   Scissors,
 } from 'lucide-react';
-import { invoke, TauriCommand } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import type { VideoSegment } from '@/core/types';
 import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/mods';
@@ -157,12 +157,12 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
       });
       const outputPath = saveHandle.name;
 
-      const audioParams = { volume: audioVolume / 100, process: audioProcess };
+      const audioParams = { volume: audioVolume / 100, process: audioProcess !== 'none' };
 
-      await invoke(TauriCommand.CUT_VIDEO, {
+      await tauri.cutVideo({
         inputPath,
         outputPath,
-        segments: segmentsToProcess,
+        segments: segmentsToProcess.map((s) => ({ start: s.startTime, end: s.endTime })),
         quality: videoQuality,
         format: exportFormat,
         transition: transitionType,

@@ -5,8 +5,8 @@ import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 // ============================================================
 export const TauriCommand = {
   // FFprobe / Video analysis
-  CHECK_FFMPEG:            'check_ffmpeg',
-  ANALYZE_VIDEO:           'analyze_video',
+  CHECK_FFMPEG:             'check_ffmpeg',
+  ANALYZE_VIDEO:            'analyze_video',
   GET_EXPORT_DIR:          'get_export_dir',
   RUN_FFPROBE:             'run_ffprobe',
 
@@ -139,6 +139,34 @@ export interface BridgeOptions {
  *   { video_path: '/path/to/video.mp4', threshold: 0.6 }
  * );
  */
+
+/** Raw invoke without TauriCommand restriction — for commentary/Rust-only commands */
+export async function rawInvoke<C extends string>(
+  command: C,
+  args?: Record<string, unknown>,
+): Promise<unknown> {
+  const { retries = 0, signal } = {} as BridgeOptions;
+
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    if (signal?.aborted) {
+      throw TauriBridgeError.fromInvoke(command as TauriCommand, new Error('Request aborted'));
+    }
+
+    try {
+      return await tauriInvoke(command, args ?? {});
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 500));
+      }
+    }
+  }
+
+  throw TauriBridgeError.fromInvoke(command as TauriCommand, lastError);
+}
+
 export async function invoke<C extends TauriCommand>(
   command: C,
   args?: Record<string, unknown>,
@@ -168,5 +196,5 @@ export async function invoke<C extends TauriCommand>(
   throw TauriBridgeError.fromInvoke(command, lastError);
 }
 
-// Re-export tauri from index (index.ts imports methods which import this file, so no circular at runtime)
+// Re-export tauri from index for consumers of TauriBridge (avoids double-import)
 export { tauri } from './index';

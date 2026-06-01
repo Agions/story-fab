@@ -9,7 +9,7 @@
  * 遵循"最优方案"架构设计
  */
 
-import { invoke } from '@tauri-apps/api/core';
+import { tauri } from '@/core/tauri';
 import type {
   ScriptStylePreset,
   CommentarySegment,
@@ -44,7 +44,7 @@ export async function createCommentarySession(
   sessionId: string,
   style?: ScriptStylePreset,
 ): Promise<string> {
-  return invoke('create_director_session', { sessionId, style });
+  return tauri.createSession(sessionId, style);
 }
 
 /**
@@ -53,7 +53,7 @@ export async function createCommentarySession(
 export async function getCommentaryStatus(
   sessionId: string,
 ): Promise<DirectorStatusResponse> {
-  return invoke('get_director_status', { sessionId });
+  return tauri.getStatus(sessionId) as Promise<DirectorStatusResponse>;
 }
 
 /**
@@ -69,12 +69,7 @@ export async function startCommentaryAnalysis(
   subtitles: string,
   targetDurationSecs?: number,
 ): Promise<void> {
-  return invoke('start_director_analysis', {
-    sessionId,
-    videoPath,
-    subtitles,
-    targetDurationSecs,
-  });
+  return tauri.startAnalysis(sessionId, videoPath, subtitles, targetDurationSecs);
 }
 
 /**
@@ -85,11 +80,7 @@ export async function generateCommentaryPlan(
   style?: ScriptStylePreset,
   targetDurationSecs?: number,
 ): Promise<DirectorPlan> {
-  return invoke('generate_director_plan', {
-    sessionId,
-    style,
-    targetDurationSecs,
-  });
+  return tauri.generatePlan(sessionId, style, targetDurationSecs) as Promise<DirectorPlan>;
 }
 
 /**
@@ -98,7 +89,7 @@ export async function generateCommentaryPlan(
 export async function approveCommentaryPlan(
   sessionId: string,
 ): Promise<string> {
-  return invoke('approve_director_plan', { sessionId });
+  return tauri.approvePlan(sessionId);
 }
 
 /**
@@ -108,7 +99,7 @@ export async function reviseCommentaryPlan(
   sessionId: string,
   modifications: PlanModifications,
 ): Promise<DirectorPlan> {
-  return invoke('revise_director_plan', { sessionId, modifications });
+  return tauri.revisePlan(sessionId, modifications) as Promise<DirectorPlan>;
 }
 
 /**
@@ -118,7 +109,7 @@ export async function completeCommentaryRender(
   sessionId: string,
   outputPath: string,
 ): Promise<string> {
-  return invoke('complete_director_render', { sessionId, outputPath });
+  return tauri.completeRender(sessionId, outputPath);
 }
 
 /**
@@ -127,7 +118,7 @@ export async function completeCommentaryRender(
 export async function destroyCommentarySession(
   sessionId: string,
 ): Promise<void> {
-  return invoke('destroy_director_session', { sessionId });
+  return tauri.destroySession(sessionId);
 }
 
 // ─── Script Generator ────────────────────────────────────────────────────
@@ -154,7 +145,7 @@ export interface GenerateScriptInput {
 export async function generateCommentaryScript(
   input: GenerateScriptInput,
 ): Promise<CommentaryScriptOutput> {
-  return invoke('generate_commentary_script', { input });
+  return tauri.generateScript(input) as Promise<CommentaryScriptOutput>;
 }
 
 // ─── Commentary Synthesizer ─────────────────────────────────────────────
@@ -169,13 +160,7 @@ export async function synthesizeCommentaryAudio(
   format?: 'mp3' | 'wav' | 'ogg',
   outputPath?: string,
 ): Promise<SynthesizeResult> {
-  return invoke('synthesize_commentary_audio', {
-    text,
-    voice,
-    speed: speed ?? 1.0,
-    format,
-    outputPath,
-  });
+  return tauri.synthesizeAudio(text, voice, speed ?? 1.0, format, outputPath) as Promise<SynthesizeResult>;
 }
 
 /**
@@ -186,11 +171,7 @@ export async function estimateTTSDuration(
   voice: string,
   speed?: number,
 ): Promise<number> {
-  return invoke('estimate_tts_duration', {
-    text,
-    voice,
-    speed: speed ?? 1.0,
-  });
+  return tauri.estimateTTSDuration(text, voice, speed ?? 1.0);
 }
 
 /**
@@ -200,7 +181,7 @@ export async function estimateTTSDuration(
 export async function listCommentaryVoices(
   style?: ScriptStylePreset,
 ): Promise<VoiceInfo[]> {
-  return invoke('list_commentary_voices', { style });
+  return tauri.listVoices(style) as Promise<VoiceInfo[]>;
 }
 
 // ─── 便捷工厂函数 ───────────────────────────────────────────────────────
