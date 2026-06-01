@@ -40,6 +40,12 @@ export const renderTranscode = {
     inputPath: string;
     outputPath: string;
     segments: Array<{ start: number; end: number }>;
+    quality?: string;
+    format?: string;
+    transition?: string;
+    transitionDuration?: number;
+    audioParams?: { volume: number; process: boolean };
+    addSubtitles?: boolean;
     useHwAccel?: boolean;
     onProgress?: (progress: unknown) => void;
   }) {
@@ -47,6 +53,12 @@ export const renderTranscode = {
       inputPath: input.inputPath,
       outputPath: input.outputPath,
       segments: input.segments,
+      quality: input.quality ?? 'medium',
+      format: input.format ?? 'mp4',
+      transition: input.transition ?? 'none',
+      transitionDuration: input.transitionDuration ?? 0.3,
+      audioParams: input.audioParams ?? { volume: 1.0, process: false },
+      addSubtitles: input.addSubtitles ?? false,
       useHwAccel: input.useHwAccel ?? false,
     }) as Promise<string>;
   },
