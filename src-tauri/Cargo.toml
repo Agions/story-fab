@@ -42,7 +42,7 @@ futures-util = "0.3"
 lto           = "fat"
 codegen-units = 1
 strip         = true
-opt-level     = "z"   # "z" > "s" for minimum binary size
+opt-level     = 3   # "z" > "s" for minimum binary size
 panic         = "abort"
 # Optional: enable inlining across crates for better runtime performance
 overflow-checks = false
