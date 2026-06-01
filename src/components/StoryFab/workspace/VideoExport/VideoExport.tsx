@@ -36,7 +36,6 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     setConfig,
     setSelectedPlatform,
     setBatchMode,
-    setSelectedPlatforms,
     handleExport,
     handleBatchExport,
     handleCancel,
@@ -207,7 +206,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                 <span className={styles.sectionLabel}>发布平台</span>
                 <button
                   className={`${styles.batchModeToggle} ${batchMode ? styles.batchModeActive : ''}`}
-                  onClick={() => setBatchMode(prev => !prev)}
+                  onClick={() => setBatchMode(!batchMode)}
                 >
                   {batchMode ? '取消批量' : '批量导出'}
                 </button>
