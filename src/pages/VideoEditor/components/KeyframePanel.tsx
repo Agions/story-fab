@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import styles from '@/pages/VideoEditor/index.module.less';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface KeyframePanelProps {
   keyframes: string[];

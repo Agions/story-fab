@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Bot } from 'lucide-react';
 import { AIClipAssistant } from '@/components/AIClip';
 import type { ClipAnalysisResult, ClipSegment } from '../../../core/services/aiClip';
-import styles from '@/pages/VideoEditor/index.module.less';
+import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface AIClipPanelProps {
   projectId: string | undefined;
