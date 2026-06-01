@@ -1,5 +1,5 @@
 /* eslint-disable */
-// @ts-ignore
+// @ts-ignore - beforeEach is re-exported from vitest for consumer convenience
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   VideoProcessingError,

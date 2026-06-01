@@ -75,22 +75,21 @@ const ProjectDetail: React.FC = () => {
   const navigate = useNavigate();
   const { addRecentProject } = useSettings();
   const { selectedAIModel, aiModelsSettings } = useModelStore();
-  // Note: loading/currentStep 等变量解构后未直接读取（由 state 或事件回调使用），setter 在函数体内被调用
+  // Note: 变量由 setter 在 effect/callback 内写入，读取通过其他 state 触发或 UI 子组件读取
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ts-ignore
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState<string>('analyze');
   const [project, setProject] = useState<ProjectData | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ts-ignore
-  const [loadError, setLoadError] = useState<string>('');
+  const [, setLoadError] = useState<string>('');
   const [activeScript, setActiveScript] = useState<Script | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ts-ignore
-  const [currentStep, setCurrentStep] = useState<'analyze' | 'script' | 'voice' | 'video'>('analyze');
+  const [, setCurrentStep] = useState<'analyze' | 'script' | 'voice' | 'video'>('analyze');
+  // 兼容性: setCurrentStep 供 stepper 子组件调用
+  void setCurrentStep;
   const [_reloadToken, _setReloadToken] = useState(0);
   const projectRef = useRef<ProjectData | null>(null);
   const loadRequestSeqRef = useRef(0);

@@ -142,5 +142,7 @@ const ModelCardBase: React.FC<ModelCardProps> = memo(({
   );
 });
 
+ModelCardBase.displayName = 'ModelCard';
+
 export const ModelCard = ModelCardBase;
 export default ModelCard;

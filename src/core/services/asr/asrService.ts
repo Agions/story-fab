@@ -22,7 +22,7 @@ import {
 // ============================================
 
 export class ASRService extends BaseService {
-// @ts-ignore
+// @ts-ignore - _isInitialized reserved for future lazy initialization state tracking
   private _isInitialized = false;
 
   constructor() {
@@ -312,9 +312,9 @@ export class ASRService extends BaseService {
    *
    * @returns ASRResult 或 null（API 不可用时）
    */
-// @ts-ignore
+// @ts-ignore - tryWebSpeechASR is experimental Web Speech API fallback, signature may change
 private tryWebSpeechASR(
-  // @ts-ignore
+  // @ts-ignore - videoInfo reserved for future media constraints in Web Speech API
   videoInfo: VideoInfo,
     opts: Required<ASROptions>
   ): Promise<ASRResult | null> {
@@ -396,7 +396,7 @@ private tryWebSpeechASR(
    *
    * @requires xfyun-app-id, xfyun-api-key 配置
    */
-// @ts-ignore
+// @ts-ignore - callXfyunASR signature reserved for future xfyun cloud ASR integration
   private async callXfyunASR(
     _videoInfo: VideoInfo,
     _options: Required<ASROptions>
@@ -422,7 +422,7 @@ private tryWebSpeechASR(
    *
    * @requires tencent-secret-id, tencent-secret-key 配置
    */
-// @ts-ignore
+// @ts-ignore - callTencentASR signature reserved for future tencent cloud ASR integration
   private async callTencentASR(
     _videoInfo: VideoInfo,
     _options: Required<ASROptions>

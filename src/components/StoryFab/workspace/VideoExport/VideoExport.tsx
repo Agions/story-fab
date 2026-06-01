@@ -40,7 +40,19 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
     handleBatchExport,
     handleCancel,
     togglePlatformSelection,
-  } = useExportHandlers({ state: state as any, onExportSettingsChange: setExportSettings, onComplete });
+  } = useExportHandlers({
+    state: {
+      synthesisData: state.synthesisData?.finalVideoUrl
+        ? { finalVideoUrl: state.synthesisData.finalVideoUrl ?? undefined }
+        : undefined,
+      currentVideo: state.currentVideo?.duration != null
+        ? { duration: state.currentVideo.duration }
+        : undefined,
+      exportSettings: state.exportSettings ?? undefined,
+    },
+    onExportSettingsChange: setExportSettings,
+    onComplete,
+  });
 
   // Platform preset handler
   const applyPlatformPreset = (platform: (typeof PLATFORM_PRESETS)[number]) => {
