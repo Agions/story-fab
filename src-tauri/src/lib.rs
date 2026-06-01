@@ -11,7 +11,7 @@ pub mod types;
 pub mod utils;
 pub mod subtitle;
 pub mod highlight;
-pub mod smart_segmenter;
+pub mod segment;
 
 pub use commands::{
     ai, auto_save, commentary, ffprobe, llm, project, render, export_state, file_ops,
