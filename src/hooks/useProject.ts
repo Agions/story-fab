@@ -7,7 +7,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { ProjectData, VideoInfo, ScriptData, ProjectSettings, TaskStatus } from '@/core/types';
 import { logger } from '../shared/utils/logging';
-import { STORAGE_KEYS } from '@/constants';
+import { STORAGE_KEYS } from '@/shared/constants';
 
 export interface UseProjectReturn {
   // 当前项目
