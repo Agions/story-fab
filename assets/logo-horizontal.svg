@@ -1,62 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="400" height="100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 128" width="512" height="128" role="img" aria-label="StoryFab horizontal logo">
+  <title>StoryFab</title>
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1a1a2e"/>
-      <stop offset="100%" stop-color="#16213e"/>
+    <linearGradient id="bgGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0c29"/>
+      <stop offset="50%" stop-color="#1a1a3e"/>
+      <stop offset="100%" stop-color="#24243e"/>
     </linearGradient>
-    <linearGradient id="film" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f4a261"/>
-      <stop offset="100%" stop-color="#e76f51"/>
+    <linearGradient id="filmGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff8a5b"/>
+      <stop offset="100%" stop-color="#e63946"/>
     </linearGradient>
-    <linearGradient id="ai" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#a8dadc"/>
-      <stop offset="100%" stop-color="#457b9d"/>
+    <linearGradient id="aiGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4cc9f0"/>
+      <stop offset="100%" stop-color="#7209b7"/>
     </linearGradient>
-    <linearGradient id="text" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#f4a261"/>
-      <stop offset="100%" stop-color="#e76f51"/>
+    <linearGradient id="textGradH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#c5c8ff"/>
     </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect width="400" height="100" rx="12" fill="url(#bg)"/>
-
-  <!-- Film reel (left) -->
-  <g transform="translate(20, 20)">
-    <circle cx="30" cy="30" r="26" fill="none" stroke="url(#film)" stroke-width="3.5"/>
-    <circle cx="30" cy="30" r="9" fill="url(#film)"/>
-    <circle cx="30" cy="8" r="4.5" fill="url(#film)"/>
-    <circle cx="30" cy="52" r="4.5" fill="url(#film)"/>
-    <circle cx="8" cy="30" r="4.5" fill="url(#film)"/>
-    <circle cx="52" cy="30" r="4.5" fill="url(#film)"/>
-    <circle cx="30" cy="30" r="3" fill="#1a1a2e"/>
+  <!-- Icon block (left side, square 112x112 padded) -->
+  <g transform="translate(8 8)">
+    <rect width="112" height="112" rx="24" ry="24" fill="url(#bgGradH)"/>
+    <!-- Diagonal film strip -->
+    <g transform="rotate(-22 56 56)">
+      <rect x="20" y="44" width="72" height="24" rx="3" fill="url(#filmGradH)"/>
+      <g fill="#0f0c29">
+        <rect x="24" y="48" width="6" height="3" rx="0.5"/>
+        <rect x="34" y="48" width="6" height="3" rx="0.5"/>
+        <rect x="44" y="48" width="6" height="3" rx="0.5"/>
+        <rect x="54" y="48" width="6" height="3" rx="0.5"/>
+        <rect x="64" y="48" width="6" height="3" rx="0.5"/>
+        <rect x="74" y="48" width="6" height="3" rx="0.5"/>
+        <rect x="24" y="61" width="6" height="3" rx="0.5"/>
+        <rect x="34" y="61" width="6" height="3" rx="0.5"/>
+        <rect x="44" y="61" width="6" height="3" rx="0.5"/>
+        <rect x="54" y="61" width="6" height="3" rx="0.5"/>
+        <rect x="64" y="61" width="6" height="3" rx="0.5"/>
+        <rect x="74" y="61" width="6" height="3" rx="0.5"/>
+      </g>
+    </g>
+    <!-- Center play -->
+    <g transform="translate(56 56)">
+      <circle r="20" fill="#0f0c29" opacity="0.92"/>
+      <circle r="20" fill="none" stroke="url(#aiGradH)" stroke-width="1.5" opacity="0.85"/>
+      <path d="M -6 -9 L 9 0 L -6 9 Z" fill="url(#aiGradH)"/>
+    </g>
+    <!-- Pulse line -->
+    <g stroke="url(#aiGradH)" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.9">
+      <polyline points="18,92 32,92 38,86 44,98 50,86 56,98 62,86 68,92 94,92"/>
+    </g>
   </g>
 
-  <!-- Play button -->
-  <path d="M260,25 L290,50 L260,75 Z" fill="url(#film)"/>
-
-  <!-- AI star -->
-  <g transform="translate(305, 25)">
-    <path d="M12,0 L14,9 L24,12 L14,15 L12,24 L10,15 L0,12 L10,9 Z" fill="url(#ai)"/>
+  <!-- Wordmark (right side) -->
+  <g transform="translate(140 0)">
+    <text x="0" y="62"
+          font-family="Inter, 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif"
+          font-size="44" font-weight="800" letter-spacing="-1.2"
+          fill="url(#textGradH)">Story<tspan fill="url(#filmGradH)">Fab</tspan></text>
+    <text x="2" y="92"
+          font-family="Inter, 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif"
+          font-size="13" font-weight="500" letter-spacing="2.4"
+          fill="#9aa0c8">AI · STORY · STUDIO</text>
   </g>
-
-  <!-- Waveform -->
-  <g transform="translate(330, 30)" opacity="0.6">
-    <rect x="0" y="10" width="4" height="20" rx="2" fill="url(#ai)"/>
-    <rect x="8" y="5" width="4" height="30" rx="2" fill="url(#ai)"/>
-    <rect x="16" y="0" width="4" height="40" rx="2" fill="url(#ai)"/>
-    <rect x="24" y="8" width="4" height="24" rx="2" fill="url(#ai)"/>
-    <rect x="32" y="15" width="4" height="10" rx="2" fill="url(#ai)"/>
-    <rect x="40" y="6" width="4" height="28" rx="2" fill="url(#ai)"/>
-    <rect x="48" y="2" width="4" height="36" rx="2" fill="url(#ai)"/>
-  </g>
-
-  <!-- "StoryFab" text -->
-  <text x="100" y="62" font-family="monospace" font-size="32" font-weight="bold" fill="url(#text)">StoryFab</text>
-
-  <!-- Tagline -->
-  <text x="100" y="82" font-family="sans-serif" font-size="11" fill="#a8dadc" opacity="0.8">AI 影视解说创作工具</text>
-
-  <!-- Separator line -->
-  <rect x="100" y="88" width="200" height="1" rx="0.5" fill="url(#film)" opacity="0.4"/>
 </svg>
