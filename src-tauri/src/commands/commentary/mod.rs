@@ -1,8 +1,9 @@
 //! Commentary 子模块统一导出
 
+pub mod commentary_synthesizer;
 pub mod director;
 pub mod script_generator;
-pub mod commentary_synthesizer;
+pub mod synthesizer;
 
 pub use crate::commands::commentary::director::commands::{
     create_director_session, get_director_status, start_director_analysis,
@@ -18,9 +19,10 @@ pub use crate::commands::commentary::script_generator::{
     generate_commentary_script, ScriptGeneratorInput, ScriptGeneratorOutput,
     ScriptSegment, ScriptStyle,
 };
-pub use crate::commands::commentary::commentary_synthesizer::synthesizer::{
-    CommentarySynthesizer, SynthesizeOptions, SynthesizeResult, VoiceInfo,
-};
-pub use crate::commands::commentary::commentary_synthesizer::synthesizer::commands::{
+pub use crate::commands::commentary::synthesizer::commands::{
     synthesize_commentary_audio, estimate_tts_duration, list_commentary_voices,
+};
+pub use crate::commands::commentary::synthesizer::struct_file::CommentarySynthesizer;
+pub use crate::commands::commentary::synthesizer::types::{
+    SynthesizeOptions, SynthesizeResult, VoiceInfo,
 };

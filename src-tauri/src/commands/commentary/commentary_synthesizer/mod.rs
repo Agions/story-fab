@@ -1,12 +1,16 @@
-//! Commentary Synthesizer — re-export from synthesizer/ submodules
+//! Commentary Synthesizer — Tauri command re-exports
 //!
-//! `synthesizer/` lives in the parent `commands::commentary` directory,
-//! so we reach it via `super::synthesizer` and re-export the
-//! #[tauri::command] functions + types so the rest of the crate can
-//! access them as `commands::commentary::commentary_synthesizer::*`.
+//! This module is a thin re-export layer. The actual synthesis
+//! implementation lives in the sibling `synthesizer/` directory
+//! (`commands::commentary::synthesizer::*`). We re-export the
+//! #[tauri::command] functions and supporting types here so
+//! `commands::commentary::commentary_synthesizer::*` paths work
+//! as a stable public API for the rest of the crate.
 
-pub use super::synthesizer::commands::{
+pub use crate::commands::commentary::synthesizer::commands::{
     estimate_tts_duration, list_commentary_voices, synthesize_commentary_audio,
 };
-pub use super::synthesizer::types::{SynthesizeOptions, SynthesizeResult, VoiceInfo};
-pub use super::synthesizer::struct_file::CommentarySynthesizer;
+pub use crate::commands::commentary::synthesizer::struct_file::CommentarySynthesizer;
+pub use crate::commands::commentary::synthesizer::types::{
+    SynthesizeOptions, SynthesizeResult, VoiceInfo,
+};

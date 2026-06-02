@@ -125,9 +125,12 @@ pub fn run() {
             commentary::director::commands::complete_director_render,
             commentary::director::commands::destroy_director_session,
             commentary::script_generator::generate_commentary_script,
-            commentary::commentary_synthesizer::synthesizer::commands::synthesize_commentary_audio,
-            commentary::commentary_synthesizer::synthesizer::commands::estimate_tts_duration,
-            commentary::commentary_synthesizer::synthesizer::commands::list_commentary_voices,
+            // Commentary Synthesizer (AI 影视解说 TTS) — 路径从 commentary_synthesizer
+            // 直接指向 sibling 的 synthesizer/commands 子模块，因为 commentary_synthesizer
+            // 只是 re-export shim，synthesizer/commands 才是 #[tauri::command] 宏展开位置。
+            commentary::synthesizer::commands::synthesize_commentary_audio,
+            commentary::synthesizer::commands::estimate_tts_duration,
+            commentary::synthesizer::commands::list_commentary_voices,
         ])
         .setup(|app| {
             tracing::info!("[StoryFab] 应用初始化中...");
