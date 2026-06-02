@@ -15,7 +15,7 @@
 [![Rust](https://img.shields.io/badge/Rust-1.77+-orange?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-8B5CF6?style=for-the-badge)]()
 
-[**官网文档**](https://agions.github.io/story-fab/) · [**下载安装**](https://github.com/Agions/story-fab/releases) · [**报告问题**](https://github.com/Agions/story-fab/issues/new) · [**功能建议**](https://github.com/Agions/story-fab/discussions)
+[**在线文档**](https://agions.github.io/story-fab/) · [**下载安装**](https://github.com/Agions/story-fab/releases) · [**报告问题**](https://github.com/Agions/story-fab/issues/new) · [**功能建议**](https://github.com/Agions/story-fab/discussions)
 
 </div>
 
