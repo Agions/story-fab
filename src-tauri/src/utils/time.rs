@@ -31,7 +31,7 @@ pub fn chrono_like_timestamp() -> String {
 }
 
 /// Format seconds as HH:MM:SS.mmm (dot separator, used by FFmpeg).
-pub(crate) fn format_time(seconds: f64) -> String {
+pub fn format_time(seconds: f64) -> String {
     let total_ms = (seconds * 1000.0).round() as u64;
     let hours = total_ms / 3_600_000;
     let minutes = (total_ms % 3_600_000) / 60_000;
@@ -41,7 +41,7 @@ pub(crate) fn format_time(seconds: f64) -> String {
 }
 
 /// Format seconds as SRT subtitle time: HH:MM:SS,mmm
-pub(crate) fn format_srt_time(seconds: f64) -> String {
+pub fn format_srt_time(seconds: f64) -> String {
     let total_ms = (seconds * 1000.0).round() as u64;
     let hours = total_ms / 3_600_000;
     let minutes = (total_ms % 3_600_000) / 60_000;
