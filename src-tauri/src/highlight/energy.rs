@@ -101,7 +101,15 @@ pub fn extract_pcm(
     };
     let _ = std::fs::remove_file(&temp_wav);
 
-    Ok(pcm_samples_from_wav(&pcm_data))
+    // Convert raw little-endian PCM s16le bytes to Vec<i16> samples.
+    if pcm_data.len() % 2 != 0 {
+        return Err("PCM byte count is not 2-byte aligned".to_string());
+    }
+    let pcm_i16: Vec<i16> = pcm_data
+        .chunks_exact(2)
+        .map(|c| i16::from_le_bytes([c[0], c[1]]))
+        .collect();
+    Ok(pcm_i16)
 }
 
 /// Compute energy profile over audio windows

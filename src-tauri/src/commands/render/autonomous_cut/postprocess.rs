@@ -38,8 +38,9 @@ pub fn build_overlay_enable_expr(markers: &[AutonomousOverlayMarker]) -> String 
     }
     let exprs: Vec<String> = markers.iter().map(|m| {
         let enable = format!("between(t,{},{})", m.start, m.end);
-        if let Some(ref label) = m.label {
-            format!("'{enable}'*if(n\\,{label}\\,1)")
+        let label_str = m.label.as_deref().unwrap_or("");
+        if !label_str.is_empty() {
+            format!("'{enable}'*if(n\\,{label_str}\\,1)")
         } else {
             format!("'{enable}'")
         }

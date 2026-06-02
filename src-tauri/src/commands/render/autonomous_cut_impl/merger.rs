@@ -19,9 +19,13 @@ pub fn merge_by_concat(merged_input: &PathBuf, final_output_path: &PathBuf) -> R
 pub fn merge_with_transitions(
     temp_files: &[PathBuf],
     transition: &str,
-    transition_duration: f64,
+    _transition_duration: f64,
     output: &PathBuf,
 ) -> Result<(), String> {
-    // 转场使用 ffmpeg xfade（简化实现：直接 concat）
-    merge_by_concat(&temp_files.first().copied().unwrap_or_default(), output)
+    // 转场使用 ffmpeg xfade（简化实现：直接 concat first file）
+    if let Some(first) = temp_files.first() {
+        merge_by_concat(first, output)
+    } else {
+        merge_by_concat(&PathBuf::new(), output)
+    }
 }

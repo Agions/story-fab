@@ -11,7 +11,7 @@ static DIRECTOR_STATES: Lazy<Mutex<HashMap<String, DirectorStateMachine>>> =
 
 /// Get a clone of the DirectorStateMachine (creates if absent)
 pub fn get_state(session_id: &str) -> DirectorStateMachine {
-    let states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
+    let mut states = DIRECTOR_STATES.lock().expect("DIRECTOR_STATES poisoned");
     states
         .entry(session_id.to_string())
         .or_insert_with(|| DirectorStateMachine {

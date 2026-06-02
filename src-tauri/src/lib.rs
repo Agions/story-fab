@@ -12,6 +12,7 @@ pub mod utils;
 pub mod subtitle;
 pub mod highlight;
 pub mod segment;
+pub mod llm;
 
 pub use commands::{
     ai, auto_save, commentary, ffprobe, llm, project, render, export_state, file_ops,
@@ -38,10 +39,7 @@ pub use video::mix_audio::{mix_audio, MixAudioInput};
 pub use video::audio_duration::get_audio_duration;
 
 // Subtitle re-exports
-pub use subtitle::{
-    check_faster_whisper, download_whisper_model, get_whisper_supported_languages,
-    list_whisper_models, transcribe_audio,
-};
+pub use subtitle::transcribe_audio;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

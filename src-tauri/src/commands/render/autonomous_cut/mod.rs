@@ -80,7 +80,12 @@ async fn render_autonomous_cut_impl(
 
     // ── Merge ────────────────────────────────────────────────────────────────
     if transition == "none" || transition == "cut" {
-        merger::merge_by_concat(&temp_files, &merged_output)?;
+        // pick first segment, copy/concat into merged_output
+        if let Some(first) = temp_files.first() {
+            merger::merge_by_concat(first, &merged_output)?;
+        } else {
+            return Err("no segments to merge".to_string());
+        }
     } else {
         merger::merge_with_transitions(&temp_files, transition, transition_duration, &merged_output)?;
     }

@@ -95,7 +95,7 @@ pub fn list_available_models() -> Vec<ModelInfo> {
 }
 
 // Re-export types for external consumers
-pub use types::{
+pub use crate::llm::types::{
     GenerateScriptInput, GenerateScriptOutput,
     AnalyzeVideoForScriptInput, AnalyzeVideoForScriptOutput,
     ScriptSegment, ScriptStyle, LLMProvider,
