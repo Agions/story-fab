@@ -67,7 +67,7 @@ pub fn generate_director_plan(
     machine.state = super::DirectorState::Planning;
     machine.updated_at = unix_timestamp();
 
-    let style = parse_style(style).unwrap_or(machine.style);
+    let style = parse_style(style);
     let plan = build_plan(style, target_duration_secs, &machine.analysis);
 
     machine.plan = Some(plan.clone());
@@ -110,14 +110,12 @@ pub fn revise_director_plan(
         apply_modifications(plan, modifications);
     }
     machine.updated_at = unix_timestamp();
+    let plan_clone = machine.plan.clone();
     update_state_from(&session_id, machine);
 
     tracing::info!("[Director] Plan 修正: session_id={}", session_id);
 
-    machine
-        .plan
-        .clone()
-        .ok_or_else(|| "Plan 不存在".to_string())
+    plan_clone.ok_or_else(|| "Plan 不存在".to_string())
 }
 
 #[tauri::command]

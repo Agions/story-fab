@@ -1,6 +1,7 @@
 //! Gemini API 调用
 
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 pub async fn call_gemini(
     client: &Client,

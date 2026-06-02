@@ -12,7 +12,7 @@ pub struct DirectorStateMachine {
     /// 当前 Plan（生成的计划）
     pub plan: Option<super::DirectorPlan>,
     /// 已生成的解说脚本
-    pub script: Option<super::script_generator::ScriptGeneratorOutput>,
+    pub script: Option<super::super::script_generator::ScriptGeneratorOutput>,
     /// 分析结果
     pub analysis: Option<super::VideoAnalysisResult>,
     /// 风格预设

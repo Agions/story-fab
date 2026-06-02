@@ -1,114 +1,25 @@
-//! faster-whisper Python 代码片段 — normalize_text + transcribe 逻辑
+// faster-whisper Python 代码片段 — normalize_text + transcribe 逻辑
+//
+// 加载 Python 模板（whisper_transcribe.py.tmpl），用 3 个占位符
+// 替换后返回完整 Python 源码。spawn_blocking 会把这份源码写入
+// 临时文件 + 启动 python3 执行。
+//
+// 重构自原本的 3 段 r#"..."# 字符串拼接 —— 旧实现因 raw string
+// 配对问题（Python 里的 `"` 字符与 `r#""#` delimiter 冲突）让
+// cargo check 报 lexer 错。改用 `include_str!` 之后 Python
+// 代码原样保留在 .py.tmpl 里，Rust 端不参与字符串字面量解析。
 
-/// 运行 faster-whisper 转录并返回 JSON 结果
-/// 返回的 Python 代码片段会被 Rust 的 spawn_blocking 执行
+/// 运行 faster-whisper 转录并返回完整 Python 脚本源码。
+/// 模板里的 `{model_size}` / `{audio_path}` / `{language}` 三个
+/// 占位符会被替换为入参。返回的源码可直接喂给 `spawn_blocking`。
 pub fn whisper_python_code(model: &str, audio_path: &str, lang_arg: &str) -> String {
+    const TEMPLATE: &str = include_str!("whisper_transcribe.py.tmpl");
+    // 用 Debug-format audio_path 让 Python 端得到带引号的 repr
+    // （如果是裸字符串字面量也得包），这样模板里的 `{audio_path}`
+    // 直接展开成 `"..."` 形式。
     let audio_path_repr = format!("{:?}", audio_path);
-    [
-        r#"import sys
-import json
-from faster_whisper import WhisperModel
-
-model_size=""#.to_string(),
-        model.to_string(),
-        r#"
-device = "cpu"
-compute_type = "int8"
-batch_size = 8
-
-try:
-    import torch
-    if torch.cuda.is_available():
-        device = "cuda"
-        compute_type = "float16"
-        print("Using CUDA with float16", file=sys.stderr)
-    else:
-        try:
-            import openvino
-            openvino_available = True
-        except ImportError:
-            openvino_available = False
-        if openvino_available:
-            device = "cpu"
-            compute_type = "int8"
-            print("Using OpenVINO (Intel GPU/CPU)", file=sys.stderr)
-        else:
-            batch_size = 16
-            print("Using CPU with batch_size=16", file=sys.stderr)
-except ImportError:
-    pass
-
-model = WhisperModel(model_size, device=device, compute_type=compute_type, num_workers=4, batch_size=batch_size)
-
-segments, info = model.transcribe("#.to_string(),
-        audio_path_repr,
-        r#"", language="#.to_string(),
-        lang_arg,
-        r#"", word_timestamps=True, vad_filter=True, vad_parameters={"min_silence_duration_ms": 500})
-
-lang = info.language or "unknown"
-lang_prob = info.language_probability or 0.0
-duration = info.duration or 0.0
-
-result = {"language": lang, "language_probability": lang_prob, "duration_ms": int(duration * 1000), "segments": []}
-
-def normalize_text(text, segment_duration_ms=0):
-    import re
-    text = text.strip()
-    if not text:
-        return text
-    text = re.sub(r'\[[\d.:]+\]', '', text)
-    text = re.sub(r'\([\d:]+\)', '', text)
-    text = re.sub(r'[\u266a\u266b\u266c\u266d]+[^\u266a\u266b\u266c\u266d]*[\u266a\u266b\u266c\u266d]+', '', text)
-    text = re.sub(r'^[\s,，、]*(?:呃|嗯|啊|噢|哈|嘿)\s*', '', text)
-    text = re.sub(r'([。！？，、；：a-zA-Z])\1{2,}', r'\1\1', text)
-    four_char_chains = ['然后然后', '那个那个', '这个这个', '其实其实', '就是就是', '其实呃', '就是呃', '就是说呃']
-    for chain in four_char_chains:
-        escaped = re.escape(chain)
-        text = re.sub(r'\B' + escaped + r'\B\B' + escaped + r'\B', r'。', text)
-    text = re.sub(r'^(.{1,2})(\1{2,})$', r'\1\1。', text)
-    text = re.sub(r'([啊呢哦呀嘛~￣])(\1{2,})', lambda m: m.group(1) * 2 + '。', text)
-    fillers = ['就是说呃', '这个这个', '嗯嗯', '呃呃', '啊啊', '就是说', '然后', '那个', '这个', '对对对', '对对']
-    for f in fillers:
-        pat = r'(?<![a-zA-Z\u4e00-\u9fff])' + re.escape(f) + r'(?![a-zA-Z\u4e00-\u9fff])'
-        text = re.sub(pat, '', text)
-    text = re.sub(r'[ \t]+', ' ', text)
-    text = re.sub(r'\n+', ' ', text)
-    text = re.sub(r'[，。．,]+([。.])', r'\1', text)
-    text = re.sub(r'[。.]{3,}', '。', text)
-    text = re.sub(r'[？]{2,}', '？', text)
-    text = re.sub(r'[！]{2,}', '！', text)
-    chinese_chars = re.findall(r'[\u4e00-\u9fff]', text)
-    if len(chinese_chars) >= 3:
-        if text and text[-1] not in '。！？…—–' and not text[-1].isspace():
-            if text[-1] not in 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789':
-                text = text + '。'
-    text = re.sub(r'\s*[\(\[\(]?\s*(?:SPEAKER_|speaker|Speaker)\s*_?\s*\d+\s*[\)\]\)]?\s*$', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'[\（\(][Ss]?[Pp]?[Ee]?[Aa]?[Kk]?[Ee]?[Rr]_[^）\)]+[）\)]', '', text)
-    text = re.sub(r' [a-z] ', ' ', text)
-    text = re.sub(r' [A-Z] ', ' ', text)
-    text = re.sub(r'[\.。]+\s*', '. ', text)
-    text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'[\s,，\.]+$', '', text)
-    text = text.strip()
-    if not text or text in '。！？…':
-        return '...'
-    if len(text) > 1 and text[-1] in '，。，' and text[-2] in '，。！？':
-        text = text[:-1]
-    return text
-
-for seg in segments:
-    seg_words = getattr(seg, 'words', []) or []
-    seg_prob = sum(w.probability for w in seg_words) / len(seg_words) if seg_words else 0.95
-    result["segments"].append({
-        "start_ms": int(seg.start * 1000), "end_ms": int(seg.end * 1000),
-        "text": normalize_text(seg.text),
-        "words": [{"word": w.word, "start_ms": int(w.start * 1000), "end_ms": int(w.end * 1000), "probability": w.probability} for w in seg_words] if seg_words else [],
-        "probability": round(seg_prob, 4),
-    })
-
-print(json.dumps(result, ensure_ascii=False))
-"#.to_string(),
-    ]
-    .join("")
+    TEMPLATE
+        .replace("{model_size}", model)
+        .replace("{audio_path}", &audio_path_repr)
+        .replace("{language}", lang_arg)
 }

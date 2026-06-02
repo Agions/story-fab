@@ -20,7 +20,7 @@ pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::high
         detect_scene: input.detect_scene,
         scene_threshold: input.scene_threshold.map(|v| v as f32),
     };
-    let highlights = detector.get_highlights(&input.video_path, &options);
+    let highlights = crate::highlight::combiner::get_highlights(&input.video_path, &options);
     Ok(highlights)
 }
 

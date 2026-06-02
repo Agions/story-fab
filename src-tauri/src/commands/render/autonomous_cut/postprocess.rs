@@ -37,9 +37,9 @@ pub fn build_overlay_enable_expr(markers: &[AutonomousOverlayMarker]) -> String 
         return String::new();
     }
     let exprs: Vec<String> = markers.iter().map(|m| {
-        let enable = format!("between(t,{},{})", m.start_time, m.end_time);
-        if let Some(ref label) = m.label {
-            format!("'{enable}'*if(n\\,{label}\\,1)")
+        let enable = format!("between(t,{},{})", m.start, m.end);
+        if !m.label.is_empty() {
+            format!("'{enable}'*if(n\\,{}\\,1)", m.label)
         } else {
             format!("'{enable}'")
         }
