@@ -4,6 +4,7 @@ use crate::llm::constants::{get_context_limit, get_default_model, normalize_prov
 use crate::llm::helpers::{build_system_prompt, build_user_prompt};
 use crate::llm::types::ScriptStyle;
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 pub async fn call_openai_compatible(
     client: &Client,
