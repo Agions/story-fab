@@ -90,12 +90,13 @@ pub fn run() {
             check_ffmpeg,
             analyze_video,
             run_ffprobe,
-            // Whisper subtitle transcription
+            // Whisper subtitle transcription (transcribe_audio lives in
+            // subtitle/transcribe.rs; check_faster_whisper /
+            // list_whisper_models / download_whisper_model /
+            // get_whisper_supported_languages are Python helper snippets
+            // in subtitle/whisper.rs and are NOT Tauri commands — they
+            // are called from transcribe.rs internally. Skipped here.)
             subtitle::transcribe::transcribe_audio,
-            subtitle::whisper::check_faster_whisper,
-            subtitle::whisper::list_whisper_models,
-            subtitle::whisper::download_whisper_model,
-            subtitle::whisper::get_whisper_supported_languages,
             // Highlight detection & smart segmentation
             detect_highlights,
             detect_zcr_bursts,
@@ -117,14 +118,14 @@ pub fn run() {
             llm::analyze_video_for_narration,
             llm::list_available_models,
             // Commentary Mode (AI 影视解说) — 直接引用子模块，避免 re-export 导致 Tauri 宏无法解析
-            commentary::director::create_director_session,
-            commentary::director::get_director_status,
-            commentary::director::start_director_analysis,
-            commentary::director::generate_director_plan,
-            commentary::director::approve_director_plan,
-            commentary::director::revise_director_plan,
-            commentary::director::complete_director_render,
-            commentary::director::destroy_director_session,
+            commentary::director::commands::create_director_session,
+            commentary::director::commands::get_director_status,
+            commentary::director::commands::start_director_analysis,
+            commentary::director::commands::generate_director_plan,
+            commentary::director::commands::approve_director_plan,
+            commentary::director::commands::revise_director_plan,
+            commentary::director::commands::complete_director_render,
+            commentary::director::commands::destroy_director_session,
             commentary::script_generator::generate_commentary_script,
             commentary::commentary_synthesizer::synthesizer::commands::synthesize_commentary_audio,
             commentary::commentary_synthesizer::synthesizer::commands::estimate_tts_duration,
