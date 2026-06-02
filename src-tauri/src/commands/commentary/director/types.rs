@@ -57,10 +57,11 @@ impl std::fmt::Display for DirectorState {
 }
 
 /// 风格预设（5 种）
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum ScriptStylePreset {
     /// 幽默风趣
+    #[default]
     Humorous,
     /// 严肃正式
     Serious,

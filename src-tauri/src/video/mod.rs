@@ -5,7 +5,7 @@
 mod metadata;
 mod keyframes;
 mod thumbnail;
-mod processor;
+pub mod processor;
 pub mod ffmpeg_cmd;
 pub mod mix_audio;
 pub mod audio_duration;

@@ -42,9 +42,9 @@ model = WhisperModel(model_size, device=device, compute_type=compute_type, num_w
 
 segments, info = model.transcribe("#.to_string(),
         audio_path_repr,
-        r#"", language="#.to_string(),
-        lang_arg,
-        r#"", word_timestamps=True, vad_filter=True, vad_parameters={"min_silence_duration_ms": 500})
+        r#""#, language="#.to_string(),
+        lang_arg.to_string(),
+        r#""#, word_timestamps=True, vad_filter=True, vad_parameters={"min_silence_duration_ms": 500})
 
 lang = info.language or "unknown"
 lang_prob = info.language_probability or 0.0

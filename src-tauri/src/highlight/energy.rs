@@ -117,7 +117,7 @@ pub fn compute_energy_profile(
 
     for i in (0..pcm_data.len().saturating_sub(window_samples)).step_by(hop_size) {
         let window = &pcm_data[i..i + window_samples];
-        let energy: f32 = window.iter().map(|&s| s * s).sum::<f32>() / window_samples as f32;
+        let energy: f32 = window.iter().map(|&s| (s as f32) * (s as f32)).sum::<f32>() / window_samples as f32;
         let time_ms = (i as f32 * 1000.0 / sample_rate as f32) as u64;
         energies.push(energy);
         timestamps.push(time_ms);

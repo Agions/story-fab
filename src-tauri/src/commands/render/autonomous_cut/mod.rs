@@ -101,9 +101,9 @@ fn apply_post_processing(
     let use_overlay = input.overlay_markers.as_ref().map(Vec::is_empty).unwrap_or(true);
 
     if !use_overlay {
-        let subtitle = input.subtitle.as_mut().and_then(|s| s.as_mut());
+        let subtitle = input.subtitles.as_ref().and_then(|s| s.first()).map(|sub| sub.text.clone());
         if let (Some(srt_content), Some(start)) = (subtitle, input.start_time) {
-            let srt_normalized = normalize_srt_for_burnin(srt_content, input.end_time.unwrap_or(start + 60.0));
+            let srt_normalized = normalize_srt_for_burnin(&srt_content, input.end_time.unwrap_or(start + 60.0));
             let temp_srt = temp_root.join("temp.srt");
             std::fs::write(&temp_srt, srt_normalized).map_err(|e| format!("写SRT失败: {e}"))?;
             burn_subtitle_ffmpeg(merged_input, final_output_path, &temp_srt)?;
