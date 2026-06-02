@@ -10,10 +10,10 @@
 //! `super::script_generator::ScriptGeneratorOutput` is reached from
 //! this module via `super::super::script_generator` in types.rs.
 
-mod commands;
-mod state_ops;
-mod states;
-mod types;
+pub mod commands;
+pub mod state_ops;
+pub mod states;
+pub mod types;
 
 pub use commands::{
     approve_director_plan, complete_director_render, create_director_session,
