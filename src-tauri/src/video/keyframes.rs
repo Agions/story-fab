@@ -3,6 +3,7 @@
 use crate::binary::ffmpeg_binary;
 use crate::utils::{chrono_like_timestamp, cmd_err};
 use std::fs;
+use std::process::Command;
 
 /// Extract key frames from a video using scene detection threshold
 pub fn extract_keyframes_impl(
