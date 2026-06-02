@@ -61,7 +61,6 @@ impl std::fmt::Display for DirectorState {
 #[serde(rename_all = "kebab-case")]
 pub enum ScriptStylePreset {
     /// 幽默风趣
-    #[default]
     Humorous,
     /// 严肃正式
     Serious,

@@ -14,7 +14,7 @@ pub async fn call_openai_compatible(
     system_prompt: &str,
     user_prompt: &str,
 ) -> Result<String, String> {
-    let url = format!("/chat/completions", base_url.trim_end_matches('/'));
+    let url = format!("{}/chat/completions", base_url.trim_end_matches('/'));
 
     #[derive(Serialize)]
     struct Message {
