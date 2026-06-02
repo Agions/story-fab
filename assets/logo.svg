@@ -1,64 +1,72 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="StoryFab logo">
+  <title>StoryFab</title>
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1a1a2e"/>
-      <stop offset="100%" stop-color="#16213e"/>
+    <!-- Deep space background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0c29"/>
+      <stop offset="50%" stop-color="#1a1a3e"/>
+      <stop offset="100%" stop-color="#24243e"/>
     </linearGradient>
-    <linearGradient id="film" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f4a261"/>
-      <stop offset="100%" stop-color="#e76f51"/>
+    <!-- Warm film-strip gradient (the "story" side) -->
+    <linearGradient id="filmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff8a5b"/>
+      <stop offset="100%" stop-color="#e63946"/>
     </linearGradient>
-    <linearGradient id="ai" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#a8dadc"/>
-      <stop offset="100%" stop-color="#457b9d"/>
+    <!-- Cool AI/neural gradient (the "fab" side) -->
+    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4cc9f0"/>
+      <stop offset="100%" stop-color="#7209b7"/>
     </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <!-- Subtle inner shadow for depth -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
   </defs>
 
-  <!-- Background circle -->
-  <circle cx="64" cy="64" r="60" fill="url(#bg)"/>
+  <!-- Rounded-square background (works as app icon) -->
+  <rect x="0" y="0" width="256" height="256" rx="56" ry="56" fill="url(#bgGrad)"/>
 
-  <!-- Film reel (story/narrative) -->
-  <g transform="translate(30, 38)">
-    <!-- Outer ring -->
-    <circle cx="32" cy="32" r="28" fill="none" stroke="url(#film)" stroke-width="4"/>
-    <!-- Inner hub -->
-    <circle cx="32" cy="32" r="10" fill="url(#film)"/>
-    <!-- Spokes -->
-    <circle cx="32" cy="10" r="5" fill="url(#film)"/>
-    <circle cx="32" cy="54" r="5" fill="url(#film)"/>
-    <circle cx="10" cy="32" r="5" fill="url(#film)"/>
-    <circle cx="54" cy="32" r="5" fill="url(#film)"/>
-    <!-- Center hole -->
-    <circle cx="32" cy="32" r="4" fill="#1a1a2e"/>
+  <!-- Diagonal film strip across the icon (45° tilt) -->
+  <g transform="rotate(-22 128 128)">
+    <!-- film strip body -->
+    <rect x="48" y="100" width="160" height="56" rx="6" ry="6" fill="url(#filmGrad)"/>
+    <!-- film perforations (top + bottom rows) -->
+    <g fill="#0f0c29">
+      <rect x="58"  y="108" width="14" height="8" rx="1.5"/>
+      <rect x="80"  y="108" width="14" height="8" rx="1.5"/>
+      <rect x="102" y="108" width="14" height="8" rx="1.5"/>
+      <rect x="124" y="108" width="14" height="8" rx="1.5"/>
+      <rect x="146" y="108" width="14" height="8" rx="1.5"/>
+      <rect x="168" y="108" width="14" height="8" rx="1.5"/>
+      <rect x="58"  y="140" width="14" height="8" rx="1.5"/>
+      <rect x="80"  y="140" width="14" height="8" rx="1.5"/>
+      <rect x="102" y="140" width="14" height="8" rx="1.5"/>
+      <rect x="124" y="140" width="14" height="8" rx="1.5"/>
+      <rect x="146" y="140" width="14" height="8" rx="1.5"/>
+      <rect x="168" y="140" width="14" height="8" rx="1.5"/>
+    </g>
   </g>
 
-  <!-- AI sparkle / star (AI-powered) -->
-  <g transform="translate(80, 28)" filter="url(#glow)">
-    <path d="M12,0 L14,9 L24,12 L14,15 L12,24 L10,15 L0,12 L10,9 Z" fill="url(#ai)"/>
+  <!-- Center play-triangle (the "play" gesture) -->
+  <g transform="translate(128 128)">
+    <circle r="42" fill="#0f0c29" opacity="0.92"/>
+    <circle r="42" fill="none" stroke="url(#aiGrad)" stroke-width="2.5" opacity="0.85"/>
+    <path d="M -12 -18 L 18 0 L -12 18 Z" fill="url(#aiGrad)"/>
   </g>
 
-  <!-- Play button overlay (video) -->
-  <g transform="translate(78, 68)">
-    <path d="M0,0 L28,18 L0,36 Z" fill="#e76f51" opacity="0.9"/>
+  <!-- Neural pulse line (the "AI" detail) -->
+  <g stroke="url(#aiGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#softGlow)" opacity="0.95">
+    <polyline points="40,210 70,210 82,196 96,224 110,196 124,224 138,196 152,210 216,210"/>
   </g>
 
-  <!-- Waveform accent (audio/TTS) -->
-  <g transform="translate(14, 92)" opacity="0.7">
-    <rect x="0" y="8" width="4" height="16" rx="2" fill="url(#ai)"/>
-    <rect x="8" y="4" width="4" height="24" rx="2" fill="url(#ai)"/>
-    <rect x="16" y="0" width="4" height="32" rx="2" fill="url(#ai)"/>
-    <rect x="24" y="6" width="4" height="20" rx="2" fill="url(#ai)"/>
-    <rect x="32" y="10" width="4" height="12" rx="2" fill="url(#ai)"/>
-    <rect x="40" y="5" width="4" height="22" rx="2" fill="url(#ai)"/>
-    <rect x="48" y="2" width="4" height="28" rx="2" fill="url(#ai)"/>
-    <rect x="56" y="7" width="4" height="18" rx="2" fill="url(#ai)"/>
+  <!-- Tiny corner sparkles (the "magic" of AI) -->
+  <g fill="#4cc9f0" opacity="0.9">
+    <circle cx="46"  cy="46"  r="2.2"/>
+    <circle cx="210" cy="60"  r="1.6"/>
+    <circle cx="60"  cy="190" r="1.6"/>
   </g>
-
-  <!-- "SF" text mark -->
-  <text x="64" y="118" font-family="monospace" font-size="14" font-weight="bold"
-        fill="#a8dadc" text-anchor="middle" opacity="0.8">StoryFab</text>
 </svg>
