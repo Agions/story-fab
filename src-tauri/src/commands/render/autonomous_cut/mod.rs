@@ -2,9 +2,8 @@
 //!
 //! ## Module structure
 //! - `postprocess.rs` — subtitle burn-in, watermark, overlay helpers
-//! - `autonomous_cut_impl/cutter.rs` — parallel segment cutting
-//! - `autonomous_cut_impl/merger.rs` — concat / transition merge
-//! - `autonomous_cut.rs` — module entry + Tauri command
+//! - this file (`mod.rs`) — Tauri command + cutter / merger entry points
+//!   (inlined here; no separate `autonomous_cut_impl/` subdirectory).
 
 use crate::binary::ffmpeg_binary;
 use crate::commands::export_state;
@@ -14,10 +13,6 @@ use std::path::PathBuf;
 use std::process::Command;
 
 mod postprocess;
-
-pub mod autonomous_cut_impl;
-use autonomous_cut_impl::cutter;
-use autonomous_cut_impl::merger;
 
 use postprocess::{
     burn_subtitle_ffmpeg, normalize_srt_for_burnin, render_single_cut_sync,

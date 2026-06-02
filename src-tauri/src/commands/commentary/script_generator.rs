@@ -5,6 +5,10 @@
 //! - 多风格预设：幽默 / 严肃 / 接地气 / 悬疑 / 温情
 //! - Coherence 机制：保证多段解说风格和情节连贯
 
+mod anthropic_call;
+mod client;
+mod gemini_call;
+mod openai_call;
 mod parsing;
 mod prompts;
 mod providers;
