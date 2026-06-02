@@ -1,113 +1,145 @@
-# StoryFab 🎬
+<div align="center">
 
-```
- _____ __                   ______      __
- / ___// /_____  _______  __/ ____/___ _/ /_
- \__ \/ __/ __ \/ ___/ / / / /_  / __ `/ __/
- ___/ / /_/ /_/ / /  / /_/ / __/ / /_/ / /_/ /
-/____/\__/\____/_/   \__, /_/    \__,_/_.___/
-                    /____/
-```
+<img src="assets/logo-horizontal.svg" alt="StoryFab" width="480"/>
 
-> **AI 影视/短剧解说创作工具** — 智能拆条 · 解说生成 · 配音合成，一站式本地完成
+<br/>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Tauri](https://img.shields.io/badge/Tauri-2.x-FFC131?style=flat-square&logo=tauri)](https://tauri.app/)
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-gray?style=flat-square)]()
+# StoryFab · AI 影视解说创作工坊
 
-**StoryFab** 是一款本地 AI 驱动的视频创作工具，基于 Tauri 2.x（Rust + React + TypeScript）构建。
-支持**剪辑模式**和**解说模式**两种工作流，帮你从直播回放、游戏高光一路搞定到电影解说。
+> **从一段原始素材到一段专业解说，AI 全程陪你一气呵成。**
+
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Tauri 2.x](https://img.shields.io/badge/Tauri-2.x-FFC131?style=for-the-badge&logo=tauri&logoColor=black)](https://tauri.app/)
+[![React 18](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Rust](https://img.shields.io/badge/Rust-1.77+-orange?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-8B5CF6?style=for-the-badge)]()
+
+[**官网文档**](https://agions.github.io/story-fab/) · [**下载安装**](https://github.com/Agions/story-fab/releases) · [**报告问题**](https://github.com/Agions/story-fab/issues/new) · [**功能建议**](https://github.com/Agions/story-fab/discussions)
+
+</div>
 
 ---
 
-## ✨ 核心功能
+## 🎬 它是什么？
 
-### 🤖 双模式工作流
+**StoryFab** 是一款**本地优先**的 AI 影视创作工坊，基于 **Tauri 2.x**（Rust + React + TypeScript）构建。
+专为**影视解说、短剧二创、直播高光**场景设计 —— 把传统的「剪辑 → 写稿 → 配音」三步流水线，压缩到**一杯咖啡的时间**。
 
-| 模式 | 适用场景 | 工作流 |
-|------|---------|--------|
-| **剪辑模式** | 直播回放、会议记录、游戏高光 | 视频 → AI 分析 → 高光检测 → 片段导出 |
-| **解说模式** | 短剧解说、电影解说、综艺解说 | 视频 → 语义分段 → AI 导演 → 解说词 → TTS 配音 → 成片 |
+你只需要提供一段视频，剩下交给 AI：
 
-### 🎯 主要能力
+- 🤖 智能识别高光片段，精准拆条
+- ✍️ 导演 Agent 多轮交互，把控解说节奏
+- 🎙️ 本地 Whisper 字幕 + Edge TTS 配音，无需云端
+- 📦 一键导出 9:16 / 1:1 / 16:9 多比例成片
 
-- 🧠 **AI 智能拆条** — 自动识别高光片段，精准切分长视频
-- 📝 **AI 解说生成** — LLM 理解剧情结构，生成专业解说文案
-- 🎙️ **本地 Whisper 字幕** — 无需上传云端，本地语音转文字
-- 🎭 **导演 Agent** — 多轮交互式策划解说结构与风格
-- 🔊 **TTS 配音合成** — Edge TTS 本地合成自然流畅的配音
-- 📐 **多比例导出** — 支持 9:16、1:1、16:9 等多分辨率
+---
 
-### 💡 技术亮点
+## ✨ 核心能力
 
-- **本地优先** — 所有 AI 处理均在本地完成，保护隐私
-- **Rust 性能** — Tauri 底层调用 FFmpeg，性能高效
-- **双引擎支持** — Azure TTS / Edge TTS 多种语音引擎
-- **交互式创作** — 导演 Agent 多轮交互，精准把控解说质量
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <h3>🤖 双模式工作流</h3>
+      <p><b>剪辑模式</b>：直播回放、会议记录、游戏集锦 — 智能高光检测<br/><b>解说模式</b>：短剧、电影、综艺 — 语义分段 + 导演 Agent</p>
+    </td>
+    <td align="center" width="33%">
+      <h3>🧠 AI 解说生成</h3>
+      <p>接入多家 LLM（OpenAI / DeepSeek / Qwen / Gemini / Anthropic），理解剧情结构，输出专业解说文案</p>
+    </td>
+    <td align="center" width="33%">
+      <h3>🎙️ 本地语音链路</h3>
+      <p>faster-whisper 离线转字幕 + Edge TTS / Azure TTS 多音色合成，隐私零外泄</p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <h3>🎬 Rust 渲染管线</h3>
+      <p>FFmpeg 底层调用，多轨时间线精准合成；9:16/1:1/16:9 多比例硬字幕烧录</p>
+    </td>
+    <td align="center">
+      <h3>🎭 导演 Agent</h3>
+      <p>多轮对话式策划 — 你定义风格（幽默/严肃/接地气），AI 把控节奏、停顿、语气</p>
+    </td>
+    <td align="center">
+      <h3>🔌 可扩展架构</h3>
+      <p>Tauri 2.x IPC 解耦前后端，新 LLM / TTS 引擎只需实现 trait 即可接入</p>
+    </td>
+  </tr>
+</table>
 
 ---
 
 ## 🚀 快速开始
 
-### 前置要求
+### 方式一：下载预编译安装包（推荐）
 
-- **Node.js** ≥ 18
-- **Rust** ≥ 1.70
-- **FFmpeg**（系统路径下可用 `ffmpeg -version`）
+前往 [**Releases**](https://github.com/Agions/story-fab/releases) 页面下载对应平台安装包：
 
-### 安装 & 启动
+| 平台 | 架构 | 文件 |
+|------|------|------|
+| 🪟 Windows | x64 | `StoryFab_x.x.x_x64-setup.exe` |
+| 🍎 macOS | Apple Silicon | `StoryFab_x.x.x_aarch64.dmg` |
+| 🍎 macOS | Intel | `StoryFab_x.x.x_x64.dmg` |
+| 🐧 Linux | x64 | `StoryFab_x.x.x_amd64.AppImage` |
+
+### 方式二：从源码构建
 
 ```bash
-# 克隆仓库
+# 前置依赖：Node.js ≥ 18 · pnpm · Rust ≥ 1.77 · FFmpeg
 git clone https://github.com/Agions/story-fab.git
 cd story-fab
-
-# 安装依赖
-npm install
-
-# 启动开发模式
-npm run tauri dev
+pnpm install
+pnpm tauri dev      # 启动开发模式
 ```
 
-> 首次运行会自动下载 Whisper 模型和 TTS 语音文件（约 100MB），请保持网络连接。
-
-### 构建发布版
+构建生产版本：
 
 ```bash
-npm run tauri build
+pnpm tauri build               # 当前平台
+pnpm tauri build --target x86_64-pc-windows-msvc   # 跨平台
 ```
-
-构建产物位于 `src-tauri/target/release/bundle/` 目录。
 
 ---
 
-## 🏗️ 技术架构
+## 🏗️ 架构概览
 
-```
-┌──────────────────────────────────────────────────────┐
-│                    前端 (Web)                        │
-│              React 18 + TypeScript                   │
-│           React Context 状态管理 · Vite              │
-└───────────────────────┬──────────────────────────────┘
-                        │ Tauri IPC (invoke)
-┌───────────────────────▼──────────────────────────────┐
-│                   后端 (Rust)                         │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐  ┌────────┐  │
-│  │  FFmpeg  │ │ Whisper  │ │   LLM    │  │  TTS   │  │
-│  │ 转码/字幕│ │ 语音识别 │ │ 脚本生成 │  │ 配音   │  │
-│  └──────────┘ └──────────┘ └──────────┘  └────────┘  │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐  ┌────────┐  │
-│  │ 混音合成 │ │ 智能拆条 │ │ 渲染引擎 │  │ 导演   │  │
-│  │          │ │          │ │          │  │ Agent  │  │
-│  └──────────┘ └──────────┘ └──────────┘  └────────┘  │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Frontend["前端 (Web)"]
+        UI[React 18 + TypeScript]
+        Store[Zustand 状态管理]
+        Editor[多轨时间线编辑器]
+    end
+
+    subgraph Bridge["Tauri IPC (invoke)"]
+        IPC[Tauri Commands]
+    end
+
+    subgraph Backend["后端 (Rust)"]
+        FFmpeg[FFmpeg 包装层<br/>转码 / 混音 / 烧字幕]
+        Whisper[faster-whisper<br/>本地语音识别]
+        LLM[LLM Provider 抽象<br/>OpenAI / DeepSeek / Qwen / Gemini / Anthropic]
+        TTS[TTS Provider 抽象<br/>Edge TTS / Azure TTS]
+        Director[Director Agent<br/>多轮交互策划]
+    end
+
+    UI --> Store
+    UI --> Editor
+    Editor --> IPC
+    IPC --> FFmpeg
+    IPC --> Whisper
+    IPC --> LLM
+    IPC --> TTS
+    IPC --> Director
+    LLM --> Director
+    TTS --> FFmpeg
+    Whisper --> FFmpeg
 ```
 
-**前端**：React 18 + TypeScript + Vite，构建工具链完整  
-**后端**：Rust + Tauri 2.x + tokio 异步运行时  
-**AI**：Whisper 本地语音识别 + LLM 解说生成 + Edge TTS 配音
+**前端**：React 18 + TypeScript + Vite + TailwindCSS，构建工具链完整  \
+**后端**：Rust + Tauri 2.x + tokio 异步运行时，FFmpeg 通过子进程调用  \
+**AI 能力**：Whisper 离线语音识别 + 多 LLM Provider + 多 TTS Provider
 
 ---
 
@@ -116,74 +148,136 @@ npm run tauri build
 ```
 story-fab/
 ├── src/                          # 前端源码
-│   ├── components/                # React 组件
+│   ├── components/
 │   │   ├── StoryFab/             # 工作流核心组件
-│   │   └── CommentaryPanel/      # 解说模式面板
-│   ├── core/                     # 核心业务逻辑
-│   │   ├── services/            # 视频/音频服务
-│   │   └── workflow/           # 工作流定义
-│   ├── hooks/                   # 自定义 Hooks
-│   ├── store/                   # 状态管理
-│   └── pages/                  # 页面入口
-├── src-tauri/                   # Rust 后端
+│   │   ├── CommentaryPanel/      # 解说模式面板
+│   │   └── MultiTrackTimeline/   # 多轨时间线
+│   ├── core/
+│   │   ├── services/             # 视频/音频服务
+│   │   └── workflow/             # 工作流定义
+│   ├── hooks/                    # 自定义 Hooks
+│   ├── store/                    # Zustand 状态
+│   └── pages/                    # 页面入口
+├── src-tauri/                    # Rust 后端
 │   └── src/
-│       ├── commands/            # Tauri IPC 命令
-│       │   ├── commentary/      # 解说模式指令
-│       │   │   ├── director.rs          # 导演 Agent
-│       │   │   ├── script_generator.rs  # 解说词生成
-│       │   │   └── commentary_synthesizer.rs  # TTS 合成
-│       │   ├── render/         # 渲染指令
-│       │   └── template/       # 模板管理
-│       ├── video_processor.rs # 视频处理核心
-│       ├── smart_segmenter.rs  # AI 智能拆条
-│       └── binary.rs          # 工具管理
-├── docs/                        # VitePress 文档
-│   ├── guide/                   # 用户指南
-│   └── dev/                     # 开发文档
-└── package.json
+│       ├── commands/             # Tauri IPC 命令
+│       │   ├── commentary/       # 解说模式（director / script_generator / synthesizer）
+│       │   ├── render/           # 渲染 / 智能拆条
+│       │   ├── llm/              # LLM Provider 实现
+│       │   └── subtitle/         # Whisper 字幕
+│       ├── video_processor.rs    # 视频处理核心
+│       └── binary.rs             # FFmpeg/Whisper 二进制管理
+├── docs/                         # VitePress 文档
+│   ├── guide/                    # 用户指南
+│   └── dev/                      # 开发文档
+└── public/                       # 静态资源（logo / favicon）
 ```
 
 ---
 
-## 🛠️ 相关命令
+## 🛠️ 开发命令
 
 ```bash
-npm run dev              # 前端开发服务器（Vite）
-npm run tauri dev        # 启动 Tauri 开发模式
-npm run tauri build     # 构建生产版本
-npm run test            # 运行 Vitest 单元测试
-npm run lint            # ESLint 代码检查
+# 前端
+pnpm dev                 # Vite 开发服务器
+pnpm build               # 生产构建
+pnpm preview             # 预览构建产物
+pnpm test                # Vitest 单元测试
+pnpm test:coverage       # 测试覆盖率
+pnpm lint                # ESLint --max-warnings 0
+pnpm type-check          # tsc --noEmit
+
+# Tauri
+pnpm tauri dev           # 启动 Tauri 开发模式（带 Rust 热重载）
+pnpm tauri build         # 构建桌面应用
+pnpm tauri build --debug # Debug 模式构建
+
+# 文档
+pnpm docs:dev            # VitePress 文档开发
+pnpm docs:build          # 构建文档站点
 ```
 
 ---
 
-## 📚 文档
+## 🤝 参与贡献
 
-👉 **[在线文档站点](https://agions.github.io/story-fab/)** — 完整使用指南与开发文档
+我们欢迎任何形式的贡献 —— Bug 报告、功能建议、文档改进、代码 PR。
 
-| 文档 | 说明 |
-|------|------|
-| [用户指南](https://agions.github.io/story-fab/guide/) | 功能介绍与操作流程 |
-| [快速开始](https://agions.github.io/story-fab/guide/quick-start.html) | 5 分钟上手教程 |
-| [架构设计](https://agions.github.io/story-fab/dev/architecture.html) | 系统架构详解 |
-| [Tauri 命令](https://agions.github.io/story-fab/dev/tauri-commands.html) | 前后端通信接口 |
-
----
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
+### 开发流程
 
 1. Fork 本仓库
 2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
 3. 提交更改 (`git commit -m 'feat: add AmazingFeature'`)
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+5. 创建 [Pull Request](https://github.com/Agions/story-fab/pulls)
+
+### Commit 规范
+
+遵循 [Conventional Commits](https://www.conventionalcommits.org/)：
+
+```
+feat: 添加新功能
+fix:  修复 Bug
+docs: 文档更新
+style: 代码格式（不影响功能）
+refactor: 重构（既非 feat 也非 fix）
+perf: 性能优化
+test: 测试相关
+chore: 构建/工具链相关
+```
+
+### 添加新的 LLM / TTS Provider
+
+所有 Provider 只需实现对应 trait 即可接入 —— 详见 [`docs/dev/provider-development.md`](docs/dev/)。
+
+---
+
+## 📚 文档导航
+
+| 文档 | 说明 |
+|------|------|
+| [📖 用户指南](https://agions.github.io/story-fab/guide/) | 功能介绍与操作流程 |
+| [🚀 快速开始](https://agions.github.io/story-fab/guide/quick-start.html) | 5 分钟上手 |
+| [🏗️ 架构设计](https://agions.github.io/story-fab/dev/architecture.html) | 系统架构详解 |
+| [🔌 Tauri 命令](https://agions.github.io/story-fab/dev/tauri-commands.html) | 前后端通信接口 |
+| [🤖 Provider 开发](https://agions.github.io/story-fab/dev/provider-development.html) | 接入新 LLM / TTS |
+
+---
+
+## 🗺️ Roadmap
+
+- [x] 剪辑模式 / 解说模式双工作流
+- [x] 5 大 LLM Provider（OpenAI / DeepSeek / Qwen / Gemini / Anthropic）
+- [x] Edge TTS / Azure TTS 双引擎
+- [x] 多比例导出（9:16 / 1:1 / 16:9）
+- [ ] 云端协作（剧本云端同步）
+- [ ] 移动端预览 App
+- [ ] AI 自动封面图生成
+- [ ] 多语言 UI（i18n 国际化）
+
+查看完整路线图 → [GitHub Projects](https://github.com/Agions/story-fab/projects)
+
+---
+
+## 💖 致谢
+
+StoryFab 的诞生离不开以下开源项目：
+
+- [**Tauri**](https://tauri.app/) — 桌面应用框架
+- [**FFmpeg**](https://ffmpeg.org/) — 视频处理引擎
+- [**faster-whisper**](https://github.com/SYSTRAN/faster-whisper) — 本地语音识别
+- [**React**](https://react.dev/) · [**Vite**](https://vitejs.dev/) · [**TailwindCSS**](https://tailwindcss.com/)
+- [**shadcn/ui**](https://ui.shadcn.com/) · [**Radix UI**](https://www.radix-ui.com/) · [**Zustand**](https://zustand-demo.pmnd.rs/)
+- [**Edge TTS**](https://github.com/rany2/edge-tts) · 多家 LLM API
 
 ---
 
 ## 📄 License
 
-本项目基于 [MIT License](https://opensource.org/licenses/MIT) 开源。
+本项目基于 [**MIT License**](LICENSE) 开源。
 
-Copyright © 2024-present [Agions](https://github.com/Agions)
+Copyright © 2024–present [**Agions**](https://github.com/Agions) · Made with ❤️ and 🐱 in the open source community.
+
+<div align="center">
+  <sub>如果 StoryFab 对你有帮助，欢迎 ⭐ Star 支持！</sub>
+</div>
