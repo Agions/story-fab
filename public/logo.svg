@@ -1,50 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="StoryFab logo">
+  <title>StoryFab</title>
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0C0D14"/>
-      <stop offset="100%" stop-color="#1A1B2E"/>
+    <linearGradient id="bgGradP" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0c29"/>
+      <stop offset="50%" stop-color="#1a1a3e"/>
+      <stop offset="100%" stop-color="#24243e"/>
     </linearGradient>
-    <linearGradient id="film" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF9F43"/>
-      <stop offset="100%" stop-color="#FFB06B"/>
+    <linearGradient id="filmGradP" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff8a5b"/>
+      <stop offset="100%" stop-color="#e63946"/>
     </linearGradient>
-    <linearGradient id="spark" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00D4FF"/>
-      <stop offset="100%" stop-color="#00F5E4"/>
+    <linearGradient id="aiGradP" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4cc9f0"/>
+      <stop offset="100%" stop-color="#7209b7"/>
     </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <rect x="0" y="0" width="256" height="256" rx="56" ry="56" fill="url(#bgGradP)"/>
 
-  <!-- Film strip left -->
-  <rect x="18" y="28" width="22" height="72" rx="4" fill="url(#film)" opacity="0.9"/>
-  <rect x="20" y="34" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="20" y="46" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="20" y="58" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="20" y="70" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="20" y="82" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="20" y="94" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-
-  <!-- Film strip right -->
-  <rect x="88" y="28" width="22" height="72" rx="4" fill="url(#film)" opacity="0.9"/>
-  <rect x="90" y="34" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="90" y="46" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="90" y="58" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="90" y="70" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="90" y="82" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-  <rect x="90" y="94" width="18" height="6" rx="2" fill="#0C0D14" opacity="0.6"/>
-
-  <!-- Center play button triangle -->
-  <polygon points="50,40 50,88 88,64" fill="url(#spark)" opacity="0.95"/>
-
-  <!-- Sparkle star top-right -->
-  <g transform="translate(98, 20)">
-    <path d="M8,0 L9.5,6 L16,8 L9.5,10 L8,16 L6.5,10 L0,8 L6.5,6 Z" fill="#00D4FF" opacity="0.85"/>
+  <g transform="rotate(-22 128 128)">
+    <rect x="48" y="100" width="160" height="56" rx="6" ry="6" fill="url(#filmGradP)"/>
+    <g fill="#0f0c29">
+      <rect x="58"  y="108" width="14" height="8" rx="1.5"/>
+      <rect x="80"  y="108" width="14" height="8" rx="1.5"/>
+      <rect x="102" y="108" width="14" height="8" rx="1.5"/>
+      <rect x="124" y="108" width="14" height="8" rx="1.5"/>
+      <rect x="146" y="108" width="14" height="8" rx="1.5"/>
+      <rect x="168" y="108" width="14" height="8" rx="1.5"/>
+      <rect x="58"  y="140" width="14" height="8" rx="1.5"/>
+      <rect x="80"  y="140" width="14" height="8" rx="1.5"/>
+      <rect x="102" y="140" width="14" height="8" rx="1.5"/>
+      <rect x="124" y="140" width="14" height="8" rx="1.5"/>
+      <rect x="146" y="140" width="14" height="8" rx="1.5"/>
+      <rect x="168" y="140" width="14" height="8" rx="1.5"/>
+    </g>
   </g>
 
-  <!-- Sparkle star bottom-left -->
-  <g transform="translate(8, 96)">
-    <path d="M6,0 L7,4.5 L12,6 L7,7.5 L6,12 L5,7.5 L0,6 L5,4.5 Z" fill="#FF9F43" opacity="0.75"/>
+  <g transform="translate(128 128)">
+    <circle r="42" fill="#0f0c29" opacity="0.92"/>
+    <circle r="42" fill="none" stroke="url(#aiGradP)" stroke-width="2.5" opacity="0.85"/>
+    <path d="M -12 -18 L 18 0 L -12 18 Z" fill="url(#aiGradP)"/>
+  </g>
+
+  <g stroke="url(#aiGradP)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.95">
+    <polyline points="40,210 70,210 82,196 96,224 110,196 124,224 138,196 152,210 216,210"/>
+  </g>
+
+  <g fill="#4cc9f0" opacity="0.9">
+    <circle cx="46"  cy="46"  r="2.2"/>
+    <circle cx="210" cy="60"  r="1.6"/>
+    <circle cx="60"  cy="190" r="1.6"/>
   </g>
 </svg>
