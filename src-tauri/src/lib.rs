@@ -91,11 +91,11 @@ pub fn run() {
             analyze_video,
             run_ffprobe,
             // Whisper subtitle transcription
-            subtitle::transcribe_audio,
-            subtitle::check_faster_whisper,
-            subtitle::list_whisper_models,
-            subtitle::download_whisper_model,
-            subtitle::get_whisper_supported_languages,
+            subtitle::transcribe::transcribe_audio,
+            subtitle::whisper::check_faster_whisper,
+            subtitle::whisper::list_whisper_models,
+            subtitle::whisper::download_whisper_model,
+            subtitle::whisper::get_whisper_supported_languages,
             // Highlight detection & smart segmentation
             detect_highlights,
             detect_zcr_bursts,
@@ -126,9 +126,9 @@ pub fn run() {
             commentary::director::complete_director_render,
             commentary::director::destroy_director_session,
             commentary::script_generator::generate_commentary_script,
-            commentary::commentary_synthesizer::synthesize_commentary_audio,
-            commentary::commentary_synthesizer::estimate_tts_duration,
-            commentary::commentary_synthesizer::list_commentary_voices,
+            commentary::commentary_synthesizer::synthesizer::commands::synthesize_commentary_audio,
+            commentary::commentary_synthesizer::synthesizer::commands::estimate_tts_duration,
+            commentary::commentary_synthesizer::synthesizer::commands::list_commentary_voices,
         ])
         .setup(|app| {
             tracing::info!("[StoryFab] 应用初始化中...");

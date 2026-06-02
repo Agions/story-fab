@@ -14,12 +14,11 @@ use std::path::PathBuf;
 use std::process::Command;
 
 pub mod postprocess;
-pub mod autonomous_cut_impl;
 
 use postprocess::{
     burn_subtitle_ffmpeg, normalize_srt_for_burnin, render_single_cut_sync,
 };
-use autonomous_cut_impl::{cutter, merger};
+use crate::commands::render::autonomous_cut_impl::{cutter, merger};
 
 // ─── Tuning Constants ─────────────────────────────────────────────────────────
 
