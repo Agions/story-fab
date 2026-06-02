@@ -104,38 +104,56 @@ pnpm tauri build --target x86_64-pc-windows-msvc   # 跨平台
 
 ## 🏗️ 架构概览
 
-```mermaid
-flowchart TB
-    subgraph Frontend["前端 (Web)"]
-        UI[React 18 + TypeScript]
-        Store[Zustand 状态管理]
-        Editor[多轨时间线编辑器]
-    end
-
-    subgraph Bridge["Tauri IPC (invoke)"]
-        IPC[Tauri Commands]
-    end
-
-    subgraph Backend["后端 (Rust)"]
-        FFmpeg[FFmpeg 包装层<br/>转码 / 混音 / 烧字幕]
-        Whisper[faster-whisper<br/>本地语音识别]
-        LLM[LLM Provider 抽象<br/>OpenAI / DeepSeek / Qwen / Gemini / Anthropic]
-        TTS[TTS Provider 抽象<br/>Edge TTS / Azure TTS]
-        Director[Director Agent<br/>多轮交互策划]
-    end
-
-    UI --> Store
-    UI --> Editor
-    Editor --> IPC
-    IPC --> FFmpeg
-    IPC --> Whisper
-    IPC --> LLM
-    IPC --> TTS
-    IPC --> Director
-    LLM --> Director
-    TTS --> FFmpeg
-    Whisper --> FFmpeg
 ```
+┌─────────────────────────────────────────────────────────────────┐
+│                     前端 (React 18 + TS)                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐   │
+│  │  UI 组件     │  │  Zustand     │  │  多轨时间线          │   │
+│  │  StoryFab /  │  │  状态管理    │  │  MultiTrackTimeline  │   │
+│  │  Commentary  │  │              │  │                      │   │
+│  └──────┬───────┘  └──────────────┘  └──────────┬───────────┘   │
+└─────────┼────────────────────────────────────────┼──────────────┘
+          │              Tauri IPC (invoke)        │
+          ▼                                        ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       后端 (Rust)                               │
+│                                                                 │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐    │
+│  │  FFmpeg  │  │ Whisper  │  │   LLM    │  │     TTS      │    │
+│  │  转码    │  │ 语音识别 │  │ 5 个     │  │  Edge /      │    │
+│  │ 混音/烧字│◄─┤  本地    │  │ Provider │  │  Azure       │    │
+│  └──────────┘  └──────────┘  └────┬─────┘  └──────┬───────┘    │
+│                                   │               │            │
+│                              ┌────▼───────────────▼────┐       │
+│                              │   Director Agent         │       │
+│                              │   多轮交互策划           │       │
+│                              └──────────────────────────┘       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+数据流向：
+
+```
+   视频源 ──► 智能拆条 ──► 语义分段 ──► Director Agent (多轮)
+                                              │
+                                              ▼
+                                         LLM Provider (5 选 1)
+                                              │
+                                              ▼
+                                         解说词脚本
+                                              │
+                                              ▼
+                                         TTS Provider (2 选 1)
+                                              │
+                                              ▼
+                                       FFmpeg 混音 + 烧字幕
+                                              │
+                                              ▼
+                                          成片导出
+```
+
+> 💡 想看更详细架构（含模块依赖、状态机、错误处理）？  
+> 👉 [系统架构 v3.0 完整文档](https://agions.github.io/story-fab/dev/architecture.html)
 
 **前端**：React 18 + TypeScript + Vite + TailwindCSS，构建工具链完整  \
 **后端**：Rust + Tauri 2.x + tokio 异步运行时，FFmpeg 通过子进程调用  \
