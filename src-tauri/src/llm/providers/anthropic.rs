@@ -1,6 +1,7 @@
 //! Anthropic Claude API 调用
 
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 pub async fn call_anthropic(
     client: &Client,

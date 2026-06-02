@@ -67,7 +67,7 @@ pub fn generate_director_plan(
     machine.state = super::DirectorState::Planning;
     machine.updated_at = unix_timestamp();
 
-    let style = parse_style(style).unwrap_or(machine.style);
+    let style = parse_style(style);
     let plan = build_plan(style, target_duration_secs, &machine.analysis);
 
     machine.plan = Some(plan.clone());

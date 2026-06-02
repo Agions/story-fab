@@ -15,7 +15,7 @@ pub mod segment;
 pub mod llm;
 
 pub use commands::{
-    ai, auto_save, commentary, ffprobe, llm, project, render, export_state, file_ops,
+    ai, auto_save, commentary, ffprobe, project, render, export_state, file_ops,
 };
 pub use types::*;
 
@@ -112,9 +112,9 @@ pub fn run() {
             auto_save::recover_autosave,
             auto_save::preview_autosave,
             // LLM / AI 脚本生成
-            llm::generate_narration_script,
-            llm::analyze_video_for_narration,
-            llm::list_available_models,
+            commands::llm::generate_narration_script,
+            commands::llm::analyze_video_for_narration,
+            commands::llm::list_available_models,
             // Commentary Mode (AI 影视解说) — 直接引用子模块，避免 re-export 导致 Tauri 宏无法解析
             commentary::director::commands::create_director_session,
             commentary::director::commands::get_director_status,

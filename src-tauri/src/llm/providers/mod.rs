@@ -6,10 +6,10 @@
 //!   anthropic.rs     — Anthropic Claude API
 //!   router.rs        — dispatcher, routes to the right provider
 
-mod anthropic;
-mod gemini;
-mod openai_compat;
-mod router;
+pub mod anthropic;
+pub mod gemini;
+pub mod openai_compat;
+pub mod router;
 
 pub use openai_compat::{call_deepseek, call_openai_compatible, call_qwen};
 pub use gemini::call_gemini;
