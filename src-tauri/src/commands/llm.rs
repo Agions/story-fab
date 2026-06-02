@@ -94,9 +94,8 @@ pub fn list_available_models() -> Vec<ModelInfo> {
     ]
 }
 
-// Re-export types for external consumers
-pub use crate::llm::types::{
-    GenerateScriptInput, GenerateScriptOutput,
-    AnalyzeVideoForScriptInput, AnalyzeVideoForScriptOutput,
-    ScriptSegment, ScriptStyle, LLMProvider,
-};
+// Re-export types for external consumers (re-exported via llm/mod.rs
+// `pub use types::*;` so consumers should reach them as
+// `crate::llm::types::GenerateScriptInput` etc.). Commands/llm.rs only
+// needs the #[tauri::command] function names; types are re-exported
+// from `llm` at the crate root.

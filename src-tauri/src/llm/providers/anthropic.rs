@@ -30,8 +30,8 @@ pub async fn call_anthropic(
     };
 
     let response = client
-        .post(&url)
-        .header("x-api-key", api_key)
+        .post(url)
+        .header("x-api-key", api_key.to_string())
         .header("anthropic-version", "2023-06-01")
         .header("Content-Type", "application/json")
         .json(&request)

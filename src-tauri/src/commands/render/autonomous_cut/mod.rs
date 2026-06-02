@@ -91,10 +91,11 @@ async fn render_autonomous_cut_impl(
     }
 
     // ── Post-processing ─────────────────────────────────────────────────────
-    apply_post_processing(&merged_output, &mut input, &temp_root, &input.output_path)?;
+    let output_path = input.output_path.clone();
+    apply_post_processing(&merged_output, &mut input, &temp_root, &output_path)?;
     let _ = tokio_fs::remove_file(&merged_output).await;
     let _ = tokio_fs::remove_dir(&temp_root).await;
-    Ok(input.output_path)
+    Ok(output_path)
 }
 
 // ─── Post-processing ─────────────────────────────────────────────────────────
