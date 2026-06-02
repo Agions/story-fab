@@ -1,11 +1,9 @@
 //! LLM 命令模块 — 主入口
 //! 整合所有子模块，提供 Tauri 命令
-
-pub mod constants;
-pub mod helpers;
-pub mod parsing;
-pub mod providers;
-pub mod types;
+//!
+//! 子模块 (`constants` / `helpers` / `parsing` / `providers` / `types`)
+//! 定义在 crate 根的 `src/llm/` 目录里，不再在本目录下重复声明。
+//! 调用方请使用 `crate::llm::...` 路径。
 
 // Reusable HTTP client with connection pooling
 use std::sync::OnceLock;
@@ -96,9 +94,8 @@ pub fn list_available_models() -> Vec<ModelInfo> {
     ]
 }
 
-// Re-export types for external consumers
-pub use types::{
-    GenerateScriptInput, GenerateScriptOutput,
-    AnalyzeVideoForScriptInput, AnalyzeVideoForScriptOutput,
-    ScriptSegment, ScriptStyle, LLMProvider,
-};
+// Re-export types for external consumers (re-exported via llm/mod.rs
+// `pub use types::*;` so consumers should reach them as
+// `crate::llm::types::GenerateScriptInput` etc.). Commands/llm.rs only
+// needs the #[tauri::command] function names; types are re-exported
+// from `llm` at the crate root.

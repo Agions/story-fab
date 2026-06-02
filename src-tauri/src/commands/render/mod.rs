@@ -8,6 +8,7 @@
 //! - `preview.rs`         — Quick preview generation
 
 pub mod autonomous_cut;
+pub mod autonomous_cut_impl;
 pub mod ffmpeg_builder;
 pub mod preview;
 pub mod subtitle_burnin;

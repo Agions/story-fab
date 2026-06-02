@@ -1,14 +1,13 @@
-//! Script Generator Providers — re-exports + dispatcher
+//! Script Generator Providers — dispatcher
+//!
+//! Implementation files (`client.rs`, `openai_call.rs`, `gemini_call.rs`,
+//! `anthropic_call.rs`) live as siblings of this file inside the
+//! `script_generator/` directory, not as children of `providers/`.
 
-mod client;
-mod openai_call;
-mod gemini_call;
-mod anthropic_call;
-
-pub use client::{get_default_model, get_http_client};
-pub use openai_call::call_openai_compatible;
-pub use gemini_call::call_gemini;
-pub use anthropic_call::call_anthropic;
+pub use super::client::{get_default_model, get_http_client};
+pub use super::openai_call::call_openai_compatible;
+pub use super::gemini_call::call_gemini;
+pub use super::anthropic_call::call_anthropic;
 
 /// Dispatch LLM call to the appropriate provider
 pub async fn call_llm(

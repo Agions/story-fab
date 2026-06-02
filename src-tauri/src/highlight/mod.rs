@@ -4,7 +4,6 @@
 mod types;
 mod audio_analysis;
 mod scene_detect;
-mod combiner;
 mod energy;
 mod zcr;
 

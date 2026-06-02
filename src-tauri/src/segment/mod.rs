@@ -4,7 +4,6 @@
 mod types;
 mod energy;
 mod scene;
-mod classifier;
 mod segmenter;
 
 pub mod classifier;
