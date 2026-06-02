@@ -41,7 +41,7 @@ pub struct HighlightSegment {
 
 impl HighlightSegment {
     /// Factory: audio energy based highlight
-    fn audio(start_ms: u64, end_ms: u64, score: f32) -> Self {
+    pub(crate) fn audio(start_ms: u64, end_ms: u64, score: f32) -> Self {
         Self {
             start_ms,
             end_ms,
@@ -54,7 +54,7 @@ impl HighlightSegment {
     }
 
     /// Factory: scene change based highlight
-    fn scene(start_ms: u64, end_ms: u64, score: f32) -> Self {
+    pub(crate) fn scene(start_ms: u64, end_ms: u64, score: f32) -> Self {
         Self {
             start_ms,
             end_ms,
@@ -67,7 +67,7 @@ impl HighlightSegment {
     }
 
     /// Merge another segment into this one (averaged scores, extended end).
-    fn combine_with(&mut self, other: &Self) {
+    pub(crate) fn combine_with(&mut self, other: &Self) {
         self.end_ms = self.end_ms.max(other.end_ms);
         self.score = (self.score + other.score) / 2.0;
         self.reason = "combined".into();
