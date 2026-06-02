@@ -16,7 +16,7 @@ pub fn parse_style(style: Option<String>) -> ScriptStylePreset {
             "warm" => Some(ScriptStylePreset::Warm),
             _ => None,
         })
-        .unwrap_or_default()
+        .unwrap_or(ScriptStylePreset::Humorous)
 }
 
 /// Build a DirectorPlan from current analysis + style + target_duration
@@ -31,7 +31,7 @@ pub fn build_plan(
         .unwrap_or_else(|| "视频内容分析中...".to_string());
 
     DirectorPlan {
-        id: super::uuid_simple(),
+        id: uuid_simple(),
         summary,
         angle: analysis
             .as_ref()
@@ -43,7 +43,7 @@ pub fn build_plan(
         target_duration_secs: target_duration_secs.unwrap_or(120.0),
         estimated_segments: 5,
         segment_mode: SegmentMode::OriginalAudio,
-        recommended_voice: super::default_voice_for_style(style),
+        recommended_voice: default_voice_for_style(style),
         key_points: analysis
             .as_ref()
             .map(|a| a.highlights.clone())
@@ -82,5 +82,27 @@ pub fn progress_for_state(state: DirectorState) -> f64 {
         DirectorState::Ready => 0.6,
         DirectorState::Rendering => 0.8,
         DirectorState::Done => 1.0,
+    }
+}
+
+/// Lightweight UUID-like identifier (uses rand-free, time-based encoding).
+pub fn uuid_simple() -> String {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
+    let pid = std::process::id();
+    format!("plan-{nanos:x}-{pid:x}")
+}
+
+/// Default voice name for a given style.
+pub fn default_voice_for_style(style: ScriptStylePreset) -> String {
+    match style {
+        ScriptStylePreset::Humorous => "zh-CN-YunxiNeural".to_string(),
+        ScriptStylePreset::Serious => "zh-CN-YunjianNeural".to_string(),
+        ScriptStylePreset::Conversational => "zh-CN-YunyangNeural".to_string(),
+        ScriptStylePreset::Suspense => "zh-CN-YunxiNeural".to_string(),
+        ScriptStylePreset::Warm => "zh-CN-XiaoxiaoNeural".to_string(),
     }
 }

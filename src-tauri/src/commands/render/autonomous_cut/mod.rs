@@ -3,8 +3,8 @@
 //! ## Module structure
 //! - `postprocess.rs` — subtitle burn-in, watermark, overlay helpers
 //! - `autonomous_cut_impl/cutter.rs` — parallel segment cutting
-//! - `autonomous_cut_impl/merger.rs` — concat / transition merge
-//! - `autonomous_cut.rs` — module entry + Tauri command
+//! - `autonomous_cut_impl/merger.rs` — concat/transition/overlay composition
+//! - this file (`mod.rs`) — Tauri command entry point
 
 use crate::binary::ffmpeg_binary;
 use crate::commands::export_state;
@@ -13,15 +13,12 @@ use crate::utils::{chrono_like_timestamp, write_concat_file};
 use std::path::PathBuf;
 use std::process::Command;
 
-mod postprocess;
-
-pub mod autonomous_cut_impl;
-use autonomous_cut_impl::cutter;
-use autonomous_cut_impl::merger;
+pub mod postprocess;
 
 use postprocess::{
     burn_subtitle_ffmpeg, normalize_srt_for_burnin, render_single_cut_sync,
 };
+use crate::commands::render::autonomous_cut_impl::{cutter, merger};
 
 // ─── Tuning Constants ─────────────────────────────────────────────────────────
 
@@ -83,16 +80,22 @@ async fn render_autonomous_cut_impl(
 
     // ── Merge ────────────────────────────────────────────────────────────────
     if transition == "none" || transition == "cut" {
-        merger::merge_by_concat(&temp_files, &merged_output)?;
+        // pick first segment, copy/concat into merged_output
+        if let Some(first) = temp_files.first() {
+            merger::merge_by_concat(first, &merged_output)?;
+        } else {
+            return Err("no segments to merge".to_string());
+        }
     } else {
         merger::merge_with_transitions(&temp_files, transition, transition_duration, &merged_output)?;
     }
 
     // ── Post-processing ─────────────────────────────────────────────────────
-    apply_post_processing(&merged_output, &mut input, &temp_root, &input.output_path)?;
+    let output_path = input.output_path.clone();
+    apply_post_processing(&merged_output, &mut input, &temp_root, &output_path)?;
     let _ = tokio_fs::remove_file(&merged_output).await;
     let _ = tokio_fs::remove_dir(&temp_root).await;
-    Ok(input.output_path)
+    Ok(output_path)
 }
 
 // ─── Post-processing ─────────────────────────────────────────────────────────
@@ -106,9 +109,9 @@ fn apply_post_processing(
     let use_overlay = input.overlay_markers.as_ref().map(Vec::is_empty).unwrap_or(true);
 
     if !use_overlay {
-        let subtitle = input.subtitle.as_mut().and_then(|s| s.as_mut());
+        let subtitle = input.subtitles.as_ref().and_then(|s| s.first()).map(|sub| sub.text.clone());
         if let (Some(srt_content), Some(start)) = (subtitle, input.start_time) {
-            let srt_normalized = normalize_srt_for_burnin(srt_content, input.end_time.unwrap_or(start + 60.0));
+            let srt_normalized = normalize_srt_for_burnin(&srt_content, input.end_time.unwrap_or(start + 60.0));
             let temp_srt = temp_root.join("temp.srt");
             std::fs::write(&temp_srt, srt_normalized).map_err(|e| format!("写SRT失败: {e}"))?;
             burn_subtitle_ffmpeg(merged_input, final_output_path, &temp_srt)?;

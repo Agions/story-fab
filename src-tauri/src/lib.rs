@@ -12,9 +12,10 @@ pub mod utils;
 pub mod subtitle;
 pub mod highlight;
 pub mod segment;
+pub mod llm;
 
 pub use commands::{
-    ai, auto_save, commentary, ffprobe, llm, project, render, export_state, file_ops,
+    ai, auto_save, commentary, ffprobe, project, render, export_state, file_ops,
 };
 pub use types::*;
 
@@ -38,10 +39,7 @@ pub use video::mix_audio::{mix_audio, MixAudioInput};
 pub use video::audio_duration::get_audio_duration;
 
 // Subtitle re-exports
-pub use subtitle::{
-    check_faster_whisper, download_whisper_model, get_whisper_supported_languages,
-    list_whisper_models, transcribe_audio,
-};
+pub use subtitle::transcribe_audio;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -90,12 +88,13 @@ pub fn run() {
             check_ffmpeg,
             analyze_video,
             run_ffprobe,
-            // Whisper subtitle transcription
-            subtitle::transcribe_audio,
-            subtitle::check_faster_whisper,
-            subtitle::list_whisper_models,
-            subtitle::download_whisper_model,
-            subtitle::get_whisper_supported_languages,
+            // Whisper subtitle transcription (transcribe_audio lives in
+            // subtitle/transcribe.rs; check_faster_whisper /
+            // list_whisper_models / download_whisper_model /
+            // get_whisper_supported_languages are Python helper snippets
+            // in subtitle/whisper.rs and are NOT Tauri commands — they
+            // are called from transcribe.rs internally. Skipped here.)
+            subtitle::transcribe::transcribe_audio,
             // Highlight detection & smart segmentation
             detect_highlights,
             detect_zcr_bursts,
@@ -113,22 +112,25 @@ pub fn run() {
             auto_save::recover_autosave,
             auto_save::preview_autosave,
             // LLM / AI 脚本生成
-            llm::generate_narration_script,
-            llm::analyze_video_for_narration,
-            llm::list_available_models,
+            commands::llm::generate_narration_script,
+            commands::llm::analyze_video_for_narration,
+            commands::llm::list_available_models,
             // Commentary Mode (AI 影视解说) — 直接引用子模块，避免 re-export 导致 Tauri 宏无法解析
-            commentary::director::create_director_session,
-            commentary::director::get_director_status,
-            commentary::director::start_director_analysis,
-            commentary::director::generate_director_plan,
-            commentary::director::approve_director_plan,
-            commentary::director::revise_director_plan,
-            commentary::director::complete_director_render,
-            commentary::director::destroy_director_session,
+            commentary::director::commands::create_director_session,
+            commentary::director::commands::get_director_status,
+            commentary::director::commands::start_director_analysis,
+            commentary::director::commands::generate_director_plan,
+            commentary::director::commands::approve_director_plan,
+            commentary::director::commands::revise_director_plan,
+            commentary::director::commands::complete_director_render,
+            commentary::director::commands::destroy_director_session,
             commentary::script_generator::generate_commentary_script,
-            commentary::commentary_synthesizer::synthesize_commentary_audio,
-            commentary::commentary_synthesizer::estimate_tts_duration,
-            commentary::commentary_synthesizer::list_commentary_voices,
+            // Commentary Synthesizer (AI 影视解说 TTS) — 路径从 commentary_synthesizer
+            // 直接指向 sibling 的 synthesizer/commands 子模块，因为 commentary_synthesizer
+            // 只是 re-export shim，synthesizer/commands 才是 #[tauri::command] 宏展开位置。
+            commentary::synthesizer::commands::synthesize_commentary_audio,
+            commentary::synthesizer::commands::estimate_tts_duration,
+            commentary::synthesizer::commands::list_commentary_voices,
         ])
         .setup(|app| {
             tracing::info!("[StoryFab] 应用初始化中...");

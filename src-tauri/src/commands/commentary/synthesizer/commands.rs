@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use tokio::fs;
 
-use super::synthesizer::CommentarySynthesizer;
+use super::struct_file::CommentarySynthesizer;
 use super::types::{SynthesizeResult, VoiceInfo};
 
 /// 合成单条解说音频
@@ -43,5 +43,5 @@ pub async fn estimate_tts_duration(
 /// 获取推荐音色列表
 #[tauri::command]
 pub fn list_commentary_voices(style: Option<String>) -> Vec<VoiceInfo> {
-    super::synthesizer::list_voices(style)
+    super::struct_file::list_voices(style)
 }

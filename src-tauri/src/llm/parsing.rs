@@ -11,9 +11,9 @@ pub fn parse_script_output(raw_text: &str, total_duration: Option<f64>, segment_
     let estimated_duration = estimate_script_duration(&clean_text);
 
     let effective_duration = total_duration.unwrap_or(estimated_duration);
-    let count = segment_count.unwrap_or_else(|| {
+    let count: usize = segment_count.map(|c| c.max(0) as usize).unwrap_or_else(|| {
         // 根据时长估算片段数：每 30-60 秒一段
-        let segs = (effective_duration / 45.0).round() as i32;
+        let segs = (effective_duration / 45.0).round() as usize;
         segs.clamp(3, 20)
     });
 

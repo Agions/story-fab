@@ -45,7 +45,7 @@ pub struct VideoSegment {
 }
 
 impl VideoSegment {
-    fn new(
+    pub(crate) fn new(
         start_ms: u64,
         end_ms: u64,
         segment_type: impl Into<String>,
