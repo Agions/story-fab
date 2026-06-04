@@ -8,11 +8,44 @@
 
 **从一段原始素材到一段专业解说，AI 全程陪你一气呵成。**
 
-<a href="LICENSE"><img src="assets/badges/license.svg" alt="MIT License"/></a> <a href="https://tauri.app/"><img src="assets/badges/tauri.svg" alt="Tauri 2.x"/></a> <a href="https://react.dev/"><img src="assets/badges/react.svg" alt="React 18"/></a> <a href="https://www.typescriptlang.org/"><img src="assets/badges/typescript.svg" alt="TypeScript 5"/></a> <a href="https://www.rust-lang.org/"><img src="assets/badges/rust.svg" alt="Rust 1.77+"/></a> <a href="https://github.com/Agions/story-fab/releases"><img src="assets/badges/platform.svg" alt="Cross-Platform"/></a>
+<br/>
+
+[![Version](https://img.shields.io/github/v/release/Agions/story-fab?style=flat-square&color=0EA5E9)](https://github.com/Agions/story-fab/releases)
+[![License](https://img.shields.io/github/license/Agions/story-fab?style=flat-square&color=22C55E)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/Agions/story-fab?style=flat-square&color=FACC15)](https://github.com/Agions/story-fab/stargazers)
+[![Forks](https://img.shields.io/github/forks/Agions/story-fab?style=flat-square&color=8B5CF6)](https://github.com/Agions/story-fab/network/members)
+[![Issues](https://img.shields.io/github/issues/Agions/story-fab?style=flat-square&color=EF4444)](https://github.com/Agions/story-fab/issues)
+
+<br/>
+
+[![Tauri](https://img.shields.io/badge/Tauri-2.x-FFC131?style=flat-square&logo=tauri&logoColor=black)](https://tauri.app/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Rust](https://img.shields.io/badge/Rust-1.77%2B-DEA584?style=flat-square&logo=rust&logoColor=black)](https://www.rust-lang.org/)
+[![Platform](https://img.shields.io/badge/Platform-Win%20%7C%20macOS%20%7C%20Linux-8B5CF6?style=flat-square)](https://github.com/Agions/story-fab/releases)
+
+<br/>
 
 [**📚 在线文档**](https://agions.github.io/story-fab/) &nbsp;·&nbsp; [**⬇️ 下载安装**](https://github.com/Agions/story-fab/releases) &nbsp;·&nbsp; [**🐛 报告问题**](https://github.com/Agions/story-fab/issues/new) &nbsp;·&nbsp; [**💡 功能建议**](https://github.com/Agions/story-fab/discussions)
 
 </div>
+
+---
+
+## 📑 目录
+
+- [它是什么？](#它是什么)
+- [核心能力](#核心能力)
+- [快速开始](#快速开始)
+- [架构概览](#架构概览)
+- [技术栈](#技术栈)
+- [项目结构](#项目结构)
+- [开发命令](#开发命令)
+- [参与贡献](#参与贡献)
+- [文档导航](#文档导航)
+- [Roadmap](#roadmap)
+- [致谢](#致谢)
+- [License](#license)
 
 ---
 
@@ -21,12 +54,16 @@
 **StoryFab** 是一款**本地优先**的 AI 影视创作工坊，基于 **Tauri 2.x**（Rust + React + TypeScript）构建。
 专为**影视解说、短剧二创、直播高光**场景设计 —— 把传统的「剪辑 → 写稿 → 配音」三步流水线，压缩到**一杯咖啡的时间**。
 
-你只需要提供一段视频，剩下交给 AI：
+### 核心卖点
 
-- 🤖 **智能拆条**：自动识别高光片段，精准切片
-- ✍️ **导演 Agent**：多轮对话式策划，把控解说节奏
-- 🎙️ **本地语音链路**：Whisper 离线字幕 + Edge TTS 配音，**零云端依赖**
-- 📦 **一键多比例导出**：9:16 / 1:1 / 16:9 硬字幕烧录成片
+| 能力 | 描述 |
+|---|---|
+| 🤖 **智能拆条** | 自动识别高光片段，精准切片；适配直播回放、会议记录、游戏集锦 |
+| ✍️ **导演 Agent** | 多轮对话式策划，把控解说节奏、停顿、语气 |
+| 🎙️ **本地语音链路** | Whisper 离线字幕 + Edge TTS 配音，**零云端依赖**、**隐私零外泄** |
+| 📦 **多比例导出** | 一键生成 9:16 / 1:1 / 16:9 硬字幕烧录成片 |
+
+> **目标用户**：影视解说博主、短剧二创作者、直播高光剪辑师、MCN 内容运营团队。
 
 ---
 
@@ -34,31 +71,36 @@
 
 <table>
   <tr>
-    <td align="center" width="33%">
-      <h3>🤖 双模式工作流</h3>
-      <p><b>剪辑模式</b>：直播回放、会议记录、游戏集锦<br/><b>解说模式</b>：短剧、电影、综艺 — 语义分段 + 导演 Agent</p>
+    <th align="center">🤖 双模式工作流</th>
+    <th align="center">🧠 多 LLM 解说生成</th>
+    <th align="center">🎙️ 本地语音链路</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top">
+      <b>剪辑模式</b>：直播回放、会议记录、游戏集锦 — 智能高光检测<br/>
+      <b>解说模式</b>：短剧、电影、综艺 — 语义分段 + 导演 Agent
     </td>
-    <td align="center" width="33%">
-      <h3>🧠 多 LLM 解说生成</h3>
-      <p>接入 5 家 LLM（OpenAI · DeepSeek · Qwen · Gemini · Anthropic），理解剧情结构，输出专业解说文案</p>
+    <td align="center" valign="top">
+      接入 <b>5 家 LLM</b>（OpenAI · DeepSeek · Qwen · Gemini · Anthropic），理解剧情结构，输出专业解说文案
     </td>
-    <td align="center" width="33%">
-      <h3>🎙️ 本地语音链路</h3>
-      <p><code>faster-whisper</code> 离线转字幕 + Edge TTS / Azure TTS 多音色合成，<b>隐私零外泄</b></p>
+    <td align="center" valign="top">
+      <code>faster-whisper</code> 离线转字幕 + Edge TTS / Azure TTS 多音色合成
     </td>
   </tr>
   <tr>
-    <td align="center">
-      <h3>🎬 Rust 渲染管线</h3>
-      <p>FFmpeg 底层调用，多轨时间线精准合成；9:16 / 1:1 / 16:9 多比例硬字幕烧录</p>
+    <th align="center">🎬 Rust 渲染管线</th>
+    <th align="center">🎭 导演 Agent</th>
+    <th align="center">🔌 可扩展架构</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top">
+      FFmpeg 底层调用，多轨时间线精准合成；9:16 / 1:1 / 16:9 多比例硬字幕烧录
     </td>
-    <td align="center">
-      <h3>🎭 导演 Agent</h3>
-      <p>多轮对话式策划 — 你定义风格（幽默 / 严肃 / 接地气），AI 把控节奏、停顿、语气</p>
+    <td align="center" valign="top">
+      多轮对话式策划 — 你定义风格（幽默 / 严肃 / 接地气），AI 把控节奏、停顿、语气
     </td>
-    <td align="center">
-      <h3>🔌 可扩展架构</h3>
-      <p>Tauri 2.x IPC 解耦前后端，新 LLM / TTS 引擎只需实现 trait 即可接入</p>
+    <td align="center" valign="top">
+      Tauri 2.x IPC 解耦前后端，新 LLM / TTS 引擎只需实现 <code>trait</code> 即可接入
     </td>
   </tr>
 </table>
@@ -86,19 +128,23 @@
 git clone https://github.com/Agions/story-fab.git
 cd story-fab
 pnpm install
-pnpm tauri dev      # 启动开发模式
+pnpm tauri dev      # 启动开发模式（Vite + Tauri 热重载）
 ```
 
 **生产构建：**
 
 ```bash
-pnpm tauri build                          # 当前平台
+pnpm tauri build                            # 当前平台
 pnpm tauri build --target x86_64-pc-windows-msvc   # 跨平台
 ```
+
+> 💡 详细构建说明、CI 产物下载、签名验证：[**📖 构建与发布文档**](https://agions.github.io/story-fab/dev/build.html)
 
 ---
 
 ## 架构概览
+
+### 系统组件
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -127,7 +173,7 @@ pnpm tauri build --target x86_64-pc-windows-msvc   # 跨平台
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**数据流向：**
+### 数据流向
 
 ```
 视频源 ──► 智能拆条 ──► 语义分段 ──► Director Agent (多轮)
@@ -157,10 +203,10 @@ pnpm tauri build --target x86_64-pc-windows-msvc   # 跨平台
 
 | 层 | 技术 |
 |---|---|
-| **前端** | React 18 · TypeScript 5 · Vite · TailwindCSS · Zustand |
-| **后端** | Rust · Tauri 2.x · tokio 异步运行时 |
-| **AI 能力** | faster-whisper（离线语音识别）· 5 LLM Provider · 2 TTS Provider |
-| **媒体处理** | FFmpeg（视频转码 / 混音 / 硬字幕烧录） |
+| **前端** | [React 18](https://react.dev/) · [TypeScript 5](https://www.typescriptlang.org/) · [Vite](https://vitejs.dev/) · [TailwindCSS](https://tailwindcss.com/) · [Zustand](https://zustand-demo.pmnd.rs/) |
+| **后端** | [Rust](https://www.rust-lang.org/) · [Tauri 2.x](https://tauri.app/) · tokio 异步运行时 |
+| **AI 能力** | [faster-whisper](https://github.com/SYSTRAN/faster-whisper)（离线语音识别）· 5 LLM Provider · 2 TTS Provider |
+| **媒体处理** | [FFmpeg](https://ffmpeg.org/)（视频转码 / 混音 / 硬字幕烧录） |
 
 ---
 
@@ -235,16 +281,16 @@ pnpm docs:build          # 构建文档站点
 
 遵循 [Conventional Commits](https://www.conventionalcommits.org/)：
 
-```
-feat:     添加新功能
-fix:      修复 Bug
-docs:     文档更新
-style:    代码格式（不影响功能）
-refactor: 重构（既非 feat 也非 fix）
-perf:     性能优化
-test:     测试相关
-chore:    构建/工具链相关
-```
+| 类型 | 用途 |
+|---|---|
+| `feat` | 添加新功能 |
+| `fix` | 修复 Bug |
+| `docs` | 文档更新 |
+| `style` | 代码格式（不影响功能）|
+| `refactor` | 重构（既非 feat 也非 fix）|
+| `perf` | 性能优化 |
+| `test` | 测试相关 |
+| `chore` | 构建/工具链相关 |
 
 ### 添加新的 LLM / TTS Provider
 
@@ -261,19 +307,23 @@ chore:    构建/工具链相关
 | [🏗️ 架构设计](https://agions.github.io/story-fab/dev/architecture.html) | 系统架构详解 |
 | [🔌 Tauri 命令](https://agions.github.io/story-fab/dev/tauri-commands.html) | 前后端通信接口 |
 | [🤖 Provider 开发](https://agions.github.io/story-fab/dev/provider-development.html) | 接入新 LLM / TTS |
+| [🛠️ 构建发布](https://agions.github.io/story-fab/dev/build.html) | 跨平台构建与签名验证 |
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-- [x] 剪辑模式 / 解说模式双工作流
-- [x] 5 大 LLM Provider（OpenAI / DeepSeek / Qwen / Gemini / Anthropic）
-- [x] Edge TTS / Azure TTS 双引擎
-- [x] 多比例导出（9:16 / 1:1 / 16:9）
-- [ ] 云端协作（剧本云端同步）
-- [ ] 移动端预览 App
-- [ ] AI 自动封面图生成
-- [ ] 多语言 UI（i18n 国际化）
+### 已完成 ✅
+- 剪辑模式 / 解说模式双工作流
+- 5 大 LLM Provider（OpenAI / DeepSeek / Qwen / Gemini / Anthropic）
+- Edge TTS / Azure TTS 双引擎
+- 多比例导出（9:16 / 1:1 / 16:9）
+
+### 规划中 🚧
+- 云端协作（剧本云端同步）
+- 移动端预览 App
+- AI 自动封面图生成
+- 多语言 UI（i18n 国际化）
 
 查看完整路线图 → [GitHub Projects](https://github.com/Agions/story-fab/projects)
 
@@ -292,7 +342,7 @@ StoryFab 的诞生离不开以下开源项目：
 
 ---
 
-## 📄 License
+## License
 
 本项目基于 [**MIT License**](LICENSE) 开源。
 
