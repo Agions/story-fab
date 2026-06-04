@@ -10,25 +10,27 @@
 
 <br/>
 
-[![Version](https://img.shields.io/github/v/release/Agions/story-fab?style=flat-square&color=0EA5E9)](https://github.com/Agions/story-fab/releases)
-[![License](https://img.shields.io/github/license/Agions/story-fab?style=flat-square&color=22C55E)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/Agions/story-fab?style=flat-square&color=FACC15)](https://github.com/Agions/story-fab/stargazers)
-[![Forks](https://img.shields.io/github/forks/Agions/story-fab?style=flat-square&color=8B5CF6)](https://github.com/Agions/story-fab/network/members)
-[![Issues](https://img.shields.io/github/issues/Agions/story-fab?style=flat-square&color=EF4444)](https://github.com/Agions/story-fab/issues)
-
-<br/>
-
-[![Tauri](https://img.shields.io/badge/Tauri-2.x-FFC131?style=flat-square&logo=tauri&logoColor=black)](https://tauri.app/)
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Rust](https://img.shields.io/badge/Rust-1.77%2B-DEA584?style=flat-square&logo=rust&logoColor=black)](https://www.rust-lang.org/)
-[![Platform](https://img.shields.io/badge/Platform-Win%20%7C%20macOS%20%7C%20Linux-8B5CF6?style=flat-square)](https://github.com/Agions/story-fab/releases)
+[![Version](https://img.shields.io/github/v/release/Agions/story-fab?style=flat-square&color=0EA5E9)](https://github.com/Agions/story-fab/releases) [![License](https://img.shields.io/github/license/Agions/story-fab?style=flat-square&color=22C55E)](LICENSE)
 
 <br/>
 
 [**📚 在线文档**](https://agions.github.io/story-fab/) &nbsp;·&nbsp; [**⬇️ 下载安装**](https://github.com/Agions/story-fab/releases) &nbsp;·&nbsp; [**🐛 报告问题**](https://github.com/Agions/story-fab/issues/new) &nbsp;·&nbsp; [**💡 功能建议**](https://github.com/Agions/story-fab/discussions)
 
 </div>
+
+---
+
+## 📋 Project Info
+
+| 字段 | 值 |
+|---|---|
+| **Repository** | [Agions/story-fab](https://github.com/Agions/story-fab) |
+| **Version** | v2.0.4 |
+| **License** | [MIT](LICENSE) |
+| **Author** | [Agions](https://github.com/Agions) |
+| **Stack** | Tauri 2.x · React 18 · TypeScript 5 · Rust 1.77+ |
+| **Platforms** | Windows · macOS (Intel + Apple Silicon) · Linux |
+| **Docs** | <https://agions.github.io/story-fab/> |
 
 ---
 
