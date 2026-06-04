@@ -6,60 +6,55 @@
 
 # StoryFab · AI 影视解说创作工坊
 
-> **从一段原始素材到一段专业解说，AI 全程陪你一气呵成。**
+**从一段原始素材到一段专业解说，AI 全程陪你一气呵成。**
 
-<a href="LICENSE"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2295%22%20height%3D%2228%22%20viewBox%3D%220%200%2095%2028%22%20role%3D%22img%22%20aria-label%3D%22license%3A%20MIT%22%3E%0A%20%20%3Ctitle%3Elicense%3A%20MIT%3C%2Ftitle%3E%0A%20%20%3ClinearGradient%20id%3D%22s%22%20x2%3D%220%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.7%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.1%22%20stop-color%3D%22%23aaa%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.9%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.35%22%2F%3E%0A%20%20%3C%2FlinearGradient%3E%0A%20%20%3CclipPath%20id%3D%22r%22%3E%3Crect%20width%3D%2295%22%20height%3D%2228%22%20rx%3D%223%22%20fill%3D%22%23fff%22%2F%3E%3C%2FclipPath%3E%0A%20%20%3Cg%20clip-path%3D%22url%28%23r%29%22%3E%0A%20%20%20%20%3Crect%20width%3D%2261%22%20height%3D%2228%22%20fill%3D%22%23555%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2261%22%20width%3D%2234%22%20height%3D%2228%22%20fill%3D%22%23007ec6%22%2F%3E%0A%20%20%20%20%3Crect%20width%3D%2295%22%20height%3D%2228%22%20fill%3D%22url%28%23s%29%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%20font-family%3D%22Verdana%2CGeneva%2CDejaVu%20Sans%2Csans-serif%22%20text-rendering%3D%22geometricPrecision%22%20font-weight%3D%22700%22%20font-size%3D%2211%22%3E%0A%20%20%20%20%3Ctext%20x%3D%2230.5%22%20y%3D%2219%22%20fill%3D%22white%22%3Elicense%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2278.0%22%20y%3D%2219%22%20fill%3D%22white%22%3EMIT%3C%2Ftext%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E" alt="MIT License"/></a>
-<a href="https://tauri.app/"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2282%22%20height%3D%2228%22%20viewBox%3D%220%200%2082%2028%22%20role%3D%22img%22%20aria-label%3D%22tauri%3A%202.x%22%3E%0A%20%20%3Ctitle%3Etauri%3A%202.x%3C%2Ftitle%3E%0A%20%20%3ClinearGradient%20id%3D%22s%22%20x2%3D%220%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.7%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.1%22%20stop-color%3D%22%23aaa%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.9%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.35%22%2F%3E%0A%20%20%3C%2FlinearGradient%3E%0A%20%20%3CclipPath%20id%3D%22r%22%3E%3Crect%20width%3D%2282%22%20height%3D%2228%22%20rx%3D%223%22%20fill%3D%22%23fff%22%2F%3E%3C%2FclipPath%3E%0A%20%20%3Cg%20clip-path%3D%22url%28%23r%29%22%3E%0A%20%20%20%20%3Crect%20width%3D%2248%22%20height%3D%2228%22%20fill%3D%22%23007ec6%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2248%22%20width%3D%2234%22%20height%3D%2228%22%20fill%3D%22%23FFC131%22%2F%3E%0A%20%20%20%20%3Crect%20width%3D%2282%22%20height%3D%2228%22%20fill%3D%22url%28%23s%29%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%20font-family%3D%22Verdana%2CGeneva%2CDejaVu%20Sans%2Csans-serif%22%20text-rendering%3D%22geometricPrecision%22%20font-weight%3D%22700%22%20font-size%3D%2211%22%3E%0A%20%20%20%20%3Ctext%20x%3D%2224.0%22%20y%3D%2219%22%20fill%3D%22white%22%3Etauri%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2265.0%22%20y%3D%2219%22%20fill%3D%22black%22%3E2.x%3C%2Ftext%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E" alt="Tauri 2.x"/></a>
-<a href="https://react.dev/"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2275%22%20height%3D%2228%22%20viewBox%3D%220%200%2075%2028%22%20role%3D%22img%22%20aria-label%3D%22react%3A%2018%22%3E%0A%20%20%3Ctitle%3Ereact%3A%2018%3C%2Ftitle%3E%0A%20%20%3ClinearGradient%20id%3D%22s%22%20x2%3D%220%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.7%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.1%22%20stop-color%3D%22%23aaa%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.9%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.35%22%2F%3E%0A%20%20%3C%2FlinearGradient%3E%0A%20%20%3CclipPath%20id%3D%22r%22%3E%3Crect%20width%3D%2275%22%20height%3D%2228%22%20rx%3D%223%22%20fill%3D%22%23fff%22%2F%3E%3C%2FclipPath%3E%0A%20%20%3Cg%20clip-path%3D%22url%28%23r%29%22%3E%0A%20%20%20%20%3Crect%20width%3D%2248%22%20height%3D%2228%22%20fill%3D%22%23007ec6%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2248%22%20width%3D%2227%22%20height%3D%2228%22%20fill%3D%22%2361DAFB%22%2F%3E%0A%20%20%20%20%3Crect%20width%3D%2275%22%20height%3D%2228%22%20fill%3D%22url%28%23s%29%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%20font-family%3D%22Verdana%2CGeneva%2CDejaVu%20Sans%2Csans-serif%22%20text-rendering%3D%22geometricPrecision%22%20font-weight%3D%22700%22%20font-size%3D%2211%22%3E%0A%20%20%20%20%3Ctext%20x%3D%2224.0%22%20y%3D%2219%22%20fill%3D%22white%22%3Ereact%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2261.5%22%20y%3D%2219%22%20fill%3D%22black%22%3E18%3C%2Ftext%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E" alt="React 18"/></a>
-<a href="https://www.typescriptlang.org/"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22102%22%20height%3D%2228%22%20viewBox%3D%220%200%20102%2028%22%20role%3D%22img%22%20aria-label%3D%22typescript%3A%205%22%3E%0A%20%20%3Ctitle%3Etypescript%3A%205%3C%2Ftitle%3E%0A%20%20%3ClinearGradient%20id%3D%22s%22%20x2%3D%220%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.7%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.1%22%20stop-color%3D%22%23aaa%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.9%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.35%22%2F%3E%0A%20%20%3C%2FlinearGradient%3E%0A%20%20%3CclipPath%20id%3D%22r%22%3E%3Crect%20width%3D%22102%22%20height%3D%2228%22%20rx%3D%223%22%20fill%3D%22%23fff%22%2F%3E%3C%2FclipPath%3E%0A%20%20%3Cg%20clip-path%3D%22url%28%23r%29%22%3E%0A%20%20%20%20%3Crect%20width%3D%2282%22%20height%3D%2228%22%20fill%3D%22%23007ec6%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2282%22%20width%3D%2220%22%20height%3D%2228%22%20fill%3D%22%233178C6%22%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22102%22%20height%3D%2228%22%20fill%3D%22url%28%23s%29%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%20font-family%3D%22Verdana%2CGeneva%2CDejaVu%20Sans%2Csans-serif%22%20text-rendering%3D%22geometricPrecision%22%20font-weight%3D%22700%22%20font-size%3D%2211%22%3E%0A%20%20%20%20%3Ctext%20x%3D%2241.0%22%20y%3D%2219%22%20fill%3D%22white%22%3Etypescript%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2292.0%22%20y%3D%2219%22%20fill%3D%22white%22%3E5%3C%2Ftext%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E" alt="TypeScript 5"/></a>
-<a href="https://www.rust-lang.org/"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2289%22%20height%3D%2228%22%20viewBox%3D%220%200%2089%2028%22%20role%3D%22img%22%20aria-label%3D%22rust%3A%201.77%2B%22%3E%0A%20%20%3Ctitle%3Erust%3A%201.77%2B%3C%2Ftitle%3E%0A%20%20%3ClinearGradient%20id%3D%22s%22%20x2%3D%220%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.7%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.1%22%20stop-color%3D%22%23aaa%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.9%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.35%22%2F%3E%0A%20%20%3C%2FlinearGradient%3E%0A%20%20%3CclipPath%20id%3D%22r%22%3E%3Crect%20width%3D%2289%22%20height%3D%2228%22%20rx%3D%223%22%20fill%3D%22%23fff%22%2F%3E%3C%2FclipPath%3E%0A%20%20%3Cg%20clip-path%3D%22url%28%23r%29%22%3E%0A%20%20%20%20%3Crect%20width%3D%2241%22%20height%3D%2228%22%20fill%3D%22%23007ec6%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2241%22%20width%3D%2248%22%20height%3D%2228%22%20fill%3D%22%23dea584%22%2F%3E%0A%20%20%20%20%3Crect%20width%3D%2289%22%20height%3D%2228%22%20fill%3D%22url%28%23s%29%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%20font-family%3D%22Verdana%2CGeneva%2CDejaVu%20Sans%2Csans-serif%22%20text-rendering%3D%22geometricPrecision%22%20font-weight%3D%22700%22%20font-size%3D%2211%22%3E%0A%20%20%20%20%3Ctext%20x%3D%2220.5%22%20y%3D%2219%22%20fill%3D%22white%22%3Erust%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2265.0%22%20y%3D%2219%22%20fill%3D%22black%22%3E1.77%2B%3C%2Ftext%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E" alt="Rust 1.77+"/></a>
-<a href="https://github.com/Agions/story-fab/releases"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22238%22%20height%3D%2228%22%20viewBox%3D%220%200%20238%2028%22%20role%3D%22img%22%20aria-label%3D%22platform%3A%20Windows%20%7C%20macOS%20%7C%20Linux%22%3E%0A%20%20%3Ctitle%3Eplatform%3A%20Windows%20%7C%20macOS%20%7C%20Linux%3C%2Ftitle%3E%0A%20%20%3ClinearGradient%20id%3D%22s%22%20x2%3D%220%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.7%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.1%22%20stop-color%3D%22%23aaa%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%22.9%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.1%22%2F%3E%0A%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23000%22%20stop-opacity%3D%22.35%22%2F%3E%0A%20%20%3C%2FlinearGradient%3E%0A%20%20%3CclipPath%20id%3D%22r%22%3E%3Crect%20width%3D%22238%22%20height%3D%2228%22%20rx%3D%223%22%20fill%3D%22%23fff%22%2F%3E%3C%2FclipPath%3E%0A%20%20%3Cg%20clip-path%3D%22url%28%23r%29%22%3E%0A%20%20%20%20%3Crect%20width%3D%2268%22%20height%3D%2228%22%20fill%3D%22%23007ec6%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2268%22%20width%3D%22170%22%20height%3D%2228%22%20fill%3D%22%238B5CF6%22%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22238%22%20height%3D%2228%22%20fill%3D%22url%28%23s%29%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%20font-family%3D%22Verdana%2CGeneva%2CDejaVu%20Sans%2Csans-serif%22%20text-rendering%3D%22geometricPrecision%22%20font-weight%3D%22700%22%20font-size%3D%2211%22%3E%0A%20%20%20%20%3Ctext%20x%3D%2234.0%22%20y%3D%2219%22%20fill%3D%22white%22%3Eplatform%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%22153.0%22%20y%3D%2219%22%20fill%3D%22white%22%3EWindows%20%7C%20macOS%20%7C%20Linux%3C%2Ftext%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E" alt="Platform: Windows | macOS | Linux"/></a>
+<a href="LICENSE"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2283%22%20height%3D%2222%22%20viewBox%3D%220%200%2083%2022%22%20role%3D%22img%22%20aria-label%3D%22MIT%20License%22%3E%0A%20%20%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%2282%22%20height%3D%2221%22%20rx%3D%2211.0%22%20fill%3D%22%23ffffff%22%20stroke%3D%221a7f37%22%20stroke-width%3D%221%22%2F%3E%0A%20%20%3Ctext%20x%3D%2241.5%22%20y%3D%2215.0%22%20text-anchor%3D%22middle%22%20font-family%3D%22-apple-system%2CBlinkMacSystemFont%2CSegoe%20UI%2CHelvetica%2CArial%2Csans-serif%22%20font-size%3D%2212%22%20font-weight%3D%22600%22%20fill%3D%221a7f37%22%3EMIT%20License%3C%2Ftext%3E%0A%3C%2Fsvg%3E" alt="MIT License"/></a> <a href="https://tauri.app/"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2272%22%20height%3D%2222%22%20viewBox%3D%220%200%2072%2022%22%20role%3D%22img%22%20aria-label%3D%22Tauri%202.x%22%3E%0A%20%20%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%2271%22%20height%3D%2221%22%20rx%3D%2211.0%22%20fill%3D%22%23ffffff%22%20stroke%3D%22bf8700%22%20stroke-width%3D%221%22%2F%3E%0A%20%20%3Ctext%20x%3D%2236.0%22%20y%3D%2215.0%22%20text-anchor%3D%22middle%22%20font-family%3D%22-apple-system%2CBlinkMacSystemFont%2CSegoe%20UI%2CHelvetica%2CArial%2Csans-serif%22%20font-size%3D%2212%22%20font-weight%3D%22600%22%20fill%3D%22bf8700%22%3ETauri%202.x%3C%2Ftext%3E%0A%3C%2Fsvg%3E" alt="Tauri 2.x"/></a> <a href="https://react.dev/"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2266%22%20height%3D%2222%22%20viewBox%3D%220%200%2066%2022%22%20role%3D%22img%22%20aria-label%3D%22React%2018%22%3E%0A%20%20%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%2265%22%20height%3D%2221%22%20rx%3D%2211.0%22%20fill%3D%22%23ffffff%22%20stroke%3D%22087ea4%22%20stroke-width%3D%221%22%2F%3E%0A%20%20%3Ctext%20x%3D%2233.0%22%20y%3D%2215.0%22%20text-anchor%3D%22middle%22%20font-family%3D%22-apple-system%2CBlinkMacSystemFont%2CSegoe%20UI%2CHelvetica%2CArial%2Csans-serif%22%20font-size%3D%2212%22%20font-weight%3D%22600%22%20fill%3D%22087ea4%22%3EReact%2018%3C%2Ftext%3E%0A%3C%2Fsvg%3E" alt="React 18"/></a> <a href="https://www.typescriptlang.org/"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2289%22%20height%3D%2222%22%20viewBox%3D%220%200%2089%2022%22%20role%3D%22img%22%20aria-label%3D%22TypeScript%205%22%3E%0A%20%20%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%2288%22%20height%3D%2221%22%20rx%3D%2211.0%22%20fill%3D%22%23ffffff%22%20stroke%3D%223178C6%22%20stroke-width%3D%221%22%2F%3E%0A%20%20%3Ctext%20x%3D%2244.5%22%20y%3D%2215.0%22%20text-anchor%3D%22middle%22%20font-family%3D%22-apple-system%2CBlinkMacSystemFont%2CSegoe%20UI%2CHelvetica%2CArial%2Csans-serif%22%20font-size%3D%2212%22%20font-weight%3D%22600%22%20fill%3D%223178C6%22%3ETypeScript%205%3C%2Ftext%3E%0A%3C%2Fsvg%3E" alt="TypeScript 5"/></a> <a href="https://www.rust-lang.org/"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2278%22%20height%3D%2222%22%20viewBox%3D%220%200%2078%2022%22%20role%3D%22img%22%20aria-label%3D%22Rust%201.77%2B%22%3E%0A%20%20%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%2277%22%20height%3D%2221%22%20rx%3D%2211.0%22%20fill%3D%22%23ffffff%22%20stroke%3D%22b7410e%22%20stroke-width%3D%221%22%2F%3E%0A%20%20%3Ctext%20x%3D%2239.0%22%20y%3D%2215.0%22%20text-anchor%3D%22middle%22%20font-family%3D%22-apple-system%2CBlinkMacSystemFont%2CSegoe%20UI%2CHelvetica%2CArial%2Csans-serif%22%20font-size%3D%2212%22%20font-weight%3D%22600%22%20fill%3D%22b7410e%22%3ERust%201.77%2B%3C%2Ftext%3E%0A%3C%2Fsvg%3E" alt="Rust 1.77+"/></a> <a href="https://github.com/Agions/story-fab/releases"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22101%22%20height%3D%2222%22%20viewBox%3D%220%200%20101%2022%22%20role%3D%22img%22%20aria-label%3D%22Cross-Platform%22%3E%0A%20%20%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%22100%22%20height%3D%2221%22%20rx%3D%2211.0%22%20fill%3D%22%23ffffff%22%20stroke%3D%226639ba%22%20stroke-width%3D%221%22%2F%3E%0A%20%20%3Ctext%20x%3D%2250.5%22%20y%3D%2215.0%22%20text-anchor%3D%22middle%22%20font-family%3D%22-apple-system%2CBlinkMacSystemFont%2CSegoe%20UI%2CHelvetica%2CArial%2Csans-serif%22%20font-size%3D%2212%22%20font-weight%3D%22600%22%20fill%3D%226639ba%22%3ECross-Platform%3C%2Ftext%3E%0A%3C%2Fsvg%3E" alt="Cross-platform: Windows / macOS / Linux"/></a>
 
-[**在线文档**](https://agions.github.io/story-fab/) · [**下载安装**](https://github.com/Agions/story-fab/releases) · [**报告问题**](https://github.com/Agions/story-fab/issues/new) · [**功能建议**](https://github.com/Agions/story-fab/discussions)
+[**📚 在线文档**](https://agions.github.io/story-fab/) &nbsp;·&nbsp; [**⬇️ 下载安装**](https://github.com/Agions/story-fab/releases) &nbsp;·&nbsp; [**🐛 报告问题**](https://github.com/Agions/story-fab/issues/new) &nbsp;·&nbsp; [**💡 功能建议**](https://github.com/Agions/story-fab/discussions)
 
 </div>
 
 ---
 
-## 🎬 它是什么？
+## 它是什么？
 
 **StoryFab** 是一款**本地优先**的 AI 影视创作工坊，基于 **Tauri 2.x**（Rust + React + TypeScript）构建。
 专为**影视解说、短剧二创、直播高光**场景设计 —— 把传统的「剪辑 → 写稿 → 配音」三步流水线，压缩到**一杯咖啡的时间**。
 
 你只需要提供一段视频，剩下交给 AI：
 
-- 🤖 智能识别高光片段，精准拆条
-- ✍️ 导演 Agent 多轮交互，把控解说节奏
-- 🎙️ 本地 Whisper 字幕 + Edge TTS 配音，无需云端
-- 📦 一键导出 9:16 / 1:1 / 16:9 多比例成片
+- 🤖 **智能拆条**：自动识别高光片段，精准切片
+- ✍️ **导演 Agent**：多轮对话式策划，把控解说节奏
+- 🎙️ **本地语音链路**：Whisper 离线字幕 + Edge TTS 配音，**零云端依赖**
+- 📦 **一键多比例导出**：9:16 / 1:1 / 16:9 硬字幕烧录成片
 
 ---
 
-## ✨ 核心能力
+## 核心能力
 
 <table>
   <tr>
     <td align="center" width="33%">
       <h3>🤖 双模式工作流</h3>
-      <p><b>剪辑模式</b>：直播回放、会议记录、游戏集锦 — 智能高光检测<br/><b>解说模式</b>：短剧、电影、综艺 — 语义分段 + 导演 Agent</p>
+      <p><b>剪辑模式</b>：直播回放、会议记录、游戏集锦<br/><b>解说模式</b>：短剧、电影、综艺 — 语义分段 + 导演 Agent</p>
     </td>
     <td align="center" width="33%">
-      <h3>🧠 AI 解说生成</h3>
-      <p>接入多家 LLM（OpenAI / DeepSeek / Qwen / Gemini / Anthropic），理解剧情结构，输出专业解说文案</p>
+      <h3>🧠 多 LLM 解说生成</h3>
+      <p>接入 5 家 LLM（OpenAI · DeepSeek · Qwen · Gemini · Anthropic），理解剧情结构，输出专业解说文案</p>
     </td>
     <td align="center" width="33%">
       <h3>🎙️ 本地语音链路</h3>
-      <p>faster-whisper 离线转字幕 + Edge TTS / Azure TTS 多音色合成，隐私零外泄</p>
+      <p><code>faster-whisper</code> 离线转字幕 + Edge TTS / Azure TTS 多音色合成，<b>隐私零外泄</b></p>
     </td>
   </tr>
   <tr>
     <td align="center">
       <h3>🎬 Rust 渲染管线</h3>
-      <p>FFmpeg 底层调用，多轨时间线精准合成；9:16/1:1/16:9 多比例硬字幕烧录</p>
+      <p>FFmpeg 底层调用，多轨时间线精准合成；9:16 / 1:1 / 16:9 多比例硬字幕烧录</p>
     </td>
     <td align="center">
       <h3>🎭 导演 Agent</h3>
-      <p>多轮对话式策划 — 你定义风格（幽默/严肃/接地气），AI 把控节奏、停顿、语气</p>
+      <p>多轮对话式策划 — 你定义风格（幽默 / 严肃 / 接地气），AI 把控节奏、停顿、语气</p>
     </td>
     <td align="center">
       <h3>🔌 可扩展架构</h3>
@@ -70,7 +65,7 @@
 
 ---
 
-## 🚀 快速开始
+## 快速开始
 
 ### 方式一：下载预编译安装包（推荐）
 
@@ -85,24 +80,25 @@
 
 ### 方式二：从源码构建
 
+**前置依赖**：Node.js ≥ 18 · pnpm · Rust ≥ 1.77 · FFmpeg
+
 ```bash
-# 前置依赖：Node.js ≥ 18 · pnpm · Rust ≥ 1.77 · FFmpeg
 git clone https://github.com/Agions/story-fab.git
 cd story-fab
 pnpm install
 pnpm tauri dev      # 启动开发模式
 ```
 
-构建生产版本：
+**生产构建：**
 
 ```bash
-pnpm tauri build               # 当前平台
+pnpm tauri build                          # 当前平台
 pnpm tauri build --target x86_64-pc-windows-msvc   # 跨平台
 ```
 
 ---
 
-## 🏗️ 架构概览
+## 架构概览
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -131,37 +127,44 @@ pnpm tauri build --target x86_64-pc-windows-msvc   # 跨平台
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-数据流向：
+**数据流向：**
 
 ```
-   视频源 ──► 智能拆条 ──► 语义分段 ──► Director Agent (多轮)
-                                              │
-                                              ▼
-                                         LLM Provider (5 选 1)
-                                              │
-                                              ▼
-                                         解说词脚本
-                                              │
-                                              ▼
-                                         TTS Provider (2 选 1)
-                                              │
-                                              ▼
-                                       FFmpeg 混音 + 烧字幕
-                                              │
-                                              ▼
-                                          成片导出
+视频源 ──► 智能拆条 ──► 语义分段 ──► Director Agent (多轮)
+                                       │
+                                       ▼
+                                LLM Provider (5 选 1)
+                                       │
+                                       ▼
+                                  解说词脚本
+                                       │
+                                       ▼
+                                TTS Provider (2 选 1)
+                                       │
+                                       ▼
+                              FFmpeg 混音 + 烧字幕
+                                       │
+                                       ▼
+                                   成片导出
 ```
 
-> 💡 想看更详细架构（含模块依赖、状态机、错误处理）？  
+> 💡 想看更详细的架构（含模块依赖、状态机、错误处理）？  
 > 👉 [系统架构 v3.0 完整文档](https://agions.github.io/story-fab/dev/architecture.html)
-
-**前端**：React 18 + TypeScript + Vite + TailwindCSS，构建工具链完整  \
-**后端**：Rust + Tauri 2.x + tokio 异步运行时，FFmpeg 通过子进程调用  \
-**AI 能力**：Whisper 离线语音识别 + 多 LLM Provider + 多 TTS Provider
 
 ---
 
-## 📂 项目结构
+## 技术栈
+
+| 层 | 技术 |
+|---|---|
+| **前端** | React 18 · TypeScript 5 · Vite · TailwindCSS · Zustand |
+| **后端** | Rust · Tauri 2.x · tokio 异步运行时 |
+| **AI 能力** | faster-whisper（离线语音识别）· 5 LLM Provider · 2 TTS Provider |
+| **媒体处理** | FFmpeg（视频转码 / 混音 / 硬字幕烧录） |
+
+---
+
+## 项目结构
 
 ```
 story-fab/
@@ -188,12 +191,13 @@ story-fab/
 ├── docs/                         # VitePress 文档
 │   ├── guide/                    # 用户指南
 │   └── dev/                      # 开发文档
-└── public/                       # 静态资源（logo / favicon）
+├── assets/                       # 品牌资源（logo / favicon）
+└── public/                       # 静态资源
 ```
 
 ---
 
-## 🛠️ 开发命令
+## 开发命令
 
 ```bash
 # 前端
@@ -201,14 +205,12 @@ pnpm dev                 # Vite 开发服务器
 pnpm build               # 生产构建
 pnpm preview             # 预览构建产物
 pnpm test                # Vitest 单元测试
-pnpm test:coverage       # 测试覆盖率
 pnpm lint                # ESLint --max-warnings 0
 pnpm type-check          # tsc --noEmit
 
 # Tauri
 pnpm tauri dev           # 启动 Tauri 开发模式（带 Rust 热重载）
 pnpm tauri build         # 构建桌面应用
-pnpm tauri build --debug # Debug 模式构建
 
 # 文档
 pnpm docs:dev            # VitePress 文档开发
@@ -217,7 +219,7 @@ pnpm docs:build          # 构建文档站点
 
 ---
 
-## 🤝 参与贡献
+## 参与贡献
 
 我们欢迎任何形式的贡献 —— Bug 报告、功能建议、文档改进、代码 PR。
 
@@ -234,14 +236,14 @@ pnpm docs:build          # 构建文档站点
 遵循 [Conventional Commits](https://www.conventionalcommits.org/)：
 
 ```
-feat: 添加新功能
-fix:  修复 Bug
-docs: 文档更新
-style: 代码格式（不影响功能）
+feat:     添加新功能
+fix:      修复 Bug
+docs:     文档更新
+style:    代码格式（不影响功能）
 refactor: 重构（既非 feat 也非 fix）
-perf: 性能优化
-test: 测试相关
-chore: 构建/工具链相关
+perf:     性能优化
+test:     测试相关
+chore:    构建/工具链相关
 ```
 
 ### 添加新的 LLM / TTS Provider
@@ -250,7 +252,7 @@ chore: 构建/工具链相关
 
 ---
 
-## 📚 文档导航
+## 文档导航
 
 | 文档 | 说明 |
 |------|------|
@@ -277,7 +279,7 @@ chore: 构建/工具链相关
 
 ---
 
-## 💖 致谢
+## 致谢
 
 StoryFab 的诞生离不开以下开源项目：
 
