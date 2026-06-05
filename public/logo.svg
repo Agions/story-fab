@@ -11,31 +11,24 @@
     </linearGradient>
   </defs>
 
-  <!-- Rounded square background (iOS-friendly) -->
+  <!-- Rounded square background -->
   <rect width="256" height="256" rx="56" ry="56" fill="url(#sfAppBg)"/>
 
-  <!-- Outer film ring (dashed) -->
-  <circle cx="128" cy="128" r="92" fill="none" stroke="url(#sfAppRing)" stroke-width="2.5" stroke-dasharray="3 6" opacity="0.5"/>
+  <!-- Single story loop ring -->
+  <circle cx="128" cy="128" r="80" fill="none" stroke="url(#sfAppRing)" stroke-width="6"/>
 
-  <!-- Inner solid ring (story loop) -->
-  <circle cx="128" cy="128" r="68" fill="none" stroke="url(#sfAppRing)" stroke-width="5"/>
+  <!-- Play triangle (optically centered) -->
+  <path d="M 112 92 L 168 128 L 112 164 Z" fill="url(#sfAppRing)"/>
 
-  <!-- Center play triangle -->
-  <path d="M 112 96 L 160 128 L 112 160 Z" fill="url(#sfAppRing)"/>
-
-  <!-- Frame ticks (top + bottom film perforations) -->
-  <g fill="url(#sfAppRing)" opacity="0.85">
-    <rect x="36"  y="36"  width="4" height="10" rx="1.5"/>
-    <rect x="56"  y="36"  width="4" height="10" rx="1.5"/>
-    <rect x="76"  y="36"  width="4" height="10" rx="1.5"/>
-    <rect x="176" y="36"  width="4" height="10" rx="1.5"/>
-    <rect x="196" y="36"  width="4" height="10" rx="1.5"/>
-    <rect x="216" y="36"  width="4" height="10" rx="1.5"/>
-    <rect x="36"  y="210" width="4" height="10" rx="1.5"/>
-    <rect x="56"  y="210" width="4" height="10" rx="1.5"/>
-    <rect x="76"  y="210" width="4" height="10" rx="1.5"/>
-    <rect x="176" y="210" width="4" height="10" rx="1.5"/>
-    <rect x="196" y="210" width="4" height="10" rx="1.5"/>
-    <rect x="216" y="210" width="4" height="10" rx="1.5"/>
+  <!-- 8 film ticks (4 corners, subtle) -->
+  <g fill="url(#sfAppRing)" opacity="0.5">
+    <rect x="32"  y="42"  width="5" height="10" rx="1.5"/>
+    <rect x="52"  y="42"  width="5" height="10" rx="1.5"/>
+    <rect x="199" y="42"  width="5" height="10" rx="1.5"/>
+    <rect x="219" y="42"  width="5" height="10" rx="1.5"/>
+    <rect x="32"  y="204" width="5" height="10" rx="1.5"/>
+    <rect x="52"  y="204" width="5" height="10" rx="1.5"/>
+    <rect x="199" y="204" width="5" height="10" rx="1.5"/>
+    <rect x="219" y="204" width="5" height="10" rx="1.5"/>
   </g>
 </svg>

@@ -16,40 +16,31 @@
     <!-- Rounded square (matches app icon) -->
     <rect width="128" height="128" rx="28" ry="28" fill="url(#sfMarkBg)"/>
 
-    <!-- Outer film ring (dashed) -->
-    <circle cx="64" cy="64" r="44" fill="none" stroke="url(#sfMarkRing)" stroke-width="2" stroke-dasharray="2 4" opacity="0.55"/>
+    <!-- Story loop ring (single, prominent) -->
+    <circle cx="64" cy="64" r="40" fill="none" stroke="url(#sfMarkRing)" stroke-width="3.5"/>
 
-    <!-- Inner solid ring (story loop) -->
-    <circle cx="64" cy="64" r="34" fill="none" stroke="url(#sfMarkRing)" stroke-width="3"/>
+    <!-- Center play triangle (offset right to balance visual weight) -->
+    <path d="M 56 46 L 82 64 L 56 82 Z" fill="url(#sfMarkRing)"/>
 
-    <!-- Center play triangle -->
-    <path d="M 56 48 L 80 64 L 56 80 Z" fill="url(#sfMarkRing)"/>
-
-    <!-- Frame ticks (top + bottom film perforations) -->
-    <g fill="url(#sfMarkRing)" opacity="0.85">
-      <rect x="18" y="20" width="3" height="6" rx="1"/>
-      <rect x="28" y="20" width="3" height="6" rx="1"/>
-      <rect x="38" y="20" width="3" height="6" rx="1"/>
-      <rect x="86" y="20" width="3" height="6" rx="1"/>
-      <rect x="96" y="20" width="3" height="6" rx="1"/>
-      <rect x="106" y="20" width="3" height="6" rx="1"/>
-      <rect x="18" y="102" width="3" height="6" rx="1"/>
-      <rect x="28" y="102" width="3" height="6" rx="1"/>
-      <rect x="38" y="102" width="3" height="6" rx="1"/>
-      <rect x="86" y="102" width="3" height="6" rx="1"/>
-      <rect x="96" y="102" width="3" height="6" rx="1"/>
-      <rect x="106" y="102" width="3" height="6" rx="1"/>
+    <!-- 4 corner film ticks (subtle, top + bottom) -->
+    <g fill="url(#sfMarkRing)" opacity="0.55">
+      <rect x="16" y="22" width="3" height="6" rx="1"/>
+      <rect x="26" y="22" width="3" height="6" rx="1"/>
+      <rect x="99" y="22" width="3" height="6" rx="1"/>
+      <rect x="109" y="22" width="3" height="6" rx="1"/>
+      <rect x="16" y="100" width="3" height="6" rx="1"/>
+      <rect x="26" y="100" width="3" height="6" rx="1"/>
+      <rect x="99" y="100" width="3" height="6" rx="1"/>
+      <rect x="109" y="100" width="3" height="6" rx="1"/>
     </g>
   </g>
 
   <!-- Wordmark (right) -->
   <g transform="translate(168 0)">
-    <!-- Brand name -->
     <text x="0" y="86"
           font-family="Inter, 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif"
           font-size="58" font-weight="800" letter-spacing="-2"
           fill="#0F0C29">Story<tspan fill="url(#sfMarkRing)">Fab</tspan></text>
-    <!-- Tagline -->
     <text x="3" y="118"
           font-family="Inter, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace"
           font-size="13" font-weight="600" letter-spacing="3.2"

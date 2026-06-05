@@ -1,13 +1,13 @@
 <div align="center">
 
-<img src="assets/logo-horizontal.svg" alt="StoryFab" width="560"/>
+<img src="assets/logo-horizontal.svg" alt="StoryFab" width="540"/>
 
 <br/>
 <br/>
 
-# StoryFab · 开源 AI 影视解说创作工坊
+# StoryFab
 
-**从一段原始素材到一段专业解说，AI 全程陪你一气呵成。**
+**本地优先的 AI 影视解说创作工坊 — 一杯咖啡的时间，从素材到成片。**
 
 <br/>
 
@@ -30,11 +30,6 @@
 [![TypeScript 5](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Rust 1.77+](https://img.shields.io/badge/Rust-1.77+-DEA584?style=flat-square&logo=rust&logoColor=black)](https://www.rust-lang.org/)
 [![License MIT](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square&logo=opensourceinitiative&logoColor=white)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Win%20%7C%20macOS%20%7C%20Linux-0F0C29?style=flat-square&logo=linux&logoColor=white)](#下载安装)
-
-<br/>
-
-[**📚 在线文档**](https://agions.github.io/story-fab/) · [**⬇️ 下载安装**](https://github.com/Agions/story-fab/releases) · [**🐛 报告问题**](https://github.com/Agions/story-fab/issues/new) · [**💡 功能建议**](https://github.com/Agions/story-fab/discussions)
 
 </div>
 
@@ -44,8 +39,12 @@
 
 - [它是什么？](#它是什么)
 - [核心能力](#核心能力)
+- [快速访问](#快速访问)
+- [工作流示例](#工作流示例)
+- [为什么选择 StoryFab](#为什么选择-storyfab)
 - [下载安装](#下载安装)
-- [快速开始](#快速开始)
+- [常见安装问题](#常见安装问题)
+- [从源码构建](#从源码构建)
 - [架构概览](#架构概览)
 - [技术栈](#技术栈)
 - [项目结构](#项目结构)
@@ -63,17 +62,9 @@
 
 **StoryFab** 是一款**本地优先**的 AI 影视创作工坊，基于 **Tauri 2.x**（Rust + React + TypeScript）构建。专为**影视解说、短剧二创、直播高光**场景设计 —— 把传统的「剪辑 → 写稿 → 配音」三步流水线，压缩到**一杯咖啡的时间**。
 
-### 为什么选择 StoryFab
+**全链路本地处理**：原始视频、字幕草稿、解说文案 100% 不离开你的设备 —— Whisper 离线转字幕、Edge TTS 离线配音，**隐私零外泄**。
 
-| 痛点 | StoryFab 解法 |
-|---|---|
-| 写解说词耗时数小时 | 多 LLM 联合生成 + Director Agent 把控节奏、语气、停顿 |
-| 配音需要专业设备 | Edge TTS / Azure TTS 双引擎，几十种音色任选 |
-| 字幕需要人工听写 | `faster-whisper` 离线转字幕，**零云端依赖** |
-| 多平台适配难 | 一键导出 9:16 / 1:1 / 16:9，硬字幕烧录成片 |
-| 隐私顾虑 | 全链路本地处理，**原始视频与脚本零上传** |
-
-> **目标用户**：影视解说博主、短剧二创作者、直播高光剪辑师、MCN 内容运营团队。
+> **目标用户**：影视解说博主 · 短剧二创作者 · 直播高光剪辑师 · MCN 内容运营团队
 
 ---
 
@@ -88,14 +79,14 @@
   <tr>
     <td align="left" valign="top">
       <b>剪辑模式</b>：直播回放、会议记录、游戏集锦 — 智能高光检测<br/><br/>
-      <b>解说模式</b>：短剧、电影、综艺 — 语义分段 + 5 步 Agent Pipeline (ADR-103)
+      <b>解说模式</b>：短剧、电影、综艺 — 语义分段 + 5 步 Agent Pipeline
     </td>
     <td align="left" valign="top">
       接入 <b>5 家 LLM</b>（OpenAI · DeepSeek · Qwen · Gemini · Anthropic）<br/><br/>
-      Director Agent 多轮对话式策划，输出专业解说文案
+      Director Agent 多轮对话式策划，把控节奏、停顿、语气
     </td>
     <td align="left" valign="top">
-      <code>faster-whisper</code> 离线转字幕 + Edge TTS / Azure TTS 多音色合成<br/><br/>
+      <code>faster-whisper</code> 离线转字幕 + Edge TTS / Azure TTS 双引擎<br/><br/>
       <b>零云端</b> · <b>隐私零外泄</b>
     </td>
   </tr>
@@ -106,19 +97,78 @@
   </tr>
   <tr>
     <td align="left" valign="top">
-      FFmpeg 底层调用，多轨时间线精准合成；9:16 / 1:1 / 16:9 多比例硬字幕烧录<br/><br/>
-      跨平台构建：Windows / macOS (Intel + Apple Silicon) / Linux
+      FFmpeg 底层调用，多轨时间线精准合成；9:16 / 1:1 / 16:9 多比例硬字幕烧录
     </td>
     <td align="left" valign="top">
       <code>director</code> → <code>visual</code> → <code>narration</code> → <code>timing</code> → <code>overlay</code><br/><br/>
       累积式 state chain，类型安全 + 单元测试覆盖
     </td>
     <td align="left" valign="top">
-      Tauri 2.x IPC 解耦前后端，新 LLM / TTS 引擎只需实现 <code>trait</code> 即可接入<br/><br/>
-      双服务层架构 (Core + Interface)
+      Tauri 2.x IPC 解耦前后端；新 LLM / TTS 引擎只需实现 <code>trait</code> 即可接入
     </td>
   </tr>
 </table>
+
+---
+
+## 快速访问
+
+| 入口 | 链接 |
+|---|---|
+| **⬇️ 桌面应用下载** | [GitHub Releases](https://github.com/Agions/story-fab/releases) · Windows / macOS / Linux |
+| **📚 在线文档** | [agions.github.io/story-fab](https://agions.github.io/story-fab/) |
+| **🐛 报告问题** | [GitHub Issues](https://github.com/Agions/story-fab/issues/new) |
+| **💡 功能建议** | [GitHub Discussions](https://github.com/Agions/story-fab/discussions) |
+| **🔒 安全漏洞** | [Security Advisories](https://github.com/Agions/story-fab/security/advisories/new) |
+| **📦 历史版本** | [25 个 release tag](https://github.com/Agions/story-fab/tags) |
+
+---
+
+## 工作流示例
+
+> 把一段 60 分钟的电影素材变成 5 分钟的解说成片，全过程 < 10 分钟。
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  Step 1  导入素材         拖入视频文件 (mp4 / mov / mkv)         │
+│           ↓                                                       │
+│  Step 2  智能拆条         Whisper 离线转字幕 + 场景语义分段      │
+│           ↓                                                       │
+│  Step 3  Director Agent  多轮对话策划 — 风格 / 节奏 / 段落优先级 │
+│           ↓                                                       │
+│  Step 4  LLM 解说生成    5 家 LLM 任选 — Director → Visual →    │
+│                          Narration → Timing → Overlay 5 步流水线  │
+│           ↓                                                       │
+│  Step 5  TTS 配音合成    Edge TTS / Azure TTS 多音色试听         │
+│           ↓                                                       │
+│  Step 6  FFmpeg 渲染     9:16 / 1:1 / 16:9 硬字幕烧录导出        │
+│           ↓                                                       │
+│  🎬 成片          5 分钟解说视频 · 含字幕 · 含配音               │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 为什么选择 StoryFab
+
+| 痛点 | StoryFab 解法 |
+|---|---|
+| 写解说词耗时数小时 | 多 LLM 联合生成 + Director Agent 把控节奏、语气、停顿 |
+| 配音需要专业设备 | Edge TTS / Azure TTS 双引擎，几十种音色任选 |
+| 字幕需要人工听写 | `faster-whisper` 离线转字幕，**零云端依赖** |
+| 多平台适配难 | 一键导出 9:16 / 1:1 / 16:9，硬字幕烧录成片 |
+| 隐私顾虑 | 全链路本地处理，**原始视频与脚本零上传** |
+| 部署门槛高 | 桌面原生（Tauri）双击即用，**无 streamlit / 无 Web 服务** |
+| 无法脚本化 | 完整的 Node + Rust API，可接入 AI Agent 自动化工作流 |
+
+### 与同类开源工具对比
+
+| 项目 | 形态 | 解说生成 | 本地优先 | 桌面原生 | 5 步 Pipeline |
+|---|---|---|---|---|---|
+| **StoryFab** | 桌面应用 | ✅ | ✅ | ✅ | ✅ (ADR-103) |
+| NarratoAI | Streamlit Web | ✅ | ⚠️ 需 pytorch | ❌ | ❌ |
+| MoneyPrinterTurbo | Streamlit Web | ❌ | ⚠️ 需 ImageMagick | ❌ | ❌ |
+| KrillinAI | Streamlit Web | ❌ 偏翻译 | ✅ | ❌ | ❌ |
 
 ---
 
@@ -137,9 +187,53 @@
 
 ---
 
-## 快速开始
+## 常见安装问题
 
-### 从源码构建
+<details>
+<summary><b>macOS 提示"无法打开，因为无法验证开发者"</b></summary>
+
+StoryFab **未购买 Apple 开发者证书**，所以 macOS Gatekeeper 会拦截。两种解决方式：
+
+**方式 1（推荐）**：右键 app → **打开** → 弹出对话框再点 **打开**
+
+**方式 2**：系统设置 → 隐私与安全性 → 点 **仍要打开**
+
+详细图文：[macOS 安装指南](https://agions.github.io/story-fab/guide/install-mac.html)
+</details>
+
+<details>
+<summary><b>Windows SmartScreen 提示"未知发布者"</b></summary>
+
+StoryFab 安装包未签名（企业签名年费 $400+）。点击 **更多信息** → **仍要运行** 即可。
+
+后续版本会接入代码签名，详见 [release 路线图](https://github.com/Agions/story-fab/projects)。
+</details>
+
+<details>
+<summary><b>Linux AppImage 启动失败</b></summary>
+
+AppImage 需要 `libfuse2`。Ubuntu 22.04+ 默认不装：
+
+```bash
+sudo apt install libfuse2
+```
+
+或改用 `.deb` 包（无需 FUSE）。详见 [Linux 安装指南](https://agions.github.io/story-fab/guide/install-linux.html)。
+</details>
+
+<details>
+<summary><b>启动时报 "Failed to load FFmpeg/Whisper binary"</b></summary>
+
+Tauri 首次启动会下载 FFmpeg / Whisper 二进制。**网络问题**会导致失败。解决：
+
+1. 设置代理或使用 VPN
+2. 或手动放置二进制到 `~/.config/story-fab/bin/`
+3. 或从 [Release 资产](https://github.com/Agions/story-fab/releases) 下载预编译二进制
+</details>
+
+---
+
+## 从源码构建
 
 **前置依赖**：Node.js ≥ 18 · pnpm · Rust ≥ 1.77 · FFmpeg
 
@@ -215,8 +309,7 @@ curl -fsSL https://raw.githubusercontent.com/Agions/story-fab/main/install.sh | 
                                    成片导出
 ```
 
-> **完整架构详解（含模块依赖、状态机、错误处理、ADR-101~103）**：
-> [系统架构文档](https://agions.github.io/story-fab/dev/architecture-optimization.html)
+> **完整架构详解**：[系统架构文档](https://agions.github.io/story-fab/dev/architecture-optimization.html)（含 ADR-101/102/103）
 
 ---
 
@@ -228,9 +321,9 @@ curl -fsSL https://raw.githubusercontent.com/Agions/story-fab/main/install.sh | 
 | **UI 组件** | [shadcn/ui](https://ui.shadcn.com/) · [Radix UI](https://www.radix-ui.com/) · [TailwindCSS](https://tailwindcss.com/) |
 | **状态管理** | [Zustand](https://zustand-demo.pmnd.rs/) · 5 个领域 store |
 | **桌面框架** | [Tauri 2.x](https://tauri.app/) · Rust 1.77+ · tokio 异步运行时 |
-| **AI 能力** | [faster-whisper](https://github.com/SYSTRAN/faster-whisper)（离线语音识别）· 5 LLM Provider · 2 TTS Provider |
-| **媒体处理** | [FFmpeg](https://ffmpeg.org/)（视频转码 / 混音 / 硬字幕烧录） |
-| **测试** | [Vitest](https://vitest.dev/) · [Playwright](https://playwright.dev/) · 25+ 单元测试 |
+| **AI 能力** | [faster-whisper](https://github.com/SYSTRAN/faster-whisper) · 5 LLM Provider · 2 TTS Provider |
+| **媒体处理** | [FFmpeg](https://ffmpeg.org/) · 视频转码 / 混音 / 硬字幕烧录 |
+| **测试** | [Vitest](https://vitest.dev/) · 17+ 单元测试覆盖 5 步 Pipeline |
 | **CI/CD** | GitHub Actions · 5 阶段质量门禁（type-check / lint / test / verify:all / build） |
 
 ---
@@ -240,11 +333,11 @@ curl -fsSL https://raw.githubusercontent.com/Agions/story-fab/main/install.sh | 
 ```
 story-fab/
 ├── src/                          # 前端源码
-│   ├── components/               # UI 组件库
+│   ├── components/
 │   │   ├── VideoProcessingController/  # 工作流核心
 │   │   ├── ai/                   # Agent 相关组件
 │   │   └── ui/                   # shadcn/ui 基础组件
-│   ├── core/                     # 核心业务层
+│   ├── core/                     # 核心业务层（ADR-101 双服务层）
 │   │   ├── pipeline/             # 5 步 Pipeline (ADR-103)
 │   │   │   └── steps/commentary/ # Commentary 模式 5 agent
 │   │   ├── services/             # 业务服务
@@ -263,8 +356,6 @@ story-fab/
 │       ├── video_processor.rs    # 视频处理核心
 │       └── binary.rs             # FFmpeg / Whisper 二进制管理
 ├── docs/                         # VitePress 文档站
-│   ├── guide/                    # 用户指南
-│   └── dev/                      # 开发文档
 ├── assets/                       # 品牌资源
 │   ├── logo-horizontal.svg       # README / 文档头
 │   └── logo-mark.svg             # 方形 monogram
@@ -335,7 +426,7 @@ pnpm verify:all           # 一键运行所有验证
 | `docs` | 文档更新 | `docs(readme): professional redesign` |
 | `refactor` | 重构（既非 feat 也非 fix） | `refactor(arch): v2.0 → v2.1 optimization` |
 | `perf` | 性能优化 | `perf(render): cache keyframe extraction` |
-| `test` | 测试相关 | `test(commentary): add 25 unit tests` |
+| `test` | 测试相关 | `test(commentary): add 17 unit tests` |
 | `chore` | 构建 / 工具链 | `chore(deps): bump tauri 2.1 → 2.2` |
 
 ### 添加新的 LLM / TTS Provider
@@ -359,7 +450,6 @@ pnpm verify:all           # 一键运行所有验证
 | [🔌 Tauri 命令](https://agions.github.io/story-fab/dev/tauri-commands.html) | 前后端通信接口 |
 | [🤖 Provider 开发](https://agions.github.io/story-fab/dev/provider-development.html) | 接入新 LLM / TTS |
 | [🛠️ 构建发布](https://agions.github.io/story-fab/dev/build.html) | 跨平台构建与签名验证 |
-| [📋 项目规范](docs/dev/architecture-optimization.md) | 命名 / 模块化 / 验证脚本 |
 
 ---
 
@@ -373,10 +463,11 @@ pnpm verify:all           # 一键运行所有验证
 - 多比例导出（9:16 / 1:1 / 16:9）
 - faster-whisper 离线字幕
 - Director Agent 多轮对话策划
-- 双服务层架构（v2.1 优化）
-- 5 步 Agent Pipeline (v2.2 commentary)
+- 双服务层架构（v2.1 优化，ADR-101/102）
+- 5 步 Agent Pipeline (v2.2 commentary, ADR-103)
 - CI/CD 5 阶段质量门禁
 - 文档站自动部署
+- 25 个 release tag，1004+ commits
 
 ### 规划中 🚧
 
@@ -395,7 +486,7 @@ pnpm verify:all           # 一键运行所有验证
 
 - 🐛 **报告 Bug**：[GitHub Issues](https://github.com/Agions/story-fab/issues/new)
 - 💡 **功能建议**：[GitHub Discussions](https://github.com/Agions/story-fab/discussions)
-- 📖 **使用问题**：[文档站](https://agions.github.io/story-fab/) · [FAQ](https://agions.github.io/story-fab/guide/faq.html)
+- 📖 **使用问题**：[文档站 FAQ](https://agions.github.io/story-fab/guide/faq.html)
 - 🔒 **安全漏洞**：[Security Advisories](https://github.com/Agions/story-fab/security/advisories/new)
 
 ---

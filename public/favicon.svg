@@ -14,21 +14,9 @@
   <!-- Rounded square -->
   <rect width="64" height="64" rx="14" ry="14" fill="url(#sfFavBg)"/>
 
-  <!-- Solid ring -->
-  <circle cx="32" cy="32" r="17" fill="none" stroke="url(#sfFavRing)" stroke-width="2.5"/>
+  <!-- Story loop ring -->
+  <circle cx="32" cy="32" r="18" fill="none" stroke="url(#sfFavRing)" stroke-width="2.8"/>
 
   <!-- Play triangle -->
-  <path d="M 28 24 L 40 32 L 28 40 Z" fill="url(#sfFavRing)"/>
-
-  <!-- Top + bottom ticks -->
-  <g fill="url(#sfFavRing)" opacity="0.85">
-    <rect x="14" y="6"  width="1.5" height="4" rx="0.5"/>
-    <rect x="22" y="6"  width="1.5" height="4" rx="0.5"/>
-    <rect x="40" y="6"  width="1.5" height="4" rx="0.5"/>
-    <rect x="48" y="6"  width="1.5" height="4" rx="0.5"/>
-    <rect x="14" y="54" width="1.5" height="4" rx="0.5"/>
-    <rect x="22" y="54" width="1.5" height="4" rx="0.5"/>
-    <rect x="40" y="54" width="1.5" height="4" rx="0.5"/>
-    <rect x="48" y="54" width="1.5" height="4" rx="0.5"/>
-  </g>
+  <path d="M 28 23 L 42 32 L 28 41 Z" fill="url(#sfFavRing)"/>
 </svg>
