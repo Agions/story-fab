@@ -9,8 +9,8 @@
 
 import React from 'react';
 import { CheckCircle2, Circle, Loader2, XCircle } from 'lucide-react';
-import { COMMENTARY_STEP_NAMES, COMMENTARY_PROGRESS_WEIGHTS } from '@/core/pipeline/steps';
-import type { CommentaryStepName } from '@/core/pipeline/steps';
+import { COMMENTARY_STEP_NAMES, COMMENTARY_PROGRESS_WEIGHTS } from '@/core/pipeline/steps/commentary/CompositeCommentaryPipeline';
+import type { CommentaryStepName } from '@/core/pipeline/steps/commentary/CompositeCommentaryPipeline';
 import { cn } from '@/shared/utils/cn';
 
 // ============================================================
