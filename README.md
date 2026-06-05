@@ -11,9 +11,7 @@
 
 <br/>
 
-[![Release](https://img.shields.io/github/v/release/Agions/story-fab?style=flat-square&color=FF6B35&logo=tauri&logoColor=black)](https://github.com/Agions/story-fab/releases)
 [![License](https://img.shields.io/github/license/Agions/story-fab?style=flat-square&color=22C55E)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/Agions/story-fab?style=flat-square&color=FACC15)](https://github.com/Agions/story-fab/stargazers)
 [![Forks](https://img.shields.io/github/forks/Agions/story-fab?style=flat-square&color=8B5CF6)](https://github.com/Agions/story-fab/network/members)
 [![Issues](https://img.shields.io/github/issues/Agions/story-fab?style=flat-square&color=EF4444)](https://github.com/Agions/story-fab/issues)
 
@@ -465,9 +463,6 @@ pnpm verify:all           # 一键运行所有验证
 - 云端协作（剧本云端同步 + 多端编辑）
 - 移动端预览 App（iOS / Android）
 - AI 自动封面图生成
-- 多语言 UI（i18n 国际化）
-- 视频素材市场
-- 团队协作权限管理
 
 查看完整路线图 → [GitHub Projects](https://github.com/Agions/story-fab/projects)
 
