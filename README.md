@@ -14,7 +14,7 @@
 
 <br/>
 
-[**📚 在线文档**](https://agions.github.io/story-fab/) &nbsp;·&nbsp; [**⬇️ 下载安装**](https://github.com/Agions/story-fab/releases) &nbsp;·&nbsp; [**🐛 报告问题**](https://github.com/Agions/story-fab/issues/new) &nbsp;·&nbsp; [**💡 功能建议**](https://github.com/Agions/story-fab/discussions)
+[**📚 在线文档**](https://agions.github.io/story-fab/) &nbsp;·&nbsp; [**⬇️ 下载安装**](https://github.com/Agions/story-fab/releases) &nbsp;·&nbsp; [**🐛 报告问题**](https://github.com/Agions/story-fab/issues/new) &nbsp;·&nbsp; [**💬 QQ 群交流**](https://github.com/Agions/story-fab/issues)
 
 </div>
 
