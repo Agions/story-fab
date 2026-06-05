@@ -3,7 +3,7 @@
   "productName": "StoryFab",
   "private": true,
   "version": "2.0.0",
-  "description": "开源自研AI视频创作工具 · 智能拆条+解说生成+配音合成 · 9:16/1:1/16:9多格式导出 · 本地Whisper字幕 · Rust渲染管线 · 无需上传",
+  "description": "开源 AI 影视解说创作工坊 (Tauri 2 + Rust)。长视频 → AI 拆条 + 多 Agent 智能解说 + 本地 Whisper 字幕 + 配音合成，9:16/1:1/16:9 多格式导出，100% 本地处理零上传。",
   "author": "Agions <agions@qq.com>",
   "license": "MIT",
   "type": "module",
