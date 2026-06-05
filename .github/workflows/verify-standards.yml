@@ -1,0 +1,122 @@
+name: Verify Project Standards
+
+# StoryFab 项目级约束校验 — 来源 ADR-002 / ADR-006 / ADR-007
+#
+# 触发时机:
+#   - push 到 main / develop
+#   - 任何 PR
+#
+# 校验项:
+#   1. 禁打 tag (本地未推送 tag 拦截)
+#   2. 禁用 antd
+#   3. 全局 git 账户一致性
+#   4. AI byline 检测 (commit message + author)
+#   5. 仓库描述存在
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  # ============================================================
+  # Job 1: 禁止 antd 引用
+  # ============================================================
+  verify-no-antd:
+    name: Verify No antd
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Check antd absence
+        run: node scripts/check-antd.mjs
+
+  # ============================================================
+  # Job 2: 禁止本地打 tag
+  # ============================================================
+  verify-no-tag:
+    name: Verify No Local Tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Check no local tag pushed
+        run: node scripts/verify-no-tag.mjs
+
+  # ============================================================
+  # Job 3: 全局 git 账户一致性
+  # ============================================================
+  verify-git-identity:
+    name: Verify Git Identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Check git config consistency
+        run: |
+          set -e
+          if [ "$(git config --global user.name)" != "Agions" ] && [ -n "$(git config --global user.name)" ]; then
+            echo "❌ Global git user.name 不匹配"
+            exit 1
+          fi
+          if [ "$(git config --global user.email)" != "1051736049@qq.com" ] && [ -n "$(git config --global user.email)" ]; then
+            echo "❌ Global git user.email 不匹配"
+            exit 1
+          fi
+          echo "✅ Git identity OK"
+
+  # ============================================================
+  # Job 4: AI byline 检测
+  # ============================================================
+  verify-no-ai-byline:
+    name: Verify No AI Byline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 10
+      - name: Scan last 10 commits for AI byline
+        run: |
+          set -e
+          BAD=$(git log -10 --pretty=%H\ %s\ %ae | grep -iE "anthropic\.com|hermes@agent|claude@anthropic|🤖" || true)
+          if [ -n "$BAD" ]; then
+            echo "❌ 检测到 AI byline 残留:"
+            echo "$BAD"
+            exit 1
+          fi
+          echo "✅ 无 AI byline 残留"
+
+  # ============================================================
+  # Job 5: 仓库描述存在性
+  # ============================================================
+  verify-repo-description:
+    name: Verify Repo Description
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check repo description via gh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DESC=$(gh repo view Agions/story-fab --json description -q '.description // ""')
+          if [ -z "$DESC" ] || [ "$DESC" = "null" ]; then
+            echo "❌ 仓库描述为空"
+            exit 1
+          fi
+          echo "✅ 仓库描述: $DESC"

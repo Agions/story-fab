@@ -8,9 +8,13 @@ import { join } from 'path';
 const BUDGETS = [
   { name: 'main js',        pattern: 'index-',         limitKb: 800   },
   { name: 'vendor-react',   pattern: 'vendor-react-',  limitKb: 1500  },
-  { name: 'vendor-antd',    pattern: 'vendor-antd-',   limitKb: 800   },
+  { name: 'vendor-tauri',   pattern: 'vendor-tauri-',  limitKb: 400   },
   { name: 'vendor-zustand', pattern: 'vendor-zustand-', limitKb: 200 },
   { name: 'vendor-router',  pattern: 'vendor-router-',  limitKb: 300  },
+  { name: 'vendor-icons',   pattern: 'vendor-icons-',   limitKb: 300  },
+  { name: 'vendor-motion',  pattern: 'vendor-motion-',  limitKb: 200  },
+  { name: 'vendor-dayjs',   pattern: 'vendor-dayjs-',   limitKb: 100  },
+  { name: 'vendor-axios',   pattern: 'vendor-axios-',   limitKb: 100  },
 ];
 
 const DIR = 'dist/assets';

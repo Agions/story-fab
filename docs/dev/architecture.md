@@ -1,6 +1,6 @@
 ---
-title: 系统架构 v3.0
-date: 2024-03-15
+title: 系统架构 v2.0
+date: 2026-06-05
 categories:
   - 开发文档
   - 架构设计
@@ -10,7 +10,7 @@ tags:
   - Tauri
   - React
   - 架构设计
-description: StoryFab Commentary Mode AI 影视/短剧解说创作工具系统架构文档
+description: StoryFab Commentary Mode AI 影视/短剧解说创作工具系统架构文档 (Tauri 2 + React 18 + shadcn/ui)
 ---
 
 # 系统架构 v3.0
