@@ -195,7 +195,7 @@ StoryFab **未购买 Apple 开发者证书**，所以 macOS Gatekeeper 会拦截
 
 StoryFab 安装包未签名（企业签名年费 $400+）。点击 **更多信息** → **仍要运行** 即可。
 
-后续版本会接入代码签名，详见 [release 路线图](https://github.com/Agions/story-fab/projects)。
+后续版本会接入代码签名，详见 [release 路线图](https://github.com/Agions/story-fab/issues?q=is%3Aopen+label%3Aenhancement)。
 </details>
 
 <details>
@@ -464,7 +464,7 @@ pnpm verify:all           # 一键运行所有验证
 - 移动端预览 App（iOS / Android）
 - AI 自动封面图生成
 
-查看完整路线图 → [GitHub Projects](https://github.com/Agions/story-fab/projects)
+查看完整路线图 → [GitHub Issues · enhancement](https://github.com/Agions/story-fab/issues?q=is%3Aopen+label%3Aenhancement)
 
 ---
 
