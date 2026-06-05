@@ -10,7 +10,7 @@
 
 <br/>
 
-[![Version](https://img.shields.io/github/v/release/Agions/story-fab?style=flat-square&color=0EA5E9)](https://github.com/Agions/story-fab/releases) [![License](https://img.shields.io/github/license/Agions/story-fab?style=flat-square&color=22C55E)](LICENSE)
+[![Version](https://img.shields.io/github/v/release/Agions/story-fab?style=flat-square&color=0EA5E9)](https://github.com/Agions/story-fab/releases) [![Stars](https://img.shields.io/github/stars/Agions/story-fab?style=flat-square&color=FACC15)](https://github.com/Agions/story-fab/stargazers) [![License](https://img.shields.io/github/license/Agions/story-fab?style=flat-square&color=22C55E)](LICENSE) [![Issues](https://img.shields.io/github/issues/Agions/story-fab?style=flat-square&color=EF4444)](https://github.com/Agions/story-fab/issues)
 
 <br/>
 
