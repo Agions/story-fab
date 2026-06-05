@@ -69,8 +69,10 @@ export default defineConfig({
           // Tauri
           if (/node_modules\/@tauri-apps\//.test(id)) return 'vendor-tauri'
 
-          // UI library — antd icons share modules with rc-* packages, keep them together
-          if (/node_modules\/(?:antd|@ant-design)\//.test(id)) return 'vendor-antd'
+          // shadcn/ui base — @base-ui/react (Radix-style headless primitives)
+          if (/node_modules\/@base-ui\//.test(id)) return 'vendor-ui-base'
+          if (/node_modules\/class-variance-authority\//.test(id)) return 'vendor-ui-base'
+          if (/node_modules\/clsx\//.test(id) || /node_modules\/tailwind-merge\//.test(id)) return 'vendor-ui-base'
 
           // Utilities
           if (/node_modules\/dayjs\//.test(id)) return 'vendor-dayjs'

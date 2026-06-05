@@ -40,7 +40,20 @@
     "prefer-const": "warn",
     "no-useless-escape": "off",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          { "name": "antd", "message": "StoryFab 禁止使用 antd，请改用 shadcn/ui (@/components/ui/*)。参考 ADR-002。" },
+          { "name": "@ant-design/icons", "message": "StoryFab 禁止使用 @ant-design/*，请改用 lucide-react。参考 ADR-002。" },
+          { "name": "@ant-design/colors", "message": "StoryFab 禁止使用 @ant-design/*。参考 ADR-002。" }
+        ],
+        "patterns": [
+          { "group": ["@ant-design/*"], "message": "StoryFab 禁止使用 @ant-design/*。参考 ADR-002。" }
+        ]
+      }
+    ]
   },
   "settings": {
     "react": {
