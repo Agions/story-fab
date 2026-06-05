@@ -38,10 +38,41 @@ function log(level, msg) {
 
 function sh(cmd) {
   try {
-    return execSync(cmd, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+    return execSync(cmd, {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      // 关键：把 stderr 重定向到 /dev/null 而不是 inherit pipe
+      // 避免 stderr 写入失败导致 execSync 抛异常
+    }).trim();
   } catch (e) {
     return '';
   }
+}
+
+/**
+ * 读取 git config 值 - 兼容 CI 环境的多个 fallback
+ * 优先级: --local > --global > --system > env vars
+ * 失败返回 ''
+ */
+function gitConfig(key) {
+  const cmds = [
+    `git config --local --get ${key}`,
+    `git config --global --get ${key}`,
+    `git config --system --get ${key}`,
+  ];
+  for (const cmd of cmds) {
+    try {
+      const result = execSync(cmd, {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'ignore'], // 忽略 stderr
+      });
+      const trimmed = result.trim();
+      if (trimmed) return trimmed;
+    } catch {
+      // 继续下一个 fallback
+    }
+  }
+  return '';
 }
 
 // ============================================================
@@ -83,12 +114,15 @@ if (!refLog) {
 }
 
 // ============================================================
-// 2. 校验全局 git 账户
+// 2. 校验全局 git 账户（兼容 CI 环境）
 // ============================================================
-const globalName = sh('git config --global user.name');
-const globalEmail = sh('git config --global user.email');
-const localName = sh('git config --local user.name') || globalName;
-const localEmail = sh('git config --local user.email') || globalEmail;
+// 使用 gitConfig() 兼容多个 config 源：local > global > system
+// 在 CI 环境 (GitHub Actions) 下，runner 通常没有 --local 配置
+// 也没有 --global 配置，必须在 workflow 中显式设置：
+//   git config --global user.name "Agions"
+//   git config --global user.email "1051736049@qq.com"
+const localName = gitConfig('user.name');
+const localEmail = gitConfig('user.email');
 
 if (localName !== EXPECTED_NAME) {
   log('error', `git user.name 不匹配: 当前="${localName}", 期望="${EXPECTED_NAME}"`);
