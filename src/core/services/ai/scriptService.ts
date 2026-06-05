@@ -3,7 +3,7 @@
  * 支持：通义千问、讯飞星火、智谱清言、DeepSeek、Moonshot Kimi
  */
 import axios from 'axios';
-import { getApiKey } from '@/services/tauri';
+import { getApiKey } from '@/core/services/auth/apiKeyService';
 import type { VideoMetadata } from '@/core/video';
 import { logger } from '@/shared/utils/logging';
 import type { ScriptSegment as CoreScriptSegment } from '@/core/types';

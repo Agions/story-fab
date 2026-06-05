@@ -4,7 +4,7 @@
  */
 import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { logger } from '@/shared/utils/logging';
-import { getConfigDir } from '@/services/file/fileOperations';
+import { getConfigDir } from '@/core/utils/config-dir';
 
 export const getAppData = async <T>(key: string): Promise<T | null> => {
   try {

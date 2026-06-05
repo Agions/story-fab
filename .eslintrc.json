@@ -59,5 +59,20 @@
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/core/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              { "group": ["@/services/*"], "message": "src/core/** 禁止引用 src/services/** (shim 层)，请直接 import @/core/... 参考 ADR-101。" }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

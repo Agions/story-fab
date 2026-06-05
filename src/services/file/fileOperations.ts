@@ -1,7 +1,6 @@
 import { invoke, TauriCommand } from '../../core/tauri/TauriBridge';
 import { open, save } from '@tauri-apps/plugin-dialog';
-import { readTextFile, writeTextFile, exists, mkdir } from '@tauri-apps/plugin-fs';
-import { appConfigDir } from '@tauri-apps/api/path';
+import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { logger } from '../../shared/utils/logging';
 
 /**
@@ -59,20 +58,9 @@ export const saveFile = async (
 
 /**
  * 获取应用配置目录
+ * @deprecated 请直接 import from '@/core/utils/config-dir'
  */
-export const getConfigDir = async (): Promise<string> => {
-  try {
-    const configDir = await appConfigDir();
-    const configExists = await exists(configDir);
-    if (!configExists) {
-      await mkdir(configDir, { recursive: true });
-    }
-    return configDir;
-  } catch (error) {
-    logger.error('获取配置目录失败:', { error });
-    return '';
-  }
-};
+export { getConfigDir } from '../../core/utils/config-dir';
 
 /**
  * 读取文本文件
