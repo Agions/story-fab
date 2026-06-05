@@ -161,15 +161,6 @@
 | 部署门槛高 | 桌面原生（Tauri）双击即用，**无 streamlit / 无 Web 服务** |
 | 无法脚本化 | 完整的 Node + Rust API，可接入 AI Agent 自动化工作流 |
 
-### 与同类开源工具对比
-
-| 项目 | 形态 | 解说生成 | 本地优先 | 桌面原生 | 5 步 Pipeline |
-|---|---|---|---|---|---|
-| **StoryFab** | 桌面应用 | ✅ | ✅ | ✅ | ✅ (ADR-103) |
-| NarratoAI | Streamlit Web | ✅ | ⚠️ 需 pytorch | ❌ | ❌ |
-| MoneyPrinterTurbo | Streamlit Web | ❌ | ⚠️ 需 ImageMagick | ❌ | ❌ |
-| KrillinAI | Streamlit Web | ❌ 偏翻译 | ✅ | ❌ | ❌ |
-
 ---
 
 ## 下载安装
