@@ -13,7 +13,10 @@ title: 更新日志
 - **ADR-101**：双服务层职责明确（`core/services/` 业务 + `services/` shim）
 - **ADR-102**：状态层依赖图规范化（view → hook → store → service → backend）
 - **ADR-103**：解说模式 5 步 Pipeline（累积式 state chain）
-- **死代码清理**：596 行净删除
+
+### 重构
+
+- **死代码清理（轮1，596 行净删除）**
   - 删除 `src/constants/` 孤儿转发层
   - 删除 `src/core/index.ts` 孤儿转发层
   - 删除 `src/hooks/useProject.ts`（与 `useProjectList.ts` 重复）
@@ -21,8 +24,32 @@ title: 更新日志
   - 删除孤儿：`useApiKeyState`、`useEditor` 默认导出、`formatNumber`、`formatPercent`
 - **命名规范化**：`subtitle_scene_aligner.ts` → `SubtitleSceneAligner.ts`
 - **DRY**：提取 `PROVIDER_NAMES` 到 `src/shared/constants/providers.ts`
-- **文档重写**：所有 24 个 docs + `.vitepress/config.ts` 重做，去 emoji 化、技术化
-- **Logo 重做**：紫粉橙渐变 + SF 字 monogram + 胶片条横穿
+
+### 重构（轮2，13 个孤儿文件）
+
+- 删 `components/AIVideoPreview/*`（整目录）
+- 删 `VideoProcessingController/mods/CommentaryAgentProgress.tsx`
+- 删 `components/common/ResponsiveImage.tsx`
+- 删 `components/ui/popover.tsx`
+- 删 `core/api/`（整目录）+ `core/services/aiClip/heuristics.ts`
+- 删 `core/services/providers/backendApi.ts` + `baidu.ts`
+- 删 `core/services/subtitle/SubtitleSceneAligner.ts`
+- 删 `core/services/video/transition-suggestion.ts`
+- 删 `services/file/*`（4 个 shim 孤儿）
+- 清理 `providers/index.ts` + `services/video/index.ts` 的 stale re-export
+
+### 重构（轮3，572 行净删除）
+
+- 删 `components/StoryFab/workspace/SubtitleStyler.tsx`（305 行 React 组件）
+- 删 `components/StoryFab/workspace/SubtitleStyler.module.less`（267 行 CSS）
+
+### 文档
+
+- **README 重写**：506 → 184 行（-64%），去 emoji、技术化
+- **docs 全量重写**：24 个 md + `.vitepress/config.ts` 重做
+  - `docs/CHANGELOG.md` -7557 → 2029 行（-73%）
+  - 删除 `docs/.vitepress/dist/`（构建产物）
+- **Logo 重做**：4 个 SVG（紫粉橙渐变 + SF 字 monogram + 胶片条横穿 + 深空蓝背景）
 
 ## [2.0.4] - 2026-06-04
 
