@@ -9,7 +9,7 @@ export { filterProjects, sortProjects } from '@/store/projectStore';
 export type { ProjectFilter, ProjectSortBy, SortOrder } from '@/store/projectStore';
 
 // Re-export formatting utilities
-export { formatFileSize as formatProjectSize, formatDuration as formatProjectDuration } from './format';
+export { formatFileSize as formatProjectSize, formatDuration as formatProjectDuration } from './formatting';
 
 /**
  * 创建新项目

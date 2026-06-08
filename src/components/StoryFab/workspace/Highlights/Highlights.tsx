@@ -17,7 +17,7 @@ import { useTimelineStore } from '../../../../store/timelineStore';
 import { notify } from '../../../../shared/utils/notify';
 import type { VideoInfo } from '@/core/types';
 import styles from './Highlights.module.css';
-import { formatTime } from '@/shared/utils/format';
+import { formatTime } from '@/shared/utils/formatting';
 
 interface Highlight {
   startTime: number;  // seconds

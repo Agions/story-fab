@@ -9,7 +9,7 @@ import {
   formatDateCustom,
   truncateText,
   capitalize,
-} from './format';
+} from './formatting';
 
 describe('formatTime', () => {
   it('should format 0 seconds as 00:00', () => {

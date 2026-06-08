@@ -41,7 +41,7 @@ import { TimeRuler } from './TimeRuler';
 import { Playhead } from './Playhead';
 import { ClipRenderer } from './ClipRenderer';
 import { ClipPropertiesPanel } from './ClipPropertiesPanel';
-import { clamp, generateId } from '@/shared/utils';
+import { clamp, generateId, formatTimecodeMs } from '@/shared/utils';
 import { MIN_CLIP_DURATION, DEFAULT_TRACK_HEIGHT, MIN_ZOOM, MAX_ZOOM, SNAP_THRESHOLD_PX, TRACK_COLORS } from './constants';
 
 import styles from '@/components/Timeline/Timeline.module.less';
@@ -554,9 +554,9 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
 
       {/* 时间显示 */}
       <div className={styles.timeDisplay}>
-        <span className={styles.currentTime}>{formatTimeDisplay(localPlayhead)}</span>
+        <span className={styles.currentTime}>{formatTimecodeMs(localPlayhead)}</span>
         <span className={styles.separator}>/</span>
-        <span className={styles.totalTime}>{formatTimeDisplay(duration)}</span>
+        <span className={styles.totalTime}>{formatTimecodeMs(duration)}</span>
       </div>
 
       {/* 时间轴主体 */}
@@ -644,12 +644,5 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
 MultiTrackTimeline.displayName = 'MultiTrackTimeline';
 
 // 格式化时间（内部使用，从 utils 导入会循环依赖）
-function formatTimeDisplay(ms: number): string {
-  const totalSeconds = ms / 1000;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.floor(totalSeconds % 60);
-  const frames = Math.floor((ms % 1000) / (1000 / 30));
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${frames.toString().padStart(2, '0')}`;
-}
 
 export default MultiTrackTimeline;

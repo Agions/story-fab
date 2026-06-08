@@ -53,8 +53,8 @@ export function getProjectUIStatus(project: ProjectView): ProjectUIStats {
   return { scriptCount, videoCount, status, progress };
 }
 
-// 格式化日期
-export function formatDate(d: string): string {
+// 格式化相对日期（3分钟前、2小时前等）
+export function formatRelativeDate(d: string): string {
   const date = new Date(d);
   const now = new Date();
   const diff = now.getTime() - date.getTime();

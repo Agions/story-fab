@@ -5,7 +5,7 @@
 
 import { tauri } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
-import { formatDurationChinese } from '../../../shared/utils/format';
+import { formatDurationChinese } from '../../../shared/utils/formatting';
 import type {
   VideoInfo,
   Scene,

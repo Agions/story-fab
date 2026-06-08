@@ -1,5 +1,5 @@
 import type { EditorExportSettings, Timeline } from './types';
-import { formatFileSize } from '../../../shared/utils/format';
+import { formatFileSize } from '../../../shared/utils/formatting';
 
 export async function exportTimeline(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

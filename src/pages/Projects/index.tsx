@@ -7,7 +7,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ProjectsToolbar } from './components/ProjectsToolbar';
 import { StatusFilterBar } from './components/StatusFilterBar';
 import { ProjectCard } from './components/ProjectCard';
-import { useProjectList, statusConfig, getProjectUIStatus, formatDate } from '../../hooks/useProjectList';
+import { useProjectList, statusConfig, getProjectUIStatus, formatRelativeDate } from '../../hooks/useProjectList';
 import { preloadProjectEditPage, preloadVideoEditorPage } from '../../core/utils/route-preload';
 import type { ProjectView } from './types';
 import React from 'react';
@@ -97,7 +97,7 @@ const ProjectManager: React.FC = () => {
                 project={project}
                 uiStatus={uiStatus}
                 statusConfig={statusConfig}
-                formatDate={formatDate}
+                formatDate={formatRelativeDate}
                 onOpen={() => {
                   addRecentProject(project.id);
                   navigate(`/project/${project.id}`);
@@ -122,7 +122,7 @@ const ProjectManager: React.FC = () => {
             loading={loading}
             statusConfig={statusConfig}
             getProjectUIStatus={getProjectUIStatus}
-            formatDate={formatDate}
+            formatDate={formatRelativeDate}
             onOpenProject={(projectId) => {
               addRecentProject(projectId);
               navigate(`/project/${projectId}`);

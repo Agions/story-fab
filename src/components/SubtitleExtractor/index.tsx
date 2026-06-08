@@ -8,7 +8,6 @@
  *
  * 设计风格：AI Cinema Studio Dark (#0C0D14)
  */
-import { MS_PER_SECOND } from '@/shared/utils';
 import React, { useState, useCallback, useRef } from 'react';
 
 // ── Progress animation constants ──────────────────────────────────────────────
@@ -38,7 +37,7 @@ import { useEditorStore } from '@/store/editorStore';
 import { useTimelineStore } from '@/store/timelineStore';
 import type { SubtitleEntry } from '@/core/types';
 import styles from './index.module.css';
-import { formatTime } from '@/shared/utils/format';
+import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';
 
 interface SubtitleSegment {
   id: string;
@@ -50,13 +49,6 @@ interface SubtitleSegment {
   quality?: 'high' | 'medium' | 'low';
 }
 
-function formatSRTTime(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  const ms = Math.floor((seconds % 1) * MS_PER_SECOND);
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
-}
 
 interface SubtitleExtractorProps {
   projectId: string;
@@ -141,7 +133,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
       setProgress(100);
       const subs: SubtitleSegment[] = result.entries.map((entry: SubtitleEntry) => ({
         id: entry.id ?? crypto.randomUUID(), startTime: entry.startTime, endTime: entry.endTime,
-        start: formatSRTTime(entry.startTime), end: formatSRTTime(entry.endTime), text: entry.text,
+        start: formatSrtTime(entry.startTime), end: formatSrtTime(entry.endTime), text: entry.text,
         quality: entry.quality,
       }));
       setExtractedSubtitles(subs);
