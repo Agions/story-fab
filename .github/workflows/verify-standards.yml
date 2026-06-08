@@ -7,11 +7,10 @@ name: Verify Project Standards
 #   - 任何 PR
 #
 # 校验项:
-#   1. 禁打 tag (本地未推送 tag 拦截)
-#   2. 禁用 antd
-#   3. 全局 git 账户一致性
-#   4. AI byline 检测 (commit message + author)
-#   5. 仓库描述存在
+#   1. 禁用 antd
+#   2. 全局 git 账户一致性
+#   3. AI byline 检测 (commit message + author)
+#   4. 仓库描述存在
 
 on:
   push:
@@ -42,30 +41,7 @@ jobs:
         run: node scripts/check-antd.mjs
 
   # ============================================================
-  # Job 2: 禁止本地打 tag
-  # ============================================================
-  verify-no-tag:
-    name: Verify No Local Tag
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-      # CI runner 默认无 git user.name/email，必须显式设置
-      # 否则 verify-no-tag.mjs 读不到 user.name/email 报失败
-      - name: Configure git identity
-        run: |
-          git config --global user.name "Agions"
-          git config --global user.email "1051736049@qq.com"
-      - name: Check no local tag pushed
-        run: node scripts/verify-no-tag.mjs
-
-  # ============================================================
-  # Job 3: 全局 git 账户一致性
+  # Job 2: 全局 git 账户一致性
   # ============================================================
   verify-git-identity:
     name: Verify Git Identity
@@ -74,7 +50,6 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      # 显式设置全局账户，让 verify-no-tag.mjs 等下游脚本能读取
       - name: Configure git identity
         run: |
           git config --global user.name "Agions"
@@ -93,7 +68,7 @@ jobs:
           echo "✅ Git identity OK"
 
   # ============================================================
-  # Job 4: AI byline 检测
+  # Job 3: AI byline 检测
   # ============================================================
   verify-no-ai-byline:
     name: Verify No AI Byline
@@ -102,7 +77,6 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 10
-      # 显式设置全局账户，git log 才能用
       - name: Configure git identity
         run: |
           git config --global user.name "Agions"
@@ -119,7 +93,7 @@ jobs:
           echo "✅ 无 AI byline 残留"
 
   # ============================================================
-  # Job 5: 仓库描述存在性
+  # Job 4: 仓库描述存在性
   # ============================================================
   verify-repo-description:
     name: Verify Repo Description

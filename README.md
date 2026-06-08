@@ -100,7 +100,7 @@ story-fab/
 │   ├── dev/               # 开发文档 + ADR
 │   └── reference/         # 参考文档
 ├── assets/                # 品牌资源 (logo SVG)
-├── scripts/               # 校验脚本 (lint / verify-no-tag / check-antd)
+├── scripts/               # 校验脚本 (lint / check-antd / check-naming)
 └── .github/workflows/     # CI/CD
 ```
 
@@ -126,10 +126,9 @@ pnpm docs:dev             # VitePress 文档开发
 pnpm docs:build           # 构建文档站点站
 
 # 验证 (CI 同样执行)
-pnpm verify:no-tag        # 禁止本地打 tag
-pnpm verify:antd          # 禁止 antd 引用
-pnpm verify:naming        # 命名规范校验
-pnpm verify:all           # 一键运行所有验证
+pnpm verify:antd         # 禁止 antd 引用
+pnpm verify:naming       # 命名规范校验
+pnpm verify:all          # 一键运行所有验证
 ```
 
 ---

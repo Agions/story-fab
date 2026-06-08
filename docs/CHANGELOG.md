@@ -51,6 +51,11 @@ title: 更新日志
   - 删除 `docs/.vitepress/dist/`（构建产物）
 - **Logo 重做**：4 个 SVG（紫粉橙渐变 + SF 字 monogram + 胶片条横穿 + 深空蓝背景）
 
+### 移除
+
+- **解除"本地禁打 tag"约束**：删除 `scripts/verify-no-tag.mjs` + CI `verify-no-tag` job + pre-commit hook 调用
+- **理由**：CI release workflow 已基于 tag 触发，本地打 tag 即可触发自动发版
+
 ## [2.0.4] - 2026-06-04
 
 ### 修复

@@ -30,10 +30,9 @@
     "docs:build": "npx vitepress build docs",
     "docs:preview": "npx vitepress preview docs",
     "test:ci": "vitest run --coverage",
-    "verify:no-tag": "node scripts/verify-no-tag.mjs",
     "verify:antd": "node scripts/check-antd.mjs",
     "verify:naming": "node scripts/check-naming.mjs",
-    "verify:all": "npm run verify:no-tag && npm run verify:antd && npm run verify:naming",
+    "verify:all": "npm run verify:antd && npm run verify:naming",
     "hooks:install": "bash scripts/install-hooks.sh"
   },
   "dependencies": {
