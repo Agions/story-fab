@@ -2,7 +2,7 @@
  * AI 视频编辑器页面
  * 采用标签页分离布局：AI第一人称解说 / AI解说 / AI混剪
  */
-import React, { useState, lazy, Suspense, useEffect, useCallback } from 'react';
+import React, { useState, lazy, Suspense, useEffect } from 'react';
 import {
   Mic,
   User,
@@ -13,6 +13,7 @@ import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useEditorStore } from '../../store/editorStore';
 import { useTimelineStore } from '../../store/timelineStore';
+import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryFab/workspace/functionModeMap';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
@@ -74,14 +75,10 @@ const AIVideoEditorContent: React.FC = () => {
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
   // Avoids N separate selector calls (each triggers re-render)
-  const editorStore = useEditorStore(
-    useCallback((s) => ({
-      previewPlaying: s.previewPlaying,
-      setPreviewPlaying: s.setPreviewPlaying,
-    }), [])
-  );
+  const previewPlaying = useEditorStore(s => s.previewPlaying);
+  const setPreviewPlaying = useEditorStore(s => s.setPreviewPlaying);
   const timelineStore = useTimelineStore(
-    useCallback((s) => ({
+    useShallow((s) => ({
       playheadMs: s.playheadMs,
       selectedClipId: s.selectedClipId,
       setPlayheadMs: s.setPlayheadMs,
@@ -91,7 +88,7 @@ const AIVideoEditorContent: React.FC = () => {
       undoTrack: s.undoTrack,
       redoTrack: s.redoTrack,
       removeClipFromTrack: s.removeClipFromTrack,
-    }), [])
+    }))
   );
 
   // ── 快捷键注册 ────────────────────────────────────────
@@ -99,10 +96,10 @@ const AIVideoEditorContent: React.FC = () => {
     enabled: true,
     preventDefault: true,
     onPlayPause: () => {
-      editorStore.setPreviewPlaying(!editorStore.previewPlaying);
+      setPreviewPlaying(!previewPlaying);
     },
     onPause: () => {
-      editorStore.setPreviewPlaying(false);
+      setPreviewPlaying(false);
     },
     onSeek: (delta) => {
       const newTime = Math.max(0, (timelineStore.playheadMs / 1000) + delta);

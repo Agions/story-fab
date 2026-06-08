@@ -74,7 +74,8 @@ const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { addRecentProject } = useSettings();
-  const { selectedAIModel, aiModelsSettings } = useModelStore();
+  const selectedAIModel = useModelStore(s => s.selectedAIModel);
+  const aiModelsSettings = useModelStore(s => s.aiModelsSettings);
   // Note: 变量由 setter 在 effect/callback 内写入，读取通过其他 state 触发或 UI 子组件读取
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [, setLoading] = useState(true);
