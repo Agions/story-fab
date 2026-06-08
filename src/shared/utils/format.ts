@@ -14,8 +14,6 @@ export {
   formatDateTime,
   formatDateCustom,
   formatRelativeTime,
-  formatNumber,
-  formatPercent,
   truncateText,
   capitalize,
   MS_PER_SECOND,

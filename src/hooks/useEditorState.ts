@@ -449,5 +449,3 @@ export function useEditor(_config?: Partial<EditorConfig>): {
     }
   };
 }
-
-export default useEditor;

@@ -145,21 +145,6 @@ export function formatRelativeTime(date: Date | string): string {
 }
 
 /**
- * 格式化数字（千分位）
- */
-export function formatNumber(num: number): string {
-  return new Intl.NumberFormat().format(num);
-}
-
-/**
- * 格式化百分比
- */
-export function formatPercent(value: number, decimals: number = 0): string {
-  if (isNaN(value)) return '0%';
-  return `${(value * 100).toFixed(decimals)}%`;
-}
-
-/**
  * 截断文本
  */
 export function truncateText(text: string, maxLength: number, suffix: string = '...'): string {

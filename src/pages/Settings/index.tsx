@@ -21,7 +21,7 @@ import useLocalStorage from '../../hooks/useLocalStorage';
 import ApiKeysPanel from '../../components/Settings/ApiKeysPanel';
 import ModelSettingsPanel from '../../components/Settings/ModelSettingsPanel';
 import GeneralSettingsPanel from '../../components/Settings/GeneralSettingsPanel';
-import { ModelProvider } from '../../constants/models';
+import type { ModelProvider } from '@/core/types';
 import { AI_MODELS as CORE_MODELS, DEFAULT_MODEL_ID } from '../../core/config/aiModels.config';
 import {
   getAvailableModelsFromApiKeys,

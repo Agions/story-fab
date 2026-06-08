@@ -8,8 +8,9 @@ import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { validateApiKey } from '@/core/services/providers/apiKeyService';
 import { notify } from '@/shared';
-import { ModelProvider, PROVIDER_NAMES } from '../../constants/models';
 import { MODEL_PROVIDERS } from '../../core/config/aiModels.config';
+import { PROVIDER_NAMES } from '@/shared/constants/providers';
+import type { ModelProvider } from '@/core/types';
 import { Key, Eye, EyeOff, Trash2, Check, X, Loader2 } from 'lucide-react';
 
 interface ApiKeyConfig {

@@ -7,8 +7,6 @@ import {
   formatDate,
   formatDateTime,
   formatDateCustom,
-  formatNumber,
-  formatPercent,
   truncateText,
   capitalize,
 } from './format';
@@ -149,29 +147,6 @@ describe('formatDateCustom', () => {
     const date = new Date('2026-04-19T14:30:45');
     expect(formatDateCustom(date, 'YYYY/MM/DD')).toBe('2026/04/19');
     expect(formatDateCustom(date, 'HH:mm:ss')).toBe('14:30:45');
-  });
-});
-
-describe('formatNumber', () => {
-  it('should format with thousand separators', () => {
-    expect(formatNumber(1000)).toBe('1,000');
-    expect(formatNumber(1000000)).toBe('1,000,000');
-  });
-});
-
-describe('formatPercent', () => {
-  it('should format as percentage', () => {
-    expect(formatPercent(0.5)).toBe('50%');
-    expect(formatPercent(0.123)).toBe('12%');
-  });
-
-  it('should respect decimal places', () => {
-    expect(formatPercent(0.123, 1)).toBe('12.3%');
-    expect(formatPercent(0.1234, 2)).toBe('12.34%');
-  });
-
-  it('should handle NaN', () => {
-    expect(formatPercent(NaN)).toBe('0%');
   });
 });
 

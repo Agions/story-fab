@@ -1,7 +1,7 @@
 /**
  * 设置页面专用 Hooks
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../shared/constants/settings';
 import useLocalStorage from './useLocalStorage';
 
@@ -76,34 +76,7 @@ export function useSettingsStore() {
 }
 
 /**
- * API 密钥状态管理 Hook
+ * (useApiKeyState 已移除 — 孤儿代码，无外部引用)
  */
-export function useApiKeyState(initialValue: string = '') {
-  const [value, setValue] = useState(initialValue);
-  const [isValid, setIsValid] = useState<boolean | null>(null);
-  const [isTesting, setIsTesting] = useState(false);
-
-  const testKey = useCallback(async (provider: string, testFn: (p: string, k: string) => Promise<boolean>) => {
-    setIsTesting(true);
-    try {
-      const valid = await testFn(provider, value);
-      setIsValid(valid);
-      return valid;
-    } catch {
-      setIsValid(false);
-      return false;
-    } finally {
-      setIsTesting(false);
-    }
-  }, [value]);
-
-  const reset = useCallback(() => {
-    setValue('');
-    setIsValid(null);
-    setIsTesting(false);
-  }, []);
-
-  return { value, setValue, isValid, isTesting, testKey, reset };
-}
 
 
