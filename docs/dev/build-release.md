@@ -1,100 +1,91 @@
+---
+title: 构建与发布
+description: StoryFab 开发构建、生产构建、CI/CD 发布
+---
+
 # 构建与发布
 
-## 开发构建
+## 开发模式
 
 ```bash
-# 安装依赖
-npm install
-
-# 开发模式运行（热重载）
-npm run dev
-
-# 类型检查
-npm run type-check
-
-# Lint 检查
-npm run lint
+pnpm install
+pnpm tauri dev         # Vite + Tauri 热重载
+pnpm dev               # 仅 Vite 前端
 ```
 
 ## 生产构建
 
-### 仅前端构建
+### 当前平台
 
 ```bash
-npm run build
+pnpm tauri build
 ```
 
-产物输出到 `dist/`。
-
-### 完整 Tauri 应用
+### 跨平台
 
 ```bash
-# 为当前平台构建 Tauri 应用
-npm run tauri build
-
-# 指定平台（Linux）
-npm run tauri build -- --target x86_64-unknown-linux-gnu
+pnpm tauri build --target x86_64-pc-windows-msvc   # Windows
+pnpm tauri build --target aarch64-apple-darwin     # macOS Apple Silicon
+pnpm tauri build --target x86_64-apple-darwin      # macOS Intel
+pnpm tauri build --target x86_64-unknown-linux-gnu # Linux
 ```
 
-产物输出到 `src-tauri/target/release/bundle/`。
+## CI/CD
 
-## 发布流水线（CI/CD）
+GitHub Actions 工作流位于 `.github/workflows/`：
 
-发布通过 GitHub Actions 全自动触发。每次匹配 `v*` 的 tag 推送都会：
+| 文件 | 用途 |
+| --- | --- |
+| `main.yml` | 主 CI（type-check + lint + test + verify:all） |
+| `release.yml` | 多平台构建与发布 |
+| `deploy-docs.yml` | 文档站部署 |
 
-1. **Rust 检查** — `cargo check`（Rust 1.88.0）
-2. **TypeScript 检查** — `npm run type-check`
-3. **前端构建** — `npm run build`
-4. **Tauri 构建** — 全平台构建（Windows、macOS x64 + ARM、Linux）
-5. **创建 Release** — 上传 `.exe`、`.dmg`、`.deb` 安装包
+## Release 流程
 
-### 触发发布
+1. 更新 `package.json` 版本号
+2. 更新 `src-tauri/Cargo.toml` 版本号
+3. 更新 `docs/CHANGELOG.md`
+4. 推送 tag（**仅从 main 分支**）：
+   ```bash
+   git tag v2.1.0   # 仅从 main
+   git push origin v2.1.0
+   ```
+5. CI 自动构建三平台安装包
+6. 草稿 Release 由 maintainer 发布
+
+## 签名
+
+| 平台 | 状态 |
+| --- | --- |
+| macOS | 未签名（个人证书年费 $99） |
+| Windows | 未签名（企业证书年费 $400+） |
+| Linux | 不需要 |
+
+后续版本接入签名，详见 [Issues · enhancement](https://github.com/Agions/story-fab/issues?q=is%3Aopen+label%3Aenhancement)。
+
+## Bundle 检查
+
+CI 用 `tauri-action` 自动构建，所有产物上传到 Release：
+
+- `StoryFab_*_x64-setup.exe`
+- `StoryFab_*_aarch64.dmg` / `StoryFab_*_x64.dmg`
+- `StoryFab_*_amd64.AppImage` / `StoryFab_*_amd64.deb`
+
+## 验证
 
 ```bash
-# 创建版本标签
-git tag v2.0.0
-git push origin v2.0.0
+pnpm test             # 单元测试
+pnpm test:coverage    # 覆盖率
+pnpm build            # 前端构建
+pnpm build:ci         # 前端构建 + bundle 预算
 ```
 
-GitHub Actions 会自动构建并创建 GitHub Release。
-
-## 版本管理
-
-|| 文件 | 版本字段 |
-|---|---|
-| `package.json` | `version` |
-| `src-tauri/Cargo.toml` | `version` |
-| `src-tauri/tauri.conf.json` | `version` |
-
-三者必须保持同步。使用 `scripts/bump-version.mjs` 一次更新全部。
-
-## 代码签名
-
-### macOS
-
-代码签名和公证在 `.github/workflows/release.yml` 中配置，需要：
-
-- `CODESIGN_CERT` — 代码签名证书（GitHub Actions secret）
-- `APPLE_SIGNING_IDENTITY` — 证书名称（如 `Developer ID Application: Your Name (TEAMID)`）
-
-### Windows
-
-Windows 代码签名配置：
-
-- `CUTDECK_CERT_PATH` — `.pfx` 证书路径
-- `CUTDECK_CERT_PASSWORD` — 证书密码
-
-## 故障排除
-
-### FFmpeg 未找到
-
-确保 FFmpeg 在系统 PATH 中，或设置 `CUTDECK_FFMPEG_PATH` 环境变量。
-
-### Rust 编译失败
-
-确保已安装 Rust 1.80+：
+## 文档站
 
 ```bash
-rustup update
-rustc --version  # 应为 1.80.0+
+pnpm docs:dev         # 本地开发
+pnpm docs:build       # 构建静态站
+pnpm docs:preview     # 预览
 ```
+
+自动部署到 `https://agions.github.io/story-fab/`。

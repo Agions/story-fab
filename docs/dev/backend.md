@@ -1,81 +1,105 @@
-# Backend Architecture
+---
+title: 后端架构
+---
 
-## Directory Structure
+# 后端架构
+
+Rust 端基于 Tauri 2，承担视频处理、字幕转写、LLM 代理、解说编排、渲染。
+
+## 目录结构
 
 ```
 src-tauri/
 ├── src/
-│   ├── lib.rs              # App entry, plugin registration, command registration
-│   ├── main.rs             # Binary entry (calls lib::run())
-│   ├── commands/           # Tauri command handlers
-│   │   ├── ai.rs           # AI operations (transcribe, highlight, script)
-│   │   ├── project.rs       # Project file CRUD
-│   │   ├── render/         # Video rendering sub-modules
-│   │   │   ├── transcode.rs      # Aspect-ratio crop + full export
-│   │   │   ├── autonomous_cut.rs # AI multi-segment cutting
-│   │   │   └── preview.rs        # Preview generation
-│   │   ├── file_ops.rs    # File system operations
-│   │   └── ffprobe.rs      # Video analysis via ffprobe
-│   ├── video_processor.rs  # Core video processing (cut, concat, etc.)
-│   ├── subtitle.rs         # Subtitle parsing and Whisper integration
-│   ├── highlight_detector.rs # Highlight scoring algorithms
-│   ├── smart_segmenter.rs  # Smart segmentation logic
-│   ├── binary.rs           # FFmpeg/ffprobe path resolution
-│   ├── types.rs            # Shared Rust structs (IPC input/output)
-│   └── utils.rs            # Logging, timestamps, error helpers
-└── Cargo.toml
+│   ├── main.rs                  Tauri 入口
+│   ├── lib.rs                   库入口
+│   ├── commands/                IPC 命令
+│   │   ├── commentary/
+│   │   │   ├── director/        Director Agent
+│   │   │   │   ├── states.rs
+│   │   │   │   └── prompts.rs
+│   │   │   ├── script_generator/
+│   │   │   │   ├── providers.rs
+│   │   │   │   └── parser.rs
+│   │   │   ├── synthesizer/     TTS
+│   │   │   └── voice_catalog.rs
+│   │   ├── render/
+│   │   │   └── autonomous_cut/  智能拆条
+│   │   ├── llm/
+│   │   │   └── providers/
+│   │   │       └── router.rs
+│   │   ├── subtitle/            Whisper
+│   │   ├── video/               视频元数据 + 抽帧
+│   │   ├── ai/                  AI 子命令
+│   │   └── export/              渲染管线
+│   ├── video_processor.rs       视频处理核心
+│   └── binary.rs                FFmpeg / Whisper 二进制管理
+├── capabilities/                Tauri 权限配置
+└── icons/                       应用图标
 ```
 
-## Command Modules
+## 命令清单
 
-### `ai.rs` — AI Operations
+### commentary
 
-- `transcribe_video` — Run Whisper on a video file
-- `detect_highlights` — Score segments by engagement potential
-- `detect_smart_segments` — Find natural breakpoints in the video
-- `run_ai_director_plan` — Full AI pipeline (analyze → segment → rank)
-- `voice_discovery` — Check Edge TTS availability
+- `start_commentary_analysis`
+- `revise_commentary_plan`
+- `complete_commentary_render`
+- `quick_commentary`
 
-### `project.rs` — Project Management
+### render
 
-- `save_project_file` / `load_project_file` — JSON project persistence
-- `list_project_files` / `delete_project_file` — Project listing and deletion
-- `get_export_dir` — Resolve the user's output directory
+- `autonomous_cut_video` — 智能拆条
+- `extract_key_frames`
+- `generate_thumbnail`
 
-### `render/` — Video Rendering
+### llm
 
-| Command | Description |
-|---|---|
-| `transcode_with_crop` | Crop video to aspect ratio (9:16 / 1:1 / 16:9) |
-| `export_video` | Full export with optional subtitle burn-in |
-| `generate_preview` | Quick low-res preview generation |
-| `render_autonomous_cut` | Multi-segment cut from AI-detected highlights |
-| `cut_video` | Cut video at specified segments |
+- `llm_router` — 多 Provider 路由
 
-### `file_ops.rs` — File Operations
+### subtitle
 
-- `clean_temp_file` — Remove temporary files
-- `open_file` — Open file in system default app
-- `read_text_file` / `get_file_size` — File metadata
+- `whisper_transcribe` — Whisper 离线转写
+- `jianying_export` — 剪映草稿导出
 
-## Binary Resolution
+### export
 
-`binary.rs` resolves FFmpeg/ffprobe paths with environment variable override:
+- `export_multi_format`
+- `transcode_with_crop`
 
-```rust
-pub fn ffmpeg_binary() -> String {
-    std::env::var("CUTDECK_FFMPEG_PATH")
-        .unwrap_or_else(|_| "ffmpeg".to_string())
-}
+## 二进制管理
+
+首次启动自动下载 FFmpeg / Whisper 二进制：
+
+```
+<config-dir>/bin/ffmpeg
+<config-dir>/bin/whisper
 ```
 
-## Error Handling
+可手动指定：
 
-All Tauri commands return `Result<T, String>`. The `utils::cmd_err` helper formats FFmpeg output into user-friendly error messages:
+```bash
+export STORYFAB_FFMPEG_PATH=/custom/path/ffmpeg
+```
 
-```rust
-fn cmd_err(label: &str, output: &std::process::Output) -> String {
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    format!("{}: {}", label, stderr.trim())
-}
+## 错误处理
+
+所有命令返回 `Result<T, TauriCommandError>`，错误枚举：
+
+- `WhisperError` — 转写失败
+- `FFmpegError` — 渲染失败
+- `LLMError` — LLM 调用失败
+- `IOError` — 文件 IO 失败
+- `ConfigError` — 配置错误
+
+## 异步模型
+
+所有 IO 命令 `async`，CPU 密集任务（编码、转码）用 `tokio::task::spawn_blocking` 派发到 blocking 线程池，避免阻塞事件循环。
+
+## 验证
+
+```bash
+cargo check --manifest-path src-tauri/Cargo.toml
+cargo test  --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml
 ```

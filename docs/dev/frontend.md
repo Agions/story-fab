@@ -1,67 +1,110 @@
+---
+title: 前端架构
+---
+
 # 前端架构
+
+## 技术栈
+
+- React 18 + TypeScript 5
+- Vite 6 构建
+- TailwindCSS 4
+- Zustand 状态
+- shadcn/ui + Radix UI
 
 ## 目录结构
 
 ```
 src/
-├── components/          # React UI 组件
-│   └── StoryFab/          # 主编辑器工作区
-│       ├── context/       # React Context（StoryFabProvider）
-│       ├── workspace/     # 步骤式编辑器 UI
-│       └── types/         # 工作流状态类型
-├── core/                 # 核心业务逻辑层
-│   ├── services/          # AI、导出、字幕服务
-│   ├── tauri/             # TauriBridge（IPC）
-│   ├── pipeline/          # AI 剪辑管道
-│   └── types/             # 共享 TypeScript 类型
-├── hooks/                 # 自定义 React Hooks
-├── store/                 # Zustand 状态管理
-├── pages/                 # 路由级组件
-└── styles/                # 全局 CSS
+├── App.tsx                      路由 + Provider
+├── main.tsx                     入口
+├── components/                  React 组件
+│   ├── ui/                      shadcn 基座
+│   └── common/                  通用组件
+├── core/                        核心业务层
+│   ├── pipeline/                Pipeline 编排
+│   ├── services/                业务服务（ADR-101）
+│   ├── tauri/                   Tauri IPC 桥接
+│   ├── types/                   全局类型
+│   └── config/                  配置
+├── pages/                       路由页面
+│   ├── Home/
+│   ├── Dashboard/
+│   ├── Projects/
+│   ├── ProjectEdit/
+│   ├── ProjectDetail/
+│   ├── ScriptDetail/
+│   ├── VideoEditor/
+│   ├── AIVideoEditor/
+│   └── Settings/
+├── hooks/                       自定义 hooks
+├── store/                       Zustand 状态
+├── shared/                      跨层共享
+│   ├── constants/
+│   ├── utils/
+│   └── types/
+├── providers/                   React Provider
+├── context/                     Context
+└── styles/                      全局样式
 ```
 
-## 状态管理
+## 分层规则
 
-StoryFab 采用**双状态**架构：
+依赖方向严格单向：
 
-1. **React Context**（`StoryFabProvider`）— 管理主编辑器工作流状态（步骤、当前视频、片段、导出设置）。基于步骤，可预测的流转。
-2. **Zustand Stores** — 跨领域独立 store：
-   - `appStore` — 应用级状态（主题、设置）
-   - `projectStore` — 项目元数据和文件管理
-   - `editorStore` — 时间轴和片段状态
-   - `timelineStore` — 时间轴特有 UI 状态
+```
+view → hook → store → service (core) → backend
+```
+
+## 工作流
+
+剪辑模式：
+
+```
+视频 → useVideo() →  store → core/services/video/ → tauri/video
+```
+
+解说模式（5 步 Pipeline）：
+
+```
+Director → Visual → Narration → Timing → Overlay → 成片
+```
+
+每步实现 `src/core/pipeline/steps/commentary/` 下的一个 Step。
+
+## 5 个 Store
+
+| Store | 职责 |
+| --- | --- |
+| `appStore` | 全局状态 |
+| `projectStore` | 项目 CRUD |
+| `editorStore` | 编辑器 |
+| `timelineStore` | 时间轴 |
+| `modelStore` | AI 模型配置 |
 
 ## TauriBridge
 
-`src/core/tauri/TauriBridge.ts` 是所有前端 → Rust IPC 调用的单一入口，提供：
+`src/core/tauri/methods/` 下集中所有 IPC 调用，类型定义在 `src/core/interfaces/`。
 
-- 类型化命令调用（无魔法字符串）
-- 一致的错误处理
-- 事件订阅辅助函数
+## 路由
 
-```typescript
-// 所有命令通过 TauriBridge
-import tauri from '@/core/tauri/TauriBridge'
+| 路由 | 组件 | 懒加载 |
+| --- | --- | --- |
+| `/` | Home | 是 |
+| `/dashboard` | Dashboard | 是 |
+| `/projects` | Projects | 是 |
+| `/projects/:id` | ProjectDetail | 是 |
+| `/projects/:id/edit` | ProjectEdit | 是 |
+| `/scripts/:id` | ScriptDetail | 是 |
+| `/editor/:id` | VideoEditor | 是 |
+| `/ai-editor/:id` | AIVideoEditor | 是 |
+| `/settings` | Settings | 是 |
 
-// 调用命令
-const result = await tauri.transcribeVideo({ videoPath, model: 'base' })
+## 验证
 
-// 订阅事件
-tauri.onProgress((data) => { /* ... */ })
-tauri.onSubtitleUpdate((data) => { /* ... */ })
+```bash
+pnpm type-check       # tsc --noEmit
+pnpm lint             # ESLint
+pnpm test             # Vitest
+pnpm verify:all       # 一键运行所有 verify
 ```
-
-## 服务层
-
-```
-src/core/services/
-├── providers/      # AI Provider 抽象（OpenAI / Anthropic / DeepSeek / SiliconFlow）
-├── ai/             # 脚本生成、AI 分析
-├── export/         # 视频导出服务
-├── subtitle/       # 字幕解析和烧录
-├── editor/         # 剪辑操作
-├── video/          # 视频处理（含 audio-mix.service.ts）
-└── pipeline/       # AI 剪辑管道（评分 → 候选 → SEO → 导出）
-```
-
-每个服务独立，可单独测试。

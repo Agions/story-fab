@@ -1,49 +1,58 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" width="640" height="160" role="img" aria-label="StoryFab">
   <title>StoryFab — AI 影视解说创作工坊</title>
   <defs>
-    <linearGradient id="sfMarkBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0F0C29"/>
-      <stop offset="100%" stop-color="#1B1742"/>
+    <linearGradient id="sfHbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F1F"/>
+      <stop offset="100%" stop-color="#1A1F3A"/>
     </linearGradient>
-    <linearGradient id="sfMarkRing" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF6B35"/>
-      <stop offset="100%" stop-color="#FF3D6E"/>
+    <linearGradient id="sfHacc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
     </linearGradient>
   </defs>
 
   <!-- Mark (left, 128x128 padded) -->
   <g transform="translate(16 16)">
-    <!-- Rounded square (matches app icon) -->
-    <rect width="128" height="128" rx="28" ry="28" fill="url(#sfMarkBg)"/>
+    <rect width="128" height="128" rx="28" ry="28" fill="url(#sfHbg)"/>
+    <circle cx="64" cy="64" r="46" fill="none" stroke="url(#sfHacc)" stroke-width="2" stroke-opacity="0.4"/>
+    <rect x="16" y="58" width="96" height="12" rx="2" fill="url(#sfHacc)" opacity="0.85"/>
+    <rect x="20" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="27" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="34" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="41" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="48" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="55" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="62" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="69" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="76" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="83" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="90" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="97" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="104" y="60" width="3" height="8" rx="1" fill="#0B0F1F" opacity="0.9"/>
 
-    <!-- Story loop ring (single, prominent) -->
-    <circle cx="64" cy="64" r="40" fill="none" stroke="url(#sfMarkRing)" stroke-width="3.5"/>
-
-    <!-- Center play triangle (offset right to balance visual weight) -->
-    <path d="M 56 46 L 82 64 L 56 82 Z" fill="url(#sfMarkRing)"/>
-
-    <!-- 4 corner film ticks (subtle, top + bottom) -->
-    <g fill="url(#sfMarkRing)" opacity="0.55">
-      <rect x="16" y="22" width="3" height="6" rx="1"/>
-      <rect x="26" y="22" width="3" height="6" rx="1"/>
-      <rect x="99" y="22" width="3" height="6" rx="1"/>
-      <rect x="109" y="22" width="3" height="6" rx="1"/>
-      <rect x="16" y="100" width="3" height="6" rx="1"/>
-      <rect x="26" y="100" width="3" height="6" rx="1"/>
-      <rect x="99" y="100" width="3" height="6" rx="1"/>
-      <rect x="109" y="100" width="3" height="6" rx="1"/>
+    <!-- SF monogram (compact) -->
+    <g transform="translate(64 64)">
+      <path d="M -17 -11 C -17 -17 -11 -19 -6 -19 C -1 -19 4 -17 4 -11 C 4 -5 -4 -3 -8 0 C -12 3 -17 5 -17 11 C -17 17 -11 19 -5 19 C 0 19 6 17 9 13"
+            fill="none" stroke="url(#sfHacc)" stroke-width="4.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 7 -19 L 7 19 M 7 -19 L 20 -19 M 7 -1 L 17 -1"
+            fill="none" stroke="#F8FAFC" stroke-width="4.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
     </g>
+
+    <circle cx="100" cy="100" r="3" fill="url(#sfHacc)"/>
   </g>
 
-  <!-- Wordmark (right) -->
+  <!-- Wordmark -->
   <g transform="translate(168 0)">
-    <text x="0" y="86"
-          font-family="Inter, 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif"
-          font-size="58" font-weight="800" letter-spacing="-2"
-          fill="#0F0C29">Story<tspan fill="url(#sfMarkRing)">Fab</tspan></text>
-    <text x="3" y="118"
-          font-family="Inter, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace"
-          font-size="13" font-weight="600" letter-spacing="3.2"
-          fill="#6B7280">AI · STORY · STUDIO</text>
+    <text x="0" y="80" font-family="'Geist Variable', 'Inter', system-ui, sans-serif"
+          font-size="56" font-weight="700" letter-spacing="-1.5" fill="#0B0F1F">
+      Story<tspan fill="url(#sfHacc)">Fab</tspan>
+    </text>
+    <text x="2" y="118" font-family="'Geist Variable', 'Inter', system-ui, sans-serif"
+          font-size="16" font-weight="500" letter-spacing="0.5" fill="#475569">
+      本地优先 · AI 影视解说创作工坊
+    </text>
   </g>
 </svg>

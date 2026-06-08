@@ -1,45 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="StoryFab favicon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="StoryFab">
   <title>StoryFab</title>
   <defs>
-    <linearGradient id="bgGradF" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f0c29"/>
-      <stop offset="100%" stop-color="#24243e"/>
+    <linearGradient id="sfFavBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F1F"/>
+      <stop offset="100%" stop-color="#1A1F3A"/>
     </linearGradient>
-    <linearGradient id="filmGradF" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff8a5b"/>
-      <stop offset="100%" stop-color="#e63946"/>
-    </linearGradient>
-    <linearGradient id="aiGradF" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4cc9f0"/>
-      <stop offset="100%" stop-color="#7209b7"/>
+    <linearGradient id="sfFavAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
     </linearGradient>
   </defs>
 
-  <!-- Rounded square bg -->
-  <rect width="64" height="64" rx="14" ry="14" fill="url(#bgGradF)"/>
+  <!-- Rounded square -->
+  <rect width="64" height="64" rx="14" ry="14" fill="url(#sfFavBg)"/>
 
-  <!-- Diagonal film strip (small) -->
-  <g transform="rotate(-22 32 32)">
-    <rect x="10" y="25" width="44" height="14" rx="2" fill="url(#filmGradF)"/>
-    <g fill="#0f0c29">
-      <rect x="13" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="19" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="25" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="31" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="37" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="43" y="28" width="4" height="2" rx="0.5"/>
-      <rect x="13" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="19" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="25" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="31" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="37" y="34" width="4" height="2" rx="0.5"/>
-      <rect x="43" y="34" width="4" height="2" rx="0.5"/>
-    </g>
-  </g>
+  <!-- Mini film strip -->
+  <rect x="8" y="28" width="48" height="8" rx="1.5" fill="url(#sfFavAccent)" opacity="0.85"/>
 
-  <!-- Center play -->
+  <!-- Center SF monogram (compact) -->
   <g transform="translate(32 32)">
-    <circle r="11" fill="#0f0c29" opacity="0.92"/>
-    <path d="M -3.5 -5 L 5 0 L -3.5 5 Z" fill="url(#aiGradF)"/>
+    <path d="M -8 -6 C -8 -10 -4 -11 0 -11 C 4 -11 7 -10 7 -6 C 7 -2 -3 0 -7 4 C -10 7 -10 11 -6 11 C -2 11 2 10 5 7"
+          fill="none" stroke="url(#sfFavAccent)" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 5 -11 L 5 11 M 5 -11 L 13 -11 M 5 -2 L 11 -2"
+          fill="none" stroke="#F8FAFC" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>

@@ -1,34 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="StoryFab mark">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="StoryFab">
   <title>StoryFab</title>
   <defs>
-    <linearGradient id="sfAppBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0F0C29"/>
-      <stop offset="100%" stop-color="#1B1742"/>
+    <linearGradient id="sfPubBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F1F"/>
+      <stop offset="100%" stop-color="#1A1F3A"/>
     </linearGradient>
-    <linearGradient id="sfAppRing" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF6B35"/>
-      <stop offset="100%" stop-color="#FF3D6E"/>
+    <linearGradient id="sfPubAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
     </linearGradient>
   </defs>
 
-  <!-- Rounded square background -->
-  <rect width="256" height="256" rx="56" ry="56" fill="url(#sfAppBg)"/>
+  <rect width="256" height="256" rx="56" ry="56" fill="url(#sfPubBg)"/>
 
-  <!-- Single story loop ring -->
-  <circle cx="128" cy="128" r="80" fill="none" stroke="url(#sfAppRing)" stroke-width="6"/>
+  <!-- Outer ring -->
+  <circle cx="128" cy="128" r="92" fill="none" stroke="url(#sfPubAccent)" stroke-width="3" stroke-opacity="0.35"/>
 
-  <!-- Play triangle (optically centered) -->
-  <path d="M 112 92 L 168 128 L 112 164 Z" fill="url(#sfAppRing)"/>
-
-  <!-- 8 film ticks (4 corners, subtle) -->
-  <g fill="url(#sfAppRing)" opacity="0.5">
-    <rect x="32"  y="42"  width="5" height="10" rx="1.5"/>
-    <rect x="52"  y="42"  width="5" height="10" rx="1.5"/>
-    <rect x="199" y="42"  width="5" height="10" rx="1.5"/>
-    <rect x="219" y="42"  width="5" height="10" rx="1.5"/>
-    <rect x="32"  y="204" width="5" height="10" rx="1.5"/>
-    <rect x="52"  y="204" width="5" height="10" rx="1.5"/>
-    <rect x="199" y="204" width="5" height="10" rx="1.5"/>
-    <rect x="219" y="204" width="5" height="10" rx="1.5"/>
+  <!-- Film strip -->
+  <g>
+    <rect x="32" y="116" width="192" height="24" rx="3" fill="url(#sfPubAccent)" opacity="0.85"/>
+    <rect x="40" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="54" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="68" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="82" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="96" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="110" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="124" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="138" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="152" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="166" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="180" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="194" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
   </g>
+
+  <!-- SF monogram -->
+  <g transform="translate(128 128)">
+    <path d="M -34 -22 C -34 -34 -22 -38 -12 -38 C -2 -38 8 -34 8 -22 C 8 -10 -8 -6 -16 0 C -24 6 -34 10 -34 22 C -34 34 -22 38 -10 38 C 0 38 12 34 18 26"
+          fill="none" stroke="url(#sfPubAccent)" stroke-width="9"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 14 -38 L 14 38 M 14 -38 L 40 -38 M 14 -2 L 34 -2"
+          fill="none" stroke="#F8FAFC" stroke-width="9"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <circle cx="200" cy="200" r="6" fill="url(#sfPubAccent)"/>
 </svg>

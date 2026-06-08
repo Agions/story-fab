@@ -1,39 +1,48 @@
+---
+title: 配置
+---
+
 # 配置
 
-通过应用内设置或环境变量自定义 StoryFab 的行为。
+所有配置存储在 `<config-dir>/`，按平台：
 
-## 应用内设置
+| 平台 | 路径 |
+| --- | --- |
+| Windows | `%APPDATA%/story-fab/` |
+| macOS | `~/Library/Application Support/story-fab/` |
+| Linux | `~/.config/story-fab/` |
 
-通过 `Ctrl/Cmd + ,` 或齿轮图标打开**设置**。
+## 配置文件
 
-### AI 设置
+| 文件 | 用途 |
+| --- | --- |
+| `settings.json` | 应用设置（主题、自动保存、快捷键） |
+| `api-keys.json` | LLM Provider API 密钥 |
+| `recent-projects.json` | 最近打开的项目 |
+| `script-cache/` | LLM 生成结果缓存 |
+| `whisper-models/` | 本地 Whisper 模型 |
 
-|| 设置 | 说明 | 默认值 |
-|---|---|---|
-| Whisper 模型 | 本地转录的模型大小 | `base` |
-| 默认 AI Provider | 脚本生成的 AI 服务 | `DeepSeek` |
-| API Key | 所选 Provider 的密钥 | — |
-| 高光灵敏度 | 低 / 中 / 高 | `中` |
-| 最大片段数 | 每个视频最多片段数 | `10` |
-| 最小片段时长 | 最短片段长度（秒） | `15` |
+## 主题
 
-### 导出设置
+light / dark / system 三档。
 
-|| 设置 | 说明 | 默认值 |
-|---|---|---|
-| 默认比例 | 新导出的预设 | `9:16` |
-| 默认质量 | CRF 预设 | `中` |
-| 默认输出目录 | 片段保存位置 | `~/Videos/StoryFab` |
-| 默认烧录字幕 | 自动启用字幕烧录 | `false` |
+## API 密钥
 
-### 外观
+每个 Provider 独立配置：
 
-|| 设置 | 说明 | 默认值 |
-|---|---|---|
-| 主题 | 深色 / 浅色 / 跟随系统 | `跟随系统` |
-| 紧凑模式 | 更密集的 UI 布局 | `false` |
-| 自动保存 | 自动保存项目更改 | `true` |
+```json
+{
+  "openai": { "key": "sk-...", "enabled": true },
+  "anthropic": { "key": "sk-ant-...", "enabled": true }
+}
+```
 
-## 环境变量
+密钥仅本地存储，不上传。
 
-高级用户或 CI/CD 场景可使用环境变量。详情见[环境变量参考](/reference/config)。
+## 自动保存
+
+间隔：5-60 秒，默认 10 秒。
+
+## 输出路径
+
+支持自定义默认输出目录。每次导出可临时覆盖。

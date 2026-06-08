@@ -1,51 +1,67 @@
-# AI 服务
+---
+title: AI 服务
+---
 
-StoryFab 通过** Provider 抽象层**支持多个 AI 后端，无需修改业务代码即可切换模型。
+# AI 服务
 
 ## Provider 架构
 
 ```
 src/core/services/providers/
-├── base.service.ts       # BaseProvider 抽象类
-├── openai.service.ts     # OpenAI GPT-4o / GPT-5
-├── anthropic.service.ts  # Anthropic Claude
-├── deepseek.service.ts   # DeepSeek V4 / Chat
-├── siliconflow.service.ts # SiliconFlow（OpenAI 兼容）
-└── index.ts              # Provider 注册表
+├── base.service.ts       抽象基类
+├── openai.ts
+├── openaiLike.ts        兼容 OpenAI 协议（DeepSeek / Qwen）
+├── anthropic.ts
+├── google.ts
+├── baidu.ts
+├── mock.ts
+├── apiKeyService.ts     API 密钥管理
+├── prompts.ts           Prompt 模板
+├── backendApi.ts        后端 API 代理
+└── types.ts
 ```
 
-## Base Provider 接口
+## 接口
 
-所有 Provider 必须实现：
-
-```typescript
-interface AIProvider {
-  generateScript(transcript: string, options?: ScriptOptions): Promise<string>
-  generateTitle(transcript: string): Promise<string>
-  generateDescription(transcript: string): Promise<string>
+```ts
+interface IAIService {
+  chat(request: ChatRequest): Promise<ChatResponse>;
+  validateCredentials(): Promise<boolean>;
+  listModels(): Promise<AIModel[]>;
 }
 ```
 
-## 新增 Provider
+## 添加新 Provider
 
-1. 创建 `src/core/services/providers/myprovider.service.ts`
-2. 继承 `BaseProvider` 并实现接口
-3. 在 `src/core/services/providers/index.ts` 注册
-4. 在 Settings 页面添加配置 UI
+1. 创建 `xxx.ts` 实现 `IAIService`
+2. 在 `index.ts` 注册
+3. 在 `src/core/config/aiModels.config.ts` 加配置
+4. 在 UI 设置页加 API 密钥输入
 
-## Whisper（本地）
+## Whisper
 
-Whisper 通过 `src-tauri/src/subtitle.rs` 完全本地运行：
+- 本地运行（`faster-whisper`）
+- 模型：`tiny` / `base` / `small` / `medium` / `large-v3`
+- 存储：`<config-dir>/whisper-models/`
 
-- 基于 `faster-whisper`（CTranslate2 实现）
-- 模型按需下载到 `~/.cache/whisper/`
-- 支持 CPU 和 CUDA 推理
+## Edge TTS
 
-## Edge TTS（本地语音合成）
+- 微软 Edge 在线 TTS
+- 通过 `edge-tts` Node 包调用
+- 几十种音色
 
-Edge TTS 用于本地语音旁白合成：
+## 性能与成本
 
-- 无需 API Key
-- 通过子进程调用 `edge-tts` CLI
-- 通过 stdin/stdout 通信
-- 语音库：[Microsoft Edge TTS 语音](https://speech.platform.bing.com/consumer/sapi/voices)
+| Provider | 平均响应 | 每千 tokens 成本 |
+| --- | --- | --- |
+| OpenAI GPT-4o-mini | 1-3 秒 | $0.15 / 1M tokens |
+| DeepSeek V3 | 2-5 秒 | $0.27 / 1M tokens |
+| Qwen Plus | 1-3 秒 | $0.40 / 1M tokens |
+| Gemini 1.5 Flash | 1-2 秒 | $0.075 / 1M tokens |
+| Anthropic Claude Haiku | 1-3 秒 | $0.25 / 1M tokens |
+
+## 验证
+
+```bash
+pnpm test -- src/core/services/providers
+```

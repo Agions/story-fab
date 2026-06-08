@@ -1,96 +1,55 @@
-# FAQ
-
-## General
-
-### What is StoryFab?
-
-StoryFab is an AI-powered desktop video editing application that automatically transforms long videos into short, shareable clips optimized for social media platforms like TikTok, YouTube Shorts, and Instagram Reels.
-
-### Is StoryFab free?
-
-Yes. StoryFab is open-source under the MIT License and is free to use for personal and commercial purposes.
-
-### What platforms does StoryFab support?
-
-StoryFab runs on Windows 10/11, macOS 12+ (both Apple Silicon and Intel), and Linux.
-
-### Does StoryFab require an internet connection?
-
-**No.** StoryFab is designed to work fully offline. The only optional online features are AI script generation (which requires an API key from OpenAI, Anthropic, or DeepSeek). Whisper transcription and voice synthesis run entirely locally.
-
+---
+title: 常见问题
 ---
 
-## Installation
+# 常见问题
 
-### The installer won't open on macOS
+## 概述
 
-macOS may block apps from unidentified developers. Right-click the `.dmg` file and select **Open**, then click **Open** in the dialog. Or run:
+**StoryFab 是什么？** 开源桌面视频创作工具，基于 Tauri 2 + React + Rust，自动从长视频中提取片段并生成解说。
 
-```bash
-sudo xattr -rd com.apple.quarantine "/Applications/StoryFab.app"
-```
+**许可证？** MIT 协议，个人和商业均可。
 
-### FFmpeg not found
+**支持哪些平台？** Windows 10/11、macOS 12+（Apple Silicon 和 Intel）、Linux（x64）。
 
-StoryFab requires FFmpeg to be installed. See [Installation → FFmpeg](/reference/config#ffmpeg-installation) for installation instructions.
+## 安装
 
-If FFmpeg is installed but in a non-standard location, set the `CUTDECK_FFMPEG_PATH` environment variable.
+**macOS 提示「无法打开，因为无法验证开发者」？** 右键 app → 打开 → 弹出框再点打开。或：`sudo xattr -rd com.apple.quarantine "/Applications/StoryFab.app"`。
 
----
+**Windows SmartScreen 拦截？** 点「更多信息」→「仍要运行」。
 
-## AI Features
+**Linux AppImage 启动失败？** 安装 `libfuse2`，或改用 `.deb` 包。
 
-### How does highlight detection work?
+## 启动
 
-StoryFab analyzes audio energy, visual scene changes, and speech patterns to score segments. Higher-scoring segments are more likely to be engaging moments. See [AI Analysis](/guide/ai-analysis) for details.
+**「Failed to load FFmpeg/Whisper binary」？** 首次启动需联网下载。失败后：设置代理、放置预编译二进制到 `~/.config/story-fab/bin/`、或从 Release 下载。
 
-### Which AI provider should I use?
+**端口 1430 被占用？** `story-fab dev --port 1431` 改端口。
 
-| Provider | Best For | Cost |
-|---|---|---|
-| DeepSeek | Best value, good quality | Very low |
-| OpenAI GPT-4o | Highest quality | High |
-| Anthropic Claude | Balanced quality/safety | Medium |
+## AI 分析
 
-All three are free to set up with your own API key. StoryFab does not charge for AI usage.
+**Whisper 转录很慢？** 改用 `tiny` 或 `base` 模型，CPU 占用低。
 
-### Can I run Whisper without an internet connection?
+**LLM 调用失败？** 检查 API 密钥格式、剩余额度、网络代理设置。
 
-Yes. Whisper runs entirely locally using the `faster-whisper` Rust crate. No internet required.
+**高光检测无结果？** 在设置中把阈值从 0.65 降到 0.4。
 
----
+## 导出
 
-## Export
+**字幕乱码？** 字幕编码选 UTF-8。
 
-### Why is the exported video so large?
+**FFmpeg 渲染失败？** 查看 `<config-dir>/logs/` 下的最新日志。
 
-Use a lower quality preset (Settings → Export → Quality → Low). This increases the CRF value, resulting in smaller files with slightly reduced quality.
+**导出文件超大？** 改用「高」预设（CRF 20）替代「极清」。
 
-### Can I export with subtitles only (no voice-over)?
+## 隐私
 
-Yes. In the export dialog, leave **Script** disabled and enable **Burn Subtitles**. This will embed the Whisper-generated subtitles directly into the video.
+**会上传我的视频吗？** 不会。所有处理在本地完成。可在设置中完全禁用网络请求。
 
-### What video formats are supported?
+## 贡献
 
-**Input:** MP4, MOV, AVI, MKV, WebM  
-**Output:** MP4 (H.264 + AAC)
+**如何贡献？** Fork → 分支 → 提交（Conventional Commits）→ PR。详见 README。
 
----
+**如何报告 Bug？** GitHub Issues，附上日志文件和复现步骤。
 
-## Troubleshooting
-
-### StoryFab crashes on startup
-
-Check the logs at:
-- **Windows:** `%APPDATA%\StoryFab\logs\`
-- **macOS:** `~/Library/Application Support/StoryFab/logs/`
-- **Linux:** `~/.local/share/StoryFab/logs/`
-
-File a bug report at [GitHub Issues](https://github.com/Agions/story-fab/issues) with the log output.
-
-### Video processing is very slow
-
-- Use a GPU-enabled Whisper model (if you have an NVIDIA GPU with CUDA)
-- Close other resource-heavy applications
-- Reduce the number of concurrent tasks
-- Use a faster Whisper model (e.g., `tiny` instead of `medium`)
+**如何添加新 LLM Provider？** 实现 `src/core/services/providers/` 下的对应 trait，详见 `docs/dev/ai-services.md`。

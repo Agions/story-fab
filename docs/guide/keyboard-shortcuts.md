@@ -1,44 +1,54 @@
-# Keyboard Shortcuts
+---
+title: 键盘快捷键
+---
 
-Speed up your editing workflow with these keyboard shortcuts.
+# 键盘快捷键
 
-## Global
+## 全局
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl/Cmd + N` | New Project |
-| `Ctrl/Cmd + O` | Open Project |
-| `Ctrl/Cmd + S` | Save Project |
-| `Ctrl/Cmd + ,` | Open Settings |
-| `Ctrl/Cmd + Q` | Quit |
+| 快捷键 | 功能 |
+| --- | --- |
+| Cmd/Ctrl + O | 打开项目 |
+| Cmd/Ctrl + N | 新建项目 |
+| Cmd/Ctrl + S | 保存 |
+| Cmd/Ctrl + Shift + S | 另存为 |
+| Cmd/Ctrl + W | 关闭当前项目 |
+| Cmd/Ctrl + Z | 撤销 |
+| Cmd/Ctrl + Shift + Z | 重做 |
+| Cmd/Ctrl + , | 打开设置 |
 
-## Video
+## 播放控制
 
-| Shortcut | Action |
-|---|---|
-| `Space` | Play / Pause |
-| `←` / `→` | Step frame backward / forward |
-| `Shift + ←` / `→` | Jump 5 seconds backward / forward |
-| `I` | Set In point |
-| `O` | Set Out point |
-| `Home` | Go to start |
-| `End` | Go to end |
+| 快捷键 | 功能 |
+| --- | --- |
+| 空格 | 播放 / 暂停 |
+| J / K / L | 逐帧后退 / 暂停 / 前进 |
+| ← / → | 5 秒后退 / 前进 |
+| Shift + ← / → | 1 秒后退 / 前进 |
+| Home / End | 跳到开始 / 结束 |
+| I / O | 设置入点 / 出点 |
 
-## Editing
+## 时间线编辑
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl/Cmd + Z` | Undo |
-| `Ctrl/Cmd + Shift + Z` | Redo |
-| `Ctrl/Cmd + X` | Cut |
-| `Ctrl/Cmd + C` | Copy |
-| `Ctrl/Cmd + V` | Paste |
-| `Delete` | Delete selected |
-| `Ctrl/Cmd + A` | Select all clips |
+| 快捷键 | 功能 |
+| --- | --- |
+| Cmd/Ctrl + X / C / V | 剪切 / 复制 / 粘贴 |
+| Delete | 删除选中片段 |
+| Cmd/Ctrl + D | 复制片段 |
+| Cmd/Ctrl + G | 分组 |
+| Cmd/Ctrl + Shift + G | 取消分组 |
 
-## Export
+## 字幕
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl/Cmd + E` | Open Export dialog |
-| `Ctrl/Cmd + Shift + E` | Quick export (last settings) |
+| 快捷键 | 功能 |
+| --- | --- |
+| F | 切换全屏预览 |
+| Enter | 编辑下一条字幕 |
+| Esc | 退出字幕编辑 |
+
+## AI 工作流
+
+| 快捷键 | 功能 |
+| --- | --- |
+| Cmd/Ctrl + R | 重新分析 |
+| Cmd/Ctrl + Enter | 应用 AI 建议 |

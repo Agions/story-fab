@@ -1,45 +1,54 @@
-# Export
+---
+title: 导出
+---
 
-StoryFab supports multiple aspect ratios, subtitle styles, and quality presets.
+# 导出
 
-## Aspect Ratios
+## 输出格式
 
-| Format | Resolution | Platform |
-|---|---|---|
-| **9:16** (Vertical) | 1080×1920 | TikTok, Instagram Reels, YouTube Shorts |
-| **1:1** (Square) | 1080×1080 | Instagram Feed |
-| **16:9** (Horizontal) | 1920×1080 | YouTube, Twitter/X, Facebook |
+| 格式 | 编码器 | 文件大小（10分钟） |
+| --- | --- | --- |
+| MP4 (H.264 + AAC) | libx264 | ~150 MB |
+| WebM (VP9 + Opus) | libvpx-vp9 | ~120 MB |
+| MOV (ProRes) | prores_ks | ~3 GB |
 
-## Quality Presets
+## 比例
 
-| Preset | CRF | FFmpeg Preset | Use Case |
-|---|---|---|---|
-| High | 18 | medium | Best quality, larger file |
-| Medium | 23 | fast | Balanced (default) |
-| Low | 28 | veryfast | Smaller file, acceptable quality |
+| 比例 | 分辨率 | 适用平台 |
+| --- | --- | --- |
+| 9:16 | 1080×1920 | TikTok、Shorts、Reels |
+| 1:1 | 1080×1080 | Instagram Feed |
+| 16:9 | 1920×1080 | YouTube、Bilibili、Twitter/X |
+| 4:5 | 1080×1350 | Instagram Feed（竖版） |
+| 21:9 | 2560×1080 | 电影感宽屏 |
 
-## Subtitle Options
+## 质量预设
 
-- **Burn-in** — Subtitles are hard-coded into the video (no toggle needed to see them)
-- **Soft** — Subtitles as a separate track (can be toggled off in video players)
-- **None** — No subtitles
+| 预设 | CRF | 码率 |
+| --- | --- | --- |
+| 低 | 28 | 1 Mbps |
+| 中 | 23 | 2.5 Mbps |
+| 高 | 20 | 5 Mbps |
+| 极清 | 18 | 8 Mbps |
+| 无损 | 0 | - |
 
-## Export Flow
+## 字幕烧录
 
-1. Select clips to export
-2. Choose aspect ratio
-3. Choose quality preset
-4. Toggle subtitle burn-in (optional)
-5. Click **Export**
-6. Wait for FFmpeg render to complete
-7. Find your clips in the output directory
+两种方式：
 
-## Output Format
+1. **硬字幕**：直接烧进视频像素，不可关闭
+2. **软字幕**：嵌入独立字幕轨道，可关闭
 
-- **Container**: MP4 (H.264 video + AAC audio)
-- **Audio**: AAC 192kbps
-- **Subtitles**: Hardsubbed via FFmpeg filter `subtitles=filename=...`
+## 渲染性能
 
-## Batch Export
+参考速度（macOS M2 / Windows i7-12700）：
 
-You can select multiple clips and export them as a batch. Each clip is exported individually with its own output file.
+| 视频长度 | 渲染时间 |
+| --- | --- |
+| 1 分钟 | 10-20 秒 |
+| 5 分钟 | 40-80 秒 |
+| 30 分钟 | 4-6 分钟 |
+
+## 剪映草稿导出
+
+支持 `.json` 格式导出到剪映/度加创作工具，便于二次精修。

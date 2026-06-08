@@ -1,72 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="StoryFab logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="StoryFab mark">
   <title>StoryFab</title>
   <defs>
-    <!-- Deep space background gradient -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f0c29"/>
-      <stop offset="50%" stop-color="#1a1a3e"/>
-      <stop offset="100%" stop-color="#24243e"/>
+    <linearGradient id="sfBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F1F"/>
+      <stop offset="100%" stop-color="#1A1F3A"/>
     </linearGradient>
-    <!-- Warm film-strip gradient (the "story" side) -->
-    <linearGradient id="filmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff8a5b"/>
-      <stop offset="100%" stop-color="#e63946"/>
+    <linearGradient id="sfAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
     </linearGradient>
-    <!-- Cool AI/neural gradient (the "fab" side) -->
-    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4cc9f0"/>
-      <stop offset="100%" stop-color="#7209b7"/>
+    <linearGradient id="sfFilm" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#EC4899" stop-opacity="0.85"/>
     </linearGradient>
-    <!-- Subtle inner shadow for depth -->
-    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
   </defs>
 
-  <!-- Rounded-square background (works as app icon) -->
-  <rect x="0" y="0" width="256" height="256" rx="56" ry="56" fill="url(#bgGrad)"/>
+  <!-- Rounded square background -->
+  <rect width="256" height="256" rx="56" ry="56" fill="url(#sfBg)"/>
 
-  <!-- Diagonal film strip across the icon (45° tilt) -->
-  <g transform="rotate(-22 128 128)">
-    <!-- film strip body -->
-    <rect x="48" y="100" width="160" height="56" rx="6" ry="6" fill="url(#filmGrad)"/>
-    <!-- film perforations (top + bottom rows) -->
-    <g fill="#0f0c29">
-      <rect x="58"  y="108" width="14" height="8" rx="1.5"/>
-      <rect x="80"  y="108" width="14" height="8" rx="1.5"/>
-      <rect x="102" y="108" width="14" height="8" rx="1.5"/>
-      <rect x="124" y="108" width="14" height="8" rx="1.5"/>
-      <rect x="146" y="108" width="14" height="8" rx="1.5"/>
-      <rect x="168" y="108" width="14" height="8" rx="1.5"/>
-      <rect x="58"  y="140" width="14" height="8" rx="1.5"/>
-      <rect x="80"  y="140" width="14" height="8" rx="1.5"/>
-      <rect x="102" y="140" width="14" height="8" rx="1.5"/>
-      <rect x="124" y="140" width="14" height="8" rx="1.5"/>
-      <rect x="146" y="140" width="14" height="8" rx="1.5"/>
-      <rect x="168" y="140" width="14" height="8" rx="1.5"/>
-    </g>
+  <!-- Outer story ring (curved type, gradient stroke) -->
+  <circle cx="128" cy="128" r="92" fill="none" stroke="url(#sfAccent)" stroke-width="3" stroke-opacity="0.35"/>
+
+  <!-- Curved film strip across the middle -->
+  <g transform="translate(0 0)">
+    <rect x="32" y="116" width="192" height="24" rx="3" fill="url(#sfFilm)"/>
+    <rect x="40" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="54" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="68" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="82" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="96" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="110" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="124" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="138" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="152" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="166" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="180" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
+    <rect x="194" y="120" width="6" height="16" rx="1.5" fill="#0B0F1F" opacity="0.9"/>
   </g>
 
-  <!-- Center play-triangle (the "play" gesture) -->
+  <!-- Center monogram: SF -->
   <g transform="translate(128 128)">
-    <circle r="42" fill="#0f0c29" opacity="0.92"/>
-    <circle r="42" fill="none" stroke="url(#aiGrad)" stroke-width="2.5" opacity="0.85"/>
-    <path d="M -12 -18 L 18 0 L -12 18 Z" fill="url(#aiGrad)"/>
+    <!-- S -->
+    <path d="M -34 -22
+             C -34 -34 -22 -38 -12 -38
+             C -2 -38 8 -34 8 -22
+             C 8 -10 -8 -6 -16 0
+             C -24 6 -34 10 -34 22
+             C -34 34 -22 38 -10 38
+             C 0 38 12 34 18 26"
+          fill="none" stroke="url(#sfAccent)" stroke-width="9"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- F -->
+    <path d="M 14 -38 L 14 38 M 14 -38 L 40 -38 M 14 -2 L 34 -2"
+          fill="none" stroke="#F8FAFC" stroke-width="9"
+          stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
-  <!-- Neural pulse line (the "AI" detail) -->
-  <g stroke="url(#aiGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#softGlow)" opacity="0.95">
-    <polyline points="40,210 70,210 82,196 96,224 110,196 124,224 138,196 152,210 216,210"/>
-  </g>
-
-  <!-- Tiny corner sparkles (the "magic" of AI) -->
-  <g fill="#4cc9f0" opacity="0.9">
-    <circle cx="46"  cy="46"  r="2.2"/>
-    <circle cx="210" cy="60"  r="1.6"/>
-    <circle cx="60"  cy="190" r="1.6"/>
-  </g>
+  <!-- Small play indicator (bottom right corner dot) -->
+  <circle cx="200" cy="200" r="6" fill="url(#sfAccent)"/>
 </svg>
