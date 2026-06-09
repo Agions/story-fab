@@ -1,3 +1,13 @@
+/**
+ * AI 剪辑分析器
+ * 职责：分析视频内容，生成剪辑点和建议
+ *
+ * 重构说明：
+ * - 提取工具函数到 analyzerUtils.ts
+ * - 改善命名，使其更具自描述性
+ * - 保持原有业务逻辑不变
+ */
+
 import { tauri } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
 import { visionService } from '../ai/visionService';
@@ -5,7 +15,6 @@ import { detectEmotionPeaks, type EmoPeak } from '../video/emotionDetector';
 import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
 import { DEFAULT_CLIP_CONFIG } from './types';
 import { formatTime as formatSharedTime } from '../../../shared/utils/formatting';
-import { MS_PER_SECOND } from '@/shared/utils';
 import type {
   AIClipConfig,
   CutPoint,
@@ -15,6 +24,30 @@ import type {
   Keyframe,
 } from './types';
 
+// 导入工具函数
+import {
+  calculateKeyframeImportance,
+  deduplicateCutPoints,
+  determineSegmentType,
+  calculateSegmentConfidence,
+  estimateFinalDuration,
+  msToSeconds,
+  type SilenceSegment,
+  type EmotionPeak as UtilsEmotionPeak,
+} from './analyzerUtils';
+
+// ============================================
+// 主分析函数
+// ============================================
+
+/**
+ * 分析视频内容
+ * @param videoInfo 视频信息
+ * @param config 分析配置
+ * @param signal 中断信号
+ * @param onProgress 进度回调
+ * @returns 分析结果
+ */
 export async function analyzeVideo(
   videoInfo: VideoInfo,
   config: Partial<AIClipConfig> = {},
@@ -27,16 +60,26 @@ export async function analyzeVideo(
   // 1. 高级场景检测
   onProgress?.(10, '检测场景切换');
   const { scenes, emotions } = await Promise.all([
-    visionService.detectScenesAdvanced(
-      videoInfo,
-      { minSceneDuration: 2, detectObjects: false, detectEmotions: false }
-    ),
-    // Skip emotion detection here — ZCR peak detector handles it more reliably
-    Promise.resolve({ scenes: [] as Scene[], objects: [], emotions: [] as EmotionAnalysis[] }),
-  ]).then(([r]) => r).catch((err) => {
-    logger.warn('[analyzer] detectScenesAdvanced failed:', err);
-    return { scenes: [] as Scene[], objects: [], emotions: [] as EmotionAnalysis[] };
-  });
+    visionService.detectScenesAdvanced(videoInfo, {
+      minSceneDuration: 2,
+      detectObjects: false,
+      detectEmotions: false,
+    }),
+    Promise.resolve({
+      scenes: [] as Scene[],
+      objects: [],
+      emotions: [] as EmotionAnalysis[],
+    }),
+  ])
+    .then(([r]) => r)
+    .catch((err) => {
+      logger.warn('[analyzer] detectScenesAdvanced failed:', err);
+      return {
+        scenes: [] as Scene[],
+        objects: [],
+        emotions: [] as EmotionAnalysis[],
+      };
+    });
 
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
   onProgress?.(30, '提取关键帧');
@@ -48,19 +91,19 @@ export async function analyzeVideo(
 
   // 3. 检测静音片段
   onProgress?.(50, '分析音频特征');
-
   const silenceSegments = fullConfig.detectSilence
     ? await detectSilenceSegments(videoInfo, fullConfig)
     : [];
 
-  // 4. 检测情感峰值（ZCR 增强）— 必须在 generateCutPoints 之前
+  // 4. 检测情感峰值（ZCR 增强）
   onProgress?.(65, '检测情感峰值');
   const { peaks: rawPeaks }: { peaks: EmoPeak[] } = await detectEmotionPeaks(videoInfo.path, {
     threshold: 1.5,
     minDurationMs: 300,
   }).catch(() => ({ peaks: [] as EmoPeak[] }));
-  const emotionPeaks = rawPeaks.map(p => ({
-    timestamp: p.startMs / MS_PER_SECOND,
+
+  const emotionPeaks: UtilsEmotionPeak[] = rawPeaks.map((p) => ({
+    timestamp: msToSeconds(p.startMs),
     energy: p.energy,
     type: p.type,
   }));
@@ -77,16 +120,16 @@ export async function analyzeVideo(
     fullConfig
   );
 
-  // 5. 生成剪辑片段
+  // 6. 生成剪辑片段
   const segments = generateSegments(videoInfo, cutPoints, scenes);
 
-  // 6. 生成AI剪辑建议
+  // 7. 生成AI剪辑建议
   onProgress?.(88, '生成剪辑建议');
   const suggestions = fullConfig.aiOptimize
     ? await generateSuggestions(videoInfo, segments, scenes, fullConfig)
     : [];
 
-  // 7. 计算预估最终时长
+  // 8. 计算预估最终时长
   const estimatedFinalDuration = estimateFinalDuration(
     videoInfo.duration,
     silenceSegments,
@@ -105,51 +148,45 @@ export async function analyzeVideo(
     sceneBoundaries: scenes.map((s) => ({
       start: s.startTime,
       end: s.endTime,
-      type: s.type || 'unknown'
+      type: s.type || 'unknown',
     })),
     estimatedFinalDuration,
     emotionPeaks,
   };
 }
 
-async function detectKeyframes(
-  videoInfo: VideoInfo,
-  interval: number
-): Promise<Keyframe[]> {
+// ============================================
+// 辅助函数
+// ============================================
+
+/**
+ * 检测关键帧
+ */
+async function detectKeyframes(videoInfo: VideoInfo, interval: number): Promise<Keyframe[]> {
   const count = Math.floor(videoInfo.duration / interval);
-  const keyframes = await visionService.extractKeyframes(
-    videoInfo,
-    { maxFrames: Math.min(count, 20) }
-  );
+  const keyframes = await visionService.extractKeyframes(videoInfo, {
+    maxFrames: Math.min(count, 20),
+  });
 
   return keyframes.map((kf, index) => ({
     timestamp: kf.timestamp,
     thumbnail: kf.thumbnail,
-    importance: calculateKeyframeImportance(kf, index, keyframes.length)
+    importance: calculateKeyframeImportance(index, keyframes.length),
   }));
 }
 
-function calculateKeyframeImportance(
-  _keyframe: SourceKeyframe,
-  index: number,
-  total: number
-): number {
-  const safeTotal = Math.max(total, 1);
-  const position = index / safeTotal;
-  const positionWeight = Math.sin(position * Math.PI);
-  const distributionWeight = 1 - Math.abs(0.5 - position) * 0.5;
-  return Math.min(1, (positionWeight + distributionWeight) / 2);
-}
-
+/**
+ * 检测静音片段
+ */
 async function detectSilenceSegments(
   videoInfo: VideoInfo,
   _config: AIClipConfig
-): Promise<Array<{ start: number; end: number; duration: number }>> {
+): Promise<SilenceSegment[]> {
   try {
-    const rustSegments = await tauri.detectSmartSegments(videoInfo.path, {
+    const rustSegments = (await tauri.detectSmartSegments(videoInfo.path, {
       minDurationMs: 500,
       maxDurationMs: 30000,
-    }) as Array<{
+    })) as Array<{
       start_ms: number;
       end_ms: number;
       segment_type: string;
@@ -158,11 +195,11 @@ async function detectSilenceSegments(
     }>;
 
     return rustSegments
-      .filter(seg => seg.segment_type === 'Silence' || (seg.silence_ratio ?? 0) > 0.3)
-      .map(seg => ({
-        start: seg.start_ms / MS_PER_SECOND,
-        end: seg.end_ms / MS_PER_SECOND,
-        duration: seg.duration_ms / MS_PER_SECOND,
+      .filter((seg) => seg.segment_type === 'Silence' || (seg.silence_ratio ?? 0) > 0.3)
+      .map((seg) => ({
+        start: msToSeconds(seg.start_ms),
+        end: msToSeconds(seg.end_ms),
+        duration: msToSeconds(seg.duration_ms),
       }));
   } catch (error) {
     // Rust 失败时返回空，不阻断主流程
@@ -170,15 +207,16 @@ async function detectSilenceSegments(
   }
 }
 
+/**
+ * 生成剪辑点
+ */
 function generateCutPoints(
-  // @ts-ignore - videoInfo reserved for future cut point metadata enrichment
   videoInfo: VideoInfo,
   scenes: Scene[],
   keyframes: Keyframe[],
-  silenceSegments: Array<{ start: number; end: number; duration: number }>,
-  // @ts-ignore - emotions reserved for future emotion-aware cut scoring
+  silenceSegments: SilenceSegment[],
   emotions: EmotionAnalysis[],
-  emotionPeaks: Array<{ timestamp: number; energy: number; type: string }>,
+  emotionPeaks: UtilsEmotionPeak[],
   config: AIClipConfig
 ): CutPoint[] {
   const cutPoints: CutPoint[] = [];
@@ -194,7 +232,7 @@ function generateCutPoints(
           confidence: scene.confidence || 0.8,
           description: `场景切换: ${scene.description || '场景 ' + (index + 1)}`,
           suggestedAction: 'transition',
-          metadata: { sceneChange: scene.confidence }
+          metadata: { sceneChange: scene.confidence },
         });
       }
     });
@@ -211,7 +249,7 @@ function generateCutPoints(
           confidence: kf.importance,
           description: `关键帧 @ ${formatSharedTime(kf.timestamp)}`,
           suggestedAction: 'keep',
-          metadata: { motionScore: kf.importance }
+          metadata: { motionScore: kf.importance },
         });
       }
     });
@@ -227,13 +265,12 @@ function generateCutPoints(
         confidence: 0.9,
         description: `静音片段 (${silence.duration.toFixed(1)}秒)`,
         suggestedAction: 'remove',
-        metadata: { audioLevel: -50 }
+        metadata: { audioLevel: -50 },
       });
     });
   }
 
-  // 硬编码的情感阈值（0-100），用于筛选情感峰值作为潜在剪辑点
-  // 来源：基于音频能量分析的通用经验值，峰值能量 > 60 时通常对应情绪高涨段落
+  // 情感峰值
   const EMOTION_ENERGY_THRESHOLD = 60;
   if (config.detectEmotion && config.aiOptimize && emotionPeaks.length > 0) {
     for (const peak of emotionPeaks) {
@@ -245,7 +282,7 @@ function generateCutPoints(
           confidence: peak.energy / 100,
           description: `情感峰值: ${peak.type} (能量 ${peak.energy})`,
           suggestedAction: 'keep',
-          metadata: { emotionScore: peak.energy / 100 }
+          metadata: { emotionScore: peak.energy / 100 },
         });
       }
     }
@@ -254,39 +291,28 @@ function generateCutPoints(
   return deduplicateCutPoints(cutPoints.sort((a, b) => a.timestamp - b.timestamp));
 }
 
-function deduplicateCutPoints(cutPoints: CutPoint[]): CutPoint[] {
-  const result: CutPoint[] = [];
-  const minGap = 0.5;
-
-  for (const point of cutPoints) {
-    const lastPoint = result[result.length - 1];
-    if (!lastPoint || Math.abs(point.timestamp - lastPoint.timestamp) >= minGap) {
-      result.push(point);
-    } else if (point.confidence > lastPoint.confidence) {
-      result[result.length - 1] = point;
-    }
-  }
-
-  return result;
-}
-
+/**
+ * 生成剪辑片段
+ */
 function generateSegments(
   videoInfo: VideoInfo,
   cutPoints: CutPoint[],
   scenes: Scene[]
 ): ClipSegment[] {
   if (cutPoints.length === 0) {
-    return [{
-      id: crypto.randomUUID(),
-      startTime: 0,
-      endTime: videoInfo.duration,
-      duration: videoInfo.duration,
-      type: 'video',
-      content: '完整视频',
-      confidence: 1,
-      cutPoints: [],
-      suggestions: []
-    }];
+    return [
+      {
+        id: crypto.randomUUID(),
+        startTime: 0,
+        endTime: videoInfo.duration,
+        duration: videoInfo.duration,
+        type: 'video',
+        content: '完整视频',
+        confidence: 1,
+        cutPoints: [],
+        suggestions: [],
+      },
+    ];
   }
 
   const segments: ClipSegment[] = [];
@@ -299,9 +325,8 @@ function generateSegments(
       const segmentCutPoints = cutPoints.filter(
         (cp) => cp.timestamp >= currentStart && cp.timestamp <= endTime
       );
-      const scene = scenes.find((s) =>
-        s.startTime <= currentStart && s.endTime >= endTime
-      );
+
+      const scene = scenes.find((s) => s.startTime <= currentStart && s.endTime >= endTime);
 
       segments.push({
         id: crypto.randomUUID(),
@@ -313,7 +338,7 @@ function generateSegments(
         thumbnail: scene?.thumbnail,
         confidence: calculateSegmentConfidence(segmentCutPoints),
         cutPoints: segmentCutPoints,
-        suggestions: []
+        suggestions: [],
       });
     }
     currentStart = endTime;
@@ -322,33 +347,12 @@ function generateSegments(
   return segments;
 }
 
-function determineSegmentType(cutPoints: CutPoint[]): ClipSegment['type'] {
-  if (cutPoints.some((cp) => cp.type === 'silence')) return 'silence';
-  if (cutPoints.some((cp) => cp.type === 'keyframe')) return 'keyframe';
-  return 'video';
-}
-
-function calculateSegmentConfidence(cutPoints: CutPoint[]): number {
-  if (cutPoints.length === 0) return 0.5;
-  // Weighted confidence: audio_energy + scene_change each get 0.4, emotion 0.2
-  let audioSum = 0, audioCount = 0;
-  let sceneSum = 0, sceneCount = 0;
-  let emotionSum = 0, emotionCount = 0;
-  for (const cp of cutPoints) {
-    if (cp.type === 'scene') { sceneSum += cp.confidence; sceneCount++; }
-    else if (cp.type === 'emotion') { emotionSum += cp.confidence; emotionCount++; }
-    else { audioSum += cp.confidence; audioCount++; }
-  }
-  const audioConf = audioCount ? audioSum / audioCount * 0.4 : 0;
-  const sceneConf = sceneCount ? sceneSum / sceneCount * 0.4 : 0;
-  const emotionConf = emotionCount ? emotionSum / emotionCount * 0.2 : 0;
-  return Math.min(1, audioConf + sceneConf + emotionConf);
-}
-
+/**
+ * 生成剪辑建议
+ */
 async function generateSuggestions(
   videoInfo: VideoInfo,
   segments: ClipSegment[],
-  // @ts-ignore - scenes reserved for future scene-aware suggestion ranking
   scenes: Scene[],
   config: AIClipConfig
 ): Promise<ClipSuggestion[]> {
@@ -365,7 +369,7 @@ async function generateSuggestions(
       description: `移除静音片段 (${segment.duration.toFixed(1)}秒)`,
       reason: '这段音频几乎没有声音，移除后可以提升视频节奏',
       confidence: 0.9,
-      autoApplicable: true
+      autoApplicable: true,
     });
   });
 
@@ -383,15 +387,13 @@ async function generateSuggestions(
         description: `合并短片段 (${current.duration.toFixed(1)}s + ${next.duration.toFixed(1)}s)`,
         reason: '两个片段都很短且相邻，合并后观看体验更好',
         confidence: 0.75,
-        autoApplicable: true
+        autoApplicable: true,
       });
     }
   }
 
   // 建议添加转场
-  const sceneChanges = segments.filter((s) =>
-    s.cutPoints.some((cp) => cp.type === 'scene')
-  );
+  const sceneChanges = segments.filter((s) => s.cutPoints.some((cp) => cp.type === 'scene'));
   sceneChanges.forEach((segment, index) => {
     if (index < sceneChanges.length - 1) {
       suggestions.push({
@@ -402,7 +404,7 @@ async function generateSuggestions(
         description: `添加${config.transitionType}转场`,
         reason: '场景切换处添加转场效果可以使过渡更自然',
         confidence: 0.8,
-        autoApplicable: config.autoTransition
+        autoApplicable: config.autoTransition,
       });
     }
   });
@@ -412,6 +414,7 @@ async function generateSuggestions(
     const currentDuration = segments
       .filter((s) => s.type !== 'silence')
       .reduce((sum, s) => sum + s.duration, 0);
+
     if (currentDuration > config.targetDuration * 1.2) {
       suggestions.push({
         id: crypto.randomUUID(),
@@ -421,7 +424,7 @@ async function generateSuggestions(
         description: `压缩视频至目标时长 (${config.targetDuration}秒)`,
         reason: `当前预估时长 ${Math.round(currentDuration)}秒，建议精简内容`,
         confidence: 0.7,
-        autoApplicable: false
+        autoApplicable: false,
       });
     }
   }
@@ -438,38 +441,10 @@ async function generateSuggestions(
         description: `加速长片段 (${segment.duration.toFixed(1)}秒)`,
         reason: '选择快速节奏模式，建议缩短长片段',
         confidence: 0.65,
-        autoApplicable: false
+        autoApplicable: false,
       });
     });
   }
 
   return suggestions.sort((a, b) => b.confidence - a.confidence);
-}
-
-function estimateFinalDuration(
-  originalDuration: number,
-  silenceSegments: Array<{ duration: number }>,
-  segments: ClipSegment[],
-  config: AIClipConfig
-): number {
-  let estimated = originalDuration;
-
-  if (config.removeSilence) {
-    const totalSilence = silenceSegments.reduce((sum, s) => sum + s.duration, 0);
-    estimated -= totalSilence;
-  }
-
-  if (config.trimDeadTime) {
-    const deadTime = segments
-      .filter((s) => s.duration < 0.5)
-      .reduce((sum, s) => sum + s.duration, 0);
-    estimated -= deadTime;
-  }
-
-  if (config.autoTransition) {
-    const transitionCount = segments.length - 1;
-    estimated += transitionCount * 0.3;
-  }
-
-  return Math.max(0, estimated);
 }
