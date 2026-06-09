@@ -86,12 +86,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   // Subscribe to notify events
   useEffect(() => {
     let cleanup: (() => void) | undefined;
+    let cancelled = false;
     import('../../shared/utils/notify').then(({ subscribeToToast }) => {
+      // If cleanup already ran before import resolved, don't subscribe
+      if (cancelled) return;
       cleanup = subscribeToToast((event) => {
         addToast(event);
       });
+    }).catch((err) => {
+      console.error('[Toast] Failed to load notify module:', err);
     });
-    return () => cleanup?.();
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, [addToast]);
 
   const ctx: ToastContextValue = {

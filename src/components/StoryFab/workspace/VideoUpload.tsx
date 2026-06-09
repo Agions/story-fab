@@ -113,9 +113,22 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
 
       for (let i = 0; i < totalChunks; i++) {
         if (uploadStatusRef.current === 'paused') {
-          await new Promise<void>((resolve) => {
+          await new Promise<void>((resolve, reject) => {
+            // Track whether the interval is still active so we can clear it on cancel/error
+            let active = true;
             const checkResume = setInterval(() => {
+              if (!active) return;
+              if (uploadStatusRef.current === 'cancelled' || uploadStatusRef.current === 'error') {
+                active = false;
+                clearInterval(checkResume);
+                if (pauseIntervalRef.current === checkResume) {
+                  pauseIntervalRef.current = null;
+                }
+                reject(new Error('Upload cancelled or errored while paused'));
+                return;
+              }
               if (uploadStatusRef.current === 'uploading') {
+                active = false;
                 clearInterval(checkResume);
                 if (pauseIntervalRef.current === checkResume) {
                   pauseIntervalRef.current = null;
