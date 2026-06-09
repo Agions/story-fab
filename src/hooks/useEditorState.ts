@@ -1,25 +1,37 @@
 /**
  * 剪辑工作流 Hook
  * 整合所有剪辑功能，提供统一的剪辑工作流
+ *
+ * 重构说明：
+ * - 原 451 行单体 Hook 已重构为多个独立 Hook 组合
+ * - usePlaybackControl: 播放控制
+ * - useClipOperations: 片段操作
+ * - useTrackOperations: 轨道操作
+ * - 本文件作为编排器，整合各子 Hook
+ * - 保持原有 API 兼容性
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { logger } from '@/shared/utils/logging';
+import { useState, useCallback, useEffect } from 'react';
 import { delay } from '@/shared';
 import {
   editorService,
   saveToStorage,
   type EditorConfig,
   type Timeline,
-  type TimelineClip,
   type VideoSegment,
-  type TextItem,
-  type AudioClip,
-  type EditorExportSettings,
+  type ScriptSegment,
 } from '@/core/services/editor';
-import type { ExportSettings, ScriptSegment } from '@/core/types';
+import type { ExportSettings } from '@/core/types';
 
-// 剪辑状态
+// 导入拆分后的子 Hook
+import { usePlaybackControl } from './usePlaybackControl';
+import { useClipOperations } from './useClipOperations';
+import { useTrackOperations } from './useTrackOperations';
+
+// ============================================
+// 类型定义（保持向后兼容）
+// ============================================
+
 export interface EditorState {
   timeline: Timeline | null;
   isLoading: boolean;
@@ -34,7 +46,6 @@ export interface EditorState {
   isExporting: boolean;
 }
 
-// 剪辑操作
 export interface EditorOperations {
   // 播放控制
   play: () => void;
@@ -43,7 +54,7 @@ export interface EditorOperations {
   setPlaybackRate: (rate: number) => void;
 
   // 片段操作
-  addClip: (trackId: string, clip: TimelineClip, position: number) => void;
+  addClip: (trackId: string, clip: any, position: number) => void;
   removeClip: (trackId: string, clipId: string) => void;
   moveClip: (trackId: string, clipId: string, newPosition: number) => void;
   copyClip: (clipId: string) => void;
@@ -53,8 +64,8 @@ export interface EditorOperations {
   // 效果操作
   addTransition: (fromClipId: string, toClipId: string, type: string, duration: number) => void;
   addEffect: (clipId: string, effect: string, params: Record<string, unknown>) => void;
-  addText: (trackId: string, text: TextItem, position: number) => void;
-  addAudio: (trackId: string, audio: AudioClip, position: number) => void;
+  addText: (trackId: string, text: any, position: number) => void;
+  addAudio: (trackId: string, audio: any, position: number) => void;
 
   // 轨道操作
   createTrack: (type: 'video' | 'audio' | 'text' | 'effect') => string;
@@ -86,7 +97,13 @@ export interface EditorOperations {
   clearProject: () => void;
 }
 
-// 剪辑 Hook
+// ============================================
+// 主 Hook
+// ============================================
+
+/**
+ * 剪辑 Hook（编排器）
+ */
 export function useEditor(_config?: Partial<EditorConfig>): {
   state: EditorState;
   operations: EditorOperations;
@@ -103,290 +120,141 @@ export function useEditor(_config?: Partial<EditorConfig>): {
     canUndo: false,
     canRedo: false,
     exportProgress: 0,
-    isExporting: false
+    isExporting: false,
   });
 
-  // 播放状态引用
-  const playbackRef = useRef<{
-    isPlaying: boolean;
-    startTime: number;
-    startPosition: number;
-    animationFrame: number | null;
-  }>({
-    isPlaying: false,
-    startTime: 0,
-    startPosition: 0,
-    animationFrame: null
-  });
-
-  // 初始化
+  // 初始化订阅
   useEffect(() => {
-    // 订阅时间轴变化
     const unsubscribe = editorService.subscribe((timeline) => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         timeline,
         canUndo: editorService.canUndo(),
-        canRedo: editorService.canRedo()
+        canRedo: editorService.canRedo(),
       }));
     });
 
-    // 尝试加载本地项目
     editorService.loadFromStorage();
 
     return () => {
       unsubscribe();
-      if (playbackRef.current.animationFrame) {
-        cancelAnimationFrame(playbackRef.current.animationFrame);
-      }
     };
   }, []);
 
-  // 播放控制
-  const play = useCallback(() => {
-    if (!state.timeline || state.isPlaying) return;
+  // 状态更新辅助函数
+  const updateState = useCallback((updates: Partial<EditorState>) => {
+    setState((prev) => ({ ...prev, ...updates }));
+  }, []);
 
-    // Capture current timeline ref to avoid stale closure in animation loop
-    const timelineRef = state.timeline;
+  // 播放控制（委托给 usePlaybackControl）
+  const playback = usePlaybackControl({
+    timeline: state.timeline,
+    isPlaying: state.isPlaying,
+    currentTime: state.currentTime,
+    onStateChange: (updates) => {
+      updateState(updates);
+    },
+  });
 
-    playbackRef.current = {
-      isPlaying: true,
-      startTime: performance.now(),
-      startPosition: state.currentTime,
-      animationFrame: null
+  // 清理播放资源
+  useEffect(() => {
+    return () => {
+      playback.cleanup();
     };
+  }, [playback]);
 
-    const animate = () => {
-      const elapsed = (performance.now() - playbackRef.current.startTime) / 1000;
-      const newTime = playbackRef.current.startPosition + elapsed;
+  // 片段操作（委托给 useClipOperations）
+  const clipOps = useClipOperations({
+    dispatch: (action) => editorService.dispatch(action),
+  });
 
-      // Use captured timelineRef instead of state.timeline to avoid stale closure
-      if (newTime >= timelineRef.duration) {
-        // 播放结束
-        setState(prev => ({
-          ...prev,
-          isPlaying: false,
-          currentTime: timelineRef.duration
-        }));
-        return;
-      }
-
-      setState(prev => ({
+  // 轨道操作（委托给 useTrackOperations）
+  const trackOps = useTrackOperations({
+    createTrackFn: (type) => editorService.createTrack(type),
+    onToggleVisibility: (trackId) => {
+      setState((prev) => ({
         ...prev,
-        currentTime: newTime
+        timeline: prev.timeline
+          ? {
+              ...prev.timeline,
+              videoTracks: prev.timeline.videoTracks.map((track) =>
+                track.id === trackId ? { ...track, visible: !track.visible } : track
+              ),
+            }
+          : null,
       }));
-
-      playbackRef.current.animationFrame = requestAnimationFrame(animate);
-    };
-
-    playbackRef.current.animationFrame = requestAnimationFrame(animate);
-
-    setState(prev => ({ ...prev, isPlaying: true }));
-  }, [state.timeline, state.currentTime, state.isPlaying]);
-
-  const pause = useCallback(() => {
-    if (playbackRef.current.animationFrame) {
-      cancelAnimationFrame(playbackRef.current.animationFrame);
-    }
-    playbackRef.current.isPlaying = false;
-    setState(prev => ({ ...prev, isPlaying: false }));
-  }, []);
-
-  const seek = useCallback((time: number) => {
-    setState(prev => ({
-      ...prev,
-      currentTime: Math.max(0, Math.min(time, prev.timeline?.duration || 0))
-    }));
-  }, []);
-
-  const setPlaybackRate = useCallback((rate: number) => {
-    // 实现播放速度调整
-    logger.debug('设置播放速度:', { rate });
-  }, []);
-
-  // 片段操作
-  const addClip = useCallback((trackId: string, clip: TimelineClip, position: number) => {
-    editorService.dispatch({
-      type: 'ADD_CLIP',
-      trackId,
-      clip,
-      position
-    });
-  }, []);
-
-  const removeClip = useCallback((trackId: string, clipId: string) => {
-    editorService.dispatch({
-      type: 'REMOVE_CLIP',
-      trackId,
-      clipId
-    });
-  }, []);
-
-  const moveClip = useCallback((trackId: string, clipId: string, newPosition: number) => {
-    editorService.dispatch({
-      type: 'MOVE_CLIP',
-      trackId,
-      clipId,
-      newPosition
-    });
-  }, []);
-
-  const copyClip = useCallback((clipId: string) => {
-    editorService.dispatch({
-      type: 'COPY_CLIP',
-      clipId
-    });
-  }, []);
-
-  const trimClip = useCallback((clipId: string, startTime: number, endTime: number) => {
-    editorService.dispatch({
-      type: 'TRIM_CLIP',
-      clipId,
-      startMs: startTime,
-      endMs: endTime
-    });
-  }, []);
-
-  const splitClip = useCallback((clipId: string, splitTime: number) => {
-    editorService.dispatch({
-      type: 'SPLIT_CLIP',
-      clipId,
-      splitMs: splitTime
-    });
-  }, []);
-
-  // 效果操作
-  const addTransition = useCallback((
-    fromClipId: string,
-    toClipId: string,
-    transitionType: string,
-    duration: number
-  ) => {
-    editorService.dispatch({
-      type: 'ADD_TRANSITION',
-      fromClipId,
-      toClipId,
-      transitionType,
-      duration
-    });
-  }, []);
-
-  const addEffect = useCallback((clipId: string, effect: string, params: Record<string, unknown>) => {
-    editorService.dispatch({
-      type: 'ADD_EFFECT',
-      clipId,
-      effect,
-      params
-    });
-  }, []);
-
-  const addText = useCallback((trackId: string, text: TextItem, position: number) => {
-    editorService.dispatch({
-      type: 'ADD_TEXT',
-      trackId,
-      text,
-      position
-    });
-  }, []);
-
-  const addAudio = useCallback((trackId: string, audio: AudioClip, position: number) => {
-    editorService.dispatch({
-      type: 'ADD_AUDIO',
-      trackId,
-      audio,
-      position
-    });
-  }, []);
-
-  // 轨道操作
-  const createTrack = useCallback((type: 'video' | 'audio' | 'text' | 'effect') => {
-    return editorService.createTrack(type);
-  }, []);
-
-  const deleteTrack = useCallback((trackId: string) => {
-    // 实现删除轨道
-    logger.debug('删除轨道:', { trackId });
-  }, []);
-
-  const toggleTrackVisibility = useCallback((trackId: string) => {
-    setState(prev => ({
-      ...prev,
-      timeline: prev.timeline ? {
-        ...prev.timeline,
-        videoTracks: prev.timeline.videoTracks.map((track) =>
-          track.id === trackId ? { ...track, visible: !track.visible } : track
-        )
-      } : null
-    }));
-  }, []);
-
-  const toggleTrackLock = useCallback((trackId: string) => {
-    setState(prev => ({
-      ...prev,
-      timeline: prev.timeline ? {
-        ...prev.timeline,
-        videoTracks: prev.timeline.videoTracks.map((track) =>
-          track.id === trackId ? { ...track, locked: !track.locked } : track
-        )
-      } : null
-    }));
-  }, []);
+    },
+    onToggleLock: (trackId) => {
+      setState((prev) => ({
+        ...prev,
+        timeline: prev.timeline
+          ? {
+              ...prev.timeline,
+              videoTracks: prev.timeline.videoTracks.map((track) =>
+                track.id === trackId ? { ...track, locked: !track.locked } : track
+              ),
+            }
+          : null,
+      }));
+    },
+  });
 
   // 历史操作
-  const undo = useCallback(() => {
-    editorService.undo();
-  }, []);
-
-  const redo = useCallback(() => {
-    editorService.redo();
-  }, []);
+  const undo = useCallback(() => editorService.undo(), []);
+  const redo = useCallback(() => editorService.redo(), []);
 
   // 选择操作
   const selectClip = useCallback((clipId: string | null) => {
-    setState(prev => ({ ...prev, selectedClipId: clipId }));
-  }, []);
+    updateState({ selectedClipId: clipId });
+  }, [updateState]);
 
   const selectTrack = useCallback((trackId: string | null) => {
-    setState(prev => ({ ...prev, selectedTrackId: trackId }));
-  }, []);
+    updateState({ selectedTrackId: trackId });
+  }, [updateState]);
 
   // 缩放操作
   const zoomIn = useCallback(() => {
-    setState(prev => ({ ...prev, zoom: Math.min(prev.zoom * 1.2, 5) }));
-  }, []);
+    updateState({ zoom: Math.min(state.zoom * 1.2, 5) });
+  }, [state.zoom, updateState]);
 
   const zoomOut = useCallback(() => {
-    setState(prev => ({ ...prev, zoom: Math.max(prev.zoom / 1.2, 0.2) }));
-  }, []);
+    updateState({ zoom: Math.max(state.zoom / 1.2, 0.2) });
+  }, [state.zoom, updateState]);
 
-  const setZoom = useCallback((zoom: number) => {
-    setState(prev => ({ ...prev, zoom: Math.max(0.2, Math.min(zoom, 5)) }));
-  }, []);
+  const setZoom = useCallback(
+    (zoom: number) => {
+      updateState({ zoom: Math.max(0.2, Math.min(zoom, 5)) });
+    },
+    [updateState]
+  );
 
   // 工作流操作
-  const generateFromScript = useCallback((
-    scriptSegments: ScriptSegment[],
-    videoSegments: VideoSegment[]
-  ) => {
-    editorService.generateTimelineFromScript(scriptSegments, videoSegments);
-  }, []);
+  const generateFromScript = useCallback(
+    (scriptSegments: ScriptSegment[], videoSegments: VideoSegment[]) => {
+      editorService.generateTimelineFromScript(scriptSegments, videoSegments);
+    },
+    []
+  );
 
-  const exportVideo = useCallback(async (settings?: Partial<ExportSettings>): Promise<Blob> => {
-    setState(prev => ({ ...prev, isExporting: true, exportProgress: 0 }));
+  const exportVideo = useCallback(
+    async (settings?: Partial<ExportSettings>): Promise<Blob> => {
+      updateState({ isExporting: true, exportProgress: 0 });
 
-    try {
-      // 模拟导出进度
-      for (let i = 0; i <= 100; i += 10) {
-        await delay(200);
-        setState(prev => ({ ...prev, exportProgress: i }));
+      try {
+        // 模拟导出进度
+        for (let i = 0; i <= 100; i += 10) {
+          await delay(200);
+          updateState({ exportProgress: i });
+        }
+
+        const blob = await editorService.exportTimeline(settings as any);
+        return blob;
+      } finally {
+        updateState({ isExporting: false, exportProgress: 100 });
       }
-
-      const blob = await editorService.exportTimeline(settings as Partial<EditorExportSettings>);
-      return blob;
-    } finally {
-      setState(prev => ({ ...prev, isExporting: false, exportProgress: 100 }));
-    }
-  }, []);
+    },
+    [updateState]
+  );
 
   const getExportPreview = useCallback(() => {
     return editorService.getExportPreview();
@@ -403,36 +271,34 @@ export function useEditor(_config?: Partial<EditorConfig>): {
 
   const clearProject = useCallback(() => {
     editorService.clear();
-    setState(prev => ({
-      ...prev,
+    updateState({
       currentTime: 0,
       selectedClipId: null,
-      selectedTrackId: null
-    }));
-  }, []);
+      selectedTrackId: null,
+    });
+  }, [updateState]);
 
-  // 返回状态和操作
   return {
     state,
     operations: {
-      play,
-      pause,
-      seek,
-      setPlaybackRate,
-      addClip,
-      removeClip,
-      moveClip,
-      copyClip,
-      trimClip,
-      splitClip,
-      addTransition,
-      addEffect,
-      addText,
-      addAudio,
-      createTrack,
-      deleteTrack,
-      toggleTrackVisibility,
-      toggleTrackLock,
+      play: playback.play,
+      pause: playback.pause,
+      seek: playback.seek,
+      setPlaybackRate: playback.setPlaybackRate,
+      addClip: clipOps.addClip,
+      removeClip: clipOps.removeClip,
+      moveClip: clipOps.moveClip,
+      copyClip: clipOps.copyClip,
+      trimClip: clipOps.trimClip,
+      splitClip: clipOps.splitClip,
+      addTransition: clipOps.addTransition,
+      addEffect: clipOps.addEffect,
+      addText: clipOps.addText,
+      addAudio: clipOps.addAudio,
+      createTrack: trackOps.createTrack,
+      deleteTrack: trackOps.deleteTrack,
+      toggleTrackVisibility: trackOps.toggleTrackVisibility,
+      toggleTrackLock: trackOps.toggleTrackLock,
       undo,
       redo,
       selectClip,
@@ -445,7 +311,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
       getExportPreview,
       saveProject,
       loadProject,
-      clearProject
-    }
+      clearProject,
+    },
   };
 }
