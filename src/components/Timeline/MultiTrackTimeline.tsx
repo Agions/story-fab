@@ -42,7 +42,8 @@ import { Playhead } from './Playhead';
 import { ClipRenderer } from './ClipRenderer';
 import { ClipPropertiesPanel } from './ClipPropertiesPanel';
 import { clamp, generateId, formatTimecodeMs } from '@/shared/utils';
-import { MIN_CLIP_DURATION, DEFAULT_TRACK_HEIGHT, MIN_ZOOM, MAX_ZOOM, SNAP_THRESHOLD_PX, TRACK_COLORS } from './constants';
+import { MIN_CLIP_DURATION, DEFAULT_TRACK_HEIGHT, MIN_ZOOM, MAX_ZOOM, TRACK_COLORS } from './constants';
+import { snapToBoundary } from './timelineSnap';
 
 import styles from '@/components/Timeline/Timeline.module.less';
 
@@ -194,28 +195,8 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedClipId, onUndo, onRedo, updateTrack, onClipDelete, onSelectionChange]);
 
-  // 吸附
-  const getSnapPoints = useCallback((excludeClipId: string): number[] => {
-    const points: number[] = [0, duration];
-    tracks.forEach((track) => {
-      track.clips.forEach((clip) => {
-        if (clip.id !== excludeClipId) {
-          points.push(clip.startMs, clip.endMs);
-        }
-      });
-    });
-    return [...new Set(points)].sort((a, b) => a - b);
-  }, [tracks, duration]);
-
-  const snapToBoundary = useCallback((ms: number, excludeClipId: string): number => {
-    if (!snapEnabled) return ms;
-    const points = getSnapPoints(excludeClipId);
-    const threshold = SNAP_THRESHOLD_PX * msPerPixel;
-    for (const point of points) {
-      if (Math.abs(ms - point) <= threshold) return point;
-    }
-    return ms;
-  }, [snapEnabled, getSnapPoints, msPerPixel]);
+  // 吸附逻辑已提取到 timelineSnap.ts
+  // 保留 msPerPixel 用于计算和向后兼容
 
   // allClips and getTrackById removed - unused
 
@@ -409,15 +390,15 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
                   let newEndMs = originalEnd;
 
                   if (dragType === 'move') {
-                    newStartMs = snapToBoundary(originalStart + deltaMs, clipId);
+                    newStartMs = snapToBoundary(originalStart + deltaMs, clipId, tracks, duration, msPerPixel, snapEnabled);
                     newEndMs = newStartMs + (originalEnd - originalStart);
                   } else if (dragType === 'start') {
-                    newStartMs = Math.max(0, snapToBoundary(originalStart + deltaMs, clipId));
+                    newStartMs = Math.max(0, snapToBoundary(originalStart + deltaMs, clipId, tracks, duration, msPerPixel, snapEnabled));
                     if (newStartMs >= newEndMs - MIN_CLIP_DURATION) {
                       newStartMs = newEndMs - MIN_CLIP_DURATION;
                     }
                   } else if (dragType === 'end') {
-                    newEndMs = Math.max(newStartMs + MIN_CLIP_DURATION, snapToBoundary(originalEnd + deltaMs, clipId));
+                    newEndMs = Math.max(newStartMs + MIN_CLIP_DURATION, snapToBoundary(originalEnd + deltaMs, clipId, tracks, duration, msPerPixel, snapEnabled));
                   }
 
                   return { ...c, startMs: newStartMs, endMs: newEndMs };
@@ -453,7 +434,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
     dragUpHandlerRef.current = handleMouseUp;
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  }, [getClipById, msPerPixel, snapToBoundary, onClipUpdate]);
+  }, [getClipById, msPerPixel, snapToBoundary, onClipUpdate, tracks, duration, snapEnabled]);
 
   // 时间线点击
   const handleTimelineClick = useCallback((e: React.MouseEvent) => {

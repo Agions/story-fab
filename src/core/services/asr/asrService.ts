@@ -1,40 +1,45 @@
 /**
  * ASR（自动语音识别）服务
- * 提供音频转文字能力，支持多语言和多种音频格式
+ * 编排多个 ASR Provider：RustWhisper → WebSpeech → Mock
+ * 策略模式实现：每种识别方案独立为 Provider，可独立测试和替换
  */
-
-import { BaseService, ServiceError } from '../providers/base.service';
+import { BaseService } from '../providers/base.service';
 import { logger } from '../../../shared/utils/logging';
 import { tauri } from '../../tauri/TauriBridge';
 import type { VideoInfo } from '@/core/types';
 import {
   DEFAULT_ASR_OPTIONS,
   type ASRResult,
-  type ASRSegment,
   type ASROptions,
-  type RustWhisperSegment,
-  type SpeechRecognitionCtor,
-  type SpeechRecognitionEvent,
 } from './asrTypes';
+import { RustWhisperASRProvider } from './providers/whisperRustProvider';
+import { WebSpeechASRProvider } from './providers/webSpeechProvider';
+import { MockASRProvider } from './providers/mockProvider';
+import type { IASRProvider } from './providers/types';
 
-// ============================================
-// ASR 服务
-// ============================================
-
+/**
+ * ASR 服务（编排器）
+ * 单一职责：管理 Provider 链，按优先级依次尝试直到成功
+ */
 export class ASRService extends BaseService {
-// @ts-ignore - _isInitialized reserved for future lazy initialization state tracking
+  // @ts-ignore - _isInitialized 预留用于未来懒加载状态跟踪
   private _isInitialized = false;
+
+  /** Provider 链：按优先级排序 */
+  private readonly _providers: IASRProvider[];
 
   constructor() {
     super('ASRService', { timeout: 60000, retries: 2 });
+    this._providers = [
+      new RustWhisperASRProvider(),
+      new WebSpeechASRProvider(),
+      new MockASRProvider(),
+    ];
   }
 
   /**
    * 视频路径转字幕 — SubtitleEditor 专用入口
    * 构造最小 VideoInfo 后调用 recognizeSpeech
-   * @param videoPath 视频文件路径
-   * @param duration  视频时长（秒）
-   * @param options   ASR 选项
    */
   async transcribeVideo(
     videoPath: string,
@@ -57,8 +62,7 @@ export class ASRService extends BaseService {
 
   /**
    * 语音识别 - 将音频转换为文字
-   * @param videoInfo 视频信息
-   * @param options ASR 选项
+   * 按 Provider 链依次尝试，返回第一个成功结果
    */
   async recognizeSpeech(
     videoInfo: VideoInfo,
@@ -73,26 +77,7 @@ export class ASRService extends BaseService {
         duration: videoInfo.duration,
       });
 
-      // ASR 策略：
-      // 1. Rust Whisper（faster-whisper，本地，优先）
-      // 2. Web Speech API（浏览器内置）
-      // 3. Mock（两者都不可用时）
-      let result: ASRResult | null = null;
-
-      try {
-        result = await this.tryRustWhisperASR(videoInfo, opts);
-      } catch (err) {
-        logger.warn('[ASRService] Rust Whisper 不可用:', String(err));
-      }
-
-      if (!result) {
-        result = await this.tryWebSpeechASR(videoInfo, opts);
-      }
-
-      if (!result) {
-        logger.warn('[ASRService] ⚠️ 所有 ASR 方案均不可用（faster-whisper 未安装 / Web Speech API 不支持）。使用模拟结果。请安装: pip install faster-whisper');
-        result = await this.mockASR(videoInfo, opts);
-      }
+      const result = await this._runProviderChain(videoInfo, opts);
 
       logger.info(`[ASRService] 语音识别完成: provider=${result.provider}, segments=${result.segments.length}`, {
         videoId: videoInfo.id,
@@ -107,8 +92,6 @@ export class ASRService extends BaseService {
 
   /**
    * 批量语音识别
-   * @param videos 视频列表
-   * @param options ASR 选项
    */
   async recognizeBatch(
     videos: VideoInfo[],
@@ -126,7 +109,6 @@ export class ASRService extends BaseService {
 
   /**
    * 获取音频峰值（用于配合 ASR 做高光检测）
-   * @param videoInfo 视频信息
    */
   async getAudioPeaks(
     videoInfo: VideoInfo,
@@ -145,298 +127,54 @@ export class ASRService extends BaseService {
         threshold: 2.5,
       });
 
-      // 将 ZCR burst 转换为峰值格式
-      // score > 1 表示超过阈值（爆裂区域）；score 本身即为强度
-      const peaks: Array<{ timestamp: number; intensity: number }> = [];
-      for (const burst of bursts) {
-        // burst.start_ms / end_ms 单位：毫秒（来自 Rust ZCR）
-        const midMs = (burst.start_ms + burst.end_ms) / 2;
-        // intensity = 归一化 score（最小为 1），转为 0~1 范围
-        const intensity = Math.min((burst.score - 1) / (burst.score + 0.001), 1);
-        // minInterval 传进来时已经是毫秒，直接比较
-        if (intensity >= (threshold - 0.3)) {
-          const lastPeak = peaks[peaks.length - 1];
-          // midMs: ms, lastPeak.timestamp: 秒 → 转 ms 再比较, minInterval: ms
-          if (!lastPeak || midMs - lastPeak.timestamp * 1000 >= minInterval) {
-            peaks.push({ timestamp: midMs / 1000, intensity });
-          }
-        }
-      }
-
-      return peaks;
+      return this._convertBurstsToPeaks(bursts, threshold, minInterval);
     }, '音频峰值检测失败');
   }
 
   /**
-   * 模拟 ASR 结果（临时实现）
-   * 实际使用时替换为真实 ASR API 调用
+   * 按顺序尝试 Provider 链，返回第一个成功结果
+   * 所有 Provider 不可用时降级到 Mock
    */
-  private async mockASR(
+  private async _runProviderChain(
     videoInfo: VideoInfo,
     opts: Required<ASROptions>
   ): Promise<ASRResult> {
-    // 生成模拟分段
-    const segmentDuration = 5; // 每段 5 秒
-    const numSegments = Math.max(1, Math.floor(videoInfo.duration / segmentDuration));
-    const segments: ASRSegment[] = [];
-
-    const sampleTexts: Record<string, string[]> = {
-      'zh_cn': [
-        '欢迎观看本期视频',
-        '今天我们来介绍一个新功能',
-        '首先让我们了解一下背景',
-        '然后进入实际操作环节',
-        '最后做一个总结',
-      ],
-      'en_us': [
-        'Welcome to this video',
-        'Today we are going to introduce a new feature',
-        'First let us understand the background',
-        'Then we move to the practical operation',
-        'Finally we make a summary',
-      ],
-    };
-
-    const texts = sampleTexts[opts.language] || sampleTexts['zh_cn'];
-
-    for (let i = 0; i < numSegments; i++) {
-      const startTime = i * segmentDuration;
-      const endTime = Math.min((i + 1) * segmentDuration, videoInfo.duration);
-      const textIndex = i % texts.length;
-
-      segments.push({
-        id: crypto.randomUUID(),
-        startTime,
-        endTime,
-        text: texts[textIndex],
-        confidence: 0.85 + Math.random() * 0.15,
-        words: opts.enableTimestamp ? [
-          {
-            word: texts[textIndex],
-            startTime,
-            endTime,
-            confidence: 0.9,
-          },
-        ] : undefined,
-      });
-    }
-
-    return {
-      text: segments.map(s => s.text).join('。'),
-      segments,
-      language: opts.language,
-      confidence: 0.88,
-      fullResult: opts.enableTimestamp ? segments.map(s => ({
-        start: s.startTime,
-        end: s.endTime,
-        text: s.text,
-        confidence: s.confidence,
-        words: s.words,
-      })) : undefined,
-      provider: 'mock',
-    };
-  }
-
-  /**
-   * 通过 Tauri 后端调用 Rust faster-whisper 进行语音识别
-   * 本地推理，准确率高，支持中文/英文，断网可用
-   *
-   * @returns ASRResult 或 null（Rust 不可用时）
-   */
-  private async tryRustWhisperASR(
-    videoInfo: VideoInfo,
-    opts: Required<ASROptions>,
-  ): Promise<ASRResult | null> {
-    try {
-      logger.info('[ASRService] 尝试 Rust Whisper ASR:', {
-        path: videoInfo.path,
-        language: opts.language,
-      });
-
-      const whisperResult = await tauri.transcribeAudio(
-        videoInfo.path,
-        opts.model,
-        opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : undefined,
-      );
-
-      if (!whisperResult || !whisperResult.segments || whisperResult.segments.length === 0) {
-        logger.warn('[ASRService] Rust Whisper 返回空结果');
-        return null;
-      }
-
-      const segments: ASRSegment[] = whisperResult.segments.map(
-        (seg: RustWhisperSegment) => ({
-          id: crypto.randomUUID(),
-          startTime: seg.start_ms / 1000,
-          endTime: seg.end_ms / 1000,
-          text: seg.text.trim(),
-          confidence: seg.probability ?? 0.95,
-          words: seg.words?.map(w => ({
-            word: w.word,
-            startTime: w.start_ms / 1000,
-            endTime: w.end_ms / 1000,
-            confidence: w.probability,
-          })),
-        }),
-      );
-
-      logger.info(`[ASRService] Rust Whisper 完成: ${segments.length} 段`, {
-        language: whisperResult.language,
-      });
-
-      return {
-        text: segments.map(s => s.text).join(' '),
-        segments,
-        language: opts.language,
-        confidence: whisperResult.language_probability ?? 0.9, // 用于整体识别质量评估
-        fullResult: opts.enableTimestamp
-          ? segments.map(s => ({
-              start: s.startTime,
-              end: s.endTime,
-              text: s.text,
-              confidence: s.confidence,
-            }))
-          : undefined,
-        provider: 'rust-whisper',
-      };
-    } catch (err) {
-      logger.warn('[ASRService] Rust Whisper 调用失败:', String(err));
-      return null;
-    }
-  }
-
-  /**
-   * 使用浏览器 Web Speech API 进行语音识别
-   * 优点：无 API key 依赖，实时性好
-   * 缺点：准确率低于 Whisper/云 ASR，仅支持部分语言
-   *
-   * @returns ASRResult 或 null（API 不可用时）
-   */
-// @ts-ignore - tryWebSpeechASR is experimental Web Speech API fallback, signature may change
-private tryWebSpeechASR(
-  // @ts-ignore - videoInfo reserved for future media constraints in Web Speech API
-  videoInfo: VideoInfo,
-    opts: Required<ASROptions>
-  ): Promise<ASRResult | null> {
-    return new Promise((resolve) => {
-      // 检查 Web Speech API 是否可用
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const SpeechRecognitionCtor = ((window as unknown as { SpeechRecognition?: SpeechRecognitionCtor; webkitSpeechRecognition?: SpeechRecognitionCtor }).SpeechRecognition
-        ?? (window as unknown as { webkitSpeechRecognition?: SpeechRecognitionCtor }).webkitSpeechRecognition) as SpeechRecognitionCtor | undefined;
-      if (!SpeechRecognitionCtor) {
-        resolve(null);
-        return;
-      }
-
+    for (const provider of this._providers) {
       try {
-        const recognition = new SpeechRecognitionCtor();
-        recognition.lang = opts.language.replace('_', '-');
-        recognition.continuous = true;
-        recognition.interimResults = false;
-
-        const segments: ASRSegment[] = [];
-        let startTime = 0;
-        let currentText = '';
-
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
-          for (let i = 0; i < event.results.length; i++) {
-            const result = event.results[i];
-            const transcript = result[0].transcript.trim();
-            if (transcript) {
-              const confidence = result[0].confidence ?? 0.85;
-              segments.push({
-                id: crypto.randomUUID(),
-                startTime,
-                endTime: startTime + Math.max(2, transcript.length / 5),
-                text: transcript,
-                confidence,
-              });
-              currentText += transcript + ' ';
-              startTime += 3; // 估计每段 3 秒
-            }
-          }
-        };
-
-        recognition.onerror = () => resolve(null);
-        recognition.onend = () => {
-          if (segments.length > 0) {
-            resolve({
-              text: currentText.trim(),
-              segments,
-              language: opts.language,
-              confidence: segments.reduce((s, seg) => s + seg.confidence, 0) / segments.length,
-              fullResult: opts.enableTimestamp ? segments.map(s => ({
-                start: s.startTime,
-                end: s.endTime,
-                text: s.text,
-                confidence: s.confidence,
-              })) : undefined,
-              provider: 'web-speech',
-            });
-          } else {
-            resolve(null);
-          }
-        };
-
-        recognition.start();
-        // Web Speech API 需要麦克风，这里模拟 2 秒后结束（实际使用时需要真实音频流）
-        setTimeout(() => recognition.stop(), 2000);
-      } catch {
-        resolve(null);
+        const result = await provider.transcribe(videoInfo, opts);
+        if (result) {
+          return result;
+        }
+      } catch (err) {
+        logger.warn(`[ASRService] ${provider.name} 不可用:`, String(err));
       }
-    });
-  }
-
-  /**
-   * 讯飞 ASR API 调用
-   *
-   * 使用方式：
-   * 1. 在 https://www.xfyun.cn 注册并获取 APPID/APISecret/APIKey
-   * 2. 设置环境变量或配置项：ASR_XFyun_APPID / ASR_XFyun_APIKEY
-   *
-   * @requires xfyun-app-id, xfyun-api-key 配置
-   */
-// @ts-ignore - callXfyunASR signature reserved for future xfyun cloud ASR integration
-  private async callXfyunASR(
-    _videoInfo: VideoInfo,
-    _options: Required<ASROptions>
-  ): Promise<ASRResult> {
-    const appId = import.meta.env.VITE_XFyun_APPID;
-    const apiKey = import.meta.env.VITE_XFyun_APIKEY;
-
-    if (!appId || !apiKey) {
-      logger.warn('[ASRService] 讯飞 ASR 未配置 API 凭证，跳过');
-      throw new ServiceError('讯飞 ASR 缺少凭证', 'NOT_CONFIGURED');
     }
 
-    // 讯飞文档: https://www.xfyun.cn/doc/asr/online_asr/API.html
-    throw new ServiceError('讯飞 ASR 接入请参考文档配置', 'NOT_IMPLEMENTED');
+    // 永远不会到达这里（Mock Provider 永远成功）
+    throw new Error('No ASR provider returned a result');
   }
 
-  /**
-   * 腾讯 ASR API 调用
-   *
-   * 使用方式：
-   * 1. 在 https://cloud.tencent.com/product/asr 注册
-   * 2. 设置环境变量：VITE_TENCENT_ASR_SECRET_ID / VITE_TENCENT_ASR_SECRET_KEY
-   *
-   * @requires tencent-secret-id, tencent-secret-key 配置
-   */
-// @ts-ignore - callTencentASR signature reserved for future tencent cloud ASR integration
-  private async callTencentASR(
-    _videoInfo: VideoInfo,
-    _options: Required<ASROptions>
-  ): Promise<ASRResult> {
-    const secretId = import.meta.env.VITE_TENCENT_ASR_SECRET_ID;
-    const secretKey = import.meta.env.VITE_TENCENT_ASR_SECRET_KEY;
+  /** 将 ZCR burst 转换为峰值格式（毫秒→秒，归一化强度） */
+  private _convertBurstsToPeaks(
+    bursts: Array<{ start_ms: number; end_ms: number; score: number }>,
+    threshold: number,
+    minInterval: number
+  ): Array<{ timestamp: number; intensity: number }> {
+    const peaks: Array<{ timestamp: number; intensity: number }> = [];
 
-    if (!secretId || !secretKey) {
-      logger.warn('[ASRService] 腾讯 ASR 未配置 API 凭证，跳过');
-      throw new ServiceError('腾讯 ASR 缺少凭证', 'NOT_CONFIGURED');
+    for (const burst of bursts) {
+      const midMs = (burst.start_ms + burst.end_ms) / 2;
+      const intensity = Math.min((burst.score - 1) / (burst.score + 0.001), 1);
+
+      if (intensity >= (threshold - 0.3)) {
+        const lastPeak = peaks[peaks.length - 1];
+        if (!lastPeak || midMs - lastPeak.timestamp * 1000 >= minInterval) {
+          peaks.push({ timestamp: midMs / 1000, intensity });
+        }
+      }
     }
 
-    // 腾讯文档: https://cloud.tencent.com/document/product/1093-37856
-    throw new ServiceError('腾讯 ASR 接入请参考文档配置', 'NOT_IMPLEMENTED');
+    return peaks;
   }
 }
 
