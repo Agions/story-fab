@@ -18,9 +18,16 @@ import { ClipRepurposingPipeline } from './pipeline';
 import type { RepurposingOptions } from './pipeline';
 import { clipSegmentFromRepurposing } from './types';
 import type { ASRSegment } from '../../asr/asrTypes';
+import {
+  buildSceneChanges,
+  isSegmentInSilence,
+  attachScriptText,
+  applyTransitionsToSegments,
+  getAnalysisDuration,
+} from './clipGenerators';
 
 // 剪辑配置
-interface ClipConfig {
+export interface ClipConfig {
   // 检测配置
   detectSceneChange: boolean;
   detectSilence: boolean;
@@ -140,15 +147,13 @@ export class ClipWorkflowService {
     
     // Step 1: 视频分析
     const analysis = await this.analyzeVideo(videoInfo);
-    
+
     // Step 2: 场景切换点（复用 analyzeVideo 已有结果，无需重复调用）
-    const sceneChanges = this.config.detectSceneChange
-      ? (analysis.scenes || []).map((s) => ({ time: s.startTime, confidence: s.confidence || 0.8 }))
-      : [];
-    
+    const sceneChanges = buildSceneChanges(analysis, this.config.detectSceneChange);
+
     // Step 3: 静音检测（VideoAnalysis 暂无音频分段数据，保守返回空）
     const silenceSections: Array<{ start: number; end: number }> = [];
-    
+
     // Step 4: 生成剪辑片段
     const segments = this.generateClips(
       analysis,
@@ -156,9 +161,9 @@ export class ClipWorkflowService {
       silenceSections,
       scriptSegments
     );
-    
+
     // Step 5: 应用转换效果
-    const finalSegments = this.applyTransitions(segments);
+    const finalSegments = applyTransitionsToSegments(segments, this.config);
     
     const totalDuration = finalSegments.reduce((sum, s) => sum + s.duration, 0);
     const removedDuration = silenceSections.reduce((sum, s) => sum + (s.end - s.start), 0);
@@ -231,7 +236,7 @@ export class ClipWorkflowService {
     );
 
     // 应用当前服务的转换效果（向后兼容）
-    const finalSegments = this.applyTransitions(segments);
+    const finalSegments = applyTransitionsToSegments(segments, this.config);
 
     const totalDuration = finalSegments.reduce((sum, s) => sum + s.duration, 0);
     const removedDuration = 0; // Pipeline 内部已过滤
@@ -274,24 +279,20 @@ export class ClipWorkflowService {
   ): ClipSegment[] {
     const segments: ClipSegment[] = [];
     let currentTime = 0;
-    const duration = this.getAnalysisDuration(analysis);
-    
+    const duration = getAnalysisDuration(analysis);
+
     // 基于场景切换生成片段
     const cutTimes = [0, ...sceneChanges.map(s => s.time), duration];
-    
+
     for (let i = 0; i < cutTimes.length - 1; i++) {
       const start = cutTimes[i];
       const end = cutTimes[i + 1];
-      
-      // 跳过静音段落
-      const isSilence = silenceSections.some(
-        s => s.start < end && s.end > start
-      );
-      
-      if (this.config.removeSilence && isSilence) {
+
+      // 跳过静音段落（使用工具函数，逻辑更清晰）
+      if (this.config.removeSilence && isSegmentInSilence(start, end, silenceSections)) {
         continue;
       }
-      
+
       // 创建片段
       const segment: ClipSegment = {
         id: crypto.randomUUID(),
@@ -303,38 +304,15 @@ export class ClipWorkflowService {
         type: 'video',
         duration: end - start,
       };
-      
-      // 关联脚本段落
-      if (scriptSegments) {
-        const relatedScript = scriptSegments[i];
-        if (relatedScript) {
-          segment.text = relatedScript.content;
-        }
-      }
-      
+
+      // 关联脚本段落（委托给工具函数）
+      attachScriptText(segment, i, scriptSegments);
+
       segments.push(segment);
       currentTime += segment.duration;
     }
-    
-    return segments;
-  }
 
-  /**
-   * 应用转换效果
-   */
-  private applyTransitions(segments: ClipSegment[]): ClipSegment[] {
-    if (!this.config.autoTransition || segments.length < 2) {
-      return segments;
-    }
-    
-    return segments.map((segment, index) => {
-      if (index === 0) return segment;
-      
-      return {
-        ...segment,
-        transition: this.config.transitionType,
-      };
-    });
+    return segments;
   }
 
   /**
@@ -411,13 +389,6 @@ export class ClipWorkflowService {
    */
   getConfig(): ClipConfig {
     return { ...this.config };
-  }
-
-  private getAnalysisDuration(analysis: VideoAnalysis): number {
-    if (!analysis.scenes || analysis.scenes.length === 0) {
-      return 0;
-    }
-    return Math.max(...analysis.scenes.map((scene) => scene.endTime));
   }
 }
 
