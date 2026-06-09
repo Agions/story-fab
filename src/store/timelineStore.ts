@@ -15,6 +15,12 @@ import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '../core/types/timeline';
 import { DEFAULT_SNAP_THRESHOLD_MS } from './editorTypes';
+import {
+  updateClipInTracks,
+  addKeyframeToClip,
+  removeKeyframeFromClip,
+  updateKeyframeInClip,
+} from './timelineHelpers';
 // Note: MAX_HISTORY_SIZE is defined locally in timelineStore
 const MAX_HISTORY_SIZE = 19;
 
@@ -93,61 +99,6 @@ export type TimelineStore = TimelineState & TimelineActions;
 // Helper functions
 // =========================================
 
-const updateClipInTracks = (
-  tracks: TimelineTrack[],
-  clipId: string,
-  clipUpdates: Partial<TimelineClip>
-): TimelineTrack[] =>
-  tracks.map((t) => ({
-    ...t,
-    clips: t.clips.map((c) => (c.id === clipId ? { ...c, ...clipUpdates } : c)),
-  }));
-
-const addKeyframeToClip = (
-  tracks: TimelineTrack[],
-  clipId: string,
-  keyframe: AnimationKeyframe
-): TimelineTrack[] =>
-  tracks.map((t) => ({
-    ...t,
-    clips: t.clips.map((c) =>
-      c.id === clipId ? { ...c, keyframes: [...(c.keyframes || []), keyframe] } : c
-    ),
-  }));
-
-const removeKeyframeFromClip = (
-  tracks: TimelineTrack[],
-  clipId: string,
-  keyframeId: string
-): TimelineTrack[] =>
-  tracks.map((t) => ({
-    ...t,
-    clips: t.clips.map((c) =>
-      c.id === clipId
-        ? { ...c, keyframes: (c.keyframes || []).filter((kf) => kf.id !== keyframeId) }
-        : c
-    ),
-  }));
-
-const updateKeyframeInClip = (
-  tracks: TimelineTrack[],
-  clipId: string,
-  keyframeId: string,
-  keyframeUpdates: Partial<AnimationKeyframe>
-): TimelineTrack[] =>
-  tracks.map((t) => ({
-    ...t,
-    clips: t.clips.map((c) =>
-      c.id === clipId
-        ? {
-            ...c,
-            keyframes: (c.keyframes || []).map((kf) =>
-              kf.id === keyframeId ? { ...kf, ...keyframeUpdates } : kf
-            ),
-          }
-        : c
-    ),
-  }));
 
 // =========================================
 // Initial State
