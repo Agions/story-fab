@@ -3,6 +3,10 @@
  * 数据输入: project (从 ProjectCreate 来)
  * 数据输出: video (VideoInfo) + duration/width/height
  * 流转到: AIAnalyze
+ *
+ * 重构说明：
+ * - 上传配置已提取到 config/videoUploadConfig.ts
+ * - 本文件仅包含上传组件逻辑和 UI
  */
 import React, { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { useStoryFab } from '../context';
@@ -12,36 +16,14 @@ import { MAX_FILE_SIZE } from '@/shared/constants';
 import type { VideoInfo } from '@/core/types';
 import styles from './VideoUpload.module.css';
 
-import { VIDEO_FORMATS } from '@/shared/constants';
-
-// 支持的视频格式
-const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map(f => `.${f}`);
-
-// ── Magic number constants ────────────────────────────────────────────────────
-// Chunk size for simulated upload (1 MB)
-const CHUNK_SIZE = 1024 * 1024;
-// Interval (ms) for checking pause → resume transition
-const PAUSE_CHECK_INTERVAL_MS = 100;
-// Simulated per-chunk upload delay range: min=80ms, max=230ms
-const UPLOAD_DELAY_MIN_MS = 80;
-const UPLOAD_DELAY_RANGE_MS = 150;
-
-// 模拟断点续传存储
-const createChunkStore = () => {
-  const chunks: Map<string, Blob[]> = new Map();
-  return {
-    addChunk: (id: string, chunk: Blob, index: number) => {
-      if (!chunks.has(id)) chunks.set(id, []);
-      const arr = chunks.get(id)!;
-      arr[index] = chunk;
-    },
-    getChunks: (id: string) => chunks.get(id) || [],
-    hasChunks: (id: string) => chunks.has(id) && chunks.get(id)!.length > 0,
-    clear: (id: string) => chunks.delete(id),
-  };
-};
-
-const chunkStore = createChunkStore();
+import {
+  VIDEO_EXTENSIONS,
+  CHUNK_SIZE,
+  PAUSE_CHECK_INTERVAL_MS,
+  UPLOAD_DELAY_MIN_MS,
+  UPLOAD_DELAY_RANGE_MS,
+  chunkStore,
+} from './config/videoUploadConfig';
 
 interface VideoUploadProps {
   onNext?: () => void;
