@@ -14,9 +14,8 @@ import { Steps } from '@/components/ui/steps';
 import { Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
-import { videoProcessor, VideoMetadata } from '@/core/video';
+import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment } from '@/core/types';
-import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/ai/scriptService';
 import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
@@ -30,11 +29,12 @@ import { ProjectEditHeader } from './components/ProjectEditHeader';
 import { AutoSaveBadge } from './components/AutoSaveBadge';
 import { ProjectForm } from './components/ProjectForm';
 import { useProjectAutoSave } from './hooks/useProjectAutoSave';
+import { useVideoAnalysis } from './hooks/useVideoAnalysis';
 import {
   type ProjectData,
   normalizeProjectData,
   createDefaultProjectName,
-  parseScriptText,
+
 } from './projectEditUtils';
 import {
   PROJECT_SAVE_BEHAVIOR_KEY,
@@ -62,7 +62,6 @@ const ProjectEdit: React.FC = () => {
   const [formDescription, setFormDescription] = useState('');
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [project, setProject] = useState<ProjectData | null>(null);
   const [videoPath, setVideoPath] = useState('');
@@ -86,7 +85,6 @@ const ProjectEdit: React.FC = () => {
 
   // Refs
   const persistLockRef = useRef(false);
-  const analyzingLockRef = useRef(false);
   const draftProjectIdRef = useRef<string>(projectId || '');
   const recentProjectTrackedRef = useRef('');
   const mountedRef = useRef(true);
@@ -95,6 +93,16 @@ const ProjectEdit: React.FC = () => {
   useEffect(() => {
     return () => { mountedRef.current = false; };
   }, []);
+
+  // ─── Video Analysis Hook ──────────────────────────────────────────────────
+  const { loading, analyzeVideo: handleAnalyzeVideo } = useVideoAnalysis({
+    videoPath,
+    videoMetadata,
+    onMetadataReady: setVideoMetadata,
+    onKeyFramesReady: setKeyFrames,
+    onScriptReady: setScriptSegments,
+    onNavigateToScript: () => goToStep(2),
+  });
 
   // ─── Auto-save ────────────────────────────────────────────────────────────
   const getProjectData = useCallback((): ProjectData => {
@@ -240,66 +248,7 @@ const ProjectEdit: React.FC = () => {
   }, []);
 
   // ─── Analyze ────────────────────────────────────────────────────────────────
-  const handleAnalyzeVideo = useCallback(async () => {
-    if (loading || analyzingLockRef.current || !videoPath) {
-      if (!videoPath) notify.error(null, '请先选择视频');
-      return;
-    }
-
-    analyzingLockRef.current = true;
-    let stage: 'metadata' | 'keyframes' | 'frames-ai' | 'script' = 'metadata';
-
-    try {
-      setLoading(true);
-
-      let meta = videoMetadata;
-      if (!meta) {
-        stage = 'metadata';
-        notify.info('正在分析视频元数据...');
-        meta = await videoProcessor.analyze(videoPath);
-        setVideoMetadata(meta);
-      }
-
-      stage = 'keyframes';
-      notify.info('正在提取关键帧...');
-      const frames = await videoProcessor.extractKeyFrames(videoPath, {}, meta.duration);
-      const paths = frames.map((f) => f.path);
-      if (paths.length === 0) throw new Error('未提取到关键帧，请尝试更换视频或检查视频时长');
-      setKeyFrames(paths);
-
-      stage = 'frames-ai';
-      notify.info('正在分析关键帧内容...');
-      const descriptions = await analyzeKeyFramesWithAI(paths);
-
-      stage = 'script';
-      notify.info('正在根据视频内容生成脚本...');
-      const text = await generateScriptWithOpenAI(meta, descriptions, {
-        style: '自然流畅', tone: '专业', length: 'medium', purpose: '内容展示',
-      });
-
-      let script = parseScriptText(text);
-      if (script.length === 0) {
-        script = [{
-          id: `segment_${Date.now()}`,
-          startTime: 0,
-          endTime: Math.max(10, Math.round(meta?.duration || 10)),
-        }];
-      }
-
-      setScriptSegments(script);
-      notify.success('视频分析完成');
-      goToStep(2);
-    } catch (e: unknown) {
-      logger.error('视频分析失败:', { error: e });
-      const msg = e instanceof Error ? e.message : '未知错误';
-      const labels = { metadata: '视频元数据分析', keyframes: '关键帧提取', 'frames-ai': '关键帧内容理解', script: '脚本生成' };
-      const label = labels[stage];
-      notify.error(e, msg.includes('失败') ? msg : `${label}失败：${msg}`);
-    } finally {
-      setLoading(false);
-      analyzingLockRef.current = false;
-    }
-  }, [loading, videoMetadata, videoPath, goToStep]);
+  // handleAnalyzeVideo 已通过 useVideoAnalysis Hook 提供（见上方）
 
   // ─── Save ─────────────────────────────────────────────────────────────────
   const handleSaveProject = useCallback(async () => {
