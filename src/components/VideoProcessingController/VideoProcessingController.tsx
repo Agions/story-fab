@@ -10,37 +10,17 @@ import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import type { VideoSegment } from '@/core/types';
 import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/mods';
-import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from '@/components/VideoProcessingController/constants';
+import {
+  QUALITY_OPTIONS,
+  FORMAT_OPTIONS,
+  AUDIO_PROCESS_OPTIONS,
+  TRANSITION_OPTIONS,
+  type QualityValue,
+  type FormatValue,
+  type TransitionValue,
+  type AudioProcessValue,
+} from '@/components/VideoProcessingController/constants';
 import styles from '@/components/VideoProcessingController/VideoProcessingController.module.less';
-
-const QUALITY_OPTIONS = [
-  { value: 'low', label: '低质量 (720p)', description: '适合快速预览或网络分享' },
-  { value: 'medium', label: '中等质量 (1080p)', description: '平衡文件大小和清晰度' },
-  { value: 'high', label: '高质量 (原始分辨率)', description: '保持原始视频质量' },
-  { value: 'custom', label: '自定义', description: '设置自定义的编码参数' }
-];
-
-const FORMAT_OPTIONS = [
-  { value: 'mp4', label: 'MP4', description: '通用兼容性最佳' },
-  { value: 'mov', label: 'MOV', description: '适合苹果设备' },
-  { value: 'webm', label: 'WebM', description: '网页视频，体积小' },
-  { value: 'gif', label: 'GIF', description: '适合短循环动画' }
-];
-
-const AUDIO_PROCESS_OPTIONS = [
-  { value: 'original', label: '保持原始音频' },
-  { value: 'normalize', label: '音量标准化' },
-  { value: 'denoise', label: '降噪处理' },
-  { value: 'none', label: '无音频 (静音)' }
-];
-
-const TRANSITION_OPTIONS = [
-  { value: 'none', label: '无转场' },
-  { value: 'fade', label: '淡入淡出' },
-  { value: 'dissolve', label: '交叉溶解' },
-  { value: 'slide', label: '滑动效果' },
-  { value: 'wipe', label: '擦除效果' },
-];
 
 interface VideoProcessingControllerProps {
   videoPath: string;
