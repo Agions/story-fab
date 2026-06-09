@@ -6,6 +6,9 @@ import React, { memo } from 'react';
 import { useStoryFab } from '@/components/StoryFab/context';
 import styles from '../VideoExport.module.less';
 import { useExportHandlers } from './useExportHandlers';
+import { NoSynthesisAlert } from './NoSynthesisAlert';
+import { ExportCompleteCard } from './ExportCompleteCard';
+import { ExportingPanel } from './ExportingPanel';
 import {
   FORMAT_OPTIONS,
   QUALITY_OPTIONS,
@@ -65,124 +68,32 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
 
   const hasSynthesis = !!state.synthesisData?.finalVideoUrl;
 
-  // ── 前置条件检查 ──────────────────────────────────────────────
+  // ── 前置条件检查：未合成时显示空状态 ─────────────────────────────
   if (!hasSynthesis) {
-    return (
-      <div className={styles.stepContent}>
-        <div className={styles.stepTitle}>
-          <div className={styles.stepTitleLeft}>
-            <h2>📤 导出设置</h2>
-          </div>
-        </div>
-        <div className={styles.warningAlert}>
-          ⚠️ 请先完成视频合成
-          <button
-            className={styles.warningAlertBtn}
-            onClick={() => setStep('video-synth')}
-          >
-            去合成
-          </button>
-        </div>
-      </div>
-    );
+    return <NoSynthesisAlert onNavigateToSynth={() => setStep('video-synth')} />;
   }
 
   // ── 导出完成 ─────────────────────────────────────────────────
   if (exported) {
     return (
-      <div className={styles.stepContent}>
-        <div className={styles.completeCard}>
-          <svg className={styles.completeIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
-          <h3 className={styles.completeTitle}>🎉 视频导出成功！</h3>
-          <div className={styles.completeMeta}>
-            <span className={styles.completeMetaTag}>{config.format.toUpperCase()}</span>
-            <span className={styles.completeMetaTag}>{config.resolution}</span>
-            <span className={styles.completeMetaTag}>{config.fps}fps</span>
-          </div>
-          <div className={styles.completeSub}>预估大小：{estimateFileSize()}</div>
-          <div className={styles.completeActions}>
-            <button className={`${styles.completeBtn} ${styles.completeBtnSecondary}`}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <polygon points="10 8 16 12 10 16 10 8" />
-              </svg>
-              预览
-            </button>
-            <button className={`${styles.completeBtn} ${styles.completeBtnPrimary}`}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              下载视频
-            </button>
-            <button className={`${styles.completeBtn} ${styles.completeBtnSecondary}`}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-              </svg>
-              分享
-            </button>
-          </div>
-        </div>
-      </div>
+      <ExportCompleteCard
+        meta={{
+          format: config.format,
+          resolution: config.resolution,
+          fps: config.fps,
+          estimatedSize: estimateFileSize(),
+        }}
+      />
     );
   }
 
   // ── 导出中 ──────────────────────────────────────────────────
   if (exporting) {
-    const circumference = 2 * Math.PI * 45;
-    const offset = circumference - (progress / 100) * circumference;
-
     return (
-      <div className={styles.stepContent}>
-        <div className={styles.exportingCard}>
-          <div className={styles.progressCircle}>
-            <svg className={styles.progressCircleSvg} viewBox="0 0 100 100">
-              <circle className={styles.progressCircleTrack} cx="50" cy="50" r="45" />
-              <circle
-                className={styles.progressCircleFill}
-                cx="50"
-                cy="50"
-                r="45"
-                style={{ strokeDashoffset: offset }}
-              />
-            </svg>
-            <div className={styles.progressPercent}>{progress}%</div>
-          </div>
-          <div className={styles.progressLabel}>
-            {progressStage || (
-              progress < 30 ? <>🎬 视频编码中...</> :
-              progress < 60 ? <>🔊 音频编码中...</> :
-              progress < 90 ? <>💾 生成文件...</> :
-              <>✨ 导出完成！</>
-            )}
-          </div>
-          <div className={styles.progressSub}>
-            {etaSeconds !== null && etaSeconds > 0
-              ? `预计剩余: ${etaSeconds}s`
-              : etaSeconds === 0 ? '导出完成！' : '请耐心等待...'}
-          </div>
-          <button className={styles.cancelBtn} onClick={handleCancel}>
-            取消导出
-          </button>
-          <div className={styles.progressBarSection}>
-            <div className={styles.progressBarTrack}>
-              <div
-                className={styles.progressBarFill}
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <div className={styles.progressBarPercent}>{progress}%</div>
-          </div>
-        </div>
-      </div>
+      <ExportingPanel
+        progress={{ percent: progress, stageLabel: progressStage, etaSeconds }}
+        onCancel={handleCancel}
+      />
     );
   }
 
