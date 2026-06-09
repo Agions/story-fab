@@ -195,6 +195,29 @@ export function formatTimecodeMs(ms: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(frames).padStart(2, '0')}`;
 }
 
+/**
+ * 帧级时间码（秒 → HH:MM:SS:FF @ 30fps）
+ * 优化：从 timecode.ts 合并而来，避免重复实现
+ */
+export function formatTimecode(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  const f = Math.floor((seconds % 1) * 30);
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}:${f.toString().padStart(2, '0')}`;
+}
+
+/**
+ * 简单时间码（秒 → HH:MM:SS，无帧）
+ * 优化：从 timecode.ts 合并而来，避免重复实现
+ */
+export function formatTimecodeSimple(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
 // ─── Subtitle timecodes ───────────────────────────────────────────────────────
 /**
  * Shared factory for subtitle timecodes.
