@@ -74,6 +74,7 @@ export function useExportHandlers({
   // 监听 Rust processing-progress 事件
   useEffect(() => {
     let unlisten: UnlistenFn | null = null;
+    let cancelled = false;
     if (exporting) {
       listen<{ stage: string; progress: number; time_remaining_secs?: number }>(
         'processing-progress',
@@ -85,9 +86,21 @@ export function useExportHandlers({
             setEtaSeconds(Math.round(time_remaining_secs));
           }
         }
-      ).then((fn) => { unlisten = fn; });
+      ).then((fn) => {
+        // If cleanup already ran before listen() resolved, unlisten immediately
+        if (cancelled) {
+          fn();
+        } else {
+          unlisten = fn;
+        }
+      }).catch((err) => {
+        console.error('[useExportHandlers] Failed to subscribe to processing-progress:', err);
+      });
     }
-    return () => { unlisten?.(); };
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
   }, [exporting]);
 
   const handleCancel = useCallback(async () => {

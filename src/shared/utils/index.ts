@@ -47,7 +47,11 @@ export async function retry<T>(
   attempts: number = 3,
   delayMs: number = 1000
 ): Promise<T> {
-  let lastError: Error;
+  if (attempts < 1) {
+    throw new Error('retry: attempts must be >= 1');
+  }
+
+  let lastError: Error | undefined;
 
   for (let i = 0; i < attempts; i++) {
     try {
@@ -60,7 +64,8 @@ export async function retry<T>(
     }
   }
 
-  throw lastError!;
+  // lastError is guaranteed to be set when attempts >= 1, but TS doesn't know
+  throw lastError ?? new Error('retry: failed without capturing an error');
 }
 
 /**

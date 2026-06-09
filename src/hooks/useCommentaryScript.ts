@@ -183,11 +183,13 @@ export function useCommentaryScript(): UseCommentaryScriptResult {
   const updateSegment = useCallback((index: number, text: string) => {
     // Multi-style mode: update corresponding style's script
     if (multiStyleMode && activeScriptStyle) {
+      // Capture activeScriptStyle into a const so TS knows it's defined in closures
+      const styleKey = activeScriptStyle;
       setScripts((prev) => {
         const next = new Map(prev);
-        const current = next.get(activeScriptStyle!);
+        const current = next.get(styleKey);
         if (current) {
-          next.set(activeScriptStyle!, {
+          next.set(styleKey, {
             ...current,
             segments: current.segments.map((seg, i) =>
               i === index ? { ...seg, text } : seg

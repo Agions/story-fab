@@ -110,7 +110,11 @@ const ProjectDetail: React.FC = () => {
 
   const schedulePersistUpdatedProject = useCallback((updatedProject: ProjectData, delayMs = 280) => {
     if (scriptPersistTimerRef.current) window.clearTimeout(scriptPersistTimerRef.current);
-    scriptPersistTimerRef.current = window.setTimeout(() => { void persistUpdatedProject(updatedProject); }, delayMs);
+    scriptPersistTimerRef.current = window.setTimeout(() => {
+      // Guard against firing after unmount
+      if (!mountedRef.current) return;
+      void persistUpdatedProject(updatedProject);
+    }, delayMs);
   }, []);
 
   useEffect(() => {
