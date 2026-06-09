@@ -5,14 +5,17 @@
  * 重构说明：
  * - 从原 analyzer.ts (475行) 中提取工具函数
  * - 职责单一，便于复用和测试
+ * - 类型从 ./types 重新导出，保持单一类型源
  */
 
 import { MS_PER_SECOND } from '@/shared/utils';
 
-// ============================================
-// 类型定义
-// ============================================
+// 从 types 重新导出，保持单一类型源
+export type { CutPoint, ClipSegment, ClipSuggestion } from './types';
+import type { CutPoint, ClipSegment } from './types';
 
+// SilenceSegment 和 EmotionPeak 是 analyzerUtils 的内部类型，不从 types 导出
+// 重新定义以保持自包含
 export interface SilenceSegment {
   start: number;
   end: number;
@@ -23,40 +26,6 @@ export interface EmotionPeak {
   timestamp: number;
   energy: number;
   type: string;
-}
-
-export interface CutPoint {
-  id: string;
-  timestamp: number;
-  type: 'scene' | 'keyframe' | 'silence' | 'emotion';
-  confidence: number;
-  description: string;
-  suggestedAction: 'keep' | 'remove' | 'transition';
-  metadata: Record<string, number>;
-}
-
-export interface ClipSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
-  duration: number;
-  type: 'video' | 'silence' | 'keyframe';
-  content: string;
-  thumbnail?: string;
-  confidence: number;
-  cutPoints: CutPoint[];
-  suggestions: ClipSuggestion[];
-}
-
-export interface ClipSuggestion {
-  id: string;
-  type: 'trim' | 'merge' | 'effect';
-  startTime: number;
-  endTime: number;
-  description: string;
-  reason: string;
-  confidence: number;
-  autoApplicable: boolean;
 }
 
 // ============================================
@@ -170,7 +139,9 @@ export function estimateFinalDuration(
   }
 
   if (config.trimDeadTime) {
-    const deadTime = segments.filter((s) => s.duration < 0.5).reduce((sum, s) => sum + s.duration, 0);
+    const deadTime = segments
+      .filter((s) => s.duration < 0.5)
+      .reduce((sum, s) => sum + s.duration, 0);
     estimated -= deadTime;
   }
 

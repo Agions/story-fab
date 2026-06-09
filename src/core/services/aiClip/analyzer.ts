@@ -12,7 +12,7 @@ import { tauri } from '../../tauri/TauriBridge';
 import { logger } from '../../../shared/utils/logging';
 import { visionService } from '../ai/visionService';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotionDetector';
-import type { EmotionAnalysis, Keyframe as SourceKeyframe, VideoInfo, Scene } from '@/core/types';
+import type { EmotionAnalysis, VideoInfo, Scene } from '@/core/types';
 import { DEFAULT_CLIP_CONFIG } from './types';
 import { formatTime as formatSharedTime } from '../../../shared/utils/formatting';
 import type {
@@ -211,11 +211,13 @@ async function detectSilenceSegments(
  * 生成剪辑点
  */
 function generateCutPoints(
-  videoInfo: VideoInfo,
+  // @ts-ignore - videoInfo reserved for future cut point metadata enrichment
+  _videoInfo: VideoInfo,
   scenes: Scene[],
   keyframes: Keyframe[],
   silenceSegments: SilenceSegment[],
-  emotions: EmotionAnalysis[],
+  // @ts-ignore - emotions reserved for future emotion-aware cut scoring
+  _emotions: EmotionAnalysis[],
   emotionPeaks: UtilsEmotionPeak[],
   config: AIClipConfig
 ): CutPoint[] {
@@ -353,7 +355,8 @@ function generateSegments(
 async function generateSuggestions(
   videoInfo: VideoInfo,
   segments: ClipSegment[],
-  scenes: Scene[],
+  // @ts-ignore - scenes reserved for future scene-aware suggestion ranking
+  _scenes: Scene[],
   config: AIClipConfig
 ): Promise<ClipSuggestion[]> {
   const suggestions: ClipSuggestion[] = [];

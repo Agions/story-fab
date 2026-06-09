@@ -14,14 +14,17 @@ export {
   generateScriptWithModel,
   parseGeneratedScript,
   generateScriptWithOpenAI,
-  AIServiceError,
+  analyzeKeyFramesWithAI,
   type AIScriptDraft,
   type Script,
   type ScriptSegment,
   type LegacyAIModelType,
   type AnalysisInput,
   type ScriptGenerationSettings,
-} from './script';
+} from './script/scriptGenerationService';
+
+// 单独导出错误类
+export { AIServiceError } from './script/aiApiClient';
 
 // 导出工具函数
 export { parseScriptContent, formatScriptToText, createScriptDraft } from './script';

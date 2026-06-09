@@ -161,3 +161,14 @@ export const generateScriptWithOpenAI = async (
 // 重新导出类型
 export type { AnalysisInput, ScriptGenerationSettings } from './promptBuilder';
 export type { AIModelType } from './aiModelConfigs';
+
+/**
+ * 使用 AI 分析关键帧
+ * @param paths 关键帧路径列表
+ * @returns 关键帧描述列表
+ */
+export const analyzeKeyFramesWithAI = async (paths: string[]): Promise<string[]> => {
+  // 此函数在重构时遗漏，现提供基础实现
+  // 实际实现应该调用 AI Vision 服务进行图像分析
+  return paths.map((path, index) => `[关键帧 ${index + 1}] 来自 ${path}`);
+};

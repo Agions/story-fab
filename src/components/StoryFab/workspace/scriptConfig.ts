@@ -61,4 +61,8 @@ export const SCRIPT_LENGTHS = [
 
 export interface ScriptGenerateProps {
   onNext?: () => void;
+  setNarrationScript?: (data: any) => void;
+  setRemixScript?: (data: any) => void;
+  setFeature?: (feature: any) => void;
+  goToNextStep?: () => void;
 }
