@@ -9,9 +9,9 @@
  */
 
 import { logger } from '../../../shared/utils/logging';
-import { formatSrtTime } from '../../../shared/utils/formatting';
 import type { SubtitleEntry, VideoInfo } from '@/core/types';
 import { whisperService, type WhisperProgress } from './whisperService';
+import { trackToSRT, trackToVTT, trackToASS } from './subtitleFormatters';
 
 // ============================================
 // 类型定义
@@ -271,11 +271,11 @@ export class SubtitleService {
 
     switch (format) {
       case 'srt':
-        return this.toSRT(track);
+        return trackToSRT(track);
       case 'vtt':
-        return this.toVTT(track);
+        return trackToVTT(track);
       case 'ass':
-        return this.toASS(track);
+        return trackToASS(track);
       default:
         throw new Error(`不支持的格式: ${format}`);
     }
@@ -438,71 +438,6 @@ export class SubtitleService {
     return result.outputPath;
   }
 
-  /**
-   * 转换为 SRT 格式
-   */
-  private toSRT(track: SubtitleTrack): string {
-    return track.entries
-      .map((entry, index) => {
-        const start = formatSrtTime(entry.startTime);
-        const end = formatSrtTime(entry.endTime);
-        return `${index + 1}\n${start} --> ${end}\n${entry.text}`;
-      })
-      .join('\n\n');
-  }
-
-  /**
-   * 转换为 VTT 格式
-   */
-  private toVTT(track: SubtitleTrack): string {
-    const header = 'WEBVTT\n\n';
-    const body = track.entries
-      .map((entry, index) => {
-        const start = formatSrtTime(entry.startTime);
-        const end = formatSrtTime(entry.endTime);
-        return `${index + 1}\n${start} --> ${end}\n${entry.text}`;
-      })
-      .join('\n\n');
-    return header + body;
-  }
-
-  /**
-   * 转换为 ASS 格式
-   */
-  private toASS(track: SubtitleTrack): string {
-    const header = `[Script Info]
-Title: StoryFab Subtitles
-ScriptType: v4.00+
-
-[V4+ Styles]
-Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Arial,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,0,2,10,10,10,1
-
-[Events]
-Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-`;
-
-    const events = track.entries
-      .map((entry) => {
-        const start = this.formatASSTime(entry.startTime);
-        const end = this.formatASSTime(entry.endTime);
-        return `Dialogue: 0,${start},${end},Default,,0,0,0,,${entry.text}`;
-      })
-      .join('\n');
-
-    return header + events;
-  }
-
-  /**
-   * 格式化 ASS 时间
-   */
-  private formatASSTime(seconds: number): string {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    const cs = Math.floor((seconds % 1) * 100);
-    return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${cs.toString().padStart(2, '0')}`;
-  }
 }
 
 // 导出单例
