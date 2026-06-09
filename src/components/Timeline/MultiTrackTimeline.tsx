@@ -34,16 +34,18 @@ import {
   Send,
   Rewind,
 } from 'lucide-react';
-import type { TimelineTrack, TimelineClip, DragType } from './types';
+import type { TimelineTrack, TimelineClip } from './types';
 
 import { TrackHeader } from './TrackHeader';
 import { TimeRuler } from './TimeRuler';
 import { Playhead } from './Playhead';
 import { ClipRenderer } from './ClipRenderer';
 import { ClipPropertiesPanel } from './ClipPropertiesPanel';
-import { clamp, generateId, formatTimecodeMs } from '@/shared/utils';
-import { MIN_CLIP_DURATION, DEFAULT_TRACK_HEIGHT, MIN_ZOOM, MAX_ZOOM, TRACK_COLORS } from './constants';
-import { snapToBoundary } from './timelineSnap';
+import { clamp, formatTimecodeMs } from '@/shared/utils';
+import { MIN_ZOOM, MAX_ZOOM } from './constants';
+import { useTrackActions } from './hooks/useTrackActions';
+import { useClipActions } from './hooks/useClipActions';
+import { useTimelineDrag } from './hooks/useTimelineDrag';
 
 import styles from '@/components/Timeline/Timeline.module.less';
 
@@ -98,25 +100,12 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
   const [localPlayhead, setLocalPlayhead] = useState(playheadMs);
   const [localZoom, setLocalZoom] = useState(zoom);
   const [localScrollX, setLocalScrollX] = useState(scrollX);
-  const [isDragging, setIsDragging] = useState(false);
-  const [_dragClipId, _setDragClipId] = useState<string | null>(null);
-  const [_dragTrackId, _setDragTrackId] = useState<string | null>(null);
-  const [_dragType, _setDragType] = useState<DragType | null>(null);
-  const [_dragStartX, _setDragStartX] = useState(0);
+  const [isDragging] = useState(false);
   const [propertiesClip, setPropertiesClip] = useState<TimelineClip | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const tracksContainerRef = useRef<HTMLDivElement>(null);
   const msPerPixel = 1000 / localZoom;
-
-  // Drag refs for rAF throttling - avoids stale closure issues
-  const dragAnimFrameRef = useRef<number>(0);
-  const dragPendingDeltaRef = useRef<number>(0);
-  const dragOriginalStartRef = useRef<number>(0);
-  const dragOriginalEndRef = useRef<number>(0);
-  const dragClipIdRef = useRef<string>('');
-  const dragTrackIdRef = useRef<string>('');
-  const dragTypeRef = useRef<DragType | null>(null);
 
   // Track initialization to handle prop changes after mount
   // (e.g., project switch — parent changes initialTracks but component stays mounted)
@@ -198,243 +187,54 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
   // 吸附逻辑已提取到 timelineSnap.ts
   // 保留 msPerPixel 用于计算和向后兼容
 
-  // allClips and getTrackById removed - unused
+  // ============================================
+  // Track 操作 Hook（增删改 + mute/lock/visible）
+  // 优化：提取到 useTrackActions，减少组件行数约 60 行
+  // ============================================
+  const {
+    toggleTrackMute,
+    toggleTrackLock,
+    toggleTrackVisible,
+    resizeTrack,
+    addTrack,
+    deleteTrack,
+  } = useTrackActions({ setTracks, onTracksChange });
 
-  const handleToggleMute = useCallback((trackId: string) => {
-    updateTrack(trackId, (t) => ({ muted: !t.muted }));
-  }, [updateTrack]);
+  // ============================================
+  // Clip 操作 Hook（增删改 + 点击/双击）
+  // 优化：提取到 useClipActions，减少组件行数约 80 行
+  // ============================================
+  const {
+    getClipById,
+    addClip,
+    handleClipClick,
+    handleClipDoubleClick,
+    handleClipUpdate,
+    handleClipDelete,
+  } = useClipActions({
+    tracks,
+    setTracks,
+    localPlayhead,
+    onTracksChange,
+    onSelectionChange,
+    onClipUpdate,
+    onClipDelete,
+    setPropertiesClip,
+  });
 
-  const handleToggleLock = useCallback((trackId: string) => {
-    updateTrack(trackId, (t) => ({ locked: !t.locked }));
-  }, [updateTrack]);
-
-  const handleToggleVisible = useCallback((trackId: string) => {
-    updateTrack(trackId, (t) => ({ visible: !t.visible }));
-  }, [updateTrack]);
-
-  const handleResizeTrack = useCallback((trackId: string, deltaY: number) => {
-    setTracks((prev) => {
-      const track = prev.find((t) => t.id === trackId);
-      if (!track) return prev;
-      const newHeight = Math.max(30, Math.min(200, track.height + deltaY));
-      return prev.map((t) => t.id === trackId ? { ...t, height: newHeight } : t);
-    });
-  }, []);
-
-  const handleAddTrack = useCallback((type: TimelineTrack['type']) => {
-    setTracks((prev) => {
-      const newTrack: TimelineTrack = {
-        id: generateId('track'),
-        type,
-        name: `${type === 'video' ? '视频' : type === 'audio' ? '音频' : type === 'subtitle' ? '字幕' : '效果'}轨 ${prev.filter((t) => t.type === type).length + 1}`,
-        clips: [],
-        muted: false,
-        locked: false,
-        visible: true,
-        height: DEFAULT_TRACK_HEIGHT,
-        color: TRACK_COLORS[type],
-      };
-      const updated = [...prev, newTrack];
-      onTracksChangeRef.current?.(updated);
-      return updated;
-    });
-  }, []);
-
-  const handleDeleteTrack = useCallback((trackId: string) => {
-    setTracks((prev) => {
-      const updated = prev.filter((t) => t.id !== trackId);
-      onTracksChangeRef.current?.(updated);
-      return updated;
-    });
-  }, []);
-
-  const handleAddClip = useCallback((trackId: string) => {
-    setTracks((prev) => {
-      const track = prev.find((t) => t.id === trackId);
-      if (!track || track.locked) return prev;
-      const newClip: TimelineClip = {
-        id: generateId('clip'),
-        trackId,
-        startMs: localPlayhead,
-        endMs: localPlayhead + 5000,
-        sourceStartMs: 0,
-        sourceEndMs: 5000,
-        name: `片段 ${prev.flatMap((t) => t.clips).length + 1}`,
-        color: TRACK_COLORS[track.type],
-      };
-      const updated = prev.map((t) =>
-        t.id === trackId ? { ...t, clips: [...t.clips, newClip] } : t
-      );
-      onTracksChange?.(updated);
-      onSelectionChange?.(newClip.id, trackId);
-      return updated;
-    });
-  }, [localPlayhead, onTracksChange, onSelectionChange]);
-
-  // 片段操作工具函数
-  const getClipById = useCallback((clipId: string) => {
-    for (const track of tracks) {
-      const clip = track.clips.find((c) => c.id === clipId);
-      if (clip) return { track, clip };
-    }
-    return undefined;
-  }, [tracks]);
-
-  // 片段操作
-  const handleClipClick = useCallback((clipId: string, trackId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelectionChange?.(clipId, trackId);
-  }, [onSelectionChange]);
-
-  const handleClipDoubleClick = useCallback((clip: TimelineClip) => {
-    setPropertiesClip(clip);
-  }, []);
-
-  const handleClipUpdate = useCallback((clipId: string, data: Partial<TimelineClip>) => {
-    setTracks((prev) => {
-      const updated = prev.map((t) => {
-        const clipIndex = t.clips.findIndex((c) => c.id === clipId);
-        if (clipIndex === -1) return t;
-        const updatedClips = [...t.clips];
-        updatedClips[clipIndex] = { ...updatedClips[clipIndex], ...data };
-        return { ...t, clips: updatedClips };
-      });
-      onTracksChange?.(updated);
-      return updated;
-    });
-    onClipUpdate?.(clipId, data);
-  }, [onTracksChange, onClipUpdate]);
-
-  const handleClipDelete = useCallback((clipId: string) => {
-    setTracks((prev) => {
-      const updated = prev.map((t) => {
-        const clipIndex = t.clips.findIndex((c) => c.id === clipId);
-        if (clipIndex === -1) return t;
-        const updatedClips = t.clips.filter((c) => c.id !== clipId);
-        return { ...t, clips: updatedClips };
-      });
-      onTracksChange?.(updated);
-      return updated;
-    });
-    onClipDelete?.(clipId);
-    onSelectionChange?.(undefined, undefined);
-  }, [onTracksChange, onClipDelete, onSelectionChange]);
-
-  // 拖拽事件监听器 refs，用于组件卸载时清理
-  const dragMoveHandlerRef = useRef<((e: MouseEvent) => void) | null>(null);
-  const dragUpHandlerRef = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (dragMoveHandlerRef.current) {
-        document.removeEventListener('mousemove', dragMoveHandlerRef.current);
-      }
-      if (dragUpHandlerRef.current) {
-        document.removeEventListener('mouseup', dragUpHandlerRef.current);
-      }
-    };
-  }, []);
-
-  // 拖拽片段 - 使用 requestAnimationFrame 节流以提高性能
-  const handleDragStart = useCallback((
-    clipId: string,
-    trackId: string,
-    type: DragType,
-    e: React.MouseEvent
-  ) => {
-    e.preventDefault();
-    const { track, clip } = getClipById(clipId) ?? {};
-    if (!clip || track?.locked) return;
-
-    setIsDragging(true);
-      _setDragClipId(clipId);
-      _setDragTrackId(trackId);
-      _setDragType(type);
-      _setDragStartX(e.clientX);
-
-    // Store initial values in refs for rAF closure
-    dragClipIdRef.current = clipId;
-    dragTrackIdRef.current = trackId;
-    dragTypeRef.current = type;
-    dragOriginalStartRef.current = clip.startMs;
-    dragOriginalEndRef.current = clip.endMs;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - e.clientX;
-      // Accumulate delta instead of immediate state update
-      dragPendingDeltaRef.current += deltaX;
-      // Reset start position to current mouse position for next frame
-      _setDragStartX(moveEvent.clientX);
-
-      // Schedule rAF if not already scheduled
-      if (!dragAnimFrameRef.current) {
-        dragAnimFrameRef.current = requestAnimationFrame(() => {
-          dragAnimFrameRef.current = 0;
-          const deltaMs = dragPendingDeltaRef.current * msPerPixel;
-          dragPendingDeltaRef.current = 0;
-
-          const originalStart = dragOriginalStartRef.current;
-          const originalEnd = dragOriginalEndRef.current;
-          const clipId = dragClipIdRef.current;
-          const trackId = dragTrackIdRef.current;
-          const dragType = dragTypeRef.current;
-
-          setTracks((prevTracks) => {
-            return prevTracks.map((t) => {
-              if (t.id !== trackId) return t;
-              return {
-                ...t,
-                clips: t.clips.map((c) => {
-                  if (c.id !== clipId) return c;
-                  let newStartMs = originalStart;
-                  let newEndMs = originalEnd;
-
-                  if (dragType === 'move') {
-                    newStartMs = snapToBoundary(originalStart + deltaMs, clipId, tracks, duration, msPerPixel, snapEnabled);
-                    newEndMs = newStartMs + (originalEnd - originalStart);
-                  } else if (dragType === 'start') {
-                    newStartMs = Math.max(0, snapToBoundary(originalStart + deltaMs, clipId, tracks, duration, msPerPixel, snapEnabled));
-                    if (newStartMs >= newEndMs - MIN_CLIP_DURATION) {
-                      newStartMs = newEndMs - MIN_CLIP_DURATION;
-                    }
-                  } else if (dragType === 'end') {
-                    newEndMs = Math.max(newStartMs + MIN_CLIP_DURATION, snapToBoundary(originalEnd + deltaMs, clipId, tracks, duration, msPerPixel, snapEnabled));
-                  }
-
-                  return { ...c, startMs: newStartMs, endMs: newEndMs };
-                }),
-              };
-            });
-          });
-        });
-      }
-    };
-
-    const handleMouseUp = () => {
-      cancelAnimationFrame(dragAnimFrameRef.current);
-      dragAnimFrameRef.current = 0;
-      setIsDragging(false);
-      _setDragClipId(null);
-      _setDragTrackId(null);
-      _setDragType(null);
-      if (dragMoveHandlerRef.current) {
-        document.removeEventListener('mousemove', dragMoveHandlerRef.current);
-      }
-      if (dragUpHandlerRef.current) {
-        document.removeEventListener('mouseup', dragUpHandlerRef.current);
-      }
-
-      const { clip: finalClip } = getClipById(clipId) ?? {};
-      if (finalClip) {
-        onClipUpdate?.(clipId, { startMs: finalClip.startMs, endMs: finalClip.endMs });
-      }
-    };
-
-    dragMoveHandlerRef.current = handleMouseMove;
-    dragUpHandlerRef.current = handleMouseUp;
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [getClipById, msPerPixel, snapToBoundary, onClipUpdate, tracks, duration, snapEnabled]);
+  // ============================================
+  // 拖拽 Hook（rAF 优化）
+  // 优化：提取到 useTimelineDrag，减少组件行数约 100 行
+  // ============================================
+  const { handleDragStart } = useTimelineDrag({
+    tracks,
+    setTracks,
+    duration,
+    msPerPixel,
+    snapEnabled,
+    onClipUpdate,
+    getClipById,
+  });
 
   // 时间线点击
   const handleTimelineClick = useCallback((e: React.MouseEvent) => {
@@ -466,11 +266,11 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
 
   // 添加轨道菜单
   const trackMenuItems = useMemo(() => [
-    { key: 'video', label: '视频轨道', onClick: () => handleAddTrack('video') },
-    { key: 'audio', label: '音频轨道', onClick: () => handleAddTrack('audio') },
-    { key: 'subtitle', label: '字幕轨道', onClick: () => handleAddTrack('subtitle') },
-    { key: 'effect', label: '效果轨道', onClick: () => handleAddTrack('effect') },
-  ], [handleAddTrack]);
+    { key: 'video', label: '视频轨道', onClick: () => addTrack('video') },
+    { key: 'audio', label: '音频轨道', onClick: () => addTrack('audio') },
+    { key: 'subtitle', label: '字幕轨道', onClick: () => addTrack('subtitle') },
+    { key: 'effect', label: '效果轨道', onClick: () => addTrack('effect') },
+  ], [addTrack]);
 
   const containerWidth = containerRef.current?.clientWidth || 800;
   const totalHeight = tracks.reduce((sum, t) => sum + t.height, 0);
@@ -549,12 +349,12 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = memo(({
             <TrackHeader
               key={track.id}
               track={track}
-              onToggleMute={handleToggleMute}
-              onToggleLock={handleToggleLock}
-              onToggleVisible={handleToggleVisible}
-              onResizeTrack={handleResizeTrack}
-              onAddClip={handleAddClip}
-              onDeleteTrack={handleDeleteTrack}
+              onToggleMute={toggleTrackMute}
+              onToggleLock={toggleTrackLock}
+              onToggleVisible={toggleTrackVisible}
+              onResizeTrack={resizeTrack}
+              onAddClip={addClip}
+              onDeleteTrack={deleteTrack}
             />
           ))}
         </div>
