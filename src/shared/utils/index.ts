@@ -1,5 +1,9 @@
 /**
- * 通用工具函数
+ * 通用工具函数 — 统一导出
+ *
+ * 【优化思路】原始文件混合了通用工具和项目特定逻辑，
+ * 已将项目指标解析函数提取到 projectMetrics.ts。
+ * 本文件保留为通用工具的 barrel 导出。
  */
 
 import { notify } from './notify';
@@ -7,6 +11,9 @@ export * from './notify';
 
 // Time formatting & timestamps
 export { formatTime, formatDuration, formatDate, formatDateTime, formatRelativeTime, clamp, formatTimecodeMs, formatTimecode, formatTimecodeSimple, now, nowISO, MS_PER_SECOND } from './formatting';
+
+// 项目指标解析（已提取到独立模块）
+export { readNumberField, resolveProjectVideoPath, extractProjectMediaMetrics, pickPreferredSizeMb, type RawProjectRecord } from './projectMetrics';
 
 /**
  * 防抖函数
@@ -21,7 +28,9 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
-}/**
+}
+
+/**
  * 生成唯一 ID（通用版，时间戳+随机数）
  */
 export function generateId(prefix?: string): string {
@@ -37,7 +46,7 @@ export function delay(ms: number): Promise<void> {
 }
 
 /**
- * 重试
+ * 带指数退避的重试
  */
 export async function retry<T>(
   fn: () => Promise<T>,
@@ -61,7 +70,6 @@ export async function retry<T>(
     }
   }
 
-  // lastError is guaranteed to be set when attempts >= 1, but TS doesn't know
   throw lastError ?? new Error('retry: failed without capturing an error');
 }
 
@@ -175,14 +183,13 @@ export function readFileAsText(file: File): Promise<string> {
 }
 
 /**
- * 复制到剪贴板
+ * 复制到剪贴板（带降级方案）
  */
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
-    // 降级方案
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
@@ -234,80 +241,8 @@ export function showInfo(msg: string): void {
   notify.info(msg);
 }
 
-export type RawProjectRecord = Record<string, unknown>;
-
-/**
- * 从未知字段中读取数字
- */
-export function readNumberField(value: unknown, fallback = 0): number {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
-  if (typeof value === 'string') {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-  }
-  return fallback;
-}
-
-/**
- * 解析项目中的主视频路径
- */
-export function resolveProjectVideoPath(project: RawProjectRecord): string {
-  if (typeof project.videoPath === 'string' && project.videoPath.trim()) {
-    return project.videoPath;
-  }
-  if (Array.isArray(project.videos) && project.videos.length > 0) {
-    const firstVideo = project.videos[0] as Record<string, unknown>;
-    if (typeof firstVideo?.path === 'string' && firstVideo.path.trim()) {
-      return firstVideo.path;
-    }
-  }
-  return '';
-}
-
-/**
- * 从项目中提取媒体指标（时长、显式体积、估算体积）
- */
-export function extractProjectMediaMetrics(project: RawProjectRecord): {
-  durationSec: number;
-  explicitSizeMb: number;
-  estimatedSizeMb: number;
-} {
-  const metadata = (project.metadata && typeof project.metadata === 'object')
-    ? (project.metadata as Record<string, unknown>)
-    : {};
-
-  const durationSec = readNumberField(metadata.duration, 0);
-  const bitrate = readNumberField(metadata.bitrate, 0);
-  const explicitSizeMb = readNumberField(project.sizeMb, readNumberField(project.size, 0));
-  const estimatedSizeMb = bitrate > 0 && durationSec > 0
-    ? (bitrate * durationSec) / 8 / 1024 / 1024
-    : 0;
-
-  return { durationSec, explicitSizeMb, estimatedSizeMb };
-}
-
-/**
- * 体积优先级选择：真实值 > 显式值 > 估算值
- */
-export function pickPreferredSizeMb(
-  exactSizeMb: number,
-  explicitSizeMb: number,
-  estimatedSizeMb: number
-): number {
-  if (exactSizeMb > 0) return exactSizeMb;
-  if (explicitSizeMb > 0) return explicitSizeMb;
-  return estimatedSizeMb;
-}
-
-// ============================================================
-// 并发映射 — 限制并发数量的并行处理工具
-// ============================================================
-
 /**
  * 并发映射：并行处理数组元素，限制同时运行的任务数
- * 用于批量 API 调用、文件处理等需要控制并发量的场景
  *
  * @example
  * ```ts
