@@ -34,41 +34,24 @@ import type {
   PipelineStage,
   RepurposingOptions,
 } from '../../../core/services/pipeline/clip-pipeline/pipeline';
-import type { SocialPlatform } from '../../../core/services/pipeline/clip-pipeline/seoGenerator';
-import { transcodeWithCrop, type AspectRatio } from '../../../services/tauri';
+import { transcodeWithCrop } from '../../../services/tauri';
 import styles from './ClipRippling.module.css';
-
-// Clip duration constraints (seconds)
-const MIN_CLIP_DURATION_SECONDS = 15;
-const MAX_CLIP_DURATION_SECONDS = 120;
-
-// Magic numbers constants
-const SCORE_THRESHOLD_HIGH = 80;
-const SCORE_THRESHOLD_MEDIUM = 60;
-const TARGET_CLIP_COUNTS = [3, 5, 8, 10, 15] as const;
-const SEO_DESCRIPTION_MAX_LENGTH = 80;
-const HASHTAGS_MAX_COUNT = 5;
-const MOTION_SCALE_HOVER = 1.01;
-const MOTION_SCALE_TAP = 0.99;
-const DEFAULT_FPS = 30;
-
-
-
-// 平台选项
-const PLATFORM_OPTIONS: { value: SocialPlatform; label: string; emoji: string }[] = [
-  { value: 'douyin', label: '抖音', emoji: '🎵' },
-  { value: 'xiaohongshu', label: '小红书', emoji: '📕' },
-  { value: 'bilibili', label: 'B站', emoji: '📺' },
-  { value: 'youtube_shorts', label: 'YouTube Shorts', emoji: '▶️' },
-  { value: 'tiktok', label: 'TikTok', emoji: '🌐' },
-];
-
-// 导出格式选项
-const FORMAT_OPTIONS: { value: AspectRatio; label: string; emoji: string }[] = [
-  { value: '9:16', label: '9:16 竖屏', emoji: '📱' },
-  { value: '1:1', label: '1:1 方屏', emoji: '🖼️' },
-  { value: '16:9', label: '16:9 横屏', emoji: '🖥️' },
-];
+import {
+  MIN_CLIP_DURATION_SECONDS,
+  MAX_CLIP_DURATION_SECONDS,
+  SCORE_THRESHOLD_HIGH,
+  SCORE_THRESHOLD_MEDIUM,
+  TARGET_CLIP_COUNTS,
+  SEO_DESCRIPTION_MAX_LENGTH,
+  HASHTAGS_MAX_COUNT,
+  MOTION_SCALE_HOVER,
+  MOTION_SCALE_TAP,
+  DEFAULT_FPS,
+  PLATFORM_OPTIONS,
+  FORMAT_OPTIONS,
+  type SocialPlatform,
+  type AspectRatio,
+} from './clipRipplingConfig';
 
 interface ClipRepurposeProps {
   onNext?: () => void;
