@@ -3,9 +3,9 @@
  * 单一职责：封装片段的增删改 + 点击/双击
  */
 import { useCallback } from 'react';
-import type { TimelineTrack, TimelineClip } from '../../core/types/timeline';
+import type { TimelineTrack, TimelineClip } from '../../../core/types/timeline';
 import { generateId } from '@/shared/utils';
-import { TRACK_COLORS } from './constants';
+import { TRACK_COLORS } from '../constants';
 
 interface UseClipActionsOptions {
   tracks: TimelineTrack[];
