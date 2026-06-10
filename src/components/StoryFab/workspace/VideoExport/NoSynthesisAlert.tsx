@@ -3,7 +3,7 @@
  * 单一职责：展示合成未完成提示
  */
 import React from 'react';
-import styles from './VideoExport.module.less';
+import styles from '../VideoExport.module.less';
 
 interface NoSynthesisAlertProps {
   /** 跳转到合成步骤 */
