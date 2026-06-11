@@ -7,7 +7,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ProjectsToolbar } from './components/ProjectsToolbar';
 import { StatusFilterBar } from './components/StatusFilterBar';
 import { ProjectCard } from './components/ProjectCard';
-import { useProjectList, statusConfig, getProjectUIStatus, formatRelativeDate } from '../../hooks/useProjectList';
+import { useProjectList, statusConfig, getProjectUIStatus } from '../../hooks/useProjectList';
+import { formatRelativeDate } from '../../shared/utils/formatting';
 import { preloadProjectEditPage, preloadVideoEditorPage } from '../../core/utils/route-preload';
 import type { ProjectView } from './types';
 import React from 'react';

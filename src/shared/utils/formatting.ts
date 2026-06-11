@@ -145,6 +145,20 @@ export function formatRelativeTime(date: Date | string): string {
 }
 
 /**
+ * 格式化相对日期（分钟/小时/天前）
+ * 与 formatRelativeTime 区别：短格式，适合列表项
+ */
+export function formatRelativeDate(d: string | Date): string {
+  const date = typeof d === 'string' ? new Date(d) : d;
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  if (diff < 3600000) return `${Math.floor(diff / 60000)} 分钟前`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)} 小时前`;
+  if (diff < 604800000) return `${Math.floor(diff / 86400000)} 天前`;
+  return date.toLocaleDateString('zh-CN');
+}
+
+/**
  * 截断文本
  */
 export function truncateText(text: string, maxLength: number, suffix: string = '...'): string {

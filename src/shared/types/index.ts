@@ -161,8 +161,8 @@ export interface Workflow {
 /** 任务类型 */
 export type TaskType = 'analysis' | 'script' | 'render' | 'export' | 'upload';
 
-/** 任务状态 */
-export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+import type { TaskStatus } from '@/core/types';
+export type { TaskStatus };
 
 /** 任务 */
 export interface Task {

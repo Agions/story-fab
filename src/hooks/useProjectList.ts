@@ -53,17 +53,6 @@ export function getProjectUIStatus(project: ProjectView): ProjectUIStats {
   return { scriptCount, videoCount, status, progress };
 }
 
-// 格式化相对日期（3分钟前、2小时前等）
-export function formatRelativeDate(d: string): string {
-  const date = new Date(d);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  if (diff < 3600000) return `${Math.floor(diff / 60000)} 分钟前`;
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)} 小时前`;
-  if (diff < 604800000) return `${Math.floor(diff / 86400000)} 天前`;
-  return date.toLocaleDateString('zh-CN');
-}
-
 export interface UseProjectListOptions {
   recentProjects?: string[];
 }

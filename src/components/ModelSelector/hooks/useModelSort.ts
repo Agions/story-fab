@@ -5,9 +5,10 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import type { AIModel } from '@/core/types';
+import type { SortOrder } from '@/store/projectStore';
 
+export type { SortOrder };
 export type SortField = 'name' | 'contextWindow' | 'pricing' | 'recommended';
-export type SortOrder = 'asc' | 'desc';
 
 interface UseModelSortProps {
   models: AIModel[];

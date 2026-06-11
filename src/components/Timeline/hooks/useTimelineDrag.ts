@@ -4,12 +4,11 @@
  * 使用 rAF 优化性能，避免每帧都触发状态更新
  */
 import { useCallback, useRef } from 'react';
-import type { TimelineTrack, TimelineClip } from '../../../core/types/timeline';
+import type { TimelineTrack, TimelineClip, DragType } from '../../../core/types/timeline';
 import { MIN_CLIP_DURATION } from '../constants';
 import { snapToBoundary } from '../timelineSnap';
 
-/** 拖拽类型 */
-export type DragType = 'move' | 'start' | 'end';
+export type { DragType };
 
 interface UseTimelineDragOptions {
   tracks: TimelineTrack[];
