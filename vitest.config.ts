@@ -15,19 +15,12 @@ export default defineConfig({
       'dist',
       '.git',
       'src/test/**/fixtures/**',
-      'src/_DEAD/__tests__/common.test.ts',
-      'src/_DEAD/__tests__/format.test.ts',
-      'src/_DEAD/__tests__/logger.test.ts',
-      'src/_DEAD/__tests__/model-availability.test.ts',
-      'src/_DEAD/__tests__/project-id.test.ts',
-      'src/_DEAD/__tests__/route-preload.test.ts',
-      'src/services/export.test.ts', // jspdf not installed — add to package.json first
     ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       reportsDirectory: './coverage',
-      exclude: ['node_modules', 'src/test', 'src/_DEAD/**', '**/*.d.ts', '**/*.config.*', '**/vite-env.d.ts', 'src/_DEAD/__tests__/common.test.ts', 'src/_DEAD/__tests__/format.test.ts', 'src/_DEAD/__tests__/logger.test.ts', 'src/_DEAD/__tests__/model-availability.test.ts', 'src/_DEAD/__tests__/project-id.test.ts', 'src/_DEAD/__tests__/route-preload.test.ts'],
+      exclude: ['node_modules', 'src/test', '**/*.d.ts', '**/*.config.*', '**/vite-env.d.ts'],
       include: ['src/**/*.{ts,tsx}'],
       thresholds: {
         lines: 5,
