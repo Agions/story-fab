@@ -59,13 +59,6 @@ export interface ApiResponse<T = unknown> {
   };
 }
 
-/** API 错误 */
-export interface ApiError {
-  code: string;
-  message: string;
-  details?: unknown;
-}
-
 // ============ 文件类型 ============
 
 /** 文件信息 */
@@ -88,14 +81,6 @@ export interface VideoFile extends FileInfo {
   fps: number;
   format: string;
   thumbnail?: string;
-}
-
-/** 音频文件 */
-export interface AudioFile extends FileInfo {
-  duration: number;
-  sampleRate?: number;
-  channels?: number;
-  codec?: string;
 }
 
 /** 图片文件 */
@@ -239,16 +224,6 @@ export interface EventEmitter {
 }
 
 // ============ 配置类型 ============
-
-/** 应用配置 */
-export interface AppConfig {
-  theme: 'light' | 'dark' | 'auto';
-  language: 'zh';
-  autoSave: boolean;
-  autoSaveInterval: number;
-  defaultQuality: 'low' | 'medium' | 'high' | 'ultra';
-  defaultFormat: 'mp4' | 'mov' | 'webm';
-}
 
 /** 主题配置 */
 export interface ThemeConfig {

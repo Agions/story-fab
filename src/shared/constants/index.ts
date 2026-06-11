@@ -116,9 +116,3 @@ export const THEME_MODES = [
   { value: 'auto', label: '自动' }
 ] as const;
 
-export const ALLOWED_EXTENSIONS = {
-  VIDEO: ['mp4', 'mov', 'webm', 'mkv', 'avi', 'flv', 'wmv'],
-  AUDIO: ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'],
-  IMAGE: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
-  DOCUMENT: ['pdf', 'doc', 'docx', 'txt', 'srt', 'vtt']
-} as const;
