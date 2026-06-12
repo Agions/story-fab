@@ -3,6 +3,9 @@
  * 文案风格、解说风格预设、文案长度选项
  */
 
+import type { ScriptData } from '@/core/types';
+import type { storyfabFeatureType } from '../types';
+
 // 文案风格选项
 export const SCRIPT_STYLES = [
   { value: 'formal', label: '正式' },
@@ -61,8 +64,8 @@ export const SCRIPT_LENGTHS = [
 
 export interface ScriptGenerateProps {
   onNext?: () => void;
-  setNarrationScript?: (data: any) => void;
-  setRemixScript?: (data: any) => void;
-  setFeature?: (feature: any) => void;
+  setNarrationScript?: (data: ScriptData) => void;
+  setRemixScript?: (data: ScriptData) => void;
+  setFeature?: (feature: storyfabFeatureType) => void;
   goToNextStep?: () => void;
 }

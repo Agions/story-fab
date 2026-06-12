@@ -13,8 +13,16 @@ import React, { useState, memo, useCallback } from 'react';
 import { useStoryFab } from '../context';
 import { notify } from '@/shared';
 import { useScriptGeneration } from './hooks/useScriptGeneration';
-import { FUNCTION_TO_FEATURE, type AIFunctionType } from './functionModeMap';
-import { COMMENTARY_STYLES, type ScriptGenerateProps } from './scriptConfig';
+import {
+  FUNCTION_TO_FEATURE,
+  type AIFunctionType,
+} from './functionModeMap';
+import {
+  COMMENTARY_STYLES,
+  type ScriptGenerateProps,
+} from './scriptConfig';
+import type { storyfabAction } from '../types';
+import type { ScriptData } from '@/core/types';
 
 // 导入子组件
 import {
@@ -307,7 +315,7 @@ export default ScriptGenerate;
 /**
  * 前置步骤提示
  */
-const PrerequisiteStep: React.FC<{ dispatch: any }> = ({ dispatch }) => {
+const PrerequisiteStep: React.FC<{ dispatch: (action: storyfabAction) => void }> = ({ dispatch }) => {
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepTitle}>
@@ -456,7 +464,7 @@ const EditorHeader: React.FC<{
  * 生成按钮区域
  */
 const GenerateSection: React.FC<{
-  currentScript: any;
+  currentScript: ScriptData | null;
   wordCount: number;
   estimatedDuration: number;
   generating: boolean;
@@ -516,7 +524,7 @@ const GenerateSection: React.FC<{
  * 脚本预览弹窗
  */
 const ScriptPreviewModal: React.FC<{
-  script: any;
+  script: ScriptData;
   wordCount: number;
   estimatedDuration: number;
   style: string;
