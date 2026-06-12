@@ -22,6 +22,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { logger } from '@/shared/utils/logging';
 import {
   FileText,
   Edit,
@@ -99,8 +100,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
       setPreviewPlaying(false);
     } else {
       video.play().catch((e) => {
-        // eslint-disable-next-line no-console
-        console.warn('[SubtitleExtractor] 播放失败:', e);
+        logger.warn('[SubtitleExtractor] 播放失败', e);
       });
       setPreviewPlaying(true);
     }
@@ -114,8 +114,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     if (!previewPlaying) {
       setPreviewPlaying(true);
       video.play().catch((e) => {
-        // eslint-disable-next-line no-console
-        console.warn('[SubtitleExtractor] 播放失败:', e);
+        logger.warn('[SubtitleExtractor] 播放失败', e);
       });
     }
   }, [previewPlaying, setPreviewPlaying, setPlayheadMs]);

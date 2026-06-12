@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { createPortal } from "react-dom";
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info, Loader } from "lucide-react";
 import styles from "@/components/ui/toast.module.css";
+import { logger } from "@/shared/utils/logging";
 
 type ToastType = "success" | "error" | "warning" | "info" | "loading";
 
@@ -94,7 +95,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         addToast(event);
       });
     }).catch((err) => {
-      console.error('[Toast] Failed to load notify module:', err);
+      logger.error('[Toast] Failed to load notify module', err);
     });
     return () => {
       cancelled = true;

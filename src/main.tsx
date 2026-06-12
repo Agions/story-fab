@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { logger } from './shared/utils/logging';
 import './styles/globals.css';
 
 // 防止控制台出现错误消息
@@ -9,8 +10,7 @@ window.addEventListener('error', (e) => {
   if (e.message && (e.message.includes('@tauri-apps/api') || e.message.includes('Tauri'))) {
     e.preventDefault();
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console -- DEV-only diagnostic
-      console.warn('[story-fab] Tauri API error suppressed:', e.message);
+      logger.warn('[story-fab] Tauri API error suppressed', e.message);
     }
   }
 });

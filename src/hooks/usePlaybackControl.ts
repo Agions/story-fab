@@ -9,6 +9,7 @@
  */
 
 import { useCallback, useRef } from 'react';
+import { logger } from '../shared/utils/logging';
 
 // ============================================
 // Hook 参数
@@ -120,7 +121,7 @@ export function usePlaybackControl(params: UsePlaybackControlParams) {
    */
   const setPlaybackRate = useCallback((rate: number) => {
     // 当前实现为占位符，实际应控制视频元素的 playbackRate
-    console.debug('[Editor] 设置播放速度:', { rate });
+    logger.debug('[Editor] 设置播放速度', { rate });
   }, []);
 
   /**

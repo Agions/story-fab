@@ -9,6 +9,7 @@
  */
 
 import { useCallback } from 'react';
+import { logger } from '../shared/utils/logging';
 
 // ============================================
 // Hook 返回值
@@ -60,7 +61,7 @@ export function useTrackOperations(params: UseTrackOperationsParams): UseTrackOp
       if (deleteTrackFn) {
         deleteTrackFn(trackId);
       } else {
-        console.debug('[Editor] 删除轨道:', { trackId });
+        logger.debug('[Editor] 删除轨道', { trackId });
       }
     },
     [deleteTrackFn]

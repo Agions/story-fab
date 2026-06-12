@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
+import { logger } from '@/shared/utils/logging';
 import type { ExportSettings } from '@/core/types';
 import { PLATFORM_PRESETS } from './exportConfig';
 
@@ -94,7 +95,7 @@ export function useExportHandlers({
           unlisten = fn;
         }
       }).catch((err) => {
-        console.error('[useExportHandlers] Failed to subscribe to processing-progress:', err);
+        logger.error('[useExportHandlers] Failed to subscribe to processing-progress', err);
       });
     }
     return () => {
