@@ -297,7 +297,7 @@ const ProjectEdit: React.FC = () => {
 
   const handleExportScript = (format: string) => notify.info(`导出脚本为 ${format.toUpperCase()} 格式`);
 
-  // @ts-ignore - reserved handler wired to form onValuesChange for auto-save trigger
+  // @ts-expect-error - reserved handler wired to form onValuesChange for auto-save trigger
   const _handleFormValuesChange = () => scheduleAutoSave();
 
   // ─── Render ────────────────────────────────────────────────────────────────

@@ -1,11 +1,8 @@
-/* eslint-disable */
 /**
  * projectStore 过滤和排序逻辑测试
  */
-// @ts-ignore - types imported only for documentation, not consumed
 import { describe, it, expect } from 'vitest';
-// @ts-ignore - types imported only for documentation, not consumed
-import { filterProjects, sortProjects, type ProjectSortBy, type SortOrder } from './projectStore';
+import { filterProjects, sortProjects } from './projectStore';
 import type { Project } from '../core/types';
 
 // 测试数据：每个字段值都不同，避免意外的 tie-breaking

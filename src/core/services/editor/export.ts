@@ -2,15 +2,12 @@ import type { EditorExportSettings, Timeline } from './types';
 import { formatFileSize } from '../../../shared/utils/formatting';
 
 export async function exportTimeline(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ts-ignore - reserved parameter for future export pipeline integration
+  // @ts-expect-error - reserved parameter for future export pipeline integration
   timeline: Timeline,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   settings?: Partial<EditorExportSettings>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   defaultSettings?: EditorExportSettings
 ): Promise<Blob> {
-  // @ts-ignore - placeholder settings object reserved for export pipeline
+  // @ts-expect-error - placeholder settings object reserved for export pipeline
   const _exportSettings = { ...defaultSettings, ...settings };
   return new Blob(['export data'], { type: 'video/mp4' });
 }

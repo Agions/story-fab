@@ -72,8 +72,7 @@ export interface RepurposingResult {
  */
 export function clipSegmentFromRepurposing(
   rep: RepurposingClip,
-  // @ts-ignore - index reserved for future index-aware repurposing mapping
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-expect-error - index reserved for future index-aware repurposing mapping
   index: number,
   sourceId: string,
 ): ClipSegment {

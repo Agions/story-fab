@@ -26,8 +26,6 @@ export interface SpeechRecognitionResultList {
   [Symbol.iterator](): Iterator<SpeechRecognitionResult>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// @ts-ignore - _SpeechRecognitionEventMap reserved for future Web Speech API integration
 export interface _SpeechRecognitionEventMap {
   'result': SpeechRecognitionEvent;
 }
@@ -57,8 +55,6 @@ export interface RustWhisperSegment {
   words?: RustWhisperWord[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// @ts-ignore - _RustWhisperResult kept for backward compatibility with whisper backend payload
 export interface _RustWhisperResult {
   segments: RustWhisperSegment[];
   language?: string;

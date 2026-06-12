@@ -17,11 +17,14 @@ import {
   editorService,
   saveToStorage,
   type EditorConfig,
+  type EditorExportSettings,
   type Timeline,
+  type TimelineClip,
+  type TextItem,
+  type AudioClip,
   type VideoSegment,
   type ScriptSegment,
 } from '@/core/services/editor';
-import type { ExportSettings } from '@/core/types';
 
 // 导入拆分后的子 Hook
 import { usePlaybackControl } from './usePlaybackControl';
@@ -54,7 +57,7 @@ export interface EditorOperations {
   setPlaybackRate: (rate: number) => void;
 
   // 片段操作
-  addClip: (trackId: string, clip: any, position: number) => void;
+  addClip: (trackId: string, clip: TimelineClip, position: number) => void;
   removeClip: (trackId: string, clipId: string) => void;
   moveClip: (trackId: string, clipId: string, newPosition: number) => void;
   copyClip: (clipId: string) => void;
@@ -64,8 +67,8 @@ export interface EditorOperations {
   // 效果操作
   addTransition: (fromClipId: string, toClipId: string, type: string, duration: number) => void;
   addEffect: (clipId: string, effect: string, params: Record<string, unknown>) => void;
-  addText: (trackId: string, text: any, position: number) => void;
-  addAudio: (trackId: string, audio: any, position: number) => void;
+  addText: (trackId: string, text: TextItem, position: number) => void;
+  addAudio: (trackId: string, audio: AudioClip, position: number) => void;
 
   // 轨道操作
   createTrack: (type: 'video' | 'audio' | 'text' | 'effect') => string;
@@ -88,7 +91,7 @@ export interface EditorOperations {
 
   // 工作流操作
   generateFromScript: (scriptSegments: ScriptSegment[], videoSegments: VideoSegment[]) => void;
-  exportVideo: (settings?: Partial<ExportSettings>) => Promise<Blob>;
+  exportVideo: (settings?: Partial<EditorExportSettings>) => Promise<Blob>;
   getExportPreview: () => { duration: number; resolution: string; estimatedSize: string };
 
   // 项目操作
@@ -237,7 +240,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
   );
 
   const exportVideo = useCallback(
-    async (settings?: Partial<ExportSettings>): Promise<Blob> => {
+    async (settings?: Partial<EditorExportSettings>): Promise<Blob> => {
       updateState({ isExporting: true, exportProgress: 0 });
 
       try {
@@ -247,7 +250,7 @@ export function useEditor(_config?: Partial<EditorConfig>): {
           updateState({ exportProgress: i });
         }
 
-        const blob = await editorService.exportTimeline(settings as any);
+        const blob = await editorService.exportTimeline(settings);
         return blob;
       } finally {
         updateState({ isExporting: false, exportProgress: 100 });

@@ -13,6 +13,7 @@ import { aiService } from '@/core/services/ai/aiService';
 import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/aiModels.config';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import type { storyfabState } from '../../types';
 import { notify } from '@/shared';
 import {
   getAvailableModelsFromApiKeys,
@@ -39,7 +40,7 @@ export interface AlignmentGate {
 }
 
 export interface UseScriptGenerationParams {
-  state: any;
+  state: storyfabState;
   setNarrationScript: (data: ScriptData) => void;
   setRemixScript: (data: ScriptData) => void;
   setFeature: (feature: 'smartClip' | 'voiceover' | 'subtitle') => void;
@@ -167,9 +168,9 @@ export function useScriptGeneration(params: UseScriptGenerationParams) {
           audience: '通用',
           language: 'zh-CN',
           keywords:
-            state.analysis?.scenes
-              ?.map((s: any) => s.type as string)
-              .filter((type: string | undefined): type is string => Boolean(type)) || [],
+            (state.analysis?.scenes ?? [])
+              .map((s) => s.type)
+              .filter((t): t is NonNullable<typeof t> => Boolean(t)),
           videoDuration: state.currentVideo?.duration,
         });
 

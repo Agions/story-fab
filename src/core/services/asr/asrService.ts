@@ -22,7 +22,7 @@ import type { IASRProvider } from './providers/types';
  * 单一职责：管理 Provider 链，按优先级依次尝试直到成功
  */
 export class ASRService extends BaseService {
-  // @ts-ignore - _isInitialized 预留用于未来懒加载状态跟踪
+  // @ts-expect-error - _isInitialized 预留用于未来懒加载状态跟踪
   private _isInitialized = false;
 
   /** Provider 链：按优先级排序 */

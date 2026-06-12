@@ -211,12 +211,10 @@ async function detectSilenceSegments(
  * 生成剪辑点
  */
 function generateCutPoints(
-  // @ts-ignore - videoInfo reserved for future cut point metadata enrichment
   _videoInfo: VideoInfo,
   scenes: Scene[],
   keyframes: Keyframe[],
   silenceSegments: SilenceSegment[],
-  // @ts-ignore - emotions reserved for future emotion-aware cut scoring
   _emotions: EmotionAnalysis[],
   emotionPeaks: UtilsEmotionPeak[],
   config: AIClipConfig
@@ -355,7 +353,6 @@ function generateSegments(
 async function generateSuggestions(
   videoInfo: VideoInfo,
   segments: ClipSegment[],
-  // @ts-ignore - scenes reserved for future scene-aware suggestion ranking
   _scenes: Scene[],
   config: AIClipConfig
 ): Promise<ClipSuggestion[]> {

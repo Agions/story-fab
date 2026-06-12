@@ -137,12 +137,11 @@ export class ClipWorkflowService {
    *
    * @see processVideoWithPipeline 完整路径（多维评分 + SEO）
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async processVideo(
     videoInfo: VideoInfo,
     scriptSegments?: ScriptSegment[]
   ): Promise<ClipResult> {
-    // @ts-ignore - _startTime reserved for future workflow timing metrics collection
+    // @ts-expect-error - _startTime reserved for future workflow timing metrics collection
     const _startTime = Date.now();
     
     // Step 1: 视频分析

@@ -76,18 +76,14 @@ const ProjectDetail: React.FC = () => {
   const { addRecentProject } = useSettings();
   const selectedAIModel = useModelStore(s => s.selectedAIModel);
   const aiModelsSettings = useModelStore(s => s.aiModelsSettings);
-  // Note: 变量由 setter 在 effect/callback 内写入，读取通过其他 state 触发或 UI 子组件读取
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState<string>('analyze');
   const [project, setProject] = useState<ProjectData | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [, setLoadError] = useState<string>('');
   const [activeScript, setActiveScript] = useState<Script | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [, setCurrentStep] = useState<'analyze' | 'script' | 'voice' | 'video'>('analyze');
   // 兼容性: setCurrentStep 供 stepper 子组件调用
   void setCurrentStep;

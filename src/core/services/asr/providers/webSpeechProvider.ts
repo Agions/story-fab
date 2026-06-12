@@ -13,12 +13,13 @@ import type { IASRProvider } from './types';
  * Web Speech API 策略实现
  * 注意：浏览器 API 仅作 fallback，准确性低于 Rust Whisper
  */
-// @ts-ignore - 浏览器 API 签名保留供未来扩展
+
+// 浏览器 API 签名保留供未来扩展
 export class WebSpeechASRProvider implements IASRProvider {
   readonly name = 'web-speech';
 
   async transcribe(
-    // @ts-ignore - videoInfo 预留以支持未来媒体约束
+    // @ts-expect-error - videoInfo 预留以支持未来媒体约束
     videoInfo: VideoInfo,
     opts: Required<ASROptions>
   ): Promise<ASRResult | null> {

@@ -73,10 +73,8 @@ export function removeClip(timeline: Timeline, trackId: string, clipId: string):
 
 /** 移动片段 */
 export function moveClip(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   timeline: Timeline,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ts-ignore - trackId reserved for future per-track constraint validation
+  // @ts-expect-error - trackId reserved for future per-track constraint validation
   trackId: string,
   clipId: string,
   newPosition: number
@@ -174,7 +172,7 @@ export function splitClip(timeline: Timeline, clipId: string, splitMs: number): 
 /** 复制片段 */
 export function copyClip(
   timeline: Timeline,
-  // @ts-ignore - trackId reserved for future source-track attribution
+  // @ts-expect-error - trackId reserved for future source-track attribution
   trackId: string,
   clipId: string,
 ): Timeline {

@@ -1,6 +1,7 @@
-/* eslint-disable */
-// @ts-ignore - beforeEach is re-exported from vitest for consumer convenience
-import { describe, it, expect, beforeEach } from 'vitest';
+/**
+ * VideoProcessingError 与 normalizeVideoError 单元测试
+ */
+import { describe, it, expect } from 'vitest';
 import {
   VideoProcessingError,
   normalizeVideoError,

@@ -9,7 +9,7 @@
  */
 
 import { useCallback } from 'react';
-import type { TimelineClip, TextItem, AudioClip } from '@/core/services/editor';
+import type { TimelineClip, TextItem, AudioClip, EditorAction } from '@/core/services/editor';
 
 // ============================================
 // Hook 返回值
@@ -34,7 +34,7 @@ export interface UseClipOperationsResult {
 
 export interface UseClipOperationsParams {
   /** 分发 action 到 editor service */
-  dispatch: (action: any) => void;
+  dispatch: (action: EditorAction) => void;
 }
 
 // ============================================
