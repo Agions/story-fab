@@ -10,6 +10,7 @@ import type { AIModel, ModelProvider, ModelCategory, AIModelSettings } from '@/c
 import useLocalStorage from './useLocalStorage';
 import { resolveDefaultModelId } from '../core/utils/model-availability';
 import { delay } from '@/shared';
+import { AppError } from '@/core/errors';
 
 export interface UseModelReturn {
   // 模型列表
@@ -154,7 +155,9 @@ export function useModel(): UseModelReturn {
       // 验证 API Key 格式
       const providerConfig = MODEL_PROVIDERS[provider];
       if (!providerConfig) {
-        throw new Error('未知的提供商');
+        throw new AppError('APP_MODEL_PROVIDER_UNKNOWN', '未知的提供商', {
+          userMessage: '未知的模型提供商',
+        });
       }
       
       // 这里可以添加实际的 API 验证逻辑

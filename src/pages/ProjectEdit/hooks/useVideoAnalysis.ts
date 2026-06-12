@@ -13,6 +13,7 @@ import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/service
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import { parseScriptText } from '../projectEditUtils';
+import { AppError } from '@/core/errors';
 
 /** 分析阶段标签 */
 const ANALYSIS_STAGE_LABELS: Record<string, string> = {
@@ -77,7 +78,9 @@ export function useVideoAnalysis({
       notify.info('正在提取关键帧...');
       const frames = await videoProcessor.extractKeyFrames(videoPath, {}, meta.duration);
       const paths = frames.map((f) => f.path);
-      if (paths.length === 0) throw new Error('未提取到关键帧，请尝试更换视频或检查视频时长');
+      if (paths.length === 0) throw new AppError('APP_KEYFRAMES_EMPTY', '未提取到关键帧，请尝试更换视频或检查视频时长', {
+        userMessage: '未提取到关键帧',
+      });
       onKeyFramesReady(paths);
 
       // 阶段 3: AI 分析关键帧内容

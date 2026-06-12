@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { VideoAnalysis, KeyMoment, Emotion } from '@/types';
 import VideoSelector from '@/components/VideoSelector/VideoSelector';
 import { notify } from '@/shared';
+import { AppError } from '@/core/errors';
 import styles from './VideoAnalyzer.module.less';
 
 const Title = ({ level = 4, children }: { level?: number; children: React.ReactNode }) => {
@@ -55,7 +56,10 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
       const videoMetadata = await (tauri.analyzeVideo(selectedVideoUrl) as Promise<AnalyzeVideoResult>).catch(err => {
         logger.error('视频分析失败:', { error: err });
-        throw new Error(`视频分析失败: ${err}`);
+        throw new AppError('APP_VIDEO_ANALYZE_FAILED', `视频分析失败: ${err}`, {
+          originalError: err,
+          userMessage: '视频分析失败',
+        });
       });
 
       setProgress(40);

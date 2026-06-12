@@ -12,6 +12,7 @@ import { logger } from '../../../shared/utils/logging';
 import type { SubtitleEntry, VideoInfo } from '@/core/types';
 import { whisperService, type WhisperProgress } from './whisperService';
 import { trackToSRT, trackToVTT, trackToASS } from './subtitleFormatters';
+import { AppError } from '@/core/errors';
 
 // ============================================
 // 类型定义
@@ -277,7 +278,9 @@ export class SubtitleService {
       case 'ass':
         return trackToASS(track);
       default:
-        throw new Error(`不支持的格式: ${format}`);
+        throw new AppError('APP_SUBTITLE_FORMAT_UNSUPPORTED', `不支持的格式: ${format}`, {
+          userMessage: `字幕格式不支持: ${format}`,
+        });
     }
   }
 
@@ -359,7 +362,11 @@ export class SubtitleService {
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${encodeURIComponent(langPair)}`;
 
     const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`MyMemory API error: ${resp.status}`);
+    if (!resp.ok) throw new AppError('APP_TRANSLATE_API_FAILED', `MyMemory API error: ${resp.status}`, {
+      statusCode: resp.status,
+      userMessage: '翻译 API 调用失败',
+      retryable: true,
+    });
 
     const data = (await resp.json()) as {
       responseData?: { translatedText?: string };
@@ -367,11 +374,18 @@ export class SubtitleService {
     };
 
     if (data.responseStatus && data.responseStatus !== 200) {
-      throw new Error(`MyMemory translation failed: ${data.responseStatus}`);
+      throw new AppError('APP_TRANSLATE_API_FAILED', `MyMemory translation failed: ${data.responseStatus}`, {
+        statusCode: data.responseStatus,
+        userMessage: '翻译 API 返回错误',
+        retryable: true,
+      });
     }
 
     const translated = data.responseData?.translatedText;
-    if (!translated) throw new Error('MyMemory returned empty translation');
+    if (!translated) throw new AppError('APP_TRANSLATE_EMPTY', 'MyMemory returned empty translation', {
+      userMessage: '翻译结果为空',
+      retryable: true,
+    });
 
     return translated;
   }

@@ -11,6 +11,7 @@
 
 import { createStep, reportProgress } from '../../Step';
 import { logger } from '../../../../shared/utils/logging';
+import { AppError } from '@/core/errors';
 import {
   type CommentaryTimingInput,
   type CommentaryTimingOutput,
@@ -89,7 +90,9 @@ export const commentaryTimingStep: import('../../Step').Step<
   const { state } = input;
   const { visualAnalysis } = state;
   if (!visualAnalysis) {
-    throw new Error(`[${STEP_META.name}] requires visualAnalysis from previous step`);
+    throw new AppError('APP_PIPELINE_ORDER', `[${STEP_META.name}] requires visualAnalysis from previous step`, {
+      userMessage: '解说流程顺序错误：缺少视觉分析',
+    });
   }
 
   const scenes = visualAnalysis.enhancedScenes;

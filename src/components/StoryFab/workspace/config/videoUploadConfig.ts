@@ -9,6 +9,7 @@
  */
 
 import { VIDEO_FORMATS } from '@/shared/constants';
+import { AppError } from '@/core/errors';
 
 // ============================================
 // 常量
@@ -97,7 +98,10 @@ export const simulateChunkedUpload = async (
 ): Promise<void> => {
   for (let i = 0; i < chunks.length; i++) {
     if (signal?.aborted) {
-      throw new Error('Upload aborted');
+      throw new AppError('APP_UPLOAD_ABORTED', 'Upload aborted', {
+        severity: 'warning',
+        userMessage: '上传已取消',
+      });
     }
     // 模拟网络延迟
     await new Promise((resolve) =>

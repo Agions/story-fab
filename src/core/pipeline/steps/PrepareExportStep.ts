@@ -15,6 +15,7 @@ import type { ExportTask } from '../../services/pipeline/clip-pipeline/multiExpo
 import { multiExporter } from '../../services/pipeline/clip-pipeline/multiExport';
 import { tauri } from '../../tauri/TauriBridge';
 import type { VideoInfo } from '@/core/types';
+import { AppError } from '@/core/errors';
 import { logger } from '../../../shared/utils/logging';
 
 // ============================================================
@@ -55,7 +56,9 @@ export const prepareExportStep: Step<PrepareExportInput, PrepareExportOutput> =
     // 获取导出目录（优先用户指定，否则调用 Rust）
     const exportDir = outputDir ?? (await tauri.getExportDir() as string | undefined);
     if (!exportDir) {
-      throw new Error('[PrepareExportStep] 无法获取导出目录，请检查 Tauri 配置');
+      throw new AppError('APP_EXPORT_DIR_MISSING', '[PrepareExportStep] 无法获取导出目录，请检查 Tauri 配置', {
+        userMessage: '无法获取导出目录',
+      });
     }
 
     logger.debug(`[PrepareExportStep] 导出目录: ${exportDir}`);

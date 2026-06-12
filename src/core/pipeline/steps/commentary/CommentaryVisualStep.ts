@@ -11,6 +11,7 @@
 
 import { createStep, reportProgress } from '../../Step';
 import { logger } from '../../../../shared/utils/logging';
+import { AppError } from '@/core/errors';
 import {
   type CommentaryVisualInput,
   type CommentaryVisualOutput,
@@ -99,7 +100,9 @@ export const commentaryVisualStep: import('../../Step').Step<
   const { analysis } = state;
   // 守卫：director 步骤未执行时拒绝运行
   if (!state.directorPlan) {
-    throw new Error('[commentary-visual] requires directorPlan from previous step');
+    throw new AppError('APP_PIPELINE_ORDER', '[commentary-visual] requires directorPlan from previous step', {
+      userMessage: '解说流程顺序错误：缺少 director 计划',
+    });
   }
   const scenes = (analysis.scenes ?? []) as Scene[];
   const emotions = (analysis.emotions ?? []) as Emotion[];

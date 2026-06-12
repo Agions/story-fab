@@ -13,6 +13,7 @@ import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
 import type { AIModelType } from './aiModelConfigs';
 import { invokeAIModel, AIServiceError } from './aiApiClient';
+import { AppError } from '@/core/errors';
 import { buildScriptPrompt, type AnalysisInput, type ScriptGenerationSettings } from './promptBuilder';
 import { parseScriptContent, createScriptDraft } from './scriptParser';
 
@@ -108,7 +109,9 @@ export const generateScriptWithOpenAI = async (
   try {
     const apiKey = await getApiKey('openai');
     if (!apiKey) {
-      throw new Error('未配置 OpenAI API 密钥，请先在设置中配置');
+      throw new AppError('APP_AI_APIKEY_MISSING', '未配置 OpenAI API 密钥，请先在设置中配置', {
+        userMessage: '未配置 OpenAI API 密钥，请先在设置中配置',
+      });
     }
 
     const normalizeStyle = (style: string | undefined): ScriptGenerationSettings['style'] => {

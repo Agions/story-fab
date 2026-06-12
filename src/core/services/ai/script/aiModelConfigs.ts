@@ -7,6 +7,8 @@
  * - 集中管理所有 AI 模型的 URL、headers、请求/响应转换
  */
 
+import { AppError } from '@/core/errors';
+
 // ============================================
 // 类型定义
 // ============================================
@@ -117,7 +119,10 @@ export const AI_MODEL_CONFIGS: Record<AIModelType, ModelConfig> = {
         payload?: { choices?: Array<{ text: string }> };
       };
       if (typed.header?.code !== 0) {
-        throw new Error(`讯飞星火API错误: ${typed.header?.message || '未知错误'}`);
+        throw new AppError('APP_AI_XUNFEI_ERROR', `讯飞星火API错误: ${typed.header?.message || '未知错误'}`, {
+          statusCode: typed.header?.code,
+          userMessage: `讯飞星火 API 错误: ${typed.header?.message || '未知错误'}`,
+        });
       }
       return typed.payload?.choices?.[0]?.text || '';
     },

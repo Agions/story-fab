@@ -6,6 +6,7 @@
 import { BaseService } from '../providers/base.service';
 import { logger } from '../../../shared/utils/logging';
 import { tauri } from '../../tauri/TauriBridge';
+import { AppError } from '@/core/errors';
 import type { VideoInfo } from '@/core/types';
 import {
   DEFAULT_ASR_OPTIONS,
@@ -151,7 +152,10 @@ export class ASRService extends BaseService {
     }
 
     // 永远不会到达这里（Mock Provider 永远成功）
-    throw new Error('No ASR provider returned a result');
+    throw new AppError('APP_ASR_NO_RESULT', 'No ASR provider returned a result', {
+      userMessage: '语音识别失败，请重试',
+      retryable: true,
+    });
   }
 
   /** 将 ZCR burst 转换为峰值格式（毫秒→秒，归一化强度） */

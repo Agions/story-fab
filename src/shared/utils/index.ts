@@ -7,6 +7,7 @@
  */
 
 import { notify } from './notify';
+import { AppError } from '@/core/errors';
 export * from './notify';
 
 // Time formatting & timestamps
@@ -54,7 +55,9 @@ export async function retry<T>(
   delayMs: number = 1000
 ): Promise<T> {
   if (attempts < 1) {
-    throw new Error('retry: attempts must be >= 1');
+    throw new AppError('APP_RETRY_INVALID', 'retry: attempts must be >= 1', {
+      userMessage: 'retry 调用参数错误',
+    });
   }
 
   let lastError: Error | undefined;

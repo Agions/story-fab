@@ -6,6 +6,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { AppError } from '@/core/errors';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import { delay, formatDuration } from '@/shared';
 import type { TaskStatusInfo } from '@/core/services/ai/types';
@@ -80,12 +81,20 @@ export function useVideo(): UseVideoReturn {
       // 验证文件格式
       const ext = file.name.split('.').pop()?.toLowerCase();
       if (!ext || !SUPPORTED_VIDEO_FORMATS.includes(ext)) {
-        throw new Error(`不支持的格式: ${ext}。请使用: ${SUPPORTED_VIDEO_FORMATS.join(', ')}`);
+        throw new AppError(
+          'APP_VIDEO_FORMAT_UNSUPPORTED',
+          `不支持的格式: ${ext}。请使用: ${SUPPORTED_VIDEO_FORMATS.join(', ')}`,
+          { userMessage: `视频格式不支持: ${ext || '未知'}` }
+        );
       }
 
       // 验证文件大小
       if (file.size > MAX_VIDEO_FILE_SIZE) {
-        throw new Error(`文件过大: ${(file.size / 1024 / 1024).toFixed(0)}MB。最大支持 2GB`);
+        throw new AppError(
+          'APP_VIDEO_SIZE_EXCEEDED',
+          `文件过大: ${(file.size / 1024 / 1024).toFixed(0)}MB。最大支持 2GB`,
+          { userMessage: '文件超过 2GB 上限' }
+        );
       }
 
       // 模拟上传进度

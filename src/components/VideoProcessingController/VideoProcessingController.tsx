@@ -7,6 +7,7 @@ import {
   Scissors,
 } from 'lucide-react';
 import { tauri } from '@/core/tauri';
+import { AppError } from '@/core/errors';
 import { notify } from '@/shared';
 import type { VideoSegment } from '@/core/types';
 import { BasicSettings, EffectsSettings, BatchProcessing } from '@/components/VideoProcessingController/mods';
@@ -125,7 +126,9 @@ const VideoProcessingController: React.FC<VideoProcessingControllerProps> = ({
 
       const showSaveFilePicker = (window as Window & { showSaveFilePicker?: SaveFilePicker }).showSaveFilePicker;
       if (typeof showSaveFilePicker !== 'function') {
-        throw new Error('当前环境不支持文件选择器');
+        throw new AppError('APP_BROWSER_UNSUPPORTED', '当前环境不支持文件选择器', {
+          userMessage: '当前浏览器不支持文件选择器',
+        });
       }
 
       const saveHandle = await showSaveFilePicker({

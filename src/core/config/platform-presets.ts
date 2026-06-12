@@ -3,6 +3,8 @@
  * 抖音/小红书/B站/快手/视频号/YouTube/TikTok
  */
 
+import { AppError } from '@/core/errors';
+
 export type BitratePreset = 'low' | 'medium' | 'high' | 'ultra';
 export type AspectRatio = '16:9' | '9:16' | '1:1';
 
@@ -84,6 +86,8 @@ export const PLATFORM_PRESETS: Record<string, PlatformPreset> = {
 
 export function getPreset(platformId: string): PlatformPreset {
   const preset = PLATFORM_PRESETS[platformId];
-  if (!preset) throw new Error(`Unknown platform: ${platformId}`);
+  if (!preset) throw new AppError('APP_PLATFORM_UNKNOWN', `Unknown platform: ${platformId}`, {
+    userMessage: `未知的平台: ${platformId}`,
+  });
   return preset;
 }

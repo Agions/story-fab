@@ -8,6 +8,7 @@ import { readTextFile, writeTextFile, BaseDirectory, exists, mkdir } from '@taur
 import { normalizeProjectId, buildProjectIdCandidates } from '@/core/utils/project-id';
 import { logger } from '@/shared/utils/logging';
 import { getConfigDir } from '@/core/utils/config-dir';
+import { AppError } from '@/core/errors';
 
 const errMsg = (err: unknown): string =>
   err instanceof Error ? err.message : String(err);
@@ -59,31 +60,46 @@ export const ensureAppDataDir = async (): Promise<void> => {
   }
   const dirExists = await exists(appDir, { baseDir: BaseDirectory.AppData }).catch((e) => {
     logger.error('检查目录是否存在时出错', { e });
-    throw new Error(`检查目录出错: ${errMsg(e)}`);
+    throw new AppError('APP_DIR_CHECK_FAILED', `检查目录出错: ${errMsg(e)}`, {
+      originalError: e,
+      userMessage: '检查数据目录失败',
+    });
   });
   if (dirExists) return;
   logger.info('应用数据目录不存在，创建目录', { appDir });
   await mkdir(appDir, { baseDir: BaseDirectory.AppData, recursive: true }).catch((e) => {
     logger.error('创建目录失败', { e });
-    throw new Error(`创建目录失败: ${errMsg(e)}`);
+    throw new AppError('APP_DIR_CREATE_FAILED', `创建目录失败: ${errMsg(e)}`, {
+      originalError: e,
+      userMessage: '创建数据目录失败',
+    });
   });
   const checkExists = await exists(appDir, { baseDir: BaseDirectory.AppData });
-  if (!checkExists) throw new Error('无法创建应用数据目录，请检查权限');
+  if (!checkExists) throw new AppError('APP_DIR_CREATE_DENIED', '无法创建应用数据目录，请检查权限', {
+    userMessage: '无法创建数据目录，请检查权限',
+  });
   logger.info('应用数据目录创建成功');
 };
 
 export const saveProjectToFile = async (projectId: string, project: object): Promise<void> => {
   const normalizedProjectId = normalizeProjectId(projectId || '');
-  if (!project || !normalizedProjectId) throw new Error('无效的项目数据');
+  if (!project || !normalizedProjectId) throw new AppError('APP_PROJECT_INVALID', '无效的项目数据', {
+    userMessage: '无效的项目数据',
+  });
   await ensureAppDataDir().catch((err) => {
-    throw new Error(`应用数据目录错误: ${err.message || '未知错误'}`);
+    throw new AppError('APP_DIR_ERROR', `应用数据目录错误: ${err.message || '未知错误'}`, {
+      originalError: err,
+      userMessage: '数据目录错误',
+    });
   });
   const cleanProject = { ...(project as ProjectFileData) };
   if (cleanProject.aiModel?.apiKey) {
     cleanProject.aiModel = { ...cleanProject.aiModel, apiKey: undefined };
   }
   const projectData = JSON.stringify(cleanProject, null, 2);
-  if (!projectData) throw new Error('项目数据序列化为空');
+  if (!projectData) throw new AppError('APP_PROJECT_SERIALIZE_EMPTY', '项目数据序列化为空', {
+    userMessage: '项目数据为空',
+  });
   const projectPath = `story-fab/${normalizedProjectId}.json`;
   try {
     await tauri.saveProject(normalizedProjectId, projectData);
@@ -107,7 +123,9 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
 
 export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string): Promise<T> => {
   const candidates = buildProjectIdCandidates(projectId);
-  if (!candidates.length) throw new Error('项目ID不能为空');
+  if (!candidates.length) throw new AppError('APP_PROJECT_ID_EMPTY', '项目ID不能为空', {
+    userMessage: '项目ID不能为空',
+  });
   let lastError: unknown = null;
   for (const candidateId of candidates) {
     try {
