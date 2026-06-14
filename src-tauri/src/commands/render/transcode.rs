@@ -1,47 +1,80 @@
+use tauri::{AppHandle, Emitter};
+
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::commands::render::ffmpeg_builder::quality_preset;
 use crate::types::{ExportVideoInput, TranscodeCropInput};
 use crate::utils::cmd_err;
 
+/// Tauri event channel for transcode progress. Emits `{ stage, percent }`
+/// payloads before/after the blocking ffmpeg invocation. The `spawn_blocking`
+/// hop keeps the Tauri main thread and Tokio worker pool responsive while
+/// the multi-minute encode runs (see Tauri discussion #10329).
+const TRANSCODE_PROGRESS_EVENT: &str = "transcode-with-crop-progress";
+
 #[tauri::command]
-pub fn transcode_with_crop(input: TranscodeCropInput) -> Result<String, String> {
+pub async fn transcode_with_crop(
+    app: AppHandle,
+    input: TranscodeCropInput,
+) -> Result<String, String> {
     if input.input_path.trim().is_empty() || input.output_path.trim().is_empty() {
         return Err("输入或输出路径不能为空".to_string());
     }
-    let mut cmd = std::process::Command::new(ffmpeg_binary());
-    cmd.arg("-y").arg("-hide_banner");
-    if let (Some(s), Some(e)) = (input.start_time, input.end_time) {
-        cmd.arg("-ss").arg(s.to_string());
-        cmd.arg("-t").arg((e - s).max(0.1).to_string());
-    }
-    cmd.arg("-i").arg(&input.input_path);
-    let vf_filter: String = match input.aspect.as_str() {
-        "9:16" => {
-            "scale=1080:1920:force_original_aspect_ratio=decrease,crop=1080:1920:(iw-1080)/2:(ih-1920)/2,setsar=1".to_string()
-        }
-        "1:1" => {
-            "scale='min(iw\\,ih):min(iw\\,ih)',crop='min(iw\\,ih):min(iw\\,ih)',setsar=1".to_string()
-        }
-        "16:9" => {
-            "scale=1920:1080:force_original_aspect_ratio=decrease,crop=1920:1080:(iw-1920)/2:(ih-1080)/2,setsar=1".to_string()
-        }
-        _ => return Err("不支持的宽高比，仅支持 9:16、1:1、16:9".to_string()),
-    };
-    cmd.arg("-vf").arg(&vf_filter);
+    let aspect = input.aspect.clone();
+    let quality = input.quality.clone();
 
-    use crate::binary::HwAccel;
-    let hw = crate::binary::hw_accel();
-    let enc = if hw == HwAccel::Cpu { "libx264" } else { hw.h264_encoder() };
-    let (crf, preset) = quality_preset(input.quality.as_deref().unwrap_or("medium"));
-    cmd.args(["-c:v", enc, "-crf", &crf.to_string(), "-preset", preset]);
-    cmd.args(["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart"]);
-    cmd.arg(&input.output_path);
-    let output = cmd.output().map_err(|e| format!("FFmpeg 执行失败: {e}"))?;
-    if output.status.success() {
-        Ok(input.output_path)
-    } else {
-        Err(cmd_err("裁切导出失败", &output))
-    }
+    // Offload the ffmpeg encode to a dedicated blocking thread so the Tauri
+    // main thread (and the Tokio worker pool) stay responsive while the
+    // multi-minute transcode runs. See Tauri discussion #10329.
+    let app_for_emit = app.clone();
+    let result = tauri::async_runtime::spawn_blocking(move || -> Result<String, String> {
+        let _ = app_for_emit.emit(
+            TRANSCODE_PROGRESS_EVENT,
+            serde_json::json!({ "stage": "start", "percent": 0 }),
+        );
+
+        let mut cmd = std::process::Command::new(ffmpeg_binary());
+        cmd.arg("-y").arg("-hide_banner");
+        if let (Some(s), Some(e)) = (input.start_time, input.end_time) {
+            cmd.arg("-ss").arg(s.to_string());
+            cmd.arg("-t").arg((e - s).max(0.1).to_string());
+        }
+        cmd.arg("-i").arg(&input.input_path);
+        let vf_filter: String = match aspect.as_str() {
+            "9:16" => {
+                "scale=1080:1920:force_original_aspect_ratio=decrease,crop=1080:1920:(iw-1080)/2:(ih-1920)/2,setsar=1".to_string()
+            }
+            "1:1" => {
+                "scale='min(iw\\,ih):min(iw\\,ih)',crop='min(iw\\,ih):min(iw\\,ih)',setsar=1".to_string()
+            }
+            "16:9" => {
+                "scale=1920:1080:force_original_aspect_ratio=decrease,crop=1920:1080:(iw-1920)/2:(ih-1080)/2,setsar=1".to_string()
+            }
+            _ => return Err("不支持的宽高比，仅支持 9:16、1:1、16:9".to_string()),
+        };
+        cmd.arg("-vf").arg(&vf_filter);
+
+        use crate::binary::HwAccel;
+        let hw = crate::binary::hw_accel();
+        let enc = if hw == HwAccel::Cpu { "libx264" } else { hw.h264_encoder() };
+        let (crf, preset) = quality_preset(quality.as_deref().unwrap_or("medium"));
+        cmd.args(["-c:v", enc, "-crf", &crf.to_string(), "-preset", preset]);
+        cmd.args(["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart"]);
+        cmd.arg(&input.output_path);
+        let output = cmd.output().map_err(|e| format!("FFmpeg 执行失败: {e}"))?;
+        if output.status.success() {
+            let _ = app_for_emit.emit(
+                TRANSCODE_PROGRESS_EVENT,
+                serde_json::json!({ "stage": "done", "percent": 100 }),
+            );
+            Ok(input.output_path)
+        } else {
+            Err(cmd_err("裁切导出失败", &output))
+        }
+    })
+    .await
+    .map_err(|e| format!("transcode task join error: {e}"))??;
+
+    Ok(result)
 }
 
 /// Export video — full-featured video export with optional subtitle burn-in.
