@@ -33,7 +33,6 @@ export * from './editor';
 
 // 导出服务（export/ 子目录）
 export { exportService, ExportService } from './export/exportService';
-export { exportProgress } from './export/exportProgress';
 
 // 字幕服务（subtitle/ 子目录）
 export { subtitleService, SubtitleService } from './subtitle/subtitleService';
@@ -41,9 +40,6 @@ export { subtitleService, SubtitleService } from './subtitle/subtitleService';
 // 视频特效 & 信号（video/ 子目录）
 export { videoEffectService, VideoEffectService } from './video/videoEffectService';
 export { detectEmotionPeaks, calculateEmotionScore } from './video/emotionDetector';
-
-// 工作流编排（workflow/ 子目录 — 旁白agents）
-export { orchestrateCommentaryAgents } from './workflow/commentaryAgents';
 
 // Commentary Mode 服务（解说模式核心服务）
 export * from './commentary';
