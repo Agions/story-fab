@@ -2,10 +2,17 @@
  * timelineStore 单元测试
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useTimelineStore } from './timelineStore';
+import { useTimelineStore, __resetTrackHistoryForTest } from './timelineStore';
+
+// 独立的 createHistory 实例用于单元测试（验证模块行为与 store 一致）
+import { createHistory } from './createHistory';
+import type { TimelineTrack } from '../core/types/timeline';
+const _testHistory = createHistory<TimelineTrack[]>({ maxSize: 19 });
 
 describe('timelineStore', () => {
   beforeEach(() => {
+    // Reset 模块闭包内的 history 栈（createHistory 持有独立状态）
+    __resetTrackHistoryForTest();
     // Reset store state before each test
     useTimelineStore.setState({
       timelineTracks: [],
@@ -17,7 +24,6 @@ describe('timelineStore', () => {
       selectedMultipleIds: undefined,
       inPointMs: undefined,
       outPointMs: undefined,
-      trackHistory: { past: [], future: [] },
     });
   });
 
@@ -45,10 +51,14 @@ describe('timelineStore', () => {
       expect(snapEnabled).toBe(true);
     });
 
-    it('should have empty trackHistory', () => {
-      const { trackHistory } = useTimelineStore.getState();
-      expect(trackHistory.past).toEqual([]);
-      expect(trackHistory.future).toEqual([]);
+    it('should have empty trackHistory (createHistory module)', () => {
+      // Phase B: history 由 createHistory 模块管理，验证 canUndo/canRedo 初始为 false
+      const { canUndoTrack, canRedoTrack } = useTimelineStore.getState();
+      expect(canUndoTrack()).toBe(false);
+      expect(canRedoTrack()).toBe(false);
+      // 验证 createHistory 模块自身行为
+      _testHistory.clear();
+      expect(_testHistory.size()).toEqual({ past: 0, future: 0 });
     });
   });
 
