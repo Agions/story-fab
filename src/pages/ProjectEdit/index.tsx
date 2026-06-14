@@ -15,7 +15,6 @@ import { Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import type { VideoMetadata } from '@/core/video';
-import type { ScriptSegment } from '@/core/types';
 import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
@@ -30,6 +29,7 @@ import { AutoSaveBadge } from './components/AutoSaveBadge';
 import { ProjectForm } from './components/ProjectForm';
 import { useProjectAutoSave } from './hooks/useProjectAutoSave';
 import { useVideoAnalysis } from './hooks/useVideoAnalysis';
+import { useProjectEditState } from './hooks/useProjectEditState';
 import {
   type ProjectData,
   normalizeProjectData,
@@ -58,30 +58,28 @@ const ProjectEdit: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { addRecentProject } = useSettings();
-  const [formName, setFormName] = useState('');
-  const [formDescription, setFormDescription] = useState('');
-
-  const [currentStep, setCurrentStep] = useState(0);
-  const [saving, setSaving] = useState(false);
-  const [project, setProject] = useState<ProjectData | null>(null);
-  const [videoPath, setVideoPath] = useState('');
-  const [videoSelected, setVideoSelected] = useState(false);
-  const [videoMetadata, setVideoMetadata] = useState<VideoMetadata | null>(null);
-  const [keyFrames, setKeyFrames] = useState<string[]>([]);
-  const [scriptSegments, setScriptSegments] = useState<ScriptSegment[]>([]);
-  const [isNewProject, setIsNewProject] = useState(true);
-  const [initialLoading, setInitialLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Replaces 17 individual useState calls with a single useReducer-backed hook
+  // (see hooks/useProjectEditState.ts). Setter names match the original
+  // useState setters, so all call sites below remain unchanged.
   const [defaultProjectName] = useState(createDefaultProjectName);
-  const [saveBehavior, setSaveBehavior] = useState<ProjectSaveBehavior>(() => {
-    try { return localStorage.getItem(PROJECT_SAVE_BEHAVIOR_KEY) === 'detail' ? 'detail' : 'stay'; }
-    catch { return 'stay'; }
-  });
-  const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(() => {
-    try { return localStorage.getItem(PROJECT_AUTO_SAVE_KEY) === '1'; }
-    catch { return false; }
-  });
-  const [reloadToken, setReloadToken] = useState(0);
+  const {
+    formName, setFormName,
+    formDescription, setFormDescription,
+    currentStep, setCurrentStep,
+    saving, setSaving,
+    project, setProject,
+    videoPath, setVideoPath,
+    videoSelected, setVideoSelected,
+    videoMetadata, setVideoMetadata,
+    keyFrames, setKeyFrames,
+    scriptSegments, setScriptSegments,
+    isNewProject, setIsNewProject,
+    initialLoading, setInitialLoading,
+    error, setError,
+    saveBehavior, setSaveBehavior,
+    autoSaveEnabled, setAutoSaveEnabled,
+    reloadToken, setReloadToken,
+  } = useProjectEditState({ defaultProjectName });
 
   // Refs
   const persistLockRef = useRef(false);
