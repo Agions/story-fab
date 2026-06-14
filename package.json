@@ -16,7 +16,6 @@
     "preview": "vite preview",
     "docs:dev": "vitepress dev docs",
     "tauri": "tauri",
-    "tauri:build:dmg": "bash scripts/build-dmg.sh",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --max-warnings 200",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
