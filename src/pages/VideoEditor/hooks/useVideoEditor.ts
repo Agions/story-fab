@@ -1,4 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+/**
+ * useVideoEditor hook — 16 useState 集中化入口
+ * 来源: refactor/video-editor-usereducer (v3.4 §A2 范式)
+ */
+import { useReducer, useMemo, useCallback, useRef } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { VideoSegment, videoProcessor } from '@/core/video';
 import { clipWorkflowService } from '../../../core/services/pipeline/clip-pipeline/clipWorkflow';
@@ -6,254 +10,198 @@ import type { VideoInfo } from '@/core/types';
 import type { ClipSegment } from '../../../core/services/aiClip';
 import { notify } from '@/shared';
 import { logger } from '../../../shared/utils/logging';
+import {
+  initialVideoEditorState,
+  videoEditorReducer,
+  type VideoEditorAction,
+  type VideoEditorState,
+  type Updater,
+} from './useVideoEditor.reducer';
+
+type Setter<K extends keyof VideoEditorState> = (updater: Updater<VideoEditorState[K]>) => void;
+type VideoEditorSetters = { [K in keyof VideoEditorState]: Setter<K> };
+
+const makeSetters = (dispatch: React.Dispatch<VideoEditorAction>): VideoEditorSetters => {
+  return Object.fromEntries(
+    (Object.keys(initialVideoEditorState) as (keyof VideoEditorState)[]).map((key) => [
+      key,
+      (updater: Updater<VideoEditorState[typeof key]>) =>
+        dispatch({ type: 'update', key, updater: updater as Updater<unknown> }),
+    ]),
+  ) as VideoEditorSetters;
+};
 
 export const useVideoEditor = (projectId: string | undefined) => {
-  // 视频状态
-  const [videoSrc, setVideoSrc] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [analyzing, setAnalyzing] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [state, dispatch] = useReducer(videoEditorReducer, initialVideoEditorState);
+  const setters = useMemo(() => makeSetters(dispatch), []);
+  const {
+    videoSrc, loading, analyzing, currentTime, duration, isPlaying,
+    segments, keyframes, selectedSegmentIndex, editHistory, historyIndex,
+    outputFormat, videoQuality, isSaving, isExporting,
+  } = state;
 
-  // 片段状态
-  const [segments, setSegments] = useState<VideoSegment[]>([]);
-  const [keyframes, setKeyframes] = useState<string[]>([]);
-  const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number>(-1);
-
-  // 历史记录
-  const [editHistory, setEditHistory] = useState<VideoSegment[][]>([]);
-  const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const historyIndexRef = useRef(-1);
-
-  // 导出设置
-  const [outputFormat, setOutputFormat] = useState<string>('mp4');
-  const [videoQuality, setVideoQuality] = useState<string>('medium');
-
-  // 操作状态
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [isExporting, setIsExporting] = useState<boolean>(false);
   const loadVideoLockRef = useRef(false);
   const smartClipLockRef = useRef(false);
 
-  // 添加到历史记录
   const addToHistory = useCallback((newSegments: VideoSegment[]) => {
-    setEditHistory((prev) => {
+    setters.editHistory((prev) => {
       const cursor = historyIndexRef.current;
       const newHistory = prev.slice(0, cursor + 1);
       const nextHistory = [...newHistory, newSegments];
       const nextIndex = nextHistory.length - 1;
       historyIndexRef.current = nextIndex;
-      setHistoryIndex(nextIndex);
+      setters.historyIndex(nextIndex);
       return nextHistory;
     });
-  }, []);
+  }, [setters]);
 
-  // 加载视频
   const handleLoadVideo = useCallback(async () => {
     if (loading || analyzing || loadVideoLockRef.current) return;
     loadVideoLockRef.current = true;
     try {
       const selected = await open({
         multiple: false,
-        filters: [{
-          name: '视频文件',
-          extensions: ['mp4', 'mov', 'avi', 'mkv', 'webm'],
-        }],
+        filters: [{ name: '视频文件', extensions: ['mp4', 'mov', 'avi', 'mkv', 'webm'] }],
       });
+      if (!selected || typeof selected !== 'string') return;
 
-      if (!selected || typeof selected !== 'string') {
-        return;
-      }
-
-      setLoading(true);
-      setAnalyzing(true);
-
+      setters.loading(true);
+      setters.analyzing(true);
       try {
-        setVideoSrc(`file://${selected}`);
-
+        setters.videoSrc(`file://${selected}`);
         const metadata = await videoProcessor.analyze(selected);
-        setDuration(metadata.duration);
+        setters.duration(metadata.duration);
 
-        const newSegment: VideoSegment = {
-          start: 0,
-          end: metadata.duration,
-        };
-
-        setSegments([newSegment]);
+        const newSegment: VideoSegment = { start: 0, end: metadata.duration };
+        setters.segments([newSegment]);
         addToHistory([newSegment]);
 
         const frames = await videoProcessor.extractKeyFrames(selected, {
           interval: Math.max(5, Math.floor(metadata.duration / 10)),
           maxFrames: 10,
         }, metadata.duration);
-
-        setKeyframes(frames.map(frame => frame.path));
-
+        setters.keyframes(frames.map(frame => frame.path));
         notify.success('视频加载成功');
       } catch (error) {
         logger.error('视频分析失败:', error);
         notify.error(error, '视频分析失败，请检查文件格式');
       } finally {
-        setAnalyzing(false);
-        setLoading(false);
+        setters.analyzing(false);
+        setters.loading(false);
       }
     } catch (err: unknown) {
       logger.error('选择文件失败:', err);
     } finally {
       loadVideoLockRef.current = false;
     }
-  }, [addToHistory, analyzing, loading]);
+  }, [addToHistory, analyzing, loading, setters]);
 
-  // 撤销
   const handleUndo = useCallback(() => {
     if (historyIndex <= 0) return;
     const newIndex = historyIndex - 1;
     historyIndexRef.current = newIndex;
-    setHistoryIndex(newIndex);
-    setSegments(editHistory[newIndex]);
-  }, [historyIndex, editHistory]);
+    setters.historyIndex(newIndex);
+    setters.segments(editHistory[newIndex]);
+  }, [historyIndex, editHistory, setters]);
 
-  // 重做
   const handleRedo = useCallback(() => {
     if (historyIndex >= editHistory.length - 1) return;
     const newIndex = historyIndex + 1;
     historyIndexRef.current = newIndex;
-    setHistoryIndex(newIndex);
-    setSegments(editHistory[newIndex]);
-  }, [historyIndex, editHistory]);
+    setters.historyIndex(newIndex);
+    setters.segments(editHistory[newIndex]);
+  }, [historyIndex, editHistory, setters]);
 
-  // 添加片段
   const handleAddSegment = useCallback(() => {
     if (duration <= 0) return;
     const baseStart = Math.max(0, Math.min(currentTime, Math.max(duration - 5, 0)));
     const baseEnd = Math.max(baseStart, Math.min(baseStart + 5, duration));
-    const newSegment: VideoSegment = {
-      start: baseStart,
-      end: baseEnd,
-    };
-
+    const newSegment: VideoSegment = { start: baseStart, end: baseEnd };
     const newSegments = [...segments, newSegment];
-    setSegments(newSegments);
+    setters.segments(newSegments);
     addToHistory(newSegments);
-    setSelectedSegmentIndex(newSegments.length - 1);
+    setters.selectedSegmentIndex(newSegments.length - 1);
     notify.success('已添加新片段');
-  }, [currentTime, duration, segments, addToHistory]);
+  }, [currentTime, duration, segments, addToHistory, setters]);
 
-  // 删除片段
   const handleDeleteSegment = useCallback((index: number) => {
     if (index < 0 || index >= segments.length) return;
     const newSegments = segments.filter((_, i) => i !== index);
-    setSegments(newSegments);
+    setters.segments(newSegments);
     addToHistory(newSegments);
-    setSelectedSegmentIndex((prev) => {
+    setters.selectedSegmentIndex((prev) => {
       if (prev === index) return -1;
       if (prev > index) return prev - 1;
       return prev;
     });
     notify.success('已删除片段');
-  }, [segments, addToHistory]);
+  }, [segments, addToHistory, setters]);
 
-  // 选择片段
   const handleSelectSegment = useCallback((index: number) => {
     if (index === selectedSegmentIndex) return;
     if (index < -1 || index >= segments.length) return;
-    setSelectedSegmentIndex(index);
+    setters.selectedSegmentIndex(index);
     if (index >= 0 && segments[index]) {
-      setCurrentTime(segments[index].start);
+      setters.currentTime(segments[index].start);
     }
-  }, [segments, selectedSegmentIndex]);
+  }, [segments, selectedSegmentIndex, setters]);
 
-  // 智能剪辑
   const handleSmartClip = useCallback(async () => {
     if (!videoSrc || analyzing || smartClipLockRef.current) return;
     smartClipLockRef.current = true;
-
-    setAnalyzing(true);
+    setters.analyzing(true);
     try {
       const videoInfo: VideoInfo = {
-        id: projectId || 'new',
-        path: videoSrc,
-        name: '当前视频',
-        duration,
-        width: 1920,
-        height: 1080,
-        fps: 30,
-        format: outputFormat,
-        size: 0,
+        id: projectId || 'new', path: videoSrc, name: '当前视频', duration,
+        width: 1920, height: 1080, fps: 30, format: outputFormat, size: 0,
         createdAt: new Date().toISOString(),
       };
-
       const result = await clipWorkflowService.processVideo(videoInfo);
-
       const newSegments: VideoSegment[] = result.segments.map(seg => ({
-        start: seg.sourceStart,
-        end: seg.sourceEnd,
-        type: 'video',
+        start: seg.sourceStart, end: seg.sourceEnd, type: 'video',
         content: `片段 ${segments.length + 1}`,
       }));
-
-      setSegments(newSegments);
+      setters.segments(newSegments);
       addToHistory(newSegments);
-
       notify.success(`智能剪辑完成: ${result.segments.length} 个片段`);
     } catch (error) {
       notify.error(error, '智能剪辑失败');
     } finally {
-      setAnalyzing(false);
+      setters.analyzing(false);
       smartClipLockRef.current = false;
     }
-  }, [projectId, videoSrc, duration, outputFormat, segments, addToHistory, analyzing]);
+  }, [projectId, videoSrc, duration, outputFormat, segments, addToHistory, analyzing, setters]);
 
-  // 应用 AI 建议
   const handleApplyAISuggestions = useCallback((aiSegments: ClipSegment[]) => {
     if (!Array.isArray(aiSegments) || aiSegments.length === 0) return;
     const newSegments = aiSegments.map(s => ({
-      start: s.startTime,
-      end: s.endTime,
-      type: s.type === 'silence' ? 'silence' : 'video' as const,
+      start: s.startTime, end: s.endTime,
+      type: s.type === 'silence' ? 'silence' as const : 'video' as const,
       content: s.content,
     }));
-    setSegments(newSegments);
+    setters.segments(newSegments);
     addToHistory(newSegments);
     notify.success('已应用 AI 剪辑建议');
-  }, [addToHistory]);
+  }, [addToHistory, setters]);
 
   return {
     // 状态
-    videoSrc,
-    loading,
-    analyzing,
-    currentTime,
-    duration,
-    isPlaying,
-    segments,
-    keyframes,
-    selectedSegmentIndex,
-    editHistory,
-    historyIndex,
-    outputFormat,
-    videoQuality,
-    isSaving,
-    isExporting,
+    videoSrc, loading, analyzing, currentTime, duration, isPlaying,
+    segments, keyframes, selectedSegmentIndex, editHistory, historyIndex,
+    outputFormat, videoQuality, isSaving, isExporting,
 
     // 状态设置器
-    setCurrentTime,
-    setDuration,
-    setIsPlaying,
-    setIsSaving,
-    setIsExporting,
-    setOutputFormat,
-    setVideoQuality,
+    setCurrentTime: setters.currentTime,
+    setDuration: setters.duration,
+    setIsPlaying: setters.isPlaying,
+    setIsSaving: setters.isSaving,
+    setIsExporting: setters.isExporting,
+    setOutputFormat: setters.outputFormat,
+    setVideoQuality: setters.videoQuality,
 
     // 操作
-    handleLoadVideo,
-    handleUndo,
-    handleRedo,
-    handleAddSegment,
-    handleDeleteSegment,
-    handleSelectSegment,
-    handleSmartClip,
-    handleApplyAISuggestions,
+    handleLoadVideo, handleUndo, handleRedo, handleAddSegment,
+    handleDeleteSegment, handleSelectSegment, handleSmartClip, handleApplyAISuggestions,
   };
 };
