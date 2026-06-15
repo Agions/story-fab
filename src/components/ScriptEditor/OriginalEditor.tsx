@@ -1,5 +1,4 @@
-import { logger } from '../../shared/utils/logging';
-import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import { Card, CardHeader, CardTitle } from '../ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
@@ -11,14 +10,12 @@ import {
   Plus,
 } from 'lucide-react';
 import type { ScriptSegment } from '@/core/types';
-import type { VideoSegment } from '@/core/video';
-import { videoProcessor, formatDuration } from '@/core/video';
-import { convertFileSrc } from '@tauri-apps/api/core';
-import { notify } from '@/shared';
+import { formatDuration } from '@/core/video';
 import SegmentTable from './SegmentTable';
 import SegmentEditForm from './SegmentEditForm';
 import PreviewModal from './PreviewModal';
 import AIModal from './AIModal';
+import { useOriginalEditor } from './hooks/useOriginalEditor';
 import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface OriginalEditorProps {
@@ -28,165 +25,24 @@ interface OriginalEditorProps {
   onExport?: (format: string) => void;
 }
 
-interface SegmentFormValues {
-  start: number;
-  end: number;
-  type: string;
-  content: string;
-}
-
 const OriginalEditor: React.FC<OriginalEditorProps> = ({
   videoPath,
   initialSegments = [],
   onSave,
   onExport,
 }) => {
-  const [segments, setSegments] = useState<ScriptSegment[]>(initialSegments);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [formValues, setFormValues] = useState<SegmentFormValues>({ start: 0, end: 30, type: 'narration', content: '' });
-  const [formError, setFormError] = useState<string>('');
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewSrc, setPreviewSrc] = useState('');
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [aiModalVisible, setAiModalVisible] = useState(false);
-  const [exportMenuOpen, setExportMenuOpen] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deleteTargetIndex, setDeleteTargetIndex] = useState<number | null>(null);
-  const [totalDuration, setTotalDuration] = useState(0);
-
-  useEffect(() => {
-    const duration = segments.reduce((sum, segment) => sum + (segment.endTime - segment.startTime), 0);
-    setTotalDuration(duration);
-  }, [segments]);
-
-  const setFieldValue = useCallback((field: keyof SegmentFormValues, value: string | number | null) => {
-    setFormValues(prev => ({ ...prev, [field]: value }));
-    setFormError('');
-  }, []);
-
-  const validateForm = useCallback((): boolean => {
-    const start = Number(formValues.start);
-    const end = Number(formValues.end);
-    if (isNaN(start) || isNaN(end)) { setFormError('请输入有效的时间值'); return false; }
-    if (end <= start) { setFormError('结束时间必须大于开始时间'); return false; }
-    if (!formValues.content.trim()) { setFormError('请输入内容'); return false; }
-    return true;
-  }, [formValues]);
-
-  // 添加新片段
-  const handleAddSegment = useCallback(() => {
-    const lastSegment = segments.length > 0 ? segments[segments.length - 1] : null;
-    const startTime = lastSegment ? lastSegment.endTime : 0;
-    const endTime = startTime + 30;
-    setFormValues({ start: startTime, end: endTime, type: 'narration', content: '' });
-    setFormError('');
-    setEditingIndex(segments.length);
-  }, [segments]);
-
-  // 编辑片段
-  const handleEditSegment = useCallback((index: number) => {
-    const segment = segments[index];
-    setFormValues({
-      start: segment.startTime,
-      end: segment.endTime,
-      type: segment.type || 'narration',
-      content: segment.content || '',
-    });
-    setFormError('');
-    setEditingIndex(index);
-  }, [segments]);
-
-  // 保存编辑片段
-  const handleSaveSegment = useCallback(() => {
-    if (!validateForm()) return;
-    const start = Number(formValues.start);
-    const end = Number(formValues.end);
-    const newSegments = [...segments];
-    const segment: ScriptSegment = {
-      id: `segment_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      startTime: start,
-      endTime: end,
-      type: formValues.type as ScriptSegment['type'],
-      content: formValues.content,
-    };
-    if (editingIndex !== null) {
-      if (editingIndex < segments.length) {
-        newSegments[editingIndex] = segment;
-      } else {
-        newSegments.push(segment);
-      }
-    }
-    setSegments(newSegments);
-    setEditingIndex(null);
-  }, [segments, editingIndex, formValues, validateForm]);
-
-  // 取消编辑
-  const handleCancelEdit = useCallback(() => {
-    setEditingIndex(null);
-    setFormError('');
-  }, []);
-
-  // 删除片段
-  const handleDeleteSegment = useCallback((index: number) => {
-    setDeleteTargetIndex(index);
-    setDeleteConfirmOpen(true);
-  }, []);
-
-  const confirmDelete = useCallback(() => {
-    if (deleteTargetIndex !== null) {
-      const newSegments = [...segments];
-      newSegments.splice(deleteTargetIndex, 1);
-      setSegments(newSegments);
-    }
-    setDeleteConfirmOpen(false);
-    setDeleteTargetIndex(null);
-  }, [deleteTargetIndex, segments]);
-
-  // 预览片段
-  const handlePreviewSegment = useCallback(async (index: number) => {
-    try {
-      setPreviewLoading(true);
-      const segment = segments[index];
-      const videoSegment: VideoSegment = { start: segment.startTime, end: segment.endTime };
-      const previewPath = await videoProcessor.preview(videoPath, videoSegment);
-      setPreviewSrc(convertFileSrc(previewPath));
-      setPreviewVisible(true);
-    } catch (error) {
-      logger.error('生成预览失败:', { error });
-      notify.error(error, '生成预览失败');
-    } finally {
-      setPreviewLoading(false);
-    }
-  }, [segments, videoPath]);
-
-  // 保存脚本
-  const handleSave = useCallback(() => {
-    onSave(segments);
-    notify.success('脚本已保存');
-  }, [onSave, segments]);
-
-  // AI 优化
-  const handleAIImprove = useCallback(async () => {
-    try {
-      notify.info('正在使用 AI 优化脚本...');
-      setAiModalVisible(false);
-      setTimeout(() => { notify.success('脚本优化完成'); }, 2000);
-    } catch (error) {
-      logger.error('AI 优化脚本失败:', { error });
-      notify.error(error, 'AI 优化脚本失败');
-    }
-  }, []);
-
-  const exportMenuItems = useMemo(() => ([
-    { key: 'txt', label: '文本文件 (.txt)' },
-    { key: 'srt', label: '字幕文件 (.srt)' },
-    { key: 'doc', label: 'Word文档 (.docx)' },
-  ]), []);
-
-  const handleExportClick = useCallback(({ key }: { key: string }) => {
-    onExport?.(String(key));
-    setExportMenuOpen(false);
-  }, [onExport]);
+  const {
+    segments, editingIndex, formValues, formError,
+    previewVisible, previewLoading, previewSrc,
+    aiModalVisible, exportMenuOpen, deleteConfirmOpen,
+    totalDuration,
+    setAiModalVisible, setExportMenuOpen, setDeleteConfirmOpen, setPreviewVisible,
+    setFieldValue,
+    handleAddSegment, handleEditSegment, handleSaveSegment, handleCancelEdit,
+    handleDeleteSegment, confirmDelete, handlePreviewSegment,
+    handleSave, handleAIImprove, handleExportClick,
+    exportMenuItems,
+  } = useOriginalEditor({ videoPath, initialSegments, onSave, onExport });
 
   return (
     <div className={styles.scriptEditor}>
@@ -247,7 +103,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
           <SegmentEditForm
             formValues={formValues}
             formError={formError}
-            onFieldChange={setFieldValue as (field: keyof SegmentFormValues, value: string | number | null) => void}
+            onFieldChange={setFieldValue as (field: 'start' | 'end' | 'type' | 'content', value: string | number | null) => void}
             editingIndex={editingIndex}
             onSave={handleSaveSegment}
             onCancel={handleCancelEdit}
