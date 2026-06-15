@@ -8,7 +8,7 @@
  *
  * 设计风格：AI Cinema Studio Dark (#0C0D14)
  */
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 
 // ── Progress animation constants ──────────────────────────────────────────────
 const PROGRESS_UPDATE_INTERVAL_MS = 250;
@@ -39,17 +39,7 @@ import { useTimelineStore } from '@/store/timelineStore';
 import type { SubtitleEntry } from '@/core/types';
 import styles from './index.module.css';
 import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';
-
-interface SubtitleSegment {
-  id: string;
-  startTime: number;
-  endTime: number;
-  start: string;
-  end: string;
-  text: string;
-  quality?: 'high' | 'medium' | 'low';
-}
-
+import { useSubtitleExtractor, type SubtitleSegment } from './useSubtitleExtractor';
 
 interface SubtitleExtractorProps {
   projectId: string;
@@ -64,15 +54,26 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
   const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [format, setFormat] = useState<'srt' | 'vtt' | 'txt'>('srt');
-  const [translate, setTranslate] = useState(false);
-  const [isExtracting, setIsExtracting] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [extractedSubtitles, setExtractedSubtitles] = useState<SubtitleSegment[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingText, setEditingText] = useState('');
-  const [activeSubId, setActiveSubId] = useState<string | null>(null);
-  const [videoDuration, setVideoDuration] = useState(0);
+  // All UI/data state centralized in reducer
+  const {
+    state,
+    setFormat,
+    setTranslate,
+    setIsExtracting,
+    setProgress,
+    incrementProgress,
+    setExtractedSubtitles,
+    updateSubtitleText,
+    setEditingId,
+    setEditingText,
+    setActiveSubId,
+    setVideoDuration,
+    startEdit,
+    cancelEdit,
+    resetForExtract,
+  } = useSubtitleExtractor();
+
+  const { format, translate, isExtracting, progress, extractedSubtitles, editingId, editingText, activeSubId, videoDuration } = state;
 
   const totalDuration = videoDuration > 0 ? videoDuration : 1;
   const playheadSec = playheadMs / MS_PER_SECOND;
@@ -90,7 +91,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     const video = videoRef.current;
     if (!video) return;
     setVideoDuration(video.duration);
-  }, []);
+  }, [setVideoDuration]);
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
@@ -121,12 +122,9 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
 
   const handleExtract = useCallback(async () => {
     if (!videoUrl) { notify.error(null, '未检测到视频源'); return; }
-    setIsExtracting(true);
-    setProgress(0);
-    setExtractedSubtitles([]);
-    setActiveSubId(null);
+    resetForExtract();
     try {
-      const interval = setInterval(() => { setProgress(prev => Math.min(prev + 8, PROGRESS_CAP)); }, PROGRESS_UPDATE_INTERVAL_MS);
+      const interval = setInterval(() => { incrementProgress(8, PROGRESS_CAP); }, PROGRESS_UPDATE_INTERVAL_MS);
       const result = await subtitleService.extractSubtitles(videoUrl, { language: 'zh-CN' });
       clearInterval(interval);
       setProgress(100);
@@ -140,16 +138,14 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
       notify.success(`成功提取 ${subs.length} 条字幕`);
     } catch (error) { notify.error(error as Parameters<typeof notify.error>[0], '字幕提取失败'); }
     finally { setIsExtracting(false); }
-  }, [videoUrl, onExtracted]);
+  }, [videoUrl, onExtracted, resetForExtract, incrementProgress, setProgress, setExtractedSubtitles, setIsExtracting]);
 
-  const startEdit = useCallback((sub: SubtitleSegment) => { setEditingId(sub.id); setEditingText(sub.text); }, []);
   const saveEdit = useCallback(() => {
     if (!editingId) return;
-    setExtractedSubtitles(prev => prev.map(s => s.id === editingId ? { ...s, text: editingText } : s));
+    updateSubtitleText(editingId, editingText);
     setEditingId(null);
     notify.success('字幕已保存');
-  }, [editingId, editingText]);
-  const cancelEdit = useCallback(() => { setEditingId(null); setEditingText(''); }, []);
+  }, [editingId, editingText, updateSubtitleText, setEditingId]);
 
   const exportSubtitle = useCallback(() => {
     if (extractedSubtitles.length === 0) { notify.warning('无字幕可导出'); return; }
