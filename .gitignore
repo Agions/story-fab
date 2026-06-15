@@ -96,4 +96,4 @@ TIMELINE_REFACTOR.md
 # Internal planning docs
 # (placeholder — add docs as needed)
 pnpm-lock.yaml
-src-tauri/Cargo.lock
+# src-tauri/Cargo.lock: Tauri 2 binary project — track transitive deps
