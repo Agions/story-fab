@@ -5,8 +5,9 @@
  * 重构说明：
  * - 任务配置已提取到 config/analysisTasks.tsx
  * - 本文件仅包含组件逻辑和 UI
+ * - 6 useState → 1 useReducer (AIVisualizer.reducer.ts)
  */
-import React, { useState, useEffect, memo } from 'react';
+import React, { useReducer, useEffect, memo } from 'react';
 import { useStoryFab } from '../context';
 import { visionService } from '../../../core/services/ai/visionService';
 import { notify } from '@/shared';
@@ -16,6 +17,7 @@ import styles from './AIVisualizer.module.css';
 import { Highlights } from './Highlights';
 import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysisTasks';
 import { formatTime } from '../../../shared/utils/formatting';
+import { aiVisualizerReducer, initialAIVisualizerState } from './AIVisualizer.reducer';
 
 // 检查图标
 const CheckIcon = () => (
@@ -27,21 +29,15 @@ const CheckIcon = () => (
 const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
   const { state, setAnalysis, goToNextStep, dispatch } = useStoryFab();
   const timeout = useTimeout();
-
-  const [analyzing, setAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [currentTaskKey, setCurrentTaskKey] = useState('');
-  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
-  const [visibleTasks, setVisibleTasks] = useState<string[]>([]);
-
-  // 配置
-  const [config, setConfig] = useState({
-    sceneDetection: true,
-    objectDetection: true,
-    emotionAnalysis: true,
-    ocrEnabled: true,
-    asrEnabled: true,
-  });
+  const [s, dispatchLocal] = useReducer(aiVisualizerReducer, initialAIVisualizerState);
+  const {
+    analyzing,
+    progress,
+    currentTaskKey,
+    completedTasks,
+    visibleTasks,
+    config,
+  } = s;
 
   const selectedCount = Object.values(config).filter(Boolean).length;
 
@@ -50,17 +46,17 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
     if (analyzing) {
       ANALYSIS_TASKS.forEach((task) => {
         timeout.set(() => {
-          setVisibleTasks(prev => [...prev, task.key]);
+          dispatchLocal({ type: 'APPEND_VISIBLE_TASK', taskKey: task.key });
         }, 100 + ANALYSIS_TASKS.findIndex(t => t.key === task.key) * 150);
       });
     } else {
-      setVisibleTasks([]);
+      dispatchLocal({ type: 'SET_VISIBLE_TASKS', visibleTasks: [] });
     }
   }, [analyzing, timeout]);
 
   // 切换配置
   const toggleConfig = (key: string) => {
-    setConfig(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
+    dispatchLocal({ type: 'TOGGLE_CONFIG', key });
   };
 
   // 执行分析
@@ -70,11 +66,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
       return;
     }
 
-    setAnalyzing(true);
-    setProgress(0);
-    setCompletedTasks([]);
-    setVisibleTasks([]);
-    setCurrentTaskKey('');
+    dispatchLocal({ type: 'RESET_FOR_RUN' });
 
     const tasks = [
       config.sceneDetection && 'scene',
@@ -90,8 +82,8 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
     try {
       // 场景检测
       if (config.sceneDetection) {
-        setCurrentTaskKey('scene');
-        timeout.set(() => setVisibleTasks(prev => [...prev, 'scene']), 100);
+        dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: 'scene' });
+        timeout.set(() => dispatchLocal({ type: 'APPEND_VISIBLE_TASK', taskKey: 'scene' }), 100);
 
         try {
           const { scenes, objects, emotions } = await visionService.detectScenesAdvanced(
@@ -122,63 +114,63 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         }
 
         completedCount++;
-        setCompletedTasks(prev => [...prev, 'scene']);
-        setProgress(Math.round((completedCount / totalTasks) * 100));
+        dispatchLocal({ type: 'APPEND_COMPLETED_TASK', taskKey: 'scene' });
+        dispatchLocal({ type: 'INCREMENT_PROGRESS', completed: completedCount, total: totalTasks });
         await timeout.delay(600);
       }
 
       // 物体识别
       if (config.objectDetection) {
-        setCurrentTaskKey('object');
-        timeout.set(() => setVisibleTasks(prev => [...prev, 'object']), 100);
+        dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: 'object' });
+        timeout.set(() => dispatchLocal({ type: 'APPEND_VISIBLE_TASK', taskKey: 'object' }), 100);
         await timeout.delay(800);
         completedCount++;
-        setCompletedTasks(prev => [...prev, 'object']);
-        setProgress(Math.round((completedCount / totalTasks) * 100));
+        dispatchLocal({ type: 'APPEND_COMPLETED_TASK', taskKey: 'object' });
+        dispatchLocal({ type: 'INCREMENT_PROGRESS', completed: completedCount, total: totalTasks });
       }
 
       // 情感分析
       if (config.emotionAnalysis) {
-        setCurrentTaskKey('emotion');
-        timeout.set(() => setVisibleTasks(prev => [...prev, 'emotion']), 100);
+        dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: 'emotion' });
+        timeout.set(() => dispatchLocal({ type: 'APPEND_VISIBLE_TASK', taskKey: 'emotion' }), 100);
         await timeout.delay(700);
         completedCount++;
-        setCompletedTasks(prev => [...prev, 'emotion']);
-        setProgress(Math.round((completedCount / totalTasks) * 100));
+        dispatchLocal({ type: 'APPEND_COMPLETED_TASK', taskKey: 'emotion' });
+        dispatchLocal({ type: 'INCREMENT_PROGRESS', completed: completedCount, total: totalTasks });
       }
 
       // OCR — stub: 功能即将上线（依赖 Rust OCR 后端）
       if (config.ocrEnabled) {
-        setCurrentTaskKey('ocr');
-        timeout.set(() => setVisibleTasks(prev => [...prev, 'ocr']), 100);
+        dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: 'ocr' });
+        timeout.set(() => dispatchLocal({ type: 'APPEND_VISIBLE_TASK', taskKey: 'ocr' }), 100);
         // 占位：OCR 后端尚未实现，跳过真实识别
         await timeout.delay(500);
-        setCompletedTasks(prev => [...prev, 'ocr']);
+        dispatchLocal({ type: 'APPEND_COMPLETED_TASK', taskKey: 'ocr' });
         completedCount++;
-        setProgress(Math.round((completedCount / totalTasks) * 100));
+        dispatchLocal({ type: 'INCREMENT_PROGRESS', completed: completedCount, total: totalTasks });
       }
 
       // ASR
       if (config.asrEnabled) {
-        setCurrentTaskKey('asr');
-        timeout.set(() => setVisibleTasks(prev => [...prev, 'asr']), 100);
+        dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: 'asr' });
+        timeout.set(() => dispatchLocal({ type: 'APPEND_VISIBLE_TASK', taskKey: 'asr' }), 100);
         try {
           const { asrService } = await import('../../../core/services/asr/asrService');
           const asrResult = await asrService.recognizeSpeech(state.currentVideo, { language: 'zh_cn' });
           if (asrResult && asrResult.text) {
-            setCompletedTasks(prev => [...prev, 'asr_done']);
+            dispatchLocal({ type: 'APPEND_COMPLETED_TASK', taskKey: 'asr_done' });
           }
         } catch (asrError) {
           logger.error('ASR failed', { error: asrError });
         }
         completedCount++;
-        setCompletedTasks(prev => [...prev, 'asr']);
-        setProgress(Math.round((completedCount / totalTasks) * 100));
+        dispatchLocal({ type: 'APPEND_COMPLETED_TASK', taskKey: 'asr' });
+        dispatchLocal({ type: 'INCREMENT_PROGRESS', completed: completedCount, total: totalTasks });
         await timeout.delay(500);
       }
 
-      setCurrentTaskKey('');
-      setProgress(100);
+      dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: '' });
+      dispatchLocal({ type: 'SET_PROGRESS', progress: 100 });
       dispatch({ type: 'SET_STEP_COMPLETE', payload: { step: 'ai-analyze', complete: true } });
       notify.success('AI 分析完成！');
 
@@ -191,16 +183,16 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
       logger.error('分析失败:', { error });
       notify.error(error, '分析过程出错，请重试');
     } finally {
-      setAnalyzing(false);
+      dispatchLocal({ type: 'SET_ANALYZING', analyzing: false });
     }
   };
 
   // 重新分析
   const handleReAnalyze = () => {
-    setProgress(0);
-    setCompletedTasks([]);
-    setVisibleTasks([]);
-    setCurrentTaskKey('');
+    dispatchLocal({ type: 'SET_PROGRESS', progress: 0 });
+    dispatchLocal({ type: 'SET_COMPLETED_TASKS', completedTasks: [] });
+    dispatchLocal({ type: 'SET_VISIBLE_TASKS', visibleTasks: [] });
+    dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: '' });
     runAnalysis();
   };
 
