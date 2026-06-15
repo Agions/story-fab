@@ -19,6 +19,7 @@ import { normalizeProjectFile } from '../../core/utils/project-file';
 import type { ProjectFileLike } from '../../core/utils/project-file';
 import type { ScriptSegment } from '@/core/types';
 import type { VideoAnalysis } from '@/types';
+import { useProjectDetail } from '@/hooks/useProjectDetail';
 import styles from '@/pages/ProjectDetail/index.module.less';
 
 const loadVideoInfo = () => import('@/components/VideoInfo');
@@ -76,18 +77,31 @@ const ProjectDetail: React.FC = () => {
   const { addRecentProject } = useSettings();
   const selectedAIModel = useModelStore(s => s.selectedAIModel);
   const aiModelsSettings = useModelStore(s => s.aiModelsSettings);
+
+  // Loading/legacy placeholders (kept as useState — non-migratable side-effect carriers)
   const [, setLoading] = useState(true);
-  const [activeStep, setActiveStep] = useState<string>('analyze');
-  const [project, setProject] = useState<ProjectData | null>(null);
   const [, setLoadError] = useState<string>('');
-  const [activeScript, setActiveScript] = useState<Script | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [, setCurrentStep] = useState<'analyze' | 'script' | 'voice' | 'video'>('analyze');
   // 兼容性: setCurrentStep 供 stepper 子组件调用
   void setCurrentStep;
-  const [_reloadToken, _setReloadToken] = useState(0);
+  const [, setReloadToken] = useState(0);
+  void setReloadToken;
+
+  // All UI/data state centralized in reducer
+  const {
+    state,
+    setActiveStep,
+    setProject,
+    updateProject,
+    setActiveScript,
+    updateActiveScriptFromSegments,
+    setAiLoading,
+    setDrawerVisible,
+    setDeleteConfirmOpen,
+  } = useProjectDetail();
+
+  const { activeStep, project, activeScript, aiLoading, drawerVisible, deleteConfirmOpen } = state;
+
   const projectRef = useRef<ProjectData | null>(null);
   const loadRequestSeqRef = useRef(0);
   const mountedRef = useRef(true);
@@ -149,9 +163,9 @@ const ProjectDetail: React.FC = () => {
         notify.error(error, '加载项目失败，请重试');
       })
       .finally(() => { if (isStale()) return; setLoading(false); });
-  }, [addRecentProject, projectId, _reloadToken]);
+  }, [addRecentProject, projectId, setProject, setActiveScript, setLoading, setLoadError]);
 
-  const handleDeleteProject = useCallback(() => { setDeleteConfirmOpen(true); }, []);
+  const handleDeleteProject = useCallback(() => { setDeleteConfirmOpen(true); }, [setDeleteConfirmOpen]);
 
   const confirmDeleteProject = useCallback(async () => {
     if (!projectId) return;
@@ -168,12 +182,12 @@ const ProjectDetail: React.FC = () => {
     try {
       const newScript: Script = { id: uuidv4(), projectId: project.id, content: [], fullText: '', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
       const updatedProject = { ...project, scripts: [...(project.scripts || []), newScript], updatedAt: new Date().toISOString() };
-      setProject(updatedProject);
+      updateProject(updatedProject);
       setActiveScript(newScript);
       notify.loading('正在保存...', 'save');
       saveProjectToFile(updatedProject.id, updatedProject).then(() => { notify.success('脚本创建成功', 'save'); }).catch(() => { notify.error(null, '保存失败', 'save'); }).finally(() => { createScriptLockRef.current = false; });
     } catch { createScriptLockRef.current = false; notify.error(null, '创建失败'); }
-  }, [project]);
+  }, [project, updateProject, setActiveScript]);
 
   const handleGenerateScript = useCallback(async () => {
     if (generateScriptLockRef.current) return;
@@ -191,37 +205,40 @@ const ProjectDetail: React.FC = () => {
       const generatedScript = parseGeneratedScript(scriptText, project.id);
       const scriptWithModelInfo = { ...generatedScript, modelUsed: selectedAIModel };
       const updatedProject = { ...project, scripts: [...(project.scripts || []), scriptWithModelInfo], updatedAt: new Date().toISOString() };
-      setProject(updatedProject);
+      updateProject(updatedProject);
       setActiveScript(scriptWithModelInfo);
       await saveProjectToFile(updatedProject.id, updatedProject);
       notify.success('AI脚本生成完毕✨', 'ai');
     } catch (error) { notify.error(error, '生成失败：未知错误', 'ai'); }
     finally { setAiLoading(false); generateScriptLockRef.current = false; }
-  }, [aiModelsSettings, project, selectedAIModel]);
+  }, [aiModelsSettings, project, selectedAIModel, updateProject, setActiveScript, setAiLoading]);
 
   const handleAnalysisComplete = useCallback((analysis: VideoAnalysis) => {
     if (!project) return;
     const updated = { ...project, analysis };
-    setProject(updated);
+    updateProject(updated);
     void persistUpdatedProject(updated);
     notify.success('画面识别已完成并保存');
-  }, [project]);
+  }, [project, updateProject]);
 
   const handleSubtitleExtracted = useCallback((subtitles: unknown) => {
     if (!project) return;
     const updated = { ...project, extractedSubtitles: subtitles };
-    setProject(updated);
+    updateProject(updated);
     void persistUpdatedProject(updated);
-  }, [project]);
+  }, [project, updateProject]);
 
   const handleScriptSave = useCallback((updatedSegments: ScriptSegment[]) => {
     if (!project || !activeScript) return;
-    const updatedScript: Script = { ...activeScript, content: updatedSegments as Script['content'], fullText: updatedSegments.map((segment) => segment.content ?? '').join('\n\n'), updatedAt: new Date().toISOString() };
-    const updatedProject = { ...project, scripts: (project.scripts ?? []).map((script) => script.id === activeScript.id ? updatedScript : script), updatedAt: new Date().toISOString() };
-    setActiveScript(updatedScript);
-    setProject(updatedProject);
+    const updatedProject: ProjectData = {
+      ...project,
+      scripts: (project.scripts ?? []).map((script) => script.id === activeScript.id ? { ...activeScript, content: updatedSegments as Script['content'], fullText: updatedSegments.map((segment) => segment.content ?? '').join('\n\n'), updatedAt: new Date().toISOString() } : script),
+      updatedAt: new Date().toISOString(),
+    };
+    updateProject(updatedProject);
+    updateActiveScriptFromSegments(updatedSegments, activeScript);
     schedulePersistUpdatedProject(updatedProject);
-  }, [activeScript, project, schedulePersistUpdatedProject]);
+  }, [activeScript, project, schedulePersistUpdatedProject, updateActiveScriptFromSegments, updateProject]);
 
   const contentNode = useMemo((): React.ReactNode => {
     if (!project) return null;
