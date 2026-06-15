@@ -11,7 +11,7 @@
  *   bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
  */
 
-import React, { useState, useCallback, memo, useMemo } from 'react';
+import React, { useCallback, memo, useMemo } from 'react';
 import { useStoryFab } from '../context';
 import { Button } from '../../ui/button';
 import { Progress } from '../../ui/progress';
@@ -30,8 +30,6 @@ import { motion } from '../../common/motion-shim';
 import { ClipRepurposingPipeline } from '../../../core/services/pipeline/clip-pipeline/pipeline';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import type {
-  RepurposingClip,
-  PipelineStage,
   RepurposingOptions,
 } from '../../../core/services/pipeline/clip-pipeline/pipeline';
 import { transcodeWithCrop } from '../../../services/tauri';
@@ -52,14 +50,15 @@ import {
   type SocialPlatform,
   type AspectRatio,
 } from './clipRipplingConfig';
+import { useClipRippling } from './useClipRippling';
 
 interface ClipRepurposeProps {
   onNext?: () => void;
 }
 
 const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
-  const { state } = useStoryFab();
-  const { currentVideo, analysis } = state;
+  const { state: storyState } = useStoryFab();
+  const { currentVideo, analysis } = storyState;
   const videoPath = currentVideo?.path ?? '';
   const videoInfo = useMemo<VideoInfo>(() => (
     currentVideo
@@ -76,16 +75,25 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
         }
       : { id: '', name: '', path: '', duration: 0, width: 1920, height: 1080, size: 0, fps: DEFAULT_FPS, format: 'mp4' }
   ), [currentVideo]);
-  const [platform, setPlatform] = useState<SocialPlatform>('douyin');
-  const [selectedFormats, setSelectedFormats] = useState<AspectRatio[]>(['9:16', '1:1']);
-  const [targetCount, setTargetCount] = useState(5);
-  const [running, setRunning] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [stage, setStage] = useState<PipelineStage | ''>('');
-  const [results, setResults] = useState<RepurposingClip[]>([]);
-  const [selectedClips, setSelectedClips] = useState<Set<string>>(new Set());
-  const [exporting, setExporting] = useState(false);
-  const [exportedPaths, setExportedPaths] = useState<string[]>([]);
+
+  // All UI/data state centralized in reducer
+  const {
+    state,
+    setPlatform,
+    toggleSelectedFormat,
+    setTargetCount,
+    setRunning,
+    setProgress,
+    setStage,
+    setResults,
+    setSelectedClips,
+    toggleClip,
+    setExporting,
+    setExportedPaths,
+    resetRun,
+  } = useClipRippling();
+
+  const { platform, selectedFormats, targetCount, running, progress, stage, results, selectedClips, exporting, exportedPaths } = state;
 
   const handleRun = useCallback(async () => {
     if (!videoPath || !videoInfo) {
@@ -93,10 +101,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
       return;
     }
 
-    setRunning(true);
-    setProgress(0);
-    setResults([]);
-    setExportedPaths([]);
+    resetRun();
 
     try {
       const pipeline = new ClipRepurposingPipeline();
@@ -131,7 +136,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
     } finally {
       setRunning(false);
     }
-  }, [videoPath, videoInfo, analysis, platform, selectedFormats, targetCount]);
+  }, [videoPath, videoInfo, analysis, platform, selectedFormats, targetCount, resetRun, setStage, setProgress, setResults, setSelectedClips, setRunning]);
 
   const handleExport = useCallback(async () => {
     if (selectedClips.size === 0) {
@@ -174,16 +179,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
     } finally {
       setExporting(false);
     }
-  }, [results, selectedClips, selectedFormats, videoPath, onNext]);
-
-  const toggleClip = (id: string) => {
-    setSelectedClips(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  }, [results, selectedClips, selectedFormats, videoPath, onNext, setExporting, setExportedPaths]);
 
   const scoreColor = (score: number) => {
     if (score >= SCORE_THRESHOLD_HIGH) return '#52c41a';
@@ -243,13 +239,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
               <Badge
                 key={fmt.value}
                 color={selectedFormats.includes(fmt.value as AspectRatio) ? 'orange' : 'default'}
-                onClick={() => {
-                  setSelectedFormats(prev =>
-                    prev.includes(fmt.value as AspectRatio)
-                      ? prev.filter(f => f !== fmt.value)
-                      : [...prev, fmt.value as AspectRatio]
-                  );
-                }}
+                onClick={() => toggleSelectedFormat(fmt.value as AspectRatio)}
                 style={{ cursor: 'pointer', fontSize: 13, padding: '4px 10px' }}
               >
                 {fmt.emoji} {fmt.label}
