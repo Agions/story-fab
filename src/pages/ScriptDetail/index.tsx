@@ -1,5 +1,5 @@
 import { logger } from '../../shared/utils/logging';
-import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import React, { useEffect, lazy, Suspense, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -14,6 +14,7 @@ import { findProjectByScriptId, normalizeProjectFile } from '../../core/utils/pr
 import type { ProjectFileLike } from '../../core/utils/project-file';
 import type { Script } from '@/core/services/ai/scriptService';
 import type { ScriptSegment } from '@/core/types';
+import { useScriptDetail } from '@/hooks/useScriptDetail';
 import styles from '@/pages/ScriptDetail/index.module.less';
 
 const loadScriptEditor = () => import('../../components/ScriptEditor');
@@ -36,16 +37,25 @@ const ScriptDetail: React.FC = () => {
   const { projectId, scriptId } = useParams<{ projectId: string; scriptId: string }>();
   const navigate = useNavigate();
   const { addRecentProject } = useSettings();
-  const [loading, setLoading] = useState(true);
-  const [project, setProject] = useState<ProjectWithScripts | null>(null);
-  const [script, setScript] = useState<Script | null>(null);
-  const [segments, setSegments] = useState<ScriptSegment[]>([]);
-  const [loadError, setLoadError] = useState<string>('');
-  const [reloadToken, setReloadToken] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  // All UI/data state centralized in reducer
+  const {
+    state,
+    setLoading,
+    setProject,
+    setScript,
+    setSegments,
+    setLoadError,
+    incrementReloadToken,
+    setIsSaving,
+    setIsExporting,
+    setIsDeleting,
+    setDeleteConfirmOpen,
+    resetForLoad,
+  } = useScriptDetail();
+
+  const { loading, project, script, segments, loadError, reloadToken, isSaving, isExporting, isDeleting, deleteConfirmOpen } = state;
+
   const loadRequestSeqRef = useRef(0);
   const mountedRef = useRef(true);
 
@@ -59,9 +69,7 @@ const ScriptDetail: React.FC = () => {
 
     if (!scriptId) {
       if (isStale()) return;
-      setProject(null);
-      setScript(null);
-      setSegments([]);
+      resetForLoad();
       setLoadError('参数错误：缺少脚本ID');
       setLoading(false);
       return;
@@ -70,11 +78,7 @@ const ScriptDetail: React.FC = () => {
     const loadData = async () => {
       try {
         if (isStale()) return;
-        setProject(null);
-        setScript(null);
-        setSegments([]);
-        setLoading(true);
-        setLoadError('');
+        resetForLoad();
         let currentProject: ProjectWithScripts | undefined;
         if (projectId) {
           currentProject = await loadProjectWithRetry(projectId, { retries: 2, retryDelayMs: 260 }) as ProjectWithScripts | undefined;
@@ -114,7 +118,7 @@ const ScriptDetail: React.FC = () => {
     };
 
     void loadData();
-  }, [addRecentProject, projectId, scriptId, reloadToken]);
+  }, [addRecentProject, projectId, scriptId, reloadToken, resetForLoad, setLoadError, setLoading, setProject, setScript, setSegments]);
 
   useEffect(() => {
     if (!loading && project && script) {
@@ -200,7 +204,7 @@ const ScriptDetail: React.FC = () => {
         <div className="text-destructive text-lg font-medium">加载脚本失败</div>
         <div className="text-muted-foreground text-sm">{loadError}</div>
         <div className="flex gap-2">
-          <Button onClick={() => setReloadToken((v) => v + 1)}>重试</Button>
+          <Button onClick={incrementReloadToken}>重试</Button>
           {projectId ? <Button variant="outline" onClick={() => navigate(`/project/${projectId}`)}>返回项目</Button> : null}
           <Button variant="outline" onClick={() => navigate('/projects')}>返回项目列表</Button>
         </div>
