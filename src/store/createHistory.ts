@@ -85,5 +85,3 @@ export function createHistory<T>(opts: CreateHistoryOptions = {}) {
     },
   };
 }
-
-export type HistoryController<T> = ReturnType<typeof createHistory<T>>;
