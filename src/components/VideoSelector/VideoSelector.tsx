@@ -1,5 +1,5 @@
 import { logger } from '@/shared/utils/logging';
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useReducer, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, Trash2, PlayCircle } from 'lucide-react';
@@ -9,6 +9,10 @@ import { tauri } from '@/core/tauri/TauriBridge';
 import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
 import { notify } from '@/shared';
 import { VIDEO_FORMATS } from '@/shared/constants';
+import {
+  videoSelectorReducer,
+  initialVideoSelectorState,
+} from './VideoSelector.reducer';
 import styles from './VideoSelector.module.less';
 
 interface VideoSelectorProps {
@@ -29,6 +33,8 @@ const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map(f => `.${f}`);
 /**
  * 视频选择器组件
  * 支持点击选择、拖拽上传，同时支持桌面端 (Tauri) 和 Web 端
+ *
+ * 状态机: 5 useState → 1 useReducer (state machine)
  */
 const VideoSelector: React.FC<VideoSelectorProps> = ({
   initialVideoPath,
@@ -36,11 +42,12 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
   onVideoRemove,
   loading = false
 }) => {
-  const [videoPath, setVideoPath] = useState<string | null>(initialVideoPath || null);
-  const [videoSrc, setVideoSrc] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState<VideoMetadata | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
+  const [state, dispatch] = useReducer(videoSelectorReducer, {
+    ...initialVideoSelectorState,
+    videoPath: initialVideoPath || null,
+  });
+  const { videoPath, videoSrc, metadata, isAnalyzing, isDragging } = state;
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const blobUrlRef = useRef<string | null>(null);
 
@@ -70,28 +77,28 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
     if (isTauriEnv) {
       // Tauri: fileOrPath 是真实路径
       const filePath = fileOrPath;
-      setVideoPath(filePath);
-      setVideoSrc(convertFileSrc(filePath));
+      dispatch({ type: 'SET_VIDEO_PATH', videoPath: filePath });
+      dispatch({ type: 'SET_VIDEO_SRC', videoSrc: convertFileSrc(filePath) });
 
-      setIsAnalyzing(true);
+      dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: true });
       try {
         const videoMetadata = await videoProcessor.analyze(filePath);
-        setMetadata(videoMetadata);
+        dispatch({ type: 'SET_METADATA', metadata: videoMetadata });
         onVideoSelect(filePath, videoMetadata);
       } catch (error) {
         logger.error('分析视频失败:', { error });
         onVideoSelect(filePath);
       } finally {
-        setIsAnalyzing(false);
+        dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: false });
       }
     } else {
       // Web: fileOrPath 是 blob URL，file 是原始 File 对象
       const blobUrl = fileOrPath;
-      setVideoPath(file?.name || '视频文件');
-      setVideoSrc(blobUrl);
+      dispatch({ type: 'SET_VIDEO_PATH', videoPath: file?.name || '视频文件' });
+      dispatch({ type: 'SET_VIDEO_SRC', videoSrc: blobUrl });
       blobUrlRef.current = blobUrl; // 跟踪 blob URL 以便清理
 
-      setIsAnalyzing(true);
+      dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: true });
       const video = document.createElement('video');
       video.preload = 'metadata';
 
@@ -104,14 +111,14 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
           codec: file?.type || 'unknown',
           bitrate: video.duration > 0 && file ? Math.round((file.size * 8) / video.duration) : 0,
         };
-        setMetadata(webMetadata);
+        dispatch({ type: 'SET_METADATA', metadata: webMetadata });
         onVideoSelect(blobUrl, webMetadata);
-        setIsAnalyzing(false);
+        dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: false });
       };
 
       video.onerror = () => {
         notify.error(null, '无法读取视频文件');
-        setIsAnalyzing(false);
+        dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: false });
       };
 
       video.src = blobUrl;
@@ -160,19 +167,19 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(true);
+    dispatch({ type: 'SET_IS_DRAGGING', isDragging: true });
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(false);
+    dispatch({ type: 'SET_IS_DRAGGING', isDragging: false });
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(false);
+    dispatch({ type: 'SET_IS_DRAGGING', isDragging: false });
 
     if (isTauri()) {
       // Tauri 环境下优先用对话框
@@ -201,9 +208,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
       URL.revokeObjectURL(blobUrlRef.current);
       blobUrlRef.current = null;
     }
-    setVideoPath(null);
-    setVideoSrc(null);
-    setMetadata(null);
+    dispatch({ type: 'RESET' });
     onVideoRemove?.();
   };
 
