@@ -1,13 +1,21 @@
 /**
  * VideoExport handlers — split from VideoExport.tsx
+ * 14 useState 集中化入口 (v3.4 §A2 范式)
  */
-import { useState, useCallback, useEffect } from 'react';
+import { useReducer, useMemo, useCallback, useEffect } from 'react';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import type { ExportSettings } from '@/core/types';
 import { PLATFORM_PRESETS } from './exportConfig';
+import {
+  initialExportHandlersState,
+  exportHandlersReducer,
+  type ExportHandlersAction,
+  type ExportHandlersState,
+  type Updater,
+} from './useExportHandlers.reducer';
 
 interface UseExportHandlersProps {
   state: {
@@ -44,33 +52,40 @@ export interface ExportHandlers {
   togglePlatformSelection: (value: string) => void;
 }
 
+type Setter<K extends keyof ExportHandlersState> = (
+  updater: Updater<ExportHandlersState[K]>,
+) => void;
+type ExportHandlersSetters = { [K in keyof ExportHandlersState]: Setter<K> };
+
+const makeSetters = (
+  dispatch: React.Dispatch<ExportHandlersAction>,
+  state: ExportHandlersState,
+): ExportHandlersSetters => {
+  return Object.fromEntries(
+    (Object.keys(state) as (keyof ExportHandlersState)[]).map((key) => [
+      key,
+      (updater: Updater<ExportHandlersState[typeof key]>) =>
+        dispatch({ type: 'update', key, updater: updater as Updater<unknown> }),
+    ]),
+  ) as ExportHandlersSetters;
+};
+
 export function useExportHandlers({
   state,
   onExportSettingsChange,
   onComplete,
 }: UseExportHandlersProps): ExportHandlers {
-  const [exporting, setExporting] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [progressStage, setProgressStage] = useState('');
-  const [etaSeconds, setEtaSeconds] = useState<number | null>(null);
-  const [exported, setExported] = useState(false);
-  const [_exportedFile, setExportedFile] = useState<string | null>(null);
-  const [_exportError, setExportError] = useState<string | null>(null);
-  const [_startTime, _setStartTime] = useState<number>(Date.now());
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
-  const [batchMode, setBatchMode] = useState(false);
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [currentExportId, setCurrentExportId] = useState<string | null>(null);
-
-  const [config, setConfig] = useState<ExportSettings>({
-    format: state.exportSettings?.format || 'mp4',
-    quality: state.exportSettings?.quality || 'high',
-    resolution: state.exportSettings?.resolution || '1080p',
-    fps: state.exportSettings?.fps || 30,
-    includeSubtitles: state.exportSettings?.includeSubtitles ?? true,
-    burnSubtitles: state.exportSettings?.burnSubtitles ?? true,
-    includeWatermark: state.exportSettings?.includeWatermark ?? false,
-  });
+  const [ehState, dispatch] = useReducer(
+    exportHandlersReducer,
+    initialExportHandlersState({ exportSettings: state.exportSettings }),
+  );
+  const setters = useMemo(() => makeSetters(dispatch, ehState), [ehState]);
+  const {
+    exporting, progress, progressStage, etaSeconds,
+    exported, exportedFile, exportError,
+    selectedPlatform, batchMode, selectedPlatforms,
+    currentExportId, config,
+  } = ehState;
 
   // 监听 Rust processing-progress 事件
   useEffect(() => {
@@ -81,28 +96,30 @@ export function useExportHandlers({
         'processing-progress',
         (event) => {
           const { stage, progress, time_remaining_secs } = event.payload;
-          setProgress(Math.round(progress * 100));
-          setProgressStage(stage);
+          setters.progress(Math.round(progress * 100));
+          setters.progressStage(stage);
           if (time_remaining_secs !== undefined) {
-            setEtaSeconds(Math.round(time_remaining_secs));
+            setters.etaSeconds(Math.round(time_remaining_secs));
           }
-        }
-      ).then((fn) => {
-        // If cleanup already ran before listen() resolved, unlisten immediately
-        if (cancelled) {
-          fn();
-        } else {
-          unlisten = fn;
-        }
-      }).catch((err) => {
-        logger.error('[useExportHandlers] Failed to subscribe to processing-progress', err);
-      });
+        },
+      )
+        .then((fn) => {
+          // If cleanup already ran before listen() resolved, unlisten immediately
+          if (cancelled) {
+            fn();
+          } else {
+            unlisten = fn;
+          }
+        })
+        .catch((err) => {
+          logger.error('[useExportHandlers] Failed to subscribe to processing-progress', err);
+        });
     }
     return () => {
       cancelled = true;
       unlisten?.();
     };
-  }, [exporting]);
+  }, [exporting, setters]);
 
   const handleCancel = useCallback(async () => {
     if (!currentExportId) return;
@@ -112,12 +129,12 @@ export function useExportHandlers({
     } catch {
       notify.error(new Error('取消导出失败'), '取消失败');
     }
-    setExporting(false);
-    setProgress(0);
-    setProgressStage('');
-    setEtaSeconds(null);
-    setCurrentExportId(null);
-  }, [currentExportId]);
+    setters.exporting(false);
+    setters.progress(0);
+    setters.progressStage('');
+    setters.etaSeconds(null);
+    setters.currentExportId(null);
+  }, [currentExportId, setters]);
 
   const estimateFileSize = useCallback(() => {
     if (!state.currentVideo?.duration) return '0 MB';
@@ -129,8 +146,16 @@ export function useExportHandlers({
 
   const getEstimatedFileSize = useCallback(() => {
     if (!state.currentVideo?.duration) return '0 MB';
-    const platform = PLATFORM_PRESETS.find(p => p.value === selectedPlatform);
-    const bitrate = platform?.bitrate || (config.quality === 'low' ? 1.5 : config.quality === 'medium' ? 4 : config.quality === 'high' ? 10 : 30);
+    const platform = PLATFORM_PRESETS.find((p) => p.value === selectedPlatform);
+    const bitrate =
+      platform?.bitrate ||
+      (config.quality === 'low'
+        ? 1.5
+        : config.quality === 'medium'
+        ? 4
+        : config.quality === 'high'
+        ? 10
+        : 30);
     const sizeMB = (bitrate * state.currentVideo.duration) / 8;
     return sizeMB > 1000 ? `${(sizeMB / 1000).toFixed(1)} GB` : `${sizeMB.toFixed(1)} MB`;
   }, [state.currentVideo?.duration, selectedPlatform, config.quality]);
@@ -141,40 +166,46 @@ export function useExportHandlers({
       return;
     }
 
-    setExporting(true);
-    setProgress(0);
-    setProgressStage('准备导出...');
-    setEtaSeconds(null);
-    setExportError(null);
+    setters.exporting(true);
+    setters.progress(0);
+    setters.progressStage('准备导出...');
+    setters.etaSeconds(null);
+    setters.exportError(null);
 
     try {
       const outputPath = `/tmp/story-fab/export_${Date.now()}.mp4`;
-      setCurrentExportId(outputPath);
+      setters.currentExportId(outputPath);
 
-      setProgressStage('正在编码...');
+      setters.progressStage('正在编码...');
 
       await tauri.autonomousRender({
         input_path: state.synthesisData.finalVideoUrl ?? '',
         output_path: outputPath,
       });
 
-      setProgress(100);
-      setProgressStage('导出完成');
-      setEtaSeconds(0);
+      setters.progress(100);
+      setters.progressStage('导出完成');
+      setters.etaSeconds(0);
 
       onExportSettingsChange(config);
-      setExportedFile(outputPath);
-      setExported(true);
+      setters.exportedFile(outputPath);
+      setters.exported(true);
       notify.success('视频导出完成！');
       onComplete?.();
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      setExportError(msg);
+      setters.exportError(msg);
       notify.error(msg, '导出失败');
     } finally {
-      setExporting(false);
+      setters.exporting(false);
     }
-  }, [state.synthesisData?.finalVideoUrl, config, onExportSettingsChange, onComplete]);
+  }, [
+    state.synthesisData?.finalVideoUrl,
+    config,
+    onExportSettingsChange,
+    onComplete,
+    setters,
+  ]);
 
   const handleBatchExport = useCallback(async () => {
     if (!state.synthesisData?.finalVideoUrl) {
@@ -186,18 +217,20 @@ export function useExportHandlers({
       return;
     }
 
-    setExporting(true);
-    setProgress(0);
-    setEtaSeconds(null);
+    setters.exporting(true);
+    setters.progress(0);
+    setters.etaSeconds(null);
 
     try {
       for (let i = 0; i < selectedPlatforms.length; i++) {
-        const platform = PLATFORM_PRESETS.find(p => p.value === selectedPlatforms[i]);
+        const platform = PLATFORM_PRESETS.find((p) => p.value === selectedPlatforms[i]);
         if (!platform) continue;
 
         const outputPath = `/tmp/story-fab/export_${platform.value}_${Date.now()}.mp4`;
-        setCurrentExportId(outputPath);
-        setProgressStage(`${platform.emoji} ${platform.label} 导出中... (${i + 1}/${selectedPlatforms.length})`);
+        setters.currentExportId(outputPath);
+        setters.progressStage(
+          `${platform.emoji} ${platform.label} 导出中... (${i + 1}/${selectedPlatforms.length})`,
+        );
 
         const exportConfig: ExportSettings = {
           ...config,
@@ -210,29 +243,51 @@ export function useExportHandlers({
           output_path: outputPath,
         });
 
-        setProgress(Math.round(((i + 1) / selectedPlatforms.length) * 100));
+        setters.progress(Math.round(((i + 1) / selectedPlatforms.length) * 100));
       }
 
-      setProgress(100);
-      setProgressStage('全部导出完成');
-      setEtaSeconds(0);
-      setExported(true);
+      setters.progress(100);
+      setters.progressStage('全部导出完成');
+      setters.etaSeconds(0);
+      setters.exported(true);
       notify.success(`批量导出完成！共 ${selectedPlatforms.length} 个平台`);
       onComplete?.();
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      setExportError(msg);
+      setters.exportError(msg);
       notify.error(msg, '批量导出失败');
     } finally {
-      setExporting(false);
+      setters.exporting(false);
     }
-  }, [state.synthesisData?.finalVideoUrl, selectedPlatforms, config, onExportSettingsChange, onComplete]);
+  }, [
+    state.synthesisData?.finalVideoUrl,
+    selectedPlatforms,
+    config,
+    onExportSettingsChange,
+    onComplete,
+    setters,
+  ]);
 
-  const togglePlatformSelection = useCallback((value: string) => {
-    setSelectedPlatforms(prev =>
-      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
-    );
-  }, []);
+  const togglePlatformSelection = useCallback(
+    (value: string) => {
+      setters.selectedPlatforms((prev) =>
+        prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
+      );
+    },
+    [setters],
+  );
+
+  // setConfig setter needs to keep React.Dispatch<React.SetStateAction<ExportSettings>> signature
+  const setConfig = useCallback<React.Dispatch<React.SetStateAction<ExportSettings>>>(
+    (updater) => {
+      if (typeof updater === 'function') {
+        setters.config((prev) => (updater as (p: ExportSettings) => ExportSettings)(prev));
+      } else {
+        setters.config(updater);
+      }
+    },
+    [setters],
+  );
 
   return {
     exporting,
@@ -240,8 +295,8 @@ export function useExportHandlers({
     progressStage,
     etaSeconds,
     exported,
-    exportedFile: _exportedFile,
-    exportError: _exportError,
+    exportedFile,
+    exportError,
     selectedPlatform,
     batchMode,
     selectedPlatforms,
@@ -250,9 +305,9 @@ export function useExportHandlers({
     estimateFileSize,
     getEstimatedFileSize,
     setConfig,
-    setSelectedPlatform,
-    setBatchMode,
-    setSelectedPlatforms,
+    setSelectedPlatform: setters.selectedPlatform,
+    setBatchMode: setters.batchMode,
+    setSelectedPlatforms: setters.selectedPlatforms,
     handleExport,
     handleBatchExport,
     handleCancel,
