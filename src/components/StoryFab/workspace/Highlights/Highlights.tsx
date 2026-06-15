@@ -1,33 +1,27 @@
 /**
  * Highlights — 高光时刻列表
-
+ *
  * 基于 Rust highlight_detector.rs 的音频能量+场景切换分析结果，
  * 以深色面板呈现，点击定位到 Timeline 播放头。
-
+ *
  * 设计风格：AI Cinema Studio Dark
  * - bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
-
  */
 import { MS_PER_SECOND } from '@/shared/utils';
-import React, { useState, useCallback } from 'react';
+import React, { useReducer, useCallback } from 'react';
 import { Slider } from '../../../ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
 import { visionService } from '../../../../core/services/ai/visionService';
 import { useTimelineStore } from '../../../../store/timelineStore';
 import { notify } from '../../../../shared/utils/notify';
 import type { VideoInfo } from '@/core/types';
+import {
+  highlightsReducer,
+  initialHighlightsState,
+  type Highlight,
+} from './Highlights.reducer';
 import styles from './Highlights.module.css';
 import { formatTime } from '@/shared/utils/formatting';
-
-interface Highlight {
-  startTime: number;  // seconds
-  endTime: number;    // seconds
-  score: number;      // 0-1
-  reason: string;
-  audioScore?: number;
-  sceneScore?: number;
-  motionScore?: number;
-}
 
 const REASON_CONFIG: Record<string, { label: string; cls: string }> = {
   audio_energy: { label: 'Audio', cls: 'audio' },
@@ -43,22 +37,18 @@ interface HighlightsProps {
 }
 
 const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _defaultExpanded = false }) => {
-  const [highlights, setHighlights] = useState<Highlight[]>([]);
-  const [detected, setDetected] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [threshold, setThreshold] = useState(1.5);
-  const [topN, setTopN] = useState(10);
+  const [state, dispatch] = useReducer(highlightsReducer, initialHighlightsState);
+  const { highlights, detected, loading, error, threshold, topN } = state;
   const setPlayheadMs = useTimelineStore((s) => s.setPlayheadMs);
 
   const handleThresholdChange = (value: number | readonly number[]) => {
     const resolvedValue = Array.isArray(value) ? value[0] : value;
-    setThreshold(resolvedValue);
+    dispatch({ type: 'SET_THRESHOLD', threshold: resolvedValue });
   };
 
   const handleTopNChange = (value: number | readonly number[]) => {
     const resolvedValue = Array.isArray(value) ? value[0] : value;
-    setTopN(resolvedValue);
+    dispatch({ type: 'SET_TOPN', topN: resolvedValue });
   };
 
   const detect = useCallback(async () => {
@@ -66,8 +56,7 @@ const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _de
       notify.warning('视频路径不可用');
       return;
     }
-    setLoading(true);
-    setError(null);
+    dispatch({ type: 'START_DETECT' });
     try {
       const result = await visionService.detectHighlights(videoInfo, {
         threshold,
@@ -75,15 +64,12 @@ const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _de
         minDurationMs: 500,
         detectScene: true,
       });
-      setHighlights(result);
-      setDetected(true);
+      dispatch({ type: 'DETECT_SUCCESS', highlights: result });
       notify.success(`检测到 ${result.length} 个高光`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setError(msg);
+      dispatch({ type: 'DETECT_FAILURE', error: msg });
       notify.error(err, `高光检测失败: ${msg}`);
-    } finally {
-      setLoading(false);
     }
   }, [videoInfo, threshold, topN]);
 
@@ -214,3 +200,4 @@ const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _de
 
 export { Highlights };
 export type { Highlight, HighlightsProps };
+
