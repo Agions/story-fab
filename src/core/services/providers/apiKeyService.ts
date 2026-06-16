@@ -1,12 +1,30 @@
 /**
  * API 密钥验证服务
  */
-import axios from 'axios';
 import { logger } from '../../../shared/utils/logging';
 
 export interface ApiKeyValidationResult {
   isValid: boolean;
   error?: string;
+}
+
+/**
+ * Helper: fetch with timeout
+ */
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 10000): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    if (!res.ok) {
+      const err = new Error(`HTTP ${res.status}`) as Error & { statusCode: number };
+      err.statusCode = res.status;
+      throw err;
+    }
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**
@@ -20,44 +38,42 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
   try {
     switch (provider) {
       case 'openai':
-        await axios.get('https://api.openai.com/v1/models', {
+        await fetchWithTimeout('https://api.openai.com/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
-          timeout: 10000,
         });
         break;
 
       case 'deepseek':
-        await axios.get('https://api.deepseek.com/v1/models', {
+        await fetchWithTimeout('https://api.deepseek.com/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
-          timeout: 10000,
         });
         break;
 
       case 'anthropic':
         // Anthropic 使用 Messages API 进行验证
-        await axios.post(
+        await fetchWithTimeout(
           'https://api.anthropic.com/v1/messages',
           {
-            model: 'claude-sonnet-4.6',
-            max_tokens: 1,
-            messages: [{ role: 'user', content: 'ping' }],
-          },
-          {
+            method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'x-api-key': apiKey,
               'anthropic-version': '2023-06-01',
             },
-            timeout: 10000,
+            body: JSON.stringify({
+              model: 'claude-sonnet-4.6',
+              max_tokens: 1,
+              messages: [{ role: 'user', content: 'ping' }],
+            }),
           }
         );
         break;
 
       case 'google':
         // Google AI Studio API 验证
-        await axios.get(
-          `https://generativelanguage.googleapis.com/v1beta/models`,
-          { params: { key: apiKey }, timeout: 10000 }
+        await fetchWithTimeout(
+          `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`,
+          {}
         );
         break;
 
@@ -67,28 +83,20 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
         if (!baiduApiKey || !baiduSecret) {
           return { isValid: false, error: '百度 API 密钥格式无效（应为 api_key:api_secret）' };
         }
-        await axios.post(
-          'https://aip.baidubce.com/oauth/2.0/token',
-          null,
-          {
-            params: {
-              grant_type: 'client_credentials',
-              client_id: baiduApiKey,
-              client_secret: baiduSecret,
-            },
-            timeout: 10000,
-          }
+        await fetchWithTimeout(
+          `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${encodeURIComponent(baiduApiKey)}&client_secret=${encodeURIComponent(baiduSecret)}`,
+          { method: 'POST' }
         );
         break;
 
       case 'alibaba':
         // 阿里通义千问 - 使用 chat/completions 验证
-        await axios.post(
+        await fetchWithTimeout(
           'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
-          { model: 'qwen2.5-max', messages: [{ role: 'user', content: 'hi' }] },
           {
+            method: 'POST',
             headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-            timeout: 10000,
+            body: JSON.stringify({ model: 'qwen2.5-max', messages: [{ role: 'user', content: 'hi' }] }),
           }
         );
         break;
@@ -103,24 +111,24 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
 
       case 'zhipu':
         // 智谱清言 - 使用 chat/completions 验证
-        await axios.post(
+        await fetchWithTimeout(
           'https://open.bigmodel.cn/api/paas/v4/chat/completions',
-          { model: 'glm-4', messages: [{ role: 'user', content: 'hi' }] },
           {
+            method: 'POST',
             headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-            timeout: 10000,
+            body: JSON.stringify({ model: 'glm-4', messages: [{ role: 'user', content: 'hi' }] }),
           }
         );
         break;
 
       case 'moonshot':
         // Moonshot Kimi - 使用 chat/completions 验证
-        await axios.post(
+        await fetchWithTimeout(
           'https://api.moonshot.cn/v1/chat/completions',
-          { model: 'moonshot-v1-8k', messages: [{ role: 'user', content: 'hi' }] },
           {
+            method: 'POST',
             headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-            timeout: 10000,
+            body: JSON.stringify({ model: 'moonshot-v1-8k', messages: [{ role: 'user', content: 'hi' }] }),
           }
         );
         break;
@@ -135,18 +143,15 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
   } catch (error: unknown) {
     let errorMessage = 'API 密钥验证失败';
 
-    if (axios.isAxiosError(error)) {
-      const axiosError = error;
-      if (axiosError.response?.data) {
-        const data = axiosError.response.data as { error?: { message?: string }; error_msg?: string; header?: { message?: string } };
-        errorMessage = data.error?.message || data.error_msg || data.header?.message || errorMessage;
-      } else if (axiosError.code === 'ECONNABORTED') {
-        errorMessage = 'API 密钥验证超时，请检查网络连接';
-      } else if (axiosError.response?.status === 401) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      const status = (error as { statusCode: number }).statusCode;
+      if (status === 401) {
         errorMessage = 'API 密钥无效或已过期';
-      } else if (axiosError.response?.status === 403) {
+      } else if (status === 403) {
         errorMessage = 'API 密钥没有访问权限';
       }
+    } else if (error instanceof DOMException && error.name === 'AbortError') {
+      errorMessage = 'API 密钥验证超时，请检查网络连接';
     } else if (error instanceof Error) {
       errorMessage = error.message;
     }

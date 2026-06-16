@@ -5,7 +5,7 @@
  * 错误归一化、FFmpeg 缓存、参数校验等通用逻辑由基类处理。
  */
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
-import { v4 as uuidv4 } from 'uuid';
+
 import { BaseVideoProcessor } from './BaseVideoProcessor';
 import { invoke, TauriCommand } from '../tauri';
 import type {
@@ -51,7 +51,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
     const totalDuration = duration ?? 0;
     const interval = framePaths.length > 0 ? totalDuration / framePaths.length : 0;
     return framePaths.map((path, index) => ({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       timestamp: index * interval,
       path,
       description: '',

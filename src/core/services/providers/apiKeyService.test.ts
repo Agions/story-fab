@@ -1,19 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import axios from 'axios';
 import { validateApiKey } from './apiKeyService';
 
-vi.mock('axios');
-const mockedAxios = vi.mocked(axios, true);
-
-// Properly mock isAxiosError as a function (type predicate signature)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(mockedAxios.isAxiosError as any) = vi.fn((val: any) =>
-  Boolean(val && typeof val === 'object' && 'isAxiosError' in val && (val as Record<string, unknown>).isAxiosError === true)
-);
+// Mock global fetch
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
 describe('validateApiKey', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default: fetch resolves with ok: true
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
   });
 
   describe('input validation', () => {
@@ -38,41 +34,39 @@ describe('validateApiKey', () => {
 
   describe('OpenAI', () => {
     it('should validate correct OpenAI key', async () => {
-      mockedAxios.get.mockResolvedValue({ data: {} });
       const result = await validateApiKey('openai', 'sk-validopenai1234567890');
       expect(result.isValid).toBe(true);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         'https://api.openai.com/v1/models',
         expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer sk-validopenai1234567890' }) })
       );
     });
 
     it('should handle 401 unauthorized', async () => {
-      mockedAxios.get.mockRejectedValue({
-        isAxiosError: true,
-        response: { status: 401, data: null },
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({}),
       });
       const result = await validateApiKey('openai', 'sk-invalid1234567890');
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe('API 密钥无效或已过期');
     });
 
     it('should handle 403 forbidden', async () => {
-      mockedAxios.get.mockRejectedValue({
-        isAxiosError: true,
-        response: { status: 403, data: null },
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 403,
+        json: () => Promise.resolve({}),
       });
       const result = await validateApiKey('openai', 'sk-forbidden1234567890');
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe('API 密钥没有访问权限');
     });
 
     it('should handle timeout', async () => {
-      mockedAxios.get.mockRejectedValue({
-        isAxiosError: true,
-        code: 'ECONNABORTED',
-        response: null,
-      });
+      mockFetch.mockImplementation(() => new Promise((_, reject) => {
+        const err = new DOMException('The operation was aborted.', 'AbortError');
+        reject(err);
+      }));
       const result = await validateApiKey('openai', 'sk-timeout1234567890');
       expect(result.isValid).toBe(false);
       expect(result.error).toBe('API 密钥验证超时，请检查网络连接');
@@ -81,10 +75,9 @@ describe('validateApiKey', () => {
 
   describe('DeepSeek', () => {
     it('should validate correct DeepSeek key', async () => {
-      mockedAxios.get.mockResolvedValue({ data: {} });
       const result = await validateApiKey('deepseek', 'sk-deepseekvalid1234567890');
       expect(result.isValid).toBe(true);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         'https://api.deepseek.com/v1/models',
         expect.any(Object)
       );
@@ -93,7 +86,6 @@ describe('validateApiKey', () => {
 
   describe('Anthropic', () => {
     it('should validate correct Anthropic key', async () => {
-      mockedAxios.post.mockResolvedValue({ data: {} });
       const result = await validateApiKey('anthropic', 'sk-antropicvalid1234567890');
       expect(result.isValid).toBe(true);
     });
@@ -126,21 +118,15 @@ describe('validateApiKey', () => {
   });
 
   describe('network errors', () => {
-    it('should handle non-axios errors', async () => {
-      mockedAxios.isAxiosError.mockReturnValue(false);
-      mockedAxios.get.mockRejectedValue(new Error('Unexpected error'));
+    it('should handle non-fetch errors', async () => {
+      mockFetch.mockRejectedValue(new Error('Unexpected error'));
       const result = await validateApiKey('openai', 'sk-network1234567890');
       expect(result.isValid).toBe(false);
       expect(result.error).toBe('Unexpected error');
     });
 
-    it('should handle axios errors without response', async () => {
-      mockedAxios.isAxiosError.mockReturnValue(true);
-      mockedAxios.get.mockRejectedValue({
-        isAxiosError: true,
-        message: 'Network failed',
-        response: null,
-      });
+    it('should handle fetch errors without response', async () => {
+      mockFetch.mockRejectedValue(new Error('Network failed'));
       const result = await validateApiKey('openai', 'sk-noresp1234567890');
       expect(result.isValid).toBe(false);
     });

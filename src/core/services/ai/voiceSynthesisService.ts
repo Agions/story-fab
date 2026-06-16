@@ -7,7 +7,7 @@
  * 不使用任何 Node.js / child_process API。
  */
 import { tauri } from '../../tauri';
-import { v4 as uuidv4 } from 'uuid';
+
 import { logger } from '../../../shared/utils/logging';
 
 // ============================================
@@ -197,7 +197,7 @@ export class VoiceSynthesisService {
     onProgress?: (p: SynthesisProgress) => void
   ): Promise<SynthesisResult> {
     const config = { ...this.config, ...options };
-    const id = uuidv4();
+    const id = crypto.randomUUID();
 
     onProgress?.({ stage: 'queued', progress: 10, message: '准备合成...' });
     onProgress?.({ stage: 'synthesizing', progress: 30, message: '正在合成...' });

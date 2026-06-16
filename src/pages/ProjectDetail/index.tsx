@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '../../components/ui/drawer';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../components/ui/tooltip';
 import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scissors, LayoutDashboard } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
+
 import { useModelStore } from '@/store';
 import { saveProjectToFile, getApiKey, loadProjectWithRetry, deleteProject } from '../../services/tauri';
 import { useSettings } from '@/context/SettingsContext';
@@ -180,7 +180,7 @@ const ProjectDetail: React.FC = () => {
     if (!project || createScriptLockRef.current) return;
     createScriptLockRef.current = true;
     try {
-      const newScript: Script = { id: uuidv4(), projectId: project.id, content: [], fullText: '', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      const newScript: Script = { id: crypto.randomUUID(), projectId: project.id, content: [], fullText: '', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
       const updatedProject = { ...project, scripts: [...(project.scripts || []), newScript], updatedAt: new Date().toISOString() };
       updateProject(updatedProject);
       setActiveScript(newScript);

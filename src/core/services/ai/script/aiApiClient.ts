@@ -7,7 +7,6 @@
  * - 统一错误处理和请求/响应转换
  */
 
-import axios from 'axios';
 import { AI_MODEL_CONFIGS, type AIModelType } from './aiModelConfigs';
 
 // ============================================
@@ -24,7 +23,7 @@ export class AIServiceError extends Error {
   }
 }
 
-interface AxiosErrorResponse {
+interface FetchErrorResponse {
   data?: {
     error?: { message?: string };
     error_msg?: string;
@@ -35,17 +34,17 @@ interface AxiosErrorResponse {
 
 function parseAIErrorResponse(error: unknown, modelType: string): AIServiceError {
   if (error && typeof error === 'object' && 'response' in error) {
-    const axiosError = error as { response?: AxiosErrorResponse };
-    const data = axiosError.response?.data;
+    const fetchError = error as { response?: FetchErrorResponse };
+    const data = fetchError.response?.data;
 
     if (data?.error?.message) {
-      return new AIServiceError(data.error.message, axiosError.response?.status);
+      return new AIServiceError(data.error.message, fetchError.response?.status);
     }
     if (typeof data?.error_msg === 'string') {
-      return new AIServiceError(data.error_msg, axiosError.response?.status);
+      return new AIServiceError(data.error_msg, fetchError.response?.status);
     }
     if (data?.header?.message) {
-      return new AIServiceError(data.header.message, axiosError.response?.status);
+      return new AIServiceError(data.header.message, fetchError.response?.status);
     }
   }
 
@@ -93,11 +92,20 @@ export async function invokeAIModel(
     const requestOptions =
       options && typeof options === 'object' ? (options as Record<string, unknown>) : undefined;
 
-    const response = await axios.post(url, config.transformRequest(prompt, requestOptions), {
+    const response = await fetch(url, {
+      method: 'POST',
       headers,
+      body: JSON.stringify(config.transformRequest(prompt, requestOptions)),
     });
 
-    return config.transformResponse(response.data);
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      const errObj = { response: { status: response.status, data } };
+      throw errObj;
+    }
+
+    const data = await response.json();
+    return config.transformResponse(data);
   } catch (error: unknown) {
     throw parseAIErrorResponse(error, modelType);
   }

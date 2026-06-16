@@ -18,7 +18,7 @@ import type { VideoMetadata } from '@/core/video';
 import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/SettingsContext';
-import { v4 as uuid } from 'uuid';
+
 import { logger } from '../../shared/utils/logging';
 
 import { VideoStep } from './components/steps/VideoStep';
@@ -108,7 +108,7 @@ const ProjectEdit: React.FC = () => {
     const description = formDescription;
     const now = new Date().toISOString();
     return {
-      id: project?.id || draftProjectIdRef.current || uuid(),
+      id: project?.id || draftProjectIdRef.current || crypto.randomUUID(),
       name: (name || '').trim() || defaultProjectName,
       description: (description || '').trim(),
       videoPath,
