@@ -82,7 +82,7 @@ export default defineConfig({
           if (/node_modules\/lucide-react\//.test(id)) return 'vendor-icons'
 
           // Animation / UI utilities
-          if (/node_modules\/framer-motion\//.test(id) || /node_modules\/vaul\//.test(id)) return 'vendor-motion'
+          if (/node_modules\/vaul\//.test(id)) return 'vendor-motion'
 
           // No catch-all — every node_modules module must have an explicit chunk above.
           // If you hit this, add a new explicit rule before the fallback.
