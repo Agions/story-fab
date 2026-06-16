@@ -1,0 +1,84 @@
+/**
+ * videoPlayerReducer 测试
+ */
+import { describe, it, expect } from 'vitest';
+import { videoPlayerReducer, initialVideoPlayerState } from './VideoPlayer.reducer';
+import type { VideoPlayerState } from './VideoPlayer.reducer';
+
+const makeState = (overrides?: Partial<VideoPlayerState>): VideoPlayerState => ({
+  ...initialVideoPlayerState,
+  ...overrides,
+});
+
+describe('videoPlayerReducer', () => {
+  describe('SET_IS_PLAYING', () => {
+    it('sets isPlaying to true', () => {
+      expect(videoPlayerReducer(makeState(), { type: 'SET_IS_PLAYING', isPlaying: true }).isPlaying).toBe(true);
+    });
+
+    it('sets isPlaying to false', () => {
+      const prev = makeState({ isPlaying: true });
+      expect(videoPlayerReducer(prev, { type: 'SET_IS_PLAYING', isPlaying: false }).isPlaying).toBe(false);
+    });
+  });
+
+  describe('SET_CURRENT_TIME', () => {
+    it('sets currentTime', () => {
+      expect(videoPlayerReducer(makeState(), { type: 'SET_CURRENT_TIME', currentTime: 42.5 }).currentTime).toBe(42.5);
+    });
+
+    it('sets currentTime to 0', () => {
+      const prev = makeState({ currentTime: 100 });
+      expect(videoPlayerReducer(prev, { type: 'SET_CURRENT_TIME', currentTime: 0 }).currentTime).toBe(0);
+    });
+  });
+
+  describe('SET_DURATION', () => {
+    it('sets duration', () => {
+      expect(videoPlayerReducer(makeState(), { type: 'SET_DURATION', duration: 3600 }).duration).toBe(3600);
+    });
+  });
+
+  describe('SET_VOLUME', () => {
+    it('sets volume', () => {
+      expect(videoPlayerReducer(makeState(), { type: 'SET_VOLUME', volume: 0.5 }).volume).toBe(0.5);
+    });
+
+    it('sets volume to 0 (muted)', () => {
+      expect(videoPlayerReducer(makeState(), { type: 'SET_VOLUME', volume: 0 }).volume).toBe(0);
+    });
+
+    it('sets volume to 1 (max)', () => {
+      const prev = makeState({ volume: 0.3 });
+      expect(videoPlayerReducer(prev, { type: 'SET_VOLUME', volume: 1 }).volume).toBe(1);
+    });
+  });
+
+  describe('SET_SHOW_VOLUME_SLIDER', () => {
+    it('sets showVolumeSlider to true', () => {
+      expect(videoPlayerReducer(makeState(), { type: 'SET_SHOW_VOLUME_SLIDER', showVolumeSlider: true }).showVolumeSlider).toBe(true);
+    });
+
+    it('sets showVolumeSlider to false', () => {
+      const prev = makeState({ showVolumeSlider: true });
+      expect(videoPlayerReducer(prev, { type: 'SET_SHOW_VOLUME_SLIDER', showVolumeSlider: false }).showVolumeSlider).toBe(false);
+    });
+  });
+
+  describe('immutability', () => {
+    it('does not mutate original state', () => {
+      const state = makeState({ isPlaying: false });
+      const next = videoPlayerReducer(state, { type: 'SET_IS_PLAYING', isPlaying: true });
+      expect(state.isPlaying).toBe(false);
+      expect(next.isPlaying).toBe(true);
+      expect(next).not.toBe(state);
+    });
+  });
+
+  describe('default', () => {
+    it('returns same state for unknown action', () => {
+      const state = makeState();
+      expect(videoPlayerReducer(state, { type: 'UNKNOWN' as any })).toBe(state);
+    });
+  });
+});
