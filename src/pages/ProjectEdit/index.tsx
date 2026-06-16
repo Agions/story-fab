@@ -226,7 +226,7 @@ const ProjectEdit: React.FC = () => {
     if (canAccessStep(step)) { setCurrentStep(step); return; }
     if (step > 0 && !videoPath) { notify.warning('请先选择视频后再继续。'); return; }
     if (step > 1) notify.warning('请先完成视频分析后再进入脚本编辑。');
-  }, [canAccessStep, videoPath]);
+  }, [canAccessStep, videoPath, setCurrentStep]);
 
   // ─── Video handlers ─────────────────────────────────────────────────────────
   const handleVideoSelect = useCallback((filePath: string, metadata?: VideoMetadata) => {
@@ -238,12 +238,12 @@ const ProjectEdit: React.FC = () => {
     setVideoSelected(true);
     if (metadata) setVideoMetadata(metadata);
     if (currentStep === 0) goToStep(1);
-  }, [currentStep, goToStep, videoMetadata, videoPath, videoSelected]);
+  }, [currentStep, goToStep, videoMetadata, videoPath, videoSelected, setVideoMetadata, setVideoPath, setVideoSelected]);
 
   const handleVideoRemove = useCallback(() => {
     setVideoPath(''); setVideoSelected(false); setVideoMetadata(null);
     setKeyFrames([]); setScriptSegments([]); setCurrentStep(0);
-  }, []);
+  }, [setCurrentStep, setKeyFrames, setScriptSegments, setVideoMetadata, setVideoPath, setVideoSelected]);
 
   // ─── Analyze ────────────────────────────────────────────────────────────────
   // handleAnalyzeVideo 已通过 useVideoAnalysis Hook 提供（见上方）
@@ -275,7 +275,7 @@ const ProjectEdit: React.FC = () => {
     } finally {
       setSaving(false);
     }
-  }, [formName, isNewProject, location.pathname, navigate, persistProject, projectId, saveBehavior, saving]);
+  }, [formName, isNewProject, location.pathname, navigate, persistProject, projectId, saveBehavior, saving, setIsNewProject, setSaving]);
 
   const handleBack = () => {
     if (window.history.length > 1) { navigate(-1); return; }
