@@ -5,9 +5,11 @@
  * - 显示/编辑生成的解说文案
  * - 分段展示（可编辑时间戳和文案）
  * - API Key 输入
+ *
+ * 状态机: 3 useState (2 SegmentRow + 1 主组件) → 2 useReducer
  */
 
-import React, { useState, useCallback, memo } from 'react';
+import React, { useReducer, useCallback, useEffect, useRef, memo } from 'react';
 import { CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +18,12 @@ import { Badge } from '@/components/ui/badge';
 import { Copy, Check, Wand2 } from 'lucide-react';
 import type { CommentaryScriptOutput, CommentarySegment } from '@/core/services/commentary';
 import { formatDuration } from '@/core/video';
+import {
+  segmentRowReducer,
+  scriptEditorReducer,
+  initialSegmentRowState,
+  initialScriptEditorState,
+} from './CommentaryScriptEditor.reducer';
 import styles from './CommentaryPanel.module.less';
 
 interface Props {
@@ -35,11 +43,14 @@ const SegmentRow: React.FC<{
   index: number;
   onChange?: (index: number, text: string) => void;
 }> = ({ segment, index, onChange }) => {
-  const [editing, setEditing] = useState(false);
-  const [text, setText] = useState(segment.text);
+  const [state, dispatch] = useReducer(segmentRowReducer, {
+    ...initialSegmentRowState,
+    text: segment.text,
+  });
+  const { editing, text } = state;
 
   const handleBlur = useCallback(() => {
-    setEditing(false);
+    dispatch({ type: 'COMMIT_EDIT' });
     if (text !== segment.text) {
       onChange?.(index, text);
     }
@@ -54,7 +65,7 @@ const SegmentRow: React.FC<{
       {editing ? (
         <Textarea
           value={text}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => dispatch({ type: 'SET_TEXT', text: e.target.value })}
           onBlur={handleBlur}
           className={styles.segmentTextarea}
           rows={2}
@@ -62,7 +73,7 @@ const SegmentRow: React.FC<{
       ) : (
         <p
           className={styles.segmentText}
-          onClick={() => setEditing(true)}
+          onClick={() => dispatch({ type: 'START_EDIT', initialText: segment.text })}
           title="点击编辑"
         >
           {segment.text}
@@ -87,13 +98,31 @@ const CommentaryScriptEditor: React.FC<Props> = ({
   onApiKeyChange,
   onSegmentChange,
 }) => {
-  const [copied, setCopied] = useState(false);
+  const [state, dispatch] = useReducer(scriptEditorReducer, initialScriptEditorState);
+  const { copied } = state;
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 组件卸载时清理 timeout
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current !== null) {
+        clearTimeout(resetTimeoutRef.current);
+        resetTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const handleCopy = useCallback(() => {
     if (!script?.fullScript) return;
     navigator.clipboard.writeText(script.fullScript);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    dispatch({ type: 'MARK_COPIED' });
+    if (resetTimeoutRef.current !== null) {
+      clearTimeout(resetTimeoutRef.current);
+    }
+    resetTimeoutRef.current = setTimeout(() => {
+      dispatch({ type: 'RESET_COPIED' });
+      resetTimeoutRef.current = null;
+    }, 2000);
   }, [script]);
 
   return (
@@ -140,7 +169,7 @@ const CommentaryScriptEditor: React.FC<Props> = ({
           <CardTitle className="text-sm mb-2">分段解说（{script.segments.length} 段）</CardTitle>
           <div className={styles.segmentsList}>
             {script.segments.map((seg, i) => (
-              <SegmentRow key={i} segment={seg} index={i} onChange={onSegmentChange} />
+              <SegmentRow key={seg.text} segment={seg} index={i} onChange={onSegmentChange} />
             ))}
           </div>
         </div>
