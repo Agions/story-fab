@@ -1,5 +1,5 @@
 import { logger } from '../../shared/utils/logging';
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useReducer, useEffect, useCallback, memo } from 'react';
 import { Card } from '../ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
 import { Button } from '../ui/button';
@@ -14,6 +14,10 @@ import {
 import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
 import { formatDuration } from '@/core/video';
 import { notify } from '@/shared';
+import {
+  workflowEditorReducer,
+  initialWorkflowEditorState,
+} from './WorkflowEditor.reducer';
 import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface WorkflowEditorProps {
@@ -23,28 +27,35 @@ interface WorkflowEditorProps {
   onScriptUpdate?: (script: ScriptData) => void;
 }
 
+/**
+ * 脚本工作流编辑器
+ *
+ * 状态机: 4 useState → 1 useReducer (state machine)
+ * - form 字段 (editedContent/editedTitle) + tab + Dialog 状态
+ */
 const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
   script,
   scenes,
   onSave,
   onScriptUpdate,
 }) => {
-  const [activeTab, setActiveTab] = useState('content');
-  const [editedContent, setEditedContent] = useState('');
-  const [editedTitle, setEditedTitle] = useState('');
-  const [aiModalVisible, setAiModalVisible] = useState(false);
+  const [state, dispatch] = useReducer(workflowEditorReducer, initialWorkflowEditorState);
+  const { activeTab, editedContent, editedTitle, aiModalVisible } = state;
 
   useEffect(() => {
-    setEditedContent(script.content || '');
-    setEditedTitle(script.title || '');
+    dispatch({
+      type: 'SYNC_FROM_SCRIPT',
+      content: script.content || '',
+      title: script.title || '',
+    });
   }, [script]);
 
   const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditedContent(e.target.value);
+    dispatch({ type: 'SET_EDITED_CONTENT', editedContent: e.target.value });
   }, []);
 
   const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedTitle(e.target.value);
+    dispatch({ type: 'SET_EDITED_TITLE', editedTitle: e.target.value });
   }, []);
 
   const handleSave = useCallback(() => {
@@ -62,7 +73,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
   const handleAIImprove = useCallback(async () => {
     try {
       notify.info('正在使用 AI 优化脚本...');
-      setAiModalVisible(false);
+      dispatch({ type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: false });
       setTimeout(() => {
         notify.success('脚本优化完成');
       }, 2000);
@@ -78,7 +89,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold">脚本编辑</h3>
           <div className="flex gap-2">
-            <Button variant="outline"  onClick={() => setAiModalVisible(true)}>
+            <Button variant="outline"  onClick={() => dispatch({ type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: true })}>
               <Edit size={14} className="mr-1" />
               AI优化
             </Button>
@@ -89,7 +100,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={(v) => dispatch({ type: 'SET_ACTIVE_TAB', activeTab: v })}>
           <TabsList>
             <TabsTrigger value="content">脚本内容</TabsTrigger>
             <TabsTrigger value="segments">片段列表</TabsTrigger>
@@ -106,7 +117,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
                   value={editedTitle}
                   onChange={handleTitleChange}
                   placeholder="输入脚本标题"
-                  
+
                 />
               </div>
               <div className={styles.contentInput}>
@@ -166,7 +177,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
       </Card>
 
       {/* AI 优化模态框 */}
-      <Dialog open={aiModalVisible} onOpenChange={(open) => !open && setAiModalVisible(false)}>
+      <Dialog open={aiModalVisible} onOpenChange={(open) => !open && dispatch({ type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: false })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>AI 优化脚本</DialogTitle>
@@ -174,7 +185,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
           <p className="text-sm text-muted-foreground">使用 AI 优化脚本将会根据视频内容和当前脚本，生成更加专业的表达和结构。</p>
           <p className="text-sm text-muted-foreground">点击确定开始优化。</p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAiModalVisible(false)}>取消</Button>
+            <Button variant="outline" onClick={() => dispatch({ type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: false })}>取消</Button>
             <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={handleAIImprove}>确定</Button>
           </DialogFooter>
         </DialogContent>
