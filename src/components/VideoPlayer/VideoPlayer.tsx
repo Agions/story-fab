@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useReducer, useRef, useEffect } from 'react';
 import { Slider } from '../ui/slider';
 import { Button } from '../ui/button';
 import { formatTime } from '../../shared/utils/formatting';
@@ -9,6 +9,10 @@ import {
   Volume2,
   Maximize,
 } from 'lucide-react';
+import {
+  videoPlayerReducer,
+  initialVideoPlayerState,
+} from './VideoPlayer.reducer';
 import styles from '@/components/VideoPlayer/VideoPlayer.module.less';
 
 interface VideoPlayerProps {
@@ -21,6 +25,13 @@ interface VideoPlayerProps {
   onEnded?: () => void;
 }
 
+/**
+ * 视频播放器组件
+ *
+ * 状态机: 5 useState → 1 useReducer (state machine)
+ * - isPlaying/currentTime/duration/volume/showVolumeSlider
+ * - 事件驱动 setter (timeupdate/durationchange/ended/play/pause)
+ */
 function VideoPlayer({
   src,
   poster,
@@ -32,32 +43,29 @@ function VideoPlayer({
 }: VideoPlayerProps): React.ReactElement {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [state, dispatch] = useReducer(videoPlayerReducer, initialVideoPlayerState);
+  const { isPlaying, currentTime, duration, volume, showVolumeSlider } = state;
 
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
     const handleTimeUpdate = () => {
-      setCurrentTime(videoElement.currentTime);
+      dispatch({ type: 'SET_CURRENT_TIME', currentTime: videoElement.currentTime });
       onTimeUpdate?.(videoElement.currentTime);
     };
 
     const handleDurationChange = () => {
-      setDuration(videoElement.duration);
+      dispatch({ type: 'SET_DURATION', duration: videoElement.duration });
     };
 
     const handleEnded = () => {
-      setIsPlaying(false);
+      dispatch({ type: 'SET_IS_PLAYING', isPlaying: false });
       onEnded?.();
     };
 
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
+    const handlePlay = () => dispatch({ type: 'SET_IS_PLAYING', isPlaying: true });
+    const handlePause = () => dispatch({ type: 'SET_IS_PLAYING', isPlaying: false });
 
     videoElement.addEventListener('timeupdate', handleTimeUpdate);
     videoElement.addEventListener('durationchange', handleDurationChange);
@@ -125,12 +133,12 @@ function VideoPlayer({
         case 'ArrowUp':
           e.preventDefault();
           video.volume = Math.min(1, video.volume + 0.1);
-          setVolume(video.volume);
+          dispatch({ type: 'SET_VOLUME', volume: video.volume });
           break;
         case 'ArrowDown':
           e.preventDefault();
           video.volume = Math.max(0, video.volume - 0.1);
-          setVolume(video.volume);
+          dispatch({ type: 'SET_VOLUME', volume: video.volume });
           break;
         default:
           break;
@@ -156,7 +164,7 @@ function VideoPlayer({
     if (!videoElement) return;
     const val = Array.isArray(value) ? value[0] : value;
     videoElement.currentTime = val;
-    setCurrentTime(val);
+    dispatch({ type: 'SET_CURRENT_TIME', currentTime: val });
   };
 
   const handleVolumeChange = (value: number | readonly number[]) => {
@@ -164,7 +172,7 @@ function VideoPlayer({
     if (!videoElement) return;
     const val = Array.isArray(value) ? value[0] : value;
     videoElement.volume = val;
-    setVolume(val);
+    dispatch({ type: 'SET_VOLUME', volume: val });
   };
 
   const toggleFullscreen = () => {
@@ -218,8 +226,8 @@ function VideoPlayer({
           <div className={styles.rightControls}>
             <div
               className={styles.volumeControl}
-              onMouseEnter={() => setShowVolumeSlider(true)}
-              onMouseLeave={() => setShowVolumeSlider(false)}
+              onMouseEnter={() => dispatch({ type: 'SET_SHOW_VOLUME_SLIDER', showVolumeSlider: true })}
+              onMouseLeave={() => dispatch({ type: 'SET_SHOW_VOLUME_SLIDER', showVolumeSlider: false })}
             >
               <Button variant="ghost" className={styles.controlButton}>
                 <Volume2 />
@@ -247,4 +255,4 @@ function VideoPlayer({
   );
 }
 
-export default VideoPlayer; 
+export default VideoPlayer;
