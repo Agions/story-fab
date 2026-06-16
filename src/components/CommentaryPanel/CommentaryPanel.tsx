@@ -14,7 +14,7 @@
  * - 五种风格预设：幽默 / 严肃 / 接地气 / 悬疑 / 温情
  */
 
-import React, { useState, useCallback, memo } from 'react';
+import React, { useReducer, useCallback, memo } from 'react';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +42,10 @@ import { useDirectorStatus } from '@/hooks/useDirectorStatus';
 import { useCommentarySession } from '@/hooks/useCommentarySession';
 import { useCommentaryScript } from '@/hooks/useCommentaryScript';
 import { useCommentaryVoice } from '@/hooks/useCommentaryVoice';
+import {
+  commentaryPanelReducer,
+  initialCommentaryPanelState,
+} from './CommentaryPanel.reducer';
 import styles from './CommentaryPanel.module.less';
 import CommentaryScriptEditor from './CommentaryScriptEditor';
 import CommentaryStyleSelector from './CommentaryStyleSelector';
@@ -91,14 +95,9 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
   durationSecs,
   disabled = false,
 }) => {
-  // ── UI 状态 ──────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState<'script' | 'style' | 'voice' | 'timeline'>('script');
-  const [planConfirmOpen, setPlanConfirmOpen] = useState(false);
-  const [_reviseOpen, _setReviseOpen] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-
-  // ── 风格选择状态 ──────────────────────────────────────────────────────
-  const [selectedStyle, setSelectedStyle] = useState<ScriptStylePreset>('conversational');
+  // ── UI 状态 (5 useState → 1 useReducer) ───────────────────────────────
+  const [state, dispatch] = useReducer(commentaryPanelReducer, initialCommentaryPanelState);
+  const { activeTab, planConfirmOpen, apiKey, selectedStyle } = state;
 
   // ── Hooks ────────────────────────────────────────────────────────────
   const { sessionId, directorStatus } = useCommentarySession(
@@ -135,14 +134,14 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
   const handleGenerateScript = useCallback(async () => {
     if (!sessionId) return;
     await generate({ sessionId, subtitles, apiKey, selectedStyle, durationSecs });
-    setActiveTab('script');
-  }, [sessionId, subtitles, apiKey, selectedStyle, durationSecs, generate, setActiveTab]);
+    dispatch({ type: 'SET_ACTIVE_TAB', activeTab: 'script' });
+  }, [sessionId, subtitles, apiKey, selectedStyle, durationSecs, generate, dispatch]);
 
   const handleMultiStyleGenerate = useCallback(async () => {
     if (!sessionId) return;
     await multiGenerate({ sessionId, subtitles, apiKey, selectedStyles: [selectedStyle], durationSecs });
-    setActiveTab('script');
-  }, [sessionId, subtitles, apiKey, selectedStyle, durationSecs, multiGenerate, setActiveTab]);
+    dispatch({ type: 'SET_ACTIVE_TAB', activeTab: 'script' });
+  }, [sessionId, subtitles, apiKey, selectedStyle, durationSecs, multiGenerate, dispatch]);
 
   const handleSegmentChange = useCallback((index: number, text: string) => {
     updateSegment(index, text);
@@ -154,23 +153,23 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
     try {
       await generateCommentaryPlan(sessionId, selectedStyle, durationSecs);
       toast.success('AI 导演计划已生成 ✨');
-      setPlanConfirmOpen(true);
+      dispatch({ type: 'SET_PLAN_CONFIRM_OPEN', planConfirmOpen: true });
     } catch (e) {
       toast.error(`生成失败: ${e}`);
     }
-  }, [sessionId, selectedStyle, durationSecs]);
+  }, [sessionId, selectedStyle, durationSecs, dispatch]);
 
   const handleApprovePlan = useCallback(async () => {
     if (!sessionId) return;
     try {
       await approveCommentaryPlan(sessionId);
-      setPlanConfirmOpen(false);
+      dispatch({ type: 'SET_PLAN_CONFIRM_OPEN', planConfirmOpen: false });
       toast.success('渲染已启动，请耐心等待 🎬');
-      setActiveTab('timeline');
+      dispatch({ type: 'SET_ACTIVE_TAB', activeTab: 'timeline' });
     } catch (e) {
       toast.error(`启动失败: ${e}`);
     }
-  }, [sessionId]);
+  }, [sessionId, dispatch]);
 
   // ── 预览 ─────────────────────────────────────────────────────────────
   const handlePreviewVoice = useCallback(async () => {
@@ -207,7 +206,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
         )}
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
+        <Tabs value={activeTab} onValueChange={(v) => dispatch({ type: 'SET_ACTIVE_TAB', activeTab: v as typeof activeTab })}>
           <TabsList className={styles.tabsList}>
             <TabsTrigger value="script"><FileText size={14} /> 脚本</TabsTrigger>
             <TabsTrigger value="style"><Sparkles size={14} /> 风格</TabsTrigger>
@@ -235,7 +234,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
                   isGenerating={isGenerating}
                   onGenerate={() => {}}
                   apiKey={apiKey}
-                  onApiKeyChange={setApiKey}
+                  onApiKeyChange={(v) => dispatch({ type: 'SET_API_KEY', apiKey: v })}
                   onSegmentChange={handleSegmentChange}
                 />
               </div>
@@ -245,7 +244,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
                 isGenerating={isGenerating}
                 onGenerate={handleGenerateScript}
                 apiKey={apiKey}
-                onApiKeyChange={setApiKey}
+                onApiKeyChange={(v) => dispatch({ type: 'SET_API_KEY', apiKey: v })}
                 onSegmentChange={handleSegmentChange}
               />
             )}
@@ -259,7 +258,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
                 if (multiStyleMode) {
                   setSelectedStyles(s as ScriptStylePreset[]);
                 } else {
-                  setSelectedStyle(s as ScriptStylePreset);
+                  dispatch({ type: 'SET_SELECTED_STYLE', selectedStyle: s as ScriptStylePreset });
                 }
               }}
               multiSelect={multiStyleMode}
@@ -341,7 +340,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
       </CardContent>
 
       {/* Plan 确认弹窗 */}
-      <Dialog open={planConfirmOpen} onOpenChange={setPlanConfirmOpen}>
+      <Dialog open={planConfirmOpen} onOpenChange={(open) => dispatch({ type: 'SET_PLAN_CONFIRM_OPEN', planConfirmOpen: open })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>AI 导演计划已生成 ✨</DialogTitle>
@@ -369,7 +368,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPlanConfirmOpen(false)}>
+            <Button variant="outline" onClick={() => dispatch({ type: 'SET_PLAN_CONFIRM_OPEN', planConfirmOpen: false })}>
               再改改
             </Button>
             <Button variant="default" onClick={handleApprovePlan}>
