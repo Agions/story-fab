@@ -1,4 +1,4 @@
-import { invoke, TauriCommand } from '../TauriBridge';
+import { invoke, TauriCommand } from '../invoke';
 
 export const mixAudio = {
   /** 混音 TTS 配音与原视频音轨 */

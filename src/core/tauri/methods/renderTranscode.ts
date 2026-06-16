@@ -1,4 +1,4 @@
-import { invoke, TauriCommand } from '../TauriBridge';
+import { invoke, TauriCommand } from '../invoke';
 
 export const renderTranscode = {
   /** 比例裁切 + 编码导出（9:16 / 1:1 / 16:9） */

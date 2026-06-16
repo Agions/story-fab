@@ -4,7 +4,7 @@
  * 笑声/掌声/情绪高潮片段得额外加分
  */
 
-import { tauri } from '../../../core/tauri/TauriBridge';
+import { tauri } from '../../../core/tauri';
 import { logger } from '../../../shared/utils/logging';
 
 /** ZCR burst entry from Rust backend */

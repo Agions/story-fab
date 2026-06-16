@@ -1,4 +1,4 @@
-import { invoke, TauriCommand } from '../TauriBridge';
+import { invoke, TauriCommand } from '../invoke';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 
 export interface ZCRProgress {

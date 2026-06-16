@@ -5,7 +5,7 @@
  */
 import { BaseService } from '../providers/base.service';
 import { logger } from '../../../shared/utils/logging';
-import { tauri } from '../../tauri/TauriBridge';
+import { tauri } from '../../tauri';
 import { AppError } from '@/core/errors';
 import type { VideoInfo } from '@/core/types';
 import {

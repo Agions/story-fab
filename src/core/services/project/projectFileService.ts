@@ -3,7 +3,7 @@
  * All project file operations: save, load, list, delete, app data dir management.
  * Single source of truth for project file operations.
  */
-import { tauri } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri';
 import { readTextFile, writeTextFile, BaseDirectory, exists, mkdir } from '@tauri-apps/plugin-fs';
 import { normalizeProjectId, buildProjectIdCandidates } from '@/core/utils/project-id';
 import { logger } from '@/shared/utils/logging';

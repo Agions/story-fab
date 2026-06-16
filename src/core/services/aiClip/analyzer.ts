@@ -8,7 +8,7 @@
  * - 保持原有业务逻辑不变
  */
 
-import { tauri } from '../../tauri/TauriBridge';
+import { tauri } from '../../tauri';
 import { logger } from '../../../shared/utils/logging';
 import { visionService } from '../ai/visionService';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotionDetector';

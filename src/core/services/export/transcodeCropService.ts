@@ -2,7 +2,7 @@
  * Transcode & Crop Export Service
  * Video export with crop/resize, multi-format export.
  */
-import { tauri } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri';
 import { logger } from '@/shared/utils/logging';
 
 export type AspectRatio = '16:9' | '9:16' | '1:1';

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
 import { Video } from 'lucide-react';
-import { tauri } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri';
 import { v4 as uuidv4 } from 'uuid';
 import type { VideoAnalysis, KeyMoment, Emotion } from '@/types';
 import VideoSelector from '@/components/VideoSelector/VideoSelector';

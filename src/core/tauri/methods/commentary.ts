@@ -1,4 +1,4 @@
-import { rawInvoke } from '../TauriBridge';
+import { rawInvoke } from '../invoke';
 
 // Typed commentary module — all commands are Rust commentary layer only
 export const commentary: {

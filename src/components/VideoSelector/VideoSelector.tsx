@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Upload, Trash2, PlayCircle } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import { tauri } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri';
 import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
 import { notify } from '@/shared';
 import { VIDEO_FORMATS } from '@/shared/constants';

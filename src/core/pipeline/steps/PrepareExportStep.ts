@@ -13,7 +13,7 @@ import type { ClipScore } from '../../services/pipeline/clip-pipeline/clipScorer
 import type { AspectRatio } from '../../services/pipeline/clip-pipeline/multiExport';
 import type { ExportTask } from '../../services/pipeline/clip-pipeline/multiExport';
 import { multiExporter } from '../../services/pipeline/clip-pipeline/multiExport';
-import { tauri } from '../../tauri/TauriBridge';
+import { tauri } from '../../tauri';
 import type { VideoInfo } from '@/core/types';
 import { AppError } from '@/core/errors';
 import { logger } from '../../../shared/utils/logging';

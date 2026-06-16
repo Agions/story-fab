@@ -1,4 +1,4 @@
-import { invoke, TauriCommand } from '../TauriBridge';
+import { invoke, TauriCommand } from '../invoke';
 
 export const fileOperations = {
   /** 读取文本文件 */

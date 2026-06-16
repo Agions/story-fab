@@ -88,6 +88,6 @@ export const tauri = {
 
 export default tauri;
 
-// Re-export types and invoke from TauriBridge for barrel import from index
-export { TauriCommand, TauriBridgeError, invoke, rawInvoke } from './TauriBridge';
-export type { BridgeOptions } from './TauriBridge';
+// Re-export types and invoke from invoke for barrel import from index
+export { TauriCommand, TauriBridgeError, invoke, rawInvoke } from './invoke';
+export type { BridgeOptions } from './invoke';

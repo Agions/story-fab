@@ -2,7 +2,7 @@
  * 音画同步服务
  * 提供专业的音视频同步功能
  */
-import { tauri } from '../../tauri/TauriBridge';
+import { tauri } from '../../tauri';
 import { logger } from '../../../shared/utils/logging';
 
 

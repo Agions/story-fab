@@ -25,7 +25,7 @@ import {
   CheckCircle,
   Download,
 } from 'lucide-react';
-import { tauri } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri';
 import { motion } from '../../common/motion-shim';
 import { ClipRepurposingPipeline } from '../../../core/services/pipeline/clip-pipeline/pipeline';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';

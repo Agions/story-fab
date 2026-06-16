@@ -1,4 +1,4 @@
-import { invoke, TauriCommand } from '../TauriBridge';
+import { invoke, TauriCommand } from '../invoke';
 
 export const subtitleAsr = {
   /** 提取字幕（SRT/VTT） */

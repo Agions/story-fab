@@ -1,4 +1,4 @@
-import { invoke, TauriCommand } from '../TauriBridge';
+import { invoke, TauriCommand } from '../invoke';
 
 export const videoAnalysis = {
   /** 检查 FFmpeg 是否可用 */

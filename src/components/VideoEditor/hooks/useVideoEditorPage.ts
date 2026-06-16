@@ -9,7 +9,7 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { ScriptSegment } from '@/types';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
-import { tauri } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri';
 import type { ExportSettingsState } from '../ExportSettings';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 import {

@@ -2,7 +2,7 @@
  * Video Operations — extract key frames, generate thumbnails
  * Split from VideoAnalyzer direct invoke calls
  */
-import { invoke, TauriCommand } from '../TauriBridge';
+import { invoke, TauriCommand } from '../invoke';
 
 export interface ExtractKeyFramesResult {
   frames: string[];

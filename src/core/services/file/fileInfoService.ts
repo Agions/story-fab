@@ -1,7 +1,7 @@
 /**
  * File Info Service — file size, FFmpeg status.
  */
-import { tauri } from '@/core/tauri/TauriBridge';
+import { tauri } from '@/core/tauri';
 import { logger } from '@/shared/utils/logging';
 
 export const getFileSizeBytes = async (path: string): Promise<number> => {

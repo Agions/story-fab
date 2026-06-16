@@ -16,7 +16,7 @@ import type { CandidateClip } from '../../services/pipeline/clip-pipeline/clipSc
 import type { ASRSegment } from '../../services/asr/asrTypes';
 import { createStep, type Step, reportProgress } from '../Step';
 import { logger } from '../../../shared/utils/logging';
-import { tauri } from '../../../core/tauri/TauriBridge';
+import { tauri } from '../../../core/tauri';
 
 // ============================================================
 // Step Metadata

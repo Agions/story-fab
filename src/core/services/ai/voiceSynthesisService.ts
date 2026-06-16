@@ -6,7 +6,7 @@
  * 通过 @tauri-apps/api/core 的 invoke 调用 Rust 后端，
  * 不使用任何 Node.js / child_process API。
  */
-import { tauri } from '../../tauri/TauriBridge';
+import { tauri } from '../../tauri';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../../../shared/utils/logging';
 

@@ -16,6 +16,7 @@ import { logger } from '../../../../shared/utils/logging';
 import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
 import { ClipRepurposingPipeline } from './pipeline';
 import type { RepurposingOptions } from './pipeline';
+import type { ClipConfig, ClipSegment } from './types';
 import { clipSegmentFromRepurposing } from './types';
 import type { ASRSegment } from '../../asr/asrTypes';
 import {
@@ -25,46 +26,6 @@ import {
   applyTransitionsToSegments,
   getAnalysisDuration,
 } from './clipGenerators';
-
-// 剪辑配置
-export interface ClipConfig {
-  // 检测配置
-  detectSceneChange: boolean;
-  detectSilence: boolean;
-  sceneThreshold: number;
-  silenceThreshold: number;
-  
-  // 剪辑选项
-  removeSilence: boolean;
-  autoTransition: boolean;
-  transitionType: 'fade' | 'cut' | 'dissolve';
-  
-  // AI 优化
-  aiOptimize: boolean;
-  targetDuration?: number;
-  
-  // 输出质量
-  outputQuality: 'low' | 'medium' | 'high' | 'ultra';
-  outputFormat: 'mp4' | 'webm' | 'mov';
-  bitrate: '2M' | '5M' | '8M' | '15M' | '30M';
-  fps: 24 | 30 | 60;
-  resolution: '720p' | '1080p' | '2k' | '4k';
-}
-
-// 剪辑片段
-export interface ClipSegment {
-  id: string;
-  _startTime: number;
-  endTime: number;
-  sourceStart: number;
-  sourceEnd: number;
-  sourceId: string;
-  type: 'video' | 'audio' | 'subtitle';
-  transition?: string;
-  effects?: string[];
-  text?: string;
-  duration: number;
-}
 
 // 剪辑结果
 export interface ClipResult {

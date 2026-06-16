@@ -11,10 +11,46 @@
  *   CandidateClip    → candidate selection (transcript, audioEnergy, sceneType)
  */
 
-import type { ClipSegment } from './clipWorkflow';
 import type { CandidateClip, ClipScore } from './clipScorer';
 import type { SEOMetadata } from './seoGenerator';
 import type { ExportTask, AspectRatio } from './multiExport';
+
+// ============================================================
+// Clip Core Types (moved from clipWorkflow.ts to break circular dep)
+// ============================================================
+
+/** 剪辑配置 */
+export interface ClipConfig {
+  detectSceneChange: boolean;
+  detectSilence: boolean;
+  sceneThreshold: number;
+  silenceThreshold: number;
+  removeSilence: boolean;
+  autoTransition: boolean;
+  transitionType: 'fade' | 'cut' | 'dissolve';
+  aiOptimize: boolean;
+  targetDuration?: number;
+  outputQuality: 'low' | 'medium' | 'high' | 'ultra';
+  outputFormat: 'mp4' | 'webm' | 'mov';
+  bitrate: '2M' | '5M' | '8M' | '15M' | '30M';
+  fps: 24 | 30 | 60;
+  resolution: '720p' | '1080p' | '2k' | '4k';
+}
+
+/** 剪辑片段 */
+export interface ClipSegment {
+  id: string;
+  _startTime: number;
+  endTime: number;
+  sourceStart: number;
+  sourceEnd: number;
+  sourceId: string;
+  type: 'video' | 'audio' | 'subtitle';
+  transition?: string;
+  effects?: string[];
+  text?: string;
+  duration: number;
+}
 
 // ============================================================
 // Shared Base

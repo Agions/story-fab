@@ -7,7 +7,7 @@
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseVideoProcessor } from './BaseVideoProcessor';
-import { invoke, TauriCommand } from '../tauri/TauriBridge';
+import { invoke, TauriCommand } from '../tauri';
 import type {
   VideoMetadata,
   KeyFrame,

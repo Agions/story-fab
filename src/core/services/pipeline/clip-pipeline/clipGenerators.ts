@@ -3,7 +3,7 @@
  * 单一职责：纯函数集合，无副作用，便于测试
  */
 import type { VideoAnalysis, ScriptSegment } from '../../../types';
-import type { ClipConfig, ClipSegment } from './clipWorkflow';
+import type { ClipConfig, ClipSegment } from './types';
 
 /**
  * 从视频分析结果中构建场景切点数组
