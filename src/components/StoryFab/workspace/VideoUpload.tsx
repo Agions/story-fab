@@ -8,12 +8,16 @@
  * - 上传配置已提取到 config/videoUploadConfig.ts
  * - 本文件仅包含上传组件逻辑和 UI
  */
-import React, { useState, useCallback, useRef, useEffect, memo } from 'react';
+import React, { useReducer, useCallback, useRef, useEffect, memo } from 'react';
 import { useStoryFab } from '../context';
 import { logger } from '../../../shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
 import { MAX_FILE_SIZE } from '@/shared/constants';
 import type { VideoInfo } from '@/core/types';
+import {
+  videoUploadReducer,
+  initialVideoUploadState,
+} from './VideoUpload.reducer';
 import styles from './VideoUpload.module.css';
 
 import {
@@ -31,12 +35,14 @@ interface VideoUploadProps {
 
 const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
   const { state, setVideo, goToNextStep } = useStoryFab();
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [dragActive, setDragActive] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'paused' | 'completed'>('idle');
-  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [local, dispatch] = useReducer(videoUploadReducer, initialVideoUploadState);
+  const { uploading, uploadProgress, dragActive, uploadStatus, currentFile } = local;
+  // ref 镜像 uploadStatus — async setInterval 回调需要读到最新值
+  // ref 保持宽 string 类型, 兼容 setInterval 内对 'cancelled' | 'error' 的死代码判等
   const uploadStatusRef = useRef<string>('idle');
+  useEffect(() => {
+    uploadStatusRef.current = uploadStatus;
+  }, [uploadStatus]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pauseIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -80,11 +86,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
       return;
     }
 
-    setUploading(true);
-    setUploadProgress(0);
-    setUploadStatus('uploading');
-    uploadStatusRef.current = 'uploading';
-    setCurrentFile(file);
+    dispatch({ type: 'START_UPLOAD', file });
 
     const uploadId = `upload_${Date.now()}`;
     chunkStore.clear(uploadId);
@@ -126,7 +128,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
         chunkStore.addChunk(uploadId, chunk, i);
 
         const progress = Math.min(((i + 1) / totalChunks) * 100, 100);
-        setUploadProgress(progress);
+        dispatch({ type: 'SET_UPLOAD_PROGRESS', uploadProgress: progress });
 
         await new Promise(r => setTimeout(r, UPLOAD_DELAY_MIN_MS + Math.random() * UPLOAD_DELAY_RANGE_MS));
       }
@@ -160,8 +162,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
         video.src = URL.createObjectURL(file);
       });
 
-      setUploadProgress(100);
-      setUploadStatus('completed');
+      dispatch({ type: 'COMPLETE_UPLOAD' });
       setVideo(videoInfo);
       notify.success('视频上传成功');
 
@@ -174,47 +175,41 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
       notify.error(error, '视频处理失败，请重试');
       logger.error('VideoUpload error:', { error });
     } finally {
-      setUploading(false);
+      dispatch({ type: 'SET_UPLOADING', uploading: false });
     }
   }, [setVideo]);
 
   // 暂停/继续
   const handlePauseResume = () => {
     if (uploadStatus === 'uploading') {
-      setUploadStatus('paused');
-      uploadStatusRef.current = 'paused';
       notify.info('上传已暂停');
     } else if (uploadStatus === 'paused') {
-      setUploadStatus('uploading');
-      uploadStatusRef.current = 'uploading';
       notify.info('继续上传中...');
     }
+    dispatch({ type: 'TOGGLE_PAUSE' });
   };
 
   // 删除视频
   const handleDelete = () => {
     setVideo(null);
-    setUploadProgress(0);
-    setUploadStatus('idle');
-    uploadStatusRef.current = 'idle';
-    setCurrentFile(null);
+    dispatch({ type: 'RESET' });
     chunkStore.clear('current');
   };
 
   // 拖拽事件
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    setDragActive(true);
+    dispatch({ type: 'SET_DRAG_ACTIVE', dragActive: true });
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    setDragActive(false);
+    dispatch({ type: 'SET_DRAG_ACTIVE', dragActive: false });
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    setDragActive(false);
+    dispatch({ type: 'SET_DRAG_ACTIVE', dragActive: false });
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleUpload(files[0]);
