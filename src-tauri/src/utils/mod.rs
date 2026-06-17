@@ -10,14 +10,15 @@
 mod audio;
 mod concat;
 mod process;
-mod resilience;
+pub mod resilience; // pub so commands::crash_recovery can reach crash_dir_path
 mod time;
 
 pub use audio::pcm_samples_from_wav;
 pub use concat::write_concat_file;
 pub use process::{cmd_err, cmd_first_line, parse_scdet_output};
 pub use resilience::{
-    install_panic_hook, resource_error_to_user_message, ResourceError, ResourceLimiter,
+    crash_dir_path, install_panic_hook, resource_error_to_user_message, ResourceError,
+    ResourceLimiter,
 };
 pub use time::{chrono_like_timestamp, format_srt_time, format_time, parse_fraction};
 

@@ -227,6 +227,11 @@ jobs:
           cd src-tauri
           cargo --version && rustc --version
           cargo test --test resilience --no-fail-fast 2>&1
+      - name: Run crash recovery integration tests
+        run: |
+          set -e
+          cd src-tauri
+          cargo test --test crash_recovery --no-fail-fast 2>&1
       - name: Upload test log
         if: always()
         uses: actions/upload-artifact@v5

@@ -138,6 +138,12 @@ pub fn run() {
             commentary::synthesizer::commands::synthesize_commentary_audio,
             commentary::synthesizer::commands::estimate_tts_duration,
             commentary::synthesizer::commands::list_commentary_voices,
+            // Crash recovery (P0-3 companion): surface panic-hook crash
+            // reports to the frontend so users can see / share them.
+            commands::crash_recovery::list_crashes,
+            commands::crash_recovery::read_crash,
+            commands::crash_recovery::delete_crash,
+            commands::crash_recovery::clear_crashes,
         ])
         .setup(|app| {
             tracing::info!("[StoryFab] 应用初始化中...");
