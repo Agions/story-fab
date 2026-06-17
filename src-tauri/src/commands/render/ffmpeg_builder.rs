@@ -132,13 +132,16 @@ mod tests {
 
     #[test]
     fn test_apply_time_segment_duration_never_negative() {
-        // Verify the duration calculation: end < start should yield 0
-        let (start, end) = (10.0, 5.0);
+        // Verify the duration calculation: end < start should yield 0.
+        // Type annotation needed because `(end - start)` defaults to an
+        // ambiguous numeric type until used; older rustc versions were
+        // more forgiving here, but 1.88 requires the explicit f64.
+        let (start, end): (f64, f64) = (10.0, 5.0);
         let duration = (end - start).max(0.0);
         assert_eq!(duration, 0.0, "negative duration should clamp to 0");
 
         // Normal case
-        let (start, end) = (5.0, 10.0);
+        let (start, end): (f64, f64) = (5.0, 10.0);
         let duration = (end - start).max(0.0);
         assert_eq!(duration, 5.0);
     }

@@ -298,17 +298,45 @@ mod tests {
 
     #[test]
     fn try_acquire_saturates() {
+        // Exercise the "pool exhaustion" guarantee: once we hold every
+        // currently-available permit, the next non-blocking `try_acquire`
+        // must return `None` instead of waiting.
+        //
+        // We intentionally do **not** assert that the count of held
+        // permits equals the limiter's `total_permits()`. The limiter
+        // is process-global (`OnceLock<Semaphore>`), so other
+        // `#[tokio::test]`s running in parallel on the lib-test thread
+        // pool may legitimately own permits at the moment this test
+        // runs. Asserting on absolute counts makes the test flake
+        // under `cargo test` (parallel), even though it always passes
+        // when run in isolation. The causal property we care about is
+        // preserved regardless: holding `n` permits ⇒ next try_acquire
+        // is None.
         let l = ResourceLimiter;
-        let total = l.available_permits();
-        let mut held = Vec::new();
-        for _ in 0..total {
-            held.push(l.try_acquire().expect("permit available"));
+        let available_at_start = l.available_permits();
+
+        // Hold every currently-available permit.
+        let mut held = Vec::with_capacity(available_at_start);
+        for _ in 0..available_at_start {
+            held.push(
+                l.try_acquire()
+                    .expect("permit must be available while pool is not exhausted"),
+            );
         }
-        // The next try_acquire must return None — we have exhausted the
-        // pool. (Not .await: try_acquire is non-blocking.)
-        assert!(l.try_acquire().is_none());
+        // Pool is now empty (from this test's perspective).
+        assert!(
+            l.try_acquire().is_none(),
+            "try_acquire must return None after exhausting the pool"
+        );
+
+        // Release. The absolute post-release count is non-assertable
+        // (other tests may have acquired+released in parallel), so we
+        // only check that *some* permit came back.
         held.clear();
-        assert_eq!(l.available_permits(), total);
+        assert!(
+            l.available_permits() >= 1,
+            "releasing our permits should free at least one slot"
+        );
     }
 
     #[test]

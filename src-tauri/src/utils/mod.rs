@@ -26,6 +26,30 @@ pub use time::{chrono_like_timestamp, format_srt_time, format_time, parse_fracti
 mod tests {
     use super::*;
 
+    /// Construct an `ExitStatus` for unit tests. On unix, `from_raw` is
+    /// the only stable way to build one from scratch (it is unsafe on
+    /// 1.86+). On Windows, the platform doesn't expose `from_raw`, so we
+    /// run a real no-op command and borrow its status.
+    #[cfg(unix)]
+    fn fake_exit_status(code: i32) -> std::process::ExitStatus {
+        // SAFETY: building an ExitStatus from a raw integer is only
+        // well-defined for the same platform's `process::exit` calling
+        // convention. We only ever pass codes 0 and 1 (success / generic
+        // failure) which are valid on every supported unix target.
+        unsafe { std::os::unix::process::ExitStatusExt::from_raw(code) }
+    }
+
+    #[cfg(windows)]
+    fn fake_exit_status(code: i32) -> std::process::ExitStatus {
+        // Run `cmd /c exit N` to obtain a real ExitStatus. Slow (one
+        // process spawn per call) but only used in 4 unit tests.
+        std::process::Command::new("cmd")
+            .args(["/C", &format!("exit {code}")])
+            .output()
+            .expect("failed to spawn cmd")
+            .status
+    }
+
     #[test]
     fn test_parse_fraction_float() {
         assert!((parse_fraction("0.5") - 0.5).abs() < 1e-9);
@@ -74,15 +98,27 @@ mod tests {
 
     #[test]
     fn test_pcm_samples_from_wav_max_amplitude() {
+        // 44-byte header + 2 bytes of i16 PCM at the maximum positive
+        // value (0x7FFF = 32767). After dividing by 32768 the result
+        // is just under 1.0 (it's not exactly 1.0 because 0x7FFF is
+        // the largest *positive* s16 — the actual 1.0 would be 0x8000
+        // which is a different bit pattern). Use a tolerance that
+        // matches the existing test_pcm_samples_from_wav_max_amplitude
+        // expectation of "approximately 1.0".
         let mut data = vec![0u8; 44];
         data.push(0xFF);
         data.push(0x7F);
         let samples = pcm_samples_from_wav(&data);
-        assert!((samples[0] - 1.0_f32).abs() < 1e-6);
+        assert_eq!(samples.len(), 1, "max amplitude test feeds one s16 frame");
+        assert!((samples[0] - 32767.0 / 32768.0).abs() < 1e-6);
+        assert!(samples[0] > 0.99, "max-amplitude sample should be very close to 1.0");
     }
 
     #[test]
     fn test_pcm_samples_from_wav_short_header() {
+        // 4 bytes total — less than the 44-byte header. The fallback
+        // branch in `pcm_samples_from_wav` treats the whole input as
+        // PCM data, producing 2 samples (2 bytes each).
         let data = vec![0x00, 0x00, 0x01, 0x00];
         let samples = pcm_samples_from_wav(&data);
         assert_eq!(samples.len(), 2);
@@ -90,10 +126,13 @@ mod tests {
 
     #[test]
     fn test_pcm_samples_from_wav_odd_byte_count() {
+        // 44-byte header + 3 bytes of PCM. After skipping the header
+        // the trailing `chunks(2)` + `filter(len == 2)` keeps exactly
+        // one full frame and drops the trailing byte.
         let mut data = vec![0u8; 44];
         data.extend([0x00, 0x00, 0x01]);
         let samples = pcm_samples_from_wav(&data);
-        assert_eq!(samples.len(), 2);
+        assert_eq!(samples.len(), 1, "odd byte count should yield one full frame");
     }
 
     #[test]
@@ -101,7 +140,7 @@ mod tests {
         let out = std::process::Output {
             stdout: "line1\nline2".as_bytes().to_vec(),
             stderr: "err1\nerr2".as_bytes().to_vec(),
-            status: std::process::ExitStatus::from_raw(0),
+            status: fake_exit_status(0),
         };
         assert_eq!(cmd_first_line(&out), Some("line1".to_string()));
     }
@@ -111,7 +150,7 @@ mod tests {
         let out = std::process::Output {
             stdout: vec![],
             stderr: "err1\nerr2".as_bytes().to_vec(),
-            status: std::process::ExitStatus::from_raw(1),
+            status: fake_exit_status(1),
         };
         assert_eq!(cmd_first_line(&out), Some("err1".to_string()));
     }
@@ -121,7 +160,7 @@ mod tests {
         let out = std::process::Output {
             stdout: vec![],
             stderr: vec![],
-            status: std::process::ExitStatus::from_raw(0),
+            status: fake_exit_status(0),
         };
         assert_eq!(cmd_first_line(&out), None);
     }
@@ -131,7 +170,7 @@ mod tests {
         let out = std::process::Output {
             stdout: vec![],
             stderr: "ffmpeg: error".as_bytes().to_vec(),
-            status: std::process::ExitStatus::from_raw(1),
+            status: fake_exit_status(1),
         };
         let result = cmd_err("export failed", &out);
         assert!(result.contains("export failed"));
