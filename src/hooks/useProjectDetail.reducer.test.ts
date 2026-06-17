@@ -1,10 +1,9 @@
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   projectDetailReducer,
   initialProjectDetailState,
   type ProjectDetailState,
   type ProjectDetailProject,
-  type ProjectDetailAction,
 } from './useProjectDetail.reducer';
 import type { AIScriptDraft } from '@/core/services/ai/scriptService';
 import type { ScriptSegment } from '@/core/types';

@@ -25,7 +25,7 @@ const makeState = (overrides?: Partial<ProjectEditState>): ProjectEditState => (
   videoMetadata: null,
   keyFrames: [],
   scriptSegments: [],
-  saveBehavior: 'manual',
+  saveBehavior: 'stay',
   autoSaveEnabled: true,
   ...overrides,
 });
@@ -78,16 +78,16 @@ describe('projectEditReducer', () => {
 
 describe('createInitialProjectEditState', () => {
   it('creates state with given project name', () => {
-    const state = createInitialProjectEditState('My Project', () => 'auto', () => true);
+    const state = createInitialProjectEditState('My Project', () => 'detail', () => true);
     expect(state.formName).toBe('My Project');
     expect(state.isNewProject).toBe(true);
-    expect(state.saveBehavior).toBe('auto');
+    expect(state.saveBehavior).toBe('detail');
     expect(state.autoSaveEnabled).toBe(true);
   });
 
   it('returns fresh object each call', () => {
-    const a = createInitialProjectEditState('A', () => 'manual', () => false);
-    const b = createInitialProjectEditState('B', () => 'manual', () => false);
+    const a = createInitialProjectEditState('A', () => 'stay', () => false);
+    const b = createInitialProjectEditState('B', () => 'stay', () => false);
     expect(a).not.toBe(b);
   });
 });

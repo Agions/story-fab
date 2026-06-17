@@ -78,7 +78,9 @@ describe('videoPlayerReducer', () => {
   describe('default', () => {
     it('returns same state for unknown action', () => {
       const state = makeState();
-      expect(videoPlayerReducer(state, { type: 'UNKNOWN' as any })).toBe(state);
+      // Test default case: pass an unknown action via unknown cast
+      const unknownAction = { type: 'UNKNOWN' } as unknown as Parameters<typeof videoPlayerReducer>[1];
+      expect(videoPlayerReducer(state, unknownAction)).toBe(state);
     });
   });
 });

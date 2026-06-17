@@ -3,7 +3,6 @@ import {
   scriptDetailReducer,
   initialScriptDetailState,
   type ScriptDetailState,
-  type ScriptDetailAction,
   type ScriptDetailProject,
 } from './useScriptDetail.reducer';
 import type { Script, ScriptSegment } from '@/core/services/ai/scriptService';

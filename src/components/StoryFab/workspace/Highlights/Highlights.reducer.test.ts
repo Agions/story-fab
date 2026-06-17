@@ -15,16 +15,6 @@ const mockHighlights: Highlight[] = [
   { startTime: 30, endTime: 45, score: 0.7, reason: 'Emotional scene' },
 ];
 
-const mockHighlightFull: Highlight = {
-  startTime: 5,
-  endTime: 15,
-  score: 0.85,
-  reason: 'Action sequence',
-  audioScore: 0.9,
-  sceneScore: 0.7,
-  motionScore: 0.8,
-};
-
 describe('highlightsReducer', () => {
   describe('SET_HIGHLIGHTS', () => {
     it('sets highlights array', () => {
