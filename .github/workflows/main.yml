@@ -199,6 +199,42 @@ jobs:
           path: src-tauri/target/
           retention-days: 1
 
+  rust-tests:
+    name: Rust Tests (resilience)
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
+      - name: Build frontend
+        run: pnpm run build
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.88.0
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      # Run the integration tests for utils::resilience (panic hook +
+      # ResourceLimiter). These live in src-tauri/tests/ as an independent
+      # crate so they are not blocked by the 6 pre-existing lib-test errors
+      # in ffmpeg_builder.rs / utils/mod.rs. See commit 839cca17.
+      - name: Run resilience integration tests
+        run: |
+          set -e
+          cd src-tauri
+          cargo --version && rustc --version
+          cargo test --test resilience --no-fail-fast 2>&1
+      - name: Upload test log
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: rust-tests-log
+          path: src-tauri/target/
+          retention-days: 3
+
   reports:
     name: Quality Reports
     needs: [lint, typecheck, coverage]
