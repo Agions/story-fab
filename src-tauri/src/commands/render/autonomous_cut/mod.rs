@@ -6,10 +6,14 @@
 //! - `autonomous_cut_impl/merger.rs` — concat/transition/overlay composition
 //! - this file (`mod.rs`) — Tauri command entry point
 
+use tauri::State;
+
 use crate::binary::ffmpeg_binary;
 use crate::commands::export_state;
 use crate::types::{AutonomousRenderInput, AutonomousOverlayMarker};
-use crate::utils::{chrono_like_timestamp, write_concat_file};
+use crate::utils::{
+    chrono_like_timestamp, resource_error_to_user_message, write_concat_file, ResourceLimiter,
+};
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -28,7 +32,16 @@ const MAX_TRANSITION_DURATION: f64 = 1.5;
 // ─── Public Command ─────────────────────────────────────────────────────────
 
 #[tauri::command]
-pub async fn render_autonomous_cut(input: AutonomousRenderInput) -> Result<String, String> {
+pub async fn render_autonomous_cut(
+    limiter: State<'_, ResourceLimiter>,
+    input: AutonomousRenderInput,
+) -> Result<String, String> {
+    // P0-2: reserve a single permit for the entire render pipeline
+    // (cut + merge + post-process). Released on success, error, or panic.
+    let _permit = limiter
+        .acquire()
+        .await
+        .map_err(resource_error_to_user_message)?;
     export_state::enter_export(&input.output_path);
     let result = render_autonomous_cut_impl(input).await;
     export_state::exit_export();

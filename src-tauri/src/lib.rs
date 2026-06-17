@@ -52,6 +52,10 @@ pub fn run() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+    // 安装 panic hook (P0-1)：捕捉未处理 panic，写崩溃报告 + 透传 default 行为
+    // 必须在 Tauri::Builder 构造之前完成，否则 panic 时拿不到 app handle
+    crate::utils::install_panic_hook();
+
     tracing::info!("StoryFab 启动中...");
 
     tauri::Builder::default()
@@ -63,6 +67,9 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_store::Builder::new().build())
+        // 注册资源限流器 (P0-2)：render/transcribe/whisper 等重活必须先 acquire()
+        // 默认 (cpus-1) 个 permit，可通过 STORYFAB_RESOURCE_PERMITS 覆盖
+        .manage(crate::utils::ResourceLimiter)
         .invoke_handler(tauri::generate_handler![
             run_ai_director_plan,
             check_app_data_directory,

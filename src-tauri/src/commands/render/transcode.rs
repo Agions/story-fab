@@ -1,9 +1,9 @@
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, State};
 
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::commands::render::ffmpeg_builder::quality_preset;
 use crate::types::{ExportVideoInput, TranscodeCropInput};
-use crate::utils::cmd_err;
+use crate::utils::{cmd_err, resource_error_to_user_message, ResourceLimiter};
 
 /// Tauri event channel for transcode progress. Emits `{ stage, percent }`
 /// payloads before/after the blocking ffmpeg invocation. The `spawn_blocking`
@@ -14,11 +14,19 @@ const TRANSCODE_PROGRESS_EVENT: &str = "transcode-with-crop-progress";
 #[tauri::command]
 pub async fn transcode_with_crop(
     app: AppHandle,
+    limiter: State<'_, ResourceLimiter>,
     input: TranscodeCropInput,
 ) -> Result<String, String> {
     if input.input_path.trim().is_empty() || input.output_path.trim().is_empty() {
         return Err("输入或输出路径不能为空".to_string());
     }
+    // P0-2: reserve a resource permit before doing heavy ffmpeg work.
+    // The permit is held for the lifetime of the spawned blocking task and
+    // auto-released on drop (success, error, or panic inside the closure).
+    let _permit = limiter
+        .acquire()
+        .await
+        .map_err(resource_error_to_user_message)?;
     let aspect = input.aspect.clone();
     let quality = input.quality.clone();
 
@@ -80,10 +88,19 @@ pub async fn transcode_with_crop(
 /// Export video — full-featured video export with optional subtitle burn-in.
 /// Returns { output_path, duration, file_size }.
 #[tauri::command]
-pub fn export_video(input: ExportVideoInput) -> Result<ExportVideoResult, String> {
+pub async fn export_video(
+    limiter: State<'_, ResourceLimiter>,
+    input: ExportVideoInput,
+) -> Result<ExportVideoResult, String> {
     if input.input_path.trim().is_empty() || input.output_path.trim().is_empty() {
         return Err("输入或输出路径不能为空".to_string());
     }
+    // P0-2: reserve a permit for the duration of the export. Released when
+    // this future is dropped, which covers both success and error paths.
+    let _permit = limiter
+        .acquire()
+        .await
+        .map_err(resource_error_to_user_message)?;
 
     // Subtitle burn-in path — normalize then delegate to subtitle_burnin module
     let sub_path_normalized = match &input.subtitle_path {

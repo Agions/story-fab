@@ -1,19 +1,24 @@
 //! Utils — shared utility functions
 //!
 //! Sub-modules:
-//!   time.rs    — parse_fraction, chrono_like_timestamp, format_time, format_srt_time
-//!   process.rs — cmd_first_line, cmd_err, parse_scdet_output
-//!   concat.rs  — write_concat_file
-//!   audio.rs   — pcm_samples_from_wav
+//!   time.rs         — parse_fraction, chrono_like_timestamp, format_time, format_srt_time
+//!   process.rs      — cmd_first_line, cmd_err, parse_scdet_output
+//!   concat.rs       — write_concat_file
+//!   audio.rs        — pcm_samples_from_wav
+//!   resilience.rs   — panic hook + ResourceLimiter (process-wide Semaphore)
 
 mod audio;
 mod concat;
 mod process;
+mod resilience;
 mod time;
 
 pub use audio::pcm_samples_from_wav;
 pub use concat::write_concat_file;
 pub use process::{cmd_err, cmd_first_line, parse_scdet_output};
+pub use resilience::{
+    install_panic_hook, resource_error_to_user_message, ResourceError, ResourceLimiter,
+};
 pub use time::{chrono_like_timestamp, format_srt_time, format_time, parse_fraction};
 
 #[cfg(test)]
