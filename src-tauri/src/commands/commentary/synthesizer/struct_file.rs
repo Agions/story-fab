@@ -1,7 +1,6 @@
 //! Commentary Synthesizer Core — TTS 语音合成引擎
 
 use std::env;
-use std::path::PathBuf;
 use tokio::fs;
 use tokio::process::Command;
 

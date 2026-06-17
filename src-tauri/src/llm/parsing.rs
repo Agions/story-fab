@@ -43,7 +43,7 @@ pub fn parse_script_output(raw_text: &str, total_duration: Option<f64>, segment_
 }
 
 /// 从完整脚本中提取第 i 个片段的文字
-fn extract_segment_text(full_script: &str, index: usize, total: usize, char_count: usize) -> String {
+fn extract_segment_text(full_script: &str, index: usize, total: usize, _char_count: usize) -> String {
     let all_chars: Vec<char> = full_script.chars().collect();
     let total_chars = all_chars.len();
 

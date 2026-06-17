@@ -1,6 +1,6 @@
 // FFmpeg command builders for video cutting
 
-use crate::binary::{ffmpeg_binary, hw_accel};
+use crate::binary::ffmpeg_binary;
 use crate::utils::{chrono_like_timestamp, format_time, cmd_err};
 use crate::video::processor::VideoProcessor;
 use serde::Deserialize;

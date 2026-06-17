@@ -78,7 +78,7 @@ pub fn render_single_cut_sync(
     let mut cmd = Command::new(&ffmpeg_bin);
     cmd.arg("-y");
     if let Some(s) = start { cmd.arg("-ss").arg(s.to_string()); }
-    if let Some(s) = start { cmd.arg("-i").arg(input_path); }
+    if let Some(_s) = start { cmd.arg("-i").arg(input_path); }
     if let (Some(s), Some(e)) = (start, end) { cmd.arg("-t").arg((e - s).max(0.1).to_string()); }
     cmd.arg("-c").arg("copy").arg(output);
     let out = cmd.output().map_err(|e| format!("单段切 clip 失败: {e}"))?;

@@ -1,5 +1,8 @@
 //! Auto-save and crash-recovery tests
 
+// `autosave_path` and `project_path` are crate-private helpers in
+// `auto_save.rs`; the test module is a sibling file (`mod tests;`),
+// so it cannot access them via `super::` without an explicit use.
 use super::{autosave_path, project_path};
 
 #[test]

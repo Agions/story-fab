@@ -1,7 +1,7 @@
 // Video processor core — delegates to submodules
 // Submodules: metadata, keyframes, thumbnail, ffmpeg_cmd, mix_audio, audio_duration
 
-use crate::binary::{ffmpeg_binary, ffprobe_binary, hw_accel, HwAccel};
+use crate::binary::{ffmpeg_binary, ffprobe_binary, HwAccel};
 use crate::utils::{cmd_err, cmd_first_line, format_time, write_concat_file};
 use crate::video::{extract_keyframes_impl, generate_thumbnail_impl, probe_metadata};
 use std::path::PathBuf;

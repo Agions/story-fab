@@ -1,8 +1,5 @@
 //! OpenAI API 调用（OpenAI 官方 + OpenAI 兼容接口）
 
-use crate::llm::constants::{get_context_limit, get_default_model, normalize_provider};
-use crate::llm::helpers::{build_system_prompt, build_user_prompt};
-use crate::llm::types::ScriptStyle;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 

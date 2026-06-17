@@ -6,14 +6,12 @@ use std::process::Command;
 
 pub struct SmartSegmenter {
     ffmpeg_path: String,
-    ffprobe_path: String,
 }
 
 impl SmartSegmenter {
     pub fn new() -> Self {
         Self {
             ffmpeg_path: resolve_binary_path("ffmpeg"),
-            ffprobe_path: resolve_binary_path("ffprobe"),
         }
     }
 

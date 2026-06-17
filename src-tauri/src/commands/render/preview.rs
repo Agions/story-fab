@@ -3,7 +3,7 @@
 //! Extracted from render.rs (original lines 561-637).
 
 use crate::utils::chrono_like_timestamp;
-use super::ffmpeg_builder::{new_cmd, apply_time_segment, h264_encoder};
+use super::ffmpeg_builder::{new_cmd, h264_encoder};
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]

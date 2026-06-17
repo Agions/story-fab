@@ -1,6 +1,5 @@
 //! Segment classification and speed derivation — split from smart_segmenter.rs
 
-use crate::segment::types::{SegmentType, VideoSegment};
 
 pub struct SegmentClassifier;
 

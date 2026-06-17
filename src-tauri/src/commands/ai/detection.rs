@@ -17,7 +17,7 @@ pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::high
     if input.video_path.trim().is_empty() {
         return Err("视频路径不能为空".to_string());
     }
-    let detector = HighlightDetector::new();
+    let _detector = HighlightDetector::new();
     let options = crate::highlight::HighlightOptions {
         threshold: input.threshold.map(|v| v as f32),
         min_duration_ms: input.min_duration_ms,

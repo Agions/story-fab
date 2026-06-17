@@ -24,7 +24,7 @@
 //! ```
 
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
 use tokio::fs as tokio_fs;
 
 use crate::utils::resilience::crash_dir_path;

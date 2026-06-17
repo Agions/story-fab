@@ -1,6 +1,6 @@
 //! Script Generator Parsing — 脚本解析
 
-use super::types::{ScriptGeneratorOutput, ScriptSegment, ScriptStyle};
+use super::types::{ScriptSegment, ScriptStyle};
 
 /// 解析 LLM 输出为分段
 pub fn parse_script_output(output: &str, style: ScriptStyle, estimated_duration: f64) -> Vec<ScriptSegment> {

@@ -1,8 +1,7 @@
 //! LLM 辅助函数
 //! Prompt 构建、时长估算
 
-use super::constants::{get_default_model, normalize_provider};
-use super::types::{ScriptStyle, ScriptSegment};
+use super::types::ScriptStyle;
 
 /// 估算脚本时长（秒）
 /// 中文平均语速：400字/分钟 ≈ 6.7字/秒，考虑停顿和情绪，实际约 5字/秒

@@ -19,7 +19,6 @@ pub use types::TtsBackendInfo;
 
 // ─── Render Commands ─────────────────────────────────────────────────────────
 
-use tauri::command;
 
 /// 获取导出目录
 #[tauri::command]

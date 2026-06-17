@@ -9,4 +9,3 @@ pub use types::{SubtitleResult, SubtitleSegment, TranscribeProgress, WhisperMode
 pub use whisper::whisper_python_code;
 pub use transcribe::transcribe_audio;
 
-pub use types::TranscribeProgress as _;

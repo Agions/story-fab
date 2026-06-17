@@ -71,7 +71,7 @@ pub fn get_highlights(
 }
 
 /// Extract audio from video to temp WAV file
-fn extract_audio_path(video_path: &str, detector: &AudioDetector) -> Result<String, String> {
+fn extract_audio_path(video_path: &str, _detector: &AudioDetector) -> Result<String, String> {
     let temp_audio = std::env::temp_dir()
         .join(format!("story-fab_audio_{}.wav", chrono_like_timestamp()));
     let ffmpeg_path = resolve_binary_path("ffmpeg");

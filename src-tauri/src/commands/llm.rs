@@ -10,13 +10,13 @@ use std::sync::OnceLock;
 use std::time::Duration;
 use reqwest::Client;
 
-use crate::llm::constants::{get_context_limit, get_default_model, normalize_provider};
-use crate::llm::helpers::{build_system_prompt, build_user_prompt, estimate_script_duration};
+use crate::llm::constants::{get_default_model, normalize_provider};
+use crate::llm::helpers::{build_system_prompt, build_user_prompt};
 use crate::llm::parsing::parse_script_output;
 use crate::llm::providers::call_llm_provider;
 use crate::llm::types::{
     AnalyzeVideoForScriptInput, AnalyzeVideoForScriptOutput,
-    GenerateScriptInput, GenerateScriptOutput, LLMProvider, ScriptStyle,
+    GenerateScriptInput, GenerateScriptOutput, ScriptStyle,
 };
 
 static HTTP_CLIENT: OnceLock<Client> = OnceLock::new();

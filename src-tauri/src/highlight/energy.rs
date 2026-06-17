@@ -2,14 +2,13 @@
 
 use crate::highlight::types::HighlightOptions;
 use crate::highlight::audio_analysis::HighlightDetector;
-use crate::utils::pcm_samples_from_wav;
 use std::process::Command;
 
 /// Compute energy profile and detect audio-based highlights
 pub fn compute_energy_highlights(
-    detector: &HighlightDetector,
-    pcm_data: &[i16],
-    sample_rate: u32,
+    _detector: &HighlightDetector,
+    _pcm_data: &[i16],
+    _sample_rate: u32,
     energies: &[f32],
     timestamps: &[u64],
     options: &HighlightOptions,

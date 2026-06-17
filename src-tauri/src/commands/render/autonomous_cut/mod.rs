@@ -8,14 +8,12 @@
 
 use tauri::State;
 
-use crate::binary::ffmpeg_binary;
 use crate::commands::export_state;
-use crate::types::{AutonomousRenderInput, AutonomousOverlayMarker};
+use crate::types::AutonomousRenderInput;
 use crate::utils::{
-    chrono_like_timestamp, resource_error_to_user_message, write_concat_file, ResourceLimiter,
+    chrono_like_timestamp, resource_error_to_user_message, ResourceLimiter,
 };
 use std::path::PathBuf;
-use std::process::Command;
 
 pub mod postprocess;
 

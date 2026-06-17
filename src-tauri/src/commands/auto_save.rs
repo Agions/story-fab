@@ -11,6 +11,7 @@ use std::path::PathBuf;
 use tauri::Manager;
 use tokio::fs as tokio_fs;
 
+#[cfg(test)]
 mod tests;
 
 // ─── Path helpers ─────────────────────────────────────────────────────────────

@@ -4,18 +4,15 @@ use crate::binary::resolve_binary_path;
 use crate::highlight::types::HighlightOptions;
 use crate::highlight::energy::{compute_energy_highlights, compute_energy_profile, extract_pcm};
 use crate::highlight::zcr::detect_zcr_bursts_impl;
-use std::process::Command;
 
 pub struct HighlightDetector {
     ffmpeg_path: String,
-    ffprobe_path: String,
 }
 
 impl HighlightDetector {
     pub fn new() -> Self {
         Self {
             ffmpeg_path: resolve_binary_path("ffmpeg"),
-            ffprobe_path: resolve_binary_path("ffprobe"),
         }
     }
 
