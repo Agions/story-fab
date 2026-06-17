@@ -128,9 +128,6 @@ export interface BridgeOptions {
   signal?: AbortSignal;
 }
 
-// Note: DEFAULT_TIMEOUT is reserved for future timeout configuration
-// const DEFAULT_TIMEOUT = 60_000; // 60s — 视频处理可能较长
-
 // ============================================================
 // 核心调用函数
 // ============================================================

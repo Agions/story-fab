@@ -161,7 +161,6 @@ export function useModel(): UseModelReturn {
       }
       
       // 这里可以添加实际的 API 验证逻辑
-      // const isValid = await validateAPIKey(provider, apiKey, apiSecret);
       
       // 更新 store
       store.updateAIModelSettings(provider, {
@@ -190,7 +189,6 @@ export function useModel(): UseModelReturn {
     
     try {
       // 这里添加实际的 API 测试逻辑
-      // const response = await testModelAPI(selectedModel.provider, modelSettings);
       
       // 模拟测试
       await delay(1000);
