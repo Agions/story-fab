@@ -67,6 +67,8 @@ view → hook → store → service → backend
 - [x] ADR-103 落地：`src/core/pipeline/steps/commentary/` 实现 5 步（CommentaryDirectorStep / CommentaryVisualStep / CommentaryNarrationStep / CommentaryTimingStep / CommentaryOverlayStep）+ CompositeCommentaryPipeline 编排 + commentary.test.ts 覆盖
 - [x] CI 校验：增加 `verify:store-boundaries` 检查
 - [x] 测试覆盖：hook 层增加最小测试
+- [x] 18 个组件迁移到 useReducer 状态机（PR #28-#47），141 个 useState 消除
+- [x] 19 个 reducer 单元测试覆盖（PR #23d370b - #cb62e54），+469 tests
 
 ## v3.0 路线图
 
