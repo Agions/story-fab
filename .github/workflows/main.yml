@@ -205,6 +205,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      # P1 fix: cargo test --test resilience compiles the full src-tauri
+      # crate, which transitively depends on tauri / gtk-rs / glib-sys.
+      # The CI runner's ubuntu-latest image ships pkg-config but not the
+      # glib-2.0 / gtk-3 / webkit2gtk .pc files, so the build fails with
+      # "Package glib-2.0 was not found in the pkg-config search path"
+      # before any test runs. Install the same system libs that the
+      # `rust` (cargo check) job installs at line 174-175.
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libglib2.0-dev
       - name: Setup pnpm
         uses: ./.github/actions/setup-pnpm
       - name: Build frontend
