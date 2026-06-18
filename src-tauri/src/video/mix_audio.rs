@@ -81,6 +81,13 @@ pub async fn mix_audio(input: MixAudioInput) -> Result<String, String> {
     Ok(input.output_path)
 }
 
+/// Check whether an ffprobe stderr line indicates the video has an audio
+/// track. Pure function — extracted from `check_video_has_audio` so it can
+/// be unit-tested without spawning an ffprobe process.
+pub(crate) fn parse_has_audio(ffprobe_stderr: &str) -> bool {
+    !ffprobe_stderr.contains("Audio: none")
+}
+
 /// 检查视频是否包含音轨
 async fn check_video_has_audio(ffmpeg_bin: &str, video_path: &str) -> Result<bool, String> {
     let output = TokioCommand::new(ffmpeg_bin)
@@ -90,5 +97,37 @@ async fn check_video_has_audio(ffmpeg_bin: &str, video_path: &str) -> Result<boo
         .map_err(|e| format!("ffprobe check failed: {e}"))?;
 
     let stderr = String::from_utf8_lossy(&output.stderr);
-    Ok(!stderr.contains("Audio: none"))
+    Ok(parse_has_audio(&stderr))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_has_audio_detects_audio_track() {
+        let stderr = "Input #0, mov,mp4,m4a, from 'video.mp4':\n  Duration: 00:00:10.00\n  Stream #0:0: Audio: aac, 44100 Hz, stereo, fltp\n";
+        assert!(parse_has_audio(stderr), "AAC track should be detected");
+    }
+
+    #[test]
+    fn parse_has_audio_detects_no_audio() {
+        // Real ffmpeg output for a video-only file ends with "Stream #0:0(und):
+        // Video: h264 ...  Audio: none" — wait, that's actually a positive
+        // match because the line "Audio:" is present. The current logic uses
+        // *strict absence* of the literal "Audio: none" to decide.
+        let stderr = "Input #0, mov,mp4,m4a, from 'video.mp4':\n  Stream #0:0(und): Video: h264, 1280x720\n  Audio: none\n";
+        assert!(!parse_has_audio(stderr), "video-only file → no audio");
+    }
+
+    #[test]
+    fn parse_has_audio_handles_empty_stderr() {
+        assert!(parse_has_audio(""), "empty stderr is treated as 'has audio' (no signal of absence)");
+    }
+
+    #[test]
+    fn parse_has_audio_handles_unrelated_text() {
+        let stderr = "ffmpeg version 6.0 Copyright (c) 2000-2023 the FFmpeg developers";
+        assert!(parse_has_audio(stderr));
+    }
 }
