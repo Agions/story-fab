@@ -3,7 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { videoProcessingReducer, initialVideoProcessingState } from './useVideoProcessingController.reducer';
-import type { VideoProcessingState } from './useVideoProcessingController.reducer';
+import type { VideoProcessingState, CustomQualitySettings, VideoProcessingAction } from './useVideoProcessingController.reducer';
 
 const makeState = (overrides?: Partial<VideoProcessingState>): VideoProcessingState => ({
   ...initialVideoProcessingState,
@@ -97,7 +97,7 @@ describe('videoProcessingReducer', () => {
       const prev = makeState();
       const next = videoProcessingReducer(prev, {
         type: 'update', key: 'customSettings',
-        updater: (p: any) => ({ ...p, bitrate: 10000 }),
+        updater: (p: CustomQualitySettings) => ({ ...p, bitrate: 10000 }),
       });
       expect(next.customSettings.bitrate).toBe(10000);
       expect(next.customSettings.resolution).toBe('1920x1080');
@@ -107,7 +107,7 @@ describe('videoProcessingReducer', () => {
   describe('default', () => {
     it('returns same state for unknown action type', () => {
       const state = makeState();
-      const next = videoProcessingReducer(state, { type: 'unknown' } as any);
+      const next = videoProcessingReducer(state, { type: 'unknown' } as unknown as VideoProcessingAction);
       expect(next).toBe(state);
     });
   });

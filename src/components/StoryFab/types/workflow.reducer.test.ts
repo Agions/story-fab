@@ -51,7 +51,7 @@ describe('storyFabReducer', () => {
   // ─── SET_PROJECT ───────────────────────────────────────────
   describe('SET_PROJECT', () => {
     it('sets project, marks step complete, advances to video-upload', () => {
-      const project = { name: 'Test', id: '1' } as any;
+      const project = { name: 'Test', id: '1' } as unknown as storyfabState['project'];
       const next = storyFabReducer(makeState(), { type: 'SET_PROJECT', payload: project });
       expect(next.project).toEqual(project);
       expect(next.stepStatus['project-create']).toBe(true);
@@ -59,24 +59,28 @@ describe('storyFabReducer', () => {
     });
 
     it('null payload resets project and preserves step', () => {
-      const prev = makeState({ project: { name: 'Old' } as any, currentStep: 'video-upload' });
+      const prev = makeState({ project: { name: 'Old' } as unknown as storyfabState['project'], currentStep: 'video-upload' });
       const next = storyFabReducer(prev, { type: 'SET_PROJECT', payload: null });
       expect(next.project).toBeNull();
       expect(next.currentStep).toBe('video-upload');
     });
 
     it('deep clones project to prevent external mutation', () => {
-      const project = { name: 'Test', nested: { val: 1 } } as any;
-      const next = storyFabReducer(makeState(), { type: 'SET_PROJECT', payload: project });
+      type ProjectWithNested = { name: string; nested: { val: number } };
+      const project: ProjectWithNested = { name: 'Test', nested: { val: 1 } };
+      const next = storyFabReducer(
+        makeState(),
+        { type: 'SET_PROJECT', payload: project as unknown as storyfabState['project'] },
+      );
       project.nested.val = 999;
-      expect((next.project as any).nested.val).toBe(1);
+      expect(((next.project ?? {}) as unknown as ProjectWithNested).nested.val).toBe(1);
     });
   });
 
   // ─── SET_VIDEO ─────────────────────────────────────────────
   describe('SET_VIDEO', () => {
     it('sets video and marks step complete', () => {
-      const video = { duration: 120, path: '/v.mp4' } as any;
+      const video = { duration: 120, path: '/v.mp4' } as unknown as storyfabState['currentVideo'];
       const next = storyFabReducer(makeState(), { type: 'SET_VIDEO', payload: video });
       expect(next.currentVideo).toEqual(video);
       expect(next.duration).toBe(120);
@@ -84,7 +88,7 @@ describe('storyFabReducer', () => {
     });
 
     it('null payload clears video', () => {
-      const prev = makeState({ currentVideo: { duration: 60 } as any, duration: 60 });
+      const prev = makeState({ currentVideo: { duration: 60 } as unknown as storyfabState['currentVideo'], duration: 60 });
       const next = storyFabReducer(prev, { type: 'SET_VIDEO', payload: null });
       expect(next.currentVideo).toBeNull();
       expect(next.duration).toBe(0);
@@ -94,7 +98,7 @@ describe('storyFabReducer', () => {
   // ─── SET_ANALYSIS ──────────────────────────────────────────
   describe('SET_ANALYSIS', () => {
     it('sets analysis and marks step complete', () => {
-      const analysis = { scenes: [] } as any;
+      const analysis = { scenes: [] } as unknown as storyfabState['analysis'];
       const next = storyFabReducer(makeState(), { type: 'SET_ANALYSIS', payload: analysis });
       expect(next.analysis).toEqual(analysis);
       expect(next.stepStatus['ai-analyze']).toBe(true);
@@ -120,13 +124,13 @@ describe('storyFabReducer', () => {
   describe('subtitle actions', () => {
     it('SET_OCR_SUBTITLE sets OCR data', () => {
       const ocr = [{ startTime: 0, endTime: 1, text: 'hi' }];
-      const next = storyFabReducer(makeState(), { type: 'SET_OCR_SUBTITLE', payload: ocr as any });
+      const next = storyFabReducer(makeState(), { type: 'SET_OCR_SUBTITLE', payload: ocr as unknown as never });
       expect(next.subtitleData.ocr).toEqual(ocr);
     });
 
     it('SET_ASR_SUBTITLE sets ASR data', () => {
       const asr = [{ startTime: 0, endTime: 1, text: 'hello', speaker: 'A' }];
-      const next = storyFabReducer(makeState(), { type: 'SET_ASR_SUBTITLE', payload: asr as any });
+      const next = storyFabReducer(makeState(), { type: 'SET_ASR_SUBTITLE', payload: asr as unknown as never });
       expect(next.subtitleData.asr).toEqual(asr);
     });
 
@@ -140,13 +144,13 @@ describe('storyFabReducer', () => {
   // ─── Script actions ────────────────────────────────────────
   describe('script actions', () => {
     it('SET_NARRATION_SCRIPT sets narration', () => {
-      const script = { segments: [] } as any;
+      const script = { segments: [] } as unknown as storyfabState['scriptData']['narration'];
       const next = storyFabReducer(makeState(), { type: 'SET_NARRATION_SCRIPT', payload: script });
       expect(next.scriptData.narration).toEqual(script);
     });
 
     it('SET_REMIX_SCRIPT sets remix', () => {
-      const script = { segments: [] } as any;
+      const script = { segments: [] } as unknown as storyfabState['scriptData']['remix'];
       const next = storyFabReducer(makeState(), { type: 'SET_REMIX_SCRIPT', payload: script });
       expect(next.scriptData.remix).toEqual(script);
     });
@@ -186,7 +190,7 @@ describe('storyFabReducer', () => {
   // ─── Export actions ────────────────────────────────────────
   describe('SET_EXPORT_PROGRESS', () => {
     it('marks export step complete when exporting finishes', () => {
-      const prev = makeState({ exportSettings: { format: 'mp4' } as any });
+      const prev = makeState({ exportSettings: { format: 'mp4' } as unknown as storyfabState['exportSettings'] });
       const next = storyFabReducer(prev, { type: 'SET_EXPORT_PROGRESS', payload: { isExporting: false, progress: 100 } });
       expect(next.stepStatus['video-export']).toBe(true);
     });
@@ -234,8 +238,8 @@ describe('storyFabReducer', () => {
     it('resets from specified step onward', () => {
       const prev = makeState({
         currentStep: 'video-export',
-        currentVideo: { duration: 60 } as any,
-        analysis: { scenes: [] } as any,
+        currentVideo: { duration: 60 } as unknown as storyfabState['currentVideo'],
+        analysis: { scenes: [] } as unknown as storyfabState['analysis'],
         stepStatus: { ...initialState.stepStatus, 'video-upload': true, 'ai-analyze': true },
       });
       const next = storyFabReducer(prev, { type: 'RESET_STEP', payload: 'ai-analyze' });
@@ -259,7 +263,7 @@ describe('storyFabReducer', () => {
   describe('default', () => {
     it('returns same state for unknown action', () => {
       const state = makeState();
-      const next = storyFabReducer(state, { type: 'UNKNOWN' as any });
+      const next = storyFabReducer(state, { type: 'UNKNOWN' } as unknown as Parameters<typeof storyFabReducer>[1]);
       expect(next).toBe(state);
     });
   });

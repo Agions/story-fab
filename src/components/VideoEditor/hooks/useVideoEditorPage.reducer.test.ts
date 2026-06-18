@@ -431,7 +431,7 @@ describe('videoEditorPageReducer', () => {
       'previewUrl', 'isDragging', 'dragType', 'dragSegmentId',
     ];
     for (const key of keys) {
-      videoEditorPageReducer(populatedState, { type: 'update', key, updater: 'mutated' as any });
+      videoEditorPageReducer(populatedState, { type: 'update', key, updater: 'mutated' as unknown as Updater<unknown> });
     }
     expect(populatedState).toEqual(snapshot);
   });

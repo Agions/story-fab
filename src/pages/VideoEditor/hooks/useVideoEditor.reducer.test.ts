@@ -4,10 +4,18 @@ import {
   initialVideoEditorState,
   type VideoEditorState,
 } from './useVideoEditor.reducer';
+import type { VideoSegment } from '@/core/video';
 
-function makeState(overrides: Partial<VideoEditorState> = {}): VideoEditorState {
-  return { ...initialVideoEditorState, ...overrides };
-}
+const makeSegment = (overrides: Partial<VideoSegment> = {}): VideoSegment => ({
+  start: 0,
+  end: 10,
+  ...overrides,
+});
+
+const makeState = (overrides: Partial<VideoEditorState> = {}): VideoEditorState => ({
+  ...initialVideoEditorState,
+  ...overrides,
+});
 
 describe('videoEditorReducer', () => {
   describe('update with direct value', () => {
@@ -67,9 +75,9 @@ describe('videoEditorReducer', () => {
 
     it('sets segments', () => {
       const segments = [
-        { id: '1', start: 0, end: 5, label: 'intro' },
-        { id: '2', start: 5, end: 10, label: 'body' },
-      ] as any[];
+        makeSegment({ end: 5 }),
+        makeSegment({ start: 5, end: 10 }),
+      ];
       const result = videoEditorReducer(makeState(), {
         type: 'update',
         key: 'segments',
@@ -99,9 +107,9 @@ describe('videoEditorReducer', () => {
 
     it('sets editHistory', () => {
       const history = [
-        [{ id: '1', start: 0, end: 5 }],
-        [{ id: '1', start: 0, end: 5 }, { id: '2', start: 5, end: 10 }],
-      ] as any[][];
+        [makeSegment({ end: 5 })],
+        [makeSegment({ end: 5 }), makeSegment({ start: 5, end: 10 })],
+      ];
       const result = videoEditorReducer(makeState(), {
         type: 'update',
         key: 'editHistory',
@@ -176,13 +184,13 @@ describe('videoEditorReducer', () => {
     });
 
     it('uses function updater to add a segment', () => {
-      const segment = { id: '3', start: 10, end: 15 };
+      const segment = makeSegment({ start: 10, end: 15 });
       const result = videoEditorReducer(
-        makeState({ segments: [{ id: '1', start: 0, end: 5 }] as any[] }),
+        makeState({ segments: [makeSegment({ end: 5 })] }),
         {
           type: 'update',
           key: 'segments',
-          updater: (prev: any[]) => [...prev, segment],
+          updater: (prev: VideoSegment[]) => [...prev, segment],
         },
       );
       expect(result.segments).toHaveLength(2);

@@ -120,7 +120,7 @@ describe('aiVisualizerReducer', () => {
   describe('default', () => {
     it('returns same state for unknown action', () => {
       const state = makeState();
-      expect(aiVisualizerReducer(state, { type: 'UNKNOWN' as any })).toBe(state);
+      expect(aiVisualizerReducer(state, { type: 'UNKNOWN' } as unknown as Parameters<typeof aiVisualizerReducer>[1])).toBe(state);
     });
   });
 });

@@ -70,7 +70,7 @@ describe('projectEditReducer', () => {
   describe('default', () => {
     it('returns same state for unknown action', () => {
       const state = makeState();
-      const next = projectEditReducer(state, { type: 'unknown' } as any);
+      const next = projectEditReducer(state, { type: 'unknown' } as unknown as Parameters<typeof projectEditReducer>[1]);
       expect(next).toBe(state);
     });
   });

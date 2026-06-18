@@ -199,7 +199,7 @@ describe('highlightsReducer', () => {
   describe('default', () => {
     it('returns same state for unknown action', () => {
       const state = makeState();
-      expect(highlightsReducer(state, { type: 'UNKNOWN' as any })).toBe(state);
+      expect(highlightsReducer(state, { type: 'UNKNOWN' } as unknown as Parameters<typeof highlightsReducer>[1])).toBe(state);
     });
   });
 });

@@ -1,10 +1,18 @@
 import { describe, it, expect } from 'vitest';
+import type { ScriptSegment } from '@/core/types';
 import {
   originalEditorReducer,
   initialOriginalEditorState,
   type OriginalEditorState,
   type OriginalEditorAction,
 } from './useOriginalEditor.reducer';
+
+const makeSegment = (overrides: Partial<ScriptSegment> = {}): ScriptSegment => ({
+  id: 'seg-default',
+  startTime: 0,
+  endTime: 10,
+  ...overrides,
+});
 
 // ---------- helpers ----------
 const makeState = (
@@ -22,8 +30,8 @@ const update = (
 // ---------- initialOriginalEditorState ----------
 describe('initialOriginalEditorState', () => {
   it('uses provided segments', () => {
-    const segments = [{ start: 0, end: 10, type: 'narration', content: 'hi' }];
-    const state = initialOriginalEditorState(segments as any);
+    const segments = [makeSegment({ content: 'hi' })];
+    const state = initialOriginalEditorState(segments);
     expect(state.segments).toBe(segments);
   });
 
@@ -47,14 +55,17 @@ describe('initialOriginalEditorState', () => {
 describe('originalEditorReducer', () => {
   it('returns the same state reference for unknown action types', () => {
     const state = makeState();
-    const result = originalEditorReducer(state, { type: 'unknown' } as any);
+    const result = originalEditorReducer(
+      state,
+      { type: 'unknown' } as unknown as OriginalEditorAction,
+    );
     expect(result).toBe(state);
   });
 
   // ---- each state key with a direct value ----
   describe('direct value updater', () => {
     const cases: [keyof OriginalEditorState, unknown][] = [
-      ['segments', [{ start: 0, end: 5, type: 'dialogue', content: 'x' }] as any],
+      ['segments', [makeSegment({ startTime: 0, endTime: 5, type: 'dialogue', content: 'x' })]],
       ['editingIndex', 3],
       ['formValues', { start: 1, end: 2, type: 'scene', content: 'abc' }],
       ['formError', 'bad input'],
@@ -87,13 +98,13 @@ describe('originalEditorReducer', () => {
     });
 
     it('applies updater to segments (array)', () => {
-      const segs = [{ start: 0, end: 10, type: 'narration', content: 'a' }] as any[];
+      const segs = [makeSegment({ content: 'a' })];
       const state = makeState({ segments: segs });
       const result = originalEditorReducer(
         state,
-        update('segments', (prev: typeof segs) => [
+        update('segments', (prev: ScriptSegment[]) => [
           ...prev,
-          { start: 10, end: 20, type: 'dialogue', content: 'b' },
+          makeSegment({ startTime: 10, endTime: 20, type: 'dialogue', content: 'b' }),
         ]),
       );
       expect(result.segments).toHaveLength(2);
@@ -145,8 +156,8 @@ describe('originalEditorReducer', () => {
     });
 
     it('preserves untouched keys', () => {
-      const state = makeState({ segments: ['a' as any], totalDuration: 99 });
-      const result = originalEditorReducer(state, update('segments', ['b' as any]));
+      const state = makeState({ segments: [makeSegment({ content: 'a' })], totalDuration: 99 });
+      const result = originalEditorReducer(state, update('segments', [makeSegment({ content: 'b' })]));
       expect(result.totalDuration).toBe(99);
     });
   });
