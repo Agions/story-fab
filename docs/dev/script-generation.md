@@ -57,13 +57,18 @@ interface DirectorPlan {
 
 ## LLM 调用
 
-5 家 Provider：
+10 个 Provider（详见 `src/core/config/ai-models/providers.ts`）：
 
-- OpenAI（gpt-4o-mini）
-- Anthropic（claude-haiku）
-- Google（gemini-1.5-flash）
-- DeepSeek（deepseek-chat）
-- Qwen（qwen-plus）
+- **OpenAI**（gpt-4o-mini 等）
+- **Anthropic**（claude-haiku 等）
+- **Google**（gemini-1.5-flash 等）
+- **DeepSeek**（deepseek-chat 等，通过 openaiLike）
+- **Qwen / 阿里**（qwen-plus 等，通过 openaiLike）
+- **智谱**（zhipu）
+- **讯飞**（iflytek）
+- **Moonshot**（kimi）
+- **Local**（本地模型）
+- **Custom**（自定义 OpenAI 兼容端点）
 
 ## 脚本解析
 

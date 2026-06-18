@@ -24,13 +24,15 @@ title: 导出
 
 ## 质量预设
 
-| 预设 | CRF | 码率 |
-| --- | --- | --- |
-| 低 | 28 | 1 Mbps |
-| 中 | 23 | 2.5 Mbps |
-| 高 | 20 | 5 Mbps |
-| 极清 | 18 | 8 Mbps |
-| 无损 | 0 | - |
+> Rust 端 `commands/render/ffmpeg_builder.rs::quality_preset()` 仅实现 3 档，未知档位默认 `medium`。下表对照说明文档与实际行为：
+
+| 预设 | CRF | 码率 | 实际档位 |
+| --- | --- | --- | --- |
+| 低（low） | 28 | 1 Mbps | ✅ 实际存在 |
+| 中（medium） | 23 | 2.5 Mbps | ✅ 实际存在（默认） |
+| 高（high） | 18 | 5 Mbps | ✅ 实际存在 |
+| 极清（ultra） | - | - | ❌ 文档列出，实际 fallback 到 medium |
+| 无损（lossless） | 0 | - | ❌ 文档列出，实际无 loseless 路径 |
 
 ## 字幕烧录
 

@@ -4,6 +4,8 @@ title: 键盘快捷键
 
 # 键盘快捷键
 
+> 部分快捷键通过 Tauri 全局插件实现（`global-shortcut`），部分通过组件级 keydown handler 实现；下表为完整快捷键蓝图，部分条目待迁移到全局注册。
+
 ## 全局
 
 | 快捷键 | 功能 |
@@ -13,8 +15,8 @@ title: 键盘快捷键
 | Cmd/Ctrl + S | 保存 |
 | Cmd/Ctrl + Shift + S | 另存为 |
 | Cmd/Ctrl + W | 关闭当前项目 |
-| Cmd/Ctrl + Z | 撤销 |
-| Cmd/Ctrl + Shift + Z | 重做 |
+| Cmd/Ctrl + Z | 撤销（Timeline 内已实现无修饰键 `z`） |
+| Cmd/Ctrl + Shift + Z | 重做（Timeline 内已实现 `Shift+Z` / `y`） |
 | Cmd/Ctrl + , | 打开设置 |
 
 ## 播放控制

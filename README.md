@@ -68,7 +68,7 @@ pnpm tauri build      # 生产构建
 │  后端   Rust · Tauri 2 · tokio                                  │
 │   ├─ ffmpeg         转码 / 硬字幕烧录 / 裁剪                    │
 │   ├─ whisper        离线语音转字幕                              │
-│   ├─ llm-providers  OpenAI · DeepSeek · Qwen · Gemini · Anthropic │
+│   ├─ llm-providers  OpenAI · Anthropic · Google · DeepSeek · Qwen · 智谱 · 讯飞 · Moonshot · Local · Custom (10 家) │
 │   ├─ tts-providers  Edge TTS · Azure TTS                        │
 │   └─ commentary     Director → Visual → Narration → Timing → Overlay │
 └─────────────────────────────────────────────────────────────────┘

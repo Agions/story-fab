@@ -84,7 +84,7 @@ Director → Visual → Narration → Timing → Overlay → 成片
 
 ## TauriBridge
 
-`src/core/tauri/methods/` 下集中所有 IPC 调用，类型定义在 `src/core/interfaces/`。
+`src/core/tauri/methods/` 下集中所有 IPC 调用，业务接口在 `src/core/interfaces/`，核心数据类型在 `src/core/types/`。
 
 ## 路由
 
