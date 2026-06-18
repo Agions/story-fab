@@ -24,7 +24,7 @@ title: 常见问题
 
 **「Failed to load FFmpeg/Whisper binary」？** 首次启动需联网下载。失败后：设置代理、放置预编译二进制到 `~/.config/story-fab/bin/`、或从 Release 下载。
 
-**端口 1430 被占用？** `story-fab dev --port 1431` 改端口。
+**端口 1430 被占用？** 修改 `vite.config.ts` 中 `port` 字段，或设置环境变量后启动开发服务器（参考 `docs/reference/config.md`）。
 
 ## AI 分析
 

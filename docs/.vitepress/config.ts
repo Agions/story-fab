@@ -90,7 +90,6 @@ export default defineConfig({
           text: '参考',
           items: [
             { text: '配置', link: '/reference/config' },
-            { text: 'CLI', link: '/reference/cli' },
             { text: 'FAQ', link: '/reference/faq' },
           ],
         },

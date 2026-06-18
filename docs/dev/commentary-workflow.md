@@ -4,16 +4,10 @@ title: 解说工作流
 
 # 解说工作流
 
-## 8 步 Pipeline
+## 5 步 Pipeline（累积式 State Chain）
 
 ```
-Director  ──►  Visual  ──►  Narration  ──►  Timing
-                                              │
-                                              ▼
-                                          Overlay
-                                              │
-                                              ▼
-                                        Render  ──►  输出
+Director  ──►  Visual  ──►  Narration  ──►  Timing  ──►  Overlay  ──►  成片
 ```
 
 ### 1. Director
@@ -36,13 +30,7 @@ LLM 生成逐句解说词。
 
 烧字幕 + 视觉叠加层。
 
-### 6. Render
-
-FFmpeg 渲染管线。
-
-### 7. Output
-
-多比例导出。
+> 详细流程参考 [commentary-mode.md](../../guide/commentary-mode.md)。
 
 ## 状态机
 

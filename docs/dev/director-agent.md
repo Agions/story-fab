@@ -76,14 +76,14 @@ interface IDirectorAgent {
 }
 ```
 
-实现位于 `src/core/services/commentary/director/`。
+实现位于 `src/core/pipeline/steps/commentary/CommentaryDirectorStep.ts`，通过 `src/core/services/commentary/` 入口调用。
 
 ## 模块依赖
 
 ```
 Director
 ├── core/services/providers/    LLM 抽象
-├── core/services/commentary/   Pipeline 入口
+├── core/pipeline/steps/        Pipeline 编排
 └── core/types/commentary       类型
 ```
 
