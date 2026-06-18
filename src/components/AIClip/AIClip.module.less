@@ -360,8 +360,10 @@
   .smartMore {
     padding: 8px 16px;
     text-align: center;
+    // 0.55 alpha on @bg-card #1a1a2e → contrast 5.89:1 (WCAG AA 4.5 ✅).
+    // 0.4 was 3.75:1, below AA.
+    color: rgba(255, 255, 255, 0.55);
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
   }
 
   .smartEmpty {
@@ -482,5 +484,27 @@
 
   .segmentsPreview {
     grid-template-columns: 1fr !important;
+  }
+
+  // 智能编辑面板 (P4): 窄屏下把 .smartItem 改成纵向布局，避免 speed/transition
+  // badge 把时间码挤出屏外；.smartHeader 改成纵排，title 与 meta 不再挤一行。
+  .smartCard {
+    .smartHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .smartItem {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 10px 12px;
+
+      .smartItemRight {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
   }
 }
