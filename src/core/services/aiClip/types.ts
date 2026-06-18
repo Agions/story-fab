@@ -120,6 +120,14 @@ export interface ClipAnalysisResult {
   estimatedFinalDuration: number;
   /** ZCR-burst enhanced emotion peaks: timestamp(s), energy(0-100), type */
   emotionPeaks?: Array<{ timestamp: number; energy: number; type: string }>;
+  /**
+   * SmartVideoSegments enriched from Rust's `detect_smart_segments` output.
+   * Each entry carries `suggestedSpeed` (from Rust energy ratio) and
+   * `suggestedTransition` (computed by the TS rule matrix). The AIClip
+   * "Smart Edit" panel renders this list.
+   * Populated only when `detectSilence` is enabled in config.
+   */
+  enrichedSegments?: import('../../video/highlight.types').SmartVideoSegment[];
 }
 
 // 关键帧

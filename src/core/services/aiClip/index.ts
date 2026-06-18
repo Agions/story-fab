@@ -2,6 +2,7 @@ export * from './types';
 export * from './analyzer';
 export * from './batchProcessor';
 export * from './config';
+export * from './segmentEnricher';
 
 import { analyzeVideo } from './analyzer';
 import { batchProcess, getBatchTask, cancelTask, applySuggestions, smartClip } from './batchProcessor';

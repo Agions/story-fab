@@ -12,6 +12,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import type { ClipAnalysisResult } from '../../../core/services/aiClip';
+import { SegmentTimelineCard } from './SegmentTimelineCard';
 import styles from '@/components/AIClip/AIClip.module.less';
 
 interface SuggestionsStepProps {
@@ -69,6 +70,14 @@ const SuggestionsStep: React.FC<SuggestionsStepProps> = ({
         </div>
       </CardHeader>
       <CardContent>
+        {/* Smart Edit preview — surfaces suggestedSpeed / suggestedTransition
+            that Rust's detect_smart_segments + our TS rule matrix computed.
+            See core/services/aiClip/segmentEnricher.ts. */}
+        {analysisResult.enrichedSegments && analysisResult.enrichedSegments.length > 0 && (
+          <div className="mb-3">
+            <SegmentTimelineCard segments={analysisResult.enrichedSegments} />
+          </div>
+        )}
         <ScrollArea className="h-[400px]">
           <div className="flex flex-col gap-2">
             {analysisResult.suggestions.map((suggestion) => (

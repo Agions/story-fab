@@ -23,6 +23,8 @@ import type {
   ClipAnalysisResult,
   Keyframe,
 } from './types';
+import type { SmartVideoSegment } from '../../video/highlight.types';
+import { enrichSegments, type RustRawSegment } from './segmentEnricher';
 
 // 导入工具函数
 import {
@@ -89,10 +91,14 @@ export async function analyzeVideo(
     ? await detectKeyframes(videoInfo, fullConfig.keyframeInterval)
     : [];
 
-  // 3. 检测静音片段
+  // 3. 检测静音片段 + 富化智能片段（共享一次 Rust 调用）
   onProgress?.(50, '分析音频特征');
+  let enrichedSegments: SmartVideoSegment[] = [];
   const silenceSegments = fullConfig.detectSilence
-    ? await detectSilenceSegments(videoInfo, fullConfig)
+    ? await detectSilenceSegments(videoInfo, fullConfig, (raw) => {
+        // 富化回调：在 detectSilenceSegments 拿到的原始 segments 上跑一次 enrich
+        enrichedSegments = enrichSegments(raw);
+      })
     : [];
 
   // 4. 检测情感峰值（ZCR 增强）
@@ -152,6 +158,7 @@ export async function analyzeVideo(
     })),
     estimatedFinalDuration,
     emotionPeaks,
+    enrichedSegments: enrichedSegments.length > 0 ? enrichedSegments : undefined,
   };
 }
 
@@ -177,10 +184,15 @@ async function detectKeyframes(videoInfo: VideoInfo, interval: number): Promise<
 
 /**
  * 检测静音片段
+ *
+ * 同时通过 `onRawSegments` 回调把 Rust 返回的**完整** segments 列表抛给调用方，
+ * 让上层（比如 analyzeVideo）可以顺手跑一次 `enrichSegments`，
+ * 避免在 UI 渲染时再次调用 `tauri.detectSmartSegments` 增加一次 IPC。
  */
 async function detectSilenceSegments(
   videoInfo: VideoInfo,
-  _config: AIClipConfig
+  _config: AIClipConfig,
+  onRawSegments?: (raw: RustRawSegment[]) => void,
 ): Promise<SilenceSegment[]> {
   try {
     const rustSegments = (await tauri.detectSmartSegments(videoInfo.path, {
@@ -193,6 +205,9 @@ async function detectSilenceSegments(
       duration_ms: number;
       silence_ratio?: number;
     }>;
+
+    // 把原始 segments（包含 suggested_speed 等 Rust 字段）抛给上层
+    onRawSegments?.(rustSegments as RustRawSegment[]);
 
     return rustSegments
       .filter((seg) => seg.segment_type === 'Silence' || (seg.silence_ratio ?? 0) > 0.3)
