@@ -41,7 +41,7 @@
 //! bug (every permit is a `SemaphorePermit` that auto-releases on drop).
 
 use std::path::PathBuf;
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use tauri::Manager;
@@ -66,8 +66,8 @@ fn default_permits() -> usize {
 }
 
 /// Process-wide limiter, lazily constructed on first access.
-fn shared_semaphore() -> &'static Semaphore {
-    static SEM: OnceLock<Semaphore> = OnceLock::new();
+fn shared_semaphore() -> &'static Arc<Semaphore> {
+    static SEM: OnceLock<Arc<Semaphore>> = OnceLock::new();
     SEM.get_or_init(|| {
         let permits = default_permits();
         tracing::info!(
@@ -77,24 +77,58 @@ fn shared_semaphore() -> &'static Semaphore {
                 .map(|n| n.get())
                 .unwrap_or(0)
         );
-        Semaphore::new(permits)
+        Arc::new(Semaphore::new(permits))
     })
 }
 
-/// Cheap, clone-friendly handle to the shared limiter.
+/// Cheap, clone-friendly handle to a `Semaphore`-backed limiter.
 ///
-/// The handle is intentionally `Copy` so it can be passed freely between
-/// command bodies and helper tasks without `Arc` boilerplate. Internally
-/// each clone is a new `Arc` to the same `Semaphore`.
-#[derive(Clone, Copy)]
-pub struct ResourceLimiter;
+/// Two ways to obtain a handle:
+///   - [`ResourceLimiter::shared`] — handle to the process-wide
+///     shared limiter. This is what production code (Tauri commands,
+///     pipelines) should use so all heavy work participates in the
+///     global permit pool.
+///   - [`ResourceLimiter::with_capacity`] — create an **independent**
+///     limiter backed by a private `Semaphore`. Primarily for tests
+///     that need isolation from the shared state.
+#[derive(Clone)]
+pub struct ResourceLimiter {
+    sem: Arc<Semaphore>,
+    total: usize,
+}
+
+impl ResourceLimiter {
+    /// Handle to the process-wide shared limiter. All calls share the
+    /// same underlying `Semaphore` (lazily constructed on first use).
+    pub fn shared() -> Self {
+        let sem = shared_semaphore().clone();
+        Self {
+            sem,
+            // total is resolved lazily — see `total_permits()`.
+            total: 0,
+        }
+    }
+
+    /// Create an **independent** limiter with a specific permit count.
+    ///
+    /// This is primarily for **tests** that need isolation from the
+    /// shared process-wide limiter. Production code should use
+    /// [`ResourceLimiter::shared`] to participate in the global pool.
+    pub fn with_capacity(permits: usize) -> Self {
+        let permits = permits.max(1);
+        Self {
+            sem: Arc::new(Semaphore::new(permits)),
+            total: permits,
+        }
+    }
+}
 
 impl ResourceLimiter {
     /// Acquire a permit. Returns [`ResourceError::ShuttingDown`] if the
     /// semaphore has been closed (which would indicate the runtime is
     /// already in a broken state).
     pub async fn acquire(&self) -> Result<SemaphorePermit<'_>, ResourceError> {
-        shared_semaphore()
+        self.sem
             .acquire()
             .await
             .map_err(|_| ResourceError::ShuttingDown)
@@ -104,18 +138,25 @@ impl ResourceLimiter {
     /// a cheap fallback path (e.g. "all permits busy → return busy error
     /// to the user instead of queueing forever").
     pub fn try_acquire(&self) -> Option<SemaphorePermit<'_>> {
-        shared_semaphore().try_acquire().ok()
+        self.sem.try_acquire().ok()
     }
 
     /// Number of permits currently available (for diagnostics / dashboards).
     pub fn available_permits(&self) -> usize {
-        shared_semaphore().available_permits()
+        self.sem.available_permits()
     }
 
-    /// Total permits this limiter was configured with at startup. Cached
-    /// via `OnceLock` so we don't recompute `default_permits()` on every
-    /// call (which would re-read env vars and the CPU count).
+    /// Total permits this limiter was configured with.
+    ///
+    /// - For handles created via [`ResourceLimiter::shared`] this is
+    ///   resolved from a process-wide `OnceLock` (re-reads
+    ///   `STORYFAB_RESOURCE_PERMITS` / cpus on first call, then cached).
+    /// - For handles created via [`ResourceLimiter::with_capacity(n)]`
+    ///   the configured `n` is returned directly. No env / cpus lookup.
     pub fn total_permits(&self) -> usize {
+        if self.total > 0 {
+            return self.total;
+        }
         static TOTAL: OnceLock<usize> = OnceLock::new();
         *TOTAL.get_or_init(default_permits)
     }
@@ -272,10 +313,10 @@ mod tests {
 
     #[test]
     fn limiter_clone_share_state() {
-        let a = ResourceLimiter;
-        let b = ResourceLimiter;
-        // Both handles point at the same semaphore. After acquiring one
-        // permit, the other handle must report one fewer available.
+        // Two handles to the SAME (independent) limiter share the underlying
+        // semaphore. Acquire on one is visible to the other.
+        let a = ResourceLimiter::with_capacity(3);
+        let b = a.clone();
         let total_before = a.available_permits();
         let permit = a.try_acquire();
         assert!(permit.is_some(), "expected to acquire a permit on idle limiter");
@@ -286,8 +327,8 @@ mod tests {
 
     #[test]
     fn permit_released_on_drop() {
-        let l = ResourceLimiter;
-        let total = l.available_permits();
+        let l = ResourceLimiter::with_capacity(3);
+        let total = l.total_permits();
         {
             let p = l.try_acquire().expect("idle limiter must yield a permit");
             assert_eq!(l.available_permits(), total - 1);
@@ -298,45 +339,43 @@ mod tests {
 
     #[test]
     fn try_acquire_saturates() {
-        // Exercise the "pool exhaustion" guarantee: once we hold every
-        // currently-available permit, the next non-blocking `try_acquire`
-        // must return `None` instead of waiting.
-        //
-        // We intentionally do **not** assert that the count of held
-        // permits equals the limiter's `total_permits()`. The limiter
-        // is process-global (`OnceLock<Semaphore>`), so other
-        // `#[tokio::test]`s running in parallel on the lib-test thread
-        // pool may legitimately own permits at the moment this test
-        // runs. Asserting on absolute counts makes the test flake
-        // under `cargo test` (parallel), even though it always passes
-        // when run in isolation. The causal property we care about is
-        // preserved regardless: holding `n` permits ⇒ next try_acquire
-        // is None.
-        let l = ResourceLimiter;
-        let available_at_start = l.available_permits();
+        // Exercise the "pool exhaustion" guarantee with a private limiter
+        // so we can assert exact counts without flakes from the shared pool.
+        let l = ResourceLimiter::with_capacity(3);
+        let total = l.total_permits();
+        assert_eq!(total, 3);
 
-        // Hold every currently-available permit.
-        let mut held = Vec::with_capacity(available_at_start);
-        for _ in 0..available_at_start {
+        // Hold every permit.
+        let mut held = Vec::with_capacity(total);
+        for _ in 0..total {
             held.push(
                 l.try_acquire()
                     .expect("permit must be available while pool is not exhausted"),
             );
         }
-        // Pool is now empty (from this test's perspective).
+        // Pool is now empty.
         assert!(
             l.try_acquire().is_none(),
             "try_acquire must return None after exhausting the pool"
         );
-
-        // Release. The absolute post-release count is non-assertable
-        // (other tests may have acquired+released in parallel), so we
-        // only check that *some* permit came back.
+        // Release. The private limiter has no other consumers, so the count
+        // is exactly the original total.
         held.clear();
-        assert!(
-            l.available_permits() >= 1,
-            "releasing our permits should free at least one slot"
-        );
+        assert_eq!(l.available_permits(), total);
+    }
+
+    #[test]
+    fn independent_limiters_do_not_share_state() {
+        // Two limiters with the same capacity must still be independent
+        // (each has its own permit pool). Exhausting one must not affect
+        // the other. This is the property that lets tests be run in
+        // parallel without cross-test pollution.
+        let a = ResourceLimiter::with_capacity(2);
+        let b = ResourceLimiter::with_capacity(2);
+        let _pa1 = a.try_acquire().unwrap();
+        let _pa2 = a.try_acquire().unwrap();
+        assert!(a.try_acquire().is_none(), "a must be exhausted");
+        assert_eq!(b.available_permits(), 2, "b must be untouched");
     }
 
     #[test]
@@ -370,8 +409,8 @@ mod tests {
 
     #[tokio::test]
     async fn acquire_awaits_and_releases() {
-        let l = ResourceLimiter;
-        let total = l.available_permits();
+        let l = ResourceLimiter::with_capacity(3);
+        let total = l.total_permits();
         let permit = l.acquire().await.expect("acquire must succeed");
         assert_eq!(l.available_permits(), total - 1);
         drop(permit);

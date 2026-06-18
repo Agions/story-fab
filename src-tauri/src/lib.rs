@@ -69,7 +69,7 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::new().build())
         // 注册资源限流器 (P0-2)：render/transcribe/whisper 等重活必须先 acquire()
         // 默认 (cpus-1) 个 permit，可通过 STORYFAB_RESOURCE_PERMITS 覆盖
-        .manage(crate::utils::ResourceLimiter)
+        .manage(crate::utils::ResourceLimiter::shared())
         .invoke_handler(tauri::generate_handler![
             run_ai_director_plan,
             check_app_data_directory,
