@@ -238,6 +238,170 @@
   }
 }
 
+// 智能编辑建议 (P1-B: SegmentTimelineCard)
+// 设计：与 .suggestionsCard 同主题（@film-amber accent），但用深色更紧凑的
+// 行式布局突出"速度 + 转场"两个信息密度高的字段。Segment type 用
+// 语义色 badge 区分（橙=action, 蓝=dialogue, 紫=transition, 灰=silence, 绿=content）。
+.smartCard {
+  background: @bg-card;
+  border: 1px solid @border-primary;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+
+  .smartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(90deg, @film-amber-glow 0%, transparent 100%);
+    border-bottom: 1px solid @border-primary;
+
+    .smartTitle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: @film-amber;
+    }
+
+    .smartMeta {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.55);
+    }
+  }
+
+  .smartBody {
+    padding: 4px 0;
+  }
+
+  .smartList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .smartItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid @border-subtle;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: @bg-hover;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .smartItemLeft {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .smartItemRight {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .smartTypeBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .smartTime {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', 'Menlo', monospace;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .smartSpeedBadge {
+      background: @film-amber !important;
+      color: @bg-page !important;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .smartTransitionBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: @bg-elevated !important;
+      color: @film-amber-light !important;
+      font-size: 11px;
+      border: 1px solid @border-active;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: help;
+    }
+  }
+
+  .smartMore {
+    padding: 8px 16px;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .smartEmpty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+  }
+
+  // Segment type 语义色（橙=action, 蓝=dialogue, 紫=transition, 灰=silence, 绿=content）
+  .tAction {
+    color: @orange-color;
+    background: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+  }
+  .tDialogue {
+    color: @info-color;
+    background: rgba(59, 130, 246, 0.12) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+  }
+  .tTransition {
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.12) !important;
+    border-color: rgba(167, 139, 250, 0.3) !important;
+  }
+  .tSilence {
+    color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: @border-subtle !important;
+  }
+  .tContent {
+    color: @success-color;
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+  }
+}
+
 // 预览步骤
 .previewCard {
   .previewStats {
