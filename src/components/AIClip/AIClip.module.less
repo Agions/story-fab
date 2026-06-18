@@ -383,7 +383,9 @@
     border-color: rgba(245, 158, 11, 0.3) !important;
   }
   .tDialogue {
-    color: @info-color;
+    // P5: switched from @info-color (4.64:1, AA临界) to @dialogue-color
+    // (6.71:1, AA 安全) for a11y. 11px text on @bg-card #1a1a2e.
+    color: @dialogue-color;
     background: rgba(59, 130, 246, 0.12) !important;
     border-color: rgba(59, 130, 246, 0.3) !important;
   }

@@ -49,6 +49,12 @@
 @primary-hover:   #e8c9a8;
 @primary-active:  #c49660;
 
+// 语义化提亮蓝 (WCAG-friendly): 用于深色背景上的小字号文字
+// 0x40 alpha @info-color #3b82f6 → 4.64:1 (临界 AA)
+// #60a5fa (Tailwind blue-400) → 6.71:1 (AA 安全)
+// 用途: AIClip .tDialogue 之类的 segment-type badge
+@dialogue-color:  #60a5fa;
+
 // =============================================
 // 渐变色
 // ✅ 统一使用琥珀色系
