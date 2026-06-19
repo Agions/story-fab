@@ -36,7 +36,11 @@ mod tests {
         // well-defined for the same platform's `process::exit` calling
         // convention. We only ever pass codes 0 and 1 (success / generic
         // failure) which are valid on every supported unix target.
-        unsafe { std::os::unix::process::ExitStatusExt::from_raw(code) }
+        // No `unsafe { }` block needed: `from_raw` is itself an `unsafe fn`,
+        // so the `unsafe`-ness is carried by the call site implicitly under
+        // the `unsafe_op_in_unsafe_fn` lint (enabled by default in 2024
+        // edition / rustc 1.86+ for this crate's MSRV).
+        std::os::unix::process::ExitStatusExt::from_raw(code)
     }
 
     #[cfg(windows)]
