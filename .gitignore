@@ -55,6 +55,9 @@ coverage/
 *.tmp
 tmp/
 temp/
+# TypeScript / CI diagnostic reports — local-only, should never be tracked
+tsc-report/
+reports/
 
 # Video/Audio cache
 *.mp4.part
