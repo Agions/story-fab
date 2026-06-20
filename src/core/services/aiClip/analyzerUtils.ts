@@ -162,11 +162,3 @@ export function msToSeconds(ms: number): number {
   return ms / MS_PER_SECOND;
 }
 
-/**
- * 转换秒到毫秒
- * @param seconds 秒
- * @returns 毫秒
- */
-export function secondsToMs(seconds: number): number {
-  return seconds * MS_PER_SECOND;
-}

@@ -65,6 +65,3 @@ export const useModelStore = create<AIModelState>()(
     }
   )
 );
-
-// 导出类型，方便使用
-export type AIModelStore = ReturnType<typeof useModelStore>; 
