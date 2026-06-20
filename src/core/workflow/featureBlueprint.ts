@@ -7,25 +7,6 @@ import type { WorkflowStep } from '@/core/types';
 export type WorkflowMode = 'ai-commentary' | 'ai-mixclip' | 'ai-first-person' | 'ai-repurposing';
 
 /**
- * 工作流模式配置
- */
-export interface WorkflowModeDefinition {
-  id: WorkflowMode;
-  label: string;
-  description: string;
-  icon: string;
-  steps: Array<WorkflowStep | 'ai-clip'>;
-  autoOriginalOverlayDefault: boolean;
-  syncTarget: 'strict' | 'balanced';
-  autonomy: 'full-auto' | 'auto-with-review';
-  /** 预估耗时(分钟) */
-  estimatedDuration: number;
-}
-
-/**
- * 工作流模式定义
- */
-/**
  * 默认工作流模式
  */
 /**
