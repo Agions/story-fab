@@ -96,33 +96,7 @@ export const colors = {
  * 将 OKLCH 颜色转换为 HEX（用于某些需要 hex 的场景）
  * 注意：这是近似转换，OKLCH 到 RGB/HEX 不是无损的
  */
-export function oklchToHex(oklch: string): string {
-  // 如果已经是 hex 则直接返回
-  if (oklch.startsWith('#')) return oklch;
-
-  // 这里可以添加 OKLCH -> RGB -> HEX 的转换逻辑
-  // 目前 design-system.css 中有些颜色仍是 hex，可以逐步迁移
-  return oklch;
-}
-
 /**
  * 获取 CSS 变量引用
  */
-export function getCssVar(name: string): string {
-  return `var(--${name})`;
-}
-
 // 重新导出 design-system.css 中的主 CSS 变量名（供 TypeScript 使用）
-export const cssVarNames = {
-  colorPrimary: '--color-primary',
-  colorSuccess: '--color-success',
-  colorWarning: '--color-warning',
-  colorError: '--color-error',
-  colorBgBase: '--color-bg-base',
-  colorBgSecondary: '--color-bg-secondary',
-  colorBgElevated: '--color-bg-elevated',
-  colorTextPrimary: '--color-text-primary',
-  colorBorderDefault: '--color-border-default',
-  glowPrimary: '--glow-primary',
-  glassBg: '--glass-bg',
-} as const;

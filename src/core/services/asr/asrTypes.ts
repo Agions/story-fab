@@ -25,11 +25,6 @@ export interface SpeechRecognitionResultList {
   [index: number]: SpeechRecognitionResult;
   [Symbol.iterator](): Iterator<SpeechRecognitionResult>;
 }
-
-export interface _SpeechRecognitionEventMap {
-  'result': SpeechRecognitionEvent;
-}
-
 export interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
   resultIndex: number;
@@ -54,13 +49,6 @@ export interface RustWhisperSegment {
   probability?: number;
   words?: RustWhisperWord[];
 }
-
-export interface _RustWhisperResult {
-  segments: RustWhisperSegment[];
-  language?: string;
-  language_probability?: number;
-}
-
 export interface SpeechRecognition extends EventTarget {
   lang: string;
   continuous: boolean;

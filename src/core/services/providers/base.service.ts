@@ -38,14 +38,6 @@ export interface ApiResponse<T = unknown> {
 /**
  * 分页响应格式
  */
-export interface PaginatedResponse<T = unknown> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
-}
-
 /**
  * 请求配置接口
  */

@@ -27,13 +27,6 @@ export interface ScriptData {
 }
 
 /** 解说片段数据（可编辑） */
-export interface CommentarySegmentData {
-  startTime: number;
-  endTime: number;
-  text: string;
-  emotion?: string;
-}
-
 export interface VoiceData {
   id: string;
   url: string;

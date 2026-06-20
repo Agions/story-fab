@@ -272,4 +272,3 @@ export type { StoryFabContextType };
 
 // 旧版兼容 Hook（别名）
 /** @deprecated 请使用 useStoryFab 代替 */
-export const useAIEditor = useStoryFab;

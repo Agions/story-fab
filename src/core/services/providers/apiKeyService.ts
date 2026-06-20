@@ -163,7 +163,3 @@ export const validateApiKey = async (provider: string, apiKey: string): Promise<
 /**
  * 测试 API 连接
  */
-export const testApiConnection = async (provider: string, apiKey: string): Promise<boolean> => {
-  const result = await validateApiKey(provider, apiKey);
-  return result.isValid;
-};

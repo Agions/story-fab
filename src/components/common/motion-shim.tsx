@@ -124,62 +124,8 @@ export const variants = {
 /**
  * 动画过渡组件
  */
-export const MotionDiv: React.FC<MotionProps> = ({ 
-  children, 
-  initial, 
-  animate: _animate, 
-  transition,
-  className,
-  style,
-  ...rest 
-}) => {
-  const baseStyle: CSSProperties = {
-    ...(typeof initial === 'object' ? initial : {}),
-    transition: transition ? 
-      `all ${transition.duration || 0.3}s cubic-bezier(${((transition.ease || [0.4, 0, 0.2, 1])).join(',')})` :
-      'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  };
-
-  return (
-    <div 
-      {...rest}
-      className={className}
-      style={{ ...baseStyle, ...style }}
-    >
-      {children}
-    </div>
-  );
-};
-
 /**
  * AnimatePresence 替代方案
  * 使用 CSS keyframes
  */
-export const AnimatePresence: React.FC<{
-  children?: React.ReactNode;
-  mode?: 'sync' | 'wait';
-  initial?: boolean;
-}> = ({ children, mode: _mode, initial = true }) => {
-  if (!initial) return <>{children}</>;
-  
-  // 简单的进入动画
-  const style: CSSProperties = {
-    animation: 'fadeIn 0.3s ease-out',
-  };
-  
-  const keyframes = `
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  `;
-  
-  return (
-    <>
-      <style>{keyframes}</style>
-      <div style={style}>{children}</div>
-    </>
-  );
-};
-
 export default motion;
