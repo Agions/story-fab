@@ -8,12 +8,3 @@ export interface AlignmentGateSummary {
   maxDriftSeconds: number;
 }
 
-export const isAlignmentGatePassed = (
-  summary: AlignmentGateSummary,
-  threshold = ALIGNMENT_GATE_THRESHOLD
-): boolean => {
-  return (
-    summary.averageConfidence >= threshold.minConfidence &&
-    summary.maxDriftSeconds <= threshold.maxDriftSeconds
-  );
-};

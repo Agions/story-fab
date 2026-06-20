@@ -16,8 +16,6 @@ export const preloadProjectsPage = (): Promise<unknown> =>
 
 export const preloadProjectEditPage = (): Promise<unknown> =>
   runOnce('page:project-edit', () => import('../../pages/ProjectEdit/index'));
-
-export const preloadProjectDetailPage = (): Promise<unknown> =>
   runOnce('page:project-detail', () => import('../../pages/ProjectDetail/index'));
 
 export const preloadVideoEditorPage = (): Promise<unknown> =>

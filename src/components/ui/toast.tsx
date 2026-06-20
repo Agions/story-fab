@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
+import React, { createContext, useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info, Loader } from "lucide-react";
 import styles from "@/components/ui/toast.module.css";
@@ -21,13 +21,6 @@ interface ToastContextValue {
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
-
-export function useToast() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error("useToast must be used within ToastProvider");
-  return ctx;
-}
-
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   const typeIcons: Record<ToastType, React.ReactNode> = {
     success: <CheckCircle size={16} className="text-green-500" />,

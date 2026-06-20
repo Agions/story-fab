@@ -18,13 +18,3 @@ export interface CustomQualitySettings {
   framerate: number;
   useHardwareAcceleration: boolean;
 }
-
-export interface VideoProcessingControllerProps {
-  videoPath: string;
-  segments: Array<{ start: number; end: number; type?: string; content?: string }>;
-  onProcessingComplete?: (outputPath: string) => void;
-  defaultQuality?: string;
-  defaultFormat?: string;
-  defaultTransition?: string;
-  defaultAudioProcess?: string;
-}

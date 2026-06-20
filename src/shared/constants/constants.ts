@@ -110,9 +110,3 @@ export const PROJECT_SAVE_BEHAVIOR_KEY = 'project_save_behavior';
 export const PROJECT_AUTO_SAVE_KEY = 'project_autosave_enabled';
 
 export type ProjectSaveBehavior = 'stay' | 'detail';
-
-export const MODEL_PROVIDERS = {
-  openai: { name: 'OpenAI', icon: '🤖' },
-  anthropic: { name: 'Anthropic', icon: '🧠' },
-  google: { name: 'Google', icon: '🔴' },
-} as const;

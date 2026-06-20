@@ -6,19 +6,6 @@
 // ============================================
 // Shared Task Status
 // ============================================
-
-export interface TaskStatusInfo {
-  id?: string;
-  type?: string;
-  status: 'idle' | 'running' | 'completed' | 'failed' | 'cancelled';
-  progress: number;
-  message?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  completedAt?: string;
-  error?: string;
-}
-
 // ============================================
 // Vision Service Shared Types
 // ============================================
