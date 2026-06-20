@@ -15,7 +15,6 @@ export {
   MODEL_CATALOG_VERIFIED_AT,
   DEFAULT_MODEL_ID,
   MODEL_VERIFICATION,
-  type ModelVerificationMeta,
   // 模型目录
   AI_MODELS,
   MODEL_RECOMMENDATIONS,
@@ -27,7 +26,4 @@ export {
   estimateContentTokens,
   selectOptimalModel,
   recommendModelsForTask,
-  type ContentProfile,
-  type TaskType,
-  type ModelSelectionHint,
 } from './ai-models';

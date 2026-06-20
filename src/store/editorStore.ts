@@ -84,5 +84,3 @@ export const useEditorStore = create<EditorStore>()(
   )
 );
 
-// Re-export types for consumers
-export type { TimelineSelection } from './editorTypes';

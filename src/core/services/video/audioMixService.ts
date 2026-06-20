@@ -77,16 +77,3 @@ export async function mixTtsWithVideo(
     throw error;
   }
 }
-
-/**
- * 获取音频文件的时长（秒）
- */
-export async function getAudioDuration(audioPath: string): Promise<number> {
-  try {
-    const duration = await tauri.mixAudio.getDuration(audioPath);
-    return duration;
-  } catch (error) {
-    logger.warn('[AudioMix] getAudioDuration failed:', error);
-    return 0;
-  }
-}

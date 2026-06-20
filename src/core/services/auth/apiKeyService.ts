@@ -15,15 +15,3 @@ export const getApiKey = async (service: string): Promise<string> => {
     return '';
   }
 };
-
-export const saveApiKey = async (service: string, apiKey: string): Promise<boolean> => {
-  try {
-    const store = await load('api_keys.json', { defaults: {}, autoSave: true });
-    await store.set(service, apiKey);
-    await store.save();
-    return true;
-  } catch (error) {
-    logger.error(`保存${service}的API密钥失败:`, error);
-    return false;
-  }
-};

@@ -98,29 +98,6 @@ export const motion: typeof MotionDivComponent & {
 });
 
 // 常用动画变体
-export const variants = {
-  // 淡入
-  fadeIn: {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-  },
-  // 从下方淡入
-  fadeInUp: {
-    initial: { opacity: 0, transform: 'translateY(20px)' },
-    animate: { opacity: 1, transform: 'translateY(0)' },
-  },
-  // 从上方淡入
-  fadeInDown: {
-    initial: { opacity: 0, transform: 'translateY(-20px)' },
-    animate: { opacity: 1, transform: 'translateY(0)' },
-  },
-  // 缩放淡入
-  scaleIn: {
-    initial: { opacity: 0, transform: 'scale(0.9)' },
-    animate: { opacity: 1, transform: 'scale(1)' },
-  },
-};
-
 /**
  * 动画过渡组件
  */

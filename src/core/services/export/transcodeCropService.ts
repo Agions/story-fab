@@ -25,14 +25,3 @@ export const transcodeWithCrop = async (options: TranscodeCropOptions): Promise<
     throw error;
   }
 };
-
-export const exportMultiFormat = async (
-  inputs: Array<{ inputPath: string; outputPath: string; aspect: AspectRatio; quality?: ExportQuality }>
-): Promise<string[]> => {
-  const results: string[] = [];
-  for (const opt of inputs) {
-    const result = await transcodeWithCrop(opt);
-    results.push(result);
-  }
-  return results;
-};
