@@ -11,12 +11,6 @@ import { logger } from '../../../../shared/utils/logging';
 // ============================================
 // 场景检测配置
 // ============================================
-
-export interface SceneDetectionOptions {
-  minSceneDuration?: number;
-  threshold?: number;
-}
-
 export interface SceneClassificationResult {
   id: string;
   description: string;

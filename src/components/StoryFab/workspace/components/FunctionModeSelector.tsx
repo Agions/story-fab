@@ -9,7 +9,7 @@
 
 import React from 'react';
 import styles from '../ScriptWriting.module.less';
-import { FEATURE_TO_FUNCTION, FUNCTION_TO_FEATURE, type AIFunctionType } from '../functionModeMap';
+import { FEATURE_TO_FUNCTION, type AIFunctionType } from '../functionModeMap';
 
 // ============================================
 // 类型定义
@@ -100,8 +100,4 @@ export function useSyncFunctionType(
 /**
  * 获取 functionType 对应的 feature
  */
-export function getFeatureFromFunctionType(type: AIFunctionType): 'smartClip' | 'voiceover' | 'subtitle' {
-  return FUNCTION_TO_FEATURE[type];
-}
-
 export default FunctionModeSelector;

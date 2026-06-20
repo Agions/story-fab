@@ -12,12 +12,6 @@ import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
 // ============================================
 // 类型定义
 // ============================================
-
-export interface ParsedScript {
-  segments: CoreScriptSegment[];
-  fullText: string;
-}
-
 // ============================================
 // 脚本解析
 // ============================================

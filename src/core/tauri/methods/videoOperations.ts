@@ -3,11 +3,6 @@
  * Split from VideoAnalyzer direct invoke calls
  */
 import { invoke, TauriCommand } from '../invoke';
-
-export interface ExtractKeyFramesResult {
-  frames: string[];
-}
-
 /**
  * 从视频中提取关键帧
  * @param path 视频路径

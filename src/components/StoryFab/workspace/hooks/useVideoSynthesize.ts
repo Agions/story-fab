@@ -23,29 +23,9 @@ import { DEFAULT_SYNTHESIZE_CONFIG } from '../composeConfig';
 // ============================================
 // Hook 状态类型
 // ============================================
-
-export interface SynthesizeState {
-  /** 合成中状态 */
-  synthesizing: boolean;
-  /** 合成进度 0-100 */
-  progress: number;
-  /** 合成配置 */
-  config: SynthesizeConfig;
-}
-
 // ============================================
 // Hook 操作类型
 // ============================================
-
-export interface SynthesizeActions {
-  /** 更新配置 */
-  updateConfig: (updates: Partial<SynthesizeConfig>) => void;
-  /** 生成配音 */
-  generateVoice: (scriptContent: string) => Promise<unknown>;
-  /** 执行视频合成 */
-  synthesize: (params: SynthesizeParams) => Promise<boolean>;
-}
-
 // ============================================
 // Hook 参数
 // ============================================

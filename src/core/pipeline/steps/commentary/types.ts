@@ -8,7 +8,7 @@
  * - 中间结果可被 UI 单独展示
  */
 
-import type { ScriptSegment, Scene, VideoAnalysis, Emotion } from '@/core/types';
+import type { ScriptSegment, Scene, VideoAnalysis } from '@/core/types';
 import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
 import type { OriginalOverlayPlanItem } from '@/core/services/ai/sceneCommentaryService';
 
@@ -221,10 +221,6 @@ export interface CommentaryPipelineResult {
 /**
  * 从 VideoAnalysis 中提取 emotion 列表
  */
-export const extractEmotions = (analysis: VideoAnalysis): Emotion[] => {
-  return (analysis.emotions ?? []) as Emotion[];
-};
-
 /**
  * Director pacing 推导
  * 根据场景密度 + 时长推导节奏

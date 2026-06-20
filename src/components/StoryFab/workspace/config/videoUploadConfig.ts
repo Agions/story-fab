@@ -9,7 +9,6 @@
  */
 
 import { VIDEO_FORMATS } from '@/shared/constants';
-import { AppError } from '@/core/errors';
 
 // ============================================
 // 常量
@@ -72,45 +71,3 @@ export const chunkStore = createChunkStore();
 // ============================================
 // 工具函数
 // ============================================
-
-/**
- * 检查文件是否为支持的视频格式
- * @param file 文件对象
- * @returns 是否支持
- */
-export const isSupportedVideoFile = (file: File): boolean => {
-  const fileName = file.name.toLowerCase();
-  return VIDEO_EXTENSIONS.some((ext) => fileName.endsWith(ext));
-};
-
-/**
- * 模拟分块上传
- * @param chunks 分块数组
- * @param onProgress 进度回调
- * @param onChunkUploaded 分块上传完成回调
- * @param signal 中断信号
- */
-export const simulateChunkedUpload = async (
-  chunks: Blob[],
-  onProgress: (percent: number) => void,
-  onChunkUploaded: (index: number) => void,
-  signal?: AbortSignal
-): Promise<void> => {
-  for (let i = 0; i < chunks.length; i++) {
-    if (signal?.aborted) {
-      throw new AppError('APP_UPLOAD_ABORTED', 'Upload aborted', {
-        severity: 'warning',
-        userMessage: '上传已取消',
-      });
-    }
-    // 模拟网络延迟
-    await new Promise((resolve) =>
-      setTimeout(
-        resolve,
-        UPLOAD_DELAY_MIN_MS + Math.random() * UPLOAD_DELAY_RANGE_MS
-      )
-    );
-    onChunkUploaded(i);
-    onProgress(Math.round(((i + 1) / chunks.length) * 100));
-  }
-};
