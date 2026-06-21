@@ -108,8 +108,6 @@ export interface RepurposingResult {
  */
 export function clipSegmentFromRepurposing(
   rep: RepurposingClip,
-  // @ts-expect-error - index reserved for future index-aware repurposing mapping
-  index: number,
   sourceId: string,
 ): ClipSegment {
   return {

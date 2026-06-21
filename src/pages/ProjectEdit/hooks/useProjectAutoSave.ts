@@ -92,20 +92,6 @@ export function useProjectAutoSave({
     }, 900);
   }, [enabled, initialLoading, loading, saving, videoPath, getCurrentFingerprint, onPersist]);
 
-  // Sync fingerprint when project changes externally (e.g., after save)
-  // @ts-expect-error - external sync handler reserved for post-save fingerprint alignment
-  const _syncFingerprint = useCallback((data: ProjectData) => {
-    lastFingerprintRef.current = buildDraftFingerprint({
-      id: data.id,
-      name: data.name,
-      description: data.description,
-      videoPath: data.videoPath,
-      keyFrameCount: data.keyFrames?.length || 0,
-      scriptCount: data.script?.length || 0,
-      hasMetadata: Boolean(data.metadata),
-    });
-  }, []);
-
   return {
     autoSaveState,
     lastAutoSaveAt,

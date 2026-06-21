@@ -102,9 +102,6 @@ export class ClipWorkflowService {
     videoInfo: VideoInfo,
     scriptSegments?: ScriptSegment[]
   ): Promise<ClipResult> {
-    // @ts-expect-error - _startTime reserved for future workflow timing metrics collection
-    const _startTime = Date.now();
-    
     // Step 1: 视频分析
     const analysis = await this.analyzeVideo(videoInfo);
 
@@ -191,8 +188,8 @@ export class ClipWorkflowService {
 
     // Pipeline 结果 → ClipSegment[]（向后兼容）
     const sourceId = videoInfo.id || 'source';
-    const segments: ClipSegment[] = pipelineResult.clips.map((rep, index) =>
-      clipSegmentFromRepurposing(rep, index, sourceId),
+    const segments: ClipSegment[] = pipelineResult.clips.map((rep) =>
+      clipSegmentFromRepurposing(rep, sourceId),
     );
 
     // 应用当前服务的转换效果（向后兼容）

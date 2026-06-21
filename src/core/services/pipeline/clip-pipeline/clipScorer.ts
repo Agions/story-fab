@@ -187,8 +187,8 @@ export class ClipScorer {
 
     const reasons = this.buildReasons(
       laughterScore, emotionScore, completenessScore,
-      silenceScore, paceScore, keywordScore,
-      transcript, duration,
+      silenceScore, keywordScore,
+      duration,
     );
 
     return {
@@ -285,11 +285,9 @@ export class ClipScorer {
 
   private buildReasons(
     laughter: number, emotion: number, completeness: number,
-    silence: number, 
-    // @ts-expect-error - pace/keywords reserved for future scoring rubric expansion
-    pace: number, keywords: number,
-    // @ts-expect-error - transcript reserved for future evidence-based reason generation
-    transcript: string, duration: number,
+    silence: number,
+    keywords: number,
+    duration: number,
   ): string[] {
     const reasons: string[] = [];
     if (laughter > 60) reasons.push('笑声密集');

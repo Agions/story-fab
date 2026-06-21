@@ -4,7 +4,6 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { preloadProjectEditPage } from '../../../core/utils/route-preload';
-import { useAppStore } from '@/store';
 import styles from '@/pages/Dashboard/index.module.less';
 
 interface WelcomeHeaderProps {
@@ -12,9 +11,6 @@ interface WelcomeHeaderProps {
 }
 
 const WelcomeHeader: React.FC<WelcomeHeaderProps> = React.memo(({ onCreateProject }) => {
-  // @ts-expect-error - user is read from store by descendants; kept for header personalization hook
-  const _user = useAppStore((state) => state.user);
-
   const handleMouseEnter = () => {
     void preloadProjectEditPage();
   };
