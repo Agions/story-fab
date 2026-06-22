@@ -22,7 +22,6 @@ interface UseCommentarySessionResult {
   startAnalysis: () => Promise<void>;
   resetSession: () => void;
   selectedStyle: ScriptStylePreset;
-  setSelectedStyle: (style: ScriptStylePreset) => void;
 }
 
 export function useCommentarySession(
@@ -95,6 +94,5 @@ export function useCommentarySession(
     startAnalysis,
     resetSession,
     selectedStyle,
-    setSelectedStyle: () => {}, // controlled externally
   };
 }

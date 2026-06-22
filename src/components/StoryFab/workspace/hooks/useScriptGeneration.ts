@@ -86,7 +86,7 @@ export function useScriptGeneration(params: UseScriptGenerationParams) {
     apiKeysRef.current = apiKeys;
   }, [apiKeys]);
 
-  const [alignmentGate, setAlignmentGate] = useState<AlignmentGate | null>(null);
+  const [alignmentGate] = useState<AlignmentGate | null>(null);
 
   const timeout = useTimeout();
   const lastTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -270,7 +270,6 @@ export function useScriptGeneration(params: UseScriptGenerationParams) {
     config,
     setConfig,
     alignmentGate,
-    setAlignmentGate,
     // 操作
     handleGenerate,
     handleEditScript,

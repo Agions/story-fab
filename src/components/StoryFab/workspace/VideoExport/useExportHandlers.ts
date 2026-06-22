@@ -45,7 +45,6 @@ interface ExportHandlers {
   setConfig: React.Dispatch<React.SetStateAction<ExportSettings>>;
   setSelectedPlatform: (v: string | null) => void;
   setBatchMode: (v: boolean) => void;
-  setSelectedPlatforms: (v: string[]) => void;
   handleExport: () => Promise<void>;
   handleBatchExport: () => Promise<void>;
   handleCancel: () => Promise<void>;
@@ -307,7 +306,6 @@ export function useExportHandlers({
     setConfig,
     setSelectedPlatform: setters.selectedPlatform,
     setBatchMode: setters.batchMode,
-    setSelectedPlatforms: setters.selectedPlatforms,
     handleExport,
     handleBatchExport,
     handleCancel,
