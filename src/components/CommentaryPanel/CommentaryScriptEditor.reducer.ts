@@ -21,7 +21,7 @@ export interface SegmentRowState {
   text: string;
 }
 
-export type SegmentRowAction =
+type SegmentRowAction =
   | { type: 'SET_EDITING'; editing: boolean }
   | { type: 'SET_TEXT'; text: string }
   | { type: 'START_EDIT'; initialText: string }
@@ -56,7 +56,7 @@ export interface ScriptEditorState {
   copied: boolean;
 }
 
-export type ScriptEditorAction =
+type ScriptEditorAction =
   | { type: 'SET_COPIED'; copied: boolean }
   | { type: 'MARK_COPIED' }
   | { type: 'RESET_COPIED' };

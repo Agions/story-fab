@@ -13,7 +13,7 @@ import type { ModelProvider } from '@/core/types';
 // 提供者元数据
 // =============================================================================
 
-export interface ModelProviderMeta {
+interface ModelProviderMeta {
   name: string;
   icon: string;
   website: string;
@@ -109,7 +109,7 @@ export const MODEL_PROVIDERS: Record<ModelProvider, ModelProviderMeta> = {
 // 模型验证元数据（来源：各大厂商官方文档 + OpenRouter 实时数据，2026-05）
 // =============================================================================
 
-export interface ModelVerificationMeta {
+interface ModelVerificationMeta {
   checkedAt: string;
   source: string;
   verified: boolean;

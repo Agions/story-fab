@@ -15,7 +15,7 @@ import { ALIGNMENT_GATE_THRESHOLD } from '@/core/workflow/alignmentGate';
 // 类型定义
 // ============================================
 
-export interface ScriptStatsBarProps {
+interface ScriptStatsBarProps {
   /** 字数 */
   wordCount: number;
   /** 预计时长（秒） */

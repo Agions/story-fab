@@ -13,13 +13,13 @@ import { STYLE_GUIDANCE_MAP, TONE_GUIDANCE_MAP } from './aiModelConfigs';
 // 类型定义
 // ============================================
 
-export interface AnalysisMoment {
+interface AnalysisMoment {
   timestamp: number;
   description: string;
   importance: number;
 }
 
-export interface AnalysisEmotion {
+interface AnalysisEmotion {
   timestamp: number;
   type: string;
   intensity: number;

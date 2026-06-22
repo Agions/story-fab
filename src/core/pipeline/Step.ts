@@ -54,7 +54,7 @@ export interface StepOptions {
 /**
  * Step 元信息
  */
-export interface StepMeta {
+interface StepMeta {
   /** 步骤名称（唯一标识） */
   name: string;
   /** 步骤描述 */
@@ -101,7 +101,7 @@ export interface Step<TInput, TOutput> {
 // Step 错误类型
 // ============================================================
 
-export class StepExecutionError extends Error {
+class StepExecutionError extends Error {
   constructor(
     message: string,
     public readonly stepName: string,
@@ -270,7 +270,7 @@ export class ChainPipeline<TStart, TEnd> {
  * ConcurrentPipeline — 并发执行多个独立分支，最后合并
  * 适用于多个并行的分析步骤
  */
-export class ConcurrentPipeline<TInput, TBranchOutput, TFinal> {
+class ConcurrentPipeline<TInput, TBranchOutput, TFinal> {
   constructor(
     private branches: Array<Step<TInput, TBranchOutput>>,
     private merger: (results: TBranchOutput[], context: PipelineContext) => Promise<TFinal>,

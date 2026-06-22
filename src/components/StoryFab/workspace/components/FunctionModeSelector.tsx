@@ -24,7 +24,7 @@ export interface FunctionMode {
   example: string;
 }
 
-export interface FunctionModeSelectorProps {
+interface FunctionModeSelectorProps {
   /** 功能配置 */
   functionConfig: Record<AIFunctionType, FunctionMode>;
   /** 当前选中的功能类型 */

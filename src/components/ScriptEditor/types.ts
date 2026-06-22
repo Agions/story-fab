@@ -2,7 +2,7 @@ import type { ScriptSegment } from '@/core/types';
 import type { ScriptData, Scene } from '@/core/types';
 
 // 原始 Props 接口
-export interface ScriptEditorOriginalProps {
+interface ScriptEditorOriginalProps {
   videoPath: string;
   initialSegments?: ScriptSegment[];
   onSave: (segments: ScriptSegment[]) => void;
@@ -10,7 +10,7 @@ export interface ScriptEditorOriginalProps {
 }
 
 // Workflow 页面使用的 Props 接口
-export interface ScriptEditorWorkflowProps {
+interface ScriptEditorWorkflowProps {
   script?: ScriptData;
   scenes?: Scene[];
   onSave: (script: ScriptData) => void;

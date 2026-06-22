@@ -36,7 +36,7 @@ export const UPLOAD_DELAY_RANGE_MS = 150;
 /**
  * 分块存储接口
  */
-export interface ChunkStore {
+interface ChunkStore {
   /** 添加分块 */
   addChunk: (id: string, chunk: Blob, index: number) => void;
   /** 获取所有分块 */
@@ -51,7 +51,7 @@ export interface ChunkStore {
  * 创建分块存储
  * 提取说明：原代码中此闭包内联在组件文件中
  */
-export const createChunkStore = (): ChunkStore => {
+const createChunkStore = (): ChunkStore => {
   const chunks: Map<string, Blob[]> = new Map();
   return {
     addChunk: (id: string, chunk: Blob, index: number) => {

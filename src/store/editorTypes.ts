@@ -42,7 +42,7 @@ export interface TimelineSelection {
 // =========================================
 // EditorStore full state & actions
 // =========================================
-export interface EditorState {
+interface EditorState {
   video: VideoData | null;
   script: ScriptData | null;
   voice: VoiceData | null;
@@ -56,7 +56,7 @@ export interface EditorState {
   scrollPosition: number;
 }
 
-export type EditorActions = {
+type EditorActions = {
   // Media
   setVideo: (video: VideoData | null) => void;
   setScript: (script: ScriptData | null) => void;

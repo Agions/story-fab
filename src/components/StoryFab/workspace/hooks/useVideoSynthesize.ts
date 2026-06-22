@@ -30,7 +30,7 @@ import { DEFAULT_SYNTHESIZE_CONFIG } from '../composeConfig';
 // Hook 参数
 // ============================================
 
-export interface SynthesizeParams {
+interface SynthesizeParams {
   /** 是否有视频 */
   hasVideo: boolean;
   /** 当前脚本内容 */

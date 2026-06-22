@@ -11,7 +11,7 @@ import { logger } from '../../../../shared/utils/logging';
 // ============================================
 // 场景检测配置
 // ============================================
-export interface SceneClassificationResult {
+interface SceneClassificationResult {
   id: string;
   description: string;
   keywords: string[];
@@ -22,7 +22,7 @@ export interface SceneClassificationResult {
 // 场景检测服务
 // ============================================
 
-export class SceneDetectionService {
+class SceneDetectionService {
   /**
    * 分割视频为场景片段
    * @param videoInfo 视频信息

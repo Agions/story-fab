@@ -7,7 +7,7 @@ import { logger } from '@/shared/utils/logging';
 
 export type AspectRatio = '16:9' | '9:16' | '1:1';
 export type ExportQuality = 'high' | 'medium' | 'low';
-export interface TranscodeCropOptions {
+interface TranscodeCropOptions {
   inputPath: string;
   outputPath: string;
   aspect: AspectRatio;

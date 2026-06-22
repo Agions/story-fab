@@ -10,7 +10,7 @@
  */
 import { useRef, useEffect, useCallback } from 'react';
 
-export interface UsePromiseDelayReturn {
+interface UsePromiseDelayReturn {
   /** 返回 Promise 的 setTimeout 包装器 */
   delay: (ms: number) => Promise<void>;
   /** 清除所有待执行的 timeout */

@@ -15,7 +15,7 @@ import { SCRIPT_STYLES, SCRIPT_LENGTHS } from '../scriptConfig';
 // 类型定义
 // ============================================
 
-export interface StyleLengthConfigProps {
+interface StyleLengthConfigProps {
   /** 当前风格 */
   currentStyle: string;
   /** 当前长度 */

@@ -134,4 +134,3 @@ const SegmentTimelineCard: React.FC<SegmentTimelineCardProps> = ({ segments, max
 };
 
 export { SegmentTimelineCard };
-export type { SegmentTimelineCardProps };

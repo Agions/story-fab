@@ -10,7 +10,7 @@ import { EMOTION_DIMENSIONS } from '../types';
 // 情感分析服务
 // ============================================
 
-export class EmotionAnalysisService {
+class EmotionAnalysisService {
   /**
    * 分析场景情感
    * @param scenes 场景列表

@@ -12,7 +12,7 @@ import { toast } from '@/components/ui/sonner';
 import { logger } from '@/shared/utils/logging';
 import type { VoiceInfo } from '@/core/services/commentary';
 
-export interface UseCommentaryVoiceResult {
+interface UseCommentaryVoiceResult {
   voices: VoiceInfo[];
   selectedVoice: string;
   setSelectedVoice: (voice: string) => void;

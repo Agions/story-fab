@@ -8,7 +8,7 @@ import {
   type ProjectDetailProject,
 } from './useProjectDetail.reducer';
 
-export interface UseProjectDetailResult {
+interface UseProjectDetailResult {
   state: ProjectDetailState;
   setActiveStep: (step: string) => void;
   setProject: (project: ProjectDetailState['project']) => void;

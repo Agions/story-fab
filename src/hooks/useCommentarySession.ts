@@ -12,7 +12,7 @@ import { logger } from '@/shared/utils/logging';
 import type { ScriptStylePreset } from '@/core/types/commentary';
 import { useDirectorStatus, UseDirectorStatusResult } from './useDirectorStatus';
 
-export interface UseCommentarySessionResult {
+interface UseCommentarySessionResult {
   sessionId: string | null;
   directorStatus: UseDirectorStatusResult['directorStatus'];
   progressPct: number;

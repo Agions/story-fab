@@ -8,7 +8,7 @@
 import React, { memo } from 'react';
 import { cn } from '@/shared/utils/cn';
 
-export interface StyleOption {
+interface StyleOption {
   value: string;
   label: string;
   description?: string;

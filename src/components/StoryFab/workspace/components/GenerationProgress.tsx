@@ -14,7 +14,7 @@ import styles from '../ScriptWriting.module.less';
 // 类型定义
 // ============================================
 
-export interface GenerationProgressProps {
+interface GenerationProgressProps {
   /** 进度 0-100 */
   progress: number;
   /** 当前生成的功能标题 */

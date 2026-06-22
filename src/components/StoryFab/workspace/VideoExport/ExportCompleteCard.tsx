@@ -5,7 +5,7 @@
 import React from 'react';
 import styles from '../VideoExport.module.less';
 
-export interface ExportCompleteMeta {
+interface ExportCompleteMeta {
   format: string;
   resolution: string;
   fps: number;

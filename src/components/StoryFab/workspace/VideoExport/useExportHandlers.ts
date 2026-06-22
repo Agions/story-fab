@@ -27,7 +27,7 @@ interface UseExportHandlersProps {
   onComplete?: () => void;
 }
 
-export interface ExportHandlers {
+interface ExportHandlers {
   exporting: boolean;
   progress: number;
   progressStage: string;

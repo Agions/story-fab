@@ -15,7 +15,7 @@ import { COMMENTARY_STYLES } from '../scriptConfig';
 // 类型定义
 // ============================================
 
-export interface CommentaryStyleSelectorProps {
+interface CommentaryStyleSelectorProps {
   /** 当前选中的风格 */
   currentStyle: string;
   /** 风格变更回调 */

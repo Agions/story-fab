@@ -10,7 +10,7 @@
 import { tauri } from '../../tauri';
 import { logger } from '../../../shared/utils/logging';
 
-export interface MixAudioOptions {
+interface MixAudioOptions {
   /** TTS 配音文件路径 */
   ttsAudioPath: string;
   /** 原视频路径（保留其音轨作为背景音） */
@@ -25,7 +25,7 @@ export interface MixAudioOptions {
   offset?: number;
 }
 
-export interface MixAudioResult {
+interface MixAudioResult {
   outputPath: string;
   duration: number;
 }

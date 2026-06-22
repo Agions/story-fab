@@ -14,7 +14,7 @@ import styles from '../VideoComposing.module.less';
 // 类型定义
 // ============================================
 
-export interface SynthesizeProgressProps {
+interface SynthesizeProgressProps {
   /** 进度 0-100 */
   progress: number;
 }

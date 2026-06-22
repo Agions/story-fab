@@ -26,20 +26,20 @@ import { FUNCTION_TO_FEATURE, type AIFunctionType } from '../functionModeMap';
 // 类型定义
 // ============================================
 
-export interface ScriptConfig {
+interface ScriptConfig {
   functionType: AIFunctionType;
   style: string;
   length: string;
   commentaryStyle: string;
 }
 
-export interface AlignmentGate {
+interface AlignmentGate {
   averageConfidence: number;
   maxDriftSeconds: number;
   passed: boolean;
 }
 
-export interface UseScriptGenerationParams {
+interface UseScriptGenerationParams {
   state: storyfabState;
   setNarrationScript: (data: ScriptData) => void;
   setRemixScript: (data: ScriptData) => void;

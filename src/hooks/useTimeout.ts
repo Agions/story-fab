@@ -6,7 +6,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { usePromiseDelay } from './usePromiseDelay';
 
-export interface UseTimeoutReturn {
+interface UseTimeoutReturn {
   /** 设置一个带自动清理的 setTimeout，返回 timeout id */
   set: (fn: () => void, delay: number) => ReturnType<typeof setTimeout>;
   /** 清除特定的 timeout */

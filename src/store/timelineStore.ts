@@ -48,7 +48,7 @@ export interface TimelineState {
   outPointMs?: number;
 }
 
-export interface TimelineActions {
+interface TimelineActions {
   // Playhead
   setPlayheadMs: (ms: number) => void;
 
@@ -89,7 +89,7 @@ export interface TimelineActions {
   canRedoTrack: () => boolean;
 }
 
-export type TimelineStore = TimelineState & TimelineActions;
+type TimelineStore = TimelineState & TimelineActions;
 
 // =========================================
 // Initial State

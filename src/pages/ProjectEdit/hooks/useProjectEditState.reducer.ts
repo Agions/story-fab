@@ -46,7 +46,7 @@ export interface ProjectEditState {
   autoSaveEnabled: boolean;
 }
 
-export type ProjectEditAction =
+type ProjectEditAction =
   | { type: 'set'; key: keyof ProjectEditState; value: ProjectEditState[keyof ProjectEditState] }
   | { type: 'update'; key: keyof ProjectEditState; updater: (prev: ProjectEditState[keyof ProjectEditState]) => ProjectEditState[keyof ProjectEditState] };
 

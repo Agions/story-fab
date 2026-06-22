@@ -20,7 +20,7 @@ export interface VideoPlayerState {
   showVolumeSlider: boolean;
 }
 
-export type VideoPlayerAction =
+type VideoPlayerAction =
   | { type: 'SET_IS_PLAYING'; isPlaying: boolean }
   | { type: 'SET_CURRENT_TIME'; currentTime: number }
   | { type: 'SET_DURATION'; duration: number }

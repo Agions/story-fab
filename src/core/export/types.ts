@@ -13,7 +13,7 @@ export type ExportQuality = 'low' | 'medium' | 'high' | 'ultra' | 'custom';
 export type ExportResolution = '480p' | '720p' | '1080p' | '1440p' | '4k' | 'custom';
 
 // 编码器
-export interface EncoderSettings {
+interface EncoderSettings {
   videoCodec: 'h264' | 'h265' | 'vp8' | 'vp9' | 'av1';
   audioCodec: 'aac' | 'mp3' | 'opus';
   bitrate?: string;

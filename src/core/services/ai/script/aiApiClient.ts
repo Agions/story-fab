@@ -59,7 +59,7 @@ function parseAIErrorResponse(error: unknown, modelType: string): AIServiceError
 // 统一调用接口
 // ============================================
 
-export interface CallAIOptions {
+interface CallAIOptions {
   appId?: string;
   [key: string]: unknown;
 }

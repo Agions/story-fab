@@ -1,7 +1,7 @@
 import { invoke, TauriCommand } from '../invoke';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 
-export interface ZCRProgress {
+interface ZCRProgress {
   stage: 'extract' | 'analyze' | 'done';
   percent: number;
 }

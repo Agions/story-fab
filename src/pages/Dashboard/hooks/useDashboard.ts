@@ -21,7 +21,7 @@ import {
 } from '@/shared';
 import { Project, DashboardStats } from '../types';
 
-export interface UseDashboardReturn {
+interface UseDashboardReturn {
   projects: Project[];
   loading: boolean;
   stats: DashboardStats;

@@ -10,7 +10,7 @@
 // Vision Service Shared Types
 // ============================================
 
-export interface SceneType {
+interface SceneType {
   id: string;
   name: string;
   keywords: string[];
@@ -27,7 +27,7 @@ export interface SceneFeatureSet {
   tags: string[];
 }
 
-export interface EmotionDimension {
+interface EmotionDimension {
   id: string;
   name: string;
   score: number;

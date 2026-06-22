@@ -34,7 +34,7 @@ export interface HighlightsState {
   topN: number;
 }
 
-export type HighlightsAction =
+type HighlightsAction =
   | { type: 'SET_HIGHLIGHTS'; highlights: Highlight[] }
   | { type: 'SET_DETECTED'; detected: boolean }
   | { type: 'SET_LOADING'; loading: boolean }

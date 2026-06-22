@@ -20,7 +20,7 @@ export interface CommentaryPanelState {
   selectedStyle: ScriptStylePreset;
 }
 
-export type CommentaryPanelAction =
+type CommentaryPanelAction =
   | { type: 'SET_ACTIVE_TAB'; activeTab: CommentaryTab }
   | { type: 'SET_PLAN_CONFIRM_OPEN'; planConfirmOpen: boolean }
   | { type: 'SET_API_KEY'; apiKey: string }

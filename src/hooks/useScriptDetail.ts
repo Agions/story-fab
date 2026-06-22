@@ -7,7 +7,7 @@ import {
   type ScriptDetailProject,
 } from './useScriptDetail.reducer';
 
-export interface UseScriptDetailResult {
+interface UseScriptDetailResult {
   state: ScriptDetailState;
   setLoading: (loading: boolean) => void;
   setProject: (project: ScriptDetailProject | null) => void;

@@ -189,7 +189,6 @@ function formatSec(seconds: number): string {
   return `${m}:${s.padStart(4, '0')}`;
 }
 
-export { formatSec };
 
 export function buildAnalysisPrompt(videoInfo: {
   duration: number;

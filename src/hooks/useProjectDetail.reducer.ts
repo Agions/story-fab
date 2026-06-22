@@ -23,7 +23,7 @@ export interface ProjectDetailProject {
   videoUrl?: string;
 }
 
-export type ProjectDetailAction =
+type ProjectDetailAction =
   | { type: 'SET_ACTIVE_STEP'; step: string }
   | { type: 'SET_PROJECT'; project: ProjectDetailState['project'] }
   | { type: 'UPDATE_PROJECT'; project: NonNullable<ProjectDetailState['project']> }

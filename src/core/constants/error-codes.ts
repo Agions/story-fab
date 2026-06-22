@@ -68,7 +68,7 @@ export const ErrorCodes = {
 /**
  * 错误码类型
  */
-export type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes];
+type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes];
 
 /**
  * 错误码描述

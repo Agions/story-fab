@@ -3,7 +3,7 @@
  */
 import { logger } from '../../../shared/utils/logging';
 
-export interface ApiKeyValidationResult {
+interface ApiKeyValidationResult {
   isValid: boolean;
   error?: string;
 }

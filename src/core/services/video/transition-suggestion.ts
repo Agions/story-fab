@@ -38,7 +38,7 @@ export type TransitionType =
   | 'glitch';
 
 /** 转场推荐结果（与 SmartVideoSegment.suggestedTransition 形状一致） */
-export interface TransitionSuggestion {
+interface TransitionSuggestion {
   type: TransitionType;
   duration: number; // ms, 200–1000
   reason: string;

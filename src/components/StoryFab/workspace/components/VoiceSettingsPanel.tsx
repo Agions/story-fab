@@ -23,7 +23,7 @@ import {
 // 类型定义
 // ============================================
 
-export interface VoiceSettingsPanelProps {
+interface VoiceSettingsPanelProps {
   /** 当前配置 */
   config: SynthesizeConfig;
   /** 配置更新回调 */
@@ -196,7 +196,7 @@ interface SliderControlProps {
  * 通用滑块控件
  * 提取说明：原代码中有 3 个相似的滑块实现，现统一为可复用组件
  */
-export const SliderControl: React.FC<SliderControlProps> = ({
+const SliderControl: React.FC<SliderControlProps> = ({
   label,
   value,
   min,
@@ -249,7 +249,7 @@ interface WaveformIndicatorProps {
  * 音频波形指示器
  * 提取说明：原代码中波形渲染逻辑内联在组件中，现提取为独立组件
  */
-export const WaveformIndicator: React.FC<WaveformIndicatorProps> = ({ barCount = 40 }) => {
+const WaveformIndicator: React.FC<WaveformIndicatorProps> = ({ barCount = 40 }) => {
   return (
     <div className={styles.waveformSection}>
       <div className={styles.waveformLabel}>音频波形</div>

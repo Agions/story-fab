@@ -7,7 +7,7 @@ import {
   type ClipRipplingState,
 } from './ClipRippling.reducer';
 
-export interface UseClipRipplingResult {
+interface UseClipRipplingResult {
   state: ClipRipplingState;
   setPlatform: (platform: SocialPlatform) => void;
   setSelectedFormats: (selectedFormats: AspectRatio[]) => void;

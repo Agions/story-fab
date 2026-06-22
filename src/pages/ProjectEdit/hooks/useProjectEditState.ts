@@ -51,7 +51,7 @@ function readAutoSaveEnabled(): boolean {
   }
 }
 
-export interface UseProjectEditStateResult extends ProjectEditState, ProjectEditSetters {}
+interface UseProjectEditStateResult extends ProjectEditState, ProjectEditSetters {}
 
 export function useProjectEditState(
   options: UseProjectEditStateOptions = {},

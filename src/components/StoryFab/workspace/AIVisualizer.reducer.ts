@@ -16,7 +16,7 @@
  * - TOGGLE_CONFIG: setConfig(prev => ({...prev, [key]: !prev[key]}))
  * - INCREMENT_PROGRESS: completedCount / total 原子化 (Pitfall 23 复合模式)
  */
-export interface AIAnalyzeConfig {
+interface AIAnalyzeConfig {
   sceneDetection: boolean;
   objectDetection: boolean;
   emotionAnalysis: boolean;
@@ -33,7 +33,7 @@ export interface AIVisualizerState {
   config: AIAnalyzeConfig;
 }
 
-export type AIVisualizerAction =
+type AIVisualizerAction =
   | { type: 'SET_ANALYZING'; analyzing: boolean }
   | { type: 'SET_PROGRESS'; progress: number }
   | { type: 'SET_CURRENT_TASK_KEY'; currentTaskKey: string }

@@ -14,7 +14,7 @@ import styles from '../ScriptWriting.module.less';
 // 类型定义
 // ============================================
 
-export interface ScriptEditorPanelProps {
+interface ScriptEditorPanelProps {
   /** 当前脚本内容 */
   content: string;
   /** 占位符 */

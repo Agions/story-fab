@@ -41,7 +41,7 @@ export function sortProjects(projects: Project[], sortBy: ProjectSortBy, order: 
 
 // ─── Store types ───────────────────────────────────────────────────────────────
 
-export interface ProjectState {
+interface ProjectState {
   projects: Project[];
   currentProject: Project | null;
   loading: boolean;

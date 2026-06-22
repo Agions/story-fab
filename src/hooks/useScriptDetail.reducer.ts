@@ -26,7 +26,7 @@ export interface ScriptDetailProject {
   videoUrl?: string;
 }
 
-export type ScriptDetailAction =
+type ScriptDetailAction =
   | { type: 'SET_LOADING'; loading: boolean }
   | { type: 'SET_PROJECT'; project: ScriptDetailProject | null }
   | { type: 'SET_SCRIPT'; script: Script | null }

@@ -28,7 +28,7 @@ import {
 } from './clipGenerators';
 
 // 剪辑结果
-export interface ClipResult {
+interface ClipResult {
   segments: ClipSegment[];
   totalDuration: number;
   removedDuration: number;

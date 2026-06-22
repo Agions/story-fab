@@ -5,7 +5,7 @@
 import React from 'react';
 import styles from '../VideoExport.module.less';
 
-export interface ExportProgress {
+interface ExportProgress {
   /** 0-100 */
   percent: number;
   /** 当前阶段描述（覆盖自动推断） */

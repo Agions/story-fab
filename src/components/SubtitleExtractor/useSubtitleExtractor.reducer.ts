@@ -22,7 +22,7 @@ export interface SubtitleExtractorState {
   videoDuration: number;
 }
 
-export type SubtitleExtractorAction =
+type SubtitleExtractorAction =
   | { type: 'SET_FORMAT'; format: SubtitleFormat }
   | { type: 'SET_TRANSLATE'; translate: boolean }
   | { type: 'SET_IS_EXTRACTING'; isExtracting: boolean }

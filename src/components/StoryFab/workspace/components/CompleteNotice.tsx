@@ -14,7 +14,7 @@ import styles from '../VideoComposing.module.less';
 // 类型定义
 // ============================================
 
-export interface CompleteNoticeProps {
+interface CompleteNoticeProps {
   /** 标题 */
   title?: string;
   /** 描述 */

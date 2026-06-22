@@ -15,7 +15,7 @@ export type { ProjectUIStatus, ProjectUIStats, ProjectView };
 export type ProjectStatusFilter = 'all' | ProjectUIStatus;
 
 // 转换函数：将记录转换为 ProjectView
-export const asProjectView = (record: Record<string, unknown>): ProjectView => ({
+const asProjectView = (record: Record<string, unknown>): ProjectView => ({
   id: String(record.id),
   name: String(record.name || '未命名项目'),
   description: typeof record.description === 'string' ? record.description : '',
@@ -53,11 +53,11 @@ export function getProjectUIStatus(project: ProjectView): ProjectUIStats {
   return { scriptCount, videoCount, status, progress };
 }
 
-export interface UseProjectListOptions {
+interface UseProjectListOptions {
   recentProjects?: string[];
 }
 
-export interface UseProjectListReturn {
+interface UseProjectListReturn {
   // 状态
   projects: ProjectView[];
   viewMode: 'grid' | 'list';

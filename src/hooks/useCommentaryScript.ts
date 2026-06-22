@@ -15,7 +15,7 @@ import type {
   ScriptStylePreset,
 } from '@/core/types/commentary';
 
-export interface UseCommentaryScriptResult {
+interface UseCommentaryScriptResult {
   script: CommentaryScriptOutput | null;
   scripts: Map<ScriptStylePreset, CommentaryScriptOutput>;
   activeScriptStyle: ScriptStylePreset | null;
@@ -46,7 +46,7 @@ export interface UseCommentaryScriptResult {
 /**
  * Pure async function: calibrate timeline with TTS duration estimates
  */
-export async function calibrateTimelineWithTTS(
+async function calibrateTimelineWithTTS(
   targetScript: CommentaryScriptOutput,
   voice: string,
 ): Promise<CommentaryScriptOutput> {

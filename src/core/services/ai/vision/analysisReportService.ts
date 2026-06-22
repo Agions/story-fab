@@ -16,7 +16,7 @@ import { formatDurationChinese } from '../../../../shared/utils/formatting';
 // 报告生成服务
 // ============================================
 
-export class AnalysisReportService {
+class AnalysisReportService {
   /**
    * 生成视频分析报告
    * @param videoInfo 视频信息

@@ -10,7 +10,7 @@ import type { TimelineTrack } from '../../core/types/timeline';
  * 包括：起点、终点、其他 clip 边界
  * @param excludeClipId 排除自身的 clip id（避免吸附到自己）
  */
-export function calculateSnapPoints(
+function calculateSnapPoints(
   tracks: TimelineTrack[],
   duration: number,
   excludeClipId: string,

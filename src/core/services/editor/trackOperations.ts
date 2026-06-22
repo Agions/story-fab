@@ -26,7 +26,7 @@ export function findTrackByClipId(timeline: Timeline, clipId: string): string | 
 }
 
 /** 通用轨道创建配置 */
-export interface CreateTrackOptions {
+interface CreateTrackOptions {
   type: TrackType;
   name?: string;
   height?: number;

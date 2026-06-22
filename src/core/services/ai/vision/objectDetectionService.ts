@@ -10,7 +10,7 @@ import { OBJECT_CATEGORIES } from '../types';
 // 物体检测服务
 // ============================================
 
-export class ObjectDetectionService {
+class ObjectDetectionService {
   /**
    * 检测场景中的物体
    * @param scenes 场景列表

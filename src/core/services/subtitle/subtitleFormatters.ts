@@ -54,7 +54,7 @@ export function trackToVTT(track: SubtitleTrack): string {
  * ASS 时间格式化：H:MM:SS.cs (厘秒，1/100 秒)
  * 与 SRT/VTT 不同，ASS 使用厘秒而非毫秒
  */
-export function formatASSTime(seconds: number): string {
+function formatASSTime(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.floor(seconds % 60);

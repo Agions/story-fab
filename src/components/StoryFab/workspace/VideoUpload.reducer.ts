@@ -13,7 +13,7 @@
  * - HANDLE_DELETE 复合 action: 替代 handleDelete 4 行 setter (uploadProgress 0 + uploadStatus 'idle' + currentFile null)
  * - TOGGLE_PAUSE 复合 action: handlePauseResume 切换 'uploading' ↔ 'paused'
  */
-export type UploadStatus = 'idle' | 'uploading' | 'paused' | 'completed';
+type UploadStatus = 'idle' | 'uploading' | 'paused' | 'completed';
 
 export interface VideoUploadState {
   uploading: boolean;
@@ -23,7 +23,7 @@ export interface VideoUploadState {
   currentFile: File | null;
 }
 
-export type VideoUploadAction =
+type VideoUploadAction =
   | { type: 'SET_UPLOADING'; uploading: boolean }
   | { type: 'SET_UPLOAD_PROGRESS'; uploadProgress: number }
   | { type: 'SET_DRAG_ACTIVE'; dragActive: boolean }

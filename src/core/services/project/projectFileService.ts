@@ -26,12 +26,11 @@ type ProjectFileData = {
   [key: string]: unknown;
 };
 
-export type { ProjectFileData };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-export const normalizeListedProject = (value: unknown): ProjectFileData | null => {
+const normalizeListedProject = (value: unknown): ProjectFileData | null => {
   if (!isRecord(value)) return null;
   const rawId = typeof value.id === 'string' ? value.id : '';
   const fallbackId = typeof value.projectId === 'string' ? value.projectId : '';
@@ -49,7 +48,7 @@ export const normalizeListedProject = (value: unknown): ProjectFileData | null =
   return merged;
 };
 
-export const ensureAppDataDir = async (): Promise<void> => {
+const ensureAppDataDir = async (): Promise<void> => {
   const appDir = 'story-fab';
   try {
     const dirPath = await tauri.checkAppDataDir();
@@ -121,7 +120,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
   logger.info('项目文件保存成功', { projectPath });
 };
 
-export const loadProjectFromFile = async <T = ProjectFileData>(projectId: string): Promise<T> => {
+const loadProjectFromFile = async <T = ProjectFileData>(projectId: string): Promise<T> => {
   const candidates = buildProjectIdCandidates(projectId);
   if (!candidates.length) throw new AppError('APP_PROJECT_ID_EMPTY', '项目ID不能为空', {
     userMessage: '项目ID不能为空',

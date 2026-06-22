@@ -22,7 +22,7 @@
  * - maxSize 滑动窗口避免内存膨胀
  * - 副作用由调用方控制（set/apply 显式调用）
  */
-export interface CreateHistoryOptions {
+interface CreateHistoryOptions {
   /** 历史栈最大长度（默认 19） */
   maxSize?: number;
 }

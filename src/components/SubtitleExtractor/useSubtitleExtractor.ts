@@ -7,7 +7,7 @@ import {
   type SubtitleSegment,
 } from './useSubtitleExtractor.reducer';
 
-export interface UseSubtitleExtractorResult {
+interface UseSubtitleExtractorResult {
   state: SubtitleExtractorState;
   setFormat: (format: SubtitleFormat) => void;
   setTranslate: (translate: boolean) => void;

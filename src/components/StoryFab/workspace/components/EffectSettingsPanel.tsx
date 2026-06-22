@@ -15,7 +15,7 @@ import { EFFECT_STYLES, type SynthesizeConfig } from '../composeConfig';
 // 类型定义
 // ============================================
 
-export interface EffectSettingsPanelProps {
+interface EffectSettingsPanelProps {
   /** 当前配置 */
   config: SynthesizeConfig;
   /** 配置更新回调 */

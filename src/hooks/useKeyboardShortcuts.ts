@@ -20,7 +20,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 
-export interface KeyboardShortcutsOptions {
+interface KeyboardShortcutsOptions {
   /** 播放/暂停回调 */
   onPlayPause?: () => void;
   /** 暂停回调 */

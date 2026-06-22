@@ -35,8 +35,8 @@ export const EFFECT_STYLES = [
   { value: 'warm', label: '暖色调', desc: '橙色系' },
 ];
 
-export const DEFAULT_VOICE_SPEED = 100;
-export const DEFAULT_VOICE_VOLUME = 80;
+const DEFAULT_VOICE_SPEED = 100;
+const DEFAULT_VOICE_VOLUME = 80;
 export const VOICE_SPEED_MIN = 50;
 export const VOICE_SPEED_MAX = 150;
 export const VOICE_SPEED_RANGE = VOICE_SPEED_MAX - VOICE_SPEED_MIN;

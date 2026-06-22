@@ -14,7 +14,7 @@ import styles from '../VideoComposing.module.less';
 // 类型定义
 // ============================================
 
-export interface WarningAlertProps {
+interface WarningAlertProps {
   /** 警告图标 */
   icon?: string;
   /** 警告消息 */

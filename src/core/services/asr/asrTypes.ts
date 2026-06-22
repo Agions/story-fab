@@ -7,19 +7,19 @@
 // Web Speech API 类型（TypeScript lib.dom.d.ts 不完整）
 // ============================================
 
-export interface SpeechRecognitionAlternative {
+interface SpeechRecognitionAlternative {
   transcript: string;
   confidence: number;
 }
 
-export interface SpeechRecognitionResult {
+interface SpeechRecognitionResult {
   readonly length: number;
   item(index: number): SpeechRecognitionAlternative;
   [index: number]: SpeechRecognitionAlternative;
   isFinal: boolean;
 }
 
-export interface SpeechRecognitionResultList {
+interface SpeechRecognitionResultList {
   readonly length: number;
   item(index: number): SpeechRecognitionResult;
   [index: number]: SpeechRecognitionResult;
@@ -35,7 +35,7 @@ export interface SpeechRecognitionCtor {
 }
 
 // Rust Whisper ASR 响应类型（来自 src-tauri/src/asr.rs）
-export interface RustWhisperWord {
+interface RustWhisperWord {
   word: string;
   start_ms: number;
   end_ms: number;
@@ -89,14 +89,14 @@ export interface ASRSegment {
   words?: ASRWord[];
 }
 
-export interface ASRWord {
+interface ASRWord {
   word: string;
   startTime: number;
   endTime: number;
   confidence: number;
 }
 
-export interface ASRFullResult {
+interface ASRFullResult {
   start: number;
   end: number;
   text: string;

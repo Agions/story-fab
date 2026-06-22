@@ -14,7 +14,7 @@ import React from 'react';
 // 类型定义
 // ============================================
 
-export interface AnalysisTask {
+interface AnalysisTask {
   key: string;
   label: string;
   icon: React.ReactNode;

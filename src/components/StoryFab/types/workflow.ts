@@ -122,7 +122,7 @@ export const CLIP_STEPS = [
   'video-export',
 ] as const;
 
-export const COMMENTARY_STEPS = [
+const COMMENTARY_STEPS = [
   'project-create',
   'video-upload',
   'ai-analyze',

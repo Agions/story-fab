@@ -9,7 +9,7 @@ export interface ProjectFileLike<TScript = unknown, TVideo = { path?: string }> 
   scripts?: TScript[];
 }
 
-export const resolveProjectVideoUrl = <TScript = unknown, TVideo extends { path?: string } = { path?: string }>(
+const resolveProjectVideoUrl = <TScript = unknown, TVideo extends { path?: string } = { path?: string }>(
   project: ProjectFileLike<TScript, TVideo>
 ): string | undefined => {
   if (project.videoUrl) return project.videoUrl;
