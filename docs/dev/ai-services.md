@@ -61,5 +61,5 @@ interface IAIService {
 ## 验证
 
 ```bash
-pnpm test -- src/core/services/providers
+npm run test -- src/core/services/providers
 ```

@@ -8,9 +8,9 @@ description: StoryFab 开发构建、生产构建、CI/CD 发布
 ## 开发模式
 
 ```bash
-pnpm install
-pnpm tauri dev         # Vite + Tauri 热重载
-pnpm dev               # 仅 Vite 前端
+npm install
+npm run tauri -- dev         # Vite + Tauri 热重载
+npm run dev               # 仅 Vite 前端
 ```
 
 ## 生产构建
@@ -18,16 +18,16 @@ pnpm dev               # 仅 Vite 前端
 ### 当前平台
 
 ```bash
-pnpm tauri build
+npm run tauri -- build
 ```
 
 ### 跨平台
 
 ```bash
-pnpm tauri build --target x86_64-pc-windows-msvc   # Windows
-pnpm tauri build --target aarch64-apple-darwin     # macOS Apple Silicon
-pnpm tauri build --target x86_64-apple-darwin      # macOS Intel
-pnpm tauri build --target x86_64-unknown-linux-gnu # Linux
+npm run tauri -- build --target x86_64-pc-windows-msvc   # Windows
+npm run tauri -- build --target aarch64-apple-darwin     # macOS Apple Silicon
+npm run tauri -- build --target x86_64-apple-darwin      # macOS Intel
+npm run tauri -- build --target x86_64-unknown-linux-gnu # Linux
 ```
 
 ## CI/CD
@@ -74,18 +74,18 @@ CI 用 `tauri-action` 自动构建，所有产物上传到 Release：
 ## 验证
 
 ```bash
-pnpm test             # 单元测试
-pnpm test:coverage    # 覆盖率
-pnpm build            # 前端构建
-pnpm build:ci         # 前端构建 + bundle 预算
+npm run test             # 单元测试
+npm run test:coverage    # 覆盖率
+npm run build            # 前端构建
+npm run build:ci         # 前端构建 + bundle 预算
 ```
 
 ## 文档站
 
 ```bash
-pnpm docs:dev         # 本地开发
-pnpm docs:build       # 构建静态站
-pnpm docs:preview     # 预览
+npm run docs:dev         # 本地开发
+npm run docs:build       # 构建静态站
+npm run docs:preview     # 预览
 ```
 
 自动部署到 `https://agions.github.io/story-fab/`。

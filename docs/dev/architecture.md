@@ -89,7 +89,7 @@ Store 边界详见 `src/store/README.md`。
 ## 验证
 
 ```bash
-pnpm type-check       # tsc --noEmit
-pnpm lint             # ESLint
-pnpm test             # Vitest 单元测试
+npm run type-check       # tsc --noEmit
+npm run lint             # ESLint
+npm run test             # Vitest 单元测试
 ```

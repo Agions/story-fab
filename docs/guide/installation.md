@@ -9,7 +9,7 @@ title: 安装指南
 - Node.js ≥ 18
 - Rust ≥ 1.77
 - FFmpeg
-- pnpm（推荐）
+- npm
 
 ## 桌面应用安装
 
@@ -50,9 +50,9 @@ sudo apt install libfuse2
 ```bash
 git clone https://github.com/Agions/story-fab.git
 cd story-fab
-pnpm install
-pnpm tauri dev        # 开发模式
-pnpm tauri build      # 生产构建
+npm install
+npm run tauri -- dev        # 开发模式
+npm run tauri -- build      # 生产构建
 ```
 
 ## 验证

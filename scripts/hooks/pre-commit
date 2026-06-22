@@ -37,7 +37,7 @@ fi
 # 3. 检测暂存文件含 .ts/.tsx 改动时跑 tsc (仅增量)
 TS_CHANGED=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx)$' | head -3 || true)
 if [ -n "$TS_CHANGED" ]; then
-  echo "📝 TypeScript 改动检测到，建议本地跑: pnpm type-check"
+  echo "📝 TypeScript 改动检测到，建议本地跑: npm run type-check"
 fi
 
 echo "✅ pre-commit checks 通过"

@@ -98,7 +98,7 @@ src/core/
 | 顶级目录 | kebab-case |
 | 常量 | SCREAMING_SNAKE_CASE |
 
-校验：`pnpm verify:naming`（`scripts/check-naming.mjs`）。
+校验：`npm run verify:naming`（`scripts/check-naming.mjs`）。
 
 ## 已清理（v2.1+）
 

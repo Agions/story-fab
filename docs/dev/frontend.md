@@ -103,8 +103,8 @@ Director → Visual → Narration → Timing → Overlay → 成片
 ## 验证
 
 ```bash
-pnpm type-check       # tsc --noEmit
-pnpm lint             # ESLint
-pnpm test             # Vitest
-pnpm verify:all       # 一键运行所有 verify
+npm run type-check       # tsc --noEmit
+npm run lint             # ESLint
+npm run test             # Vitest
+npm run verify:all       # 一键运行所有 verify
 ```

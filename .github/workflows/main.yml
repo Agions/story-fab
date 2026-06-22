@@ -18,8 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
       - name: TypeScript check
         run: |
           mkdir -p reports
@@ -43,14 +46,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
       - name: Create reports directory
         run: mkdir -p reports
       - name: ESLint
-        run: pnpm run lint
+        run: npm run lint
       - name: ESLint JSON report
-        run: pnpm exec eslint src --format json --output-file reports/eslint-report.json
+        run: npx eslint src --format json --output-file reports/eslint-report.json
         continue-on-error: true
       - name: Upload ESLint report
         if: always()
@@ -65,12 +71,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
       - name: Create reports directory
         run: mkdir -p reports
       - name: Coverage with JSON reporter
-        run: pnpm run test:ci
+        run: npm run test:ci
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v5
@@ -150,12 +159,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
       - name: Build
-        run: pnpm run build
+        run: npm run build
       - name: Bundle budget check
-        run: pnpm run build:budget
+        run: npm run build:budget
       - name: Upload build artifact
         uses: actions/upload-artifact@v5
         with:
@@ -173,10 +185,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
       - name: Build frontend
-        run: pnpm run build
+        run: npm run build
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -216,10 +231,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libglib2.0-dev
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
       - name: Build frontend
-        run: pnpm run build
+        run: npm run build
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -269,8 +287,11 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v5
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
       - name: Download all reports
         uses: actions/download-artifact@v5
         with:

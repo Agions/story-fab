@@ -224,7 +224,7 @@ const handle = await invoke<CommentaryAnalysisHandle>(
 
 ```bash
 # Type-check 命令签名
-pnpm type-check
+npm run type-check
 
 # Rust 端单元测试
 cargo test --manifest-path src-tauri/Cargo.toml

@@ -7,7 +7,7 @@ on:
       - 'docs/**'
       - 'scripts/**'
       - 'package.json'
-      - 'pnpm-lock.yaml'
+      - 'package-lock.json'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -31,16 +31,11 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: '9'
-
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: npm ci --ignore-scripts
 
       - name: Build VitePress
-        run: pnpm run docs:build
+        run: npm run docs:build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
