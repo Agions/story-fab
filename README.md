@@ -68,7 +68,7 @@ pnpm tauri build      # 生产构建
 │  后端   Rust · Tauri 2 · tokio                                  │
 │   ├─ ffmpeg         转码 / 硬字幕烧录 / 裁剪                    │
 │   ├─ whisper        离线语音转字幕                              │
-│   ├─ llm-providers  OpenAI · DeepSeek · Qwen · Gemini · Anthropic │
+│   ├─ llm-providers  OpenAI · Anthropic · Google · DeepSeek · Qwen · 智谱 · 讯飞 · Moonshot · Local · Custom (10 家) │
 │   ├─ tts-providers  Edge TTS · Azure TTS                        │
 │   └─ commentary     Director → Visual → Narration → Timing → Overlay │
 └─────────────────────────────────────────────────────────────────┘
@@ -110,12 +110,23 @@ story-fab/
 
 ```bash
 # 前端
-pnpm dev                  # Vite 开发服务器
+pnpm dev                  # Vite 开发服务器（端口 1430）
 pnpm build                # 生产构建
+pnpm build:budget         # Bundle 预算校验
+pnpm build:ci             # 构建 + 预算校验
+pnpm build:prod           # 生产模式构建
+pnpm preview              # 预览生产构建
 pnpm test                 # Vitest 单元测试
+pnpm test:run             # Vitest 一次性跑（CI 风格）
 pnpm test:coverage        # 覆盖率
-pnpm lint                 # ESLint
+pnpm test:ui              # Vitest 交互式 UI
+pnpm test:ci              # 覆盖率 + CI 报告
+pnpm lint                 # ESLint（src/, max-warnings 200）
+pnpm lint:fix             # ESLint 自动修复
+pnpm format               # Prettier 格式化
+pnpm format:check         # Prettier 检查
 pnpm type-check           # tsc --noEmit
+pnpm clean                # 删除 dist/
 
 # Tauri
 pnpm tauri dev            # 启动桌面应用开发
@@ -123,12 +134,16 @@ pnpm tauri build          # 桌面应用生产构建
 
 # 文档
 pnpm docs:dev             # VitePress 文档开发
-pnpm docs:build           # 构建文档站点站
+pnpm docs:build           # VitePress 构建静态站点
+pnpm docs:preview         # 预览文档站
 
 # 验证 (CI 同样执行)
-pnpm verify:antd         # 禁止 antd 引用
-pnpm verify:naming       # 命名规范校验
-pnpm verify:all          # 一键运行所有验证
+pnpm verify:antd          # 禁止 antd 引用
+pnpm verify:naming        # 命名规范校验
+pnpm verify:all           # 一键运行所有验证
+
+# Git hooks
+pnpm hooks:install        # 安装 pre-commit 校验
 ```
 
 ---
@@ -140,8 +155,8 @@ pnpm verify:all          # 一键运行所有验证
 | React 组件 | PascalCase | `MultiTrackTimeline.tsx` |
 | Hook | camelCase + `use` 前缀 | `useProjectList.ts` |
 | 工具函数 | camelCase | `formatTime.ts` |
-| 业务目录 | PascalCase | `core/services/VideoProcessor/` |
-| 顶级目录 | kebab-case | `core/services/` |
+| 业务目录（`pages/`、`components/` 等） | PascalCase | `pages/VideoEditor/` |
+| 顶级目录（`core/`、`services/` 等） | kebab-case | `core/services/` |
 | 常量 | SCREAMING_SNAKE_CASE | `MODEL_PROVIDERS` |
 
 校验脚本：`pnpm verify:naming`（`scripts/check-naming.mjs`）。
@@ -158,7 +173,6 @@ pnpm verify:all          # 一键运行所有验证
 - [Tauri 命令](docs/dev/tauri-commands.md)
 - [构建与发布](docs/dev/build-release.md)
 - [FAQ](docs/reference/faq.md)
-- [CLI 参考](docs/reference/cli.md)
 - [配置参考](docs/reference/config.md)
 
 ---

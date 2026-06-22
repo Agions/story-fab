@@ -14,7 +14,7 @@ StoryFab 是 Tauri 2 桌面应用：前端 React 18 + TypeScript，后端 Rust 1
 | UI 组件 | shadcn/ui、Radix UI |
 | 状态管理 | Zustand（5 store） |
 | 桌面框架 | Tauri 2.x、Rust、tokio |
-| AI 能力 | faster-whisper、5 LLM Provider、2 TTS Provider |
+| AI 能力 | faster-whisper（6 档）、10 LLM Provider、2 TTS Provider |
 | 媒体处理 | FFmpeg（转码 / 烧字幕 / 裁剪） |
 
 ## 双服务层（ADR-101）
@@ -56,7 +56,7 @@ Store 边界详见 `src/store/README.md`。
 
 ## TauriBridge
 
-前后端通信通过 `@tauri-apps/api/core` 的 `invoke` 完成。所有 IPC 调用集中在 `src/core/tauri/methods/` 下，类型定义在 `src/core/interfaces/`。
+前后端通信通过 `@tauri-apps/api/core` 的 `invoke` 完成。所有 IPC 调用集中在 `src/core/tauri/methods/` 下，业务接口定义在 `src/core/interfaces/`（`editor.interface.ts` / `timeline.interface.ts` 等），核心数据类型在 `src/core/types/`（`commentary.ts` / `video-project.ts` / `timeline.ts` / `voice.ts` / `jianying.ts`）。
 
 ## 数据流
 

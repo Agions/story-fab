@@ -8,15 +8,16 @@ title: AI 分析
 
 ## 1. Whisper 转录
 
-| 模型 | 大小 | 速度 | 准确度 |
+| 模型 | 大小（约） | 速度 | 准确度 |
 | --- | --- | --- | --- |
 | tiny | 75 MB | 快 | 基础 |
 | base | 142 MB | 中 | 良好 |
 | small | 488 MB | 中 | 优秀 |
 | medium | 1.5 GB | 慢 | 卓越 |
+| large-v2 | 2.9 GB | 很慢 | 最佳 |
 | large-v3 | 3 GB | 很慢 | 最佳 |
 
-模型首次使用会下载到 `<config-dir>/whisper-models/`。
+模型首次使用会下载到 `<config-dir>/whisper-models/`（默认 base）。
 
 ## 2. 高光检测
 

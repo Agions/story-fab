@@ -41,9 +41,9 @@ title: 解说模式
 | 项 | 要求 |
 | --- | --- |
 | 视频长度 | 30 秒 - 30 分钟 |
-| LLM Provider | 5 家可选：OpenAI、DeepSeek、Qwen、Gemini、Anthropic |
+| LLM Provider | 10 家可选：OpenAI / Anthropic / Google / DeepSeek / Qwen / 智谱 / 讯飞 / Moonshot / Local / Custom |
 | TTS 引擎 | Edge TTS / Azure TTS 双引擎 |
-| 输出比例 | 9:16 / 1:1 / 16:9 |
+| 输出比例 | 9:16 / 1:1 / 16:9 / 4:5 / 21:9 |
 
 ## 性能
 

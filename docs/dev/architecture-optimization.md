@@ -11,11 +11,13 @@ description: v2.0 现状的 5 个痛点 + 最小入侵改进路径
 
 | 维度 | 数量 |
 | --- | --- |
-| 前端 TS/TSX 源文件 | 390 |
-| Rust 源文件 | 93 |
+| 前端 TS/TSX 源文件 | 439 |
+| Rust 源文件 | 95 |
 | Pages | 9 |
 | Zustand store | 5 |
-| services 子模块 | 13 |
+| services 子模块 | 14 |
+| `#[tauri::command]` 数 | 61 |
+| Rust 集成测试文件 | 3（resilience / crash_recovery / audio_mix） |
 
 ## 5 个核心痛点
 
@@ -62,9 +64,11 @@ view → hook → store → service → backend
 
 - [x] ADR-101 落地：`src/services/README.md` 明确说明双层职责
 - [x] ADR-102 落地：`src/store/README.md` 说明边界
-- [x] ADR-103 落地：`src/core/pipeline/steps/commentary/` 实现 5 步
+- [x] ADR-103 落地：`src/core/pipeline/steps/commentary/` 实现 5 步（CommentaryDirectorStep / CommentaryVisualStep / CommentaryNarrationStep / CommentaryTimingStep / CommentaryOverlayStep）+ CompositeCommentaryPipeline 编排 + commentary.test.ts 覆盖
 - [x] CI 校验：增加 `verify:store-boundaries` 检查
 - [x] 测试覆盖：hook 层增加最小测试
+- [x] 18 个组件迁移到 useReducer 状态机（PR #28-#47），141 个 useState 消除
+- [x] 19 个 reducer 单元测试覆盖（PR #23d370b - #cb62e54），+469 tests
 
 ## v3.0 路线图
 

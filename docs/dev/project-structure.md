@@ -38,50 +38,53 @@ story-fab/
 src/core/
 ├── pipeline/                Pipeline 编排
 │   └── steps/
-│       └── commentary/      5 步 Agent
-├── services/                业务服务
-│   ├── ai/                  LLM + Provider 抽象
+│       └── commentary/      5 步 Agent（Director/Visual/Narration/Timing/Overlay）
+├── services/                业务服务（14 个子目录）
+│   ├── ai/                  LLM 调用层 + 视觉/语音/脚本
 │   ├── aiClip/              AI 拆条
 │   ├── asr/                 Whisper 集成
 │   ├── auth/                认证
 │   ├── commentary/          解说模式入口
 │   ├── editor/              时间轴编辑
 │   ├── export/              渲染 + 转码
-│   ├── file/                文件系统
+│   ├── file/                文件元数据
 │   ├── pipeline/
 │   │   └── clip-pipeline/   剪辑模式流水线
 │   ├── project/             项目存储
-│   ├── providers/           LLM Provider
+│   ├── providers/           LLM Provider 实现
 │   ├── storage/             配置存储
 │   ├── subtitle/            字幕 + 对齐
-│   ├── video/               视频元数据
-│   └── workflow/            进度跟踪
+│   └── video/               视频元数据（含 audioMix / transition-suggestion）
 ├── tauri/                   IPC 桥接
 │   ├── TauriBridge.ts       invoke 入口
 │   └── methods/             按域分组的方法
 ├── types/                   全局类型
-├── interfaces/              业务接口
+├── interfaces/              业务接口（editor/timeline 等）
 ├── constants/               内部常量
 ├── config/                  配置项
 ├── utils/                   工具
-├── video/                   视频处理
-├── workflow/                工作流
-├── export/                  导出
-└── pipeline/                Pipeline 容器
+└── index.ts                 顶层 barrel
 ```
 
 ## 后端 src-tauri/
 
 | 目录 | 用途 |
 | --- | --- |
+| `src/commands/ai/` | AI 子命令（TTS 等） |
+| `src/commands/auto_save/` | 自动保存与崩溃恢复 |
 | `src/commands/commentary/` | 解说模式后端 |
-| `src/commands/render/` | 渲染 |
-| `src/commands/llm/providers/` | LLM Provider |
-| `src/commands/subtitle/` | Whisper |
-| `src/commands/video/` | 视频元数据 |
-| `src/commands/export/` | 导出 |
-| `src/commands/ai/` | AI 子命令 |
+| `src/commands/project/` | 项目管理 |
+| `src/commands/render/` | 渲染 + 智能拆条 |
+| `src/llm/` | LLM Provider（含 `providers/` 子目录） |
+| `src/subtitle/` | Whisper 字幕 |
+| `src/video/` | 视频元数据 + 抽帧 |
+| `src/highlight/` | 高光检测 |
+| `src/segment/` | 语义分段 |
+| `src/binary/` | FFmpeg / Whisper 二进制管理 |
+| `src/utils/` | 工具函数 |
+| `tests/` | Rust 集成测试（resilience / crash_recovery / audio_mix） |
 | `capabilities/` | Tauri 权限 |
+| `icons/` | 应用图标 |
 
 ## 命名规范
 

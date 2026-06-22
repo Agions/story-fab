@@ -13,11 +13,9 @@ src/core/services/providers/
 ├── openaiLike.ts        兼容 OpenAI 协议（DeepSeek / Qwen）
 ├── anthropic.ts
 ├── google.ts
-├── baidu.ts
 ├── mock.ts
 ├── apiKeyService.ts     API 密钥管理
 ├── prompts.ts           Prompt 模板
-├── backendApi.ts        后端 API 代理
 └── types.ts
 ```
 

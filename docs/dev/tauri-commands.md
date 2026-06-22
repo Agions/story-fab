@@ -9,61 +9,154 @@ description: StoryFab Rust → TS 的所有 IPC 命令
 
 ## commentary
 
-### start_commentary_analysis
+### start_director_analysis
 
-启动解说模式分析。
+启动 Director Agent 分析。
 
 ```rust
-async fn start_commentary_analysis(
+async fn start_director_analysis(
     video_path: String,
     config: CommentaryConfig,
-) -> Result<CommentaryAnalysisHandle>
+) -> Result<DirectorSessionHandle>
 ```
 
-### revise_commentary_plan
+### revise_director_plan
 
-根据用户反馈修订解说计划。
+根据用户反馈修订 Director 计划。
 
 ```rust
-async fn revise_commentary_plan(
-    handle: CommentaryAnalysisHandle,
+async fn revise_director_plan(
+    handle: DirectorSessionHandle,
     feedback: String,
 ) -> Result<DirectorPlan>
 ```
 
-### complete_commentary_render
+### complete_director_render
 
-完成解说视频渲染。
+完成 Director 渲染。
 
 ```rust
-async fn complete_commentary_render(
-    handle: CommentaryAnalysisHandle,
+async fn complete_director_render(
+    handle: DirectorSessionHandle,
     options: RenderOptions,
 ) -> Result<RenderResult>
 ```
 
-### quick_commentary
+### generate_commentary_script
 
-快速解说（无 Director 介入）。
+生成解说脚本。
 
 ```rust
-async fn quick_commentary(
-    video_path: String,
+async fn generate_commentary_script(
+    handle: DirectorSessionHandle,
+) -> Result<DraftScript>
+```
+
+### synthesize_commentary_audio
+
+合成解说音频。
+
+```rust
+async fn synthesize_commentary_audio(
+    handle: DirectorSessionHandle,
     voice: VoiceConfig,
-) -> Result<RenderResult>
+) -> Result<AudioHandle>
 ```
 
 ## render
 
-### autonomous_cut_video
+### render_autonomous_cut
 
-智能拆条。
+智能拆条渲染。
 
 ```rust
-async fn autonomous_cut_video(
+async fn render_autonomous_cut(
+    project_id: String,
+    options: HighlightOptions,
+) -> Result<Vec<HighlightSegment>>
+```
+
+### burn_subtitles
+
+烧录字幕到视频。
+
+```rust
+async fn burn_subtitles(
+    video_path: String,
+    subtitle_path: String,
+    output_path: String,
+) -> Result<String>
+```
+
+### export_video
+
+导出视频。
+
+```rust
+async fn export_video(
+    project_id: String,
+    options: ExportOptions,
+) -> Result<ExportResult>
+```
+
+### detect_highlights
+
+检测视频高光。
+
+```rust
+async fn detect_highlights(
     video_path: String,
     options: HighlightOptions,
 ) -> Result<Vec<HighlightSegment>>
+```
+
+## llm
+
+### call_llm
+
+LLM 统一调用入口。
+
+```rust
+async fn call_llm(
+    provider: ModelProvider,
+    request: LLMRequest,
+) -> Result<LLMResponse>
+```
+
+## subtitle
+
+### whisper_transcribe
+
+Whisper 离线转写。
+
+```rust
+async fn whisper_transcribe(
+    audio_path: String,
+    model: WhisperModel,
+) -> Result<TranscriptionResult>
+```
+
+### auto_save_project
+
+自动保存项目。
+
+```rust
+async fn auto_save_project(
+    project_id: String,
+    data: ProjectSnapshot,
+) -> Result<String>
+```
+
+## project
+
+### analyze_video
+
+分析视频元数据。
+
+```rust
+async fn analyze_video(
+    video_path: String,
+) -> Result<VideoMeta>
 ```
 
 ### extract_key_frames
@@ -88,65 +181,28 @@ async fn generate_thumbnail(
 ) -> Result<Thumbnail>
 ```
 
-## llm
+## ai
 
-### llm_router
+### synthesize_speech
 
-LLM Provider 路由。
-
-```rust
-async fn llm_router(
-    provider: ModelProvider,
-    request: LLMRequest,
-) -> Result<LLMResponse>
-```
-
-## subtitle
-
-### whisper_transcribe
-
-Whisper 离线转写。
+TTS 语音合成。
 
 ```rust
-async fn whisper_transcribe(
-    audio_path: String,
-    model: WhisperModel,
-) -> Result<TranscriptionResult>
+async fn synthesize_speech(
+    text: String,
+    voice: VoiceConfig,
+) -> Result<AudioHandle>
 ```
 
-### jianying_export
+### list_available_models
 
-剪映草稿导出。
+列出可用 LLM 模型。
 
 ```rust
-async fn jianying_export(
-    project: JianyingProject,
-    output_path: String,
-) -> Result<String>
+async fn list_available_models() -> Result<Vec<AIModel>>
 ```
 
-## export
-
-### export_multi_format
-
-多格式导出。
-
-```rust
-async fn export_multi_format(
-    project_id: String,
-    formats: Vec<ExportFormat>,
-) -> Result<Vec<ExportResult>>
-```
-
-### transcode_with_crop
-
-转码 + 裁剪。
-
-```rust
-async fn transcode_with_crop(
-    options: TranscodeCropOptions,
-) -> Result<String>
-```
+> 完整命令清单（当前 61 个）：`grep -rE '#\[tauri::command\]' src-tauri/src/`，详见 [backend.md](backend.md)。
 
 ## TS 调用
 
