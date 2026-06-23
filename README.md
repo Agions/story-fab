@@ -202,9 +202,6 @@ npm run verify:all           # 一键运行所有验证
 
 - [系统架构](docs/dev/architecture.md)
 - [项目结构](docs/dev/project-structure.md)
-- [解说工作流](docs/dev/commentary-workflow.md)
-- [导演 Agent](docs/dev/director-agent.md)
-- [脚本生成（dev）](docs/dev/script-generation.md)
 - [AI 服务](docs/dev/ai-services.md)
 - [Tauri 命令](docs/dev/tauri-commands.md)
 - [构建与发布](docs/dev/build-release.md)
