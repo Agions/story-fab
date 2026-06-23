@@ -12,6 +12,7 @@ import { useStoryFab } from '../context';
 import { visionService } from '../../../core/services/ai/visionService';
 import { notify } from '@/shared';
 import { useTimeout } from '../../../hooks/useTimeout';
+import { logger } from '@/shared/utils/logging';
 import type { AIAnalyzeProps, Scene } from '@/core/types';
 import styles from './AIVisualizer.module.css';
 import { Highlights } from './Highlights';

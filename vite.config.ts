@@ -76,7 +76,6 @@ export default defineConfig({
 
           // Utilities
           if (/node_modules\/dayjs\//.test(id)) return 'vendor-dayjs'
-          if (/node_modules\/axios\//.test(id)) return 'vendor-axios'
 
           // Icon libraries — large tree-shakeable exports, benefit from isolated chunk
           if (/node_modules\/lucide-react\//.test(id)) return 'vendor-icons'
@@ -92,16 +91,12 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'axios', 'dayjs', 'zustand'],
+    include: ['react', 'react-dom', 'react-router-dom', 'dayjs', 'zustand'],
   },
   // Only drop console/debugger in production builds for easier debugging
   esbuild: {
     legalComments: 'none',
     drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
     target: 'esnext',
-  },
-  define: {
-    __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
-    __BUILD_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
   },
 })
