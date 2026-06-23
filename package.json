@@ -31,8 +31,7 @@
     "test:ci": "vitest run --coverage",
     "verify:antd": "node scripts/check-antd.mjs",
     "verify:naming": "node scripts/check-naming.mjs",
-    "verify:all": "npm run verify:antd && npm run verify:naming",
-    "hooks:install": "bash scripts/install-hooks.sh"
+    "verify:all": "npm run verify:antd && npm run verify:naming"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
