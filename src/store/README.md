@@ -70,4 +70,4 @@ useProjectStore.getState().setLoading(true);
 
 - ✅ `modelStore.ts` 类型错位修复：`AppState` → `AIModelState`，并 export interface
 
-详见 [docs/dev/architecture-optimization.md §2](../../docs/dev/architecture-optimization.md)
+详见 [docs/dev/architecture.md §双服务层 (ADR-101)](../../docs/dev/architecture.md)

@@ -44,4 +44,4 @@ import { getApiKey } from '@/services/tauri';  // re-export from core/services/a
 - ✅ `src/services/**` 引用 `src/core/**`（shim 可以 re-export core）
 - ✅ 页面 / 组件层可引用两者
 
-详见 [docs/dev/architecture-optimization.md §1](../../docs/dev/architecture-optimization.md)
+详见 [docs/dev/architecture.md §双服务层 (ADR-101)](../../docs/dev/architecture.md)
