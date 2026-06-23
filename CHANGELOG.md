@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+### 📝 Docs
+
+- **README.md 重写**（commit `69363cda`）：口径校准 10 LLM Provider（openai / anthropic / google / alibaba-qwen / zhipu / iflytek / deepseek / moonshot / local / custom，验证自 `src/core/config/ai-models/providers.ts`）；分离 "这是什么 / 特性 / 快速开始 / 架构 / 目录" 5 大段；文档导航拆为用户指南 / 开发文档 / 参考 3 组。
+- **8 个不规范的文档删除**（commit `edd3d715`，共 1025 行）：`REFACTORING_REPORT.md`（0609 残留,描述从未落地的 visionService 拆分）、`docs/CHANGELOG.md`（与根 CHANGELOG 重复）、`docs/dev/architecture-optimization.md`（5 个 pain point + 3 个 ADR 全部已实现,文档是"未来计划"非"实现记录"）、`docs/dev/backend.md` / `docs/dev/frontend.md`（与 architecture.md 100% 重叠）、`docs/dev/commentary-workflow.md` / `director-agent.md` / `script-generation.md`（三处讲同一 5 步 Pipeline,合并为 commentary.md）。所有 8 个文件 `rg -l <name>` 零引用,安全删除。
+- **`docs/dev/architecture.md` 重写 + `docs/dev/commentary.md` 新建**（commit `d93ae770`）：architecture.md 94 → 305 行补全 v2.2.0 真实状态（10 LLM Provider / 61 个 Tauri 命令 / 双服务层 ADR-101 / 5 步 Pipeline ADR-103 / 18 组件 useState→useReducer 状态机迁移 / 9 个路由页面 / 5 个 Zustand store / 14 个 core/services 子模块 / Rust 端 commands/ commentary 3 子目录 + render 2 子目录 / 3 个 Rust 集成测试 / CUTDECK_/STORYFAB_ 双前缀环境变量）；commentary.md 新建 286 行整合 3 文件——5 步 Pipeline 状态机、6 阶段 Director 状态机、10 Provider Prompt 模板、5 风格质量检查、5 分钟视频性能/成本表。
+- **`docs/.vitepress/config.ts` 同步**（commit `f5f96938`）：sidebar 删 6 个 dead link（指向已删文件），"解说工作流" 指向新 commentary.md，"系统架构" 标题同步。
+- **2 处死链修复**（commit `aa870e60`）：`src/store/README.md` + `src/services/README.md` 引用已删 `architecture-optimization.md`，重定向到 `architecture.md §双服务层 (ADR-101)`。
+
 ### 🚀 New Features
 
 #### P1 — 智能片段速度推荐
