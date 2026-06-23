@@ -60,10 +60,7 @@ export default defineConfig({
         {
           text: '架构',
           items: [
-            { text: '系统概览', link: '/dev/architecture' },
-            { text: '架构优化 ADR', link: '/dev/architecture-optimization' },
-            { text: '前端', link: '/dev/frontend' },
-            { text: '后端', link: '/dev/backend' },
+            { text: '系统架构', link: '/dev/architecture' },
           ],
         },
         {
@@ -77,9 +74,7 @@ export default defineConfig({
         {
           text: '模块',
           items: [
-            { text: '解说工作流', link: '/dev/commentary-workflow' },
-            { text: '导演 Agent', link: '/dev/director-agent' },
-            { text: '脚本生成', link: '/dev/script-generation' },
+            { text: '解说工作流', link: '/dev/commentary' },
             { text: 'AI 服务', link: '/dev/ai-services' },
           ],
         },
