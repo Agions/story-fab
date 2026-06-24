@@ -4,8 +4,8 @@
  */
 
 export { ExportService, FORMAT_MIME_TYPES } from '@/core/services/export/export-service';
-export * from '@/core/services/export/scriptExportService';
-export * from '@/core/services/export/transcodeCropService';
+export * from '@/core/services/export/script-export-service';
+export * from '@/core/services/export/transcode-crop-service';
 
 export type {
   ExportFormat,

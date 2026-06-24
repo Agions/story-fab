@@ -24,7 +24,7 @@ import type {
   Keyframe,
 } from './types';
 import type { SmartVideoSegment } from '../../video/highlight.types';
-import { enrichSegments, type RustRawSegment } from './segmentEnricher';
+import { enrichSegments, type RustRawSegment } from './segment-enricher';
 
 // 导入工具函数
 import {
@@ -36,7 +36,7 @@ import {
   msToSeconds,
   type SilenceSegment,
   type EmotionPeak as UtilsEmotionPeak,
-} from './analyzerUtils';
+} from './analyzer-utils';
 
 // ============================================
 // 主分析函数

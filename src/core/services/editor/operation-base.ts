@@ -11,7 +11,7 @@
 
 import type { Timeline, TimelineClip, TimelineTrack } from '../../types/timeline';
 import { syncLegacyTracks } from '../../types/timeline';
-import { findTrackIndex } from './timelineHelpers';
+import { findTrackIndex } from './timeline-helpers';
 
 /**
  * 轨道不存在时的错误处理类型

@@ -10,7 +10,7 @@ import type {
   TrackType,
 } from '../../types/timeline';
 import { syncLegacyTracks } from '../../types/timeline';
-import { calculateDuration } from './timelineHelpers';
+import { calculateDuration } from './timeline-helpers';
 
 /** 创建空时间线 */
 export { createEmptyTimeline } from '../../types/timeline';

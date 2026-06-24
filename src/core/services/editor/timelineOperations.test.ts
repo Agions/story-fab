@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { Timeline, TimelineTrack, TimelineClip } from '../../types/timeline';
 import { createEmptyTimeline } from '../../types/timeline';
-import { addClip, removeClip, moveClip, splitClip } from './timelineOperations';
+import { addClip, removeClip, moveClip, splitClip } from './timeline-operations';
 
 // Mock crypto.randomUUID for deterministic tests
 let mockUuidCounter = 0;

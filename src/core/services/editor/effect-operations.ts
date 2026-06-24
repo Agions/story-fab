@@ -4,7 +4,7 @@
  * @version 2.0 - 2026-05-03
  */
 
-import { findClipInTracks } from './timelineHelpers';
+import { findClipInTracks } from './timeline-helpers';
 import type {
   Timeline,
   TimelineClip,
@@ -15,7 +15,7 @@ import {
   findTrackIndex,
   updateClipInTrack,
   calculateDuration,
-} from './timelineHelpers';
+} from './timeline-helpers';
 
 /** 添加转场 */
 export function addTransition(

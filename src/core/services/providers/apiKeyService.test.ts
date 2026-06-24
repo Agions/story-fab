@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { validateApiKey } from './apiKeyService';
+import { validateApiKey } from './api-key-service';
 
 // Mock global fetch
 const mockFetch = vi.fn();

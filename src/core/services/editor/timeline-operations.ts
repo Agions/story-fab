@@ -23,7 +23,7 @@ export {
   findClipInTracks,
   updateClipInTrack,
   calculateDuration,
-} from './timelineHelpers';
+} from './timeline-helpers';
 
 // Re-export track operations
 export {
@@ -31,7 +31,7 @@ export {
   findTrackByClipId,
   addTrack,
   removeTrack,
-} from './trackOperations';
+} from './track-operations';
 
 // Re-export clip operations
 export {
@@ -41,7 +41,7 @@ export {
   trimClip,
   splitClip,
   copyClip,
-} from './clipOperations';
+} from './clip-operations';
 
 // Re-export effect operations
 export {
@@ -49,10 +49,10 @@ export {
   addEffect,
   adjustSpeed,
   adjustVolume,
-} from './effectOperations';
+} from './effect-operations';
 
 // Re-export media operations
 export {
   addText,
   addAudio,
-} from './mediaOperations';
+} from './media-operations';

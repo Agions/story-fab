@@ -18,7 +18,7 @@ export { resolveLegacyModel, getLegacyModelCompatMap } from '@/core/services/ai/
 // ─── AI 剪辑批处理 ───
 export { aiClipService } from '@/core/services/aiClip';
 export { analyzeVideo } from '@/core/services/aiClip/analyzer';
-export { batchProcess } from '@/core/services/aiClip/batchProcessor';
+export { batchProcess } from '@/core/services/aiClip/batch-processor';
 
 // ─── LLM Providers ───
 export { BaseService, ServiceError } from '@/core/services/providers/base.service';

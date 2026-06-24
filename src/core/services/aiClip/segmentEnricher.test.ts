@@ -4,7 +4,7 @@ import {
   enrichSegments,
   summarizeSpeeds,
   type RustRawSegment,
-} from './segmentEnricher';
+} from './segment-enricher';
 
 const raw = (over: Partial<RustRawSegment>): RustRawSegment => ({
   start_ms: 0,

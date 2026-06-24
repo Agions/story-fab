@@ -1,9 +1,9 @@
 export * from './types';
-export * from './timelineOperations';
+export * from './timeline-operations';
 export * from './history';
 export * from './export';
 export * from './storage';
-export * from './operationBase';
+export * from './operation-base';
 
 import {
   createEmptyTimeline,
@@ -21,7 +21,7 @@ import {
   adjustVolume,
   addTrack,
   findTrackByClipId,
-} from './timelineOperations';
+} from './timeline-operations';
 import { createHistory, pushHistory, undo, redo, canUndo, canRedo } from './history';
 import { exportTimeline, getExportPreview } from './export';
 import { saveToStorage, loadFromStorage, clearStorage } from './storage';

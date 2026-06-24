@@ -23,7 +23,7 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 import { AI_MODELS } from '@/core/config/aiModels.config';
 import type { ModelProvider } from '@/core/types';
 import { notify } from '@/shared';
-import { validateApiKey } from '@/core/services/providers/apiKeyService';
+import { validateApiKey } from '@/core/services/providers/api-key-service';
 
 interface SettingsDialogProps {
   open: boolean;

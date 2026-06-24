@@ -12,7 +12,7 @@ import { useState, useCallback } from 'react';
 import { voiceSynthesisService } from '@/core/services/ai/voice-synthesis-service';
 import { videoEffectService } from '@/core/services/video/video-effect-service';
 import { audioVideoSyncService } from '@/core/services/asr/audio-sync-service';
-import { mixTtsWithVideo } from '@/core/services/video/audioMixService';
+import { mixTtsWithVideo } from '@/core/services/video/audio-mix-service';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import { useTimeout } from '@/hooks/useTimeout';

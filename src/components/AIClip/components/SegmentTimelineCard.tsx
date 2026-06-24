@@ -19,7 +19,7 @@ import { ScrollArea } from '../../ui/scroll-area';
 import { Gauge, Shuffle, Clock, Zap, MessageCircle, Eye, Pause, FileVideo } from 'lucide-react';
 import { formatTime } from '@/shared/utils/formatting';
 import type { SmartVideoSegment } from '../../../core/video/highlight.types';
-import { summarizeSpeeds } from '../../../core/services/aiClip/segmentEnricher';
+import { summarizeSpeeds } from '../../../core/services/aiClip/segment-enricher';
 import type { TransitionType } from '../../../core/services/video/transition-suggestion';
 import styles from '../AIClip.module.less';
 

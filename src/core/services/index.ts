@@ -18,7 +18,7 @@ export { resolveLegacyModel, getLegacyModelCompatMap } from './ai/ai-model-adapt
 // AI 剪辑批处理（aiClip/ — 原 ai/batch/，现提升到 services/ 一级）
 export { aiClipService, AIClipService } from './aiClip';
 export { analyzeVideo } from './aiClip/analyzer';
-export { batchProcess } from './aiClip/batchProcessor';
+export { batchProcess } from './aiClip/batch-processor';
 
 // 剪辑 pipeline（pipeline/clip-pipeline/ — 原 ai/pipeline/，现提升到 services/ 一级）
 export { clipWorkflowService, ClipWorkflowService } from './pipeline/clip-pipeline/clipWorkflow';

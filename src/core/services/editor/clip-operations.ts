@@ -13,8 +13,8 @@ import {
   findClipInTracks,
   updateClipInTrack,
   calculateDuration,
-} from './timelineHelpers';
-import { lookupTrack } from './operationBase';
+} from './timeline-helpers';
+import { lookupTrack } from './operation-base';
 
 /** 添加片段到轨道 */
 export function addClip(

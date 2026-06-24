@@ -10,16 +10,16 @@ export {
   loadProjectWithRetry,
   listProjects,
   deleteProject,
-} from '@/core/services/project/projectFileService';
+} from '@/core/services/project/project-file-service';
 
 // Auth service
 export { getApiKey } from '@/core/services/auth/apiKeyService';
 
 // Transcode/crop service
-export { transcodeWithCrop } from '@/core/services/export/transcodeCropService';
+export { transcodeWithCrop } from '@/core/services/export/transcode-crop-service';
 
 // File info service
-export { getFileSizeBytes, getFileSizeMb } from '@/core/services/file/fileInfoService';
+export { getFileSizeBytes, getFileSizeMb } from '@/core/services/file/file-info-service';
 
 // Script export — kept here (standalone utility)
-export { exportScriptToFile } from '@/core/services/export/scriptExportService';
+export { exportScriptToFile } from '@/core/services/export/script-export-service';

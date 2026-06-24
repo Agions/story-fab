@@ -1,11 +1,11 @@
 export * from './types';
 export * from './analyzer';
-export * from './batchProcessor';
+export * from './batch-processor';
 export * from './config';
-export * from './segmentEnricher';
+export * from './segment-enricher';
 
 import { analyzeVideo } from './analyzer';
-import { batchProcess, getBatchTask, cancelTask, applySuggestions, smartClip } from './batchProcessor';
+import { batchProcess, getBatchTask, cancelTask, applySuggestions, smartClip } from './batch-processor';
 import { exportClipConfig, importClipConfig } from './config';
 import {
   DEFAULT_CLIP_CONFIG,

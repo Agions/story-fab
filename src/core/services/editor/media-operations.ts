@@ -11,7 +11,7 @@ import type {
   AudioClip,
 } from '../../types/timeline';
 import { syncLegacyTracks } from '../../types/timeline';
-import { lookupTrack } from './operationBase';
+import { lookupTrack } from './operation-base';
 
 /**
  * 创建基础 TimelineClip 的配置
