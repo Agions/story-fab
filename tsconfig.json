@@ -26,6 +26,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/types/*": ["./src/types/*"],
+      "@/services/*": ["./src/services/*"],
       "@/core/*": ["./src/core/*"],
       "@/shared/*": ["./src/shared/*"],
       "@/components/*": ["./src/components/*"]
