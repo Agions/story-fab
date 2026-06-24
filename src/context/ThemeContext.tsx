@@ -5,7 +5,7 @@
  * 底层使用 appStore 的 theme 状态
  */
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/store/app-store';
 
 type Theme = 'light' | 'dark';
 

@@ -14,15 +14,15 @@
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
-import { createHistory } from './createHistory';
+import { createHistory } from './create-history';
 import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '../core/types/timeline';
-import { DEFAULT_SNAP_THRESHOLD_MS } from './editorTypes';
+import { DEFAULT_SNAP_THRESHOLD_MS } from './editor-types';
 import {
   updateClipInTracks,
   addKeyframeToClip,
   removeKeyframeFromClip,
   updateKeyframeInClip,
-} from './timelineHelpers';
+} from './timeline-helpers';
 
 const MAX_HISTORY_SIZE = 19;
 

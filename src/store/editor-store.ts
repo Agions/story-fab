@@ -12,14 +12,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 
-import type { EditorStore, VideoData, ScriptData, VoiceData, EditorPanel } from './editorTypes';
+import type { EditorStore, VideoData, ScriptData, VoiceData, EditorPanel } from './editor-types';
 import {
   DEFAULT_ZOOM,
   ZOOM_MIN,
   ZOOM_MAX,
   VOLUME_MIN,
   VOLUME_MAX,
-} from './editorTypes';
+} from './editor-types';
 
 // =========================================
 // Initial state

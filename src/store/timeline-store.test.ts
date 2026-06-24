@@ -2,10 +2,10 @@
  * timelineStore 单元测试
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useTimelineStore, __resetTrackHistoryForTest } from './timelineStore';
+import { useTimelineStore, __resetTrackHistoryForTest } from './timeline-store';
 
 // 独立的 createHistory 实例用于单元测试（验证模块行为与 store 一致）
-import { createHistory } from './createHistory';
+import { createHistory } from './create-history';
 import type { TimelineTrack } from '../core/types/timeline';
 const _testHistory = createHistory<TimelineTrack[]>({ maxSize: 19 });
 

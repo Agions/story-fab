@@ -5,8 +5,8 @@
 import type { Project, ProjectStatus } from '@/core/types';
 
 // Re-export filter/sort from store (single source of truth)
-export { filterProjects, sortProjects } from '@/store/projectStore';
-export type { ProjectFilter, ProjectSortBy, SortOrder } from '@/store/projectStore';
+export { filterProjects, sortProjects } from '@/store/project-store';
+export type { ProjectFilter, ProjectSortBy, SortOrder } from '@/store/project-store';
 
 // Re-export formatting utilities
 export { formatFileSize as formatProjectSize, formatDuration as formatProjectDuration } from './formatting';

@@ -34,8 +34,8 @@ import {
 } from 'lucide-react';
 import { notify } from '@/shared';
 import { subtitleService } from '@/core/services/subtitle/subtitleService';
-import { useEditorStore } from '@/store/editorStore';
-import { useTimelineStore } from '@/store/timelineStore';
+import { useEditorStore } from '@/store/editor-store';
+import { useTimelineStore } from '@/store/timeline-store';
 import type { SubtitleEntry } from '@/core/types';
 import styles from './index.module.css';
 import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';

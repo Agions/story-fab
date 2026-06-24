@@ -2,7 +2,7 @@
  * projectStore 过滤和排序逻辑测试
  */
 import { describe, it, expect } from 'vitest';
-import { filterProjects, sortProjects } from './projectStore';
+import { filterProjects, sortProjects } from './project-store';
 import type { Project } from '../core/types';
 
 // 测试数据：每个字段值都不同，避免意外的 tie-breaking

@@ -4,7 +4,7 @@
  * 验证 undo/redo 行为正确性、滑动窗口边界、未来栈清空规则
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createHistory } from './createHistory';
+import { createHistory } from './create-history';
 
 type Snapshot = { value: number };
 

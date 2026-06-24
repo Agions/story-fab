@@ -11,8 +11,8 @@ import {
 import { StoryFabProvider, useStoryFab } from '@/components/StoryFab/context';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
-import { useEditorStore } from '../../store/editorStore';
-import { useTimelineStore } from '../../store/timelineStore';
+import { useEditorStore } from '../../store/editor-store';
+import { useTimelineStore } from '../../store/timeline-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryFab/workspace/functionModeMap';
