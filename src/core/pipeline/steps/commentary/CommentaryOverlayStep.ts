@@ -17,7 +17,7 @@ import {
   type CommentaryOverlayOutput,
   type OverlayPlan,
 } from './types';
-import { sceneCommentaryAlignmentService } from '../../../../core/services/ai/sceneCommentaryService';
+import { sceneCommentaryAlignmentService } from '../../../../core/services/ai/scene-commentary-service';
 
 // ============================================================
 // Step Metadata

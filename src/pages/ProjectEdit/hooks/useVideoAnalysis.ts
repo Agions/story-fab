@@ -9,7 +9,7 @@
 import { useCallback, useRef, useState } from 'react';
 import type { ScriptSegment } from '@/core/types';
 import { videoProcessor, VideoMetadata } from '@/core/video';
-import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/ai/scriptService';
+import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/ai/script-service';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import { parseScriptText } from '../projectEditUtils';

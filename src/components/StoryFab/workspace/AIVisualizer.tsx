@@ -9,7 +9,7 @@
  */
 import React, { useReducer, useEffect, memo } from 'react';
 import { useStoryFab } from '../context';
-import { visionService } from '../../../core/services/ai/visionService';
+import { visionService } from '../../../core/services/ai/vision-service';
 import { notify } from '@/shared';
 import { useTimeout } from '../../../hooks/useTimeout';
 import { logger } from '@/shared/utils/logging';

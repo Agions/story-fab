@@ -33,7 +33,7 @@ import {
   Mic,
 } from 'lucide-react';
 import { notify } from '@/shared';
-import { subtitleService } from '@/core/services/subtitle/subtitleService';
+import { subtitleService } from '@/core/services/subtitle/subtitle-service';
 import { useEditorStore } from '@/store/editor-store';
 import { useTimelineStore } from '@/store/timeline-store';
 import type { SubtitleEntry } from '@/core/types';

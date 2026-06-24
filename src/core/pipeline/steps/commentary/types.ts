@@ -10,7 +10,7 @@
 
 import type { ScriptSegment, Scene, VideoAnalysis } from '@/core/types';
 import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
-import type { OriginalOverlayPlanItem } from '@/core/services/ai/sceneCommentaryService';
+import type { OriginalOverlayPlanItem } from '@/core/services/ai/scene-commentary-service';
 
 // ============================================================
 // Pipeline 共享 Context (贯穿所有 step)

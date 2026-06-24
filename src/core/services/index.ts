@@ -8,12 +8,12 @@ export { BaseService, ServiceError } from './providers/base.service';
 export * from './providers';
 
 // AI 服务（ai/ 子目录 — 模型调用层）
-export { aiService } from './ai/aiService';
-export { visionService } from './ai/visionService';
-export { voiceSynthesisService, VoiceSynthesisService } from './ai/voiceSynthesisService';
-export { scriptGenerationService } from './ai/scriptService';
-export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './ai/sceneCommentaryService';
-export { resolveLegacyModel, getLegacyModelCompatMap } from './ai/aiModelAdapter';
+export { aiService } from './ai/ai-service';
+export { visionService } from './ai/vision-service';
+export { voiceSynthesisService, VoiceSynthesisService } from './ai/voice-synthesis-service';
+export { scriptGenerationService } from './ai/script-service';
+export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './ai/scene-commentary-service';
+export { resolveLegacyModel, getLegacyModelCompatMap } from './ai/ai-model-adapter';
 
 // AI 剪辑批处理（aiClip/ — 原 ai/batch/，现提升到 services/ 一级）
 export { aiClipService, AIClipService } from './aiClip';
@@ -32,14 +32,14 @@ export { editorService, EditorService } from './editor';
 export * from './editor';
 
 // 导出服务（export/ 子目录）
-export { exportService, ExportService } from './export/exportService';
+export { exportService, ExportService } from './export/export-service';
 
 // 字幕服务（subtitle/ 子目录）
-export { subtitleService, SubtitleService } from './subtitle/subtitleService';
+export { subtitleService, SubtitleService } from './subtitle/subtitle-service';
 
 // 视频特效 & 信号（video/ 子目录）
-export { videoEffectService, VideoEffectService } from './video/videoEffectService';
-export { detectEmotionPeaks, calculateEmotionScore } from './video/emotionDetector';
+export { videoEffectService, VideoEffectService } from './video/video-effect-service';
+export { detectEmotionPeaks, calculateEmotionScore } from './video/emotion-detector';
 
 // Commentary Mode 服务（解说模式核心服务）
 export * from './commentary';

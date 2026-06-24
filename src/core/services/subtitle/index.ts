@@ -16,7 +16,7 @@ export {
   type SubtitleTrack,
   type SubtitleExtractOptions,
   type SubtitleTranslateOptions,
-} from './subtitleService';
+} from './subtitle-service';
 
 // 导出 Whisper 服务
 export {

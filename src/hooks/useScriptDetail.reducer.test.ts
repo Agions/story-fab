@@ -5,7 +5,7 @@ import {
   type ScriptDetailState,
   type ScriptDetailProject,
 } from './useScriptDetail.reducer';
-import type { Script, ScriptSegment } from '@/core/services/ai/scriptService';
+import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
 
 // ---------------------------------------------------------------------------
 // Helpers

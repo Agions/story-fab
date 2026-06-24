@@ -9,8 +9,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { voiceSynthesisService } from '@/core/services/ai/voiceSynthesisService';
-import { videoEffectService } from '@/core/services/video/videoEffectService';
+import { voiceSynthesisService } from '@/core/services/ai/voice-synthesis-service';
+import { videoEffectService } from '@/core/services/video/video-effect-service';
 import { audioVideoSyncService } from '@/core/services/asr/audioSyncService';
 import { mixTtsWithVideo } from '@/core/services/video/audioMixService';
 import { tauri } from '@/core/tauri';

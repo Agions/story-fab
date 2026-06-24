@@ -1,5 +1,5 @@
 /**
  * 视频特效 & 信号处理
  */
-export * from './videoEffectService';
-export * from './emotionDetector';
+export * from './video-effect-service';
+export * from './emotion-detector';

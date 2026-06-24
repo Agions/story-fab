@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useReducer } from 'react';
-import type { Script, ScriptSegment } from '@/core/services/ai/scriptService';
+import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
 import {
   initialScriptDetailState,
   scriptDetailReducer,

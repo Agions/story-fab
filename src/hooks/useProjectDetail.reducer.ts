@@ -1,4 +1,4 @@
-import type { AIScriptDraft } from '@/core/services/ai/scriptService';
+import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/core/types';
 import type { VideoAnalysis } from '@/types';
 

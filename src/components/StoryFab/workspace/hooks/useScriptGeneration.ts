@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { aiService } from '@/core/services/ai/aiService';
+import { aiService } from '@/core/services/ai/ai-service';
 import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/aiModels.config';
 import useLocalStorage from '@/hooks/useLocalStorage';

@@ -1,4 +1,4 @@
-import type { Script, ScriptSegment } from '@/core/services/ai/scriptService';
+import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
 
 export interface ScriptDetailState {
   loading: boolean;

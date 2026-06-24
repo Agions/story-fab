@@ -17,7 +17,7 @@ import {
   type CommentaryTimingOutput,
   type AlignedSegments,
 } from './types';
-import { sceneCommentaryAlignmentService } from '../../../../core/services/ai/sceneCommentaryService';
+import { sceneCommentaryAlignmentService } from '../../../../core/services/ai/scene-commentary-service';
 import type { Scene, ScriptSegment } from '@/core/types';
 
 // ============================================================

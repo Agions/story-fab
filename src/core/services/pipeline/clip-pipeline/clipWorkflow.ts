@@ -10,7 +10,7 @@
  * 类型定义见 clipRepurposing/types.ts
  */
 
-import { visionService } from '../../ai/visionService';
+import { visionService } from '../../ai/vision-service';
 import { asrService } from '../../asr/asrService';
 import { logger } from '../../../../shared/utils/logging';
 import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
