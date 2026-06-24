@@ -2,10 +2,10 @@
  * 错误处理统一入口
  */
 
-export { AppError } from './AppError';
-export type { AppErrorSeverity, AppErrorOptions } from './AppError';
+export { AppError } from './app-error';
+export type { AppErrorSeverity, AppErrorOptions } from './app-error';
 
-import { AppError } from './AppError';
+import { AppError } from './app-error';
 import { logger } from '@/shared/utils/logging';
 
 /**
@@ -15,7 +15,6 @@ import { logger } from '@/shared/utils/logging';
 export function handleError(err: unknown, code: string, context?: Record<string, unknown>): AppError {
   const appErr = AppError.from(err, code);
   if (context) {
-    // 合并 context（保留已有）
     const merged = { ...(appErr.context ?? {}), ...context };
     Object.assign(appErr, { context: merged });
   }
