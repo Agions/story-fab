@@ -3,13 +3,13 @@ import { Card, CardContent } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { Plus, Trash2 } from 'lucide-react';
-import { VideoSegment } from '@/core/video';
+import { SimpleVideoSegment } from '@/core/video';
 import { formatDuration } from '../../../shared/utils/formatting';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface SegmentItemProps {
   index: number;
-  segment: VideoSegment;
+  segment: SimpleVideoSegment;
   selected: boolean;
   onSelectSegment: (index: number) => void;
   onDeleteSegment: (index: number) => void;
@@ -70,7 +70,7 @@ const SegmentItem: React.FC<SegmentItemProps> = memo(({
 SegmentItem.displayName = 'SegmentItem';
 
 interface SegmentListProps {
-  segments: VideoSegment[];
+  segments: SimpleVideoSegment[];
   selectedIndex: number;
   hasVideo: boolean;
   onSelectSegment: (index: number) => void;
@@ -88,7 +88,7 @@ const SegmentList: React.FC<SegmentListProps> = ({
 }) => {
   // Stable segment key derived from segment data — avoids re-creating keys on every render
   const segmentKeyRef = useRef<Map<string, string>>(new Map());
-  const getSegmentKey = useCallback((segment: VideoSegment, index: number): string => {
+  const getSegmentKey = useCallback((segment: SimpleVideoSegment, index: number): string => {
     const key = `${index}-${segment.start.toFixed(3)}-${segment.end.toFixed(3)}`;
     if (!segmentKeyRef.current.has(key)) {
       segmentKeyRef.current.set(key, key);

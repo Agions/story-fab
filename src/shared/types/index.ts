@@ -146,7 +146,7 @@ export interface Workflow {
 /** 任务类型 */
 export type TaskType = 'analysis' | 'script' | 'render' | 'export' | 'upload';
 
-import type { TaskStatus } from '@/core/types';
+import type { TaskStatus } from '@/types';
 export type { TaskStatus };
 
 /** 任务 */

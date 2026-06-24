@@ -11,7 +11,7 @@ import { invoke, TauriCommand } from '../tauri';
 import type {
   VideoMetadata,
   KeyFrame,
-  VideoSegment,
+  SimpleVideoSegment,
   ExtractKeyFramesOptions,
   CutOptions,
   FFmpegStatus,
@@ -68,7 +68,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
   protected async doCut(
     inputPath: string,
     outputPath: string,
-    segments: VideoSegment[],
+    segments: SimpleVideoSegment[],
     options: CutOptions
   ): Promise<string> {
     let unlisten: UnlistenFn | null = null;
@@ -91,7 +91,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
     }
   }
 
-  protected async doPreview(inputPath: string, segment: VideoSegment): Promise<string> {
+  protected async doPreview(inputPath: string, segment: SimpleVideoSegment): Promise<string> {
     return await invoke(TauriCommand.GENERATE_PREVIEW, {
       inputPath,
       segment: {

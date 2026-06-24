@@ -27,7 +27,7 @@ interface AnalysisEmotion {
 
 export interface AnalysisInput {
   keyMoments?: AnalysisMoment[];
-  emotions?: AnalysisEmotion[];
+  emotions?: string[] | AnalysisEmotion[];
   summary?: string;
   title?: string;
   duration?: number;
@@ -63,10 +63,10 @@ export function buildScriptPrompt(analysis: AnalysisInput, options?: ScriptGener
 
   // 格式化情感标记
   const emotionsText = emotions
-    .map(
-      (e) =>
-        `时间点: ${Math.floor(e.timestamp / 60)}分${e.timestamp % 60}秒, 情感: ${e.type}, 强度: ${e.intensity}`
-    )
+    .map((e) => {
+      if (typeof e === 'string') return e;
+      return `时间点: ${Math.floor(e.timestamp / 60)}分${e.timestamp % 60}秒, 情感: ${e.type}, 强度: ${e.intensity}`;
+    })
     .join('\n');
 
   // 获取风格和语气指导

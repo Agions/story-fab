@@ -6,4 +6,4 @@
  * 此文件保留用于向后兼容
  */
 
-export type { Project, ProjectStatus } from '../../core/types';
+export type { Project, ProjectStatus } from '@/types';

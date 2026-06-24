@@ -3,7 +3,7 @@
  * 来源: refactor/video-editor-usereducer (v3.4 §A2 范式)
  * 模式: 1 hook + 1 .reducer.ts + makeSetter<K> + Updater<T>
  */
-import type { VideoSegment } from '@/core/video';
+import type { SimpleVideoSegment } from '@/core/video';
 
 export interface VideoEditorState {
   videoSrc: string;
@@ -12,10 +12,10 @@ export interface VideoEditorState {
   currentTime: number;
   duration: number;
   isPlaying: boolean;
-  segments: VideoSegment[];
+  segments: SimpleVideoSegment[];
   keyframes: string[];
   selectedSegmentIndex: number;
-  editHistory: VideoSegment[][];
+  editHistory: SimpleVideoSegment[][];
   historyIndex: number;
   outputFormat: string;
   videoQuality: string;

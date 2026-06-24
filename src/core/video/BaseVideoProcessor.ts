@@ -12,7 +12,7 @@
 import { IVideoProcessor, type FFmpegStatus } from './IVideoProcessor';
 import type {
   VideoMetadata,
-  VideoSegment,
+  SimpleVideoSegment,
   KeyFrame,
   ExtractKeyFramesOptions,
   CutOptions,
@@ -167,7 +167,7 @@ export abstract class BaseVideoProcessor implements IVideoProcessor {
 
   // ---------- Editing ----------
 
-  async cut(inputPath: string, outputPath: string, segments: VideoSegment[], options: CutOptions = {}) {
+  async cut(inputPath: string, outputPath: string, segments: SimpleVideoSegment[], options: CutOptions = {}) {
     if (!inputPath?.trim() || !outputPath?.trim()) {
       throw new VideoProcessingError('剪辑', '输入或输出路径不能为空');
     }
@@ -184,7 +184,7 @@ export abstract class BaseVideoProcessor implements IVideoProcessor {
     }
   }
 
-  async preview(inputPath: string, segment: VideoSegment) {
+  async preview(inputPath: string, segment: SimpleVideoSegment) {
     if (!inputPath?.trim()) throw new VideoProcessingError('生成预览', '视频路径不能为空');
     if (!(await this.ensureAvailable())) throw new VideoProcessingError('生成预览', '未安装FFmpeg');
     logger.debug('预览片段:', { segment });
@@ -216,8 +216,8 @@ export abstract class BaseVideoProcessor implements IVideoProcessor {
   protected abstract doGenerateThumbnail(videoPath: string, time: number): Promise<string>;
 
   /** 平台特定：剪辑 */
-  protected abstract doCut(inputPath: string, outputPath: string, segments: VideoSegment[], options: CutOptions): Promise<string>;
+  protected abstract doCut(inputPath: string, outputPath: string, segments: SimpleVideoSegment[], options: CutOptions): Promise<string>;
 
   /** 平台特定：预览 */
-  protected abstract doPreview(inputPath: string, segment: VideoSegment): Promise<string>;
+  protected abstract doPreview(inputPath: string, segment: SimpleVideoSegment): Promise<string>;
 }

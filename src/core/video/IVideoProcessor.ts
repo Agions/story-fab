@@ -7,13 +7,13 @@
 import type {
   VideoMetadata,
   KeyFrame,
-  VideoSegment,
+  SimpleVideoSegment,
   ExtractKeyFramesOptions,
   CutOptions,
   FFmpegStatus,
 } from './types';
 
-export { VideoMetadata, KeyFrame, VideoSegment, ExtractKeyFramesOptions, CutOptions, FFmpegStatus };
+export { VideoMetadata, KeyFrame, SimpleVideoSegment, ExtractKeyFramesOptions, CutOptions, FFmpegStatus };
 
 export interface IVideoProcessor {
   // ---------- FFmpeg ----------
@@ -43,8 +43,8 @@ export interface IVideoProcessor {
   // ---------- Editing ----------
 
   /** 剪辑视频片段 */
-  cut(inputPath: string, outputPath: string, segments: VideoSegment[], options?: CutOptions): Promise<string>;
+  cut(inputPath: string, outputPath: string, segments: SimpleVideoSegment[], options?: CutOptions): Promise<string>;
 
   /** 生成片段预览 */
-  preview(inputPath: string, segment: VideoSegment): Promise<string>;
+  preview(inputPath: string, segment: SimpleVideoSegment): Promise<string>;
 }

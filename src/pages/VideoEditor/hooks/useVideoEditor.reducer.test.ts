@@ -4,9 +4,9 @@ import {
   initialVideoEditorState,
   type VideoEditorState,
 } from './useVideoEditor.reducer';
-import type { VideoSegment } from '@/core/video';
+import type { SimpleVideoSegment } from '@/core/video';
 
-const makeSegment = (overrides: Partial<VideoSegment> = {}): VideoSegment => ({
+const makeSegment = (overrides: Partial<SimpleVideoSegment> = {}): SimpleVideoSegment => ({
   start: 0,
   end: 10,
   ...overrides,
@@ -190,7 +190,7 @@ describe('videoEditorReducer', () => {
         {
           type: 'update',
           key: 'segments',
-          updater: (prev: VideoSegment[]) => [...prev, segment],
+          updater: (prev: SimpleVideoSegment[]) => [...prev, segment],
         },
       );
       expect(result.segments).toHaveLength(2);

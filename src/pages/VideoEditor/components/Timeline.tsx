@@ -1,9 +1,9 @@
 import React, { useRef, memo, useMemo } from 'react';
-import { VideoSegment } from '@/core/video';
+import { SimpleVideoSegment } from '@/core/video';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface TimelineProps {
-  segments: VideoSegment[];
+  segments: SimpleVideoSegment[];
   currentTime: number;
   duration: number;
   selectedIndex: number;

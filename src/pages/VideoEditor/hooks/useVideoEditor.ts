@@ -4,7 +4,7 @@
  */
 import { useReducer, useMemo, useCallback, useRef } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
-import { VideoSegment, videoProcessor } from '@/core/video';
+import { SimpleVideoSegment, videoProcessor } from '@/core/video';
 import { clipWorkflowService } from '../../../core/services/pipeline/clip-pipeline/clipWorkflow';
 import type { VideoInfo } from '@/core/types';
 import type { ClipSegment } from '../../../core/services/aiClip';
@@ -44,7 +44,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
   const loadVideoLockRef = useRef(false);
   const smartClipLockRef = useRef(false);
 
-  const addToHistory = useCallback((newSegments: VideoSegment[]) => {
+  const addToHistory = useCallback((newSegments: SimpleVideoSegment[]) => {
     setters.editHistory((prev) => {
       const cursor = historyIndexRef.current;
       const newHistory = prev.slice(0, cursor + 1);
@@ -73,7 +73,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
         const metadata = await videoProcessor.analyze(selected);
         setters.duration(metadata.duration);
 
-        const newSegment: VideoSegment = { start: 0, end: metadata.duration };
+        const newSegment: SimpleVideoSegment = { start: 0, end: metadata.duration };
         setters.segments([newSegment]);
         addToHistory([newSegment]);
 
@@ -117,7 +117,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
     if (duration <= 0) return;
     const baseStart = Math.max(0, Math.min(currentTime, Math.max(duration - 5, 0)));
     const baseEnd = Math.max(baseStart, Math.min(baseStart + 5, duration));
-    const newSegment: VideoSegment = { start: baseStart, end: baseEnd };
+    const newSegment: SimpleVideoSegment = { start: baseStart, end: baseEnd };
     const newSegments = [...segments, newSegment];
     setters.segments(newSegments);
     addToHistory(newSegments);
@@ -158,7 +158,7 @@ export const useVideoEditor = (projectId: string | undefined) => {
         createdAt: new Date().toISOString(),
       };
       const result = await clipWorkflowService.processVideo(videoInfo);
-      const newSegments: VideoSegment[] = result.segments.map(seg => ({
+      const newSegments: SimpleVideoSegment[] = result.segments.map(seg => ({
         start: seg.sourceStart, end: seg.sourceEnd, type: 'video',
         content: `片段 ${segments.length + 1}`,
       }));

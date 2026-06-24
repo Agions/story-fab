@@ -17,6 +17,7 @@ export const FORMAT_MIME_TYPES: Record<ExportFormat, string> = {
   webm: 'video/webm',
   mov: 'video/quicktime',
   mkv: 'video/x-matroska',
+  gif: 'image/gif',
 };
 
 export class ExportService {

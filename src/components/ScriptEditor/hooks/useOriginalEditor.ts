@@ -5,7 +5,7 @@
 import { useReducer, useMemo, useCallback, useEffect } from 'react';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import type { ScriptSegment } from '@/core/types';
-import type { VideoSegment } from '@/core/video';
+import type { SimpleVideoSegment } from '@/core/video';
 import { videoProcessor } from '@/core/video';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
@@ -178,7 +178,7 @@ export const useOriginalEditor = ({
       try {
         setters.previewLoading(true);
         const segment = segments[index];
-        const videoSegment: VideoSegment = { start: segment.startTime, end: segment.endTime };
+        const videoSegment: SimpleVideoSegment = { start: segment.startTime, end: segment.endTime };
         const previewPath = await videoProcessor.preview(videoPath, videoSegment);
         setters.previewSrc(convertFileSrc(previewPath));
         setters.previewVisible(true);

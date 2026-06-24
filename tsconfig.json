@@ -25,6 +25,7 @@
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
     "paths": {
       "@/*": ["./src/*"],
+      "@/types/*": ["./src/types/*"],
       "@/core/*": ["./src/core/*"],
       "@/shared/*": ["./src/shared/*"],
       "@/components/*": ["./src/components/*"]
