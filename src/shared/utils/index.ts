@@ -14,7 +14,7 @@ export * from './notify';
 export { formatTime, formatDuration, formatDate, formatDateTime, formatRelativeTime, clamp, formatTimecodeMs, formatTimecode, formatTimecodeSimple, now, nowISO, MS_PER_SECOND } from './formatting';
 
 // 项目指标解析（已提取到独立模块）
-export { readNumberField, resolveProjectVideoPath, extractProjectMediaMetrics, pickPreferredSizeMb, type RawProjectRecord } from './projectMetrics';
+export { readNumberField, resolveProjectVideoPath, extractProjectMediaMetrics, pickPreferredSizeMb, type RawProjectRecord } from './project-metrics';
 
 /**
  * 防抖函数

@@ -10,7 +10,7 @@ export * from './utils/formatting';
 export * from './utils/logging';
 
 // 项目工具函数
-export * from './utils/projectUtils';
+export * from './utils/project-utils';
 
 // 通用工具函数
 export * from '@/shared/utils';
