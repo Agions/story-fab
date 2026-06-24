@@ -17,45 +17,45 @@
  *   } from '@/core/pipeline/steps';
  */
 
-export { buildCandidatesStep } from './BuildCandidatesStep';
-export { scoreClipsStep } from './ScoreClipsStep';
-export { generateSEOStep } from './GenerateSEOStep';
-export { prepareExportStep } from './PrepareExportStep';
+export { buildCandidatesStep } from './build-candidates-step';
+export { scoreClipsStep } from './score-clips-step';
+export { generateSEOStep } from './generate-seo-step';
+export { prepareExportStep } from './prepare-export-step';
 
 // Commentary 5-Step pipeline
-export { commentaryDirectorStep } from './commentary/CommentaryDirectorStep';
-export { commentaryVisualStep } from './commentary/CommentaryVisualStep';
-export { commentaryNarrationStep } from './commentary/CommentaryNarrationStep';
-export { commentaryTimingStep } from './commentary/CommentaryTimingStep';
-export { commentaryOverlayStep } from './commentary/CommentaryOverlayStep';
+export { commentaryDirectorStep } from './commentary/director-step';
+export { commentaryVisualStep } from './commentary/visual-step';
+export { commentaryNarrationStep } from './commentary/narration-step';
+export { commentaryTimingStep } from './commentary/timing-step';
+export { commentaryOverlayStep } from './commentary/overlay-step';
 export {
   runCommentaryPipeline,
   createCommentaryPipeline,
   COMMENTARY_PROGRESS_WEIGHTS,
   COMMENTARY_STEP_NAMES,
   type CommentaryStepName,
-} from './commentary/CompositeCommentaryPipeline';
+} from './commentary/composite-pipeline';
 
 // Re-export input/output types for convenience
 export type {
   BuildCandidatesInput,
   BuildCandidatesOutput,
-} from './BuildCandidatesStep';
+} from './build-candidates-step';
 
 export type {
   ScoreClipsInput,
   ScoreClipsOutput,
-} from './ScoreClipsStep';
+} from './score-clips-step';
 
 export type {
   GenerateSEOInput,
   GenerateSEOOutput,
-} from './GenerateSEOStep';
+} from './generate-seo-step';
 
 export type {
   PrepareExportInput,
   PrepareExportOutput,
-} from './PrepareExportStep';
+} from './prepare-export-step';
 
 // Commentary types
 export type {

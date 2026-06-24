@@ -23,13 +23,13 @@ export {
   type LegacyAIModelType,
   type AnalysisInput,
   type ScriptGenerationSettings,
-} from './scriptGenerationService';
+} from './script-generation-service';
 
 // 导出错误类
-export { AIServiceError } from './aiApiClient';
+export { AIServiceError } from './ai-api-client';
 
 // 导出工具
-export { parseScriptContent, formatScriptToText, createScriptDraft } from './scriptParser';
-export { buildScriptPrompt } from './promptBuilder';
-export { invokeAIModel } from './aiApiClient';
-export { AI_MODEL_CONFIGS, type AIModelType, type ModelConfig } from './aiModelConfigs';
+export { parseScriptContent, formatScriptToText, createScriptDraft } from './script-parser';
+export { buildScriptPrompt } from './prompt-builder';
+export { invokeAIModel } from './ai-api-client';
+export { AI_MODEL_CONFIGS, type AIModelType, type ModelConfig } from './ai-model-configs';

@@ -10,15 +10,15 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { commentaryDirectorStep } from './CommentaryDirectorStep';
-import { commentaryVisualStep } from './CommentaryVisualStep';
-import { commentaryNarrationStep } from './CommentaryNarrationStep';
-import { commentaryTimingStep } from './CommentaryTimingStep';
-import { commentaryOverlayStep } from './CommentaryOverlayStep';
+import { commentaryDirectorStep } from './director-step';
+import { commentaryVisualStep } from './visual-step';
+import { commentaryNarrationStep } from './narration-step';
+import { commentaryTimingStep } from './timing-step';
+import { commentaryOverlayStep } from './overlay-step';
 import {
   runCommentaryPipeline,
   COMMENTARY_PROGRESS_WEIGHTS,
-} from './CompositeCommentaryPipeline';
+} from './composite-pipeline';
 import type { CommentaryPipelineState } from './types';
 import type { Scene, VideoAnalysis, ScriptSegment, Emotion } from '@/core/types';
 

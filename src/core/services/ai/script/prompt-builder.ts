@@ -7,7 +7,7 @@
  * - 职责单一，便于维护和测试
  */
 
-import { STYLE_GUIDANCE_MAP, TONE_GUIDANCE_MAP } from './aiModelConfigs';
+import { STYLE_GUIDANCE_MAP, TONE_GUIDANCE_MAP } from './ai-model-configs';
 
 // ============================================
 // 类型定义

@@ -20,16 +20,16 @@ import type {
 import type { HighlightSegment, DetectOptions, HighlightReason } from '@/core/interfaces';
 
 // 导入拆分后的服务
-import { sceneDetectionService } from './sceneDetectionService';
-import { objectDetectionService } from './objectDetectionService';
-import { emotionAnalysisService } from './emotionAnalysisService';
-import { analysisReportService } from './analysisReportService';
+import { sceneDetectionService } from './scene-detection-service';
+import { objectDetectionService } from './object-detection-service';
+import { emotionAnalysisService } from './emotion-analysis-service';
+import { analysisReportService } from './analysis-report-service';
 
 // 重新导出各服务
-export { sceneDetectionService } from './sceneDetectionService';
-export { objectDetectionService } from './objectDetectionService';
-export { emotionAnalysisService } from './emotionAnalysisService';
-export { analysisReportService } from './analysisReportService';
+export { sceneDetectionService } from './scene-detection-service';
+export { objectDetectionService } from './object-detection-service';
+export { emotionAnalysisService } from './emotion-analysis-service';
+export { analysisReportService } from './analysis-report-service';
 
 // ============================================
 // 视频分析选项

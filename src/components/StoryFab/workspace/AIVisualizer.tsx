@@ -156,7 +156,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: 'asr' });
         timeout.set(() => dispatchLocal({ type: 'APPEND_VISIBLE_TASK', taskKey: 'asr' }), 100);
         try {
-          const { asrService } = await import('../../../core/services/asr/asrService');
+          const { asrService } = await import('../../../core/services/asr/asr-service');
           const asrResult = await asrService.recognizeSpeech(state.currentVideo, { language: 'zh_cn' });
           if (asrResult && asrResult.text) {
             dispatchLocal({ type: 'APPEND_COMPLETED_TASK', taskKey: 'asr_done' });

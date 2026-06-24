@@ -12,10 +12,10 @@ import {
   DEFAULT_ASR_OPTIONS,
   type ASRResult,
   type ASROptions,
-} from './asrTypes';
-import { RustWhisperASRProvider } from './providers/whisperRustProvider';
-import { WebSpeechASRProvider } from './providers/webSpeechProvider';
-import { MockASRProvider } from './providers/mockProvider';
+} from './asr-types';
+import { RustWhisperASRProvider } from './providers/whisper-rust-provider';
+import { WebSpeechASRProvider } from './providers/web-speech-provider';
+import { MockASRProvider } from './providers/mock-provider';
 import type { IASRProvider } from './providers/types';
 
 /**

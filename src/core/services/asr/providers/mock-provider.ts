@@ -3,7 +3,7 @@
  * 模拟 ASR 结果，用于 Rust Whisper 和 Web Speech 都不可用时的降级方案
  */
 import type { VideoInfo } from '../../../types';
-import type { ASRResult, ASRSegment, ASROptions } from '../asrTypes';
+import type { ASRResult, ASRSegment, ASROptions } from '../asr-types';
 import type { IASRProvider } from './types';
 
 /** 模拟 ASR 文本样本（按语言） */

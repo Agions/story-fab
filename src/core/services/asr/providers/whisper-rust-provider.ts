@@ -6,7 +6,7 @@
 import { logger } from '../../../../shared/utils/logging';
 import { tauri } from '../../../tauri';
 import type { VideoInfo } from '../../../types';
-import type { ASRResult, ASRSegment, ASROptions, RustWhisperSegment } from '../asrTypes';
+import type { ASRResult, ASRSegment, ASROptions, RustWhisperSegment } from '../asr-types';
 import type { IASRProvider } from './types';
 
 /**

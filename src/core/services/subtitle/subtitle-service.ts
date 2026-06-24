@@ -118,7 +118,7 @@ export class SubtitleService {
 
     logger.info('[SubtitleService] 提取字幕:', { videoPath, language });
 
-    const { asrService } = await import('../asr/asrService');
+    const { asrService } = await import('../asr/asr-service');
 
     const langMap: Record<string, 'zh_cn' | 'en_us' | 'ja_jp' | 'ko_kr'> = {
       'zh-CN': 'zh_cn',

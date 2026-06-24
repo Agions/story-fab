@@ -15,11 +15,11 @@
  */
 
 import { ChainPipeline, type PipelineResult, type StepOptions } from '../../Step';
-import { commentaryDirectorStep } from './CommentaryDirectorStep';
-import { commentaryVisualStep } from './CommentaryVisualStep';
-import { commentaryNarrationStep } from './CommentaryNarrationStep';
-import { commentaryTimingStep } from './CommentaryTimingStep';
-import { commentaryOverlayStep } from './CommentaryOverlayStep';
+import { commentaryDirectorStep } from './director-step';
+import { commentaryVisualStep } from './visual-step';
+import { commentaryNarrationStep } from './narration-step';
+import { commentaryTimingStep } from './timing-step';
+import { commentaryOverlayStep } from './overlay-step';
 import type { CommentaryPipelineState, CommentaryPipelineResult } from './types';
 
 // ============================================================

@@ -11,11 +11,11 @@
 import { getApiKey } from '@/core/services/auth/apiKeyService';
 import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
-import type { AIModelType } from './aiModelConfigs';
-import { invokeAIModel, AIServiceError } from './aiApiClient';
+import type { AIModelType } from './ai-model-configs';
+import { invokeAIModel, AIServiceError } from './ai-api-client';
 import { AppError } from '@/core/errors';
-import { buildScriptPrompt, type AnalysisInput, type ScriptGenerationSettings } from './promptBuilder';
-import { parseScriptContent, createScriptDraft } from './scriptParser';
+import { buildScriptPrompt, type AnalysisInput, type ScriptGenerationSettings } from './prompt-builder';
+import { parseScriptContent, createScriptDraft } from './script-parser';
 
 // ============================================
 // 类型定义
@@ -162,8 +162,8 @@ export const generateScriptWithOpenAI = async (
 };
 
 // 重新导出类型
-export type { AnalysisInput, ScriptGenerationSettings } from './promptBuilder';
-export type { AIModelType } from './aiModelConfigs';
+export type { AnalysisInput, ScriptGenerationSettings } from './prompt-builder';
+export type { AIModelType } from './ai-model-configs';
 
 /**
  * 使用 AI 分析关键帧

@@ -11,14 +11,14 @@
  */
 
 import { visionService } from '../../ai/vision-service';
-import { asrService } from '../../asr/asrService';
+import { asrService } from '../../asr/asr-service';
 import { logger } from '../../../../shared/utils/logging';
 import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
 import { ClipRepurposingPipeline } from './pipeline';
 import type { RepurposingOptions } from './pipeline';
 import type { ClipConfig, ClipSegment } from './types';
 import { clipSegmentFromRepurposing } from './types';
-import type { ASRSegment } from '../../asr/asrTypes';
+import type { ASRSegment } from '../../asr/asr-types';
 import {
   buildSceneChanges,
   isSegmentInSilence,

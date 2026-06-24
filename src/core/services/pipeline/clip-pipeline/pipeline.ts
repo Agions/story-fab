@@ -15,7 +15,7 @@
 import { logger } from '../../../../shared/utils/logging';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
 import type { CandidateClip } from './clipScorer';
-import type { ASRSegment } from '../../asr/asrTypes';
+import type { ASRSegment } from '../../asr/asr-types';
 import type { SEOMetadata, SocialPlatform } from './seoGenerator';
 import type { AspectRatio, ExportTask } from './multiExport';
 

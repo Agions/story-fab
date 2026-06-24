@@ -7,7 +7,7 @@
  * - 统一错误处理和请求/响应转换
  */
 
-import { AI_MODEL_CONFIGS, type AIModelType } from './aiModelConfigs';
+import { AI_MODEL_CONFIGS, type AIModelType } from './ai-model-configs';
 
 // ============================================
 // 错误处理

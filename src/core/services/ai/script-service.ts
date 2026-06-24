@@ -21,10 +21,10 @@ export {
   type LegacyAIModelType,
   type AnalysisInput,
   type ScriptGenerationSettings,
-} from './script/scriptGenerationService';
+} from './script/script-generation-service';
 
 // 单独导出错误类
-export { AIServiceError } from './script/aiApiClient';
+export { AIServiceError } from './script/ai-api-client';
 
 // 导出工具函数
 export { parseScriptContent, formatScriptToText, createScriptDraft } from './script';

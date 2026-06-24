@@ -6,7 +6,7 @@
  */
 import { logger } from '../../../../shared/utils/logging';
 import type { VideoInfo } from '../../../types';
-import type { ASRResult, ASRSegment, ASROptions, SpeechRecognitionCtor, SpeechRecognitionEvent } from '../asrTypes';
+import type { ASRResult, ASRSegment, ASROptions, SpeechRecognitionCtor, SpeechRecognitionEvent } from '../asr-types';
 import type { IASRProvider } from './types';
 
 /**
