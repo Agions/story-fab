@@ -12,7 +12,7 @@
  *   - Hashtags（5-10 个）
  */
 
-import type { ClipScore } from './clipScorer';
+import type { ClipScore } from './clip-scorer';
 import {
   TITLE_MAX_LENGTH,
   TITLE_SENTENCE_BOUNDARY_MIN,
@@ -23,7 +23,7 @@ import {
   TEMPLATE_BIO_TRUNCATE_SUFFIX,
   HASHTAG_MAX_COUNT,
   HASHTAG_WORDS_SAMPLE,
-} from './seoConstants';
+} from './seo-constants';
 
 export type SocialPlatform = 'youtube' | 'tiktok' | 'instagram' | 'douyin' | 'xiaohongshu' | 'bilibili' | 'youtube_shorts';
 

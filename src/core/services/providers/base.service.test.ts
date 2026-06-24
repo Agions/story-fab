@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { ServiceError } from './base.service';
+import { ServiceError } from './base-service';
 
 describe('ServiceError', () => {
   describe('constructor', () => {

@@ -14,8 +14,8 @@
  */
 
 import { createStep, type Step, reportProgress } from '../Step';
-import type { CandidateClip, ClipScore } from '../../services/pipeline/clip-pipeline/clipScorer';
-import { ClipScorer } from '../../services/pipeline/clip-pipeline/clipScorer';
+import type { CandidateClip, ClipScore } from '../../services/pipeline/clip-pipeline/clip-scorer';
+import { ClipScorer } from '../../services/pipeline/clip-pipeline/clip-scorer';
 import { logger } from '../../../shared/utils/logging';
 
 // ============================================================

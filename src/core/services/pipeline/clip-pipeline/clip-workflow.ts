@@ -25,7 +25,7 @@ import {
   attachScriptText,
   applyTransitionsToSegments,
   getAnalysisDuration,
-} from './clipGenerators';
+} from './clip-generators';
 
 // 剪辑结果
 interface ClipResult {

@@ -11,9 +11,9 @@
  *   CandidateClip    → candidate selection (transcript, audioEnergy, sceneType)
  */
 
-import type { CandidateClip, ClipScore } from './clipScorer';
-import type { SEOMetadata } from './seoGenerator';
-import type { ExportTask, AspectRatio } from './multiExport';
+import type { CandidateClip, ClipScore } from './clip-scorer';
+import type { SEOMetadata } from './seo-generator';
+import type { ExportTask, AspectRatio } from './multi-export';
 
 // ============================================================
 // Clip Core Types (moved from clipWorkflow.ts to break circular dep)

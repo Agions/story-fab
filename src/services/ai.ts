@@ -21,5 +21,5 @@ export { analyzeVideo } from '@/core/services/aiClip/analyzer';
 export { batchProcess } from '@/core/services/aiClip/batch-processor';
 
 // ─── LLM Providers ───
-export { BaseService, ServiceError } from '@/core/services/providers/base.service';
+export { BaseService, ServiceError } from '@/core/services/providers/base-service';
 export * from '@/core/services/providers';

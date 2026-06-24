@@ -3,7 +3,7 @@
  * 编排多个 ASR Provider：RustWhisper → WebSpeech → Mock
  * 策略模式实现：每种识别方案独立为 Provider，可独立测试和替换
  */
-import { BaseService } from '../providers/base.service';
+import { BaseService } from '../providers/base-service';
 import { logger } from '../../../shared/utils/logging';
 import { tauri } from '../../tauri';
 import { AppError } from '@/core/errors';

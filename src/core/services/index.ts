@@ -4,7 +4,7 @@
  */
 
 // 基础 & providers
-export { BaseService, ServiceError } from './providers/base.service';
+export { BaseService, ServiceError } from './providers/base-service';
 export * from './providers';
 
 // AI 服务（ai/ 子目录 — 模型调用层）
@@ -21,11 +21,11 @@ export { analyzeVideo } from './aiClip/analyzer';
 export { batchProcess } from './aiClip/batch-processor';
 
 // 剪辑 pipeline（pipeline/clip-pipeline/ — 原 ai/pipeline/，现提升到 services/ 一级）
-export { clipWorkflowService, ClipWorkflowService } from './pipeline/clip-pipeline/clipWorkflow';
+export { clipWorkflowService, ClipWorkflowService } from './pipeline/clip-pipeline/clip-workflow';
 export { clipRepurposingPipeline, ClipRepurposingPipeline } from './pipeline/clip-pipeline/pipeline';
-export { clipScorer } from './pipeline/clip-pipeline/clipScorer';
-export { multiExporter } from './pipeline/clip-pipeline/multiExport';
-export { seoGenerator } from './pipeline/clip-pipeline/seoGenerator';
+export { clipScorer } from './pipeline/clip-pipeline/clip-scorer';
+export { multiExporter } from './pipeline/clip-pipeline/multi-export';
+export { seoGenerator } from './pipeline/clip-pipeline/seo-generator';
 
 // 编辑器服务
 export { editorService, EditorService } from './editor';

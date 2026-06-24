@@ -14,10 +14,10 @@
 
 import { logger } from '../../../../shared/utils/logging';
 import type { VideoInfo, VideoAnalysis } from '@/core/types';
-import type { CandidateClip } from './clipScorer';
+import type { CandidateClip } from './clip-scorer';
 import type { ASRSegment } from '../../asr/asr-types';
-import type { SEOMetadata, SocialPlatform } from './seoGenerator';
-import type { AspectRatio, ExportTask } from './multiExport';
+import type { SEOMetadata, SocialPlatform } from './seo-generator';
+import type { AspectRatio, ExportTask } from './multi-export';
 
 // Step-based pipeline components
 import {

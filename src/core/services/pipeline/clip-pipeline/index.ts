@@ -8,8 +8,8 @@
  *   pipeline.ts      — 完整拆条管道编排
  */
 
-export * from './clipScorer';
-export * from './seoGenerator';
-export * from './multiExport';
+export * from './clip-scorer';
+export * from './seo-generator';
+export * from './multi-export';
 export * from './pipeline';
 export * from './types';
