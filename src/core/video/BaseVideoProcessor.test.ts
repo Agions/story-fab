@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import {
   VideoProcessingError,
   normalizeVideoError,
-} from './BaseVideoProcessor';
+} from './base-video-processor';
 
 describe('VideoProcessingError', () => {
   it('should create error with operation and message', () => {

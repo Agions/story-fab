@@ -20,7 +20,7 @@
  */
 export * from './types';
 export * from './highlight.types';
-export * from './IVideoProcessor';
-export { BaseVideoProcessor, VideoProcessingError, normalizeVideoError } from './BaseVideoProcessor';
-export { videoProcessor, TauriVideoProcessor } from './TauriVideoProcessor';
+export * from './ivideo-processor';
+export { BaseVideoProcessor, VideoProcessingError, normalizeVideoError } from './base-video-processor';
+export { videoProcessor, TauriVideoProcessor } from './tauri-video-processor';
 export * from './formatters';

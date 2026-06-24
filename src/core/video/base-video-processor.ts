@@ -9,7 +9,7 @@
  * 使用方式：
  *   class TauriVideoProcessor extends BaseVideoProcessor implements IVideoProcessor { ... }
  */
-import { IVideoProcessor, type FFmpegStatus } from './IVideoProcessor';
+import { IVideoProcessor, type FFmpegStatus } from './ivideo-processor';
 import type {
   VideoMetadata,
   SimpleVideoSegment,
