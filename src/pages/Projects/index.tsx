@@ -4,9 +4,9 @@ import { Skeleton } from '../../components/ui/skeleton';
 import { Plus } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
-import { ProjectsToolbar } from './components/ProjectsToolbar';
-import { StatusFilterBar } from './components/StatusFilterBar';
-import { ProjectCard } from './components/ProjectCard';
+import { ProjectsToolbar } from './components/projects-toolbar';
+import { StatusFilterBar } from './components/status-filter-bar';
+import { ProjectCard } from './components/project-card';
 import { useProjectList, statusConfig, getProjectUIStatus } from '../../hooks/useProjectList';
 import { formatRelativeDate } from '../../shared/utils/formatting';
 import { preloadProjectEditPage, preloadVideoEditorPage } from '../../core/utils/route-preload';
@@ -14,7 +14,7 @@ import type { ProjectView } from './types';
 import React from 'react';
 import { Edit3, Trash2, Play, Download } from 'lucide-react';
 
-const loadProjectsListView = () => import('./components/ProjectsListView');
+const loadProjectsListView = () => import('./components/projects-list-view');
 const ProjectsListView = React.lazy(loadProjectsListView);
 
 const ProjectManager: React.FC = () => {
