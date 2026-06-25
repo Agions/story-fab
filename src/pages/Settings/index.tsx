@@ -18,9 +18,9 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import useLocalStorage from '../../hooks/useLocalStorage';
-import ApiKeysPanel from '../../components/Settings/ApiKeysPanel';
-import ModelSettingsPanel from '../../components/Settings/ModelSettingsPanel';
-import GeneralSettingsPanel from '../../components/Settings/GeneralSettingsPanel';
+import ApiKeysPanel from '../../components/Settings/api-keys-panel';
+import ModelSettingsPanel from '../../components/Settings/model-settings-panel';
+import GeneralSettingsPanel from '../../components/Settings/general-settings-panel';
 import type { ModelProvider } from '@/core/types';
 import { AI_MODELS as CORE_MODELS, DEFAULT_MODEL_ID } from '../../core/config/ai-models-config';
 import {

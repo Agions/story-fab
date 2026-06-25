@@ -1,5 +1,5 @@
-export { SettingsDialog } from './SettingsDialog';
-export { AISettings } from './AISettings';
-export { AppearanceSettings } from './AppearanceSettings';
-export { ShortcutSettings } from './ShortcutSettings';
-export { ExportSettings } from './ExportSettings';
+export { SettingsDialog } from './settings-dialog';
+export { AISettings } from './ai-settings';
+export { AppearanceSettings } from './appearance-settings';
+export { ShortcutSettings } from './shortcut-settings';
+export { ExportSettings } from './export-settings';
