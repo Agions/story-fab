@@ -8,7 +8,6 @@ export type {
   ProjectStatus,
   ProjectSettings,
   ProjectData,
-  VideoProject,
   User,
   UserPreferences,
   AppSettings,
