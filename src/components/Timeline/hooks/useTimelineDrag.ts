@@ -6,7 +6,7 @@
 import { useCallback, useRef } from 'react';
 import type { TimelineTrack, TimelineClip, DragType } from '../../../core/types/timeline';
 import { MIN_CLIP_DURATION } from '../constants';
-import { snapToBoundary } from '../timelineSnap';
+import { snapToBoundary } from '../timeline-snap';
 
 export type { DragType };
 
