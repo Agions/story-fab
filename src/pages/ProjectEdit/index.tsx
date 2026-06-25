@@ -17,7 +17,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import type { VideoMetadata } from '@/core/video';
 import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
-import { useSettings } from '@/context/SettingsContext';
+import { useSettings } from '@/context/settings-context';
 
 import { logger } from '../../shared/utils/logging';
 

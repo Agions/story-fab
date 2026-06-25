@@ -10,7 +10,7 @@ import {
   PROJECTS_CHANGED_EVENT,
   deleteProject,
 } from '../../../services/tauri';
-import { useSettings } from '../../../context/SettingsContext';
+import { useSettings } from '../../../context/settings-context';
 import {
   extractProjectMediaMetrics,
   notify,

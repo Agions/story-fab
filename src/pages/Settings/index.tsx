@@ -16,7 +16,7 @@ import {
   Info,
   Lock,
 } from 'lucide-react';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from '@/context/theme-context';
 import useLocalStorage from '../../hooks/use-local-storage';
 import ApiKeysPanel from '../../components/Settings/api-keys-panel';
 import ModelSettingsPanel from '../../components/Settings/model-settings-panel';

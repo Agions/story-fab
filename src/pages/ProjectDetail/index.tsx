@@ -10,7 +10,7 @@ import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scisso
 
 import { useModelStore } from '@/store';
 import { saveProjectToFile, getApiKey, loadProjectWithRetry, deleteProject } from '../../services/tauri';
-import { useSettings } from '@/context/SettingsContext';
+import { useSettings } from '@/context/settings-context';
 import { notify } from '@/shared';
 import { generateScriptWithModel, parseGeneratedScript } from '@/core/services/ai/script-service';
 import { resolveLegacyModel } from '@/core/services/ai/ai-model-adapter';

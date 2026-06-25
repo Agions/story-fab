@@ -8,7 +8,7 @@ import { useStoryFab } from '../context';
 import type { ProjectData } from '@/core/types';
 import { saveProjectToFile } from '../../../services/tauri';
 import { notify } from '@/shared';
-import { useSettings } from '@/context/SettingsContext';
+import { useSettings } from '@/context/settings-context';
 import styles from './ProjectSetup.module.less';
 
 interface ProjectCreateProps {

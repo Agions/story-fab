@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { SettingsProvider } from '@/context/SettingsContext';
+import { ThemeProvider } from '@/context/theme-context';
+import { SettingsProvider } from '@/context/settings-context';
 import { ToastProvider } from '@/components/ui/toast';
 
 interface AppProviderProps {

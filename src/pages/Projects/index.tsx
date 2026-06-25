@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '../../components/ui/skeleton';
 import { Plus } from 'lucide-react';
-import { useSettings } from '../../context/SettingsContext';
+import { useSettings } from '../../context/settings-context';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import { ProjectsToolbar } from './components/projects-toolbar';
 import { StatusFilterBar } from './components/status-filter-bar';

@@ -4,7 +4,7 @@ import { Routes, Route, HashRouter, Navigate } from 'react-router-dom';
 import './App.css';
 
 import ErrorBoundary from './components/common/error-boundary';
-const loadAppProvider = () => import('./providers/AppProvider');
+const loadAppProvider = () => import('./providers/app-provider');
 const loadLayout = () => import('./components/Layout/layout');
 const AppProvider = lazy(loadAppProvider);
 const Layout = lazy(loadLayout);

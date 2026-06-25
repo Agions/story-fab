@@ -10,8 +10,8 @@ import {
   Video, Plus, Play, Rocket, Zap, FileText, Clock, CheckCircle, ArrowRight,
   FlaskConical, Scissors, Download, Folder, Loader2,
 } from 'lucide-react';
-import { useTheme } from '@/context/ThemeContext';
-import { useSettings } from '@/context/SettingsContext';
+import { useTheme } from '@/context/theme-context';
+import { useSettings } from '@/context/settings-context';
 import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '../../services/tauri';
 import { preloadProjectEditPage, preloadProjectsPage } from '../../core/utils/route-preload';
 import {
