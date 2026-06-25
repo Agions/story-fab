@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ErrorBoundary } from './ErrorBoundary';
+import { ErrorBoundary } from './error-boundary';
 import { logger } from '../../shared/utils/logging';
 
 vi.mock('../../shared/utils/logging', () => ({
