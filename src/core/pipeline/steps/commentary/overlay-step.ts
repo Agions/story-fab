@@ -9,7 +9,7 @@
  * 进度范围：[0.85, 1.0]
  */
 
-import { createStep, reportProgress } from '../../Step';
+import { createStep, reportProgress } from '../../step';
 import { logger } from '../../../../shared/utils/logging';
 import { AppError } from '@/core/errors';
 import {
@@ -49,7 +49,7 @@ const computeAverageIntensity = (plan: OverlayPlan['plan']): number => {
 // Step Implementation
 // ============================================================
 
-export const commentaryOverlayStep: import('../../Step').Step<
+export const commentaryOverlayStep: import('../../step').Step<
   CommentaryOverlayInput,
   CommentaryOverlayOutput
 > = createStep(STEP_META, async (input, _ctx, options) => {

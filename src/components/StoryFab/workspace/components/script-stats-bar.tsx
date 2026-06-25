@@ -9,7 +9,7 @@
 
 import React from 'react';
 import styles from '../ScriptWriting.module.less';
-import { ALIGNMENT_GATE_THRESHOLD } from '@/core/workflow/alignmentGate';
+import { ALIGNMENT_GATE_THRESHOLD } from '@/core/workflow/alignment-gate';
 
 // ============================================
 // 类型定义

@@ -9,7 +9,7 @@
  * 进度范围：[0.15, 0.40]
  */
 
-import { createStep, reportProgress } from '../../Step';
+import { createStep, reportProgress } from '../../step';
 import { logger } from '../../../../shared/utils/logging';
 import { AppError } from '@/core/errors';
 import {
@@ -92,7 +92,7 @@ const extractKeyAnchors = (
 // Step Implementation
 // ============================================================
 
-export const commentaryVisualStep: import('../../Step').Step<
+export const commentaryVisualStep: import('../../step').Step<
   CommentaryVisualInput,
   CommentaryVisualOutput
 > = createStep(STEP_META, async (input, _ctx, options) => {

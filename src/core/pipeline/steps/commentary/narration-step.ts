@@ -9,7 +9,7 @@
  * 进度范围：[0.40, 0.65]
  */
 
-import { createStep, reportProgress } from '../../Step';
+import { createStep, reportProgress } from '../../step';
 import { logger } from '../../../../shared/utils/logging';
 import {
   type CommentaryNarrationInput,
@@ -109,7 +109,7 @@ const computeToneConsistency = (segments: ScriptSegment[], mode: string): number
 // Step Implementation
 // ============================================================
 
-export const commentaryNarrationStep: import('../../Step').Step<
+export const commentaryNarrationStep: import('../../step').Step<
   CommentaryNarrationInput,
   CommentaryNarrationOutput
 > = createStep(STEP_META, async (input, _ctx, options) => {

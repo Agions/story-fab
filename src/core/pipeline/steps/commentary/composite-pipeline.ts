@@ -14,7 +14,7 @@
  * - overlay:   [0.85, 1.00]
  */
 
-import { ChainPipeline, type PipelineResult, type StepOptions } from '../../Step';
+import { ChainPipeline, type PipelineResult, type StepOptions } from '../../step';
 import { commentaryDirectorStep } from './director-step';
 import { commentaryVisualStep } from './visual-step';
 import { commentaryNarrationStep } from './narration-step';
@@ -75,11 +75,11 @@ const computeGlobalProgress = (
  */
 export const createCommentaryPipeline = (): ChainPipeline<Start, End> => {
   return new ChainPipeline<Start, End>(
-    commentaryDirectorStep as unknown as import('../../Step').Step<Start, unknown>,
-    commentaryVisualStep as unknown as import('../../Step').Step<unknown, unknown>,
-    commentaryNarrationStep as unknown as import('../../Step').Step<unknown, unknown>,
-    commentaryTimingStep as unknown as import('../../Step').Step<unknown, unknown>,
-    commentaryOverlayStep as unknown as import('../../Step').Step<unknown, End>
+    commentaryDirectorStep as unknown as import('../../step').Step<Start, unknown>,
+    commentaryVisualStep as unknown as import('../../step').Step<unknown, unknown>,
+    commentaryNarrationStep as unknown as import('../../step').Step<unknown, unknown>,
+    commentaryTimingStep as unknown as import('../../step').Step<unknown, unknown>,
+    commentaryOverlayStep as unknown as import('../../step').Step<unknown, End>
   );
 };
 

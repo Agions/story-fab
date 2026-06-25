@@ -13,7 +13,7 @@
  *   6. keyword_boost      — 关键词命中
  */
 
-import { createStep, type Step, reportProgress } from '../Step';
+import { createStep, type Step, reportProgress } from '../step';
 import type { CandidateClip, ClipScore } from '../../services/pipeline/clip-pipeline/clip-scorer';
 import { ClipScorer } from '../../services/pipeline/clip-pipeline/clip-scorer';
 import { logger } from '../../../shared/utils/logging';

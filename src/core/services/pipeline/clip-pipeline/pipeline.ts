@@ -26,7 +26,7 @@ import {
   generateSEOStep,
   prepareExportStep,
 } from '@/core/pipeline/steps';
-import type { PipelineContext, StepOptions } from '../../../../core/pipeline/Step';
+import type { PipelineContext, StepOptions } from '../../../../core/pipeline/step';
 
 // ============================================================
 // Types

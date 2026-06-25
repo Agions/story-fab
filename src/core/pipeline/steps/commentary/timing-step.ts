@@ -9,7 +9,7 @@
  * 进度范围：[0.65, 0.85]
  */
 
-import { createStep, reportProgress } from '../../Step';
+import { createStep, reportProgress } from '../../step';
 import { logger } from '../../../../shared/utils/logging';
 import { AppError } from '@/core/errors';
 import {
@@ -83,7 +83,7 @@ const allocateSegmentsToScenes = (
 // Step Implementation
 // ============================================================
 
-export const commentaryTimingStep: import('../../Step').Step<
+export const commentaryTimingStep: import('../../step').Step<
   CommentaryTimingInput,
   CommentaryTimingOutput
 > = createStep(STEP_META, async (input, _ctx, options) => {

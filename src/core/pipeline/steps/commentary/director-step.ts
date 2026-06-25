@@ -9,7 +9,7 @@
  * 进度范围：[0.0, 0.15]
  */
 
-import { createStep, reportProgress } from '../../Step';
+import { createStep, reportProgress } from '../../step';
 import { logger } from '../../../../shared/utils/logging';
 import {
   type CommentaryDirectorInput,
@@ -84,7 +84,7 @@ const computeTargetDrift = (mode: string): number => {
 // Step Implementation
 // ============================================================
 
-export const commentaryDirectorStep: import('../../Step').Step<
+export const commentaryDirectorStep: import('../../step').Step<
   CommentaryDirectorInput,
   CommentaryDirectorOutput
 > = createStep(STEP_META, async (input, _ctx, options) => {

@@ -9,7 +9,7 @@
  */
 
 import type { ScriptSegment, Scene, VideoAnalysis } from '@/core/types';
-import type { WorkflowMode } from '@/core/workflow/featureBlueprint';
+import type { WorkflowMode } from '@/core/workflow/feature-blueprint';
 import type { OriginalOverlayPlanItem } from '@/core/services/ai/scene-commentary-service';
 
 // ============================================================
