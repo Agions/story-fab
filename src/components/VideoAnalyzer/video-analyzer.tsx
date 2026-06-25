@@ -7,7 +7,7 @@ import { Video } from 'lucide-react';
 import { tauri } from '@/core/tauri';
 
 import type { VideoAnalysis, KeyMoment, Emotion } from '@/types';
-import VideoSelector from '@/components/VideoSelector/VideoSelector';
+import VideoSelector from '@/components/VideoSelector/video-selector';
 import { notify } from '@/shared';
 import { AppError } from '@/core/errors';
 import styles from './VideoAnalyzer.module.less';

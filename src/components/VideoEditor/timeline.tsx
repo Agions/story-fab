@@ -1,6 +1,6 @@
 import React, { useRef, memo } from 'react';
 import { ScriptSegment } from '@/types';
-import SegmentMarker from './SegmentMarker';
+import SegmentMarker from './segment-marker';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 interface TimelineProps {

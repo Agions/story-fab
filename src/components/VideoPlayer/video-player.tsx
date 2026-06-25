@@ -12,7 +12,7 @@ import {
 import {
   videoPlayerReducer,
   initialVideoPlayerState,
-} from './VideoPlayer.reducer';
+} from './video-player.reducer';
 import styles from '@/components/VideoPlayer/VideoPlayer.module.less';
 
 interface VideoPlayerProps {

@@ -4,7 +4,7 @@
  * 模式: 1 hook + 1 .reducer.ts + makeSetter<K> + Updater<T>
  */
 import type { ScriptSegment } from '@/types';
-import type { ExportSettingsState } from '../ExportSettings';
+import type { ExportSettingsState } from '../export-settings';
 
 export interface VideoEditorPageState {
   // player (3 — 保留丢弃 setter 兼容原 API)

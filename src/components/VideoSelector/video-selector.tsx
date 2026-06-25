@@ -12,7 +12,7 @@ import { VIDEO_FORMATS } from '@/shared/constants';
 import {
   videoSelectorReducer,
   initialVideoSelectorState,
-} from './VideoSelector.reducer';
+} from './video-selector.reducer';
 import styles from './VideoSelector.module.less';
 
 interface VideoSelectorProps {
