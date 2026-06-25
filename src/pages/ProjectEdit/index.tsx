@@ -35,7 +35,7 @@ import {
   normalizeProjectData,
   createDefaultProjectName,
 
-} from './projectEditUtils';
+} from './project-edit-utils';
 import {
   PROJECT_SAVE_BEHAVIOR_KEY,
   PROJECT_AUTO_SAVE_KEY,

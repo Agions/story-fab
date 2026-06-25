@@ -14,7 +14,7 @@
  *   - Public setter names match the original useState setters, so consumers
  *     need no changes beyond the import swap.
  */
-import type { ProjectData } from '../projectEditUtils';
+import type { ProjectData } from '../project-edit-utils';
 import type { ProjectSaveBehavior } from '@/shared/constants/settings';
 import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment } from '@/core/types';

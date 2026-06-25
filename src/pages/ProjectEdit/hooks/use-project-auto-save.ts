@@ -3,7 +3,7 @@
  */
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { logger } from '../../../shared/utils/logging';
-import { buildDraftFingerprint, type ProjectData } from '../projectEditUtils';
+import { buildDraftFingerprint, type ProjectData } from '../project-edit-utils';
 
 interface UseProjectAutoSaveOptions {
   enabled: boolean;

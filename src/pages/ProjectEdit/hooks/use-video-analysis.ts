@@ -12,7 +12,7 @@ import { videoProcessor, VideoMetadata } from '@/core/video';
 import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/ai/script-service';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
-import { parseScriptText } from '../projectEditUtils';
+import { parseScriptText } from '../project-edit-utils';
 import { AppError } from '@/core/errors';
 
 /** 分析阶段标签 */
