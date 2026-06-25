@@ -79,13 +79,7 @@
   margin: 0;
 }
 
-.slider :global(.ant-slider-track) {
-  background: #FF9F43;
-}
 
-.slider :global(.ant-slider-handle)::after {
-  box-shadow: 0 0 0 2px #FF9F43;
-}
 
 .detectBtn {
   display: inline-flex;
@@ -245,17 +239,6 @@
   border-radius: 3px;
 }
 
-.reason_audio { background: rgba(0, 212, 255, 0.18); color: #00D4FF; }
-.reason_scene { background: rgba(255, 159, 67, 0.18); color: #FF9F43; }
-.reason_motion { background: rgba(180, 100, 255, 0.18); color: #B464FF; }
-.reason_combo  { background: rgba(82, 255, 128, 0.18); color: #52FF80; }
-.reason_default { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); }
-
-.subScore {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.35);
-}
 
 .seekBtn {
   align-self: flex-start;
