@@ -2,7 +2,6 @@
  * 流水线模块统一导出
  */
 
-export { PipelineEngine, createPipeline } from './engine';
 export type {
   StepName,
   PipelineDataContext,

@@ -287,6 +287,3 @@ export class PipelineEngine {
 
 // ─── 工厂函数 ───
 
-export function createPipeline(projectId: string, videoPath: string): PipelineEngine {
-  return new PipelineEngine(projectId, videoPath);
-}
