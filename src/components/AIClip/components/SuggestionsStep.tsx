@@ -12,7 +12,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import type { ClipAnalysisResult } from '../../../core/services/aiClip';
-import { SegmentTimelineCard } from './SegmentTimelineCard';
+import { SegmentTimelineCard } from './segment-timeline-card';
 import styles from '@/components/AIClip/AIClip.module.less';
 
 interface SuggestionsStepProps {
