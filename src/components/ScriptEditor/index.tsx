@@ -4,8 +4,8 @@ import { FileText } from 'lucide-react';
 import { ScriptEditorProps, isWorkflowProps } from './types';
 import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
-const WorkflowEditor = lazy(() => import('./WorkflowEditor'));
-const OriginalEditor = lazy(() => import('./OriginalEditor'));
+const WorkflowEditor = lazy(() => import('./workflow-editor'));
+const OriginalEditor = lazy(() => import('./original-editor'));
 
 const EditorFallback: React.FC = () => (
   <Card className={styles.scriptEditor}>

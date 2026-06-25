@@ -17,7 +17,7 @@ import { notify } from '@/shared';
 import {
   workflowEditorReducer,
   initialWorkflowEditorState,
-} from './WorkflowEditor.reducer';
+} from './workflow-editor.reducer';
 import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface WorkflowEditorProps {

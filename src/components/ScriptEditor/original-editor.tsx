@@ -11,10 +11,10 @@ import {
 } from 'lucide-react';
 import type { ScriptSegment } from '@/core/types';
 import { formatDuration } from '@/core/video';
-import SegmentTable from './SegmentTable';
-import SegmentEditForm from './SegmentEditForm';
-import PreviewModal from './PreviewModal';
-import AIModal from './AIModal';
+import SegmentTable from './segment-table';
+import SegmentEditForm from './segment-edit-form';
+import PreviewModal from './preview-modal';
+import AIModal from './ai-modal';
 import { useOriginalEditor } from './hooks/useOriginalEditor';
 import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
