@@ -27,7 +27,7 @@ import {
   projectEditReducer,
   type ProjectEditSetters,
   type ProjectEditState,
-} from './useProjectEditState.reducer';
+} from './use-project-edit-state.reducer';
 
 interface UseProjectEditStateOptions {
   /** Override the default project name (typically passed from outside so

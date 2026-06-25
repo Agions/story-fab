@@ -27,9 +27,9 @@ import { ScriptStep } from './components/steps/script-step';
 import { ProjectEditHeader } from './components/project-edit-header';
 import { AutoSaveBadge } from './components/auto-save-badge';
 import { ProjectForm } from './components/project-form';
-import { useProjectAutoSave } from './hooks/useProjectAutoSave';
-import { useVideoAnalysis } from './hooks/useVideoAnalysis';
-import { useProjectEditState } from './hooks/useProjectEditState';
+import { useProjectAutoSave } from './hooks/use-project-auto-save';
+import { useVideoAnalysis } from './hooks/use-video-analysis';
+import { useProjectEditState } from './hooks/use-project-edit-state';
 import {
   type ProjectData,
   normalizeProjectData,

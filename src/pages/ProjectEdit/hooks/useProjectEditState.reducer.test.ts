@@ -7,8 +7,8 @@ import {
   projectEditReducer,
   createInitialProjectEditState,
   createProjectEditSetters,
-} from './useProjectEditState.reducer';
-import type { ProjectEditState } from './useProjectEditState.reducer';
+} from './use-project-edit-state.reducer';
+import type { ProjectEditState } from './use-project-edit-state.reducer';
 
 const makeState = (overrides?: Partial<ProjectEditState>): ProjectEditState => ({
   formName: 'Test Project',
