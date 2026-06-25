@@ -4,4 +4,4 @@
  */
 export { BasicSettings } from './basic-settings';
 export { EffectsSettings } from './effects-settings';
-export { BatchProcessing } from './BatchProcessing';
+export { BatchProcessing } from './batch-processing';

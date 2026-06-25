@@ -8,7 +8,7 @@ import styles from '../VideoExport.module.less';
 import { useExportHandlers } from './use-export-handlers';
 import { NoSynthesisAlert } from './NoSynthesisAlert';
 import { ExportCompleteCard } from './ExportCompleteCard';
-import { ExportingPanel } from './ExportingPanel';
+import { ExportingPanel } from './exporting-panel';
 import {
   FORMAT_OPTIONS,
   QUALITY_OPTIONS,

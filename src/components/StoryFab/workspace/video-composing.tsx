@@ -17,9 +17,9 @@ import { notify } from '@/shared';
 import { TAB_OPTIONS, type ComposingTab } from './composeConfig';
 
 // 导入子组件
-import { VoiceSettingsPanel } from './components/VoiceSettingsPanel';
-import { SubtitleSettingsPanel } from './components/SubtitleSettingsPanel';
-import { EffectSettingsPanel } from './components/EffectSettingsPanel';
+import { VoiceSettingsPanel } from './components/voice-settings-panel';
+import { SubtitleSettingsPanel } from './components/subtitle-settings-panel';
+import { EffectSettingsPanel } from './components/effect-settings-panel';
 import { SynthesizeProgress } from './components/SynthesizeProgress';
 import { WarningAlert } from './components/WarningAlert';
 import { CompleteNotice } from './components/CompleteNotice';
