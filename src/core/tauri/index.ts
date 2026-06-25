@@ -1,14 +1,14 @@
-import { videoAnalysis } from './methods/videoAnalysis';
-import { highlightDetection } from './methods/highlightDetection';
-import { renderTranscode } from './methods/renderTranscode';
-import { subtitleAsr } from './methods/subtitleAsr';
+import { videoAnalysis } from './methods/video-analysis';
+import { highlightDetection } from './methods/highlight-detection';
+import { renderTranscode } from './methods/render-transcode';
+import { subtitleAsr } from './methods/subtitle-asr';
 import { tts } from './methods/tts';
-import { mixAudio } from './methods/mixAudio';
-import { fileOperations } from './methods/fileOperations';
+import { mixAudio } from './methods/mix-audio';
+import { fileOperations } from './methods/file-operations';
 import { project } from './methods/project';
-import { aiScript } from './methods/aiScript';
+import { aiScript } from './methods/ai-script';
 import { commentary } from './methods/commentary';
-import { videoOperations } from './methods/videoOperations';
+import { videoOperations } from './methods/video-operations';
 
 // ─── Tauri API Surface ─────────────────────────────────────────────────────────
 // Explicitly declared so TypeScript knows every method without relying on inference
