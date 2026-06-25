@@ -4,10 +4,10 @@
  */
 import React from 'react';
 import { useDashboard } from './hooks/useDashboard';
-import WelcomeHeader from './components/WelcomeHeader';
-import StatsOverview from './components/StatsOverview';
-import RecentProjects from './components/RecentProjects';
-import QuickActions from './components/QuickActions';
+import WelcomeHeader from './components/welcome-header';
+import StatsOverview from './components/stats-overview';
+import RecentProjects from './components/recent-projects';
+import QuickActions from './components/quick-actions';
 import styles from '@/pages/Dashboard/index.module.less';
 
 const Dashboard: React.FC = () => {

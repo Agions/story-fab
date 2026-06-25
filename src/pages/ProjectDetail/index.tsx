@@ -24,7 +24,7 @@ import styles from '@/pages/ProjectDetail/index.module.less';
 
 const loadVideoInfo = () => import('@/components/VideoInfo');
 const loadScriptEditor = () => import('@/components/ScriptEditor');
-const loadVideoProcessingController = () => import('@/components/VideoProcessingController/VideoProcessingController');
+const loadVideoProcessingController = () => import('@/components/VideoProcessingController/video-processing-controller');
 const loadVideoAnalyzer = () => import('@/components/VideoAnalyzer/video-analyzer');
 const loadSubtitleExtractor = () => import('@/components/SubtitleExtractor');
 
