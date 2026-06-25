@@ -16,7 +16,7 @@ import {
   type VideoEditorAction,
   type VideoEditorState,
   type Updater,
-} from './useVideoEditor.reducer';
+} from './use-video-editor.reducer';
 
 type Setter<K extends keyof VideoEditorState> = (updater: Updater<VideoEditorState[K]>) => void;
 type VideoEditorSetters = { [K in keyof VideoEditorState]: Setter<K> };

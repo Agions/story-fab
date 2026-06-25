@@ -3,7 +3,7 @@ import {
   videoEditorReducer,
   initialVideoEditorState,
   type VideoEditorState,
-} from './useVideoEditor.reducer';
+} from './use-video-editor.reducer';
 import type { SimpleVideoSegment } from '@/core/video';
 
 const makeSegment = (overrides: Partial<SimpleVideoSegment> = {}): SimpleVideoSegment => ({
