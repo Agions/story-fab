@@ -4,7 +4,7 @@ import {
   initialClipRipplingState,
   type ClipRipplingState,
   type ClipRipplingAction,
-} from './ClipRippling.reducer';
+} from './clip-rippling.reducer';
 import type { SocialPlatform, AspectRatio } from './clipRipplingConfig';
 import type { RepurposingClip, PipelineStage } from '../../../core/services/pipeline/clip-pipeline/pipeline';
 

@@ -2,8 +2,8 @@
  * aiVisualizerReducer 测试
  */
 import { describe, it, expect } from 'vitest';
-import { aiVisualizerReducer, initialAIVisualizerState } from './AIVisualizer.reducer';
-import type { AIVisualizerState } from './AIVisualizer.reducer';
+import { aiVisualizerReducer, initialAIVisualizerState } from './ai-visualizer.reducer';
+import type { AIVisualizerState } from './ai-visualizer.reducer';
 
 const makeState = (overrides?: Partial<AIVisualizerState>): AIVisualizerState => ({
   ...initialAIVisualizerState,

@@ -5,7 +5,7 @@ import {
   initialClipRipplingState,
   clipRipplingReducer,
   type ClipRipplingState,
-} from './ClipRippling.reducer';
+} from './clip-rippling.reducer';
 
 interface UseClipRipplingResult {
   state: ClipRipplingState;

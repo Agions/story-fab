@@ -17,7 +17,7 @@ import type { VideoInfo } from '@/core/types';
 import {
   videoUploadReducer,
   initialVideoUploadState,
-} from './VideoUpload.reducer';
+} from './video-upload.reducer';
 import styles from './VideoUpload.module.css';
 
 import {

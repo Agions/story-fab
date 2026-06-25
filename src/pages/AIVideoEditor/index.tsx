@@ -19,13 +19,13 @@ import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryFab/wor
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 const Workspace = lazy(() => import('@/components/StoryFab/workspace/Workspace'));
-const ProjectSetup = lazy(() => import('@/components/StoryFab/workspace/ProjectSetup'));
-const VideoUpload = lazy(() => import('@/components/StoryFab/workspace/VideoUpload'));
-const AIVisualizer = lazy(() => import('@/components/StoryFab/workspace/AIVisualizer'));
-const ScriptWriting = lazy(() => import('@/components/StoryFab/workspace/ScriptWriting'));
-const VideoComposing = lazy(() => import('@/components/StoryFab/workspace/VideoComposing'));
+const ProjectSetup = lazy(() => import('@/components/StoryFab/workspace/project-setup'));
+const VideoUpload = lazy(() => import('@/components/StoryFab/workspace/video-upload'));
+const AIVisualizer = lazy(() => import('@/components/StoryFab/workspace/ai-visualizer'));
+const ScriptWriting = lazy(() => import('@/components/StoryFab/workspace/script-writing'));
+const VideoComposing = lazy(() => import('@/components/StoryFab/workspace/video-composing'));
 const VideoExport = lazy(() => import('@/components/StoryFab/workspace/VideoExport'));
-const ClipRippling = lazy(() => import('@/components/StoryFab/workspace/ClipRippling'));
+const ClipRippling = lazy(() => import('@/components/StoryFab/workspace/clip-rippling'));
 const CommentaryPanel = lazy(() => import('@/components/CommentaryPanel'));
 
 // 三个核心功能配置
