@@ -21,12 +21,12 @@ import { useSettings } from '@/context/SettingsContext';
 
 import { logger } from '../../shared/utils/logging';
 
-import { VideoStep } from './components/steps/VideoStep';
-import { AnalyzeStep } from './components/steps/AnalyzeStep';
-import { ScriptStep } from './components/steps/ScriptStep';
-import { ProjectEditHeader } from './components/ProjectEditHeader';
-import { AutoSaveBadge } from './components/AutoSaveBadge';
-import { ProjectForm } from './components/ProjectForm';
+import { VideoStep } from './components/steps/video-step';
+import { AnalyzeStep } from './components/steps/analyze-step';
+import { ScriptStep } from './components/steps/script-step';
+import { ProjectEditHeader } from './components/project-edit-header';
+import { AutoSaveBadge } from './components/auto-save-badge';
+import { ProjectForm } from './components/project-form';
 import { useProjectAutoSave } from './hooks/useProjectAutoSave';
 import { useVideoAnalysis } from './hooks/useVideoAnalysis';
 import { useProjectEditState } from './hooks/useProjectEditState';
