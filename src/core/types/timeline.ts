@@ -32,10 +32,6 @@ export type {
 
 export {
   DEFAULT_EDITOR_CONFIG,
-  isVideoTrack,
-  isAudioTrack,
-  isClipSelected,
-  getClipDuration,
   createEmptyTimeline,
   syncLegacyTracks,
 } from '@/types';

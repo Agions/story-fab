@@ -273,21 +273,9 @@ export const DEFAULT_EDITOR_CONFIG: EditorConfig = {
 
 // ─── 工具函数 ───
 
-export function isVideoTrack(track: TimelineTrack): boolean {
-  return track.type === 'video';
-}
 
-export function isAudioTrack(track: TimelineTrack): boolean {
-  return track.type === 'audio';
-}
 
-export function isClipSelected(clip: TimelineClip): boolean {
-  return clip.selected === true;
-}
 
-export function getClipDuration(clip: TimelineClip): number {
-  return clip.endMs - clip.startMs;
-}
 
 export function createEmptyTimeline(): Timeline {
   const now = new Date().toISOString();
