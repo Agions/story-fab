@@ -36,11 +36,11 @@ import {
 } from 'lucide-react';
 import type { TimelineTrack, TimelineClip } from './types';
 
-import { TrackHeader } from './TrackHeader';
-import { TimeRuler } from './TimeRuler';
-import { Playhead } from './Playhead';
-import { ClipRenderer } from './ClipRenderer';
-import { ClipPropertiesPanel } from './ClipPropertiesPanel';
+import { TrackHeader } from './track-header';
+import { TimeRuler } from './time-ruler';
+import { Playhead } from './playhead';
+import { ClipRenderer } from './clip-renderer';
+import { ClipPropertiesPanel } from './clip-properties-panel';
 import { clamp, formatTimecodeMs } from '@/shared/utils';
 import { MIN_ZOOM, MAX_ZOOM } from './constants';
 import { useTrackActions } from './hooks/useTrackActions';

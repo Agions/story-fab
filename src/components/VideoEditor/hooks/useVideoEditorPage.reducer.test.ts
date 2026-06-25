@@ -5,7 +5,7 @@ import {
   type VideoEditorPageState,
   type VideoEditorPageAction,
   type Updater,
-} from './useVideoEditorPage.reducer';
+} from './use-video-editor-page.reducer';
 import type { ScriptSegment } from '@/types';
 
 // ── helpers ──────────────────────────────────────────────────
