@@ -18,7 +18,7 @@ import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryFab/workspace/functionModeMap';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
-const Workspace = lazy(() => import('@/components/StoryFab/workspace/Workspace'));
+const Workspace = lazy(() => import('@/components/StoryFab/workspace/workspace'));
 const ProjectSetup = lazy(() => import('@/components/StoryFab/workspace/project-setup'));
 const VideoUpload = lazy(() => import('@/components/StoryFab/workspace/video-upload'));
 const AIVisualizer = lazy(() => import('@/components/StoryFab/workspace/ai-visualizer'));

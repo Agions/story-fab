@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useStoryFab, type storyfabStep, STORYFAB_STEPS } from '../context';
 import styles from './Workspace.module.less';
-import StepList from './StepList';
+import StepList from './step-list';
 
 // ============================================================================
 // 类型定义
