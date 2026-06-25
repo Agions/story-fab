@@ -1,8 +1,8 @@
 /**
  * story-fab context — context barrel export
  */
-export { StoryFabProvider, useStoryFab, StoryFabContext } from './StoryFabContext';
-export type { StoryFabContextType } from './StoryFabContext';
+export { StoryFabProvider, useStoryFab, StoryFabContext } from './storyfab-context';
+export type { StoryFabContextType } from './storyfab-context';
 
 // Re-export types for convenience
 export type { storyfabState, storyfabStep, storyfabAction, storyfabFeatureType, storyfabMode } from '../types';

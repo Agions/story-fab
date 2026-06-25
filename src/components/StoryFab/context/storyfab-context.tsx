@@ -6,7 +6,7 @@ export {
   StoryFabProvider,
   useStoryFab,
   StoryFabContext,
-} from './StoryFabProvider';
+} from './storyfab-provider';
 
-export type { StoryFabContextType } from './StoryFabProvider';
+export type { StoryFabContextType } from './storyfab-provider';
 export type { storyfabAction, storyfabState, storyfabStep, storyfabFeatureType } from '../types';
