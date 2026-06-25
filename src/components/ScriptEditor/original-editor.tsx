@@ -15,7 +15,7 @@ import SegmentTable from './segment-table';
 import SegmentEditForm from './segment-edit-form';
 import PreviewModal from './preview-modal';
 import AIModal from './ai-modal';
-import { useOriginalEditor } from './hooks/useOriginalEditor';
+import { useOriginalEditor } from './hooks/use-original-editor';
 import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface OriginalEditorProps {

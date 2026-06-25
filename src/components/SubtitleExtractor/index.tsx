@@ -39,7 +39,7 @@ import { useTimelineStore } from '@/store/timeline-store';
 import type { SubtitleEntry } from '@/core/types';
 import styles from './index.module.css';
 import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';
-import { useSubtitleExtractor, type SubtitleSegment } from './useSubtitleExtractor';
+import { useSubtitleExtractor, type SubtitleSegment } from './use-subtitle-extractor';
 
 interface SubtitleExtractorProps {
   projectId: string;

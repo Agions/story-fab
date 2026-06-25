@@ -5,7 +5,7 @@ import {
   type SubtitleExtractorState,
   type SubtitleFormat,
   type SubtitleSegment,
-} from './useSubtitleExtractor.reducer';
+} from './use-subtitle-extractor.reducer';
 
 interface UseSubtitleExtractorResult {
   state: SubtitleExtractorState;

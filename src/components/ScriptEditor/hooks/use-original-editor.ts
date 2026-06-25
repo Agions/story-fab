@@ -16,7 +16,7 @@ import {
   type OriginalEditorState,
   type SegmentFormValues,
   type Updater,
-} from './useOriginalEditor.reducer';
+} from './use-original-editor.reducer';
 
 type Setter<K extends keyof OriginalEditorState> = (
   updater: Updater<OriginalEditorState[K]>,

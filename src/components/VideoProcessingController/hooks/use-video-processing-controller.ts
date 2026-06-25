@@ -15,7 +15,7 @@ import {
   type VideoProcessingState,
   type Updater,
   type CustomQualitySettings,
-} from './useVideoProcessingController.reducer';
+} from './use-video-processing-controller.reducer';
 
 type Setter<K extends keyof VideoProcessingState> = (
   updater: Updater<VideoProcessingState[K]>,
