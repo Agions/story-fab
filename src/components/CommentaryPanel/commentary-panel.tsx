@@ -45,12 +45,12 @@ import { useCommentaryVoice } from '@/hooks/useCommentaryVoice';
 import {
   commentaryPanelReducer,
   initialCommentaryPanelState,
-} from './CommentaryPanel.reducer';
+} from './commentary-panel.reducer';
 import styles from './CommentaryPanel.module.less';
-import CommentaryScriptEditor from './CommentaryScriptEditor';
-import CommentaryStyleSelector from './CommentaryStyleSelector';
-import CommentaryVoiceSelector from './CommentaryVoiceSelector';
-import CommentaryTimeline from './CommentaryTimeline';
+import CommentaryScriptEditor from './commentary-script-editor';
+import CommentaryStyleSelector from './commentary-style-selector';
+import CommentaryVoiceSelector from './commentary-voice-selector';
+import CommentaryTimeline from './commentary-timeline';
 
 // ─── 状态映射 ───────────────────────────────────────────────────────────
 

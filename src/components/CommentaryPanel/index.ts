@@ -9,4 +9,4 @@
  * - CommentaryTimeline.tsx      — 时间线
  */
 
-export { default } from './CommentaryPanel';
+export { default } from './commentary-panel';

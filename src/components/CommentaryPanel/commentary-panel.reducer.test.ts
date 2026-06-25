@@ -4,7 +4,7 @@ import {
   initialCommentaryPanelState,
   type CommentaryPanelState,
   type CommentaryTab,
-} from './CommentaryPanel.reducer';
+} from './commentary-panel.reducer';
 
 function makeState(overrides: Partial<CommentaryPanelState> = {}): CommentaryPanelState {
   return { ...initialCommentaryPanelState, ...overrides };
