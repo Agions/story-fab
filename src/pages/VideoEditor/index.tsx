@@ -10,16 +10,16 @@ import { logger } from '../../shared/utils/logging';
 import { useVideoEditor } from './hooks/useVideoEditor';
 import { exportService } from '../../core/services/export/export-service';
 
-import Toolbar from './components/Toolbar';
+import Toolbar from './components/toolbar';
 import VideoPlayer from '@/components/VideoPlayer/video-player';
-import Timeline from './components/Timeline';
-import SegmentList from './components/SegmentList';
+import Timeline from './components/timeline';
+import SegmentList from './components/segment-list';
 
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
-const loadKeyframePanel = () => import('./components/KeyframePanel');
-const loadAIClipPanel = () => import('./components/AIClipPanel');
-const loadExportSettingsPanel = () => import('./components/ExportSettingsPanel');
+const loadKeyframePanel = () => import('./components/keyframe-panel');
+const loadAIClipPanel = () => import('./components/ai-clip-panel');
+const loadExportSettingsPanel = () => import('./components/export-settings-panel');
 const KeyframePanel = lazy(loadKeyframePanel);
 const AIClipPanel = lazy(loadAIClipPanel);
 const ExportSettingsPanel = lazy(loadExportSettingsPanel);
