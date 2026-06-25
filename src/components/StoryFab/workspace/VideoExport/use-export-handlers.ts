@@ -15,7 +15,7 @@ import {
   type ExportHandlersAction,
   type ExportHandlersState,
   type Updater,
-} from './useExportHandlers.reducer';
+} from './use-export-handlers.reducer';
 
 interface UseExportHandlersProps {
   state: {

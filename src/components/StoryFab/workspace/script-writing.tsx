@@ -12,7 +12,7 @@
 import React, { useState, memo, useCallback } from 'react';
 import { useStoryFab } from '../context';
 import { notify } from '@/shared';
-import { useScriptGeneration } from './hooks/useScriptGeneration';
+import { useScriptGeneration } from './hooks/use-script-generation';
 import {
   FUNCTION_TO_FEATURE,
   type AIFunctionType,

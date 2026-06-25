@@ -1,2 +1,2 @@
-export { Highlights } from './Highlights';
-export type { Highlight, HighlightsProps } from './Highlights';
+export { Highlights } from './highlights';
+export type { Highlight, HighlightsProps } from './highlights';

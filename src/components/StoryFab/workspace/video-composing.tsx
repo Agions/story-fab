@@ -12,7 +12,7 @@
 
 import React, { memo } from 'react';
 import { useStoryFab } from '../context';
-import { useVideoSynthesize } from './hooks/useVideoSynthesize';
+import { useVideoSynthesize } from './hooks/use-video-synthesize';
 import { notify } from '@/shared';
 import { TAB_OPTIONS, type ComposingTab } from './composeConfig';
 

@@ -19,7 +19,7 @@ import {
   highlightsReducer,
   initialHighlightsState,
   type Highlight,
-} from './Highlights.reducer';
+} from './highlights.reducer';
 import styles from './Highlights.module.css';
 import { formatTime } from '@/shared/utils/formatting';
 
