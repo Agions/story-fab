@@ -20,7 +20,7 @@ import { AppearanceSettings } from './AppearanceSettings';
 import { ShortcutSettings } from './ShortcutSettings';
 import { ExportSettings } from './ExportSettings';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { AI_MODELS } from '@/core/config/aiModels.config';
+import { AI_MODELS } from '@/core/config/ai-models-config';
 import type { ModelProvider } from '@/core/types';
 import { notify } from '@/shared';
 import { validateApiKey } from '@/core/services/providers/api-key-service';

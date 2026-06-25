@@ -9,7 +9,7 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { validateApiKey } from '@/core/services/providers/api-key-service';
-import { AI_MODELS } from '@/core/config/aiModels.config';
+import { AI_MODELS } from '@/core/config/ai-models-config';
 import type { ModelProvider, AIModel } from '@/core/types';
 
 interface AISettingsProps {

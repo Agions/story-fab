@@ -22,7 +22,7 @@ import ApiKeysPanel from '../../components/Settings/ApiKeysPanel';
 import ModelSettingsPanel from '../../components/Settings/ModelSettingsPanel';
 import GeneralSettingsPanel from '../../components/Settings/GeneralSettingsPanel';
 import type { ModelProvider } from '@/core/types';
-import { AI_MODELS as CORE_MODELS, DEFAULT_MODEL_ID } from '../../core/config/aiModels.config';
+import { AI_MODELS as CORE_MODELS, DEFAULT_MODEL_ID } from '../../core/config/ai-models-config';
 import {
   getAvailableModelsFromApiKeys,
   resolveDefaultModelId,
