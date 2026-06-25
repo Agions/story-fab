@@ -12,7 +12,7 @@ import {
   Bot,
   PlayCircle,
 } from 'lucide-react';
-import { useAIClipAssistant } from './hooks/useAIClipAssistant';
+import { useAIClipAssistant } from './hooks/use-ai-clip-assistant';
 import { ConfigStep, AnalyzeStep, SuggestionsStep, PreviewStep } from '@/components/AIClip/components';
 import type { AIClipAssistantProps } from './types';
 import styles from '@/components/AIClip/AIClip.module.less';
