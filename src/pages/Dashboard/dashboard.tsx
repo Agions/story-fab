@@ -3,7 +3,7 @@
  * 全新视觉系统：深炭底 + 琥珀光 + 电青色
  */
 import React from 'react';
-import { useDashboard } from './hooks/useDashboard';
+import { useDashboard } from './hooks/use-dashboard';
 import WelcomeHeader from './components/welcome-header';
 import StatsOverview from './components/stats-overview';
 import RecentProjects from './components/recent-projects';

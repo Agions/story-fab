@@ -3,4 +3,4 @@
  */
 export { default } from './dashboard';
 export * from './types';
-export { useDashboard } from './hooks/useDashboard';
+export { useDashboard } from './hooks/use-dashboard';
