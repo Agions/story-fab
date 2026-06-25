@@ -20,9 +20,9 @@ import { TAB_OPTIONS, type ComposingTab } from './composeConfig';
 import { VoiceSettingsPanel } from './components/voice-settings-panel';
 import { SubtitleSettingsPanel } from './components/subtitle-settings-panel';
 import { EffectSettingsPanel } from './components/effect-settings-panel';
-import { SynthesizeProgress } from './components/SynthesizeProgress';
-import { WarningAlert } from './components/WarningAlert';
-import { CompleteNotice } from './components/CompleteNotice';
+import { SynthesizeProgress } from './components/synthesize-progress';
+import { WarningAlert } from './components/warning-alert';
+import { CompleteNotice } from './components/complete-notice';
 
 import styles from './VideoComposing.module.less';
 

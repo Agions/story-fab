@@ -6,8 +6,8 @@ import React, { memo } from 'react';
 import { useStoryFab } from '@/components/StoryFab/context';
 import styles from '../VideoExport.module.less';
 import { useExportHandlers } from './use-export-handlers';
-import { NoSynthesisAlert } from './NoSynthesisAlert';
-import { ExportCompleteCard } from './ExportCompleteCard';
+import { NoSynthesisAlert } from './no-synthesis-alert';
+import { ExportCompleteCard } from './export-complete-card';
 import { ExportingPanel } from './exporting-panel';
 import {
   FORMAT_OPTIONS,

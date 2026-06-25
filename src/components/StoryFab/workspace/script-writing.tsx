@@ -29,12 +29,12 @@ import {
   FunctionModeSelector,
   useSyncFunctionType,
   type FunctionMode,
-} from './components/FunctionModeSelector';
-import { StyleLengthConfig } from './components/StyleLengthConfig';
-import { CommentaryStyleSelector } from './components/CommentaryStyleSelector';
-import { ScriptEditorPanel } from './components/ScriptEditorPanel';
-import { ScriptStatsBar } from './components/ScriptStatsBar';
-import { GenerationProgress } from './components/GenerationProgress';
+} from './components/function-mode-selector';
+import { StyleLengthConfig } from './components/style-length-config';
+import { CommentaryStyleSelector } from './components/commentary-style-selector';
+import { ScriptEditorPanel } from './components/script-editor-panel';
+import { ScriptStatsBar } from './components/script-stats-bar';
+import { GenerationProgress } from './components/generation-progress';
 
 import styles from './ScriptWriting.module.less';
 
