@@ -5,7 +5,7 @@ import {
   scriptDetailReducer,
   type ScriptDetailState,
   type ScriptDetailProject,
-} from './useScriptDetail.reducer';
+} from './use-script-detail.reducer';
 
 interface UseScriptDetailResult {
   state: ScriptDetailState;

@@ -19,7 +19,7 @@ import { normalizeProjectFile } from '../../core/utils/project-file';
 import type { ProjectFileLike } from '../../core/utils/project-file';
 import type { ScriptSegment } from '@/core/types';
 import type { VideoAnalysis } from '@/types';
-import { useProjectDetail } from '@/hooks/useProjectDetail';
+import { useProjectDetail } from '@/hooks/use-project-detail';
 import styles from '@/pages/ProjectDetail/index.module.less';
 
 const loadVideoInfo = () => import('@/components/VideoInfo');

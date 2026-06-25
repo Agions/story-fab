@@ -6,7 +6,7 @@ import {
   projectDetailReducer,
   type ProjectDetailState,
   type ProjectDetailProject,
-} from './useProjectDetail.reducer';
+} from './use-project-detail.reducer';
 
 interface UseProjectDetailResult {
   state: ProjectDetailState;

@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createCommentarySession, destroyCommentarySession } from '@/core/services/commentary';
 import { logger } from '@/shared/utils/logging';
 import type { ScriptStylePreset } from '@/core/types/commentary';
-import { useDirectorStatus, UseDirectorStatusResult } from './useDirectorStatus';
+import { useDirectorStatus, UseDirectorStatusResult } from './use-director-status';
 
 interface UseCommentarySessionResult {
   sessionId: string | null;

@@ -9,7 +9,7 @@ import {
   Scissors,
 } from 'lucide-react';
 import { StoryFabProvider, useStoryFab } from '@/components/StoryFab/context';
-import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useEditorStore } from '../../store/editor-store';
 import { useTimelineStore } from '../../store/timeline-store';

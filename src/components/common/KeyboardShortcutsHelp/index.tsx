@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '../../ui/dialog';
-import { KEYBOARD_SHORTCUTS_HELP } from '../../../hooks/useKeyboardShortcuts';
+import { KEYBOARD_SHORTCUTS_HELP } from '../../../hooks/use-keyboard-shortcuts';
 import styles from '@/components/common/KeyboardShortcutsHelp/KeyboardShortcutsHelp.module.css';
 
 interface KeyboardShortcutsHelpProps {

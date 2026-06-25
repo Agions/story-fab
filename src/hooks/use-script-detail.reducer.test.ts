@@ -4,7 +4,7 @@ import {
   initialScriptDetailState,
   type ScriptDetailState,
   type ScriptDetailProject,
-} from './useScriptDetail.reducer';
+} from './use-script-detail.reducer';
 import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
 
 // ---------------------------------------------------------------------------

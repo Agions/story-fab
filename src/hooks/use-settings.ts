@@ -3,7 +3,7 @@
  */
 import { useCallback, useMemo } from 'react';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../shared/constants/settings';
-import useLocalStorage from './useLocalStorage';
+import useLocalStorage from './use-local-storage';
 
 /**
  * 应用设置类型

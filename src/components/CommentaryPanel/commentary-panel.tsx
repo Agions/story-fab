@@ -38,10 +38,10 @@ import {
   approveCommentaryPlan,
   type ScriptStylePreset,
 } from '@/core/services/commentary';
-import { useDirectorStatus } from '@/hooks/useDirectorStatus';
-import { useCommentarySession } from '@/hooks/useCommentarySession';
-import { useCommentaryScript } from '@/hooks/useCommentaryScript';
-import { useCommentaryVoice } from '@/hooks/useCommentaryVoice';
+import { useDirectorStatus } from '@/hooks/use-director-status';
+import { useCommentarySession } from '@/hooks/use-commentary-session';
+import { useCommentaryScript } from '@/hooks/use-commentary-script';
+import { useCommentaryVoice } from '@/hooks/use-commentary-voice';
 import {
   commentaryPanelReducer,
   initialCommentaryPanelState,

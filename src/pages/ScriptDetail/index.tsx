@@ -14,7 +14,7 @@ import { findProjectByScriptId, normalizeProjectFile } from '../../core/utils/pr
 import type { ProjectFileLike } from '../../core/utils/project-file';
 import type { Script } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/core/types';
-import { useScriptDetail } from '@/hooks/useScriptDetail';
+import { useScriptDetail } from '@/hooks/use-script-detail';
 import styles from '@/pages/ScriptDetail/index.module.less';
 
 const loadScriptEditor = () => import('../../components/ScriptEditor');

@@ -15,7 +15,7 @@ import { audioVideoSyncService } from '@/core/services/asr/audio-sync-service';
 import { mixTtsWithVideo } from '@/core/services/video/audio-mix-service';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
-import { useTimeout } from '@/hooks/useTimeout';
+import { useTimeout } from '@/hooks/use-timeout';
 import { EFFECT_PRESET_MAP } from '../composeConfig';
 import type { SynthesizeConfig } from '../composeConfig';
 import { DEFAULT_SYNTHESIZE_CONFIG } from '../composeConfig';

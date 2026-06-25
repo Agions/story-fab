@@ -19,7 +19,7 @@ import ApiKeysPanel from './api-keys-panel';
 import { AppearanceSettings } from './appearance-settings';
 import { ShortcutSettings } from './shortcut-settings';
 import { ExportSettings } from './export-settings';
-import useLocalStorage from '@/hooks/useLocalStorage';
+import useLocalStorage from '@/hooks/use-local-storage';
 import { AI_MODELS } from '@/core/config/ai-models-config';
 import type { ModelProvider } from '@/core/types';
 import { notify } from '@/shared';

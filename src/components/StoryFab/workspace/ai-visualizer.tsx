@@ -11,7 +11,7 @@ import React, { useReducer, useEffect, memo } from 'react';
 import { useStoryFab } from '../context';
 import { visionService } from '../../../core/services/ai/vision-service';
 import { notify } from '@/shared';
-import { useTimeout } from '../../../hooks/useTimeout';
+import { useTimeout } from '../../../hooks/use-timeout';
 import { logger } from '@/shared/utils/logging';
 import type { AIAnalyzeProps, Scene } from '@/core/types';
 import styles from './AIVisualizer.module.css';

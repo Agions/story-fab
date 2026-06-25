@@ -4,7 +4,7 @@
  * 自动在组件卸载时清理所有注册的 timeout
  */
 import { useRef, useEffect, useCallback } from 'react';
-import { usePromiseDelay } from './usePromiseDelay';
+import { usePromiseDelay } from './use-promise-delay';
 
 interface UseTimeoutReturn {
   /** 设置一个带自动清理的 setTimeout，返回 timeout id */

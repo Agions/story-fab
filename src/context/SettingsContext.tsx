@@ -6,7 +6,7 @@
  */
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useAppStore, UserSettings } from '@/store/app-store';
-import { useSettingsStore } from '@/hooks/useSettings';
+import { useSettingsStore } from '@/hooks/use-settings';
 
 interface SettingsContextValue {
   settings: UserSettings;
