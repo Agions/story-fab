@@ -16,7 +16,7 @@ import { logger } from '@/shared/utils/logging';
 import type { AIAnalyzeProps, Scene } from '@/core/types';
 import styles from './AIVisualizer.module.css';
 import { Highlights } from './Highlights';
-import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysisTasks';
+import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysis-tasks';
 import { formatTime } from '../../../shared/utils/formatting';
 import { aiVisualizerReducer, initialAIVisualizerState } from './ai-visualizer.reducer';
 
