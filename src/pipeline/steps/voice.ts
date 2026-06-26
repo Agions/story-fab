@@ -5,7 +5,7 @@
 
 import type { PipelineStep, PipelineDataContext, VoiceTrackData } from '../engine';
 import type { Script } from '@/types';
-import { invoke, TauriCommand } from '@/core/tauri';
+import { tts } from '@/core/tauri/methods/tts';
 
 export interface VoiceStepConfig {
   voice?: string;
@@ -69,7 +69,7 @@ async function synthesizeSegment(
   pitch: number,
 ): Promise<string> {
   try {
-    const result = await invoke(TauriCommand.SYNTHESIZE_SPEECH, {
+    const result = await tts.synthesizeSpeech({
       text,
       voice,
       rate: speed,
