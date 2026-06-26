@@ -99,11 +99,6 @@ export type {
 
 export type {
   // pipeline
-  WorkflowState,
-  WorkflowStatus,
-  WorkflowStepType,
-  WorkflowStepInstance,
-  WorkflowResult,
   PipelineContext,
   StepOptions,
   StepMeta,

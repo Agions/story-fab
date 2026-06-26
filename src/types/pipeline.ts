@@ -3,39 +3,6 @@
  * 合并自 core/types.ts workflow 部分 + core/pipeline/Step.ts
  */
 
-// ─── 工作流状态 ───
-
-export type WorkflowStatus = 'idle' | 'running' | 'completed' | 'error' | 'paused';
-
-export type WorkflowStepType =
-  | 'ingest' | 'analyze' | 'script' | 'voice' | 'compose' | 'export';
-
-export interface WorkflowStepInstance {
-  id: string;
-  name: WorkflowStepType;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  progress: number;
-  duration?: number;
-}
-
-export interface WorkflowState {
-  id: string;
-  status: WorkflowStatus;
-  progress: number;
-  currentStep: WorkflowStepType;
-  steps: WorkflowStepInstance[];
-  result?: WorkflowResult;
-}
-
-export interface WorkflowResult {
-  videoId: string;
-  videoPath: string;
-  duration: number;
-  clips: import('./media').VideoSegment[];
-  script?: import('./script').Script;
-  subtitles?: import('./media').Subtitle;
-}
-
 // ─── Pipeline 引擎类型 ───
 
 export interface PipelineContext {
