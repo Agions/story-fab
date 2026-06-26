@@ -42,14 +42,6 @@ export interface AIModelConfig {
   apiKey?: string;
 }
 
-export interface AIModelInfo {
-  name: string;
-  provider: string;
-  description: string;
-  icon: string;
-  apiKeyFormat: string;
-}
-
 export interface AIModelSettings {
   provider?: ModelProvider;
   model?: string;
@@ -65,6 +57,13 @@ export interface AIModelSettings {
 export type AIModelType = ModelProvider;
 
 // ─── 分析结果 ───
+
+export interface AnalysisStats {
+  totalDuration?: number;
+  sceneCount: number;
+  keyframeCount: number;
+  objectCount: number;
+}
 
 export interface AnalysisResult {
   scenes: import('./media').Scene[];
@@ -107,13 +106,6 @@ export interface KeyMoment {
   type?: string;
   description: string;
   importance: number;
-}
-
-export interface AnalysisStats {
-  totalDuration?: number;
-  sceneCount: number;
-  keyframeCount: number;
-  objectCount: number;
 }
 
 export interface VideoAnalysis {

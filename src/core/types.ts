@@ -77,7 +77,6 @@ export type {
   ModelProvider,
   ModelCategory,
   AIModelConfig,
-  AIModelInfo,
   AIModelSettings,
   AIModelType,
   AnalysisResult,
