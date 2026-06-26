@@ -9,7 +9,7 @@ import { clipWorkflowService } from '../../../core/services/pipeline/clip-pipeli
 import type { VideoInfo } from '@/core/types';
 import type { ClipSegment } from '../../../core/services/aiClip';
 import { notify } from '@/shared';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import {
   initialVideoEditorState,
   videoEditorReducer,

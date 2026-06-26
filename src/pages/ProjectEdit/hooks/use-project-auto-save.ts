@@ -2,7 +2,7 @@
  * useProjectAutoSave — auto-save logic hook
  */
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import { buildDraftFingerprint, type ProjectData } from '../project-edit-utils';
 
 interface UseProjectAutoSaveOptions {

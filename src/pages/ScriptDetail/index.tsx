@@ -1,4 +1,4 @@
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import React, { useEffect, lazy, Suspense, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/card';

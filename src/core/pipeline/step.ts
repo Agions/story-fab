@@ -19,7 +19,7 @@
  * const result = await pipeline.run(videoInfo);
  */
 
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 // ============================================================
 // Step 接口定义

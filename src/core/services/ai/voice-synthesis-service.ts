@@ -8,7 +8,7 @@
  */
 import { tauri } from '../../tauri';
 
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 // ============================================
 // 类型定义

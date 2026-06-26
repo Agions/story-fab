@@ -10,7 +10,7 @@
  */
 import React, { useReducer, useCallback, useRef, useEffect, memo } from 'react';
 import { useStoryFab } from '../context';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
 import { MAX_FILE_SIZE } from '@/shared/constants';
 import type { VideoInfo } from '@/core/types';

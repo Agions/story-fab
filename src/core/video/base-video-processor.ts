@@ -17,7 +17,7 @@ import type {
   ExtractKeyFramesOptions,
   CutOptions,
 } from './types';
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 // ============================================
 // FFmpeg Status Cache

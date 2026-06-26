@@ -7,7 +7,7 @@
 export * from './utils/formatting';
 
 // 日志工具
-export * from './utils/logging';
+export * from '@/shared/utils/logging';
 
 // 项目工具函数
 export * from './utils/project-utils';

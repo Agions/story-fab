@@ -1,4 +1,4 @@
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import React, { useReducer, useEffect, useCallback, memo } from 'react';
 import { Card } from '../ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';

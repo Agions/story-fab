@@ -6,7 +6,7 @@ import { Bot } from 'lucide-react';
 import { saveProjectToFile } from '../../services/tauri';
 import { notify, withLock } from '@/shared';
 import type { ClipAnalysisResult } from '../../core/services/aiClip';
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import { useVideoEditor } from './hooks/use-video-editor';
 import { exportService } from '../../core/services/export/export-service';
 

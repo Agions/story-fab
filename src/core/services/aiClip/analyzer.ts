@@ -9,7 +9,7 @@
  */
 
 import { tauri } from '../../tauri';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import { visionService } from '../ai/vision-service';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotion-detector';
 import type { EmotionAnalysis, VideoInfo, Scene } from '@/core/types';

@@ -8,7 +8,7 @@
  * - 如果原视频无音轨：直接使用 TTS 音频
  */
 import { tauri } from '../../tauri';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 interface MixAudioOptions {
   /** TTS 配音文件路径 */

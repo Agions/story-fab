@@ -5,7 +5,7 @@
  */
 
 import { invoke, TauriCommand } from '../../tauri';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 import type { ExportFormat, ExportQuality, ExportResolution, ExportConfig, ExportResult } from '../../export/types';
 import { EXPORT_PRESETS, FORMAT_INFO } from '../../export/types';

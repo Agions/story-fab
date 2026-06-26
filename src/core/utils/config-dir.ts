@@ -6,7 +6,7 @@
  */
 import { appConfigDir } from '@tauri-apps/api/path';
 import { exists, mkdir } from '@tauri-apps/plugin-fs';
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 /**
  * 获取应用配置目录路径

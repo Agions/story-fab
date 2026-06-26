@@ -5,7 +5,7 @@
  */
 
 import { tauri } from '../../../core/tauri';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 /** ZCR burst entry from Rust backend */
 interface ZCRBurst {

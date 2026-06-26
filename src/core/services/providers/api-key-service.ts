@@ -1,7 +1,7 @@
 /**
  * API 密钥验证服务
  */
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 interface ApiKeyValidationResult {
   isValid: boolean;

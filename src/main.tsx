@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app';
-import { logger } from './shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import './styles/globals.css';
 
 // 防止控制台出现错误消息

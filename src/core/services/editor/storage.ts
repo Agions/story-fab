@@ -1,5 +1,5 @@
 import type { Timeline } from './types';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import { STORAGE_KEYS } from '@/shared/constants';
 
 // Timeline storage key - 使用统一的键名，兼容旧数据

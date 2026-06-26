@@ -7,7 +7,7 @@
  * - 职责单一：Whisper 模型管理和语音转录
  */
 
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 // ============================================
 // Whisper 类型定义

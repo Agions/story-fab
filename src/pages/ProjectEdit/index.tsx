@@ -19,7 +19,7 @@ import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/settings-context';
 
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 import { VideoStep } from './components/steps/video-step';
 import { AnalyzeStep } from './components/steps/analyze-step';

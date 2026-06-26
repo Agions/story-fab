@@ -16,7 +16,7 @@ import { multiExporter } from '../../services/pipeline/clip-pipeline/multi-expor
 import { tauri } from '../../tauri';
 import type { VideoInfo } from '@/core/types';
 import { AppError } from '@/core/errors';
-import { logger } from '../../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 
 // ============================================================
 // Metadata

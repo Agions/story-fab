@@ -1,4 +1,4 @@
-import { logger } from '../../shared/utils/logging';
+import { logger } from '@/shared/utils/logging';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/card';
