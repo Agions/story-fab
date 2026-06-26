@@ -81,8 +81,6 @@ export type {
   AIModelType,
   AnalysisResult,
   Keyframe,
-  DetectedObject,
-  EmotionData,
   Emotion,
   KeyMoment,
   AnalysisStats,
@@ -137,6 +135,3 @@ export interface ModalProps {
   width?: number | string;
   footer?: ReactNode;
 }
-
-// 保留旧的 WorkflowStep 兼容别名
-export type WorkflowStep = import('@/types').WorkflowStepType;

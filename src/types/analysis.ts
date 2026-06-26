@@ -68,8 +68,8 @@ export interface AnalysisStats {
 export interface AnalysisResult {
   scenes: import('./media').Scene[];
   keyframes: Keyframe[];
-  objects: DetectedObject[];
-  emotions: EmotionData[];
+  objects: ObjectDetection[];
+  emotions: EmotionAnalysis[];
   stats: AnalysisStats;
 }
 
@@ -78,19 +78,6 @@ export interface Keyframe {
   timestamp: number;
   imageUrl?: string;
   description?: string;
-}
-
-export interface DetectedObject {
-  id?: string;
-  label: string;
-  confidence: number;
-  bbox: [number, number, number, number];
-}
-
-export interface EmotionData {
-  timestamp: number;
-  emotion: string;
-  intensity: number;
 }
 
 export interface Emotion {
@@ -119,7 +106,7 @@ export interface VideoAnalysis {
   transcript?: string;
   scenes?: import('./media').Scene[];
   keyframes?: Keyframe[];
-  objects?: DetectedObject[];
+  objects?: ObjectDetection[];
   ocrText?: string;
   asrText?: string;
   createdAt?: string;
