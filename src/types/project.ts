@@ -38,21 +38,6 @@ export interface ProjectData {
   updatedAt?: string;
 }
 
-export interface VideoProject {
-  id: string;
-  name: string;
-  description: string;
-  videoUrl: string;
-  videoPath?: string;
-  outputDir?: string;
-  metadata?: Record<string, unknown>;
-  analysis?: import('./analysis').VideoAnalysis;
-  scripts: import('./script').Script[];
-  createdAt: string;
-  updatedAt: string;
-  aiModel?: import('./analysis').AIModelConfig;
-}
-
 // ─── 项目设置 ───
 
 export interface ProjectSettings {
