@@ -49,7 +49,6 @@ export type {
   Script,
   ScriptSegment,
   ScriptMetadata,
-  ScriptTemplate,
   ScriptData,
   ScriptStylePreset,
   SegmentMode,

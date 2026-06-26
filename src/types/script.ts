@@ -52,16 +52,6 @@ export interface ScriptMetadata {
   style?: string;
 }
 
-export interface ScriptTemplate {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  content: string;
-  duration?: number;
-  wordCount?: number;
-}
-
 export interface ScriptData {
   id: string;
   title: string;
