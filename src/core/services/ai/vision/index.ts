@@ -16,7 +16,7 @@ import type {
   VideoAnalysis,
   ObjectDetection,
   EmotionAnalysis,
-} from '@/core/types';
+} from '@/types';
 import type { HighlightSegment, HighlightOptions } from '@/types';
 
 // 导入拆分后的服务

@@ -13,7 +13,7 @@ import { visionService } from '../../../core/services/ai/vision-service';
 import { notify } from '@/shared';
 import { useTimeout } from '../../../hooks/use-timeout';
 import { logger } from '@/shared/utils/logging';
-import type { AIAnalyzeProps, Scene } from '@/core/types';
+import type { AIAnalyzeProps, Scene } from '@/types';
 import styles from './AIVisualizer.module.css';
 import { Highlights } from './Highlights';
 import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysis-tasks';

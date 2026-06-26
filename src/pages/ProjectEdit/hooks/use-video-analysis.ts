@@ -7,7 +7,7 @@
  */
 
 import { useCallback, useRef, useState } from 'react';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 import { videoProcessor, VideoMetadata } from '@/core/video';
 import { generateScriptWithOpenAI, analyzeKeyFramesWithAI } from '@/core/services/ai/script-service';
 import { notify } from '@/shared';

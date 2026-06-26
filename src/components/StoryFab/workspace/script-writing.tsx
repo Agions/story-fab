@@ -22,7 +22,7 @@ import {
   type ScriptGenerateProps,
 } from './script-config';
 import type { storyfabAction } from '../types';
-import type { ScriptData } from '@/core/types';
+import type { ScriptData } from '@/types';
 
 // 导入子组件
 import {

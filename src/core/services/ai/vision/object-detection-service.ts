@@ -3,7 +3,7 @@
  * 职责：视频中的物体识别和分类
  */
 
-import type { VideoInfo, Scene, ObjectDetection } from '@/core/types';
+import type { VideoInfo, Scene, ObjectDetection } from '@/types';
 import { OBJECT_CATEGORIES } from '../types';
 
 // ============================================

@@ -4,7 +4,7 @@
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
-import type { Project, ProjectStatus } from '@/core/types';
+import type { Project, ProjectStatus } from '@/types';
 
 // ─── Pure filter/sort functions (exported for testing) ────────────────────────
 

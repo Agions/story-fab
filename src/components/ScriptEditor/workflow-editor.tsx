@@ -11,7 +11,7 @@ import {
   Save,
   Clock,
 } from 'lucide-react';
-import type { ScriptData, Scene, ScriptSegment } from '@/core/types';
+import type { ScriptData, Scene, ScriptSegment } from '@/types';
 import { formatDuration } from '@/core/video';
 import { notify } from '@/shared';
 import {

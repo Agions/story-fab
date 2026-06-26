@@ -10,7 +10,7 @@
 
 import { getApiKey } from '@/core/services/auth/api-key-service';
 import type { VideoMetadata } from '@/core/video';
-import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
+import type { ScriptSegment as CoreScriptSegment } from '@/types';
 import type { AIModelType } from './ai-model-configs';
 import { invokeAIModel, AIServiceError } from './ai-api-client';
 import { AppError } from '@/core/errors';

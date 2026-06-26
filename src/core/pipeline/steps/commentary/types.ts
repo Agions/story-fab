@@ -8,7 +8,7 @@
  * - 中间结果可被 UI 单独展示
  */
 
-import type { ScriptSegment, Scene, VideoAnalysis } from '@/core/types';
+import type { ScriptSegment, Scene, VideoAnalysis } from '@/types';
 import type { WorkflowMode } from '@/core/workflow/feature-blueprint';
 import type { OriginalOverlayPlanItem } from '@/core/services/ai/scene-commentary-service';
 

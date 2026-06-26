@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 import {
   originalEditorReducer,
   initialOriginalEditorState,

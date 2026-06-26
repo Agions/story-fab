@@ -16,7 +16,7 @@ import {
   type CommentaryNarrationOutput,
   type DraftScript,
 } from './types';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 
 // ============================================================
 // Step Metadata

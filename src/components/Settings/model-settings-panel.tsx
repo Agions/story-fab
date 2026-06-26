@@ -8,7 +8,7 @@ import { Badge } from '../ui/badge';
 import { Bot, Zap, DollarSign } from 'lucide-react';
 import { MODEL_VERIFICATION, MODEL_CATALOG_VERIFIED_AT } from '../../core/config/ai-models-config';
 import { PROVIDER_NAMES } from '@/shared/constants/providers';
-import type { AIModel } from '@/core/types';
+import type { AIModel } from '@/types';
 
 interface ModelSettingsPanelProps {
   defaultModel: string;

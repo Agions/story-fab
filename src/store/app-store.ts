@@ -4,7 +4,7 @@
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
-import type { User } from '@/core/types';
+import type { User } from '@/types';
 
 // ==========================================
 // 类型定义

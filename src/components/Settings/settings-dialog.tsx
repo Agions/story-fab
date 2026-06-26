@@ -21,7 +21,7 @@ import { ShortcutSettings } from './shortcut-settings';
 import { ExportSettings } from './export-settings';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { AI_MODELS } from '@/core/config/ai-models-config';
-import type { ModelProvider } from '@/core/types';
+import type { ModelProvider } from '@/types';
 import { notify } from '@/shared';
 import { validateApiKey } from '@/core/services/providers/api-key-service';
 

@@ -51,4 +51,4 @@ export type {
 export { DEFAULT_EDITOR_CONFIG } from '../../types/timeline';
 
 // Legacy re-exports from ../../types
-export type { VideoSegment, ScriptSegment } from '@/core/types';
+export type { VideoSegment, ScriptSegment } from '@/types';

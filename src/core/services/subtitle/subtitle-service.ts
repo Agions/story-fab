@@ -9,7 +9,7 @@
  */
 
 import { logger } from '@/shared/utils/logging';
-import type { SubtitleEntry, VideoInfo } from '@/core/types';
+import type { SubtitleEntry, VideoInfo } from '@/types';
 import { whisperService, type WhisperProgress } from './whisper-service';
 import { trackToSRT, trackToVTT, trackToASS } from './subtitle-formatters';
 import { AppError } from '@/core/errors';

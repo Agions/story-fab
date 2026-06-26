@@ -17,7 +17,7 @@ import { resolveLegacyModel } from '@/core/services/ai/ai-model-adapter';
 import type { Script } from '@/core/services/ai/script-service';
 import { normalizeProjectFile } from '../../core/utils/project-file';
 import type { ProjectFileLike } from '../../core/utils/project-file';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 import type { VideoAnalysis } from '@/types';
 import { useProjectDetail } from '@/hooks/use-project-detail';
 import styles from '@/pages/ProjectDetail/index.module.less';

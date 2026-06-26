@@ -13,7 +13,7 @@
 import { visionService } from '../../ai/vision-service';
 import { asrService } from '../../asr/asr-service';
 import { logger } from '../../../../shared/utils/logging';
-import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, ScriptSegment, ExportSettings } from '@/types';
 import { ClipRepurposingPipeline } from './pipeline';
 import type { RepurposingOptions } from './pipeline';
 import type { ClipConfig, ClipSegment } from './types';

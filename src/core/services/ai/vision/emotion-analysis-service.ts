@@ -3,7 +3,7 @@
  * 职责：视频场景的情感分析和情绪识别
  */
 
-import type { Scene, EmotionAnalysis } from '@/core/types';
+import type { Scene, EmotionAnalysis } from '@/types';
 import { EMOTION_DIMENSIONS } from '../types';
 
 // ============================================

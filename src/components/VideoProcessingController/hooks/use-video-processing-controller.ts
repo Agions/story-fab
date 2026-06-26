@@ -7,7 +7,7 @@ import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import { tauri } from '@/core/tauri';
 import { AppError } from '@/core/errors';
-import type { VideoSegment } from '@/core/types';
+import type { VideoSegment } from '@/types';
 import {
   initialVideoProcessingState,
   videoProcessingReducer,

@@ -7,7 +7,7 @@
  *   aiService.ts — 主服务（公开 API、请求路由、response 解析）
  */
 import { BaseService, ServiceError } from '../providers/base-service';
-import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis, VideoInfo, Scene, Keyframe } from '@/core/types';
+import type { AIModel, AIModelSettings, ScriptData, ScriptSegment, VideoAnalysis, VideoInfo, Scene, Keyframe } from '@/types';
 import { AI_MODELS, DEFAULT_MODEL_ID, MODEL_RECOMMENDATIONS } from '../../config/ai-models-config';
 import { visionService } from './vision-service';
 

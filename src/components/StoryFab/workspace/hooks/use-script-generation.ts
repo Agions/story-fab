@@ -10,7 +10,7 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { aiService } from '@/core/services/ai/ai-service';
-import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/core/types';
+import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/types';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/ai-models-config';
 import useLocalStorage from '@/hooks/use-local-storage';
 import type { storyfabState } from '../../types';

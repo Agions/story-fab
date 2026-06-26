@@ -3,7 +3,7 @@
  * 来源: refactor/original-editor-usereducer (v3.4 §A2 范式)
  * 模式: 1 hook + 1 .reducer.ts + makeSetter<K> + Updater<T>
  */
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 
 export interface SegmentFormValues {
   start: number;

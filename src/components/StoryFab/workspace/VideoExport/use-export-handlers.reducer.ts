@@ -3,7 +3,7 @@
  * 来源: refactor/export-handlers-usereducer (v3.4 §A2 范式)
  * 模式: 1 hook + 1 .reducer.ts + makeSetter<K> + Updater<T>
  */
-import type { ExportSettings } from '@/core/types';
+import type { ExportSettings } from '@/types';
 
 export interface ExportHandlersState {
   // progress

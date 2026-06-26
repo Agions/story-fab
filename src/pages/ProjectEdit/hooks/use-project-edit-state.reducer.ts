@@ -17,7 +17,7 @@
 import type { ProjectData } from '../project-edit-utils';
 import type { ProjectSaveBehavior } from '@/shared/constants/settings';
 import type { VideoMetadata } from '@/core/video';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 
 /** All page state in one shape. Fields grouped loosely by domain. */
 export interface ProjectEditState {

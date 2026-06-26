@@ -13,7 +13,7 @@ import { useStoryFab } from '../context';
 import { logger } from '@/shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
 import { MAX_FILE_SIZE } from '@/shared/constants';
-import type { VideoInfo } from '@/core/types';
+import type { VideoInfo } from '@/types';
 import {
   videoUploadReducer,
   initialVideoUploadState,

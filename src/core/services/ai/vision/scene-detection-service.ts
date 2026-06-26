@@ -3,7 +3,7 @@
  * 职责：视频场景分割、分类和特征分析
  */
 
-import type { VideoInfo, Scene } from '@/core/types';
+import type { VideoInfo, Scene } from '@/types';
 import type { SceneFeatureSet } from '../types';
 import { SCENE_TYPES } from '../types';
 import { logger } from '../../../../shared/utils/logging';

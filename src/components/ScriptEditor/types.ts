@@ -1,5 +1,5 @@
-import type { ScriptSegment } from '@/core/types';
-import type { ScriptData, Scene } from '@/core/types';
+import type { ScriptSegment } from '@/types';
+import type { ScriptData, Scene } from '@/types';
 
 // 原始 Props 接口
 interface ScriptEditorOriginalProps {

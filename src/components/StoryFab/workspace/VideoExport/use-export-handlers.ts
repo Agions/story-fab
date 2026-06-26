@@ -7,7 +7,7 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
-import type { ExportSettings } from '@/core/types';
+import type { ExportSettings } from '@/types';
 import { PLATFORM_PRESETS } from './export-config';
 import {
   initialExportHandlersState,

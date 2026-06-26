@@ -3,7 +3,7 @@
  * 文案风格、解说风格预设、文案长度选项
  */
 
-import type { ScriptData } from '@/core/types';
+import type { ScriptData } from '@/types';
 import type { storyfabFeatureType } from '../types';
 
 // 文案风格选项

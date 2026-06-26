@@ -11,7 +11,7 @@
  */
 
 import { visionService } from '../../services/ai/vision-service';
-import type { VideoInfo, VideoAnalysis } from '@/core/types';
+import type { VideoInfo, VideoAnalysis } from '@/types';
 import type { CandidateClip } from '../../services/pipeline/clip-pipeline/clip-scorer';
 import type { ASRSegment } from '../../services/asr/asr-types';
 import { createStep, type Step, reportProgress } from '../step';

@@ -18,14 +18,14 @@ import type {
   PlanModifications,
   SynthesizeResult,
   CommentaryScriptOutput,
-} from '@/core/types/commentary';
+} from '@/types';
 export type {
   ScriptStylePreset,
   CommentarySegment,
   CommentaryScriptOutput,
-} from '@/core/types/commentary';
-import type { VoiceInfo as CanonicalVoiceInfo } from '@/core/types/voice';
-export type { VoiceInfo as VoiceCatalogInfo } from '@/core/types/voice';
+} from '@/types';
+import type { VoiceInfo as CanonicalVoiceInfo } from '@/types/voice';
+export type { VoiceInfo as VoiceCatalogInfo } from '@/types/voice';
 
 /** 音色信息（commentary 上下文专用，style/description required） */
 export interface VoiceInfo extends CanonicalVoiceInfo {

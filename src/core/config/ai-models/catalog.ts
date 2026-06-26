@@ -5,7 +5,7 @@
  * 包含模型列表、推荐配置和按条件查找的纯函数。
  */
 
-import type { AIModel, ModelProvider, ModelCategory } from '@/core/types';
+import type { AIModel, ModelProvider, ModelCategory } from '@/types';
 
 export const AI_MODELS: AIModel[] = [
   {

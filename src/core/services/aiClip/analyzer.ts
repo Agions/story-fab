@@ -12,7 +12,7 @@ import { tauri } from '../../tauri';
 import { logger } from '@/shared/utils/logging';
 import { visionService } from '../ai/vision-service';
 import { detectEmotionPeaks, type EmoPeak } from '../video/emotion-detector';
-import type { EmotionAnalysis, VideoInfo, Scene } from '@/core/types';
+import type { EmotionAnalysis, VideoInfo, Scene } from '@/types';
 import { DEFAULT_CLIP_CONFIG } from './types';
 import { formatTime as formatSharedTime } from '../../../shared/utils/formatting';
 import type {

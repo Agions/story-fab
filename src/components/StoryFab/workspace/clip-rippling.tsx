@@ -28,7 +28,7 @@ import {
 import { tauri } from '@/core/tauri';
 import { motion } from '../../common/motion-shim';
 import { ClipRepurposingPipeline } from '../../../core/services/pipeline/clip-pipeline/pipeline';
-import type { VideoInfo, VideoAnalysis } from '@/core/types';
+import type { VideoInfo, VideoAnalysis } from '@/types';
 import type {
   RepurposingOptions,
 } from '../../../core/services/pipeline/clip-pipeline/pipeline';

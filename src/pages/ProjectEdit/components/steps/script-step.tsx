@@ -7,7 +7,7 @@ import { Button } from '../../../../components/ui/button';
 
 import { cn } from '@/shared/utils/cn';
 import ScriptEditor from '@/components/ScriptEditor';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 import styles from '@/pages/ProjectEdit/index.module.less';
 
 interface ScriptStepProps {

@@ -3,7 +3,7 @@
  * Previously split across: workflow.types.ts / workflow.constants.ts / workflow.initialState.ts
  * All content now in one self-contained file, zero circular imports.
  */
-import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/core/types';
+import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

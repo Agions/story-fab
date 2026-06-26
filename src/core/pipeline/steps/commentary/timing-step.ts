@@ -18,7 +18,7 @@ import {
   type AlignedSegments,
 } from './types';
 import { sceneCommentaryAlignmentService } from '../../../../core/services/ai/scene-commentary-service';
-import type { Scene, ScriptSegment } from '@/core/types';
+import type { Scene, ScriptSegment } from '@/types';
 
 // ============================================================
 // Step Metadata

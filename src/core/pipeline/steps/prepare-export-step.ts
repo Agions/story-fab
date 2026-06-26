@@ -14,7 +14,7 @@ import type { AspectRatio } from '../../services/pipeline/clip-pipeline/multi-ex
 import type { ExportTask } from '../../services/pipeline/clip-pipeline/multi-export';
 import { multiExporter } from '../../services/pipeline/clip-pipeline/multi-export';
 import { tauri } from '../../tauri';
-import type { VideoInfo } from '@/core/types';
+import type { VideoInfo } from '@/types';
 import { AppError } from '@/core/errors';
 import { logger } from '@/shared/utils/logging';
 

@@ -6,7 +6,7 @@ import { useReducer, useMemo, useCallback, useRef } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { SimpleVideoSegment, videoProcessor } from '@/core/video';
 import { clipWorkflowService } from '../../../core/services/pipeline/clip-pipeline/clip-workflow';
-import type { VideoInfo } from '@/core/types';
+import type { VideoInfo } from '@/types';
 import type { ClipSegment } from '../../../core/services/aiClip';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';

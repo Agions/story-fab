@@ -10,7 +10,7 @@ import { validateApiKey } from '@/core/services/providers/api-key-service';
 import { notify } from '@/shared';
 import { MODEL_PROVIDERS } from '../../core/config/ai-models-config';
 import { PROVIDER_NAMES } from '@/shared/constants/providers';
-import type { ModelProvider } from '@/core/types';
+import type { ModelProvider } from '@/types';
 import { Key, Eye, EyeOff, Trash2, Check, X, Loader2 } from 'lucide-react';
 
 interface ApiKeyConfig {

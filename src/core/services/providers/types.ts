@@ -1,7 +1,7 @@
 /**
  * AI Provider 共享类型
  */
-import type { AIModel } from '@/core/types';
+import type { AIModel } from '@/types';
 
 export interface AIResponse {
   content: string;

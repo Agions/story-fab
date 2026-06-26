@@ -16,7 +16,7 @@ import {
   type CommentaryDirectorOutput,
   derivePacing,
 } from './types';
-import type { Scene } from '@/core/types';
+import type { Scene } from '@/types';
 
 // ============================================================
 // Step Metadata

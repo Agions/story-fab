@@ -2,7 +2,7 @@
  * 项目工具函数
  */
 
-import type { Project, ProjectStatus } from '@/core/types';
+import type { Project, ProjectStatus } from '@/types';
 
 // Re-export filter/sort from store (single source of truth)
 export { filterProjects, sortProjects } from '@/store/project-store';

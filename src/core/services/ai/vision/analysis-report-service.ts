@@ -9,7 +9,7 @@ import type {
   ObjectDetection,
   EmotionAnalysis,
   VideoAnalysis,
-} from '@/core/types';
+} from '@/types';
 import { formatDurationChinese } from '../../../../shared/utils/formatting';
 
 // ============================================

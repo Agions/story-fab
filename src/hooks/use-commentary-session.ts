@@ -9,7 +9,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createCommentarySession, destroyCommentarySession } from '@/core/services/commentary';
 import { logger } from '@/shared/utils/logging';
-import type { ScriptStylePreset } from '@/core/types/commentary';
+import type { ScriptStylePreset } from '@/types';
 import { useDirectorStatus, UseDirectorStatusResult } from './use-director-status';
 
 interface UseCommentarySessionResult {

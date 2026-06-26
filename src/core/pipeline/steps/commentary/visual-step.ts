@@ -17,7 +17,7 @@ import {
   type CommentaryVisualOutput,
   type VisualAnalysisOutput,
 } from './types';
-import type { Scene, Emotion } from '@/core/types';
+import type { Scene, Emotion } from '@/types';
 
 // ============================================================
 // Step Metadata

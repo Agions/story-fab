@@ -4,7 +4,7 @@
  */
 import { useReducer, useMemo, useCallback, useEffect } from 'react';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 import type { SimpleVideoSegment } from '@/core/video';
 import { videoProcessor } from '@/core/video';
 import { notify } from '@/shared';

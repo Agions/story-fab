@@ -6,7 +6,7 @@ import {
   type ProjectDetailProject,
 } from './use-project-detail.reducer';
 import type { AIScriptDraft } from '@/core/services/ai/script-service';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 
 // ─── helpers ───────────────────────────────────────────────────────────────────
 

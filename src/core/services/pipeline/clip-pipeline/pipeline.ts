@@ -13,7 +13,7 @@
  */
 
 import { logger } from '../../../../shared/utils/logging';
-import type { VideoInfo, VideoAnalysis } from '@/core/types';
+import type { VideoInfo, VideoAnalysis } from '@/types';
 import type { CandidateClip } from './clip-scorer';
 import type { ASRSegment } from '../../asr/asr-types';
 import type { SEOMetadata, SocialPlatform } from './seo-generator';

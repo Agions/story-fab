@@ -9,7 +9,7 @@ import {
   ChevronDown,
   Plus,
 } from 'lucide-react';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 import { formatDuration } from '@/core/video';
 import SegmentTable from './segment-table';
 import SegmentEditForm from './segment-edit-form';

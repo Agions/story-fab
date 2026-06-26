@@ -20,7 +20,7 @@ import {
   COMMENTARY_PROGRESS_WEIGHTS,
 } from './composite-pipeline';
 import type { CommentaryPipelineState } from './types';
-import type { Scene, VideoAnalysis, ScriptSegment, Emotion } from '@/core/types';
+import type { Scene, VideoAnalysis, ScriptSegment, Emotion } from '@/types';
 
 // ============================================================
 // Test Fixtures

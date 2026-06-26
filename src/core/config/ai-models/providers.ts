@@ -7,7 +7,7 @@
  * 来源：各大厂商官方文档 + OpenRouter 实时数据（2026-05）
  */
 
-import type { ModelProvider } from '@/core/types';
+import type { ModelProvider } from '@/types';
 
 // =============================================================================
 // 提供者元数据

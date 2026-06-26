@@ -7,7 +7,7 @@
  * - 职责单一，便于维护和测试
  */
 
-import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
+import type { ScriptSegment as CoreScriptSegment } from '@/types';
 
 // ============================================
 // 类型定义

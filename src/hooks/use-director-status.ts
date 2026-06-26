@@ -11,7 +11,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getCommentaryStatus } from '@/core/services/commentary';
 import { toast } from '@/components/ui/sonner';
 import { logger } from '@/shared/utils/logging';
-import type { DirectorStatusResponse, DirectorState } from '@/core/types/commentary';
+import type { DirectorStatusResponse, DirectorState } from '@/types';
 
 const INITIAL_INTERVAL_MS = 2000;
 const MAX_INTERVAL_MS = 16000;

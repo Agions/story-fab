@@ -1,5 +1,5 @@
 import type { AIScriptDraft } from '@/core/services/ai/script-service';
-import type { ScriptSegment } from '@/core/types';
+import type { ScriptSegment } from '@/types';
 import type { VideoAnalysis } from '@/types';
 
 export interface ProjectDetailState {

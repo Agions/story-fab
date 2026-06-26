@@ -5,7 +5,7 @@
  */
 import React, { useState, memo } from 'react';
 import { useStoryFab } from '../context';
-import type { ProjectData } from '@/core/types';
+import type { ProjectData } from '@/types';
 import { saveProjectToFile } from '../../../services/tauri';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/settings-context';

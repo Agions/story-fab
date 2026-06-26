@@ -13,7 +13,7 @@ import { logger } from '@/shared/utils/logging';
 import type {
   CommentaryScriptOutput,
   ScriptStylePreset,
-} from '@/core/types/commentary';
+} from '@/types';
 
 interface UseCommentaryScriptResult {
   script: CommentaryScriptOutput | null;
