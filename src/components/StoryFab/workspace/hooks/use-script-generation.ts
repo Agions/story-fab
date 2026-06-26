@@ -20,7 +20,7 @@ import {
   resolveDefaultModelId,
 } from '@/core/utils/model-availability';
 import { useTimeout } from '@/hooks/use-timeout';
-import { FUNCTION_TO_FEATURE, type AIFunctionType } from '../functionModeMap';
+import { FUNCTION_TO_FEATURE, type AIFunctionType } from '../function-mode-map';
 
 // ============================================
 // 类型定义

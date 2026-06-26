@@ -49,8 +49,8 @@ import {
   FORMAT_OPTIONS,
   type SocialPlatform,
   type AspectRatio,
-} from './clipRipplingConfig';
-import { useClipRippling } from './useClipRippling';
+} from './clip-rippling-config';
+import { useClipRippling } from './use-clip-rippling';
 
 interface ClipRepurposeProps {
   onNext?: () => void;

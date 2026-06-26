@@ -9,7 +9,7 @@
 
 import React from 'react';
 import styles from '../ScriptWriting.module.less';
-import { FEATURE_TO_FUNCTION, type AIFunctionType } from '../functionModeMap';
+import { FEATURE_TO_FUNCTION, type AIFunctionType } from '../function-mode-map';
 
 // ============================================
 // 类型定义

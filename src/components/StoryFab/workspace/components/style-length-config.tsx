@@ -9,7 +9,7 @@
 
 import React from 'react';
 import styles from '../ScriptWriting.module.less';
-import { SCRIPT_STYLES, SCRIPT_LENGTHS } from '../scriptConfig';
+import { SCRIPT_STYLES, SCRIPT_LENGTHS } from '../script-config';
 
 // ============================================
 // 类型定义

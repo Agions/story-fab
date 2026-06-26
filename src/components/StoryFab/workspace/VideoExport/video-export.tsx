@@ -15,7 +15,7 @@ import {
   RESOLUTION_OPTIONS,
   FPS_OPTIONS,
   PLATFORM_PRESETS,
-} from './exportConfig';
+} from './export-config';
 
 interface VideoExportProps {
   onComplete?: () => void;

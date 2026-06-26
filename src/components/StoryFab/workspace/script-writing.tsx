@@ -16,11 +16,11 @@ import { useScriptGeneration } from './hooks/use-script-generation';
 import {
   FUNCTION_TO_FEATURE,
   type AIFunctionType,
-} from './functionModeMap';
+} from './function-mode-map';
 import {
   COMMENTARY_STYLES,
   type ScriptGenerateProps,
-} from './scriptConfig';
+} from './script-config';
 import type { storyfabAction } from '../types';
 import type { ScriptData } from '@/core/types';
 

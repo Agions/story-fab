@@ -9,7 +9,7 @@
 
 import React from 'react';
 import styles from '../VideoComposing.module.less';
-import { EFFECT_STYLES, type SynthesizeConfig } from '../composeConfig';
+import { EFFECT_STYLES, type SynthesizeConfig } from '../compose-config';
 
 // ============================================
 // 类型定义

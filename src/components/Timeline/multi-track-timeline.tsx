@@ -44,7 +44,7 @@ import { ClipPropertiesPanel } from './clip-properties-panel';
 import { clamp, formatTimecodeMs } from '@/shared/utils';
 import { MIN_ZOOM, MAX_ZOOM } from './constants';
 import { useTrackActions } from './hooks/use-track-actions';
-import { useClipActions } from './hooks/useClipActions';
+import { useClipActions } from './hooks/use-clip-actions';
 import { useTimelineDrag } from './hooks/use-timeline-drag';
 
 import styles from '@/components/Timeline/Timeline.module.less';

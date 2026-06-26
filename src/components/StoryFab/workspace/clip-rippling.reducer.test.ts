@@ -5,7 +5,7 @@ import {
   type ClipRipplingState,
   type ClipRipplingAction,
 } from './clip-rippling.reducer';
-import type { SocialPlatform, AspectRatio } from './clipRipplingConfig';
+import type { SocialPlatform, AspectRatio } from './clip-rippling-config';
 import type { RepurposingClip, PipelineStage } from '../../../core/services/pipeline/clip-pipeline/pipeline';
 
 // ── Test helpers ──────────────────────────────────────────────

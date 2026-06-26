@@ -17,7 +17,7 @@ import {
   VOICE_SPEED_MAX,
   VOICE_SPEED_RANGE,
   type SynthesizeConfig,
-} from '../composeConfig';
+} from '../compose-config';
 
 // ============================================
 // 类型定义

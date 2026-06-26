@@ -13,4 +13,4 @@ export { default as StepList } from './step-list';
 export { Highlights, type Highlight, type HighlightsProps } from './Highlights';
 
 // 导出类型
-export type { AIFunctionType } from './functionModeMap';
+export type { AIFunctionType } from './function-mode-map';

@@ -8,7 +8,7 @@
  * - 保持原有 API 兼容性
  */
 
-import { getApiKey } from '@/core/services/auth/apiKeyService';
+import { getApiKey } from '@/core/services/auth/api-key-service';
 import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment as CoreScriptSegment } from '@/core/types';
 import type { AIModelType } from './ai-model-configs';

@@ -8,7 +8,7 @@ import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import type { ExportSettings } from '@/core/types';
-import { PLATFORM_PRESETS } from './exportConfig';
+import { PLATFORM_PRESETS } from './export-config';
 import {
   initialExportHandlersState,
   exportHandlersReducer,

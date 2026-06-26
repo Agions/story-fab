@@ -15,7 +15,7 @@ import { useEditorStore } from '../../store/editor-store';
 import { useTimelineStore } from '../../store/timeline-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryFab/workspace/functionModeMap';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryFab/workspace/function-mode-map';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
 const Workspace = lazy(() => import('@/components/StoryFab/workspace/workspace'));

@@ -13,7 +13,7 @@ export {
 } from '@/core/services/project/project-file-service';
 
 // Auth service
-export { getApiKey } from '@/core/services/auth/apiKeyService';
+export { getApiKey } from '@/core/services/auth/api-key-service';
 
 // Transcode/crop service
 export { transcodeWithCrop } from '@/core/services/export/transcode-crop-service';
