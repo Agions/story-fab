@@ -9,7 +9,6 @@ export type {
   ProjectSettings,
   ProjectData,
   User,
-  UserPreferences,
   AppSettings,
   ApiResponse,
   TaskStatus,

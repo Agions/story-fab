@@ -77,14 +77,6 @@ export interface User {
   role?: 'admin' | 'user';
 }
 
-export interface UserPreferences {
-  theme?: 'light' | 'dark' | 'auto';
-  language?: string;
-  autoSave?: boolean;
-  notifications?: boolean;
-  [key: string]: unknown;
-}
-
 export interface AppSettings {
   autoSave: boolean;
   defaultAIModel?: import('./analysis').ModelProvider;
