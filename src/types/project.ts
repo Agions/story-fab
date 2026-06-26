@@ -116,16 +116,4 @@ export interface ApiResponse<T = unknown> {
   message?: string;
 }
 
-export interface PaginationParams {
-  page: number;
-  pageSize: number;
-  total?: number;
-}
-
-export interface SelectOption {
-  label: string;
-  value: string | number;
-  disabled?: boolean;
-}
-
 export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';

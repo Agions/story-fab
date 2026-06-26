@@ -12,8 +12,6 @@ export type {
   UserPreferences,
   AppSettings,
   ApiResponse,
-  PaginationParams,
-  SelectOption,
   TaskStatus,
   SubtitleStyle,
 } from '@/types';
