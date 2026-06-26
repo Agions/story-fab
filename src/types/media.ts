@@ -110,8 +110,10 @@ export interface KeyFrame {
 // ─── 高光检测 ───
 
 export interface HighlightSegment {
-  startMs: number;
-  endMs: number;
+  /** 秒 */
+  startTime: number;
+  /** 秒 */
+  endTime: number;
   score: number;
   reason: string;
   audioScore?: number;

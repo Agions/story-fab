@@ -17,7 +17,7 @@ import type {
   ObjectDetection,
   EmotionAnalysis,
 } from '@/core/types';
-import type { HighlightSegment, DetectOptions, HighlightReason } from '@/core/interfaces';
+import type { HighlightSegment, HighlightOptions } from '@/types';
 
 // 导入拆分后的服务
 import { sceneDetectionService } from './scene-detection-service';
@@ -202,11 +202,11 @@ export class VisionService {
    * 使用 FFmpeg scdet 滤镜 + 音频短时能量分析，无需外部 AI 服务
    * 识别高光片段（音频能量峰值 + 场景切换）
    *
-   * @deprecated 使用 @/core/interfaces DetectOptions 类型 + tauri.detectHighlights()
+   * @deprecated 使用 @/core/interfaces HighlightOptions 类型 + tauri.detectHighlights()
    */
   async detectHighlights(
     videoInfo: VideoInfo,
-    options: Partial<DetectOptions> = {}
+    options: Partial<HighlightOptions> = {}
   ): Promise<HighlightSegment[]> {
     const videoPath = videoInfo.path;
 
@@ -237,7 +237,7 @@ export class VisionService {
         startTime: h.start_ms / 1000,
         endTime: h.end_ms / 1000,
         score: h.score,
-        reason: h.reason as HighlightReason,
+        reason: h.reason as string,
         audioScore: h.audio_score,
         sceneScore: h.scene_score,
         motionScore: h.motion_score,
