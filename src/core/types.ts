@@ -51,7 +51,6 @@ export type {
   ScriptMetadata,
   ScriptTemplate,
   ScriptData,
-  ScriptGenerationOptions,
   ScriptStylePreset,
   SegmentMode,
   CommentarySegment,

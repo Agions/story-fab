@@ -73,13 +73,6 @@ export interface ScriptData {
   updatedAt?: string;
 }
 
-export interface ScriptGenerationOptions {
-  style?: string;
-  tone?: string;
-  length?: 'short' | 'medium' | 'long';
-  purpose?: string;
-}
-
 // ─── 解说脚本 ───
 
 export interface CommentarySegment {
