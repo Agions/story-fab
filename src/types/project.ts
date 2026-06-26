@@ -32,28 +32,10 @@ export interface ProjectData {
   scripts?: import('./script').Script[];
   videoAssets?: import('./media').VideoAsset[];
   videos?: import('./media').VideoInfo[];
-  settings?: ProjectSettings;
+  settings?: Record<string, unknown>;
   status?: string;
   createdAt?: string;
   updatedAt?: string;
-}
-
-// ─── 项目设置 ───
-
-export interface ProjectSettings {
-  autoSave?: boolean;
-  compactMode?: boolean;
-  theme?: 'light' | 'dark' | 'auto';
-  projectSaveBehavior?: 'stay' | 'detail';
-  videoQuality?: 'low' | 'medium' | 'high' | 'ultra';
-  outputFormat?: 'mp4' | 'webm' | 'gif';
-  resolution?: '720p' | '1080p' | '4k';
-  frameRate?: 24 | 30 | 60;
-  audioCodec?: string;
-  videoCodec?: string;
-  subtitleEnabled?: boolean;
-  subtitleStyle?: SubtitleStyle;
-  includeWatermark?: boolean;
 }
 
 export interface SubtitleStyle {

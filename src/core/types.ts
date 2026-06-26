@@ -6,7 +6,6 @@ export type {
   // project
   Project,
   ProjectStatus,
-  ProjectSettings,
   ProjectData,
   User,
   AppSettings,
@@ -75,7 +74,6 @@ export type {
   AIModel,
   ModelProvider,
   ModelCategory,
-  AIModelConfig,
   AIModelSettings,
   AIModelType,
   AnalysisResult,

@@ -35,13 +35,6 @@ export interface AIModel {
   recommended?: boolean;
 }
 
-export interface AIModelConfig {
-  key: string;
-  name: string;
-  provider: string;
-  apiKey?: string;
-}
-
 export interface AIModelSettings {
   provider?: ModelProvider;
   model?: string;
