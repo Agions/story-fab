@@ -122,7 +122,6 @@ export type {
   ExportSettings,
   ExportConfig,
   ExportResult,
-  ExportRecord,
   EncoderSettings,
 } from '@/types';
 

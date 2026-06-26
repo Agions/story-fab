@@ -64,19 +64,6 @@ export interface ExportResult {
   format: ExportFormat;
 }
 
-export interface ExportRecord {
-  id: string;
-  projectId: string;
-  format: string;
-  quality: string;
-  resolution: string;
-  fileSize?: number;
-  filePath?: string;
-  status: import('./project').TaskStatus;
-  createdAt: string;
-  completedAt?: string;
-}
-
 // ─── 导出质量预设 ───
 
 export const EXPORT_PRESETS: Record<ExportQuality, Partial<ExportConfig>> = {
