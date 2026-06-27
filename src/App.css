@@ -20,7 +20,7 @@ body {
     'Segoe UI', 'Noto Sans SC', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-primary, #0d0d0f);
+  background-color: var(--bg-primary, #0c0c0e);
   color: var(--text-primary, #f0f0f2);
   font-size: 14px;
   line-height: 1.6;
@@ -126,14 +126,14 @@ video {
    Text Selection — 使用品牌色 Amber
    ============================================================================ */
 ::selection {
-  background-color: rgba(249, 115, 22, 0.25);
-  color: #fed7aa;
+  background-color: rgba(200, 149, 108, 0.3);
+  color: var(--text-primary, #f0eee8);
 }
 
 /* ============================================================================
    Dark Mode Body
    ============================================================================ */
 body.dark-mode {
-  background-color: #0d0d0f;
-  color: #f0f0f2;
+  background-color: #08080a;
+  color: #f0eee8;
 }

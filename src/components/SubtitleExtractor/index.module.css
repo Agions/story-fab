@@ -1,6 +1,6 @@
 /**
  * SubtitleExtractor — Dark Theme (AI Cinema Studio)
- * bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
+ * bg-base: #08080a | accent: #c8956c | cyan: #5a9e9e
  */
 
 .container {
@@ -42,7 +42,7 @@
   justify-content: center;
   gap: 12px;
   height: 200px;
-  background: #0C0D14;
+  background: #08080a;
   border: 1px dashed rgba(255, 255, 255, 0.12);
   border-radius: 10px;
   color: rgba(255, 255, 255, 0.3);
@@ -71,8 +71,8 @@
 }
 
 .playBtn:hover {
-  background: rgba(255, 159, 67, 0.6);
-  border-color: #FF9F43;
+  background: rgba(200, 149, 108, 0.6);
+  border-color: #c8956c;
 }
 
 .currentSubtitleHint {
@@ -86,7 +86,7 @@
   font-size: 13px;
   text-align: center;
   backdrop-filter: blur(4px);
-  border-top: 1px solid rgba(255, 159, 67, 0.2);
+  border-top: 1px solid rgba(200, 149, 108, 0.2);
 }
 
 .timeDisplay {
@@ -101,7 +101,7 @@
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 13px;
   font-weight: 600;
-  color: #FF9F43;
+  color: #c8956c;
 }
 
 .timeTotal {
@@ -126,7 +126,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: #FF9F43;
+  background: #c8956c;
   z-index: 10;
   pointer-events: none;
   transition: left 0.1s linear;
@@ -139,7 +139,7 @@
   left: -4px;
   width: 10px;
   height: 10px;
-  background: #FF9F43;
+  background: #c8956c;
   border-radius: 50%;
 }
 
@@ -156,8 +156,8 @@
 .subBlock {
   position: absolute;
   height: 22px;
-  background: rgba(0, 212, 255, 0.35);
-  border: 1px solid rgba(0, 212, 255, 0.5);
+  background: rgba(90, 158, 158, 0.35);
+  border: 1px solid rgba(90, 158, 158, 0.5);
   border-radius: 3px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
@@ -165,13 +165,13 @@
 }
 
 .subBlock:hover {
-  background: rgba(0, 212, 255, 0.55);
-  border-color: #00D4FF;
+  background: rgba(90, 158, 158, 0.55);
+  border-color: #5a9e9e;
 }
 
 .subBlockActive {
-  background: rgba(255, 159, 67, 0.45) !important;
-  border-color: #FF9F43 !important;
+  background: rgba(200, 149, 108, 0.45) !important;
+  border-color: #c8956c !important;
 }
 
 /* ── Control Bar ──────────────────────────────────── */
@@ -209,12 +209,12 @@
 }
 
 .subItem:hover {
-  background: rgba(255, 159, 67, 0.05);
+  background: rgba(200, 149, 108, 0.05);
 }
 
 .subItemCurrent {
-  background: rgba(255, 159, 67, 0.08) !important;
-  border-left: 3px solid #FF9F43;
+  background: rgba(200, 149, 108, 0.08) !important;
+  border-left: 3px solid #c8956c;
 }
 
 .subItemContent {
@@ -235,7 +235,7 @@
   white-space: nowrap;
 }
 
-.timeStart { color: #FF9F43; font-weight: 600; }
+.timeStart { color: #c8956c; font-weight: 600; }
 .timeSep   { color: rgba(255, 255, 255, 0.25); }
 .timeEnd   { color: rgba(255, 255, 255, 0.4); }
 
@@ -272,8 +272,8 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  background: #FF9F43;
-  color: #0C0D14;
+  background: #c8956c;
+  color: #08080a;
   border-radius: 50%;
   font-size: 11px;
   flex-shrink: 0;

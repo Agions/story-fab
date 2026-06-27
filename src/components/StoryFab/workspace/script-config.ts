@@ -23,14 +23,14 @@ export const COMMENTARY_STYLES = [
     label: '幽默风趣',
     desc: '轻松诙谐，吸引眼球',
     icon: '😄',
-    color: '#FF9F43',
+    color: '#c8956c',
   },
   {
     value: 'casual',
     label: '自然随意',
     desc: '口语化表达，贴近生活',
     icon: '🎯',
-    color: '#52c41a',
+    color: '#5a9e6f',
   },
   {
     value: 'shocking',
@@ -51,7 +51,7 @@ export const COMMENTARY_STYLES = [
     label: '专业深度',
     desc: '分析解读，树立权威',
     icon: '📚',
-    color: '#1890ff',
+    color: '#6b8cce',
   },
 ];
 

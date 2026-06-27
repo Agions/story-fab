@@ -6,7 +6,7 @@
  * - 中部：字幕时间轴（可点击跳转）
  * - 底部：字幕列表（内联编辑）
  *
- * 设计风格：AI Cinema Studio Dark (#0C0D14)
+ * 设计风格：AI Cinema Studio Dark (#08080a)
  */
 import React, { useCallback, useRef } from 'react';
 

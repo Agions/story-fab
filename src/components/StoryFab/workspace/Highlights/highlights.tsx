@@ -5,7 +5,7 @@
  * 以深色面板呈现，点击定位到 Timeline 播放头。
  *
  * 设计风格：AI Cinema Studio Dark
- * - bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
+ * - bg-base: #08080a | accent: #c8956c | cyan: #5a9e9e
  */
 import { MS_PER_SECOND } from '@/shared/utils';
 import React, { useReducer, useCallback } from 'react';

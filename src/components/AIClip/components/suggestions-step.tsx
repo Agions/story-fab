@@ -112,9 +112,9 @@ const SuggestionsStep: React.FC<SuggestionsStepProps> = ({
                   style={{
                     backgroundColor:
                       suggestion.confidence > 0.8
-                        ? '#52c41a'
+                        ? '#5a9e6f'
                         : suggestion.confidence > 0.5
-                        ? '#faad14'
+                        ? '#c49660'
                         : '#ff4d4f',
                     color: '#fff'
                   }}

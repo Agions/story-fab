@@ -39,7 +39,7 @@ const AI_FUNCTIONS = [
       </span>
     ),
     description: '以第一人称视角讲述，像主播一样与观众互动',
-    color: '#52c41a',
+    color: '#5a9e6f',
     icon: <User />,
   },
   {
@@ -51,7 +51,7 @@ const AI_FUNCTIONS = [
       </span>
     ),
     description: '专业解说，适合教程、评测类内容',
-    color: '#1890ff',
+    color: '#6b8cce',
     icon: <Mic />,
   },
   {
@@ -63,7 +63,7 @@ const AI_FUNCTIONS = [
       </span>
     ),
     description: '自动识别精彩片段，生成节奏感强的混剪',
-    color: '#fa8c16',
+    color: '#c49660',
     icon: <Scissors />,
   },
 ];

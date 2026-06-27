@@ -1,7 +1,28 @@
-/* Google Fonts removed - using local Geist font for better performance */
+/**
+ * StoryFab — Cinematic Darkroom Design System
+ *
+ * A warm, film-editing-suite aesthetic. Deep charcoal bases with amber/gold
+ * accents that evoke film projector light. Every surface has a subtle warm
+ * undertone — this is NOT cold tech-dark.
+ *
+ * Typography: Space Grotesk (display) + Inter (body) + JetBrains Mono (data)
+ * Palette: Warm charcoal → Slate surfaces → Amber/Gold accents
+ * Signature: Film-strip pipeline indicators with light-leak gradients
+ */
+
 @import "tw-animate-css";
 
-/* Geist Latin-only — removes cyrillic + latin-ext fonts (~30KB savings) */
+/* Space Grotesk — geometric display face with character */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url('https://fonts.gstatic.com/s/spacegrotesk/v16/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj62UUsjNsFjTDJK.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Geist Variable — body/utility face */
 @font-face {
   font-family: 'Geist Variable';
   font-style: normal;
@@ -13,52 +34,108 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Tailwind CSS v4 - use @import instead of @tailwind directives */
 @import "tailwindcss";
 
 @layer base {
-  /* StoryFab design tokens — dark professional tool theme */
+  /* ═══════════════════════════════════════════════════════════
+     Cinematic Darkroom — Dark Theme (default)
+     ═══════════════════════════════════════════════════════════ */
   :root {
-    --bg-primary: #0d0d0f;
-    --bg-secondary: #141418;
-    --bg-tertiary: #1a1a1f;
-    --bg-hover: #222228;
-    --border-subtle: #2a2a30;
-    --border-default: #3a3a42;
-    --text-primary: #f0f0f2;
-    --text-secondary: #8a8a96;
-    --text-disabled: #4a4a52;
-    --accent-primary: #f97316;
-    --accent-primary-hover: #fb923c;
-    --accent-secondary: #3b82f6;
-    --accent-success: #22c55e;
-    --accent-warning: #eab308;
-    --accent-danger: #ef4444;
-    --timeline-video: #8b5cf6;
-    --timeline-audio: #06b6d4;
-    --timeline-subtitle: #f59e0b;
+    /* ── Core backgrounds (warm charcoal, NOT pure black) ── */
+    --bg-base:       #08080a;
+    --bg-primary:    #0c0c0e;
+    --bg-secondary:  #111114;
+    --bg-tertiary:   #161619;
+    --bg-elevated:   #1a1a1e;
+    --bg-hover:      #1f1f24;
+    --bg-active:     #26262c;
 
-    /* shadcn mapped vars — point to our design tokens */
-    --background: var(--bg-primary);
-    --foreground: var(--text-primary);
-    --card: var(--bg-secondary);
-    --card-foreground: var(--text-primary);
-    --popover: var(--bg-secondary);
-    --popover-foreground: var(--text-primary);
-    --primary: var(--accent-primary);
-    --primary-foreground: #ffffff;
-    --secondary: var(--bg-tertiary);
+    /* ── Borders (warm-tinted) ── */
+    --border-subtle:  #1e1e23;
+    --border-default: #2a2a31;
+    --border-strong:  #38383f;
+    --border-active:  #4a4a52;
+
+    /* ── Text ── */
+    --text-primary:   #f0eee8;
+    --text-secondary: #9a9690;
+    --text-tertiary:  #6b6760;
+    --text-disabled:  #4a4742;
+
+    /* ── Accent — Amber/Gold cinema ── */
+    --accent-primary:       #c8956c;
+    --accent-primary-hover: #d4a574;
+    --accent-primary-dim:   #8a6848;
+    --accent-gold:          #d4a574;
+    --accent-amber:         #c49660;
+    --accent-warm:          #b8856a;
+
+    /* ── Functional accents ── */
+    --accent-secondary: #6b8cce;
+    --accent-success:   #5a9e6f;
+    --accent-warning:   #c49660;
+    --accent-danger:    #c75050;
+    --accent-info:      #6b8cce;
+
+    /* ── Timeline track colors ── */
+    --timeline-video:    #8b7ec8;
+    --timeline-audio:    #5a9e9e;
+    --timeline-subtitle: #c49660;
+
+    /* ── shadcn/ui mapped variables ── */
+    --background:           var(--bg-primary);
+    --foreground:           var(--text-primary);
+    --card:                 var(--bg-secondary);
+    --card-foreground:      var(--text-primary);
+    --popover:              var(--bg-elevated);
+    --popover-foreground:   var(--text-primary);
+    --primary:              var(--accent-primary);
+    --primary-foreground:   #ffffff;
+    --secondary:            var(--bg-tertiary);
     --secondary-foreground: var(--text-primary);
-    --muted: var(--bg-tertiary);
-    --muted-foreground: var(--text-secondary);
-    --accent: var(--bg-hover);
-    --accent-foreground: var(--text-primary);
-    --destructive: var(--accent-danger);
-    --border: var(--border-default);
-    --input: var(--bg-tertiary);
-    --ring: var(--accent-primary);
+    --muted:                var(--bg-tertiary);
+    --muted-foreground:     var(--text-secondary);
+    --accent:               var(--bg-hover);
+    --accent-foreground:    var(--text-primary);
+    --destructive:          var(--accent-danger);
+    --border:               var(--border-default);
+    --input:                var(--bg-tertiary);
+    --ring:                 var(--accent-primary);
+    --radius:               0.5rem;
 
-    --radius: 0.5rem;
+    /* ── Signature cinematic effects ── */
+    --glow-amber:    0 0 20px rgba(200, 149, 108, 0.3), 0 0 40px rgba(200, 149, 108, 0.1);
+    --glow-amber-sm: 0 0 8px rgba(200, 149, 108, 0.2);
+    --glow-blue:     0 0 20px rgba(107, 140, 206, 0.25);
+    --glass-bg:      rgba(17, 17, 20, 0.85);
+    --glass-border:  rgba(255, 255, 255, 0.06);
+
+    /* ── Film light-leak gradient (signature) ── */
+    --gradient-light-leak: linear-gradient(
+      90deg,
+      rgba(200, 149, 108, 0) 0%,
+      rgba(200, 149, 108, 0.08) 15%,
+      rgba(200, 149, 108, 0.15) 40%,
+      rgba(196, 150, 96, 0.12) 65%,
+      rgba(184, 133, 106, 0.06) 85%,
+      rgba(184, 133, 106, 0) 100%
+    );
+
+    --gradient-hero: linear-gradient(
+      135deg,
+      #c8956c 0%,
+      #d4a574 35%,
+      #b8856a 70%,
+      #8a6848 100%
+    );
+
+    --gradient-surface: linear-gradient(
+      180deg,
+      var(--bg-secondary) 0%,
+      var(--bg-primary) 100%
+    );
+
+    color-scheme: dark;
   }
 
   * {
@@ -66,28 +143,57 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Tailwind v4 theme extension
+   ═══════════════════════════════════════════════════════════ */
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: 'Inter', sans-serif;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-sans: 'Inter', 'Geist Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  /* Map all CSS vars to Tailwind utilities */
+  --color-bg-base: var(--bg-base);
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-hover: var(--bg-hover);
+  --color-bg-active: var(--bg-active);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+  --color-border-active: var(--border-active);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-disabled: var(--text-disabled);
+
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-primary-hover: var(--accent-primary-hover);
+  --color-accent-primary-dim: var(--accent-primary-dim);
+  --color-accent-gold: var(--accent-gold);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-warm: var(--accent-warm);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-accent-success: var(--accent-success);
+  --color-accent-warning: var(--accent-warning);
+  --color-accent-danger: var(--accent-danger);
+
+  --color-timeline-video: var(--timeline-video);
+  --color-timeline-audio: var(--timeline-audio);
+  --color-timeline-subtitle: var(--timeline-subtitle);
+
+  /* shadcn/ui color mapping */
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -106,6 +212,7 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -115,54 +222,159 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ─── Light theme ─────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   Cinematic Darkroom — Light Theme
+   Warm paper tones, NOT cold white
+   ═══════════════════════════════════════════════════════════ */
 .light {
-  /* StoryFab design tokens — light professional tool theme */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f4f4f5;
-  --bg-tertiary: #fafafa;
-  --bg-hover: #e4e4e7;
-  --border-subtle: #e4e4e7;
-  --border-default: #d4d4d8;
-  --text-primary: #09090b;
-  --text-secondary: #71717a;
-  --text-disabled: #a1a1aa;
-  --accent-primary: #f97316;
-  --accent-primary-hover: #fb923c;
-  --accent-secondary: #3b82f6;
-  --accent-success: #22c55e;
-  --accent-warning: #eab308;
-  --accent-danger: #ef4444;
-  --timeline-video: #8b5cf6;
-  --timeline-audio: #06b6d4;
-  --timeline-subtitle: #f59e0b;
+  --bg-base:       #f7f5f0;
+  --bg-primary:    #faf8f4;
+  --bg-secondary:  #f0ede6;
+  --bg-tertiary:   #e8e4dc;
+  --bg-elevated:   #ffffff;
+  --bg-hover:      #e2ddd4;
+  --bg-active:     #d8d2c8;
 
-  /* shadcn mapped vars — light theme */
-  --background: #ffffff;
-  --foreground: #09090b;
-  --card: #f4f4f5;
-  --card-foreground: #09090b;
-  --popover: #f4f4f5;
-  --popover-foreground: #09090b;
-  --primary: #f97316;
-  --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #09090b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #e4e4e7;
-  --accent-foreground: #09090b;
-  --destructive: #ef4444;
-  --border: #e4e4e7;
-  --input: #f4f4f5;
-  --ring: #f97316;
+  --border-subtle:  #e2ddd4;
+  --border-default: #d0c9bd;
+  --border-strong:  #b8b0a2;
+  --border-active:  #a0968a;
 
-  --radius: 0.5rem;
+  --text-primary:   #1a1814;
+  --text-secondary: #6b6560;
+  --text-tertiary:  #9a948c;
+  --text-disabled:  #b8b0a2;
+
+  --accent-primary:       #a07040;
+  --accent-primary-hover: #b8856a;
+  --accent-primary-dim:   #d4b896;
+  --accent-gold:          #a07040;
+  --accent-amber:         #8a6030;
+  --accent-warm:          #b8856a;
+
+  --accent-secondary: #4a6a9e;
+  --accent-success:   #3a7e4f;
+  --accent-warning:   #a07040;
+  --accent-danger:    #a73030;
+  --accent-info:      #4a6a9e;
+
+  --timeline-video:    #6a5e9e;
+  --timeline-audio:    #3a7e7e;
+  --timeline-subtitle: #a07040;
+
+  --background:           #faf8f4;
+  --foreground:           #1a1814;
+  --card:                 #f0ede6;
+  --card-foreground:      #1a1814;
+  --popover:              #ffffff;
+  --popover-foreground:   #1a1814;
+  --primary:              #a07040;
+  --primary-foreground:   #ffffff;
+  --secondary:            #e8e4dc;
+  --secondary-foreground: #1a1814;
+  --muted:                #e8e4dc;
+  --muted-foreground:     #6b6560;
+  --accent:               #e2ddd4;
+  --accent-foreground:    #1a1814;
+  --destructive:          #a73030;
+  --border:               #d0c9bd;
+  --input:                #e8e4dc;
+  --ring:                 #a07040;
+
+  --glow-amber:    0 0 20px rgba(160, 112, 64, 0.15), 0 0 40px rgba(160, 112, 64, 0.05);
+  --glow-amber-sm: 0 0 8px rgba(160, 112, 64, 0.1);
+  --glow-blue:     0 0 20px rgba(74, 106, 158, 0.15);
+  --glass-bg:      rgba(250, 248, 244, 0.9);
+  --glass-border:  rgba(0, 0, 0, 0.06);
+
+  --gradient-light-leak: linear-gradient(
+    90deg,
+    rgba(160, 112, 64, 0) 0%,
+    rgba(160, 112, 64, 0.04) 15%,
+    rgba(184, 133, 106, 0.08) 40%,
+    rgba(138, 96, 48, 0.06) 65%,
+    rgba(138, 96, 48, 0.03) 85%,
+    rgba(138, 96, 48, 0) 100%
+  );
+
+  --gradient-hero: linear-gradient(
+    135deg,
+    #a07040 0%,
+    #b8856a 35%,
+    #8a6030 70%,
+    #6b4820 100%
+  );
+
+  --gradient-surface: linear-gradient(
+    180deg,
+    #f0ede6 0%,
+    #faf8f4 100%
+  );
 
   color-scheme: light;
 }
 
-/* ─── Dark theme (legacy support) ──────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   Dark theme class (for explicit toggling)
+   ═══════════════════════════════════════════════════════════ */
 .dark {
   color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Global animations
+   ═══════════════════════════════════════════════════════════ */
+@keyframes storyfab-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes storyfab-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes storyfab-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes storyfab-pulse-glow {
+  0%, 100% { box-shadow: var(--glow-amber-sm); }
+  50%      { box-shadow: var(--glow-amber); }
+}
+
+@keyframes storyfab-light-leak {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Selection color — amber tinted */
+::selection {
+  background: rgba(200, 149, 108, 0.3);
+  color: var(--text-primary);
+}
+
+/* Scrollbar styling — thin, warm-tinted */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
 }

@@ -1,26 +1,26 @@
 /**
  * ScriptGenerate.module.less
  * AI Cinema Studio Design System
- * Deep Charcoal #0C0D14 | Amber #FF9F43 | Electric Cyan #00D4FF
+ * Deep Charcoal #08080a | Amber #c8956c | Electric Cyan #5a9e9e
  */
 
 // ============================================================================
 // Variables
 // ============================================================================
 
-@bg-deep: #0C0D14;
-@amber: #FF9F43;
-@cyan: #00D4FF;
-@text-primary: #FFFFFF;
-@text-secondary: rgba(255, 255, 255, 0.65);
-@text-muted: rgba(255, 255, 255, 0.38);
+@bg-deep: #08080a;
+@amber: #c8956c;
+@cyan: #5a9e9e;
+@text-primary: #f0eee8;
+@text-secondary: rgba(240, 238, 232, 0.65);
+@text-muted: rgba(240, 238, 232, 0.38);
 
-@glass-bg: rgba(20, 21, 32, 0.8);
-@glass-border: rgba(255, 255, 255, 0.07);
-@glass-highlight: rgba(255, 255, 255, 0.1);
+@glass-bg: rgba(17, 17, 20, 0.85);
+@glass-border: rgba(255, 255, 255, 0.06);
+@glass-highlight: rgba(255, 255, 255, 0.08);
 
-@amber-glow: rgba(255, 159, 67, 0.3);
-@cyan-glow: rgba(0, 212, 255, 0.25);
+@amber-glow: rgba(200, 149, 108, 0.3);
+@cyan-glow: rgba(90, 158, 158, 0.25);
 
 @radius-lg: 16px;
 @radius-md: 12px;
@@ -57,8 +57,8 @@
 
 @keyframes cyanPulse {
   0% { box-shadow: 0 0 0 0 @cyan-glow; }
-  50% { box-shadow: 0 0 0 6px rgba(0, 212, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+  50% { box-shadow: 0 0 0 6px rgba(90, 158, 158, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(90, 158, 158, 0); }
 }
 
 @keyframes shimmer {
@@ -115,8 +115,8 @@
   align-items: center;
   gap: 6px;
   padding: 5px 14px;
-  background: rgba(255, 159, 67, 0.12);
-  border: 1px solid rgba(255, 159, 67, 0.3);
+  background: rgba(200, 149, 108, 0.12);
+  border: 1px solid rgba(200, 149, 108, 0.3);
   border-radius: 20px;
   font-family: 'Figtree', sans-serif;
   font-size: 13px;
@@ -219,14 +219,14 @@
     position: absolute;
     inset: 0;
     border-radius: @radius-md;
-    background: radial-gradient(ellipse at top left, rgba(255, 159, 67, 0.06) 0%, transparent 60%);
+    background: radial-gradient(ellipse at top left, rgba(200, 149, 108, 0.06) 0%, transparent 60%);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   &:hover {
-    border-color: rgba(255, 159, 67, 0.2);
-    background: rgba(255, 159, 67, 0.03);
+    border-color: rgba(200, 149, 108, 0.2);
+    background: rgba(200, 149, 108, 0.03);
 
     &::before {
       opacity: 1;
@@ -235,7 +235,7 @@
 
   &.modeActive {
     border-color: @amber;
-    background: rgba(255, 159, 67, 0.07);
+    background: rgba(200, 149, 108, 0.07);
 
     &::before {
       opacity: 1;
@@ -258,7 +258,7 @@
   font-size: 20px;
   margin-top: 1px;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 5px rgba(255, 159, 67, 0.2));
+  filter: drop-shadow(0 0 5px rgba(200, 149, 108, 0.2));
 }
 
 .modeItemContent {
@@ -285,7 +285,7 @@
   font-family: 'Figtree', sans-serif;
   font-size: 10px;
   font-weight: 500;
-  color: #52c41a;
+  color: #5a9e6f;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
@@ -373,8 +373,8 @@
 
   &:focus {
     border-color: @amber;
-    background: rgba(255, 159, 67, 0.05);
-    box-shadow: 0 0 0 3px rgba(255, 159, 67, 0.1);
+    background: rgba(200, 149, 108, 0.05);
+    box-shadow: 0 0 0 3px rgba(200, 149, 108, 0.1);
   }
 }
 
@@ -416,8 +416,8 @@
 
 .featureTag {
   padding: 4px 10px;
-  background: rgba(255, 159, 67, 0.08);
-  border: 1px solid rgba(255, 159, 67, 0.15);
+  background: rgba(200, 149, 108, 0.08);
+  border: 1px solid rgba(200, 149, 108, 0.15);
   border-radius: 20px;
   font-family: 'Figtree', sans-serif;
   font-size: 11px;
@@ -429,7 +429,7 @@
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: @radius-sm;
-  border-left: 3px solid rgba(255, 159, 67, 0.3);
+  border-left: 3px solid rgba(200, 149, 108, 0.3);
 }
 
 .exampleLabel {
@@ -479,14 +479,14 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(0, 212, 255, 0.03) 100%);
+    background: linear-gradient(135deg, rgba(90, 158, 158, 0.08) 0%, rgba(90, 158, 158, 0.03) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   &:hover {
     border-color: @cyan;
-    box-shadow: 0 0 20px @cyan-glow, 0 0 40px rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 20px @cyan-glow, 0 0 40px rgba(90, 158, 158, 0.1);
     transform: translateY(-1px);
 
     &::before {
@@ -513,7 +513,7 @@
 .generateBtnSpinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(0, 212, 255, 0.3);
+  border: 2px solid rgba(90, 158, 158, 0.3);
   border-top-color: @cyan;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -620,7 +620,7 @@
   border-radius: 20px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
-  color: #52c41a;
+  color: #5a9e6f;
 }
 
 .regenBtn {
@@ -642,7 +642,7 @@
 
   &:hover {
     box-shadow: 0 0 16px @cyan-glow;
-    background: rgba(0, 212, 255, 0.05);
+    background: rgba(90, 158, 158, 0.05);
   }
 
   &:disabled {
@@ -693,7 +693,7 @@
 .progressFill {
   height: 100%;
   border-radius: 2px;
-  background: linear-gradient(90deg, @cyan, rgba(0, 212, 255, 0.5));
+  background: linear-gradient(90deg, @cyan, rgba(90, 158, 158, 0.5));
   background-size: 200% 100%;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   animation: shimmer 2s linear infinite;
@@ -802,8 +802,8 @@
 
   &:focus {
     border-color: @cyan;
-    background: rgba(0, 212, 255, 0.03);
-    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.08);
+    background: rgba(90, 158, 158, 0.03);
+    box-shadow: 0 0 0 3px rgba(90, 158, 158, 0.08);
   }
 
   &:disabled {
@@ -909,8 +909,8 @@
   margin-top: 1px;
 }
 
-.alertSuccess .alignmentIcon { color: #52c41a; }
-.alertWarning .alignmentIcon { color: #faad14; }
+.alertSuccess .alignmentIcon { color: #5a9e6f; }
+.alertWarning .alignmentIcon { color: #c49660; }
 
 .alignmentTitle {
   font-weight: 600;
@@ -1023,8 +1023,8 @@
   width: 100%;
   height: 34px;
   border-radius: 8px;
-  background: rgba(255, 159, 67, 0.08);
-  border: 1px solid rgba(255, 159, 67, 0.2);
+  background: rgba(200, 149, 108, 0.08);
+  border: 1px solid rgba(200, 149, 108, 0.2);
   font-family: 'Figtree', sans-serif;
   font-size: 12px;
   font-weight: 500;
@@ -1038,8 +1038,8 @@
   }
 
   &:hover {
-    background: rgba(255, 159, 67, 0.12);
-    border-color: rgba(255, 159, 67, 0.35);
+    background: rgba(200, 149, 108, 0.12);
+    border-color: rgba(200, 149, 108, 0.35);
     box-shadow: 0 0 12px @amber-glow;
   }
 }

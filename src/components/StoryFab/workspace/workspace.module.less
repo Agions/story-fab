@@ -3,9 +3,9 @@
  * AI Cinema Studio 设计系统
  *
  * 色彩规范：
- * - 深炭底：#0C0D14（背景）
- * - 琥珀光：#FF9F43（主强调/CTA）
- * - 电青色：#00D4FF（AI 状态/信息）
+ * - 深炭底：#08080a（背景）
+ * - 琥珀光：#c8956c（主强调/CTA）
+ * - 电青色：#5a9e9e（AI 状态/信息）
  * - 玻璃拟态：rgba(20, 21, 32, 0.8) + backdrop-filter: blur(20px)
  *
  * 字体：Outfit（标题）+ Figtree（正文）
@@ -15,19 +15,19 @@
 // 变量
 // ============================================================================
 
-@bg-deep: #0C0D14;
-@amber: #FF9F43;
-@cyan: #00D4FF;
-@text-primary: #FFFFFF;
-@text-secondary: rgba(255, 255, 255, 0.65);
-@text-muted: rgba(255, 255, 255, 0.4);
+@bg-deep: #08080a;
+@amber: #c8956c;
+@cyan: #5a9e9e;
+@text-primary: #f0eee8;
+@text-secondary: rgba(240, 238, 232, 0.65);
+@text-muted: rgba(240, 238, 232, 0.4);
 
 @glass-bg: rgba(20, 21, 32, 0.8);
 @glass-border: rgba(255, 255, 255, 0.08);
 @glass-highlight: rgba(255, 255, 255, 0.12);
 
-@amber-glow: rgba(255, 159, 67, 0.3);
-@cyan-glow: rgba(0, 212, 255, 0.4);
+@amber-glow: rgba(200, 149, 108, 0.3);
+@cyan-glow: rgba(90, 158, 158, 0.4);
 
 @radius-lg: 16px;
 @radius-md: 10px;
@@ -44,11 +44,11 @@
     opacity: 1;
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+    box-shadow: 0 0 0 8px rgba(90, 158, 158, 0);
     opacity: 0.85;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
+    box-shadow: 0 0 0 0 rgba(90, 158, 158, 0);
     opacity: 1;
   }
 }

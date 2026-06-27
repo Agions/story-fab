@@ -27,7 +27,7 @@ export const ClipRenderer = memo<ClipRendererProps>(({
   const msPerPixel = 1000 / zoom;
   const clipLeft = clip.startMs / msPerPixel - scrollX;
   const clipWidth = Math.max(4, (clip.endMs - clip.startMs) / msPerPixel);
-  const color = clip.color || TRACK_COLORS[track.type] || '#1890ff';
+  const color = clip.color || TRACK_COLORS[track.type] || '#8b7ec8';
   const isSelected = selectedClipId === clip.id;
 
   return (

@@ -75,7 +75,7 @@ export const TrackHeader = memo<TrackHeaderProps>(({
       className={styles.trackHeader}
       style={{
         height: track.height,
-        borderLeftColor: TRACK_COLORS[track.type] || '#999',
+        borderLeftColor: TRACK_COLORS[track.type] || '#6b6760',
       }}
     >
       <div className={styles.trackName}>{track.name}</div>

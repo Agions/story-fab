@@ -8,8 +8,8 @@ export const SNAP_THRESHOLD_PX = 8;
 
 // 轨道类型颜色映射
 export const TRACK_COLORS: Record<string, string> = {
-  video: '#1890ff',
-  audio: '#52c41a',
-  subtitle: '#fa8c16',
-  effect: '#722ed1',
+  video: '#8b7ec8',
+  audio: '#5a9e9e',
+  subtitle: '#c49660',
+  effect: '#c77080',
 };

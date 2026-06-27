@@ -16,11 +16,41 @@ function TooltipProvider({
   )
 }
 
+/**
+ * Tooltip component supporting two patterns:
+ *
+ * 1. Simple API (with `title` prop):
+ *    <Tooltip title="Save"><button>Click</button></Tooltip>
+ *
+ * 2. Compound API (with TooltipTrigger + TooltipContent):
+ *    <Tooltip>
+ *      <TooltipTrigger render={<button />} />
+ *      <TooltipContent>Save</TooltipContent>
+ *    </Tooltip>
+ */
 function Tooltip({ title, children, ...props }: TooltipPrimitive.Root.Props & { title?: React.ReactNode }) {
+  const childArray = React.Children.toArray(children as React.ReactNode)
+  const hasCompoundTrigger = childArray.some(
+    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'TooltipTrigger'
+  )
+  const hasCompoundContent = childArray.some(
+    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'TooltipContent'
+  )
+
+  // Compound API: children contain TooltipTrigger and/or TooltipContent
+  if (hasCompoundTrigger || hasCompoundContent) {
+    return (
+      <TooltipPrimitive.Root data-slot="tooltip" {...props}>
+        {children as React.ReactNode}
+      </TooltipPrimitive.Root>
+    )
+  }
+
+  // Simple API: render internal trigger + popup from `title`
   return (
     <TooltipPrimitive.Root data-slot="tooltip" {...props}>
       <TooltipPrimitive.Trigger render={<span />}>
-        {String(children)}
+        {children as React.ReactNode}
       </TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>
         <TooltipPrimitive.Positioner sideOffset={4}>
@@ -33,9 +63,12 @@ function Tooltip({ title, children, ...props }: TooltipPrimitive.Root.Props & { 
   )
 }
 
+Tooltip.displayName = 'Tooltip'
+
 function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
 }
+TooltipTrigger.displayName = 'TooltipTrigger'
 
 function TooltipContent({
   className,
@@ -73,5 +106,6 @@ function TooltipContent({
     </TooltipPrimitive.Portal>
   )
 }
+TooltipContent.displayName = 'TooltipContent'
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }

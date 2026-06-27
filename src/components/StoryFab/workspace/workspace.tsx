@@ -2,9 +2,9 @@
  * * Workspace - AI 视频剪辑工作区主容器组件
  *
  * 设计系统：AI Cinema Studio
- * - 深炭底：#0C0D14
- * - 琥珀光：#FF9F43（主强调/CTA）
- * - 电青色：#00D4FF（AI 状态/信息）
+ * - 深炭底：#08080a
+ * - 琥珀光：#c8956c（主强调/CTA）
+ * - 电青色：#5a9e9e（AI 状态/信息）
  * - 字体：Outfit（标题）+ Figtree（正文）
  * - 玻璃拟态：rgba(20, 21, 32, 0.8) + backdrop-filter: blur(20px)
  */

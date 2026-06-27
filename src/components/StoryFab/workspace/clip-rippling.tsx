@@ -8,7 +8,7 @@
  *   4. 多格式导出 → 9:16 / 1:1 / 16:9（新增）
  *
  * @design-system AI Cinema Studio
- *   bg-base: #0C0D14 | accent: #FF9F43 | cyan: #00D4FF
+ *   bg-base: #08080a | accent: #c8956c | cyan: #5a9e9e
  */
 
 import React, { useCallback, memo, useMemo } from 'react';
@@ -182,8 +182,8 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
   }, [results, selectedClips, selectedFormats, videoPath, onNext, setExporting, setExportedPaths]);
 
   const scoreColor = (score: number) => {
-    if (score >= SCORE_THRESHOLD_HIGH) return '#52c41a';
-    if (score >= SCORE_THRESHOLD_MEDIUM) return '#faad14';
+    if (score >= SCORE_THRESHOLD_HIGH) return '#5a9e6f';
+    if (score >= SCORE_THRESHOLD_MEDIUM) return '#c49660';
     return '#ff4d4f';
   };
 
@@ -364,7 +364,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
           {/* 已导出文件 */}
           {exportedPaths.length > 0 && (
             <div className={styles.exportedSection}>
-              <CheckCircle style={{ color: '#52c41a' }} />
+              <CheckCircle style={{ color: '#5a9e6f' }} />
               <span style={{ marginLeft: 8 }}>已导出 {exportedPaths.length} 个文件</span>
             </div>
           )}

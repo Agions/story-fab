@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { useTheme } from '@/context/theme-context';
+
 
 export interface ShortcutOverlayProps {
   open: boolean;
@@ -104,8 +104,6 @@ function KbdBadge({ children, style: kbdStyle }: { children: React.ReactNode; st
 
 export const ShortcutOverlay = React.memo<ShortcutOverlayProps>(
   ({ open, onOpenChange }) => {
-    const { isDarkMode } = useTheme();
-
     // 全局 ? 键监听
     const handleKeyDown = useCallback(
       (e: KeyboardEvent) => {
@@ -133,23 +131,13 @@ export const ShortcutOverlay = React.memo<ShortcutOverlayProps>(
       return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
 
-    const borderColor = isDarkMode
-      ? 'rgba(255,255,255,0.08)'
-      : 'rgba(0,0,0,0.08)';
-    const headerBg = isDarkMode
-      ? 'rgba(255,255,255,0.04)'
-      : 'rgba(0,0,0,0.02)';
-    const rowHover = isDarkMode
-      ? 'rgba(255,255,255,0.04)'
-      : 'rgba(0,0,0,0.03)';
-    const mutedColor = isDarkMode ? '#8a8a96' : '#71717a';
-    const primaryColor = isDarkMode ? '#f0f0f2' : '#09090b';
-    const kbdBg = isDarkMode
-      ? 'rgba(255,255,255,0.08)'
-      : 'rgba(0,0,0,0.06)';
-    const kbdBorder = isDarkMode
-      ? 'rgba(255,255,255,0.12)'
-      : 'rgba(0,0,0,0.12)';
+    const borderColor = 'var(--border-subtle)';
+    const headerBg = 'var(--bg-hover)';
+    const rowHover = 'var(--bg-hover)';
+    const mutedColor = 'var(--text-tertiary)';
+    const primaryColor = 'var(--text-primary)';
+    const kbdBg = 'var(--bg-hover)';
+    const kbdBorder = 'var(--border-default)';
 
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -157,7 +145,7 @@ export const ShortcutOverlay = React.memo<ShortcutOverlayProps>(
           showCloseButton
           className="max-w-lg w-full p-0 overflow-hidden"
           style={{
-            backgroundColor: isDarkMode ? '#141418' : '#ffffff',
+            backgroundColor: 'var(--bg-elevated)',
             border: `1px solid ${borderColor}`,
           }}
         >

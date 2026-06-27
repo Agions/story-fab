@@ -1,102 +1,95 @@
 /**
- * story-fab 统一色彩系统 - TypeScript
+ * StoryFab — Cinematic Darkroom Color System (TypeScript)
  *
- * 基于 globals.css OKLCH 语义化分层（设计系统入口）
+ * A warm, film-editing-suite palette. Deep charcoal bases with amber/gold
+ * accents that evoke film projector light. Every surface has a subtle warm
+ * undertone — this is NOT cold tech-dark.
  *
- * 使用方式：
- *   import { colors } from '@/theme';
- *
- * 架构说明：
- * - globals.css :root {} — 运行时 CSS 入口（main.tsx 已导入）
- * - colors.ts（TypeScript）— OKLCH 原始值
- * - variables.less — 被 mixins.less 引用，编译时使用
- * - design-system.css — 已删除（从未作为 CSS 加载）
- * - _film-variables.less — 已删除（从未被 @import）
+ * Architecture:
+ * - globals.css :root {} — runtime CSS entry (design system source of truth)
+ * - colors.ts (this file) — programmatic color values for JS/TS usage
+ * - tailwind.config.ts — Tailwind utility classes
+ * - variables.less — Less compile-time variables
  */
-
-// =============================================
-// 🎨 色彩 Token（OKLCH 语义化分层）
-// 与 globals.css :root {} 保持数值一致（OKLCH + hex 双重定义）
-// =============================================
 
 export const colors = {
-  // --- 主色：琥珀色（电影胶片感）---
-  primary: 'oklch(65% 0.18 70)',
-  primaryHover: 'oklch(72% 0.18 70)',
-  primaryActive: 'oklch(58% 0.18 70)',
+  /* ═══ Primary: Amber/Gold Cinema ═══ */
+  primary:       '#c8956c',
+  primaryHover:  '#d4a574',
+  primaryActive: '#a07040',
+  primaryDim:    '#8a6848',
 
-  // --- 功能色 ---
-  success: 'oklch(65% 0.20 145)',
-  successBg: 'oklch(65% 0.20 145 / 0.12)',
-  warning: 'oklch(75% 0.16 85)',
-  warningBg: 'oklch(75% 0.16 85 / 0.12)',
-  error: 'oklch(60% 0.22 25)',
-  errorBg: 'oklch(60% 0.22 25 / 0.12)',
-  info: 'oklch(70% 0.14 200)',
+  gold:  '#d4a574',
+  amber: '#c49660',
+  warm:  '#b8856a',
 
-  // --- 科技霓虹色（StoryFab 特色保留）---
-  neonBlue: '#00d2ff',
-  neonPurple: '#a855f7',
-  neonPink: '#ec4899',
-  neonGreen: '#10b981',
-  neonOrange: '#f97316',
-  accentCyan: '#06b6d4',
-  accentPink: '#f43f5e',
-  accentBlue: '#3b82f6',
+  /* ═══ Functional Colors ═══ */
+  success:    '#5a9e6f',
+  successBg:  'rgba(90, 158, 111, 0.12)',
+  warning:    '#c49660',
+  warningBg:  'rgba(196, 150, 96, 0.12)',
+  error:      '#c75050',
+  errorBg:    'rgba(199, 80, 80, 0.12)',
+  info:       '#6b8cce',
+  infoBg:     'rgba(107, 140, 206, 0.12)',
 
-  // --- 文字色（暗黑背景）---
-  textPrimary: 'oklch(95% 0.01 70)',
-  textSecondary: 'oklch(70% 0.02 70)',
-  textTertiary: 'oklch(55% 0.02 70)',
-  textDisabled: 'oklch(45% 0.01 70)',
-  textInverse: 'oklch(15% 0.02 70)',
+  /* ═══ Secondary Accent Colors ═══ */
+  accentBlue:   '#6b8cce',
+  accentPurple: '#8b7ec8',
+  accentCyan:   '#5a9e9e',
+  accentRose:   '#c77080',
 
-  // --- 背景色（科技暗黑层级）---
-  bgBase: 'oklch(10% 0.02 70)',
-  bgPrimary: 'oklch(8% 0.02 70)',
-  bgSecondary: 'oklch(14% 0.02 70)',
-  bgTertiary: 'oklch(18% 0.02 70)',
-  bgElevated: 'oklch(22% 0.02 70)',
-  bgHover: 'oklch(26% 0.02 70)',
-  bgOverlay: 'oklch(5% 0.02 70 / 0.85)',
+  /* ═══ Text Colors ═══ */
+  textPrimary:   '#f0eee8',
+  textSecondary: '#9a9690',
+  textTertiary:  '#6b6760',
+  textDisabled:  '#4a4742',
+  textInverse:   '#1a1814',
 
-  // --- 边框 ---
-  borderDefault: 'oklch(25% 0.02 70)',
-  borderSecondary: 'oklch(30% 0.02 70)',
-  borderActive: 'oklch(40% 0.02 70)',
-  borderFocus: 'oklch(65% 0.18 70)',
+  /* ═══ Background Colors (Warm Dark Layering) ═══ */
+  bgBase:     '#08080a',
+  bgPrimary:  '#0c0c0e',
+  bgSecondary:'#111114',
+  bgTertiary: '#161619',
+  bgElevated: '#1a1a1e',
+  bgHover:    '#1f1f24',
+  bgActive:   '#26262c',
+  bgOverlay:  'rgba(8, 8, 10, 0.85)',
 
-  // --- 渐变 ---
-  gradientPrimary: 'linear-gradient(135deg, oklch(65% 0.18 70) 0%, oklch(55% 0.22 280) 100%)',
-  gradientHero: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a855f7 100%)',
-  gradientCyber: 'linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%)',
-  gradientNeonPink: 'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)',
-  gradientSurface: 'linear-gradient(180deg, oklch(18% 0.02 70) 0%, oklch(14% 0.02 70) 100%)',
+  /* ═══ Borders ═══ */
+  borderSubtle:  '#1e1e23',
+  borderDefault: '#2a2a31',
+  borderStrong:  '#38383f',
+  borderActive:  '#4a4a52',
 
-  // --- 发光效果 ---
-  glowPrimary: '0 0 20px oklch(65% 0.18 70 / 0.45)',
-  glowCyan: '0 0 20px oklch(70% 0.14 200 / 0.4)',
-  glowPink: '0 0 20px oklch(65% 0.22 25 / 0.4)',
-  glowPurple: '0 0 20px oklch(60% 0.22 280 / 0.4)',
-  glowNeonBlue: '0 0 10px rgba(0, 210, 255, 0.3), 0 0 20px rgba(0, 210, 255, 0.2)',
-  glowNeonPurple: '0 0 10px rgba(168, 85, 247, 0.3), 0 0 20px rgba(168, 85, 247, 0.2)',
-  glowNeonPink: '0 0 10px rgba(236, 72, 153, 0.3), 0 0 20px rgba(236, 72, 153, 0.2)',
+  /* ═══ Timeline Track Colors ═══ */
+  timelineVideo:    '#8b7ec8',
+  timelineAudio:    '#5a9e9e',
+  timelineSubtitle: '#c49660',
 
-  // --- 玻璃拟态 ---
-  glassBg: 'oklch(14% 0.02 70 / 0.8)',
-  glassBorder: 'oklch(100% 0 0 / 0.1)',
-  glassBlur: 'blur(10px)',
+  /* ═══ Gradients ═══ */
+  gradientHero: `linear-gradient(135deg, #c8956c 0%, #d4a574 35%, #b8856a 70%, #8a6848 100%)`,
+  gradientSurface: `linear-gradient(180deg, #111114 0%, #0c0c0e 100%)`,
+  gradientLightLeak: `linear-gradient(90deg,
+    rgba(200,149,108,0) 0%,
+    rgba(200,149,108,0.08) 15%,
+    rgba(212,165,116,0.15) 40%,
+    rgba(196,150,96,0.12) 65%,
+    rgba(184,133,106,0.06) 85%,
+    rgba(184,133,106,0) 100%
+  )`,
+  gradientAmber: `linear-gradient(135deg, #c8956c 0%, #d4a574 100%)`,
+  gradientGold:  `linear-gradient(135deg, #d4a574 0%, #c49660 100%)`,
+
+  /* ═══ Glow Effects ═══ */
+  glowAmber:   '0 0 20px rgba(200, 149, 108, 0.3), 0 0 40px rgba(200, 149, 108, 0.1)',
+  glowAmberSm: '0 0 8px rgba(200, 149, 108, 0.2)',
+  glowBlue:    '0 0 20px rgba(107, 140, 206, 0.25)',
+  glowPurple:  '0 0 20px rgba(139, 126, 200, 0.25)',
+  glowSuccess: '0 0 12px rgba(90, 158, 111, 0.3)',
+
+  /* ═══ Glass Morphism ═══ */
+  glassBg:     'rgba(17, 17, 20, 0.85)',
+  glassBorder: 'rgba(255, 255, 255, 0.06)',
+  glassBlur:   'blur(10px)',
 } as const;
-
-// =============================================
-// 工具函数
-// =============================================
-
-/**
- * 将 OKLCH 颜色转换为 HEX（用于某些需要 hex 的场景）
- * 注意：这是近似转换，OKLCH 到 RGB/HEX 不是无损的
- */
-/**
- * 获取 CSS 变量引用
- */
-// 重新导出 design-system.css 中的主 CSS 变量名（供 TypeScript 使用）

@@ -22,88 +22,88 @@
 // 科技暗黑背景色系统
 // ✅ 统一使用 OKLCH 语义化分层（与 design-system.css 一致）
 // =============================================
-@bg-primary:   #0a0a0f;
-@bg-secondary: #12121a;
-@bg-tertiary:  #1a1a24;
-@bg-elevated:  #22222e;
-@bg-hover:     #2a2a3a;
+@bg-primary:   #0c0c0e;
+@bg-secondary: #111114;
+@bg-tertiary:  #161619;
+@bg-elevated:  #1a1a1e;
+@bg-hover:     #1f1f24;
 
 // =============================================
 // 边框
 // =============================================
-@border-primary:   #2a2a3a;
-@border-secondary: #3a3a4a;
-@border-active:    #4a4a5a;
+@border-primary:   #1e1e23;
+@border-secondary: #2a2a31;
+@border-active:    #4a4a52;
 
 // =============================================
 // 主色调 (琥珀色 — OKLCH 统一系统)
 // ✅ 与 design-system.css --color-primary 统一
 // =============================================
-@primary-color:   #d4a574;
-@primary-hover:   #e8c9a8;
-@primary-active:  #c49660;
+@primary-color:   #c8956c;
+@primary-hover:   #d4a574;
+@primary-active:  #a07040;
 
 // =============================================
 // 渐变色
 // ✅ 统一使用琥珀色系
 // =============================================
-@gradient-primary:   linear-gradient(135deg, #d4a574 0%, #a855f7 100%);
-@gradient-hero:      linear-gradient(135deg, #d4a574 0%, #764ba2 50%, #a855f7 100%);
-@gradient-cyber:     linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-@gradient-neon-pink: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+@gradient-primary:   linear-gradient(135deg, #c8956c 0%, #d4a574 100%);
+@gradient-hero:      linear-gradient(135deg, #c8956c 0%, #d4a574 35%, #b8856a 70%, #8a6848 100%);
+@gradient-cyber:     linear-gradient(135deg, #6b8cce 0%, #5a9e9e 100%);
+@gradient-neon-pink: linear-gradient(135deg, #c77080 0%, #c75050 100%);
 
 // =============================================
 // 辅助色
 // =============================================
-@accent-cyan: #06b6d4;
-@accent-pink: #f43f5e;
-@accent-blue: #3b82f6;
+@accent-cyan: #5a9e9e;
+@accent-pink: #c77080;
+@accent-blue: #6b8cce;
 
 // =============================================
 // 功能色
 // =============================================
-@success-color: #10b981;
-@success-bg:    rgba(16, 185, 129, 0.15);
-@warning-color: #f59e0b;
-@warning-bg:    rgba(245, 158, 11, 0.15);
-@error-color:   #ef4444;
-@error-bg:      rgba(239, 68, 68, 0.15);
-@info-color:    #3b82f6;
-@info-bg:       rgba(59, 130, 246, 0.15);
+@success-color: #5a9e6f;
+@success-bg:    rgba(90, 158, 111, 0.12);
+@warning-color: #c49660;
+@warning-bg:    rgba(196, 150, 96, 0.12);
+@error-color:   #c75050;
+@error-bg:      rgba(199, 80, 80, 0.12);
+@info-color:    #6b8cce;
+@info-bg:       rgba(107, 140, 206, 0.12);
 
 // =============================================
 // 霓虹发光色
 // =============================================
-@neon-blue:    #00d2ff;
-@neon-purple:  #a855f7;
-@neon-pink:    #ec4899;
-@neon-green:   #10b981;
-@neon-orange:  #f97316;
+@neon-blue:    #6b8cce;
+@neon-purple:  #8b7ec8;
+@neon-pink:    #c77080;
+@neon-green:   #5a9e6f;
+@neon-orange:  #c8956c;
 
 // =============================================
 // 发光效果（琥珀色）
 // ✅ 统一使用琥珀色发光
 // =============================================
-@glow-primary:   0 0 20px rgba(212, 165, 116, 0.5);
-@glow-cyan:      0 0 20px rgba(6, 182, 212, 0.5);
-@glow-pink:      0 0 20px rgba(244, 63, 94, 0.5);
-@glow-purple:    0 0 20px rgba(168, 85, 247, 0.5);
+@glow-primary:   0 0 20px rgba(200, 149, 108, 0.5);
+@glow-cyan:      0 0 20px rgba(90, 158, 158, 0.5);
+@glow-pink:      0 0 20px rgba(199, 112, 128, 0.5);
+@glow-purple:    0 0 20px rgba(139, 126, 200, 0.5);
 
 // Aliases for mixin compatibility
 @primary-glow: @glow-primary;
-@primary-dark: #c49660;
-@ink-black: #0d0d0f;
+@primary-dark: #a07040;
+@ink-black: #08080a;
 @font-body: @font-family;
 @font-mono: @font-family-code;
 
 // =============================================
 // 文字颜色
 // =============================================
-@text-primary:   #f1f5f9;
-@text-secondary: #94a3b8;
-@text-tertiary:  #64748b;
-@text-disabled:  #475569;
-@text-inverse:   #0a0a0f;
+@text-primary:   #f0eee8;
+@text-secondary: #9a9690;
+@text-tertiary:  #6b6760;
+@text-disabled:  #4a4742;
+@text-inverse:   #1a1814;
 
 // =============================================
 // 字体系统
@@ -159,16 +159,16 @@
 @shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3);
 @shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5), 0 8px 10px rgba(0, 0, 0, 0.3);
 
-@shadow-neon-blue:   0 0 10px rgba(0, 210, 255, 0.3), 0 0 20px rgba(0, 210, 255, 0.2);
-@shadow-neon-purple: 0 0 10px rgba(168, 85, 247, 0.3), 0 0 20px rgba(168, 85, 247, 0.2);
-@shadow-neon-pink:   0 0 10px rgba(236, 72, 153, 0.3), 0 0 20px rgba(236, 72, 153, 0.2);
-@shadow-glow-primary: 0 0 15px rgba(212, 165, 116, 0.4), 0 0 30px rgba(212, 165, 116, 0.2);
+@shadow-neon-blue:   0 0 10px rgba(107, 140, 206, 0.3), 0 0 20px rgba(107, 140, 206, 0.2);
+@shadow-neon-purple: 0 0 10px rgba(139, 126, 200, 0.3), 0 0 20px rgba(139, 126, 200, 0.2);
+@shadow-neon-pink:   0 0 10px rgba(199, 112, 128, 0.3), 0 0 20px rgba(199, 112, 128, 0.2);
+@shadow-glow-primary: 0 0 15px rgba(200, 149, 108, 0.4), 0 0 30px rgba(200, 149, 108, 0.2);
 
 // =============================================
 // 玻璃拟态
 // =============================================
-@glass-bg:     rgba(18, 18, 26, 0.8);
-@glass-border: rgba(255, 255, 255, 0.1);
+@glass-bg:     rgba(17, 17, 20, 0.85);
+@glass-border: rgba(255, 255, 255, 0.06);
 @glass-blur:  blur(10px);
 
 // =============================================
@@ -195,7 +195,7 @@
 // 侧边栏
 @sidebar-bg:          @bg-secondary;
 @sidebar-hover:       @bg-hover;
-@sidebar-active:      rgba(212, 165, 116, 0.15);  // 琥珀色透明
+@sidebar-active:      rgba(200, 149, 108, 0.15);  // 琥珀色透明
 @sidebar-text:        @text-secondary;
 @sidebar-text-active: @primary-color;              // 琥珀色
 
@@ -234,7 +234,7 @@
 // Dashboard 视觉系统变量（深炭底 + 琥珀光 + 电青色）
 // ⚠️ 迁移至 CSS: 使用 CSS custom properties
 // =============================================
-@dashboard-bg-base:      #0C0D14;
+@dashboard-bg-base:      #08080a;
 @dashboard-bg-surface:  #141520;
 @dashboard-bg-elevated:  #1C1D2E;
 @dashboard-bg-overlay:   #24263A;
@@ -243,16 +243,16 @@
 @dashboard-border-default: rgba(255, 255, 255, 0.10);
 @dashboard-border-strong:  rgba(255, 255, 255, 0.18);
 
-@dashboard-accent:        #FF9F43;
-@dashboard-accent-light: #FFBE76;
-@dashboard-accent-dark:   #E8891C;
-@dashboard-accent-glow:   rgba(255, 159, 67, 0.25);
-@dashboard-accent-glow-strong: rgba(255, 159, 67, 0.40);
+@dashboard-accent:        #c8956c;
+@dashboard-accent-light: #d4a574;
+@dashboard-accent-dark:   #a07040;
+@dashboard-accent-glow:   rgba(200, 149, 108, 0.25);
+@dashboard-accent-glow-strong: rgba(200, 149, 108, 0.40);
 
-@dashboard-cyan:        #00D4FF;
-@dashboard-cyan-light: #66E3FF;
-@dashboard-cyan-dark:   #00A8CC;
-@dashboard-cyan-glow:   rgba(0, 212, 255, 0.20);
+@dashboard-cyan:        #5a9e9e;
+@dashboard-cyan-light: #7ab8b8;
+@dashboard-cyan-dark:   #3a7e7e;
+@dashboard-cyan-glow:   rgba(90, 158, 158, 0.20);
 
 @dashboard-text-primary:   #F0F0F5;
 @dashboard-text-secondary: #8888A0;
@@ -275,7 +275,7 @@
 // =============================================
 @film-amber:        #d4a574;
 @film-amber-light:  #e8c9a8;
-@film-amber-glow:   rgba(212, 165, 116, 0.35);
+@film-amber-glow:   rgba(200, 149, 108, 0.35);
 
 @ink-black:    #0d0d0f;
 @ink-deep:     #141418;

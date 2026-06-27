@@ -1,6 +1,12 @@
 import type { Config } from 'tailwindcss'
 import tailwindcss from '@tailwindcss/vite'
 
+/**
+ * StoryFab — Cinematic Darkroom Tailwind Config
+ *
+ * Warm charcoal palette with amber/gold cinema accents.
+ * All values also defined as CSS custom properties in globals.css.
+ */
 export default {
   content: [
     './index.html',
@@ -9,47 +15,69 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Professional dark tool aesthetic — Phase 3 redesign
-        'bg-primary': '#09090B',      // zinc-950 — deepest background
-        'bg-secondary': '#18181B',     // zinc-900 — panel surface
-        'bg-tertiary': '#1C1C1E',     // zinc-900/80 — elevated surface
-        'bg-hover': '#27272A',        // zinc-800 — hover state
-        'border-subtle': '#27272A',    // zinc-800 — default border
-        'border-default': '#3F3F46',  // zinc-700 — emphasis border
-        'text-primary': '#fafafa',    // zinc-50 — primary text
-        'text-secondary': '#a1a1aa',  // zinc-400 — secondary text
-        'text-disabled': '#52525b',   // zinc-600 — disabled/muted
-        'accent-primary': '#f97316',  // orange-500 — primary brand
-        'accent-primary-hover': '#fb923c', // orange-400
-        'accent-secondary': '#3b82f6', // blue-500
-        'accent-success': '#22c55e', // green-500
-        'accent-warning': '#eab308', // yellow-500
-        'accent-danger': '#ef4444',  // red-500
-        'timeline-video': '#8b5cf6', // violet-500
-        'timeline-audio': '#06b6d4', // cyan-500
-        'timeline-subtitle': '#f59e0b', // amber-500
-        // Base-ui / shadcn design tokens (required by components)
-        'foreground': '#fafafa',
-        'muted': '#27272A',
-        'muted-foreground': '#71717a',
-        'popover': '#18181B',
-        'popover-foreground': '#fafafa',
-        'accent': '#27272A',
-        'accent-foreground': '#fafafa',
-        'primary': '#f97316',
-        'primary-foreground': '#ffffff',
-        'secondary': '#27272A',
-        'secondary-foreground': '#fafafa',
-        'destructive': '#ef4444',
+        /* ── Core backgrounds (warm charcoal) ── */
+        'bg-base':       '#08080a',
+        'bg-primary':    '#0c0c0e',
+        'bg-secondary':  '#111114',
+        'bg-tertiary':   '#161619',
+        'bg-elevated':   '#1a1a1e',
+        'bg-hover':      '#1f1f24',
+        'bg-active':     '#26262c',
+
+        /* ── Borders (warm-tinted) ── */
+        'border-subtle':  '#1e1e23',
+        'border-default': '#2a2a31',
+        'border-strong':  '#38383f',
+        'border-active':  '#4a4a52',
+
+        /* ── Text ── */
+        'text-primary':   '#f0eee8',
+        'text-secondary': '#9a9690',
+        'text-tertiary':  '#6b6760',
+        'text-disabled':  '#4a4742',
+
+        /* ── Accent — Amber/Gold cinema ── */
+        'accent-primary':       '#c8956c',
+        'accent-primary-hover': '#d4a574',
+        'accent-primary-dim':   '#8a6848',
+        'accent-gold':          '#d4a574',
+        'accent-amber':         '#c49660',
+        'accent-warm':          '#b8856a',
+
+        /* ── Functional accents ── */
+        'accent-secondary': '#6b8cce',
+        'accent-success':   '#5a9e6f',
+        'accent-warning':   '#c49660',
+        'accent-danger':    '#c75050',
+
+        /* ── Timeline track colors ── */
+        'timeline-video':    '#8b7ec8',
+        'timeline-audio':    '#5a9e9e',
+        'timeline-subtitle': '#c49660',
+
+        /* ── shadcn/ui required tokens ── */
+        'foreground':           '#f0eee8',
+        'muted':                '#161619',
+        'muted-foreground':     '#9a9690',
+        'popover':              '#1a1a1e',
+        'popover-foreground':   '#f0eee8',
+        'accent':               '#1f1f24',
+        'accent-foreground':    '#f0eee8',
+        'primary':              '#c8956c',
+        'primary-foreground':   '#ffffff',
+        'secondary':            '#161619',
+        'secondary-foreground': '#f0eee8',
+        'destructive':          '#c75050',
         'destructive-foreground': '#ffffff',
-        'border': '#27272A',
-        'input': '#27272A',
-        'ring': '#f97316',
-        'ring-offset': '#09090B',
+        'border':               '#2a2a31',
+        'input':                '#161619',
+        'ring':                 '#c8956c',
+        'ring-offset':          '#0c0c0e',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'Geist Variable', 'system-ui', 'sans-serif'],
+        mono:    ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
       },
     },
   },

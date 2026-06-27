@@ -1,27 +1,27 @@
 /**
  * VideoSynthesize.module.less
  * AI Cinema Studio Design System
- * Deep Charcoal #0C0D14 | Amber #FF9F43 | Electric Cyan #00D4FF
+ * Deep Charcoal #08080a | Amber #c8956c | Electric Cyan #5a9e9e
  */
 
 // ============================================================================
 // Variables
 // ============================================================================
 
-@bg-deep: #0C0D14;
-@amber: #FF9F43;
-@cyan: #00D4FF;
-@text-primary: #FFFFFF;
-@text-secondary: rgba(255, 255, 255, 0.65);
-@text-muted: rgba(255, 255, 255, 0.38);
+@bg-deep: #08080a;
+@amber: #c8956c;
+@cyan: #5a9e9e;
+@text-primary: #f0eee8;
+@text-secondary: rgba(240, 238, 232, 0.65);
+@text-muted: rgba(240, 238, 232, 0.38);
 
 @glass-bg: rgba(20, 21, 32, 0.8);
 @glass-border: rgba(255, 255, 255, 0.07);
 @glass-highlight: rgba(255, 255, 255, 0.1);
 
-@amber-glow: rgba(255, 159, 67, 0.35);
-@amber-glow-lg: rgba(255, 159, 67, 0.12);
-@cyan-glow: rgba(0, 212, 255, 0.25);
+@amber-glow: rgba(200, 149, 108, 0.35);
+@amber-glow-lg: rgba(200, 149, 108, 0.12);
+@cyan-glow: rgba(90, 158, 158, 0.25);
 
 @radius-lg: 16px;
 @radius-md: 12px;
@@ -47,16 +47,16 @@
     box-shadow: 0 0 0 0 @amber-glow;
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(255, 159, 67, 0);
+    box-shadow: 0 0 0 10px rgba(200, 149, 108, 0);
   }
 }
 
 @keyframes amberGlow {
   0%, 100% {
-    box-shadow: 0 0 20px @amber-glow, 0 0 40px rgba(255, 159, 67, 0.2);
+    box-shadow: 0 0 20px @amber-glow, 0 0 40px rgba(200, 149, 108, 0.2);
   }
   50% {
-    box-shadow: 0 0 30px @amber-glow, 0 0 60px rgba(255, 159, 67, 0.3);
+    box-shadow: 0 0 30px @amber-glow, 0 0 60px rgba(200, 149, 108, 0.3);
   }
 }
 
@@ -121,14 +121,14 @@
   font-family: 'Figtree', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: #52c41a;
+  color: #5a9e6f;
 }
 
 .statusBadgeDot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #52c41a;
+  background: #5a9e6f;
   animation: amberPulse 1.5s ease-in-out infinite;
 }
 
@@ -157,7 +157,7 @@
   background: rgba(250, 173, 20, 0.1);
   border: 1px solid rgba(250, 173, 20, 0.25);
   border-radius: 8px;
-  color: #faad14;
+  color: #c49660;
   font-family: 'Figtree', sans-serif;
   font-size: 13px;
   cursor: pointer;
@@ -204,8 +204,8 @@
   margin-top: 1px;
 }
 
-.alertSuccess .alertIcon { color: #52c41a; }
-.alertWarning .alertIcon { color: #faad14; }
+.alertSuccess .alertIcon { color: #5a9e6f; }
+.alertWarning .alertIcon { color: #c49660; }
 
 .alertTitle {
   font-weight: 600;
@@ -258,7 +258,7 @@
     background: @glass-bg;
     color: @amber;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 @glass-highlight;
-    border: 1px solid rgba(255, 159, 67, 0.2);
+    border: 1px solid rgba(200, 149, 108, 0.2);
   }
 }
 
@@ -353,7 +353,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(255, 159, 67, 0.9);
+  background: rgba(200, 149, 108, 0.9);
   border: none;
   cursor: pointer;
   display: flex;
@@ -443,7 +443,7 @@
   }
 
   &.toggleOn {
-    background: rgba(255, 159, 67, 0.3);
+    background: rgba(200, 149, 108, 0.3);
     border-color: @amber;
     box-shadow: 0 0 8px @amber-glow-lg;
 
@@ -559,13 +559,13 @@
   transition: all 0.25s ease;
 
   &:hover {
-    border-color: rgba(255, 159, 67, 0.2);
-    background: rgba(255, 159, 67, 0.03);
+    border-color: rgba(200, 149, 108, 0.2);
+    background: rgba(200, 149, 108, 0.03);
   }
 
   &.voiceActive {
     border-color: @amber;
-    background: rgba(255, 159, 67, 0.06);
+    background: rgba(200, 149, 108, 0.06);
   }
 }
 
@@ -650,7 +650,7 @@
 
   &.positionActive {
     border-color: @amber;
-    background: rgba(255, 159, 67, 0.08);
+    background: rgba(200, 149, 108, 0.08);
     color: @amber;
   }
 }
@@ -682,13 +682,13 @@
   text-align: center;
 
   &:hover {
-    border-color: rgba(255, 159, 67, 0.2);
-    background: rgba(255, 159, 67, 0.03);
+    border-color: rgba(200, 149, 108, 0.2);
+    background: rgba(200, 149, 108, 0.03);
   }
 
   &.effectActive {
     border-color: @amber;
-    background: rgba(255, 159, 67, 0.07);
+    background: rgba(200, 149, 108, 0.07);
   }
 }
 
@@ -779,7 +779,7 @@
 }
 
 .synthesizeBtnReady {
-  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  background: linear-gradient(135deg, #5a9e6f 0%, #5a9e6f 100%);
   animation: amberGlow 2s ease-in-out infinite;
 }
 
@@ -803,7 +803,7 @@
   height: 7px;
   border-radius: 50%;
 
-  &.dotGreen { background: #52c41a; }
+  &.dotGreen { background: #5a9e6f; }
   &.dotRed { background: #ff4d4f; }
   &.dotAmber { background: @amber; }
 }
@@ -901,7 +901,7 @@
   width: 64px;
   height: 64px;
   margin: 0 auto 20px;
-  color: #52c41a;
+  color: #5a9e6f;
 }
 
 .completeTitle {
@@ -994,14 +994,14 @@
 
   &:hover {
     border-color: @cyan;
-    background: rgba(0, 212, 255, 0.04);
+    background: rgba(90, 158, 158, 0.04);
     transform: translateY(-1px);
   }
 
   &.voicePresetActive {
     border-color: @cyan;
-    background: rgba(0, 212, 255, 0.08);
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+    background: rgba(90, 158, 158, 0.08);
+    box-shadow: 0 0 10px rgba(90, 158, 158, 0.2);
   }
 }
 
@@ -1062,7 +1062,7 @@
 
 .waveformBar {
   flex: 1;
-  background: linear-gradient(to top, @cyan, rgba(0, 212, 255, 0.4));
+  background: linear-gradient(to top, @cyan, rgba(90, 158, 158, 0.4));
   border-radius: 2px;
   min-width: 3px;
   animation: waveformPulse 0.8s ease-in-out infinite alternate;
@@ -1086,8 +1086,8 @@
   height: 38px;
   margin-bottom: 16px;
   border-radius: @radius-sm;
-  background: rgba(0, 212, 255, 0.08);
-  border: 1.5px solid rgba(0, 212, 255, 0.25);
+  background: rgba(90, 158, 158, 0.08);
+  border: 1.5px solid rgba(90, 158, 158, 0.25);
   font-family: 'Figtree', sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -1101,9 +1101,9 @@
   }
 
   &:hover:not(:disabled) {
-    background: rgba(0, 212, 255, 0.12);
-    border-color: rgba(0, 212, 255, 0.4);
-    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+    background: rgba(90, 158, 158, 0.12);
+    border-color: rgba(90, 158, 158, 0.4);
+    box-shadow: 0 0 12px rgba(90, 158, 158, 0.2);
   }
 
   &:disabled {

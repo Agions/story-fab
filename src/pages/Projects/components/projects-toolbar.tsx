@@ -65,7 +65,8 @@ export const ProjectsToolbar = React.memo<ProjectsToolbarProps>(({
           </Button>
         </div>
         <Button
-          className="bg-gradient-to-r from-[#667eea] to-[#764ba2] border-0"
+          className="border-0 font-semibold"
+          style={{ background: 'var(--gradient-hero)', color: '#fff' }}
           onClick={onNewProject}
         >
           <Plus size={16} className="mr-1" />

@@ -6,6 +6,7 @@
 import type { PipelineStep, PipelineDataContext, VoiceTrackData } from '../engine';
 import type { Script } from '@/types';
 import { tts } from '@/core/tauri/methods/tts';
+import { logger } from '@/shared/utils/logging';
 
 export interface VoiceStepConfig {
   voice?: string;
@@ -79,7 +80,7 @@ async function synthesizeSegment(
 
     return (result as any)?.audioPath ?? '';
   } catch (err) {
-    console.error('TTS synthesis failed:', err);
+    logger.error('TTS synthesis failed:', { error: err });
     return '';
   }
 }

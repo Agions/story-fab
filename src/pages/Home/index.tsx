@@ -5,12 +5,10 @@ import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Row, Col } from '../../components/ui/grid';
 import { Badge } from '../../components/ui/badge';
-
 import {
   Video, Plus, Play, Rocket, Zap, FileText, Clock, CheckCircle, ArrowRight,
-  FlaskConical, Scissors, Download, Folder, Loader2,
+  FlaskConical, Scissors, Download, Folder, Loader2, Sparkles,
 } from 'lucide-react';
-import { useTheme } from '@/context/theme-context';
 import { useSettings } from '@/context/settings-context';
 import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '../../services/tauri';
 import { preloadProjectEditPage, preloadProjectsPage } from '../../core/utils/route-preload';
@@ -20,8 +18,11 @@ import {
   resolveProjectVideoPath,
 } from '@/shared';
 import styles from '@/pages/Home/index.module.less';
+import { concurrentMap } from '@/shared/utils';
 
-const AMBER = '#d4a574';
+/* ─── Constants ─────────────────────────────────────────────────── */
+
+const AMBER = '#c8956c';
 
 interface HomeProjectItem {
   id: string;
@@ -35,21 +36,23 @@ interface HomeProjectItem {
 }
 
 const workflowSteps = [
-  { icon: <Video size={20} />, title: '上传视频', desc: '支持 MP4/MOV/WebM', color: AMBER },
-  { icon: <Zap size={20} />, title: '智能分析', desc: '场景检测 · 关键帧', color: '#c49660' },
-  { icon: <FileText size={20} />, title: '脚本生成', desc: '8大AI模型 · 7种模板', color: '#e2c49a' },
-  { icon: <FlaskConical size={20} />, title: '去重优化', desc: '原创性保障', color: '#06b6d4' },
-  { icon: <Scissors size={20} />, title: '智能剪辑', desc: '时间轴编排', color: '#10b981' },
-  { icon: <Download size={20} />, title: '导出发布', desc: '720p ~ 4K', color: '#f43f5e' },
+  { icon: <Video size={18} />, title: '导入素材', desc: 'MP4 / MOV / WebM', color: AMBER },
+  { icon: <Zap size={18} />, title: '智能分析', desc: '场景 · 关键帧 · 音频', color: '#c49660' },
+  { icon: <FileText size={18} />, title: '脚本生成', desc: '10+ AI 模型', color: '#d4a574' },
+  { icon: <FlaskConical size={18} />, title: '去重优化', desc: '原创性保障', color: '#5a9e9e' },
+  { icon: <Scissors size={18} />, title: '智能剪辑', desc: '时间轴编排', color: '#5a9e6f' },
+  { icon: <Download size={18} />, title: '导出发布', desc: '720p → 4K', color: '#6b8cce' },
 ];
 
-const aiModels = ['GPT-5.3 Codex', 'o3', 'Claude Sonnet 4.6', 'Gemini 3.1 Pro Preview', 'Gemini 3.1 Flash Lite Preview', 'Qwen-Max-Latest', 'GLM-5', 'Kimi K2.5'];
+const aiModels = [
+  'GPT-5.3 Codex', 'o3', 'Claude Sonnet 4.6', 'Gemini 3.1 Pro',
+  'Gemini 3.1 Flash', 'Qwen-Max', 'GLM-5', 'Kimi K2.5',
+];
 
-import { concurrentMap } from '@/shared/utils';
+/* ─── Component ─────────────────────────────────────────────────── */
 
 const Home = () => {
   const navigate = useNavigate();
-  const { isDarkMode } = useTheme();
   const { settings } = useSettings();
   const [projects, setProjects] = useState<HomeProjectItem[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
@@ -59,7 +62,8 @@ const Home = () => {
     try {
       const rawProjects = await listProjects();
       if (activeRef && !activeRef.current) return;
-      const filtered = (Array.isArray(rawProjects) ? rawProjects : []).filter((project) => typeof project.id === 'string');
+      const filtered = (Array.isArray(rawProjects) ? rawProjects : [])
+        .filter((p) => typeof p.id === 'string');
       const enriched = await concurrentMap(filtered, async (project) => {
         const metrics = extractProjectMediaMetrics(project);
         const videoPath = resolveProjectVideoPath(project);
@@ -95,48 +99,96 @@ const Home = () => {
     };
   }, [loadProjects]);
 
+  /* ─── Derived data ──────────────────────────────────────────── */
+
   const recentProjects = useMemo(() => {
-    const projectMap = new Map(projects.map((project) => [project.id, project]));
-    const orderedByRecent = settings.recentProjects.map((projectId) => projectMap.get(projectId))
-      .filter((project): project is HomeProjectItem => Boolean(project))
+    const projectMap = new Map(projects.map((p) => [p.id, p]));
+    const ordered = settings.recentProjects
+      .map((id) => projectMap.get(id))
+      .filter((p): p is HomeProjectItem => Boolean(p))
       .slice(0, 4);
-    if (orderedByRecent.length > 0) return orderedByRecent;
-    return [...projects].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4);
+    if (ordered.length > 0) return ordered;
+    return [...projects]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 4);
   }, [projects, settings.recentProjects]);
 
   const getRelativeTime = (dateText: string) => {
-    const time = new Date(dateText).getTime();
-    const now = Date.now();
-    const diff = now - time;
-    if (diff < 60 * 60 * 1000) return `${Math.max(1, Math.floor(diff / (60 * 1000)))} 分钟前`;
-    if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / (60 * 60 * 1000))} 小时前`;
-    if (diff < 7 * 24 * 60 * 60 * 1000) return `${Math.floor(diff / (24 * 60 * 60 * 1000))} 天前`;
+    const diff = Date.now() - new Date(dateText).getTime();
+    if (diff < 60 * 60 * 1000) return `${Math.max(1, Math.floor(diff / 60000))} 分钟前`;
+    if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / 3600000)} 小时前`;
+    if (diff < 7 * 24 * 60 * 60 * 1000) return `${Math.floor(diff / 86400000)} 天前`;
     return new Date(dateText).toLocaleDateString('zh-CN');
   };
 
   const statsData = useMemo(() => [
-    { title: '总项目', value: projects.length, icon: <Video size={18} />, color: AMBER, suffix: '个' },
-    { title: '已完成', value: projects.filter((p) => p.status === 'completed').length, icon: <CheckCircle size={18} />, color: '#10b981', suffix: '个' },
-    { title: '本月创作', value: (() => {
-      const now = new Date();
-      return projects.filter((p) => {
-        if (!p.createdAt) return false;
-        const d = new Date(p.createdAt);
-        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-      }).length;
-    })(), icon: <Rocket size={18} />, color: '#f59e0b', suffix: '个' },
-    { title: '总时长', value: Number((projects.reduce((s, p) => s + (p.durationSec || 0), 0) / 60).toFixed(1)), icon: <Clock size={18} />, color: '#06b6d4', suffix: '分钟' },
-    { title: '存储容量', value: Number((projects.reduce((s, p) => s + (p.sizeMb || 0), 0) / 1024).toFixed(2)), icon: <Folder size={18} />, color: AMBER, suffix: 'GB' },
+    {
+      title: '总项目',
+      value: projects.length,
+      icon: <Video size={16} />,
+      color: AMBER,
+      bg: 'rgba(200, 149, 108, 0.1)',
+      suffix: '个',
+    },
+    {
+      title: '已完成',
+      value: projects.filter((p) => p.status === 'completed').length,
+      icon: <CheckCircle size={16} />,
+      color: '#5a9e6f',
+      bg: 'rgba(90, 158, 111, 0.1)',
+      suffix: '个',
+    },
+    {
+      title: '本月创作',
+      value: (() => {
+        const now = new Date();
+        return projects.filter((p) => {
+          if (!p.createdAt) return false;
+          const d = new Date(p.createdAt);
+          return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+        }).length;
+      })(),
+      icon: <Rocket size={16} />,
+      color: '#c49660',
+      bg: 'rgba(196, 150, 96, 0.1)',
+      suffix: '个',
+    },
+    {
+      title: '总时长',
+      value: Number((projects.reduce((s, p) => s + (p.durationSec || 0), 0) / 60).toFixed(1)),
+      icon: <Clock size={16} />,
+      color: '#5a9e9e',
+      bg: 'rgba(90, 158, 158, 0.1)',
+      suffix: '分钟',
+    },
+    {
+      title: '存储容量',
+      value: Number((projects.reduce((s, p) => s + (p.sizeMb || 0), 0) / 1024).toFixed(2)),
+      icon: <Folder size={16} />,
+      color: '#6b8cce',
+      bg: 'rgba(107, 140, 206, 0.1)',
+      suffix: 'GB',
+    },
   ], [projects]);
 
   const recentActivities = useMemo(() => {
-    const ordered = [...projects].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4);
-    if (ordered.length === 0) return [{ color: AMBER, title: '开始创建你的第一个项目', desc: '点击"创建新项目"进入完整 AI 工作流', time: '现在', processing: false }];
+    const ordered = [...projects]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 4);
+    if (ordered.length === 0) {
+      return [{
+        color: AMBER,
+        title: '开始创建你的第一个项目',
+        desc: '点击「新建项目」进入完整 AI 工作流',
+        time: '现在',
+        processing: false,
+      }];
+    }
     return ordered.map((project) => {
       const isCompleted = project.status === 'completed';
       const isProcessing = project.status === 'processing';
       return {
-        color: isCompleted ? '#10b981' : isProcessing ? '#f59e0b' : AMBER,
+        color: isCompleted ? '#5a9e6f' : isProcessing ? '#c49660' : AMBER,
         title: project.name || '未命名项目',
         desc: isCompleted ? '项目已完成' : isProcessing ? '处理中' : '草稿已更新',
         time: getRelativeTime(project.updatedAt),
@@ -145,64 +197,70 @@ const Home = () => {
     });
   }, [projects]);
 
+  /* ─── Greeting ──────────────────────────────────────────────── */
+
   const hours = new Date().getHours();
   const greeting = hours < 12 ? '早上好' : hours < 18 ? '下午好' : '晚上好';
-  const heroGradient = isDarkMode ? 'linear-gradient(135deg, #d4a574 0%, #c49660 50%, #b8856a 100%)' : 'linear-gradient(135deg, #d4a574 0%, #c49660 100%)';
+
+  /* ─── Render ────────────────────────────────────────────────── */
 
   return (
     <div className={styles.container}>
-      {/* 欢迎横幅 */}
-      <Card
-        className={styles.heroBanner}
-        style={{ padding: '40px 36px', position: 'relative', zIndex: 1, background: heroGradient }}
-      >
-        <div className={styles.heroGrid} />
-        <div className={styles.heroGlow} />
+      {/* ═══ Hero ═══ */}
+      <Card className={styles.heroBanner}>
         <Row align="center" justify="between">
           <Col>
-            <h2 className={styles.heroTitle}>{greeting}，欢迎使用 Story-Fab</h2>
-            <p className={styles.heroParagraph}>AI 驱动的专业视频内容创作平台</p>
+            <h2 className={styles.heroTitle}>{greeting}，欢迎回来</h2>
+            <p className={styles.heroParagraph}>
+              AI 驱动的影视解说创作平台 · 本地处理 · 隐私优先
+            </p>
             <div className="flex gap-3">
               <Button
                 size="lg"
-                className="bg-white/20 border-0 hover:bg-white/30 text-white"
+                className="bg-white/20 border-0 hover:bg-white/30 text-white font-semibold"
                 onClick={() => navigate('/project/new')}
                 onMouseEnter={() => { void preloadProjectEditPage(); }}
               >
-                <Plus size={16} className="mr-1" />
-                创建新项目
+                <Plus size={16} className="mr-1.5" />
+                新建项目
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10"
+                className="border-white/25 text-white hover:bg-white/10 font-medium"
                 onClick={() => navigate('/projects')}
                 onMouseEnter={() => { void preloadProjectsPage(); }}
               >
-                <Folder size={16} className="mr-1" />
+                <Folder size={16} className="mr-1.5" />
                 项目管理
               </Button>
             </div>
           </Col>
           <Col>
-            <div className={styles.heroIcon}><Play size={48} /></div>
+            <div className={styles.heroIcon}>
+              <Play size={36} />
+            </div>
           </Col>
         </Row>
       </Card>
 
-      {/* 统计卡片 */}
-      <Row gutter={[16, 16]} className={styles.statsRow}>
+      {/* ═══ Stats ═══ */}
+      <Row gutter={[12, 12]} className={styles.statsRow}>
         {statsData.map((item, idx) => (
-          <Col span={6} key={idx}>
-            <Card className={`${styles.statsCard} ${isDarkMode ? styles.cardDark : styles.cardLight}`}>
+          <Col key={idx} style={{ flex: '1 1 0' }}>
+            <Card className={styles.statsCard}>
               <div className="flex items-center gap-3">
-                <div className={styles.statIcon} style={{ background: isDarkMode ? `${item.color}20` : `${item.color}15`, color: item.color }}>
+                <div
+                  className={styles.statIcon}
+                  style={{ background: item.bg, color: item.color }}
+                >
                   {item.icon}
                 </div>
                 <div>
-                  <div className={`${styles.statLabel} ${isDarkMode ? 'text-slate-400' : 'text-black/45'}`}>{item.title}</div>
-                  <div className={`${styles.statValue} ${isDarkMode ? 'text-slate-100' : 'text-black/87'}`}>
-                    {item.value}<span className={`${styles.statSuffix} ${isDarkMode ? 'text-slate-600' : 'text-black/45'}`}>{item.suffix}</span>
+                  <div className={styles.statLabel}>{item.title}</div>
+                  <div className={styles.statValue}>
+                    {item.value}
+                    <span className={styles.statSuffix}>{item.suffix}</span>
                   </div>
                 </div>
               </div>
@@ -211,17 +269,23 @@ const Home = () => {
         ))}
       </Row>
 
-      {/* 最近项目 */}
-      <Card
-        className={`${styles.recentProjectsCard} ${isDarkMode ? styles.cardDark : styles.cardLight}`}
-      >
+      {/* ═══ Recent Projects ═══ */}
+      <Card className={styles.recentProjectsCard}>
         {projectsLoading ? (
-          <div className="flex items-center justify-center py-8"><Loader2 className="animate-spin" /></div>
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="animate-spin" style={{ color: 'var(--text-tertiary)' }} />
+          </div>
         ) : recentProjects.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground mb-3">暂无项目，先创建一个项目开始创作。</p>
-            <Button onClick={() => navigate('/project/new')}>
-              <Plus size={14} className="mr-1" />创建项目
+            <p style={{ color: 'var(--text-tertiary)', marginBottom: 12 }}>
+              暂无项目，开始你的第一次创作
+            </p>
+            <Button
+              onClick={() => navigate('/project/new')}
+              className="font-medium"
+            >
+              <Plus size={14} className="mr-1" />
+              创建项目
             </Button>
           </div>
         ) : (
@@ -229,19 +293,38 @@ const Home = () => {
             {recentProjects.map((project) => (
               <Col span={6} key={project.id}>
                 <Card
-                  className={`${styles.projectCard} ${isDarkMode ? styles.projectCardDark : styles.projectCardLight}`}
+                  className={styles.projectCard}
                   onClick={() => navigate(`/project/edit/${project.id}`)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/project/edit/${project.id}`); } }}
                   onMouseEnter={() => { void preloadProjectEditPage(); }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`打开项目 ${project.name || '未命名项目'}`}
                 >
                   <div className="flex flex-col gap-2">
                     <div className="flex items-start justify-between">
-                      <span className={`${styles.projectCardTitle} font-semibold truncate`}>{project.name || '未命名项目'}</span>
-                      <Badge variant={project.status === 'completed' ? 'default' : 'secondary'}>
+                      <span className={`${styles.projectCardTitle} truncate`}>
+                        {project.name || '未命名项目'}
+                      </span>
+                      <Badge
+                        variant={project.status === 'completed' ? 'default' : 'secondary'}
+                        className="text-[10px] shrink-0"
+                      >
                         {project.status === 'completed' ? '已完成' : '草稿'}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">{project.description || '无项目描述'}</p>
-                    <span className="text-xs text-muted-foreground">{new Date(project.updatedAt).toLocaleDateString('zh-CN')}</span>
+                    <p
+                      className="text-xs truncate"
+                      style={{ color: 'var(--text-tertiary)' }}
+                    >
+                      {project.description || '无项目描述'}
+                    </p>
+                    <span
+                      className="text-[10px]"
+                      style={{ color: 'var(--text-disabled)' }}
+                    >
+                      {new Date(project.updatedAt).toLocaleDateString('zh-CN')}
+                    </span>
                   </div>
                 </Card>
               </Col>
@@ -250,49 +333,87 @@ const Home = () => {
         )}
       </Card>
 
-      <Row gutter={[16, 16]}>
-        {/* 工作流程 */}
+      {/* ═══ Workflow + Activity ═══ */}
+      <Row gutter={[12, 12]}>
+        {/* Workflow Pipeline */}
         <Col span={12}>
-          <Card className={`${styles.workflowCard} ${isDarkMode ? styles.cardDark : styles.cardLight}`}>
-            <Row gutter={[12, 16]}>
+          <Card className={styles.workflowCard}>
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles size={14} style={{ color: AMBER }} />
+              <span
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
+                创作流程
+              </span>
+            </div>
+            <Row gutter={[8, 12]}>
               {workflowSteps.map((step, idx) => (
                 <Col span={6} key={idx}>
-                  <div className={styles.workflowItem} style={{ background: isDarkMode ? 'rgba(212, 165, 116, 0.08)' : '#fafafa' }}>
-                    <div className={styles.workflowIcon} style={{ background: isDarkMode ? `${step.color}20` : `${step.color}15`, color: step.color }}>
+                  <div className={styles.workflowItem}>
+                    <div
+                      className={styles.workflowIcon}
+                      style={{
+                        background: `${step.color}15`,
+                        color: step.color,
+                      }}
+                    >
                       {step.icon}
                     </div>
-                    <div className={`${styles.workflowStepTitle} ${isDarkMode ? 'text-slate-100' : 'text-black/87'}`}>{step.title}</div>
-                    <div className={`${styles.workflowStepDesc} ${isDarkMode ? 'text-slate-500' : 'text-black/45'}`}>{step.desc}</div>
+                    <div className={styles.workflowStepTitle}>{step.title}</div>
+                    <div className={styles.workflowStepDesc}>{step.desc}</div>
                   </div>
                 </Col>
               ))}
             </Row>
-            <div className="mt-4 flex justify-center">
-              <Button className="bg-gradient-to-r from-[#667eea] to-[#764ba2] border-0" onClick={() => navigate('/project/new')}>
-                开始创作 <ArrowRight size={14} className="ml-1" />
+            <div className="mt-5 flex justify-center">
+              <Button
+                className="font-semibold"
+                style={{
+                  background: 'var(--gradient-hero)',
+                  border: 'none',
+                  color: '#fff',
+                }}
+                onClick={() => navigate('/project/new')}
+              >
+                开始创作
+                <ArrowRight size={14} className="ml-1.5" />
               </Button>
             </div>
           </Card>
         </Col>
 
-        {/* 最近动态 */}
+        {/* Recent Activity */}
         <Col span={12}>
-          <Card className={`${styles.activitiesCard} ${isDarkMode ? styles.cardDark : styles.cardLight}`}>
+          <Card className={styles.activitiesCard}>
+            <div className="flex items-center gap-2 mb-4">
+              <Clock size={14} style={{ color: 'var(--text-tertiary)' }} />
+              <span
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
+                最近动态
+              </span>
+            </div>
             <div className="flex flex-col gap-3">
               {recentActivities.map((item, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <div className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                  <div
+                    className={styles.activityDot}
+                    style={{ backgroundColor: item.color }}
+                  />
                   <div className="flex-1 min-w-0">
-                    <div className={`font-medium truncate ${isDarkMode ? 'text-slate-100' : 'text-black/87'}`}>{item.title}</div>
+                    <div className={styles.activityTitle}>{item.title}</div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-black/65'}`}>{item.desc}</span>
+                      <span className={styles.activityDesc}>{item.desc}</span>
                       {item.processing && (
-                        <Badge variant="destructive" className="text-xs">
-                          <Loader2 size={10} className="animate-spin mr-1" />处理中
-                        </Badge>
+                        <span className={styles.processingTag}>
+                          <Loader2 size={10} className="animate-spin" />
+                          处理中
+                        </span>
                       )}
                     </div>
-                    <div className={`text-xs ${isDarkMode ? 'text-slate-600' : 'text-black/45'}`}>{item.time}</div>
+                    <div className={styles.activityTime}>{item.time}</div>
                   </div>
                 </div>
               ))}
@@ -301,17 +422,22 @@ const Home = () => {
         </Col>
       </Row>
 
-      {/* AI 模型支持 */}
-      <Card className={`${styles.aiModelsCard} ${isDarkMode ? styles.cardDark : styles.cardLight}`}>
+      {/* ═══ AI Models ═══ */}
+      <Card className={styles.aiModelsCard}>
         <div className="flex items-center gap-2 mb-3">
-          <Rocket size={14} style={{ color: '#f59e0b' }} />
-          <span className={isDarkMode ? 'text-slate-400' : 'text-black/65'}>支持的 AI 模型</span>
+          <Rocket size={13} style={{ color: AMBER }} />
+          <span
+            className="text-xs font-medium"
+            style={{ color: 'var(--text-tertiary)' }}
+          >
+            支持的 AI 模型
+          </span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {aiModels.map((m) => (
-            <Badge key={m} variant="outline" className={`${styles.aiModelTag} ${isDarkMode ? styles.aiModelTagDark : styles.aiModelTagLight}`}>
+            <span key={m} className={styles.aiModelTag}>
               {m}
-            </Badge>
+            </span>
           ))}
         </div>
       </Card>

@@ -383,8 +383,8 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
       {!state.stepStatus['project-create'] ? (
         <div style={{
           padding: '24px',
-          background: 'rgba(255, 159, 67, 0.05)',
-          border: '1px solid rgba(255, 159, 67, 0.15)',
+          background: 'rgba(200, 149, 108, 0.05)',
+          border: '1px solid rgba(200, 149, 108, 0.15)',
           borderRadius: '12px',
           fontFamily: 'Figtree, sans-serif',
           color: 'rgba(255, 255, 255, 0.6)',

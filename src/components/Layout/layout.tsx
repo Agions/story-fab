@@ -1,180 +1,179 @@
 /**
- * story-fab Layout — AI Cinema Studio Design
- * 三区制布局：AI工作流侧栏 | 预览区 | 片段卡片流
+ * StoryFab Layout — Cinematic Darkroom
  *
- * Redesigned per frontend-design-pro principles:
- * - OKLCH color space / warm-tinted dark backgrounds
- * - 4px base spacing grid
- * - cubic-bezier(0.16, 1, 0.3, 1) easing / max 200ms micro-interactions
- * - prefers-reduced-motion respected
+ * Professional film-editing-suite shell with a narrow icon rail,
+ * thin top bar, and maximum content area. Warm charcoal + amber accents.
  */
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { ShortcutOverlay } from '@/components/ShortcutOverlay';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Home,
-  Video,
-  Settings,
-  Bell,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Plus,
-  CircleHelp,
+  Home, Video, Settings, Bell, Plus,
 } from 'lucide-react';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import {
+  Tooltip, TooltipTrigger, TooltipContent, TooltipProvider,
+} from '@/components/ui/tooltip';
 import styles from './layout.module.less';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-// Hook to extract page info from location pathname
 const usePageInfo = (pathname: string) => {
   return useMemo(() => {
     if (pathname === '/') return { selectedKey: '/', pageTitle: '首页' };
-    if (pathname.startsWith('/projects') || pathname.startsWith('/project') || pathname.startsWith('/editor')) {
-      return { selectedKey: '/projects', pageTitle: '我的项目' };
+    if (pathname.startsWith('/projects') || pathname.startsWith('/project') || pathname.startsWith('/editor') || pathname.startsWith('/workspace')) {
+      return { selectedKey: '/projects', pageTitle: '项目' };
     }
     if (pathname.startsWith('/settings')) return { selectedKey: '/settings', pageTitle: '设置' };
-    return { selectedKey: '/', pageTitle: 'Story-Fab' };
+    return { selectedKey: '/', pageTitle: 'StoryFab' };
   }, [pathname]);
 };
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [shortcutOverlayOpen, setShortcutOverlayOpen] = useState(false);
   const reducedMotion = useRef(
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   );
 
   const { selectedKey, pageTitle } = usePageInfo(location.pathname);
 
-  // Auto-collapse on narrow screens
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1280) setSidebarCollapsed(true);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const handleLogoKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      navigate('/');
+    }
+  }, [navigate]);
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { key: '/', icon: <Home size={18} />, label: '首页', onClick: () => navigate('/') },
-    { key: '/projects', icon: <Video size={18} />, label: '我的项目', onClick: () => navigate('/projects') },
+    { key: '/projects', icon: <Video size={18} />, label: '项目', onClick: () => navigate('/projects') },
     { key: '/settings', icon: <Settings size={18} />, label: '设置', onClick: () => navigate('/settings') },
-  ];
+  ], [navigate]);
 
   return (
-    <div className={styles.shell}>
-      {/* ── Left Sidebar ── */}
-      <aside className={`${styles.sidebar} ${sidebarCollapsed ? styles.collapsed : ''}`}>
-        {/* Logo */}
-        <div className={styles.logo} onClick={() => navigate('/')} role="button" tabIndex={0}>
-          <div className={styles.logoIcon}>
-            <svg width="28" height="28" viewBox="0 0 160 160" fill="none" aria-hidden="true">
-              <rect width="160" height="160" rx="20" fill="#1C1D2E"/>
-              <polygon points="68,50 104,68 68,86" fill="url(#pg)"/>
-              <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff"/><stop offset="1" stopColor="#d4a574"/></linearGradient></defs>
-            </svg>
+    <TooltipProvider>
+      <div className={styles.shell}>
+        {/* ── Left Icon Rail ── */}
+        <aside className={styles.sidebar}>
+          {/* Logo */}
+          <div
+            className={styles.logo}
+            onClick={() => navigate('/')}
+            onKeyDown={handleLogoKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label="StoryFab 首页"
+          >
+            <div className={styles.logoIcon}>
+              <svg width="28" height="28" viewBox="0 0 160 160" fill="none" aria-hidden="true">
+                <rect width="160" height="160" rx="20" fill="#1C1D2E" />
+                <polygon points="68,50 104,68 68,86" fill="url(#pg)" />
+                <defs>
+                  <linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
+                    <stop stopColor="#fff" />
+                    <stop offset="1" stopColor="#d4a574" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
           </div>
-          {!sidebarCollapsed && <span className={styles.logoText}>Story-Fab</span>}
-        </div>
 
-        {/* New Project Button */}
-        {!sidebarCollapsed && (
-          <button className={styles.newProjectBtn} onClick={() => navigate('/editor/new')}>
-            <Plus size={16} />
-            <span>新建项目</span>
-          </button>
-        )}
-        {sidebarCollapsed && (
-          <TooltipProvider>
+          {/* New Project */}
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button className={styles.newProjectBtnIcon} onClick={() => navigate('/project/new')} aria-label="新建项目" />
+              }
+            >
+              <Plus size={16} />
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={8}>
+              新建项目
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Navigation */}
+          <nav className={styles.nav} role="navigation" aria-label="主导航">
+            {navItems.map((item) => {
+              const isActive = selectedKey === item.key;
+              return (
+                <Tooltip key={item.key}>
+                  <TooltipTrigger
+                    render={
+                      <button
+                        className={`${styles.navItem} ${isActive ? styles.active : ''}`}
+                        onClick={item.onClick}
+                        aria-current={isActive ? 'page' : undefined}
+                        aria-label={item.label}
+                      />
+                    }
+                  >
+                    <span className={styles.navIcon}>{item.icon}</span>
+                    {isActive && !reducedMotion.current && (
+                      <span className={styles.navIndicator} aria-hidden="true" />
+                    )}
+                  </TooltipTrigger>
+                  <TooltipContent side="right" sideOffset={8}>
+                    {item.label}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </nav>
+
+          {/* Bottom */}
+          <div className={styles.sidebarBottom}>
             <Tooltip>
               <TooltipTrigger
-                render={<button className={styles.newProjectBtnIcon} />}
-                onClick={() => navigate('/editor/new')}
+                render={
+                  <button
+                    className={styles.iconBtn}
+                    onClick={() => setShortcutOverlayOpen(true)}
+                    aria-label="键盘快捷键"
+                  />
+                }
               >
-                <Plus size={16} />
+                <span className="text-xs font-bold" style={{ color: 'var(--text-tertiary)' }}>?</span>
               </TooltipTrigger>
-              <TooltipContent side="right">新建项目</TooltipContent>
+              <TooltipContent side="right" sideOffset={8}>
+                快捷键
+              </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-        )}
+          </div>
+        </aside>
 
-        {/* Nav */}
-        <nav className={styles.nav} role="navigation" aria-label="主导航">
-          {navItems.map(item => (
-            <button
-              key={item.key}
-              className={`${styles.navItem} ${selectedKey === item.key ? styles.active : ''}`}
-              onClick={item.onClick}
-              title={sidebarCollapsed ? item.label : undefined}
-              aria-current={selectedKey === item.key ? 'page' : undefined}
-            >
-              <span className={styles.navIcon}>{item.icon}</span>
-              {!sidebarCollapsed && <span className={styles.navLabel}>{item.label}</span>}
-              {selectedKey === item.key && !reducedMotion.current && <span className={styles.navIndicator} aria-hidden="true" />}
-            </button>
-          ))}
-        </nav>
-
-        {/* Bottom */}
-        <div className={styles.sidebarBottom}>
-          <button
-            className={styles.collapseBtn}
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            title={sidebarCollapsed ? '展开' : '收起'}
-            aria-label={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
-          >
-            {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
-        </div>
-      </aside>
-
-      {/* ── Top Bar ── */}
-      <header className={styles.topbar} role="banner">
-        <div className={styles.topbarLeft}>
-          <h1 className={styles.pageTitle}>{pageTitle}</h1>
-        </div>
-        <div className={styles.topbarRight}>
-          <TooltipProvider>
+        {/* ── Top Bar ── */}
+        <header className={styles.topbar} role="banner">
+          <div className={styles.topbarLeft}>
+            <h1 className={styles.pageTitle}>{pageTitle}</h1>
+          </div>
+          <div className={styles.topbarRight}>
             <Tooltip>
-              <TooltipTrigger render={<button className={styles.iconBtn} />} onClick={() => setShortcutOverlayOpen(true)}>
-                <CircleHelp size={18} />
-              </TooltipTrigger>
-              <TooltipContent>键盘快捷键</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger render={<button className={styles.iconBtn} />}>
-                <Bell size={18} />
+              <TooltipTrigger render={<button className={styles.iconBtn} aria-label="通知" />}>
+                <Bell size={16} />
               </TooltipTrigger>
               <TooltipContent>通知</TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-          <button className={styles.userBtn} aria-label="用户菜单">
-            <div className={styles.avatar} aria-hidden="true">A</div>
-            <span className={styles.userName}>Agions</span>
-          </button>
-        </div>
-      </header>
+            <button className={styles.userBtn} aria-label="用户菜单">
+              <div className={styles.avatar} aria-hidden="true">A</div>
+              <span className={styles.userName}>Agions</span>
+            </button>
+          </div>
+        </header>
 
-      {/* ── Main Content ── */}
-      <main className={`${styles.content} ${sidebarCollapsed ? styles.contentExpanded : ''}`} id="main-content">
-        {children}
-      </main>
+        {/* ── Main Content ── */}
+        <main className={styles.content} id="main-content">
+          {children}
+        </main>
 
-      {/* Global keyboard shortcut overlay */}
-      <ShortcutOverlay
-        open={shortcutOverlayOpen}
-        onOpenChange={setShortcutOverlayOpen}
-      />
-    </div>
+        <ShortcutOverlay open={shortcutOverlayOpen} onOpenChange={setShortcutOverlayOpen} />
+      </div>
+    </TooltipProvider>
   );
 };
 

@@ -123,7 +123,7 @@ export const SettingsDialog = memo<SettingsDialogProps>(({ open, onOpenChange })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl w-full" style={{ maxWidth: 640, backgroundColor: '#18181B', border: '1px solid #27272A' }}>
+      <DialogContent className="max-w-2xl w-full" style={{ maxWidth: 640, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}>
         <DialogHeader>
           <DialogTitle className="text-base font-semibold text-text-primary">
             Settings

@@ -70,7 +70,7 @@
   
   :global(.ant-slider-handle) {
     border-color: @film-amber;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(200, 149, 108, 0.2);
   }
 }
 
@@ -128,29 +128,29 @@
   }
 }
 
-/* 暗色模式适配 */
+/* 暗色模式适配 — Cinematic Darkroom */
 :global(.dark) {
   .videoPlayerContainer {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
-  
+
   .progressBar {
     :global(.ant-slider-rail) {
       background-color: rgba(255, 255, 255, 0.15);
     }
-    
+
     :global(.ant-slider-track) {
-      background-color: #177ddc;
+      background-color: @film-amber;
     }
-    
+
     :global(.ant-slider-handle) {
-      border-color: #177ddc;
+      border-color: @film-amber;
     }
   }
-  
+
   .controlButton {
     &:hover, &:focus {
-      color: #177ddc;
+      color: @film-amber;
     }
   }
 }

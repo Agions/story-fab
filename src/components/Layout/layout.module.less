@@ -1,162 +1,113 @@
 /**
- * story-fab Layout — Redesigned per frontend-design-pro
+ * StoryFab — Cinematic Darkroom Layout
  *
- * Design tokens (OKLCH-aware):
- * - Dark bg uses warm-tinted #0f0f0f (not pure black)
- * - Accent amber OKLCH-based with glow
- * - 8px base spacing grid
- * - cubic-bezier(0.16, 1, 0.3, 1) easing for all transitions
- * - Micro-interactions: max 200ms / Page transitions: max 300ms
- * - prefers-reduced-motion respected (no decorative animations)
+ * A professional film-editing-suite shell. Narrow icon rail on the left,
+ * thin top bar, maximum content area. Warm charcoal with amber accents.
+ *
+ * Design tokens from globals.css (CSS custom properties).
+ * This file uses LESS variables only for layout dimensions and easing.
  */
 
-// ─── Design Tokens ────────────────────────────────────────────────
-@bg-base: #0f0f12;          // warm-tinted dark (not pure #000)
-@bg-surface: #16161d;        // slightly lighter surface
-@bg-elevated: #1e1e28;      // elevated / hover
-@bg-overlay: #28283a;       // overlay / active
+// ─── Layout Dimensions ────────────────────────────────────────────
+@sidebar-width: 64px;
+@topbar-height: 48px;
 
-@border-subtle: #22222e;
-@border-default: #2e2e3e;
-@border-strong: #3e3e52;
-
-@accent: #d4a574;           // unified amber (OKLCH 65% 0.18 70)
-@accent-light: #e8c9a8;
-@accent-dark: #c49660;
-@accent-glow: color-mix(in oklch, @accent 20%, transparent);
-
-@text-primary: #eeeef2;
-@text-secondary: #8888a2;
-@text-tertiary: #55556e;
-
-@font-display: 'Outfit', system-ui, sans-serif;
-@font-body: 'Figtree', system-ui, sans-serif;
-
-@radius-sm: 4px;
-@radius-md: 8px;
-@radius-lg: 12px;
-@radius-xl: 16px;
-@radius-full: 9999px;
-
+// ─── Easing ───────────────────────────────────────────────────────
 @ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-@ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-
-@transition-fast: 120ms;
-@transition-default: 200ms;
-@transition-slow: 300ms;
-
-@sidebar-width: 220px;
-@sidebar-collapsed-width: 64px;
-@topbar-height: 56px;
 
 // ─── Layout Shell ─────────────────────────────────────────────────
 .shell {
   display: flex;
   min-height: 100vh;
-  background: @bg-base;
+  background: var(--bg-base);
 }
 
-// ─── Left Sidebar ─────────────────────────────────────────────────
+// ─── Left Icon Rail ───────────────────────────────────────────────
 .sidebar {
   width: @sidebar-width;
   min-height: 100vh;
-  background: @bg-surface;
-  border-right: 1px solid @border-subtle;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
+  align-items: center;
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
   z-index: 200;
-  transition:
-    width @transition-slow @ease-out,
-    background @transition-default;
+  transition: width 300ms @ease-out;
   overflow: hidden;
-
-  &.collapsed {
-    width: @sidebar-collapsed-width;
-
-    .logo { justify-content: center; padding: 0; }
-    .nav { padding: 0; }
-    .navItem {
-      justify-content: center;
-      padding: 0;
-      width: 40px;
-      height: 40px;
-      border-radius: @radius-md;
-      margin: 2px auto;
-    }
-    .sidebarBottom { justify-content: center; }
-  }
 }
 
 // Logo
 .logo {
   height: @topbar-height;
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 20px;
-  border-bottom: 1px solid @border-subtle;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-subtle);
   cursor: pointer;
-  transition: background @transition-default @ease-out;
+  transition: background 200ms @ease-out;
   flex-shrink: 0;
 
-  &:hover { background: @bg-elevated; }
+  &:hover {
+    background: var(--bg-hover);
+  }
+
   &:focus-visible {
-    outline: 2px solid @accent;
+    outline: 2px solid var(--accent-primary);
     outline-offset: -2px;
-    border-radius: @radius-sm;
   }
 }
 
 .logoIcon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
-  border-radius: @radius-md;
+  border-radius: 6px;
   overflow: hidden;
 }
 
 .logoText {
-  font-family: @font-display;
-  font-size: 16px;
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  font-size: 15px;
   font-weight: 700;
-  color: @text-primary;
   letter-spacing: -0.02em;
   white-space: nowrap;
-  background: linear-gradient(135deg, @accent 0%, @accent-light 100%);
+  background: var(--gradient-hero);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-// New Project Button
+// New Project Button (icon-only in rail)
 .newProjectBtn {
+  display: none;
+}
+
+.newProjectBtnIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin: 12px;
-  padding: 9px 16px;
-  background: linear-gradient(135deg, @accent 0%, @accent-dark 100%);
-  color: @bg-base;
+  width: 36px;
+  height: 36px;
+  margin: 8px auto;
+  background: var(--gradient-hero);
+  color: var(--bg-base);
   border: none;
-  border-radius: @radius-md;
-  font-family: @font-body;
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
   transition:
-    transform @transition-default @ease-out,
-    box-shadow @transition-default @ease-out;
-  white-space: nowrap;
+    box-shadow 200ms @ease-out,
+    transform 150ms @ease-out;
   flex-shrink: 0;
 
   &:hover {
+    box-shadow: var(--glow-amber);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px @accent-glow;
   }
 
   &:active {
@@ -164,36 +115,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid @accent;
-    outline-offset: 2px;
-  }
-}
-
-.newProjectBtnIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  margin: 12px auto;
-  background: linear-gradient(135deg, @accent 0%, @accent-dark 100%);
-  color: @bg-base;
-  border: none;
-  border-radius: @radius-md;
-  font-size: 16px;
-  cursor: pointer;
-  transition:
-    box-shadow @transition-default @ease-out,
-    transform @transition-default @ease-out;
-  flex-shrink: 0;
-
-  &:hover {
-    box-shadow: 0 4px 16px @accent-glow;
-    transform: translateY(-1px);
-  }
-
-  &:focus-visible {
-    outline: 2px solid @accent;
+    outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
   }
 }
@@ -203,47 +125,45 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 8px;
+  padding: 8px 0;
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: 100%;
+  align-items: center;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 12px;
+  justify-content: center;
+  width: 40px;
   height: 40px;
-  border-radius: @radius-md;
+  border-radius: 10px;
   background: transparent;
   border: none;
-  color: @text-secondary;
-  font-family: @font-body;
-  font-size: 13px;
-  font-weight: 500;
+  color: var(--text-tertiary);
   cursor: pointer;
   transition:
-    background @transition-default @ease-out,
-    color @transition-default;
+    background 200ms @ease-out,
+    color 200ms @ease-out;
   position: relative;
-  text-align: left;
-  width: 100%;
+  flex-shrink: 0;
 
   &:hover {
-    background: @bg-elevated;
-    color: @text-primary;
+    background: var(--bg-hover);
+    color: var(--text-primary);
   }
 
   &.active {
-    background: color-mix(in oklch, @accent 10%, transparent);
-    color: @accent;
+    background: rgba(200, 149, 108, 0.1);
+    color: var(--accent-primary);
 
-    .navIcon { color: @accent; }
+    .navIcon {
+      color: var(--accent-primary);
+    }
   }
 
   &:focus-visible {
-    outline: 2px solid @accent;
+    outline: 2px solid var(--accent-primary);
     outline-offset: -2px;
   }
 }
@@ -251,26 +171,22 @@
 .navIcon {
   font-size: 16px;
   flex-shrink: 0;
-  color: @text-tertiary;
-  transition: color @transition-default;
+  transition: color 200ms;
 }
 
 .navLabel {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: none;
 }
 
-// Active indicator — no bounce animation, respects reduced-motion
+// Active indicator — subtle amber dot (film perforation motif)
 .navIndicator {
   position: absolute;
-  right: 8px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: @accent;
-  box-shadow: 0 0 8px @accent;
-  // No animation — decorative only, hidden when reduced-motion
+  left: -8px;
+  width: 3px;
+  height: 12px;
+  border-radius: 0 2px 2px 0;
+  background: var(--accent-primary);
+  box-shadow: var(--glow-amber-sm);
 
   @media (prefers-reduced-motion: reduce) {
     display: none;
@@ -281,10 +197,11 @@
 .sidebarBottom {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding: 12px 16px;
-  border-top: 1px solid @border-subtle;
+  justify-content: center;
+  padding: 8px 0 12px;
+  border-top: 1px solid var(--border-subtle);
   flex-shrink: 0;
+  width: 100%;
 }
 
 .collapseBtn {
@@ -294,24 +211,23 @@
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1px solid @border-default;
-  border-radius: @radius-md;
-  color: @text-tertiary;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  color: var(--text-tertiary);
   cursor: pointer;
   transition:
-    background @transition-default @ease-out,
-    color @transition-default,
-    border-color @transition-default;
-  font-size: 14px;
+    background 200ms @ease-out,
+    color 200ms,
+    border-color 200ms;
 
   &:hover {
-    background: @bg-elevated;
-    color: @text-primary;
-    border-color: @border-strong;
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
   }
 
   &:focus-visible {
-    outline: 2px solid @accent;
+    outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
   }
 }
@@ -319,25 +235,33 @@
 // ─── Top Bar ──────────────────────────────────────────────────────
 .topbar {
   height: @topbar-height;
-  background: @bg-surface;
-  border-bottom: 1px solid @border-subtle;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 20px;
   position: fixed;
   top: 0;
   left: @sidebar-width;
   right: 0;
   z-index: 100;
-  transition: left @transition-slow @ease-out;
+  transition: left 300ms @ease-out;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .pageTitle {
-  font-family: @font-display;
-  font-size: 15px;
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  font-size: 14px;
   font-weight: 600;
-  color: @text-primary;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
   margin: 0;
 }
@@ -345,31 +269,31 @@
 .topbarRight {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .iconBtn {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: @radius-md;
-  color: @text-tertiary;
+  border-radius: 8px;
+  color: var(--text-tertiary);
   cursor: pointer;
   transition:
-    background @transition-fast,
-    color @transition-fast;
+    background 120ms,
+    color 120ms;
 
   &:hover {
-    background: @bg-elevated;
-    color: @text-primary;
+    background: var(--bg-hover);
+    color: var(--text-primary);
   }
 
   &:focus-visible {
-    outline: 2px solid @accent;
+    outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
   }
 }
@@ -377,47 +301,47 @@
 .userBtn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 10px 4px 4px;
+  gap: 6px;
+  padding: 3px 8px 3px 3px;
   background: transparent;
-  border: 1px solid @border-default;
-  border-radius: @radius-full;
+  border: 1px solid var(--border-default);
+  border-radius: 9999px;
   cursor: pointer;
   transition:
-    background @transition-default @ease-out,
-    border-color @transition-default;
+    background 200ms @ease-out,
+    border-color 200ms;
   margin-left: 4px;
 
   &:hover {
-    background: @bg-elevated;
-    border-color: @border-strong;
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
   }
 
   &:focus-visible {
-    outline: 2px solid @accent;
+    outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
   }
 }
 
 .avatar {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, @accent 0%, @accent-dark 100%);
+  background: var(--gradient-hero);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  color: @bg-base;
-  font-family: @font-display;
+  color: var(--bg-base);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
 }
 
 .userName {
-  font-family: @font-body;
-  font-size: 12px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 11px;
   font-weight: 500;
-  color: @text-secondary;
+  color: var(--text-secondary);
 }
 
 // ─── Main Content ─────────────────────────────────────────────────
@@ -425,56 +349,33 @@
   flex: 1;
   margin-left: @sidebar-width;
   margin-top: @topbar-height;
-  padding: 24px;
+  padding: 20px;
   min-height: calc(100vh - @topbar-height);
-  background: @bg-base;
-  transition: margin-left @transition-slow @ease-out;
-
-  &.contentExpanded {
-    margin-left: @sidebar-collapsed-width;
-  }
+  background: var(--bg-base);
+  transition: margin-left 300ms @ease-out;
 }
 
 // ─── Responsive ────────────────────────────────────────────────────
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .sidebar {
-    width: @sidebar-collapsed-width;
-
-    .logo { justify-content: center; padding: 0; }
-    .logoText { display: none; }
-    .newProjectBtn { display: none; }
-    .navItem {
-      justify-content: center;
-      padding: 0;
-      width: 40px;
-      height: 40px;
-      border-radius: @radius-md;
-      margin: 2px auto;
-    }
-    .navLabel { display: none; }
-    .navIndicator { display: none; }
-    .sidebarBottom { justify-content: center; }
+    width: 48px;
   }
 
-  .topbar { left: @sidebar-collapsed-width; }
-
-  .content {
-    margin-left: @sidebar-collapsed-width;
-
-    &.contentExpanded { margin-left: @sidebar-collapsed-width; }
-  }
-}
-
-@media (max-width: 640px) {
   .topbar {
-    left: 0;
-    padding: 0 16px;
+    left: 48px;
+    padding: 0 12px;
   }
 
   .content {
-    margin-left: 0;
-    padding: 16px;
+    margin-left: 48px;
+    padding: 12px;
+
+    &.contentExpanded {
+      margin-left: 48px;
+    }
   }
 
-  .userName { display: none; }
+  .userName {
+    display: none;
+  }
 }

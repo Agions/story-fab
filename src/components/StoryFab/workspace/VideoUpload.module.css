@@ -1,6 +1,6 @@
 /**
  * VideoUpload - AI Cinema Studio Design System
- * Deep Charcoal #0C0D14 | Amber #FF9F43 | Electric Cyan #00D4FF
+ * Deep Charcoal #08080a | Amber #c8956c | Electric Cyan #5a9e9e
  */
 
 /* ==================== Layout ==================== */
@@ -32,7 +32,7 @@
 /* ==================== Upload Zone ==================== */
 .uploadZone {
   position: relative;
-  border: 2px dashed rgba(255, 159, 67, 0.3);
+  border: 2px dashed rgba(200, 149, 108, 0.3);
   border-radius: 16px;
   padding: 56px 32px;
   text-align: center;
@@ -50,7 +50,7 @@
   border-radius: 14px;
   background: radial-gradient(
     ellipse at center,
-    rgba(255, 159, 67, 0.05) 0%,
+    rgba(200, 149, 108, 0.05) 0%,
     transparent 70%
   );
   opacity: 0;
@@ -58,11 +58,11 @@
 }
 
 .uploadZone:hover {
-  border-color: #FF9F43;
+  border-color: #c8956c;
   box-shadow:
-    0 0 20px rgba(255, 159, 67, 0.15),
-    0 0 40px rgba(255, 159, 67, 0.08),
-    inset 0 0 20px rgba(255, 159, 67, 0.03);
+    0 0 20px rgba(200, 149, 108, 0.15),
+    0 0 40px rgba(200, 149, 108, 0.08),
+    inset 0 0 20px rgba(200, 149, 108, 0.03);
   transform: translateY(-1px);
 }
 
@@ -71,13 +71,13 @@
 }
 
 .uploadZone.dragActive {
-  border-color: #FF9F43;
-  background: rgba(255, 159, 67, 0.06);
+  border-color: #c8956c;
+  background: rgba(200, 149, 108, 0.06);
   transform: scale(1.01);
   box-shadow:
-    0 0 30px rgba(255, 159, 67, 0.2),
-    0 0 60px rgba(255, 159, 67, 0.1),
-    inset 0 0 30px rgba(255, 159, 67, 0.05);
+    0 0 30px rgba(200, 149, 108, 0.2),
+    0 0 60px rgba(200, 149, 108, 0.1),
+    inset 0 0 30px rgba(200, 149, 108, 0.05);
 }
 
 .uploadZone.dragActive::before {
@@ -89,14 +89,14 @@
   0%, 100% {
     background: radial-gradient(
       ellipse at center,
-      rgba(255, 159, 67, 0.05) 0%,
+      rgba(200, 149, 108, 0.05) 0%,
       transparent 70%
     );
   }
   50% {
     background: radial-gradient(
       ellipse at center,
-      rgba(255, 159, 67, 0.12) 0%,
+      rgba(200, 149, 108, 0.12) 0%,
       transparent 70%
     );
   }
@@ -110,7 +110,7 @@
   border-radius: 14px;
   background-image: radial-gradient(
     circle,
-    rgba(255, 159, 67, 0.08) 1px,
+    rgba(200, 149, 108, 0.08) 1px,
     transparent 1px
   );
   background-size: 24px 24px;
@@ -137,21 +137,21 @@
 .uploadIconSvg {
   width: 56px;
   height: 56px;
-  color: rgba(255, 159, 67, 0.7);
+  color: rgba(200, 149, 108, 0.7);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: drop-shadow(0 0 8px rgba(255, 159, 67, 0.3));
+  filter: drop-shadow(0 0 8px rgba(200, 149, 108, 0.3));
 }
 
 .uploadZone:hover .uploadIconSvg {
-  color: #FF9F43;
+  color: #c8956c;
   transform: translateY(-3px);
-  filter: drop-shadow(0 0 16px rgba(255, 159, 67, 0.5));
+  filter: drop-shadow(0 0 16px rgba(200, 149, 108, 0.5));
 }
 
 .uploadZone.dragActive .uploadIconSvg {
-  color: #FF9F43;
+  color: #c8956c;
   animation: floatIcon 1.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-  filter: drop-shadow(0 0 20px rgba(255, 159, 67, 0.6));
+  filter: drop-shadow(0 0 20px rgba(200, 149, 108, 0.6));
 }
 
 @keyframes floatIcon {
@@ -204,7 +204,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: rgba(255, 159, 67, 0.5);
+  background: rgba(200, 149, 108, 0.5);
 }
 
 /* ==================== Hidden File Input ==================== */
@@ -230,10 +230,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 159, 67, 0.1);
-  border: 1px solid rgba(255, 159, 67, 0.2);
+  background: rgba(200, 149, 108, 0.1);
+  border: 1px solid rgba(200, 149, 108, 0.2);
   border-radius: 10px;
-  color: #FF9F43;
+  color: #c8956c;
 }
 
 .progressInfo {
@@ -274,7 +274,7 @@
   top: 0;
   height: 100%;
   border-radius: 3px;
-  background: linear-gradient(90deg, #FF9F43, #FFB86B, #FF9F43);
+  background: linear-gradient(90deg, #c8956c, #d4a574, #c8956c);
   background-size: 200% 100%;
   transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   animation: shimmer 2s linear infinite;
@@ -317,7 +317,7 @@
   font-family: 'Outfit', sans-serif;
   font-size: 28px;
   font-weight: 700;
-  color: #FF9F43;
+  color: #c8956c;
   line-height: 1;
 }
 
@@ -372,26 +372,26 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(255, 159, 67, 0.9);
+  background: rgba(200, 149, 108, 0.9);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 30px rgba(255, 159, 67, 0.4);
+  box-shadow: 0 0 30px rgba(200, 149, 108, 0.4);
 }
 
 .playBtn:hover {
   transform: scale(1.08);
-  background: #FF9F43;
-  box-shadow: 0 0 40px rgba(255, 159, 67, 0.6);
+  background: #c8956c;
+  box-shadow: 0 0 40px rgba(200, 149, 108, 0.6);
 }
 
 .playBtnSvg {
   width: 24px;
   height: 24px;
-  color: #0C0D14;
+  color: #08080a;
   margin-left: 3px;
 }
 
@@ -419,8 +419,8 @@
 }
 
 .detailItem:hover {
-  background: rgba(255, 159, 67, 0.05);
-  border-color: rgba(255, 159, 67, 0.15);
+  background: rgba(200, 149, 108, 0.05);
+  border-color: rgba(200, 149, 108, 0.15);
 }
 
 .detailLabel {
@@ -464,34 +464,34 @@
 }
 
 .actionBtnPrimary {
-  background: linear-gradient(135deg, #FF9F43, #FFB86B);
-  color: #0C0D14;
-  box-shadow: 0 4px 16px rgba(255, 159, 67, 0.3);
+  background: linear-gradient(135deg, #c8956c, #d4a574);
+  color: #08080a;
+  box-shadow: 0 4px 16px rgba(200, 149, 108, 0.3);
 }
 
 .actionBtnPrimary:hover {
-  background: linear-gradient(135deg, #FFB86B, #FF9F43);
-  box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4);
+  background: linear-gradient(135deg, #d4a574, #c8956c);
+  box-shadow: 0 6px 20px rgba(200, 149, 108, 0.4);
   transform: translateY(-1px);
 }
 
 .actionBtnDanger {
-  background: rgba(255, 77, 79, 0.1);
-  border: 1px solid rgba(255, 77, 79, 0.2);
+  background: rgba(199, 80, 80, 0.1);
+  border: 1px solid rgba(199, 80, 80, 0.2);
   color: #ff4d4f;
 }
 
 .actionBtnDanger:hover {
-  background: rgba(255, 77, 79, 0.15);
-  border-color: rgba(255, 77, 79, 0.3);
+  background: rgba(199, 80, 80, 0.15);
+  border-color: rgba(199, 80, 80, 0.3);
 }
 
 /* ==================== Hint Alert ==================== */
 .hintAlert {
   margin-top: 20px;
   padding: 16px 20px;
-  background: rgba(0, 212, 255, 0.05);
-  border: 1px solid rgba(0, 212, 255, 0.12);
+  background: rgba(90, 158, 158, 0.05);
+  border: 1px solid rgba(90, 158, 158, 0.12);
   border-radius: 12px;
 }
 
@@ -503,7 +503,7 @@
   font-family: 'Figtree', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #00D4FF;
+  color: #5a9e9e;
 }
 
 .hintIcon {

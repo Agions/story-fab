@@ -52,7 +52,7 @@ const ProjectsListView: React.FC<ProjectsListViewProps> = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-6 w-6 rounded-full border-2 border-orange-500/30 border-t-orange-500 animate-spin" />
+        <div className="h-6 w-6 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--border-default)', borderTopColor: 'var(--accent-primary)' }} />
       </div>
     );
   }
@@ -100,7 +100,7 @@ const ProjectsListView: React.FC<ProjectsListViewProps> = ({
                   <div className="mb-2">
                     <Progress value={uiStatus.progress} className="w-full">
                       <ProgressTrack className="h-1">
-                        <ProgressIndicator className="bg-orange-500" />
+                        <ProgressIndicator style={{ background: 'var(--accent-primary)' }} />
                       </ProgressTrack>
                     </Progress>
                   </div>

@@ -19,19 +19,19 @@
 // 主色调渐变（琥珀色）
 // =============================================
 .primary-gradient() {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #c8956c 0%, #d4a574 100%);
 }
 
 .primary-gradient-hover() {
-  background: linear-gradient(135deg, #7c7ff7 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #d4a574 0%, #e2c49a 100%);
 }
 
 .primary-glow-shadow() {
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 15px rgba(200, 149, 108, 0.3);
 }
 
 .primary-glow-shadow-hover() {
-  box-shadow: 0 0 25px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 25px rgba(200, 149, 108, 0.5);
 }
 
 // =============================================
@@ -104,7 +104,7 @@
   margin-bottom: 32px;
 
   &:hover {
-    border-color: rgba(212, 165, 116, 0.1);
+    border-color: rgba(200, 149, 108, 0.1);
   }
 }
 
@@ -123,7 +123,7 @@
   }
 
   &:hover {
-    border-color: rgba(212, 165, 116, 0.3) !important;
+    border-color: rgba(200, 149, 108, 0.3) !important;
   }
 
   &:focus,
@@ -176,11 +176,11 @@
     color: var(--text-color-primary, @text-primary);
 
     &:hover {
-      background-color: rgba(99, 102, 241, 0.1);
+      background-color: rgba(107, 140, 206, 0.1);
     }
 
     &-selected {
-      background-color: rgba(99, 102, 241, 0.15);
+      background-color: rgba(107, 140, 206, 0.15);
       color: var(--primary-color, @primary-color);
     }
   }
@@ -197,7 +197,7 @@
     font-family: @font-body !important;
 
     &-option-selected {
-      background: rgba(255, 159, 67, 0.12) !important;
+      background: rgba(200, 149, 108, 0.12) !important;
       color: @primary-color !important;
     }
 
@@ -214,11 +214,11 @@
   color: var(--text-color-primary, @text-primary);
 
   &:hover {
-    background-color: rgba(99, 102, 241, 0.1);
+    background-color: rgba(107, 140, 206, 0.1);
   }
 
   &-selected {
-    background-color: rgba(99, 102, 241, 0.15);
+    background-color: rgba(107, 140, 206, 0.15);
     color: var(--primary-color, @primary-color);
   }
 }
@@ -269,8 +269,8 @@
 }
 
 .status-badge-completed(@accent-color; @accent-glow) {
-  background: rgba(255, 159, 67, 0.12);
-  border-color: rgba(255, 159, 67, 0.25);
+  background: rgba(200, 149, 108, 0.12);
+  border-color: rgba(200, 149, 108, 0.25);
   color: @accent-color;
 
   .statusDot {
@@ -280,8 +280,8 @@
 }
 
 .status-badge-processing(@color; @glow) {
-  background: rgba(0, 212, 255, 0.10);
-  border-color: rgba(0, 212, 255, 0.20);
+  background: rgba(90, 158, 158, 0.10);
+  border-color: rgba(90, 158, 158, 0.20);
   color: @color;
 
   .statusDot {
@@ -427,7 +427,7 @@
   padding: 0 !important;
 
   &:hover {
-    background: rgba(255, 159, 67, 0.20) !important;
+    background: rgba(200, 149, 108, 0.20) !important;
     border-color: @primary-color !important;
     transform: scale(1.1);
   }
@@ -460,7 +460,7 @@
   }
 
   .ant-pagination-item-active {
-    background-color: rgba(99, 102, 241, 0.15);
+    background-color: rgba(107, 140, 206, 0.15);
     border-color: @primary-color;
 
     a {

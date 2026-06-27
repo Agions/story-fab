@@ -177,10 +177,10 @@ export function useProjectList(options: UseProjectListOptions = {}): UseProjectL
 
   // 状态过滤器数据
   const statusFilters = useMemo(() => [
-    { label: '全部', value: projects.length, color: '#667eea', filter: 'all' as ProjectStatusFilter },
-    { label: '草稿', value: projects.filter(p => getProjectUIStatus(p).status === 'draft').length, color: '#8c8c8c', filter: 'draft' as ProjectStatusFilter },
-    { label: '制作中', value: projects.filter(p => getProjectUIStatus(p).status === 'processing').length, color: '#1890ff', filter: 'processing' as ProjectStatusFilter },
-    { label: '已完成', value: projects.filter(p => getProjectUIStatus(p).status === 'completed').length, color: '#52c41a', filter: 'completed' as ProjectStatusFilter },
+    { label: '全部', value: projects.length, color: '#c8956c', filter: 'all' as ProjectStatusFilter },
+    { label: '草稿', value: projects.filter(p => getProjectUIStatus(p).status === 'draft').length, color: '#6b6760', filter: 'draft' as ProjectStatusFilter },
+    { label: '制作中', value: projects.filter(p => getProjectUIStatus(p).status === 'processing').length, color: '#c49660', filter: 'processing' as ProjectStatusFilter },
+    { label: '已完成', value: projects.filter(p => getProjectUIStatus(p).status === 'completed').length, color: '#5a9e6f', filter: 'completed' as ProjectStatusFilter },
   ], [projects]);
 
   return {

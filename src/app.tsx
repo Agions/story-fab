@@ -32,8 +32,8 @@ const PageLoader = () => (
       style={{
         width: 36,
         height: 36,
-        border: '3px solid rgba(255, 159, 67, 0.25)',
-        borderTopColor: '#FF9F43',
+        border: '3px solid rgba(200, 149, 108, 0.25)',
+        borderTopColor: '#c8956c',
         borderRadius: '50%',
         animation: 'StoryFab-spin 0.9s linear infinite',
       }}

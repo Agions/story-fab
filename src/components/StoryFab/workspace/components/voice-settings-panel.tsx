@@ -135,7 +135,7 @@ export const VoiceSettingsPanel: React.FC<VoiceSettingsPanelProps> = ({
             max={100}
             valueFormatter={(v) => `${v}%`}
             onChange={(value) => onConfigChange({ originalAudioVolume: value })}
-            fillColor="linear-gradient(90deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.8))"
+            fillColor="linear-gradient(90deg, rgba(90, 158, 158, 0.5), rgba(90, 158, 158, 0.8))"
           />
 
           {/* 音频波形指示器 */}
