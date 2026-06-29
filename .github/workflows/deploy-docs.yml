@@ -34,14 +34,15 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
-        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
-        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
-        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
-        # || 兜底: 检测 "npm error" 字符串, 强制 fail
-        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner registry
+        # (npm/cli#7006 confirmed: npm 10.x "Exit handler never called" 100% reproducible)
+        # Node 20 ships npm 10.8.2 by default; we override to npm@9 via global install
+        # npm install (not ci) tolerates lockfile drift
+        # --prefer-offline: minimize registry roundtrips
+        # timeout + grep "^npm error" + exit 1: catch silent npm failures
         run: |
           set -e
+          npm install -g npm@9 --silent
           npm install --prefer-offline --no-audit --no-fund --ignore-scripts 2>&1 | tee /tmp/npm-ci.log
           if grep -q "^npm error" /tmp/npm-ci.log; then
             echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
