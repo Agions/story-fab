@@ -28,8 +28,16 @@ jobs:
       - name: Install dependencies
         # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
         # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
+        # || 兜底: 检测 "npm error" 字符串, 强制 fail
         # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
-        run: npm ci --prefer-offline --no-audit --no-fund
+        run: |
+          set -e
+          npm ci --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm error" /tmp/npm-ci.log; then
+            echo "::error::npm ci reported errors (likely hang, node_modules incomplete)"
+            exit 1
+          fi
         timeout-minutes: 3
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
@@ -69,8 +77,16 @@ jobs:
       - name: Install dependencies
         # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
         # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
+        # || 兜底: 检测 "npm error" 字符串, 强制 fail
         # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
-        run: npm ci --prefer-offline --no-audit --no-fund
+        run: |
+          set -e
+          npm ci --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm error" /tmp/npm-ci.log; then
+            echo "::error::npm ci reported errors (likely hang, node_modules incomplete)"
+            exit 1
+          fi
         timeout-minutes: 3
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
@@ -107,8 +123,16 @@ jobs:
       - name: Install dependencies
         # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
         # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
+        # || 兜底: 检测 "npm error" 字符串, 强制 fail
         # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
-        run: npm ci --prefer-offline --no-audit --no-fund
+        run: |
+          set -e
+          npm ci --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm error" /tmp/npm-ci.log; then
+            echo "::error::npm ci reported errors (likely hang, node_modules incomplete)"
+            exit 1
+          fi
         timeout-minutes: 3
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
