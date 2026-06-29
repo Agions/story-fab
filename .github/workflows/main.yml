@@ -25,6 +25,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+        env:
+          # npm "Exit handler never called" bug 偶发 (GitHub Runner Node 24
+          # + 默认 npm 已知问题), 关 telemetry/fund/audit 加速
+          NPM_CONFIG_FUND: 'false'
+          NPM_CONFIG_AUDIT: 'false'
+          NPM_CONFIG_UPDATE_NOTIFIER: 'false'
       - name: TypeScript check
         run: |
           mkdir -p reports
@@ -55,6 +61,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+        env:
+          # npm "Exit handler never called" bug 偶发 (GitHub Runner Node 24
+          # + 默认 npm 已知问题), 关 telemetry/fund/audit 加速
+          NPM_CONFIG_FUND: 'false'
+          NPM_CONFIG_AUDIT: 'false'
+          NPM_CONFIG_UPDATE_NOTIFIER: 'false'
       - name: Create reports directory
         run: mkdir -p reports
       - name: ESLint
@@ -82,6 +94,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+        env:
+          # npm "Exit handler never called" bug 偶发 (GitHub Runner Node 24
+          # + 默认 npm 已知问题), 关 telemetry/fund/audit 加速
+          NPM_CONFIG_FUND: 'false'
+          NPM_CONFIG_AUDIT: 'false'
+          NPM_CONFIG_UPDATE_NOTIFIER: 'false'
       - name: Create reports directory
         run: mkdir -p reports
       - name: Coverage with JSON reporter
