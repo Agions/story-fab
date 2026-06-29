@@ -27,14 +27,14 @@ jobs:
       - name: Install dependencies
         # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner
         # (npm/cli#7006 confirmed: "Exit handler never called" 100% reproducible)
-        # Override registry to npmjs.org (lockfile pins to tencentyun mirror, GH Runner DNS ENOTFOUND)
-        # npm install (not ci) tolerates lockfile drift
-        # --prefer-offline: minimize registry roundtrips
-        # timeout + grep "^npm ERR" + exit 1: catch silent npm failures
+        # Rewrite lockfile: tencentyun mirror (China-only) → npmjs.org (lockfile has 207 entries
+        # pinning to tencentyun, GH Runner DNS ENOTFOUND for this China-only mirror)
+        # --registry flag alone doesn't override hardcoded URLs in lockfile
         run: |
           set -e
           npm install -g npm@9 --silent
-          npm install --registry=https://registry.npmjs.org/ --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
           if grep -q "^npm ERR" /tmp/npm-ci.log; then
             echo "::error::npm install reported errors"
             exit 1
@@ -77,14 +77,14 @@ jobs:
       - name: Install dependencies
         # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner
         # (npm/cli#7006 confirmed: "Exit handler never called" 100% reproducible)
-        # Override registry to npmjs.org (lockfile pins to tencentyun mirror, GH Runner DNS ENOTFOUND)
-        # npm install (not ci) tolerates lockfile drift
-        # --prefer-offline: minimize registry roundtrips
-        # timeout + grep "^npm ERR" + exit 1: catch silent npm failures
+        # Rewrite lockfile: tencentyun mirror (China-only) → npmjs.org (lockfile has 207 entries
+        # pinning to tencentyun, GH Runner DNS ENOTFOUND for this China-only mirror)
+        # --registry flag alone doesn't override hardcoded URLs in lockfile
         run: |
           set -e
           npm install -g npm@9 --silent
-          npm install --registry=https://registry.npmjs.org/ --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
           if grep -q "^npm ERR" /tmp/npm-ci.log; then
             echo "::error::npm install reported errors"
             exit 1
@@ -124,14 +124,14 @@ jobs:
       - name: Install dependencies
         # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner
         # (npm/cli#7006 confirmed: "Exit handler never called" 100% reproducible)
-        # Override registry to npmjs.org (lockfile pins to tencentyun mirror, GH Runner DNS ENOTFOUND)
-        # npm install (not ci) tolerates lockfile drift
-        # --prefer-offline: minimize registry roundtrips
-        # timeout + grep "^npm ERR" + exit 1: catch silent npm failures
+        # Rewrite lockfile: tencentyun mirror (China-only) → npmjs.org (lockfile has 207 entries
+        # pinning to tencentyun, GH Runner DNS ENOTFOUND for this China-only mirror)
+        # --registry flag alone doesn't override hardcoded URLs in lockfile
         run: |
           set -e
           npm install -g npm@9 --silent
-          npm install --registry=https://registry.npmjs.org/ --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
           if grep -q "^npm ERR" /tmp/npm-ci.log; then
             echo "::error::npm install reported errors"
             exit 1
