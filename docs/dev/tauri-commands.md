@@ -202,7 +202,7 @@ async fn synthesize_speech(
 async fn list_available_models() -> Result<Vec<AIModel>>
 ```
 
-> 完整命令清单（当前 61 个）：`grep -rE '#\[tauri::command\]' src-tauri/src/`，详见 [backend.md](backend.md)。
+> 完整命令清单（当前 61 个）：`rg '#\[tauri::command\]' src-tauri/src/ | wc -l`（实测 61），详见本文件 commentary / render / llm / subtitle / project 5 段。
 
 ## TS 调用
 

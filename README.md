@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 [![Rust 1.77+](https://img.shields.io/badge/Rust-1.77+-DEA584?logo=rust&logoColor=black)](https://www.rust-lang.org/)
 [![Version](https://img.shields.io/badge/version-2.2.0-brightgreen.svg)](CHANGELOG.md)
 
-[English](README_EN.md) · [更新日志](CHANGELOG.md) · [文档站](https://agions.github.io/story-fab/)
+[更新日志](CHANGELOG.md) · [文档站](https://agions.github.io/story-fab/)
 
 ---
 
