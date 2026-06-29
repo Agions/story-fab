@@ -15,7 +15,7 @@ import { Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import type { VideoMetadata } from '@/core/video';
-import { loadProjectWithRetry, saveProjectToFile } from '@/services/tauri';
+import { loadProjectWithRetry, saveProjectToFile } from '@/core/services/project/project-file-service';
 import { notify } from '@/shared';
 import { useSettings } from '@/context/settings-context';
 

@@ -1,22 +1,21 @@
 /**
- * Timeline Store - 专门管理时间线相关状态
+ * Workspace Store — 统一管理编辑器 + 时间线状态
  *
- * Phase 3: Store 拆分 - 将 timeline 相关状态从 editorStore 中分离
- * Phase B: history 内联抽离到 createHistory 泛型模块（消除 5 个 action 重复）
+ * 合并来源：
+ *   - editor-store.ts: 媒体数据、播放状态、UI 状态
+ *   - timeline-store.ts: 轨道/片段/关键帧、历史记录
  *
- * 包含：
- * - timelineTracks: 多轨道时间线数据
- * - playheadMs: 播放头位置
- * - timelineDuration: 时间线总时长
- * - snapEnabled/snapThreshold: 吸附配置
- * - selectedClipId/selectedTrackId: 当前选中
- * - history: undo/redo 由 createHistory 模块托管（不再存到 state）
+ * 持久化策略（与拆分前一致）：
+ *   - 持久化: video, zoom, volume, muted, snapEnabled, snapThreshold
+ *   - 不持久化: 时间线数据（项目相关）、播放状态
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
-import { createHistory } from './create-history';
+
 import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '../core/types/timeline';
-import { DEFAULT_SNAP_THRESHOLD_MS } from './editor-types';
+import type { VideoData, ScriptData, VoiceData, EditorPanel, TimelineSelection } from './editor-types';
+import { DEFAULT_ZOOM, ZOOM_MIN, ZOOM_MAX, VOLUME_MIN, VOLUME_MAX, DEFAULT_SNAP_THRESHOLD_MS } from './editor-types';
+import { createHistory } from './create-history';
 import {
   updateClipInTracks,
   addKeyframeToClip,
@@ -24,23 +23,30 @@ import {
   updateKeyframeInClip,
 } from './timeline-helpers';
 
-const MAX_HISTORY_SIZE = 19;
-
 // =========================================
 // Types
 // =========================================
 
-export interface TimelineState {
-  // Core timeline data
+interface WorkspaceState {
+  // Editor state
+  video: VideoData | null;
+  script: ScriptData | null;
+  voice: VoiceData | null;
+  activePanel: EditorPanel;
+  previewPlaying: boolean;
+  currentTime: number;
+  volume: number;
+  muted: boolean;
+  selection: TimelineSelection;
+  zoom: number;
+  scrollPosition: number;
+
+  // Timeline state
   timelineTracks: TimelineTrack[];
   playheadMs: number;
   timelineDuration: number;
-
-  // Snap configuration
   snapEnabled: boolean;
-  snapThreshold: number; // ms
-
-  // Selection
+  snapThreshold: number;
   selectedClipId?: string;
   selectedTrackId?: string;
   selectedMultipleIds?: string[];
@@ -48,40 +54,43 @@ export interface TimelineState {
   outPointMs?: number;
 }
 
-interface TimelineActions {
-  // Playhead
-  setPlayheadMs: (ms: number) => void;
+interface WorkspaceActions {
+  // Editor actions
+  setVideo: (video: VideoData | null) => void;
+  setScript: (script: ScriptData | null) => void;
+  setVoice: (voice: VoiceData | null) => void;
+  setActivePanel: (panel: EditorPanel) => void;
+  setPreviewPlaying: (playing: boolean) => void;
+  setCurrentTime: (time: number) => void;
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  setSelection: (selection: Partial<TimelineSelection>) => void;
+  clearSelection: () => void;
+  setZoom: (zoom: number) => void;
+  setScrollPosition: (position: number) => void;
+  reset: () => void;
 
-  // Track management
+  // Timeline actions
+  setPlayheadMs: (ms: number) => void;
   setTimelineTracks: (tracks: TimelineTrack[]) => void;
   addTimelineTrack: (type: TrackType, name?: string) => string;
   removeTimelineTrack: (trackId: string) => void;
   updateTimelineTrack: (trackId: string, updates: Partial<TimelineTrack>) => void;
-
-  // Clip management
   addClipToTrack: (trackId: string, clipData: Omit<TimelineClip, 'id' | 'trackId'>) => string;
   removeClipFromTrack: (clipId: string) => void;
   updateClip: (clipId: string, updates: Partial<TimelineClip>) => void;
   moveClip: (clipId: string, targetTrackId: string, newStartMs: number, newEndMs?: number, skipHistory?: boolean) => void;
   splitClip: (clipId: string, splitMs: number) => void;
-
-  // Keyframe management
   addKeyframe: (clipId: string, kfData: Omit<AnimationKeyframe, 'id'>) => string;
   removeKeyframe: (clipId: string, keyframeId: string) => void;
   updateKeyframe: (clipId: string, keyframeId: string, updates: Partial<AnimationKeyframe>) => void;
-
-  // Selection
   setTimelineSelection: (clipId?: string, trackId?: string) => void;
   clearTimelineSelection: () => void;
   setInPoint: () => void;
   setOutPoint: () => void;
   selectAllClips: () => void;
-
-  // Timeline config
   setTimelineDuration: (ms: number) => void;
   setSnapEnabled: (enabled: boolean) => void;
-
-  // History（由 createHistory 模块托管，不入 state）
   saveTrackHistory: () => void;
   undoTrack: () => void;
   redoTrack: () => void;
@@ -89,46 +98,79 @@ interface TimelineActions {
   canRedoTrack: () => boolean;
 }
 
-type TimelineStore = TimelineState & TimelineActions;
+export type WorkspaceStore = WorkspaceState & WorkspaceActions;
 
 // =========================================
 // Initial State
 // =========================================
 
-const initialState: TimelineState = {
-  timelineTracks: [],
+const initialEditorState = {
+  video: null as VideoData | null,
+  script: null as ScriptData | null,
+  voice: null as VoiceData | null,
+  activePanel: 'video' as EditorPanel,
+  previewPlaying: false,
+  currentTime: 0,
+  volume: 1,
+  muted: false,
+  selection: { segmentId: undefined, multipleIds: [] } as TimelineSelection,
+  zoom: DEFAULT_ZOOM,
+  scrollPosition: 0,
+};
+
+const initialTimelineState = {
+  timelineTracks: [] as TimelineTrack[],
   playheadMs: 0,
   timelineDuration: 60000,
   snapEnabled: true,
   snapThreshold: DEFAULT_SNAP_THRESHOLD_MS,
-  selectedClipId: undefined,
-  selectedTrackId: undefined,
-  inPointMs: undefined,
-  outPointMs: undefined,
+  selectedClipId: undefined as string | undefined,
+  selectedTrackId: undefined as string | undefined,
+  selectedMultipleIds: undefined as string[] | undefined,
+  inPointMs: undefined as number | undefined,
+  outPointMs: undefined as number | undefined,
 };
 
-// History controller（模块作用域，闭包内存储 past/future）
-// 不入 React state，避免持久化和无谓重渲染
+// =========================================
+// History controller
+// =========================================
+
+const MAX_HISTORY_SIZE = 19;
 const trackHistory = createHistory<TimelineTrack[]>({ maxSize: MAX_HISTORY_SIZE });
 
-// 仅供测试使用：vitest 的 beforeEach 需要在每个 case 前重置模块闭包内的 past/future
-// 内部 action 不暴露此入口
 export const __resetTrackHistoryForTest = () => trackHistory.clear();
 
 // =========================================
 // Store
 // =========================================
 
-export const useTimelineStore = create<TimelineStore>()(
+export const useWorkspaceStore = create<WorkspaceStore>()(
   devtools(
     persist(
       (set, get) => ({
-        ...initialState,
+        ...initialEditorState,
+        ...initialTimelineState,
 
-        // ─── Playhead ────────────────────────────────────────────────────────
+        // ─── Editor Actions ───────────────────────────────────────────────────
+        setVideo: (video) => set({ video }),
+        setScript: (script) => set({ script }),
+        setVoice: (voice) => set({ voice }),
+        setActivePanel: (activePanel) => set({ activePanel }),
+        setPreviewPlaying: (previewPlaying) => set({ previewPlaying }),
+        setCurrentTime: (currentTime) => set({ currentTime }),
+        setVolume: (volume) => set({ volume: Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, volume)) }),
+        setMuted: (muted) => set({ muted }),
+        setSelection: (selection) => set((s) => ({ selection: { ...s.selection, ...selection } })),
+        clearSelection: () => set({ selection: { segmentId: undefined, multipleIds: [] } }),
+        setZoom: (zoom) => set({ zoom: Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom)) }),
+        setScrollPosition: (scrollPosition) => set({ scrollPosition }),
+        reset: () => set({
+          ...initialEditorState,
+          ...initialTimelineState,
+        }),
+
+        // ─── Timeline Actions ─────────────────────────────────────────────────
         setPlayheadMs: (ms) => set({ playheadMs: Math.max(0, ms) }),
-
-        // ─── Track Management ────────────────────────────────────────────────
         setTimelineTracks: (tracks) => {
           trackHistory.save(get().timelineTracks);
           set({ timelineTracks: tracks });
@@ -169,7 +211,6 @@ export const useTimelineStore = create<TimelineStore>()(
             ),
           })),
 
-        // ─── Clip Management ─────────────────────────────────────────────────
         addClipToTrack: (trackId, clipData) => {
           const id = crypto.randomUUID();
           const clip: TimelineClip = { ...clipData, id, trackId };
@@ -266,7 +307,6 @@ export const useTimelineStore = create<TimelineStore>()(
           }));
         },
 
-        // ─── Keyframe Management ─────────────────────────────────────────────
         addKeyframe: (clipId, kfData) => {
           trackHistory.save(get().timelineTracks);
           const id = crypto.randomUUID();
@@ -291,7 +331,6 @@ export const useTimelineStore = create<TimelineStore>()(
           }));
         },
 
-        // ─── Selection ───────────────────────────────────────────────────────
         setTimelineSelection: (clipId, trackId) =>
           set({ selectedClipId: clipId, selectedTrackId: trackId }),
 
@@ -304,7 +343,6 @@ export const useTimelineStore = create<TimelineStore>()(
         selectAllClips: () => {
           const allClipIds = get().timelineTracks.flatMap((t) => t.clips.map((c) => c.id));
           if (allClipIds.length === 0) return;
-          // 选中所有 clip: 第一个作为主要选中，其余放入 multipleIds
           const [firstId, ...restIds] = allClipIds;
           const firstTrack = get().timelineTracks.find((t) => t.clips.some((c) => c.id === firstId));
           set({
@@ -314,11 +352,9 @@ export const useTimelineStore = create<TimelineStore>()(
           });
         },
 
-        // ─── Timeline Config ─────────────────────────────────────────────────
         setTimelineDuration: (ms) => set({ timelineDuration: Math.max(0, ms) }),
         setSnapEnabled: (enabled) => set({ snapEnabled: enabled }),
 
-        // ─── History（createHistory 模块驱动） ──────────────────────────────
         saveTrackHistory: () => trackHistory.save(get().timelineTracks),
         undoTrack: () => {
           const prev = trackHistory.undo(get().timelineTracks);
@@ -332,18 +368,18 @@ export const useTimelineStore = create<TimelineStore>()(
         canRedoTrack: () => trackHistory.canRedo(),
       }),
       {
-        name: 'StoryFab-timeline',
+        name: 'StoryFab-workspace',
         storage: createJSONStorage(() => localStorage),
-        // Don't persist timeline data - it's project-specific
         partialize: (state) => ({
+          video: state.video,
+          zoom: state.zoom,
+          volume: state.volume,
+          muted: state.muted,
           snapEnabled: state.snapEnabled,
           snapThreshold: state.snapThreshold,
         }),
       }
     ),
-    { name: 'TimelineStore' }
+    { name: 'WorkspaceStore' }
   )
 );
-
-// Re-export types
-export type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '../core/types/timeline';

@@ -42,6 +42,7 @@ export interface AppState {
   clearNotifications: () => void;
   updateUserSettings: (settings: Partial<UserSettings>) => void;
   setAutoSave: (autoSave: boolean) => void;
+  addRecentProject: (projectId: string) => void;
 }
 
 // ==========================================
@@ -93,6 +94,17 @@ export const useAppStore = create<AppState>()(
         })),
 
       setAutoSave: (autoSave) => set({ autoSave }),
+
+      addRecentProject: (projectId) =>
+        set((state) => ({
+          userSettings: {
+            ...state.userSettings,
+            recentProjects: [
+              projectId,
+              ...state.userSettings.recentProjects.filter((id) => id !== projectId),
+            ].slice(0, 10),
+          },
+        })),
     }),
     {
       name: 'StoryFab-app',

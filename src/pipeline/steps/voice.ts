@@ -78,7 +78,7 @@ async function synthesizeSegment(
       format: 'mp3',
     });
 
-    return (result as any)?.audioPath ?? '';
+    return (result as string) ?? '';
   } catch (err) {
     logger.error('TTS synthesis failed:', { error: err });
     return '';

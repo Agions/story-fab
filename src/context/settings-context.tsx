@@ -2,15 +2,18 @@
  * Settings Context
  *
  * 用户偏好设置的 Context 层
- * 底层使用 appStore 的 userSettings 状态
+ * 底层统一使用 appStore 的 userSettings 状态
  */
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useAppStore, UserSettings } from '@/store/app-store';
-import { useSettingsStore } from '@/hooks/use-settings';
+import { useAppStore } from '@/store/app-store';
 
 interface SettingsContextValue {
-  settings: UserSettings;
-  updateSettings: (settings: Partial<UserSettings>) => void;
+  settings: {
+    compactMode: boolean;
+    language: string;
+    recentProjects: string[];
+  };
+  updateSettings: (settings: Partial<{ compactMode: boolean; language: string; recentProjects: string[] }>) => void;
   compactMode: boolean;
   language: string;
   addRecentProject: (projectId: string) => void;
@@ -21,7 +24,7 @@ const SettingsContext = createContext<SettingsContextValue | null>(null);
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const settings = useAppStore((s) => s.userSettings);
   const updateSettings = useAppStore((s) => s.updateUserSettings);
-  const { addRecentProject } = useSettingsStore();
+  const addRecentProject = useAppStore((s) => s.addRecentProject);
 
   return (
     <SettingsContext.Provider

@@ -1,6 +1,6 @@
 /**
- * @deprecated 请从 @/types 导入时间线相关类型
- * 此文件为向后兼容的重导出层，将在后续版本移除
+ * 核心时间线类型统一导出
+ * 从 @/types 重新导出，供 core/ 及其子域使用
  */
 export type {
   TrackType,
@@ -11,15 +11,8 @@ export type {
   AnimationKeyframe,
   TimelineTrack,
   TimelineMarker,
-  Timeline,
-  VideoClip,
-  AudioClip,
-  VideoTrack,
-  AudioTrack,
-  TextItem,
-  TextTrack,
-  EffectTrack,
   Transition,
+  Timeline,
   TimelineState,
   DragState,
   TimelineSelection,
@@ -28,6 +21,14 @@ export type {
   EditorHistory,
   EditorExportSettings,
   EditorConfig,
+  // 遗留类型（已废弃，保留向后兼容）
+  VideoClip,
+  AudioClip,
+  VideoTrack,
+  AudioTrack,
+  TextItem,
+  TextTrack,
+  EffectTrack,
 } from '@/types';
 
 export {

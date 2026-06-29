@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Timeline } from '../../../core/types/timeline';
+import type { Timeline } from '@/types';
 import {
   createHistory,
   pushHistory,

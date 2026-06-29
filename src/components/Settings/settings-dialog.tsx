@@ -19,11 +19,11 @@ import ApiKeysPanel from './api-keys-panel';
 import { AppearanceSettings } from './appearance-settings';
 import { ShortcutSettings } from './shortcut-settings';
 import { ExportSettings } from './export-settings';
-import useLocalStorage from '@/hooks/use-local-storage';
 import { AI_MODELS } from '@/core/config/ai-models-config';
 import type { ModelProvider } from '@/types';
 import { notify } from '@/shared';
 import { validateApiKey } from '@/core/services/providers/api-key-service';
+import { useSecureApiKeys } from '@/hooks/use-secure-api-keys';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -40,13 +40,10 @@ const TABS: { key: TabKey; label: string }[] = [
 ];
 
 // ─── AI Tab 内容 ───────────────────────────────────────────────
-interface ApiKeyConfig { key: string; isValid?: boolean; }
 
 const AITabContent: React.FC = () => {
-  const [apiKeys, setApiKeys] = useLocalStorage<Partial<Record<ModelProvider, ApiKeyConfig>>>(
-    'api_keys', {}
-  );
-  const [defaultModel, setDefaultModel] = useLocalStorage<string>('default_model', 'gpt-5.5');
+  const [apiKeys, setApiKeys] = useSecureApiKeys({});
+  const [defaultModel, setDefaultModel] = useState('gpt-5.5');
 
   // 当前选中模型对应的 provider 和 apiKey
   const selectedModel = AI_MODELS.find(m => m.id === defaultModel);
@@ -60,15 +57,14 @@ const AITabContent: React.FC = () => {
     if (!key.trim()) {
       delete newKeys[provider];
     } else {
-      // 先设为无效状态，再异步验证
       newKeys[provider] = { key, isValid: undefined };
     }
-    setApiKeys(newKeys);
+    await setApiKeys(newKeys);
 
     // 异步验证
     if (key.trim()) {
       const result = await validateApiKey(provider, key);
-      setApiKeys(prev => ({
+      await setApiKeys(prev => ({
         ...prev,
         [provider]: { key, isValid: result.isValid },
       }));
@@ -79,8 +75,8 @@ const AITabContent: React.FC = () => {
   }, [apiKeys, setApiKeys]);
 
   // 删除某个 provider 的 API Key
-  const handleDeleteKey = useCallback((provider: ModelProvider) => {
-    setApiKeys(prev => {
+  const handleDeleteKey = useCallback(async (provider: ModelProvider) => {
+    await setApiKeys(prev => {
       const next = { ...prev };
       delete next[provider];
       return next;
@@ -91,7 +87,7 @@ const AITabContent: React.FC = () => {
   // 默认模型切换时，同步 API Key 输入框显示对应的 key
   const handleModelChange = useCallback((modelId: string) => {
     setDefaultModel(modelId);
-  }, [setDefaultModel]);
+  }, []);
 
   return (
     <div className="flex flex-col gap-6">

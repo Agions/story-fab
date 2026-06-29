@@ -8,10 +8,9 @@
 // 导出各个 store
 export { useAppStore } from './app-store';
 export { useProjectStore } from './project-store';
-export { useEditorStore } from './editor-store';
-export { useTimelineStore } from './timeline-store';
+export { useWorkspaceStore } from './workspace-store';
 
-// mainStore 导出为 useModelStore（AI 模型相关状态）
+// AI 模型相关状态
 export { useModelStore } from './model-store';
 
 // story-fab workspace 专用 store（保留在 components/story-fab/context/）

@@ -5,7 +5,7 @@
  * 缺点：准确率低于 Whisper/云 ASR，仅支持部分语言
  */
 import { logger } from '../../../../shared/utils/logging';
-import type { VideoInfo } from '../../../types';
+import type { VideoInfo } from '@/types';
 import type { ASRResult, ASRSegment, ASROptions, SpeechRecognitionCtor, SpeechRecognitionEvent } from '../asr-types';
 import type { IASRProvider } from './types';
 

@@ -32,7 +32,7 @@ import type { VideoInfo, VideoAnalysis } from '@/types';
 import type {
   RepurposingOptions,
 } from '../../../core/services/pipeline/clip-pipeline/pipeline';
-import { transcodeWithCrop } from '../../../services/tauri';
+import { transcodeWithCrop } from '@/core/services/export/transcode-crop-service';
 import styles from './ClipRippling.module.css';
 import {
   MIN_CLIP_DURATION_SECONDS,

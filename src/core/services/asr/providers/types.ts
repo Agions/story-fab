@@ -3,7 +3,7 @@
  * 单一职责：每个 Provider 只负责一种 ASR 识别方案
  */
 import type { ASRResult, ASROptions } from '../asr-types';
-import type { VideoInfo } from '../../../types';
+import type { VideoInfo } from '@/types';
 
 /**
  * ASR Provider 接口

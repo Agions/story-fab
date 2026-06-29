@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { ArrowLeft, Save, Trash2, Download, Bot, Loader2 } from 'lucide-react';
 import { useSettings } from '@/context/settings-context';
 import { notify } from '@/shared';
-import { exportScriptToFile, saveProjectToFile, loadProjectWithRetry, listProjects } from '../../services/tauri';
+import { saveProjectToFile, loadProjectWithRetry, listProjects } from '@/core/services/project/project-file-service';
+import { exportScriptToFile } from '@/core/services/export/script-export-service';
 import { findProjectByScriptId, normalizeProjectFile } from '../../core/utils/project-file';
 import type { ProjectFileLike } from '../../core/utils/project-file';
 import type { Script } from '@/core/services/ai/script-service';

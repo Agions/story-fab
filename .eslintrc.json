@@ -3,8 +3,7 @@
   "ignorePatterns": [
     "node_modules/",
     "dist/",
-    "src/_DEAD/**",
-    "**/error-codes.ts"
+    "src/_DEAD/**"
   ],
   "env": {
     "browser": true,

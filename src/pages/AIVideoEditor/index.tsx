@@ -11,8 +11,7 @@ import {
 import { StoryFabProvider, useStoryFab } from '@/components/StoryFab/context';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
-import { useEditorStore } from '../../store/editor-store';
-import { useTimelineStore } from '../../store/timeline-store';
+import { useWorkspaceStore } from '../../store/workspace-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryFab/workspace/function-mode-map';
@@ -75,9 +74,9 @@ const AIVideoEditorContent: React.FC = () => {
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
   // Avoids N separate selector calls (each triggers re-render)
-  const previewPlaying = useEditorStore(s => s.previewPlaying);
-  const setPreviewPlaying = useEditorStore(s => s.setPreviewPlaying);
-  const timelineStore = useTimelineStore(
+  const previewPlaying = useWorkspaceStore(s => s.previewPlaying);
+  const setPreviewPlaying = useWorkspaceStore(s => s.setPreviewPlaying);
+  const timelineActions = useWorkspaceStore(
     useShallow((s) => ({
       playheadMs: s.playheadMs,
       selectedClipId: s.selectedClipId,
@@ -102,36 +101,36 @@ const AIVideoEditorContent: React.FC = () => {
       setPreviewPlaying(false);
     },
     onSeek: (delta) => {
-      const newTime = Math.max(0, (timelineStore.playheadMs / 1000) + delta);
-      timelineStore.setPlayheadMs(newTime * 1000);
+      const newTime = Math.max(0, (timelineActions.playheadMs / 1000) + delta);
+      timelineActions.setPlayheadMs(newTime * 1000);
     },
     onSeekTo: (time) => {
-      timelineStore.setPlayheadMs(time * 1000);
+      timelineActions.setPlayheadMs(time * 1000);
     },
     onDelete: () => {
-      if (timelineStore.selectedClipId) {
-        timelineStore.removeClipFromTrack(timelineStore.selectedClipId);
+      if (timelineActions.selectedClipId) {
+        timelineActions.removeClipFromTrack(timelineActions.selectedClipId);
         notify.success('片段已删除');
       } else {
         notify.warning('请先选择要删除的片段');
       }
     },
     onInPoint: () => {
-      timelineStore.setInPoint();
-      notify.success(`入点: ${(timelineStore.playheadMs / 1000).toFixed(1)}s`);
+      timelineActions.setInPoint();
+      notify.success(`入点: ${(timelineActions.playheadMs / 1000).toFixed(1)}s`);
     },
     onOutPoint: () => {
-      timelineStore.setOutPoint();
-      notify.success(`出点: ${(timelineStore.playheadMs / 1000).toFixed(1)}s`);
+      timelineActions.setOutPoint();
+      notify.success(`出点: ${(timelineActions.playheadMs / 1000).toFixed(1)}s`);
     },
     onSelectAll: () => {
-      timelineStore.selectAllClips();
+      timelineActions.selectAllClips();
     },
     onUndo: () => {
-      timelineStore.undoTrack();
+      timelineActions.undoTrack();
     },
     onRedo: () => {
-      timelineStore.redoTrack();
+      timelineActions.redoTrack();
     },
     onExport: () => {
       goToNextStep();

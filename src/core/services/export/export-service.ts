@@ -7,12 +7,11 @@
 import { invoke, TauriCommand } from '../../tauri';
 import { logger } from '@/shared/utils/logging';
 
-import type { ExportFormat, ExportQuality, ExportResolution, ExportConfig, ExportResult } from '../../export/types';
+import type { ExportConfig, ExportResult, ExportFormat } from '../../export/types';
 import { EXPORT_PRESETS, FORMAT_INFO } from '../../export/types';
-export type { ExportFormat, ExportQuality, ExportResolution, ExportConfig, ExportResult };
-export { EXPORT_PRESETS, FORMAT_INFO };
+export type { ExportResult };
 
-export const FORMAT_MIME_TYPES: Record<ExportFormat, string> = {
+export const FORMAT_MIME_TYPES: Record<string, string> = {
   mp4: 'video/mp4',
   webm: 'video/webm',
   mov: 'video/quicktime',
@@ -20,41 +19,43 @@ export const FORMAT_MIME_TYPES: Record<ExportFormat, string> = {
   gif: 'image/gif',
 };
 
+export function mergeExportConfig(
+  overrides: Partial<ExportConfig>,
+  instance: ExportConfig | null,
+): ExportConfig {
+  const quality = overrides.quality ?? instance?.quality ?? 'medium';
+  const preset = EXPORT_PRESETS[quality];
+  return {
+    format: overrides.format ?? instance?.format ?? 'mp4',
+    quality,
+    resolution: overrides.resolution ?? instance?.resolution ?? preset.resolution ?? '1080p',
+    frameRate: overrides.frameRate ?? instance?.frameRate ?? preset.frameRate ?? 30,
+    aspectRatio: overrides.aspectRatio ?? instance?.aspectRatio ?? '16:9',
+    audioCodec: overrides.audioCodec ?? instance?.audioCodec ?? preset.encoder?.audioCodec ?? 'aac',
+    audioBitrate: overrides.audioBitrate ?? instance?.audioBitrate ?? preset.audioBitrate ?? '192k',
+    sampleRate: overrides.sampleRate ?? instance?.sampleRate ?? 48000,
+    channels: overrides.channels ?? instance?.channels ?? 2,
+    encoder: overrides.encoder ?? instance?.encoder ?? preset.encoder ?? { videoCodec: 'h264', audioCodec: 'aac', crf: 23, preset: 'medium' },
+    subtitleEnabled: overrides.subtitleEnabled ?? instance?.subtitleEnabled ?? false,
+    subtitlePath: overrides.subtitlePath ?? instance?.subtitlePath,
+    burnSubtitles: overrides.burnSubtitles ?? instance?.burnSubtitles ?? false,
+    watermarkEnabled: overrides.watermarkEnabled ?? instance?.watermarkEnabled ?? false,
+    watermarkText: overrides.watermarkText ?? instance?.watermarkText,
+    watermarkImage: overrides.watermarkImage ?? instance?.watermarkImage,
+    watermarkPosition: overrides.watermarkPosition ?? instance?.watermarkPosition ?? 'bottom-right',
+    watermarkOpacity: overrides.watermarkOpacity ?? instance?.watermarkOpacity ?? 0.8,
+    title: overrides.title ?? instance?.title,
+    author: overrides.author ?? instance?.author,
+    copyright: overrides.copyright ?? instance?.copyright,
+  };
+}
+
 export class ExportService {
   private currentExportId: string | null = null;
   private config: ExportConfig | null = null;
 
-  /** Shared config merging logic: partial + instance + preset defaults */
-  private _buildConfig(overrides: Partial<ExportConfig>, useInstance = true): ExportConfig {
-    const quality = overrides.quality ?? (useInstance ? this.config?.quality : undefined) ?? 'medium';
-    const preset = EXPORT_PRESETS[quality];
-    return {
-      format: overrides.format ?? (useInstance ? this.config?.format : undefined) ?? 'mp4',
-      quality,
-      resolution: overrides.resolution ?? (useInstance ? this.config?.resolution : undefined) ?? preset.resolution ?? '1080p',
-      frameRate: overrides.frameRate ?? (useInstance ? this.config?.frameRate : undefined) ?? preset.frameRate ?? 30,
-      aspectRatio: overrides.aspectRatio ?? (useInstance ? this.config?.aspectRatio : undefined) ?? '16:9',
-      audioCodec: overrides.audioCodec ?? (useInstance ? this.config?.audioCodec : undefined) ?? preset.encoder?.audioCodec ?? 'aac',
-      audioBitrate: overrides.audioBitrate ?? (useInstance ? this.config?.audioBitrate : undefined) ?? preset.audioBitrate ?? '192k',
-      sampleRate: overrides.sampleRate ?? (useInstance ? this.config?.sampleRate : undefined) ?? 48000,
-      channels: overrides.channels ?? (useInstance ? this.config?.channels : undefined) ?? 2,
-      encoder: overrides.encoder ?? (useInstance ? this.config?.encoder : undefined) ?? preset.encoder ?? { videoCodec: 'h264', audioCodec: 'aac', crf: 23, preset: 'medium' },
-      subtitleEnabled: overrides.subtitleEnabled ?? (useInstance ? this.config?.subtitleEnabled : undefined) ?? false,
-      subtitlePath: overrides.subtitlePath ?? (useInstance ? this.config?.subtitlePath : undefined),
-      burnSubtitles: overrides.burnSubtitles ?? (useInstance ? this.config?.burnSubtitles : undefined) ?? false,
-      watermarkEnabled: overrides.watermarkEnabled ?? (useInstance ? this.config?.watermarkEnabled : undefined) ?? false,
-      watermarkText: overrides.watermarkText ?? (useInstance ? this.config?.watermarkText : undefined),
-      watermarkImage: overrides.watermarkImage ?? (useInstance ? this.config?.watermarkImage : undefined),
-      watermarkPosition: overrides.watermarkPosition ?? (useInstance ? this.config?.watermarkPosition : undefined) ?? 'bottom-right',
-      watermarkOpacity: overrides.watermarkOpacity ?? (useInstance ? this.config?.watermarkOpacity : undefined) ?? 0.8,
-      title: overrides.title ?? (useInstance ? this.config?.title : undefined),
-      author: overrides.author ?? (useInstance ? this.config?.author : undefined),
-      copyright: overrides.copyright ?? (useInstance ? this.config?.copyright : undefined),
-    };
-  }
-
   setConfig(config: Partial<ExportConfig>): void {
-    this.config = this._buildConfig(config, false);
+    this.config = mergeExportConfig(config, null);
   }
 
   getConfig(): ExportConfig | null {
@@ -67,7 +68,7 @@ export class ExportService {
     config: Partial<ExportConfig>,
     _onProgress?: (percent: number) => void
   ): Promise<ExportResult> {
-    const fullConfig = this._buildConfig(config, true);
+    const fullConfig = mergeExportConfig(config, this.config);
 
     const exportId = crypto.randomUUID();
     this.currentExportId = exportId;
@@ -125,7 +126,7 @@ export class ExportService {
     }
   }
 
-  getExportPresets(): Record<ExportQuality, Partial<ExportConfig>> {
+  getExportPresets(): Record<string, Partial<ExportConfig>> {
     return EXPORT_PRESETS;
   }
 

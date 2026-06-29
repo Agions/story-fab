@@ -1,6 +1,5 @@
 //! Commentary 子模块统一导出
 
-pub mod commentary_synthesizer;
 pub mod director;
 pub mod script_generator;
 pub mod synthesizer;

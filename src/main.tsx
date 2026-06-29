@@ -4,28 +4,23 @@ import App from './app';
 import { logger } from '@/shared/utils/logging';
 import './styles/globals.css';
 
-// 防止控制台出现错误消息
-window.addEventListener('error', (e) => {
-  // 忽略与@tauri-apps/api相关的错误
-  if (e.message && (e.message.includes('@tauri-apps/api') || e.message.includes('Tauri'))) {
-    e.preventDefault();
-    if (import.meta.env.DEV) {
-      logger.warn('[story-fab] Tauri API error suppressed', e.message);
-    }
-  }
-});
-
-// 创建根元素
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('找不到根元素');
 }
 
 const root = ReactDOM.createRoot(rootElement);
-const RootWrapper = import.meta.env.DEV ? React.Fragment : React.StrictMode;
+
+if (import.meta.env.DEV) {
+  window.addEventListener('unhandledrejection', (e) => {
+    if (e.reason instanceof Error && e.reason.message.includes('@tauri-apps/api')) {
+      logger.warn('[story-fab] Tauri API unhandled rejection', e.reason.message);
+    }
+  });
+}
 
 root.render(
-  <RootWrapper>
+  <React.StrictMode>
     <App />
-  </RootWrapper>
-); 
+  </React.StrictMode>
+);

@@ -10,6 +10,8 @@ use std::sync::OnceLock;
 use std::time::Duration;
 use reqwest::Client;
 
+use crate::highlight::HighlightOptions;
+use crate::highlight::SceneDetector;
 use crate::llm::constants::{get_default_model, normalize_provider};
 use crate::llm::helpers::{build_system_prompt, build_user_prompt};
 use crate::llm::parsing::parse_script_output;
@@ -18,6 +20,15 @@ use crate::llm::types::{
     AnalyzeVideoForScriptInput, AnalyzeVideoForScriptOutput,
     GenerateScriptInput, GenerateScriptOutput, ScriptStyle,
 };
+
+static MODEL_CATALOG: OnceLock<Vec<ModelInfo>> = OnceLock::new();
+
+fn get_model_catalog() -> &'static Vec<ModelInfo> {
+    MODEL_CATALOG.get_or_init(|| {
+        let raw = include_str!("../llm/models.json");
+        serde_json::from_str(raw).expect("Failed to parse llm/models.json")
+    })
+}
 
 static HTTP_CLIENT: OnceLock<Client> = OnceLock::new();
 
@@ -34,7 +45,7 @@ fn get_http_client() -> &'static Client {
 
 // ─── Tauri 命令实现 ─────────────────────────────────────────────────────────
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Clone, serde::Deserialize)]
 pub struct ModelInfo {
     pub id: String,
     pub provider: String,
@@ -73,25 +84,49 @@ pub async fn generate_narration_script(
 pub async fn analyze_video_for_narration(
     input: AnalyzeVideoForScriptInput,
 ) -> Result<AnalyzeVideoForScriptOutput, String> {
-    // 简化实现：实际需要调用 Rust 视频处理能力
+    let detector = SceneDetector::new();
+    let options = HighlightOptions {
+        scene_threshold: Some(0.35),
+        min_duration_ms: Some(500),
+        top_n: Some(12),
+        detect_scene: Some(true),
+        ..Default::default()
+    };
+
+    let scenes = detector.detect_scene_changes(&input.video_path, &options);
+    let key_scenes: Vec<f64> = scenes
+        .iter()
+        .map(|s| s.start_ms as f64 / 1000.0)
+        .collect();
+
+    let scene_count = key_scenes.len();
+    let video_type = match scene_count {
+        0..=2 => "短视频",
+        3..=8 => "中视频",
+        _ => "长视频",
+    }
+    .to_string();
+
+    let summary = if scene_count == 0 {
+        format!("视频路径: {}（未检测到明显场景切换）", input.video_path)
+    } else {
+        format!(
+            "视频路径: {}，检测到 {} 个关键场景",
+            input.video_path, scene_count
+        )
+    };
+
     Ok(AnalyzeVideoForScriptOutput {
-        video_type: "短视频".to_string(),
-        summary: format!("视频路径: {}", input.video_path),
-        key_scenes: vec![],
+        video_type,
+        summary,
+        key_scenes,
     })
 }
 
 /// 列出可用模型
 #[tauri::command]
 pub fn list_available_models() -> Vec<ModelInfo> {
-    vec![
-        ModelInfo { id: "gpt-5.5-pro".into(), provider: "openai".into(), name: "GPT-5.5 Pro".into(), context_limit: 128_000 },
-        ModelInfo { id: "gpt-5.5-instant".into(), provider: "openai".into(), name: "GPT-5.5 Instant".into(), context_limit: 128_000 },
-        ModelInfo { id: "gemini-3.1-pro".into(), provider: "google".into(), name: "Gemini 3.1 Pro".into(), context_limit: 1_000_000 },
-        ModelInfo { id: "deepseek-v4-pro".into(), provider: "deepseek".into(), name: "DeepSeek V4 Pro".into(), context_limit: 1_000_000 },
-        ModelInfo { id: "qwen3.5-plus".into(), provider: "qwen".into(), name: "Qwen 3.5 Plus".into(), context_limit: 32_000 },
-        ModelInfo { id: "claude-opus-4-7".into(), provider: "anthropic".into(), name: "Claude Opus 4.7".into(), context_limit: 200_000 },
-    ]
+    get_model_catalog().clone()
 }
 
 // Re-export types for external consumers (re-exported via llm/mod.rs

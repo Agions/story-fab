@@ -29,7 +29,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.openai.com https://*.googleapis.com https://*.deepseek.com https://*.qwen.com https://api.mymemory.translated.net https://*.anthropic.com; font-src 'self' data:; frame-src 'none'; object-src 'none';"
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.openai.com https://*.googleapis.com https://*.deepseek.com https://*.qwen.com https://*.anthropic.com; font-src 'self' data:; frame-src 'none'; object-src 'none';"
     }
   },
   "bundle": {

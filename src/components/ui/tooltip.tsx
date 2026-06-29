@@ -31,10 +31,10 @@ function TooltipProvider({
 function Tooltip({ title, children, ...props }: TooltipPrimitive.Root.Props & { title?: React.ReactNode }) {
   const childArray = React.Children.toArray(children as React.ReactNode)
   const hasCompoundTrigger = childArray.some(
-    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'TooltipTrigger'
+    (child) => React.isValidElement(child) && (child.type as React.ElementType)?.displayName === 'TooltipTrigger'
   )
   const hasCompoundContent = childArray.some(
-    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'TooltipContent'
+    (child) => React.isValidElement(child) && (child.type as React.ElementType)?.displayName === 'TooltipContent'
   )
 
   // Compound API: children contain TooltipTrigger and/or TooltipContent

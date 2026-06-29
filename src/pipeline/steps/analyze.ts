@@ -67,7 +67,7 @@ async function detectScenes(videoPath: string): Promise<Scene[]> {
     });
 
     if (Array.isArray(result)) {
-      return result.map((h: any, i: number) => ({
+      return result.map((h: { startMs: number; endMs: number; score: number; reason: string }, i: number) => ({
         id: `scene_${i}`,
         startTime: h.startMs / 1000,
         endTime: h.endMs / 1000,
@@ -92,7 +92,7 @@ async function detectAudioPeaks(videoPath: string): Promise<Array<{ timestamp: n
     });
 
     if (Array.isArray(result)) {
-      return result.map((h: any) => ({
+      return result.map((h: { startMs: number; endMs: number; score: number; audioScore?: number }) => ({
         timestamp: h.startMs / 1000,
         score: h.audioScore ?? h.score,
         type: 'speech',

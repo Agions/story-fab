@@ -9,7 +9,8 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../
 import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scissors, LayoutDashboard } from 'lucide-react';
 
 import { useModelStore } from '@/store';
-import { saveProjectToFile, getApiKey, loadProjectWithRetry, deleteProject } from '../../services/tauri';
+import { saveProjectToFile, loadProjectWithRetry, deleteProject } from '@/core/services/project/project-file-service';
+import { getApiKey } from '@/core/services/auth/api-key-service';
 import { useSettings } from '@/context/settings-context';
 import { notify } from '@/shared';
 import { generateScriptWithModel, parseGeneratedScript } from '@/core/services/ai/script-service';

@@ -10,7 +10,8 @@ import {
   FlaskConical, Scissors, Download, Folder, Loader2, Sparkles,
 } from 'lucide-react';
 import { useSettings } from '@/context/settings-context';
-import { getFileSizeBytes, listProjects, PROJECTS_CHANGED_EVENT } from '../../services/tauri';
+import { getFileSizeBytes } from '@/core/services/file/file-info-service';
+import { listProjects, PROJECTS_CHANGED_EVENT } from '@/core/services/project/project-file-service';
 import { preloadProjectEditPage, preloadProjectsPage } from '../../core/utils/route-preload';
 import {
   extractProjectMediaMetrics,

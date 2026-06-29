@@ -21,9 +21,14 @@ export interface ProjectFilter {
 export function filterProjects(projects: Project[], filter: ProjectFilter): Project[] {
   return projects.filter(p => {
     if (filter.status && p.status !== filter.status) return false;
+    if (filter.starred !== undefined && p.starred !== filter.starred) return false;
+    if (filter.tags?.length && !filter.tags.some(tag => p.tags.includes(tag))) return false;
     if (filter.search) {
       const q = filter.search.toLowerCase();
-      if (!p.title.toLowerCase().includes(q)) return false;
+      if (
+        !p.title.toLowerCase().includes(q) &&
+        !(p.description?.toLowerCase().includes(q))
+      ) return false;
     }
     return true;
   });
@@ -109,57 +114,10 @@ export const useProjectStore = create<ProjectState>()(
       setFilter: (filter) => set({ filter }),
       clearFilter: () => set({ filter: {} }),
 
-      getFilteredProjects: (() => {
-        let cached: { key: string; result: Project[] } | null = null;
-        return () => {
-          const { projects, sortBy, sortOrder, filter } = get();
-          const key = JSON.stringify({ projects: projects.map(p => p.id).join(','), sortBy, sortOrder, filter });
-          if (cached && cached.key === key) return cached.result;
-
-          let result = [...projects];
-
-        if (filter.status) {
-          result = result.filter(p => p.status === filter.status);
-        }
-        if (filter.starred !== undefined) {
-          result = result.filter(p => p.starred === filter.starred);
-        }
-        if (filter.tags?.length) {
-          result = result.filter(p =>
-            filter.tags!.some(tag => p.tags.includes(tag))
-          );
-        }
-        if (filter.search) {
-          const search = filter.search.toLowerCase();
-          result = result.filter(p =>
-            p.title.toLowerCase().includes(search) ||
-            p.description?.toLowerCase().includes(search)
-          );
-        }
-
-        result.sort((a, b) => {
-          let comparison = 0;
-          switch (sortBy) {
-            case 'title':
-              comparison = a.title.localeCompare(b.title);
-              break;
-            case 'createdAt':
-              comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-              break;
-            case 'updatedAt':
-              comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-              break;
-            case 'duration':
-              comparison = a.duration - b.duration;
-              break;
-          }
-          return sortOrder === 'asc' ? comparison : -comparison;
-        });
-
-        cached = { key, result };
-        return result;
-        };
-      })(),
+      getFilteredProjects: () => {
+        const { projects, sortBy, sortOrder, filter } = get();
+        return sortProjects(filterProjects(projects, filter), sortBy, sortOrder);
+      },
 
       getProjectById: (id) => {
         return get().projects.find(p => p.id === id);

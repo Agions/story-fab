@@ -3,7 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { filterProjects, sortProjects } from './project-store';
-import type { Project } from '../core/types';
+import type { Project } from '@/types';
 
 // 测试数据：每个字段值都不同，避免意外的 tie-breaking
 const mockProjects: Project[] = [

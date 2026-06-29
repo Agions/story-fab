@@ -69,6 +69,14 @@ export interface TimelineMarker {
   label?: string;
 }
 
+export interface Transition {
+  id: string;
+  fromClipId: string;
+  toClipId: string;
+  type: string;
+  duration: number;
+}
+
 // ─── 时间线容器 ───
 
 export interface Timeline {
@@ -86,85 +94,6 @@ export interface Timeline {
   textTracks: TextTrack[];
   /** @deprecated 请使用 tracks */
   effectTracks: EffectTrack[];
-}
-
-// ─── 遗留类型别名（向后兼容）───
-
-/** @deprecated 请使用 TimelineClip */
-export interface VideoClip {
-  id: string;
-  sourceId?: string;
-  sourceStart?: number;
-  sourceEnd?: number;
-  startTime: number;
-  endTime: number;
-  speed?: number;
-  effects?: Array<{ type: string; params: Record<string, unknown> }>;
-}
-
-/** @deprecated 请使用 TimelineClip */
-export interface AudioClip {
-  id: string;
-  sourceId?: string;
-  startTime: number;
-  endTime: number;
-  duration?: number;
-}
-
-/** @deprecated 请使用 TimelineTrack */
-export interface VideoTrack {
-  id: string;
-  name: string;
-  clips: VideoClip[];
-  transitions?: Transition[];
-  visible: boolean;
-  locked: boolean;
-}
-
-/** @deprecated 请使用 TimelineTrack */
-export interface AudioTrack {
-  id: string;
-  name: string;
-  clips: AudioClip[];
-  visible: boolean;
-  locked: boolean;
-  volume: number;
-}
-
-/** @deprecated 请使用 TimelineClip */
-export interface TextItem {
-  id: string;
-  content: string;
-  startTime: number;
-  endTime: number;
-  duration?: number;
-  style?: Record<string, unknown>;
-}
-
-/** @deprecated 请使用 TimelineTrack */
-export interface TextTrack {
-  id: string;
-  name: string;
-  items: TextItem[];
-  visible: boolean;
-  locked: boolean;
-}
-
-/** @deprecated 请使用 TimelineTrack */
-export interface EffectTrack {
-  id: string;
-  name: string;
-  effects: Array<Record<string, unknown>>;
-  visible: boolean;
-  locked: boolean;
-}
-
-export interface Transition {
-  id: string;
-  fromClipId: string;
-  toClipId: string;
-  type: string;
-  duration: number;
 }
 
 // ─── 编辑器状态 ───
@@ -273,10 +202,6 @@ export const DEFAULT_EDITOR_CONFIG: EditorConfig = {
 
 // ─── 工具函数 ───
 
-
-
-
-
 export function createEmptyTimeline(): Timeline {
   const now = new Date().toISOString();
   return {
@@ -293,6 +218,78 @@ export function createEmptyTimeline(): Timeline {
   };
 }
 
+// ─── 遗留类型别名（向后兼容）───
+
+/** @deprecated 请使用 TimelineClip */
+export interface VideoClip {
+  id: string;
+  sourceId?: string;
+  sourceStart?: number;
+  sourceEnd?: number;
+  startTime: number;
+  endTime: number;
+  speed?: number;
+  effects?: Array<{ type: string; params: Record<string, unknown> }>;
+}
+
+/** @deprecated 请使用 TimelineClip */
+export interface AudioClip {
+  id: string;
+  sourceId?: string;
+  startTime: number;
+  endTime: number;
+  duration?: number;
+}
+
+/** @deprecated 请使用 TimelineTrack */
+export interface VideoTrack {
+  id: string;
+  name: string;
+  clips: VideoClip[];
+  transitions?: Transition[];
+  visible: boolean;
+  locked: boolean;
+}
+
+/** @deprecated 请使用 TimelineTrack */
+export interface AudioTrack {
+  id: string;
+  name: string;
+  clips: AudioClip[];
+  visible: boolean;
+  locked: boolean;
+  volume: number;
+}
+
+/** @deprecated 请使用 TimelineClip */
+export interface TextItem {
+  id: string;
+  content: string;
+  startTime: number;
+  endTime: number;
+  duration?: number;
+  style?: Record<string, unknown>;
+}
+
+/** @deprecated 请使用 TimelineTrack */
+export interface TextTrack {
+  id: string;
+  name: string;
+  items: TextItem[];
+  visible: boolean;
+  locked: boolean;
+}
+
+/** @deprecated 请使用 TimelineTrack */
+export interface EffectTrack {
+  id: string;
+  name: string;
+  effects: Array<Record<string, unknown>>;
+  visible: boolean;
+  locked: boolean;
+}
+
+/** @deprecated 请在新建 Timeline 时不再使用 videoTracks/audioTracks/textTracks/effectTracks 字段 */
 export function syncLegacyTracks(timeline: Timeline): Timeline {
   const videoTracks: VideoTrack[] = [];
   const audioTracks: AudioTrack[] = [];
@@ -316,5 +313,5 @@ export function syncLegacyTracks(timeline: Timeline): Timeline {
     }
   }
 
-  return { ...timeline, videoTracks, audioTracks, textTracks, effectTracks };
+  return { ...timeline, videoTracks, audioTracks, textTracks, effectTracks } as Timeline;
 }

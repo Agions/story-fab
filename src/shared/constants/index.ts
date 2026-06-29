@@ -43,9 +43,6 @@ export {
   ENCODER_PRESETS,
 } from '@/core/constants/video-config';
 
-// 统一错误码
-export { ErrorCodes, ErrorMessages, createError } from '@/core/constants/error-codes';
-
 // ─── 独立常量（本地定义）────────────────────────────────────────────────────
 
 // 路由路径

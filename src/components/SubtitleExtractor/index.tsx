@@ -34,8 +34,7 @@ import {
 } from 'lucide-react';
 import { notify } from '@/shared';
 import { subtitleService } from '@/core/services/subtitle/subtitle-service';
-import { useEditorStore } from '@/store/editor-store';
-import { useTimelineStore } from '@/store/timeline-store';
+import { useWorkspaceStore } from '@/store/workspace-store';
 import type { SubtitleEntry } from '@/types';
 import styles from './index.module.css';
 import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';
@@ -48,10 +47,10 @@ interface SubtitleExtractorProps {
 }
 
 const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoUrl, onExtracted }) => {
-  const playheadMs = useTimelineStore(state => state.playheadMs);
-  const previewPlaying = useEditorStore(state => state.previewPlaying);
-  const setPlayheadMs = useTimelineStore(state => state.setPlayheadMs);
-  const setPreviewPlaying = useEditorStore(state => state.setPreviewPlaying);
+  const playheadMs = useWorkspaceStore(state => state.playheadMs);
+  const previewPlaying = useWorkspaceStore(state => state.previewPlaying);
+  const setPlayheadMs = useWorkspaceStore(state => state.setPlayheadMs);
+  const setPreviewPlaying = useWorkspaceStore(state => state.setPreviewPlaying);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // All UI/data state centralized in reducer

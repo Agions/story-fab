@@ -43,7 +43,7 @@ export const createExportStep = (config: ExportStepConfig = {}): PipelineStep<Co
         quality,
       });
 
-      const exportResult = result as any;
+      const exportResult = result as { outputPath?: string; duration?: number; fileSize?: number };
 
       return {
         outputPath: exportResult?.outputPath ?? outputPath,

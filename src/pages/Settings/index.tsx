@@ -29,14 +29,10 @@ import {
 } from '../../core/utils/model-availability';
 import { useModelStore } from '@/store';
 import { notify } from '@/shared';
+import { useSecureApiKeys } from '@/hooks/use-secure-api-keys';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../../shared/constants/settings';
 import packageJson from '../../../package.json';
 import styles from '@/pages/Settings/index.module.less';
-
-interface ApiKeyConfig {
-  key: string;
-  isValid?: boolean;
-}
 
 const Settings: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -50,10 +46,7 @@ const Settings: React.FC = () => {
     'default_model',
     DEFAULT_MODEL_ID
   );
-  const [apiKeys, setApiKeys] = useLocalStorage<Partial<Record<ModelProvider, ApiKeyConfig>>>(
-    'api_keys',
-    {}
-  );
+  const [apiKeys, setApiKeys] = useSecureApiKeys({});
   const [autoSave, setAutoSave] = useLocalStorage<boolean>('auto_save', true);
   const [compactMode, setCompactMode] = useLocalStorage<boolean>('compact_mode', false);
   const [theme, setTheme] = useLocalStorage<string>('theme', 'auto');
@@ -85,7 +78,6 @@ const Settings: React.FC = () => {
     }));
     updateAIModelSettings(provider, {
       enabled: Boolean(key.trim()),
-      apiKey: key.trim() || undefined,
     });
   };
 
@@ -97,7 +89,6 @@ const Settings: React.FC = () => {
     });
     updateAIModelSettings(provider, {
       enabled: false,
-      apiKey: undefined,
     });
     notify.success('API 密钥已删除');
   };

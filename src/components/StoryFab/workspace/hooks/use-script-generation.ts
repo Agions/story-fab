@@ -13,6 +13,7 @@ import { aiService } from '@/core/services/ai/ai-service';
 import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/types';
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/ai-models-config';
 import useLocalStorage from '@/hooks/use-local-storage';
+import { getAllApiKeys } from '@/core/services/auth/api-key-service';
 import type { storyfabState } from '../../types';
 import { notify } from '@/shared';
 import {
@@ -60,7 +61,20 @@ export function useScriptGeneration(params: UseScriptGenerationParams) {
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [defaultModel] = useLocalStorage<string>('default_model', DEFAULT_MODEL_ID);
-  const [apiKeys] = useLocalStorage<Partial<Record<ModelProvider, { key: string; isValid?: boolean }>>>('api_keys', {});
+  const [apiKeys, setApiKeys] = useState<Partial<Record<ModelProvider, { key: string; isValid?: boolean }>>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    getAllApiKeys().then(keys => {
+      if (cancelled) return;
+      const configs: Partial<Record<ModelProvider, { key: string; isValid?: boolean }>> = {};
+      for (const [provider, key] of Object.entries(keys)) {
+        configs[provider as ModelProvider] = { key };
+      }
+      setApiKeys(configs);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const [config, setConfig] = useState<ScriptConfig>({
     functionType: 'video-narration' as AIFunctionType,

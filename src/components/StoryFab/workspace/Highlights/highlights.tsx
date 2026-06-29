@@ -12,7 +12,7 @@ import React, { useReducer, useCallback } from 'react';
 import { Slider } from '../../../ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
 import { visionService } from '../../../../core/services/ai/vision-service';
-import { useTimelineStore } from '../../../../store/timeline-store';
+import { useWorkspaceStore } from '../../../../store/workspace-store';
 import { notify } from '../../../../shared/utils/notify';
 import type { VideoInfo } from '@/types';
 import {
@@ -39,7 +39,7 @@ interface HighlightsProps {
 const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _defaultExpanded = false }) => {
   const [state, dispatch] = useReducer(highlightsReducer, initialHighlightsState);
   const { highlights, detected, loading, error, threshold, topN } = state;
-  const setPlayheadMs = useTimelineStore((s) => s.setPlayheadMs);
+  const setPlayheadMs = useWorkspaceStore((s) => s.setPlayheadMs);
 
   const handleThresholdChange = (value: number | readonly number[]) => {
     const resolvedValue = Array.isArray(value) ? value[0] : value;

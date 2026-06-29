@@ -17,7 +17,7 @@
     "docs:dev": "vitepress dev docs",
     "tauri": "tauri",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src --max-warnings 200",
+    "lint": "eslint src --max-warnings 10",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,less}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,less}\"",

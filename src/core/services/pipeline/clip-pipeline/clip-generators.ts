@@ -2,7 +2,7 @@
  * Clip 生成工具函数
  * 单一职责：纯函数集合，无副作用，便于测试
  */
-import type { VideoAnalysis, ScriptSegment } from '../../../types';
+import type { VideoAnalysis, ScriptSegment } from '@/types';
 import type { ClipConfig, ClipSegment } from './types';
 
 /**

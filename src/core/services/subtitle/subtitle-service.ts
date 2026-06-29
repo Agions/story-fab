@@ -13,6 +13,7 @@ import type { SubtitleEntry, VideoInfo } from '@/types';
 import { whisperService, type WhisperProgress } from './whisper-service';
 import { trackToSRT, trackToVTT, trackToASS } from './subtitle-formatters';
 import { AppError } from '@/core/errors';
+import { invoke, TauriCommand } from '@/core/tauri';
 
 // ============================================
 // 类型定义
@@ -358,36 +359,28 @@ export class SubtitleService {
    */
   private async translateText(text: string, targetLang: string, _provider: string): Promise<string> {
     const langCode = this.normalizeLangCode(targetLang);
-    const langPair = `en|${langCode}`;
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${encodeURIComponent(langPair)}`;
 
-    const resp = await fetch(url);
-    if (!resp.ok) throw new AppError('APP_TRANSLATE_API_FAILED', `MyMemory API error: ${resp.status}`, {
-      statusCode: resp.status,
-      userMessage: '翻译 API 调用失败',
-      retryable: true,
-    });
-
-    const data = (await resp.json()) as {
-      responseData?: { translatedText?: string };
-      responseStatus?: number;
-    };
-
-    if (data.responseStatus && data.responseStatus !== 200) {
-      throw new AppError('APP_TRANSLATE_API_FAILED', `MyMemory translation failed: ${data.responseStatus}`, {
-        statusCode: data.responseStatus,
-        userMessage: '翻译 API 返回错误',
+    try {
+      const translated = await invoke(
+        TauriCommand.TRANSLATE_TEXT,
+        { text, fromLang: 'en', toLang: langCode }
+      ) as string;
+      if (!translated) {
+        throw new AppError('APP_TRANSLATE_EMPTY', 'Translation returned empty result', {
+          userMessage: '翻译结果为空',
+          retryable: true,
+        });
+      }
+      return translated;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new AppError('APP_TRANSLATE_API_FAILED', `Translation failed: ${message}`, {
+        statusCode: 500,
+        userMessage: '翻译 API 调用失败',
         retryable: true,
+        originalError: error,
       });
     }
-
-    const translated = data.responseData?.translatedText;
-    if (!translated) throw new AppError('APP_TRANSLATE_EMPTY', 'MyMemory returned empty translation', {
-      userMessage: '翻译结果为空',
-      retryable: true,
-    });
-
-    return translated;
   }
 
   /**

@@ -5,8 +5,8 @@
 
 import type { PipelineStep, PipelineDataContext } from '../engine';
 import type { AnalysisResult, Script, ScriptSegment, ScriptStylePreset } from '@/types';
-import { generateScriptWithModel } from '@/core/services/ai/script-service';
-import { resolveLegacyModel } from '@/core/services/ai/ai-model-adapter';
+import { generateScriptWithModel, type AnalysisInput, type ScriptGenerationSettings } from '@/core/services/ai/script-service';
+import { resolveLegacyModel, type ModelProvider } from '@/core/services/ai/ai-model-adapter';
 
 export interface ScriptStepConfig {
   style?: ScriptStylePreset;
@@ -31,8 +31,8 @@ export const createScriptStep = (config: ScriptStepConfig): PipelineStep<Analysi
     const { style = 'informative', apiKey, provider = 'openai' } = config;
 
     // 调用 LLM 生成脚本
-    const model = resolveLegacyModel(provider as any);
-    const analysisInput = {
+    const model = resolveLegacyModel(provider as ModelProvider);
+    const analysisInput: AnalysisInput = {
       keyMoments: analysis.scenes?.map(s => ({
         timestamp: s.startTime,
         description: s.description ?? s.type,
@@ -41,7 +41,7 @@ export const createScriptStep = (config: ScriptStepConfig): PipelineStep<Analysi
       emotions: analysis.emotions,
       summary: `共 ${analysis.stats?.sceneCount ?? 0} 个场景`,
     };
-    const scriptText = await generateScriptWithModel(model, apiKey!, analysisInput as any, { style: style as any });
+    const scriptText = await generateScriptWithModel(model, apiKey!, analysisInput, { style: style as ScriptGenerationSettings['style'] });
 
     // 解析脚本为片段
     const segments = parseScriptSegments(scriptText, analysis);
