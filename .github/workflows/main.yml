@@ -22,8 +22,20 @@ jobs:
         uses: actions/setup-node@v5
         with:
           # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # Skip 'cache: npm' (cache mostly empty on GH Runner, 675B observed)
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Install dependencies
         # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
         # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
@@ -71,8 +83,20 @@ jobs:
         uses: actions/setup-node@v5
         with:
           # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # Skip 'cache: npm' (cache mostly empty on GH Runner, 675B observed)
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Install dependencies
         # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
         # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
@@ -117,8 +141,20 @@ jobs:
         uses: actions/setup-node@v5
         with:
           # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # Skip 'cache: npm' (cache mostly empty on GH Runner, 675B observed)
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Install dependencies
         # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
         # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
@@ -226,8 +262,20 @@ jobs:
         uses: actions/setup-node@v5
         with:
           # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # Skip 'cache: npm' (cache mostly empty on GH Runner, 675B observed)
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Build
         run: npm run build
       - name: Bundle budget check
@@ -253,8 +301,20 @@ jobs:
         uses: actions/setup-node@v5
         with:
           # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # Skip 'cache: npm' (cache mostly empty on GH Runner, 675B observed)
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Build frontend
         run: npm run build
       - name: Install Rust toolchain
@@ -300,8 +360,20 @@ jobs:
         uses: actions/setup-node@v5
         with:
           # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # Skip 'cache: npm' (cache mostly empty on GH Runner, 675B observed)
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Build frontend
         run: npm run build
       - name: Install Rust toolchain
@@ -357,8 +429,20 @@ jobs:
         uses: actions/setup-node@v5
         with:
           # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # Skip 'cache: npm' (cache mostly empty on GH Runner, 675B observed)
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Download all reports
         uses: actions/download-artifact@v5
         with:
