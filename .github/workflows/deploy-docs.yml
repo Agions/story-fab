@@ -32,11 +32,21 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
+      - name: Install dependencies (with retry for npm hang)
+        run: |
+          for i in 1 2 3; do
+            echo "=== Attempt $i ==="
+            if npm ci --ignore-scripts; then
+              echo "✅ npm ci succeeded on attempt $i"
+              exit 0
+            fi
+            echo "⚠️ npm ci failed on attempt $i, retrying in 10s..."
+            sleep 10
+          done
+          echo "❌ npm ci failed after 3 attempts"
+          exit 1
         env:
-          # npm "Exit handler never called" bug 偶发 (GitHub Runner Node 24
-          # + 默认 npm 已知问题), 关 telemetry/fund/audit 加速
+          # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
           NPM_CONFIG_AUDIT: 'false'
           NPM_CONFIG_UPDATE_NOTIFIER: 'false'
