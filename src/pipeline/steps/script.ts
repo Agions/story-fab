@@ -5,8 +5,9 @@
 
 import type { PipelineStep, PipelineDataContext } from '../engine';
 import type { AnalysisResult, Script, ScriptSegment, ScriptStylePreset } from '@/types';
+import type { ModelProvider } from '@/types';
 import { generateScriptWithModel, type AnalysisInput, type ScriptGenerationSettings } from '@/core/services/ai/script-service';
-import { resolveLegacyModel, type ModelProvider } from '@/core/services/ai/ai-model-adapter';
+import { resolveLegacyModel } from '@/core/services/ai/ai-model-adapter';
 
 export interface ScriptStepConfig {
   style?: ScriptStylePreset;
@@ -32,13 +33,19 @@ export const createScriptStep = (config: ScriptStepConfig): PipelineStep<Analysi
 
     // 调用 LLM 生成脚本
     const model = resolveLegacyModel(provider as ModelProvider);
+    // Map EmotionAnalysis[] → AnalysisEmotion[] (drop confidence, rename emotion→type)
+    // AnalysisInput.emotions only accepts string[] | { type, intensity }[]
     const analysisInput: AnalysisInput = {
       keyMoments: analysis.scenes?.map(s => ({
         timestamp: s.startTime,
         description: s.description ?? s.type,
         importance: s.score,
       })),
-      emotions: analysis.emotions,
+      emotions: analysis.emotions?.map(e => ({
+        timestamp: e.timestamp,
+        type: e.emotion ?? e.dominant ?? 'neutral',
+        intensity: e.intensity ?? 0.5,
+      })),
       summary: `共 ${analysis.stats?.sceneCount ?? 0} 个场景`,
     };
     const scriptText = await generateScriptWithModel(model, apiKey!, analysisInput, { style: style as ScriptGenerationSettings['style'] });

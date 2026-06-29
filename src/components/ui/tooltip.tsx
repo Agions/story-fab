@@ -30,11 +30,14 @@ function TooltipProvider({
  */
 function Tooltip({ title, children, ...props }: TooltipPrimitive.Root.Props & { title?: React.ReactNode }) {
   const childArray = React.Children.toArray(children as React.ReactNode)
+  // displayName is set on our local TooltipTrigger/TooltipContent functions (line 71/109).
+  // Cast through unknown: React.ElementType is too narrow (string | ComponentType),
+  // and displayName is a React-internal marker — not part of public ElementType type.
   const hasCompoundTrigger = childArray.some(
-    (child) => React.isValidElement(child) && (child.type as React.ElementType)?.displayName === 'TooltipTrigger'
+    (child) => React.isValidElement(child) && (child.type as unknown as { displayName?: string })?.displayName === 'TooltipTrigger'
   )
   const hasCompoundContent = childArray.some(
-    (child) => React.isValidElement(child) && (child.type as React.ElementType)?.displayName === 'TooltipContent'
+    (child) => React.isValidElement(child) && (child.type as unknown as { displayName?: string })?.displayName === 'TooltipContent'
   )
 
   // Compound API: children contain TooltipTrigger and/or TooltipContent
