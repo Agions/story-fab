@@ -102,7 +102,7 @@ story-fab/
 │   ├── components/        # React 组件（按 PascalCase 业务目录）
 │   ├── core/              # 核心业务层（双服务层：core/services + services）
 │   │   ├── pipeline/      # Pipeline 编排（解说模式 5 步）
-│   │   ├── services/      # 业务服务（14 个子模块）
+│   │   ├── services/      # 业务服务（13 个子目录，editor/ 内含 storage.ts）
 │   │   ├── tauri/         # Tauri IPC 桥接
 │   │   ├── interfaces/    # 业务接口
 │   │   └── types/         # 全局类型

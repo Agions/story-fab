@@ -119,19 +119,18 @@ src/
 │   ├── pipeline/            Pipeline 编排
 │   │   └── steps/
 │   │       └── commentary/  5 步 Agent 实现
-│   ├── services/            业务服务 (14 个子模块)
+│   ├── services/            业务服务 (13 个子目录)
 │   │   ├── ai/              LLM 调用层
 │   │   ├── aiClip/          AI 拆条
 │   │   ├── asr/             Whisper 集成 (含 providers/ 子目录)
 │   │   ├── auth/            认证
 │   │   ├── commentary/      解说模式入口
-│   │   ├── editor/          时间轴编辑
+│   │   ├── editor/          时间轴编辑 (含 storage.ts / clip / effect / media / timeline 等)
 │   │   ├── export/          渲染 + 转码
 │   │   ├── file/            文件元数据
 │   │   ├── pipeline/        剪辑模式流水线
 │   │   ├── project/         项目存储
 │   │   ├── providers/       LLM Provider 实现
-│   │   ├── storage/         配置存储
 │   │   ├── subtitle/        字幕 + 对齐
 │   │   └── video/           视频元数据 (含 audioMix / transition-suggestion)
 │   ├── tauri/               IPC 桥接
