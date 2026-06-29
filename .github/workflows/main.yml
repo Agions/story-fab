@@ -228,21 +228,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
+      - name: Install dependencies
+        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner
+        # Rewrite lockfile: tencentyun mirror → npmjs.org
+        run: |
+          set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
+            exit 1
+          fi
+        timeout-minutes: 8
       - name: Build
         run: npm run build
       - name: Bundle budget check
@@ -267,21 +266,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
+      - name: Install dependencies
+        # Use npm 9.x + npmjs.org registry (see main typecheck/lint for full rationale)
+        run: |
+          set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
+            exit 1
+          fi
+        timeout-minutes: 8
       - name: Build frontend
         run: npm run build
       - name: Install Rust toolchain
@@ -326,21 +323,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
+      - name: Install dependencies
+        # Use npm 9.x + npmjs.org registry (see main typecheck/lint for full rationale)
+        run: |
+          set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
+            exit 1
+          fi
+        timeout-minutes: 8
       - name: Build frontend
         run: npm run build
       - name: Install Rust toolchain
