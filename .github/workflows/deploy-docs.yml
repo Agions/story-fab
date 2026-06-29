@@ -29,7 +29,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          # Pin Node 20 (LTS Iron) — Node 22.5+ has known "Exit handler never called"
+          # bug (npm/cli#7657) on GitHub Runner. Node 24 is default on Runner but
+          # also affected. Node 20 is most stable for npm ci.
+          node-version: '20'
           cache: 'npm'
 
       - name: Upgrade npm (workaround Runner Node 24 + default npm 10.x hang)
