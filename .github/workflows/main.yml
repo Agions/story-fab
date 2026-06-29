@@ -26,7 +26,11 @@ jobs:
       - name: Upgrade npm (workaround Runner Node 24 + default npm 10.x hang)
         run: npm install -g npm@10.8.2
       - name: Install dependencies
-        run: npm ci
+        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
+        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        run: npm ci --prefer-offline --no-audit --no-fund
+        timeout-minutes: 3
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
@@ -63,7 +67,11 @@ jobs:
       - name: Upgrade npm (workaround Runner Node 24 + default npm 10.x hang)
         run: npm install -g npm@10.8.2
       - name: Install dependencies
-        run: npm ci
+        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
+        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        run: npm ci --prefer-offline --no-audit --no-fund
+        timeout-minutes: 3
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
@@ -97,7 +105,11 @@ jobs:
       - name: Upgrade npm (workaround Runner Node 24 + default npm 10.x hang)
         run: npm install -g npm@10.8.2
       - name: Install dependencies
-        run: npm ci
+        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
+        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        run: npm ci --prefer-offline --no-audit --no-fund
+        timeout-minutes: 3
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
