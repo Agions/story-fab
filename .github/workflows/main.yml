@@ -21,13 +21,38 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
-          cache: 'npm'
+          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Install dependencies
-        run: npm ci
+        # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
+        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
+        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
+        # || 兜底: 检测 "npm error" 字符串, 强制 fail
+        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        run: |
+          set -e
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm error" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+            exit 1
+          fi
+        timeout-minutes: 5
         env:
-          # npm "Exit handler never called" bug 偶发 (GitHub Runner Node 24
-          # + 默认 npm 已知问题), 关 telemetry/fund/audit 加速
+          # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
           NPM_CONFIG_AUDIT: 'false'
           NPM_CONFIG_UPDATE_NOTIFIER: 'false'
@@ -57,13 +82,38 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
-          cache: 'npm'
+          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Install dependencies
-        run: npm ci
+        # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
+        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
+        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
+        # || 兜底: 检测 "npm error" 字符串, 强制 fail
+        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        run: |
+          set -e
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm error" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+            exit 1
+          fi
+        timeout-minutes: 5
         env:
-          # npm "Exit handler never called" bug 偶发 (GitHub Runner Node 24
-          # + 默认 npm 已知问题), 关 telemetry/fund/audit 加速
+          # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
           NPM_CONFIG_AUDIT: 'false'
           NPM_CONFIG_UPDATE_NOTIFIER: 'false'
@@ -90,13 +140,38 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
-          cache: 'npm'
+          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Install dependencies
-        run: npm ci
+        # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
+        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
+        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
+        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
+        # || 兜底: 检测 "npm error" 字符串, 强制 fail
+        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        run: |
+          set -e
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm error" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+            exit 1
+          fi
+        timeout-minutes: 5
         env:
-          # npm "Exit handler never called" bug 偶发 (GitHub Runner Node 24
-          # + 默认 npm 已知问题), 关 telemetry/fund/audit 加速
+          # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
           NPM_CONFIG_AUDIT: 'false'
           NPM_CONFIG_UPDATE_NOTIFIER: 'false'
@@ -186,8 +261,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
-          cache: 'npm'
+          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Build
         run: npm run build
       - name: Bundle budget check
@@ -212,8 +300,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
-          cache: 'npm'
+          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Build frontend
         run: npm run build
       - name: Install Rust toolchain
@@ -258,8 +359,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
-          cache: 'npm'
+          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Build frontend
         run: npm run build
       - name: Install Rust toolchain
@@ -314,8 +428,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
-          cache: 'npm'
+          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
+          # 'cache: npm' was returning 675B (empty) — GH cache key collision
+          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          node-version: '20'
+      - name: Cache npm + node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          # Cache key based on lockfile hash — invalidates when lock changes
+          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node20-npm-
+            ${{ runner.os }}-node-
       - name: Download all reports
         uses: actions/download-artifact@v5
         with:
