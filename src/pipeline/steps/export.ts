@@ -7,6 +7,13 @@ import type { PipelineStep, PipelineDataContext, ComposedVideoData } from '../en
 import type { ExportResult, ExportFormat, ExportQuality } from '@/types';
 import { invoke, TauriCommand } from '@/core/tauri';
 
+/** Rust ExportVideoResult 序列化后的 TypeScript 映射 (camelCase) */
+interface ExportVideoResult {
+  outputPath: string;
+  duration: number;
+  fileSize: number;
+}
+
 export interface ExportStepConfig {
   format?: ExportFormat;
   quality?: ExportQuality;
@@ -36,14 +43,14 @@ export const createExportStep = (config: ExportStepConfig = {}): PipelineStep<Co
 
     try {
       // 调用后端导出
-      const result = await invoke(TauriCommand.EXPORT_VIDEO, {
+      const result = (await invoke(TauriCommand.EXPORT_VIDEO, {
         inputPath: input.videoPath,
         outputPath,
         format,
         quality,
-      });
+      })) as Partial<ExportVideoResult> | unknown;
 
-      const exportResult = result as any;
+      const exportResult = result as Partial<ExportVideoResult> | undefined | null;
 
       return {
         outputPath: exportResult?.outputPath ?? outputPath,

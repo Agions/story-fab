@@ -3,6 +3,24 @@ import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
 
 import { cn } from '@/shared/utils/cn'
 
+/**
+ * 提取 React 元素的 displayName — React 18+ 强类型版本。
+ * React.isValidElement 守卫后 child 是 ReactElement, type 是
+ * string | JSXElementConstructor<unknown> | ComponentType.
+ * - 函数组件 / forwardRef 组件: 通过 .displayName 静态字段
+ * - React.memo 包裹: .type.$displayName 字段 (Base UI 模式)
+ * - string tag (div/span): 返回 undefined
+ */
+function getDisplayName(element: React.ReactElement): string | undefined {
+  const t = element.type as
+    | string
+    | { displayName?: string; name?: string; $displayName?: string }
+    | React.JSXElementConstructor<unknown>
+  if (typeof t === 'string') return undefined
+  const fn = t as { displayName?: string; name?: string; $displayName?: string }
+  return fn.displayName ?? fn.name ?? fn.$displayName
+}
+
 function TooltipProvider({
   delay = 0,
   ...props
@@ -31,10 +49,10 @@ function TooltipProvider({
 function Tooltip({ title, children, ...props }: TooltipPrimitive.Root.Props & { title?: React.ReactNode }) {
   const childArray = React.Children.toArray(children as React.ReactNode)
   const hasCompoundTrigger = childArray.some(
-    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'TooltipTrigger'
+    (child) => React.isValidElement(child) && getDisplayName(child) === 'TooltipTrigger'
   )
   const hasCompoundContent = childArray.some(
-    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'TooltipContent'
+    (child) => React.isValidElement(child) && getDisplayName(child) === 'TooltipContent'
   )
 
   // Compound API: children contain TooltipTrigger and/or TooltipContent

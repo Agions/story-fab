@@ -63,6 +63,12 @@ export const createVoiceStep = (config: VoiceStepConfig): PipelineStep<Script, V
 
 // ─── 辅助函数 ───
 
+/** Rust SynthesizeSpeechOutput 序列化后的 TypeScript 映射 (camelCase) */
+interface SynthesizeSpeechOutput {
+  audioPath: string;
+  durationSecs: number;
+}
+
 async function synthesizeSegment(
   text: string,
   voice: string,
@@ -70,15 +76,18 @@ async function synthesizeSegment(
   pitch: number,
 ): Promise<string> {
   try {
-    const result = await tts.synthesizeSpeech({
+    const result = (await tts.synthesizeSpeech({
       text,
       voice,
       rate: speed,
       pitch,
       format: 'mp3',
-    });
+    })) as Partial<SynthesizeSpeechOutput> | string | unknown;
 
-    return (result as any)?.audioPath ?? '';
+    if (result && typeof result === 'object') {
+      return (result as SynthesizeSpeechOutput).audioPath ?? '';
+    }
+    return '';
   } catch (err) {
     logger.error('TTS synthesis failed:', { error: err });
     return '';

@@ -8,6 +8,17 @@ import type { VideoInfo, AnalysisResult, Scene, Keyframe } from '@/types';
 import { videoProcessor } from '@/core/video';
 import { invoke, TauriCommand } from '@/core/tauri';
 
+/** Rust HighlightSegment 序列化后的 TypeScript 映射 (camelCase, 毫秒) */
+interface RustHighlightSegment {
+  startMs: number;
+  endMs: number;
+  score: number;
+  reason: string;
+  audioScore?: number;
+  sceneScore?: number;
+  motionScore?: number;
+}
+
 export const analyzeStep: PipelineStep<VideoInfo, AnalysisResult> = {
   name: 'analyze',
 
@@ -60,14 +71,14 @@ export const analyzeStep: PipelineStep<VideoInfo, AnalysisResult> = {
 
 async function detectScenes(videoPath: string): Promise<Scene[]> {
   try {
-    const result = await invoke(TauriCommand.DETECT_HIGHLIGHTS, {
+    const result = (await invoke(TauriCommand.DETECT_HIGHLIGHTS, {
       videoPath,
       threshold: 0.3,
       minDurationMs: 1000,
-    });
+    })) as RustHighlightSegment[] | unknown;
 
     if (Array.isArray(result)) {
-      return result.map((h: any, i: number) => ({
+      return result.map((h, i) => ({
         id: `scene_${i}`,
         startTime: h.startMs / 1000,
         endTime: h.endMs / 1000,
@@ -85,14 +96,14 @@ async function detectScenes(videoPath: string): Promise<Scene[]> {
 
 async function detectAudioPeaks(videoPath: string): Promise<Array<{ timestamp: number; score: number; type: string }>> {
   try {
-    const result = await invoke(TauriCommand.DETECT_HIGHLIGHTS, {
+    const result = (await invoke(TauriCommand.DETECT_HIGHLIGHTS, {
       videoPath,
       threshold: 0.5,
       minDurationMs: 500,
-    });
+    })) as RustHighlightSegment[] | unknown;
 
     if (Array.isArray(result)) {
-      return result.map((h: any) => ({
+      return result.map((h) => ({
         timestamp: h.startMs / 1000,
         score: h.audioScore ?? h.score,
         type: 'speech',
