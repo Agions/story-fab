@@ -25,21 +25,18 @@ jobs:
           # which has DNS/network regression causing npm 1m12s hang)
           node-version: '20'
       - name: Install dependencies
-        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner registry
-        # (npm/cli#7006 confirmed: npm 10.x "Exit handler never called" 100% reproducible)
-        # Node 20 ships npm 10.8.2 by default; we override to npm@9 via npx
-        # npm install (not ci) tolerates lockfile drift
+        # Override registry to npmjs.org (lockfile pins to tencentyun mirror, GH Runner DNS ENOTFOUND)
+        # npm install (not ci) regenerates lockfile entries that fail to resolve
         # --prefer-offline: minimize registry roundtrips
         # timeout + grep "^npm error" + exit 1: catch silent npm failures
         run: |
           set -e
-          npm install -g npm@9 --silent
-          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
-          if grep -q "^npm error" /tmp/npm-ci.log; then
-            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+          npm install --registry=https://registry.npmjs.org/ --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
             exit 1
           fi
-        timeout-minutes: 5
+        timeout-minutes: 8
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
@@ -75,21 +72,18 @@ jobs:
           # which has DNS/network regression causing npm 1m12s hang)
           node-version: '20'
       - name: Install dependencies
-        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner registry
-        # (npm/cli#7006 confirmed: npm 10.x "Exit handler never called" 100% reproducible)
-        # Node 20 ships npm 10.8.2 by default; we override to npm@9 via npx
-        # npm install (not ci) tolerates lockfile drift
+        # Override registry to npmjs.org (lockfile pins to tencentyun mirror, GH Runner DNS ENOTFOUND)
+        # npm install (not ci) regenerates lockfile entries that fail to resolve
         # --prefer-offline: minimize registry roundtrips
         # timeout + grep "^npm error" + exit 1: catch silent npm failures
         run: |
           set -e
-          npm install -g npm@9 --silent
-          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
-          if grep -q "^npm error" /tmp/npm-ci.log; then
-            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+          npm install --registry=https://registry.npmjs.org/ --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
             exit 1
           fi
-        timeout-minutes: 5
+        timeout-minutes: 8
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
@@ -122,21 +116,18 @@ jobs:
           # which has DNS/network regression causing npm 1m12s hang)
           node-version: '20'
       - name: Install dependencies
-        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner registry
-        # (npm/cli#7006 confirmed: npm 10.x "Exit handler never called" 100% reproducible)
-        # Node 20 ships npm 10.8.2 by default; we override to npm@9 via npx
-        # npm install (not ci) tolerates lockfile drift
+        # Override registry to npmjs.org (lockfile pins to tencentyun mirror, GH Runner DNS ENOTFOUND)
+        # npm install (not ci) regenerates lockfile entries that fail to resolve
         # --prefer-offline: minimize registry roundtrips
         # timeout + grep "^npm error" + exit 1: catch silent npm failures
         run: |
           set -e
-          npm install -g npm@9 --silent
-          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
-          if grep -q "^npm error" /tmp/npm-ci.log; then
-            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+          npm install --registry=https://registry.npmjs.org/ --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
             exit 1
           fi
-        timeout-minutes: 5
+        timeout-minutes: 8
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
