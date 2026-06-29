@@ -30,9 +30,16 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
+        env:
+          # npm "Exit handler never called" bug 偶发 (GitHub Runner Node 24
+          # + 默认 npm 已知问题), 关 telemetry/fund/audit 加速
+          NPM_CONFIG_FUND: 'false'
+          NPM_CONFIG_AUDIT: 'false'
+          NPM_CONFIG_UPDATE_NOTIFIER: 'false'
 
       - name: Build VitePress
         run: npm run docs:build

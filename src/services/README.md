@@ -6,8 +6,8 @@
 
 | 层 | 路径 | 职责 | 数量 |
 |---|---|---|---|
-| **Shim / Adapter** | `src/services/` | UI 关心的文件操作、向后兼容 re-export | 4-5 个文件 |
-| **Domain / Business** | `src/core/services/` | 厚业务逻辑（AI/ASR/Pipeline/Workflow 等） | 12 个子目录 |
+| **Shim / Adapter** | `src/services/` | UI 关心的文件操作、向后兼容 re-export | 2 个文件 (tauri.ts + README.md) |
+| **Domain / Business** | `src/core/services/` | 厚业务逻辑（AI/ASR/Pipeline/Workflow 等） | 13 个子目录（editor/ 内含 storage.ts） |
 
 ## 文件清单
 

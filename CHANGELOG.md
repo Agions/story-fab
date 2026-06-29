@@ -7,6 +7,7 @@
 - **`docs/dev/architecture.md` 重写 + `docs/dev/commentary.md` 新建**（commit `d93ae770`）：architecture.md 94 → 305 行补全 v2.2.0 真实状态（10 LLM Provider / 61 个 Tauri 命令 / 双服务层 ADR-101 / 5 步 Pipeline ADR-103 / 18 组件 useState→useReducer 状态机迁移 / 9 个路由页面 / 5 个 Zustand store / 14 个 core/services 子模块 / Rust 端 commands/ commentary 3 子目录 + render 2 子目录 / 3 个 Rust 集成测试 / CUTDECK_/STORYFAB_ 双前缀环境变量）；commentary.md 新建 286 行整合 3 文件——5 步 Pipeline 状态机、6 阶段 Director 状态机、10 Provider Prompt 模板、5 风格质量检查、5 分钟视频性能/成本表。
 - **`docs/.vitepress/config.ts` 同步**（commit `f5f96938`）：sidebar 删 6 个 dead link（指向已删文件），"解说工作流" 指向新 commentary.md，"系统架构" 标题同步。
 - **2 处死链修复**（commit `aa870e60`）：`src/store/README.md` + `src/services/README.md` 引用已删 `architecture-optimization.md`，重定向到 `architecture.md §双服务层 (ADR-101)`。
+- **CHANGELOG 勘误**（commit `d93ae770` 当日 tree 即如此，非 post-refactor drift）：v2.2.0 [Unreleased] L7 + 同 commit message 描述 "14 个 core/services 子模块" 应为 **13 个**（实为 ai/aiClip/asr/auth/commentary/editor/export/file/pipeline/project/providers/subtitle/video；"配置存储" 实为 `editor/storage.ts` 文件而非独立 `storage/` 子目录）。本次 audit (2026-06-29) 通过 `git show d93ae770:src/core/services/` 直接验证。历史 L7 数字按 pitfall #21 保留不修, 勘误条作为"v2.2.0 当天 tree 真相记录"。
 
 ### 🚀 New Features
 

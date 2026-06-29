@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 [![Rust 1.77+](https://img.shields.io/badge/Rust-1.77+-DEA584?logo=rust&logoColor=black)](https://www.rust-lang.org/)
 [![Version](https://img.shields.io/badge/version-2.2.0-brightgreen.svg)](CHANGELOG.md)
 
-[English](README_EN.md) · [更新日志](CHANGELOG.md) · [文档站](https://agions.github.io/story-fab/)
+[更新日志](CHANGELOG.md) · [文档站](https://agions.github.io/story-fab/)
 
 ---
 
@@ -102,7 +102,7 @@ story-fab/
 │   ├── components/        # React 组件（按 PascalCase 业务目录）
 │   ├── core/              # 核心业务层（双服务层：core/services + services）
 │   │   ├── pipeline/      # Pipeline 编排（解说模式 5 步）
-│   │   ├── services/      # 业务服务（14 个子模块）
+│   │   ├── services/      # 业务服务（13 个子目录，editor/ 内含 storage.ts）
 │   │   ├── tauri/         # Tauri IPC 桥接
 │   │   ├── interfaces/    # 业务接口
 │   │   └── types/         # 全局类型
