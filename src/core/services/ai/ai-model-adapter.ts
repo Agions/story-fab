@@ -10,7 +10,6 @@ const PROVIDER_TO_LEGACY_MODEL: Record<ModelProvider, LegacyAIModelType> = {
   iflytek: 'spark',
   deepseek: 'deepseek',
   moonshot: 'moonshot',
-  // resolved to openai
   local: 'openai',
   custom: 'openai',
 };
@@ -20,3 +19,5 @@ export const resolveLegacyModel = (provider: ModelProvider): LegacyAIModelType =
 
 export const getLegacyModelCompatMap = (): Readonly<Record<ModelProvider, LegacyAIModelType>> =>
   Object.freeze({ ...PROVIDER_TO_LEGACY_MODEL });
+
+export type { ModelProvider };

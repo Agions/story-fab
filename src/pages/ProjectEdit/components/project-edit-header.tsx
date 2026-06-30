@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { ArrowLeft, Save } from 'lucide-react';
-import type { ProjectSaveBehavior } from '@/shared/constants/settings';
+import type { ProjectSaveBehavior } from '@/shared/constants/constants';
 import styles from '@/pages/ProjectEdit/index.module.less';
 
 interface ProjectEditHeaderProps {

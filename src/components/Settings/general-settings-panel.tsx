@@ -7,7 +7,7 @@ import { Button } from '../ui/button';
 import { Switch } from '../ui/switch';
 import { Settings, RotateCcw } from 'lucide-react';
 import { notify } from '@/shared';
-import type { ProjectSaveBehavior } from '../../shared/constants/settings';
+import type { ProjectSaveBehavior } from '../../shared/constants/constants';
 
 interface GeneralSettingsPanelProps {
   autoSave: boolean;

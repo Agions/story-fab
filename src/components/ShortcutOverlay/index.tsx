@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-
+import styles from './ShortcutOverlay.module.less';
 
 export interface ShortcutOverlayProps {
   open: boolean;
@@ -78,25 +78,9 @@ const KEYBOARD_SHORTCUTS: ShortcutCategory[] = [
   },
 ];
 
-function KbdBadge({ children, style: kbdStyle }: { children: React.ReactNode; style?: React.CSSProperties }) {
+function KbdBadge({ children }: { children: React.ReactNode }) {
   return (
-    <kbd
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2px 6px',
-        fontSize: '11px',
-        fontFamily: 'JetBrains Mono, monospace',
-        fontWeight: 500,
-        borderRadius: '4px',
-        border: '1px solid',
-        whiteSpace: 'nowrap',
-        minWidth: '24px',
-        lineHeight: 1.4,
-        ...kbdStyle,
-      }}
-    >
+    <kbd className={styles.kbdBadge}>
       {children}
     </kbd>
   );
@@ -104,7 +88,6 @@ function KbdBadge({ children, style: kbdStyle }: { children: React.ReactNode; st
 
 export const ShortcutOverlay = React.memo<ShortcutOverlayProps>(
   ({ open, onOpenChange }) => {
-    // 全局 ? 键监听
     const handleKeyDown = useCallback(
       (e: KeyboardEvent) => {
         if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -131,123 +114,47 @@ export const ShortcutOverlay = React.memo<ShortcutOverlayProps>(
       return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
 
-    const borderColor = 'var(--border-subtle)';
-    const headerBg = 'var(--bg-hover)';
-    const rowHover = 'var(--bg-hover)';
-    const mutedColor = 'var(--text-tertiary)';
-    const primaryColor = 'var(--text-primary)';
-    const kbdBg = 'var(--bg-hover)';
-    const kbdBorder = 'var(--border-default)';
-
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
           showCloseButton
-          className="max-w-lg w-full p-0 overflow-hidden"
-          style={{
-            backgroundColor: 'var(--bg-elevated)',
-            border: `1px solid ${borderColor}`,
-          }}
+          className={`max-w-lg w-full p-0 overflow-hidden ${styles.overlay}`}
         >
-          <DialogHeader
-            className="px-6 pt-5 pb-4"
-            style={{ backgroundColor: headerBg, borderBottom: `1px solid ${borderColor}` }}
-          >
-            <DialogTitle
-              style={{
-                fontSize: '15px',
-                fontWeight: 600,
-                color: primaryColor,
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
+          <DialogHeader className={`px-6 pt-5 pb-4 ${styles.header}`}>
+            <DialogTitle className={styles.title}>
               键盘快捷键
             </DialogTitle>
-            <DialogDescription
-              style={{
-                fontSize: '12px',
-                color: mutedColor,
-                marginTop: '2px',
-              }}
-            >
-              Keyboard Shortcuts — 按 <kbd style={{ background: kbdBg, border: `1px solid ${kbdBorder}`, color: primaryColor, padding: '2px 6px', fontSize: '11px', fontFamily: 'JetBrains Mono, monospace', fontWeight: 500, borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: '24px', lineHeight: 1.4 }}>?</kbd> 键快速打开
+            <DialogDescription className={styles.description}>
+              Keyboard Shortcuts — 按 <kbd className={styles.inlineKbd}>?</kbd> 键快速打开
             </DialogDescription>
           </DialogHeader>
 
-          <div
-            className="overflow-y-auto"
-            style={{
-              maxHeight: '420px',
-              padding: '0 0 16px',
-            }}
-          >
+          <div className={styles.scrollArea}>
             {KEYBOARD_SHORTCUTS.map((group) => (
-              <div key={group.category} style={{ marginTop: '16px' }}>
-                <div
-                  style={{
-                    padding: '6px 16px',
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    color: mutedColor,
-                  }}
-                >
+              <div key={group.category} className={styles.category}>
+                <div className={styles.categoryTitle}>
                   {group.category}
                 </div>
-                <table
-                  style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                  }}
-                >
+                <table className={styles.table}>
                   <tbody>
                     {group.items.map((item, i) => (
                       <tr
                         key={item.key}
-                        style={{
-                          borderTop: `1px solid ${borderColor}`,
-                          backgroundColor: i % 2 === 0 ? 'transparent' : rowHover,
-                        }}
+                        className={`${styles.row} ${i % 2 === 0 ? styles.rowEven : styles.rowOdd}`}
                       >
-                        <td
-                          style={{
-                            padding: '8px 16px',
-                            fontSize: '12px',
-                            color: primaryColor,
-                            width: '45%',
-                            verticalAlign: 'middle',
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              flexWrap: 'wrap',
-                            }}
-                          >
+                        <td className={`${styles.cell} ${styles.cellKey}`}>
+                          <div className={styles.keyGroup}>
                             {item.key.split('/').map((part, j) => (
                               <React.Fragment key={j}>
                                 {j > 0 && (
-                                  <span style={{ color: mutedColor, fontSize: '10px' }}>
-                                    /
-                                  </span>
+                                  <span className={styles.separator}>/</span>
                                 )}
                                 {part.trim().split('+').map((keyPart, k) => (
                                   <React.Fragment key={k}>
                                     {k > 0 && (
-                                      <span style={{ color: mutedColor, fontSize: '10px' }}>
-                                        +
-                                      </span>
+                                      <span className={styles.separator}>+</span>
                                     )}
-                                    <KbdBadge
-                                      style={{
-                                        background: kbdBg,
-                                        border: `1px solid ${kbdBorder}`,
-                                        color: primaryColor,
-                                      }}
-                                    >
+                                    <KbdBadge>
                                       {keyPart.trim()}
                                     </KbdBadge>
                                   </React.Fragment>
@@ -256,14 +163,7 @@ export const ShortcutOverlay = React.memo<ShortcutOverlayProps>(
                             ))}
                           </div>
                         </td>
-                        <td
-                          style={{
-                            padding: '8px 16px',
-                            fontSize: '12px',
-                            color: mutedColor,
-                            verticalAlign: 'middle',
-                          }}
-                        >
+                        <td className={`${styles.cell} ${styles.cellDesc}`}>
                           {item.desc}
                         </td>
                       </tr>

@@ -13,6 +13,7 @@ import { preloadProjectEditPage, preloadAIVideoEditorPage } from '../../core/uti
 import type { ProjectView } from './types';
 import React from 'react';
 import { Edit3, Trash2, Play, Download } from 'lucide-react';
+import styles from './index.module.less';
 
 const loadProjectsListView = () => import('./components/projects-list-view');
 const ProjectsListView = React.lazy(loadProjectsListView);
@@ -52,7 +53,7 @@ const ProjectManager: React.FC = () => {
   ];
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+    <div className={styles.pageContainer}>
       {/* 工具栏 */}
       <Suspense fallback={null}>
         <ProjectsToolbar
@@ -80,8 +81,7 @@ const ProjectManager: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {/* 创建项目卡片 */}
           <div
-            className="rounded-xl border-2 border-dashed border-primary/30 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors"
-            style={{ height: 220 }}
+            className={`${styles.createCard} rounded-xl border-2 border-dashed border-primary/30 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors`}
             onClick={() => navigate('/project/new')}
           >
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/10 flex items-center justify-center text-primary mb-3">

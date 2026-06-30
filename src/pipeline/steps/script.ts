@@ -30,7 +30,6 @@ export const createScriptStep = (config: ScriptStepConfig): PipelineStep<Analysi
   async execute(analysis: AnalysisResult, ctx: PipelineDataContext): Promise<Script> {
     const { style = 'informative', apiKey, provider = 'openai' } = config;
 
-    // 调用 LLM 生成脚本
     const model = resolveLegacyModel(provider as ModelProvider);
     const analysisInput: AnalysisInput = {
       keyMoments: analysis.scenes?.map(s => ({
@@ -38,12 +37,15 @@ export const createScriptStep = (config: ScriptStepConfig): PipelineStep<Analysi
         description: s.description ?? s.type,
         importance: s.score,
       })),
-      emotions: analysis.emotions,
+      emotions: analysis.emotions?.map((e) => ({
+        timestamp: e.timestamp,
+        type: e.emotion ?? e.dominant ?? 'neutral',
+        intensity: e.intensity ?? e.confidence ?? 0,
+      })),
       summary: `共 ${analysis.stats?.sceneCount ?? 0} 个场景`,
     };
     const scriptText = await generateScriptWithModel(model, apiKey!, analysisInput, { style: style as ScriptGenerationSettings['style'] });
 
-    // 解析脚本为片段
     const segments = parseScriptSegments(scriptText, analysis);
 
     return {

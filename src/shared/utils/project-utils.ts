@@ -4,11 +4,42 @@
 
 import type { Project, ProjectStatus } from '@/types';
 
-// Re-export filter/sort from store (single source of truth)
-export { filterProjects, sortProjects } from '@/store/project-store';
-export type { ProjectFilter, ProjectSortBy, SortOrder } from '@/store/project-store';
+export type ProjectSortBy = 'updatedAt' | 'createdAt' | 'title' | 'duration';
+export type SortOrder = 'asc' | 'desc';
 
-// Re-export formatting utilities
+export interface ProjectFilter {
+  status?: ProjectStatus;
+  starred?: boolean;
+  tags?: string[];
+  search?: string;
+}
+
+export function filterProjects(projects: Project[], filter: ProjectFilter): Project[] {
+  return projects.filter(p => {
+    if (filter.status && p.status !== filter.status) return false;
+    if (filter.starred !== undefined && p.starred !== filter.starred) return false;
+    if (filter.tags?.length && !filter.tags.some(tag => p.tags.includes(tag))) return false;
+    if (filter.search) {
+      const q = filter.search.toLowerCase();
+      if (
+        !p.title.toLowerCase().includes(q) &&
+        !(p.description?.toLowerCase().includes(q))
+      ) return false;
+    }
+    return true;
+  });
+}
+
+export function sortProjects(projects: Project[], sortBy: ProjectSortBy, order: SortOrder): Project[] {
+  return [...projects].sort((a, b) => {
+    let cmp = 0;
+    if (sortBy === 'title') cmp = a.title.localeCompare(b.title);
+    else if (sortBy === 'duration') cmp = (a.duration ?? 0) - (b.duration ?? 0);
+    else cmp = new Date(a[sortBy]).getTime() - new Date(b[sortBy]).getTime();
+    return order === 'asc' ? cmp : -cmp;
+  });
+}
+
 export { formatFileSize as formatProjectSize, formatDuration as formatProjectDuration } from './formatting';
 
 /**
@@ -37,4 +68,3 @@ export function getStatusColor(status: ProjectStatus): string {
   };
   return colors[status] || 'default';
 }
-

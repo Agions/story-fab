@@ -19,7 +19,7 @@ import {
   PROJECT_AUTO_SAVE_KEY,
   PROJECT_SAVE_BEHAVIOR_KEY,
   type ProjectSaveBehavior,
-} from '@/shared/constants/settings';
+} from '@/shared/constants/constants';
 import { createDefaultProjectName } from '../project-edit-utils';
 import {
   createInitialProjectEditState,

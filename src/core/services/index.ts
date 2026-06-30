@@ -27,10 +27,6 @@ export { clipScorer } from './pipeline/clip-pipeline/clip-scorer';
 export { multiExporter } from './pipeline/clip-pipeline/multi-export';
 export { seoGenerator } from './pipeline/clip-pipeline/seo-generator';
 
-// 编辑器服务
-export { editorService, EditorService } from './editor';
-export * from './editor';
-
 // 导出服务（export/ 子目录）
 export { exportService, ExportService } from './export/export-service';
 

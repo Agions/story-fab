@@ -15,7 +15,7 @@
  *     need no changes beyond the import swap.
  */
 import type { ProjectData } from '../project-edit-utils';
-import type { ProjectSaveBehavior } from '@/shared/constants/settings';
+import type { ProjectSaveBehavior } from '@/shared/constants/constants';
 import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment } from '@/types';
 

@@ -86,14 +86,6 @@ export interface Timeline {
   markers: TimelineMarker[];
   createdAt: string;
   updatedAt: string;
-  /** @deprecated 请使用 tracks */
-  videoTracks: VideoTrack[];
-  /** @deprecated 请使用 tracks */
-  audioTracks: AudioTrack[];
-  /** @deprecated 请使用 tracks */
-  textTracks: TextTrack[];
-  /** @deprecated 请使用 tracks */
-  effectTracks: EffectTrack[];
 }
 
 // ─── 编辑器状态 ───
@@ -151,8 +143,6 @@ export type EditorAction =
   | { type: 'ADD_EFFECT'; clipId: string; effect: string; params: Record<string, unknown> }
   | { type: 'ADJUST_SPEED'; clipId: string; speed: number }
   | { type: 'ADJUST_VOLUME'; trackId: string; volume: number }
-  | { type: 'ADD_TEXT'; trackId: string; text: TextItem; position: number }
-  | { type: 'ADD_AUDIO'; trackId: string; audio: AudioClip; position: number }
   | { type: 'UNDO' }
   | { type: 'REDO' };
 
@@ -211,107 +201,5 @@ export function createEmptyTimeline(): Timeline {
     markers: [],
     createdAt: now,
     updatedAt: now,
-    videoTracks: [],
-    audioTracks: [],
-    textTracks: [],
-    effectTracks: [],
   };
-}
-
-// ─── 遗留类型别名（向后兼容）───
-
-/** @deprecated 请使用 TimelineClip */
-export interface VideoClip {
-  id: string;
-  sourceId?: string;
-  sourceStart?: number;
-  sourceEnd?: number;
-  startTime: number;
-  endTime: number;
-  speed?: number;
-  effects?: Array<{ type: string; params: Record<string, unknown> }>;
-}
-
-/** @deprecated 请使用 TimelineClip */
-export interface AudioClip {
-  id: string;
-  sourceId?: string;
-  startTime: number;
-  endTime: number;
-  duration?: number;
-}
-
-/** @deprecated 请使用 TimelineTrack */
-export interface VideoTrack {
-  id: string;
-  name: string;
-  clips: VideoClip[];
-  transitions?: Transition[];
-  visible: boolean;
-  locked: boolean;
-}
-
-/** @deprecated 请使用 TimelineTrack */
-export interface AudioTrack {
-  id: string;
-  name: string;
-  clips: AudioClip[];
-  visible: boolean;
-  locked: boolean;
-  volume: number;
-}
-
-/** @deprecated 请使用 TimelineClip */
-export interface TextItem {
-  id: string;
-  content: string;
-  startTime: number;
-  endTime: number;
-  duration?: number;
-  style?: Record<string, unknown>;
-}
-
-/** @deprecated 请使用 TimelineTrack */
-export interface TextTrack {
-  id: string;
-  name: string;
-  items: TextItem[];
-  visible: boolean;
-  locked: boolean;
-}
-
-/** @deprecated 请使用 TimelineTrack */
-export interface EffectTrack {
-  id: string;
-  name: string;
-  effects: Array<Record<string, unknown>>;
-  visible: boolean;
-  locked: boolean;
-}
-
-/** @deprecated 请在新建 Timeline 时不再使用 videoTracks/audioTracks/textTracks/effectTracks 字段 */
-export function syncLegacyTracks(timeline: Timeline): Timeline {
-  const videoTracks: VideoTrack[] = [];
-  const audioTracks: AudioTrack[] = [];
-  const textTracks: TextTrack[] = [];
-  const effectTracks: EffectTrack[] = [];
-
-  for (const track of timeline.tracks) {
-    switch (track.type) {
-      case 'video':
-        videoTracks.push(track as unknown as VideoTrack);
-        break;
-      case 'audio':
-        audioTracks.push(track as unknown as AudioTrack);
-        break;
-      case 'subtitle':
-        textTracks.push(track as unknown as TextTrack);
-        break;
-      case 'effect':
-        effectTracks.push(track as unknown as EffectTrack);
-        break;
-    }
-  }
-
-  return { ...timeline, videoTracks, audioTracks, textTracks, effectTracks } as Timeline;
 }

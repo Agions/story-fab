@@ -3,7 +3,7 @@
 import React, { createContext, useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info, Loader } from "lucide-react";
-import styles from "@/components/ui/toast.module.css";
+import styles from "@/components/ui/toast.module.less";
 import { logger } from "@/shared/utils/logging";
 
 type ToastType = "success" | "error" | "warning" | "info" | "loading";

@@ -49,7 +49,7 @@ export * from './project';
 export { ExportService, FORMAT_MIME_TYPES } from './export';
 
 // ─── 编辑器服务 ───
-export { editorService, EditorService } from '@/core/services/editor';
+// EditorService 已移除，由 workspace-store.ts (Zustand) 接管编辑器状态
 
 // ─── 解说模式 ───
 export * from '@/core/services/commentary';

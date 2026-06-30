@@ -36,7 +36,7 @@ import { notify } from '@/shared';
 import { subtitleService } from '@/core/services/subtitle/subtitle-service';
 import { useWorkspaceStore } from '@/store/workspace-store';
 import type { SubtitleEntry } from '@/types';
-import styles from './index.module.css';
+import styles from './index.module.less';
 import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';
 import { useSubtitleExtractor, type SubtitleSegment } from './use-subtitle-extractor';
 

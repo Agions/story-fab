@@ -14,8 +14,8 @@ import { notify } from '@/shared';
 import { useTimeout } from '../../../hooks/use-timeout';
 import { logger } from '@/shared/utils/logging';
 import type { AIAnalyzeProps, Scene } from '@/types';
-import styles from './AIVisualizer.module.css';
-import { Highlights } from './Highlights';
+import styles from './AIVisualizer.module.less';
+import { Highlights } from './Highlights/highlights';
 import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysis-tasks';
 import { formatTime } from '../../../shared/utils/formatting';
 import { aiVisualizerReducer, initialAIVisualizerState } from './ai-visualizer.reducer';
@@ -213,7 +213,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          <p style={{ margin: 0 }}>请先上传视频，再进行 AI 分析</p>
+          <p className={styles.noVideoHint}>请先上传视频，再进行 AI 分析</p>
         </div>
       </div>
     );
@@ -282,7 +282,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
 
           {/* 高光时刻 — Rust highlight_detector.rs */}
           {state.currentVideo && (
-            <div style={{ marginTop: 16 }}>
+            <div className={styles.highlightsSection}>
               <Highlights videoInfo={state.currentVideo} />
             </div>
           )}

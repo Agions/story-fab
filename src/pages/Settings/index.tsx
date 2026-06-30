@@ -30,7 +30,7 @@ import {
 import { useModelStore } from '@/store';
 import { notify } from '@/shared';
 import { useSecureApiKeys } from '@/hooks/use-secure-api-keys';
-import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../../shared/constants/settings';
+import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../../shared/constants/constants';
 import packageJson from '../../../package.json';
 import styles from '@/pages/Settings/index.module.less';
 

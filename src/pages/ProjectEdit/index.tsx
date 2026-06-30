@@ -40,7 +40,7 @@ import {
   PROJECT_SAVE_BEHAVIOR_KEY,
   PROJECT_AUTO_SAVE_KEY,
   type ProjectSaveBehavior,
-} from '@/shared/constants/settings';
+} from '@/shared/constants/constants';
 
 import styles from '@/pages/ProjectEdit/index.module.less';
 

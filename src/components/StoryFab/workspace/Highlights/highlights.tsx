@@ -20,7 +20,7 @@ import {
   initialHighlightsState,
   type Highlight,
 } from './highlights.reducer';
-import styles from './highlights.module.css';
+import styles from './highlights.module.less';
 import { formatTime } from '@/shared/utils/formatting';
 
 const REASON_CONFIG: Record<string, { label: string; cls: string }> = {

@@ -1,0 +1,130 @@
+/**
+ * ShortcutOverlay — 快捷键帮助面板样式
+ */
+
+.overlay {
+  max-width: 512px;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.header {
+  padding: 20px 24px 16px;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.title {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.description {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.scrollArea {
+  overflow-y: auto;
+  max-height: 420px;
+  padding: 0 0 16px;
+}
+
+.category {
+  margin-top: 16px;
+}
+
+.categoryTitle {
+  padding: 6px 16px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.row {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.rowEven {
+  background: transparent;
+}
+
+.rowOdd {
+  background: var(--bg-hover);
+}
+
+.cell {
+  padding: 8px 16px;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.cellKey {
+  width: 45%;
+  color: var(--text-primary);
+}
+
+.cellDesc {
+  color: var(--text-tertiary);
+}
+
+.keyGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.separator {
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.kbdBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  border-radius: 4px;
+  border: 1px solid;
+  white-space: nowrap;
+  min-width: 24px;
+  line-height: 1.4;
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.inlineKbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  border-radius: 4px;
+  border: 1px solid;
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+  min-width: 24px;
+  line-height: 1.4;
+}

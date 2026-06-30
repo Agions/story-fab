@@ -92,25 +92,28 @@ export interface ImageFile extends FileInfo {
 
 // ============ 项目类型 ============
 
-// Extracted to project.ts - barrel export below
 export type { Project, ProjectStatus } from './project';
 
-/* Original definitions (commented out):
-/** 项目状态 *\/
-export type ProjectStatus = 'draft' | 'processing' | 'completed' | 'archived';
+export type ProjectUIStatus = 'draft' | 'processing' | 'completed';
 
-/** 项目 *\/
-export interface Project {
-  id: ID;
+export type ProjectView = {
+  id: string;
   name: string;
   description?: string;
-  status: ProjectStatus;
-  thumbnail?: string;
-  videos: VideoFile[];
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-*/
+  status: ProjectUIStatus;
+  createdAt: string;
+  updatedAt: string;
+  scripts?: unknown[];
+  videos?: unknown[];
+  videoPath?: string;
+};
+
+export type ProjectUIStats = {
+  scriptCount: number;
+  videoCount: number;
+  status: ProjectUIStatus;
+  progress: number;
+};
 
 // ============ 工作流类型 ============
 
@@ -146,8 +149,9 @@ export interface Workflow {
 /** 任务类型 */
 export type TaskType = 'analysis' | 'script' | 'render' | 'export' | 'upload';
 
-import type { TaskStatus } from '@/types';
-export type { TaskStatus };
+// ============ 任务类型 ============
+
+export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
 
 /** 任务 */
 export interface Task {

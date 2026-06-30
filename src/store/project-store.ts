@@ -1,50 +1,7 @@
-/**
- * Project Store - 项目状态
- * 包含: 项目列表、当前项目、加载状态、筛选排序
- */
-import { create } from 'zustand';
-import { persist, createJSONStorage, devtools } from 'zustand/middleware';
+import { createPersistedStore } from './create-persisted-store';
+import { createJSONStorage } from 'zustand/middleware';
 import type { Project, ProjectStatus } from '@/types';
-
-// ─── Pure filter/sort functions (exported for testing) ────────────────────────
-
-export type ProjectSortBy = 'updatedAt' | 'createdAt' | 'title' | 'duration';
-export type SortOrder = 'asc' | 'desc';
-
-export interface ProjectFilter {
-  status?: ProjectStatus;
-  starred?: boolean;
-  tags?: string[];
-  search?: string;
-}
-
-export function filterProjects(projects: Project[], filter: ProjectFilter): Project[] {
-  return projects.filter(p => {
-    if (filter.status && p.status !== filter.status) return false;
-    if (filter.starred !== undefined && p.starred !== filter.starred) return false;
-    if (filter.tags?.length && !filter.tags.some(tag => p.tags.includes(tag))) return false;
-    if (filter.search) {
-      const q = filter.search.toLowerCase();
-      if (
-        !p.title.toLowerCase().includes(q) &&
-        !(p.description?.toLowerCase().includes(q))
-      ) return false;
-    }
-    return true;
-  });
-}
-
-export function sortProjects(projects: Project[], sortBy: ProjectSortBy, order: SortOrder): Project[] {
-  return [...projects].sort((a, b) => {
-    let cmp = 0;
-    if (sortBy === 'title') cmp = a.title.localeCompare(b.title);
-    else if (sortBy === 'duration') cmp = (a.duration ?? 0) - (b.duration ?? 0);
-    else cmp = new Date(a[sortBy]).getTime() - new Date(b[sortBy]).getTime();
-    return order === 'asc' ? cmp : -cmp;
-  });
-}
-
-// ─── Store types ───────────────────────────────────────────────────────────────
+import { filterProjects, sortProjects, type ProjectFilter, type ProjectSortBy, type SortOrder } from '@/shared/utils/project-utils';
 
 interface ProjectState {
   projects: Project[];
@@ -53,7 +10,6 @@ interface ProjectState {
   sortBy: ProjectSortBy;
   sortOrder: SortOrder;
   filter: ProjectFilter;
-
   setProjects: (projects: Project[]) => void;
   addProject: (project: Project) => void;
   updateProject: (id: string, data: Partial<Project>) => void;
@@ -68,72 +24,56 @@ interface ProjectState {
   getProjectById: (id: string) => Project | undefined;
 }
 
-// ─── Store implementation ──────────────────────────────────────────────────────
-
-export const useProjectStore = create<ProjectState>()(
-  devtools(
-    persist(
-      (set, get) => ({
-      projects: [] as Project[],
-      currentProject: null as Project | null,
-      loading: false,
-      sortBy: 'updatedAt',
-      sortOrder: 'desc',
-      filter: {},
-
-      setProjects: (projects) => set({ projects }),
-
-      addProject: (project) =>
-        set((state) => ({
-          projects: [...state.projects, project],
-        })),
-
-      updateProject: (id, data) =>
-        set((state) => ({
-          projects: state.projects.map((p) =>
-            p.id === id
-              ? { ...p, ...data, updatedAt: new Date().toISOString() }
-              : p
-          ),
-          currentProject: state.currentProject?.id === id
-            ? { ...state.currentProject, ...data, updatedAt: new Date().toISOString() }
-            : state.currentProject,
-        })),
-
-      deleteProject: (id) =>
-        set((state) => ({
-          projects: state.projects.filter((p) => p.id !== id),
-          currentProject: state.currentProject?.id === id ? null : state.currentProject,
-        })),
-
-      setCurrentProject: (project) => set({ currentProject: project }),
-      setLoading: (loading) => set({ loading }),
-
-      setSortBy: (sortBy) => set({ sortBy }),
-      setSortOrder: (sortOrder) => set({ sortOrder }),
-      setFilter: (filter) => set({ filter }),
-      clearFilter: () => set({ filter: {} }),
-
-      getFilteredProjects: () => {
-        const { projects, sortBy, sortOrder, filter } = get();
-        return sortProjects(filterProjects(projects, filter), sortBy, sortOrder);
-      },
-
-      getProjectById: (id) => {
-        return get().projects.find(p => p.id === id);
-      },
-    }),
-    {
-      name: 'StoryFab-projects',
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        projects: state.projects,
-        currentProject: state.currentProject,
-        sortBy: state.sortBy,
-        sortOrder: state.sortOrder,
-      }),
-    }
-    ),
-    { name: 'ProjectStore' }
-  )
-);
+export const useProjectStore = createPersistedStore<ProjectState>({
+  name: 'StoryFab-projects',
+  devtoolsName: 'ProjectStore',
+  storage: createJSONStorage(() => localStorage),
+  partialize: (state) => ({
+    projects: state.projects,
+    currentProject: state.currentProject,
+    sortBy: state.sortBy,
+    sortOrder: state.sortOrder,
+  }),
+  state: (set, get) => ({
+    projects: [],
+    currentProject: null,
+    loading: false,
+    sortBy: 'updatedAt',
+    sortOrder: 'desc',
+    filter: {},
+    setProjects: (projects) => set({ projects }),
+    addProject: (project) =>
+      set((state) => ({
+        projects: [...state.projects, project],
+      })),
+    updateProject: (id, data) =>
+      set((state) => ({
+        projects: state.projects.map((p) =>
+          p.id === id
+            ? { ...p, ...data, updatedAt: new Date().toISOString() }
+            : p
+        ),
+        currentProject: state.currentProject?.id === id
+          ? { ...state.currentProject, ...data, updatedAt: new Date().toISOString() }
+          : state.currentProject,
+      })),
+    deleteProject: (id) =>
+      set((state) => ({
+        projects: state.projects.filter((p) => p.id !== id),
+        currentProject: state.currentProject?.id === id ? null : state.currentProject,
+      })),
+    setCurrentProject: (project) => set({ currentProject: project }),
+    setLoading: (loading) => set({ loading }),
+    setSortBy: (sortBy) => set({ sortBy }),
+    setSortOrder: (sortOrder) => set({ sortOrder }),
+    setFilter: (filter) => set({ filter }),
+    clearFilter: () => set({ filter: {} }),
+    getFilteredProjects: () => {
+      const { projects, sortBy, sortOrder, filter } = get();
+      return sortProjects(filterProjects(projects, filter), sortBy, sortOrder);
+    },
+    getProjectById: (id) => {
+      return get().projects.find(p => p.id === id);
+    },
+  }),
+});

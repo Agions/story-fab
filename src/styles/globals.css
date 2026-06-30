@@ -62,6 +62,38 @@
     --text-tertiary:  #6b6760;
     --text-disabled:  #4a4742;
 
+    /* ── Spacing (4px base grid) ── */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    /* ── Typography scale ── */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.8125rem;
+    --font-size-base: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
     /* ── Accent — Amber/Gold cinema ── */
     --accent-primary:       #c8956c;
     --accent-primary-hover: #d4a574;
@@ -322,6 +354,56 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
+   Reset & Base
+   ═══════════════════════════════════════════════════════════ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', 'Figtree', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Noto Sans SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Ant Design compatibility overrides
+   ═══════════════════════════════════════════════════════════ */
+.ant-layout {
+  overflow-x: hidden;
+}
+
+.ant-card-hoverable {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ant-card-hoverable:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.ant-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Video
+   ═══════════════════════════════════════════════════════════ */
+video {
+  max-width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════
    Global animations
    ═══════════════════════════════════════════════════════════ */
 @keyframes storyfab-spin {
@@ -348,7 +430,9 @@
   100% { background-position: 200% center; }
 }
 
-/* Reduced motion */
+/* ═══════════════════════════════════════════════════════════
+   Reduced motion
+   ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -357,13 +441,17 @@
   }
 }
 
-/* Selection color — amber tinted */
+/* ═══════════════════════════════════════════════════════════
+   Selection color — amber tinted
+   ═══════════════════════════════════════════════════════════ */
 ::selection {
   background: rgba(200, 149, 108, 0.3);
   color: var(--text-primary);
 }
 
-/* Scrollbar styling — thin, warm-tinted */
+/* ═══════════════════════════════════════════════════════════
+   Scrollbar styling — thin, warm-tinted
+   ═══════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -377,4 +465,21 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-strong);
+}
+
+/* Page loader */
+.page-loader {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+.page-loader-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(200, 149, 108, 0.25);
+  border-top-color: #c8956c;
+  border-radius: 50%;
+  animation: storyfab-spin 0.9s linear infinite;
 }

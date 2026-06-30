@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { logger } from '@/shared/utils/logging';
 import { notify } from '@/shared';
 import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '@/core/services/project/project-file-service';
-import type { ProjectUIStatus, ProjectUIStats, ProjectView } from '../pages/Projects/types';
+import type { ProjectUIStatus, ProjectUIStats, ProjectView } from '@/shared/types';
 
 export type { ProjectUIStatus, ProjectUIStats, ProjectView };
 

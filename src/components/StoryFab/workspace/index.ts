@@ -10,7 +10,7 @@ export { default as VideoComposing } from './video-composing';
 export { default as ClipRippling } from './clip-rippling';
 export { default as VideoExport } from './VideoExport';
 export { default as StepList } from './step-list';
-export { Highlights, type Highlight, type HighlightsProps } from './Highlights';
+export { Highlights, type Highlight, type HighlightsProps } from './Highlights/highlights';
 
 // 导出类型
 export type { AIFunctionType } from './function-mode-map';

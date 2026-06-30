@@ -27,7 +27,7 @@ export {
 export { AIServiceError } from './script/ai-api-client';
 
 // 导出工具函数
-export { parseScriptContent, formatScriptToText, createScriptDraft } from './script';
-export { buildScriptPrompt } from './script';
-export { invokeAIModel } from './script';
-export { AI_MODEL_CONFIGS, type AIModelType, type ModelConfig } from './script';
+export { parseScriptContent, formatScriptToText, createScriptDraft } from './script/';
+export { buildScriptPrompt } from './script/';
+export { invokeAIModel } from './script/';
+export { AI_MODEL_CONFIGS, type AIModelType, type ModelConfig } from './script/';

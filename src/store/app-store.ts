@@ -1,14 +1,7 @@
-/**
- * App Store - 全局应用状态
- * 包含: 用户认证、UI状态、通知、设置、自动保存
- */
-import { create } from 'zustand';
-import { persist, createJSONStorage, devtools } from 'zustand/middleware';
+import { createPersistedStore } from './create-persisted-store';
+import { createJSONStorage } from 'zustand/middleware';
 import type { User } from '@/types';
 
-// ==========================================
-// 类型定义
-// ==========================================
 export interface UserSettings {
   compactMode: boolean;
   language: string;
@@ -16,24 +9,13 @@ export interface UserSettings {
 }
 
 export interface AppState {
-  // 用户状态
   user: User | null;
   isAuthenticated: boolean;
-
-  // UI 状态
   sidebarCollapsed: boolean;
   theme: 'light' | 'dark';
-
-  // 通知
   notifications: number;
-
-  // 自动保存（提升到顶层，方便调用）
   autoSave: boolean;
-
-  // 用户设置
   userSettings: UserSettings;
-
-  // Actions
   setUser: (user: User | null) => void;
   setTheme: (theme: 'light' | 'dark') => void;
   toggleSidebar: () => void;
@@ -45,79 +27,55 @@ export interface AppState {
   addRecentProject: (projectId: string) => void;
 }
 
-// ==========================================
-// 默认值
-// ==========================================
 const defaultSettings: UserSettings = {
   compactMode: false,
   language: 'zh-CN',
   recentProjects: [],
 };
 
-// ==========================================
-// Store 创建
-// ==========================================
-export const useAppStore = create<AppState>()(
-  devtools(
-    persist(
-      (set): AppState => ({
-      // 初始状态
-      user: null as User | null,
+export const useAppStore = createPersistedStore<AppState>({
+  name: 'StoryFab-app',
+  devtoolsName: 'AppStore',
+  storage: createJSONStorage(() => localStorage),
+  partialize: (state) => ({
+    theme: state.theme,
+    sidebarCollapsed: state.sidebarCollapsed,
+    userSettings: state.userSettings,
+    autoSave: state.autoSave,
+  }),
+  state: (set) => ({
+    user: null,
+    isAuthenticated: false,
+    sidebarCollapsed: false,
+    theme: 'light',
+    notifications: 0,
+    autoSave: true,
+    userSettings: defaultSettings,
+    setUser: (user) => set({ user, isAuthenticated: !!user }),
+    setTheme: (theme) => set({ theme }),
+    toggleSidebar: () =>
+      set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+    logout: () => set({
+      user: null,
       isAuthenticated: false,
-      sidebarCollapsed: false,
-      theme: 'light' as const,
       notifications: 0,
-      autoSave: true,
-      userSettings: defaultSettings,
-
-      // Actions
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
-
-      setTheme: (theme) => set({ theme }),
-
-      toggleSidebar: () =>
-        set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
-
-      logout: () => set({
-        user: null,
-        isAuthenticated: false,
-        notifications: 0,
-      }),
-
-      setNotifications: (count) => set({ notifications: count }),
-
-      clearNotifications: () => set({ notifications: 0 }),
-
-      updateUserSettings: (settings) =>
-        set((state) => ({
-          userSettings: { ...state.userSettings, ...settings },
-        })),
-
-      setAutoSave: (autoSave) => set({ autoSave }),
-
-      addRecentProject: (projectId) =>
-        set((state) => ({
-          userSettings: {
-            ...state.userSettings,
-            recentProjects: [
-              projectId,
-              ...state.userSettings.recentProjects.filter((id) => id !== projectId),
-            ].slice(0, 10),
-          },
-        })),
     }),
-    {
-      name: 'StoryFab-app',
-      storage: createJSONStorage(() => localStorage),
-      // 只持久化这些字段
-      partialize: (state) => ({
-        theme: state.theme,
-        sidebarCollapsed: state.sidebarCollapsed,
-        userSettings: state.userSettings,
-        autoSave: state.autoSave,
-      }),
-    }
-    ),
-    { name: 'AppStore' }
-  )
-);
+    setNotifications: (count) => set({ notifications: count }),
+    clearNotifications: () => set({ notifications: 0 }),
+    updateUserSettings: (settings) =>
+      set((state) => ({
+        userSettings: { ...state.userSettings, ...settings },
+      })),
+    setAutoSave: (autoSave) => set({ autoSave }),
+    addRecentProject: (projectId) =>
+      set((state) => ({
+        userSettings: {
+          ...state.userSettings,
+          recentProjects: [
+            projectId,
+            ...state.userSettings.recentProjects.filter((id) => id !== projectId),
+          ].slice(0, 10),
+        },
+      })),
+  }),
+});

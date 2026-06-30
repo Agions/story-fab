@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Grid3X3, List, Plus, Search } from 'lucide-react';
+import styles from '../index.module.less';
 
 type ViewMode = 'grid' | 'list';
 type ProjectStatusFilter = 'all' | 'draft' | 'processing' | 'completed';
@@ -21,7 +22,7 @@ export const ProjectsToolbar = React.memo<ProjectsToolbarProps>(({
   searchText, statusFilter, viewMode,
   onSearchChange, onStatusFilterChange, onViewModeChange, onNewProject,
 }) => (
-  <Card className="mb-4" style={{ padding: '12px 20px' }}>
+  <Card className={`${styles.toolbarCard} mb-4`}>
     <div className="flex items-center justify-between flex-wrap gap-3">
       <div className="flex items-center gap-3">
         <div className="relative">

@@ -17,22 +17,8 @@ export type {
   DragState,
   TimelineSelection,
   ClipProperties,
-  EditorAction,
-  EditorHistory,
-  EditorExportSettings,
-  EditorConfig,
-  // 遗留类型（已废弃，保留向后兼容）
-  VideoClip,
-  AudioClip,
-  VideoTrack,
-  AudioTrack,
-  TextItem,
-  TextTrack,
-  EffectTrack,
 } from '@/types';
 
 export {
-  DEFAULT_EDITOR_CONFIG,
   createEmptyTimeline,
-  syncLegacyTracks,
 } from '@/types';

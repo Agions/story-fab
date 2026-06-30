@@ -1,8 +1,6 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, HashRouter, Navigate } from 'react-router-dom';
 
-import './App.css';
-
 import ErrorBoundary from './components/common/error-boundary';
 const loadAppProvider = () => import('./providers/app-provider');
 const loadLayout = () => import('./components/Layout/layout');
@@ -27,17 +25,8 @@ const Settings = lazy(loadSettings);
 
 // 加载占位符 - 骨架屏
 const PageLoader = () => (
-  <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '24px' }}>
-    <div
-      style={{
-        width: 36,
-        height: 36,
-        border: '3px solid rgba(200, 149, 108, 0.25)',
-        borderTopColor: '#c8956c',
-        borderRadius: '50%',
-        animation: 'StoryFab-spin 0.9s linear infinite',
-      }}
-    />
+  <div className="page-loader">
+    <div className="page-loader-spinner" />
   </div>
 );
 

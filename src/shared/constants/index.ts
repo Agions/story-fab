@@ -3,12 +3,12 @@
  * 单一代谢来源
  */
 
-// ─── 应用层常量（从 settings.ts 重导出）──────────────────────────────
+// ─── 应用层常量（从 constants.ts 直接导出）──────────────────────────────
 export {
   PROJECT_SAVE_BEHAVIOR_KEY,
   PROJECT_AUTO_SAVE_KEY,
   type ProjectSaveBehavior,
-} from '@/shared/constants/settings';
+} from '@/shared/constants/constants';
 
 export {
   APP,

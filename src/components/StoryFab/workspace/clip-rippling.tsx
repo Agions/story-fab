@@ -33,12 +33,10 @@ import type {
   RepurposingOptions,
 } from '../../../core/services/pipeline/clip-pipeline/pipeline';
 import { transcodeWithCrop } from '@/core/services/export/transcode-crop-service';
-import styles from './ClipRippling.module.css';
+import styles from './ClipRippling.module.less';
 import {
   MIN_CLIP_DURATION_SECONDS,
   MAX_CLIP_DURATION_SECONDS,
-  SCORE_THRESHOLD_HIGH,
-  SCORE_THRESHOLD_MEDIUM,
   TARGET_CLIP_COUNTS,
   SEO_DESCRIPTION_MAX_LENGTH,
   HASHTAGS_MAX_COUNT,
@@ -181,12 +179,6 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
     }
   }, [results, selectedClips, selectedFormats, videoPath, onNext, setExporting, setExportedPaths]);
 
-  const scoreColor = (score: number) => {
-    if (score >= SCORE_THRESHOLD_HIGH) return '#5a9e6f';
-    if (score >= SCORE_THRESHOLD_MEDIUM) return '#c49660';
-    return '#ff4d4f';
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -240,7 +232,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
                 key={fmt.value}
                 color={selectedFormats.includes(fmt.value as AspectRatio) ? 'orange' : 'default'}
                 onClick={() => toggleSelectedFormat(fmt.value as AspectRatio)}
-                style={{ cursor: 'pointer', fontSize: 13, padding: '4px 10px' }}
+                className={`${styles.actionBtn} ${selectedFormats.includes(fmt.value as AspectRatio) ? 'bg-orange-500' : ''}`}
               >
                 {fmt.emoji} {fmt.label}
               </Badge>
@@ -283,7 +275,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
           <div className={styles.clipsHeader}>
             <span className={styles.clipsTitle}>
               📋 生成 {results.length} 个短片段
-              <Badge variant="default" className="bg-green-100 text-green-700" style={{ marginLeft: 8 }}>
+              <Badge variant="default" className={`bg-green-100 text-green-700 ${styles.badgeMarginLeft}`}>
                 已选 {selectedClips.size} 个
               </Badge>
             </span>
@@ -318,12 +310,9 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
                     <Checkbox checked={isSelected} />
                     <span className={styles.clipTime}>
                       ⏱ {startStr} → {endStr}
-                      <Badge style={{ marginLeft: 6 }}>{duration.toFixed(0)}s</Badge>
+                      <Badge className={styles.badgeMarginLeftSmall}>{duration.toFixed(0)}s</Badge>
                     </span>
-                    <span
-                      className={styles.clipScore}
-                      style={{ color: scoreColor(score.totalScore) }}
-                    >
+                    <span className={`${styles.clipScore} ${styles.scoreText}`}>
                       {score.totalScore.toFixed(0)}
                     </span>
                   </div>
@@ -349,7 +338,7 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
                       <p className={styles.seoDesc}>{seo.description?.slice(0, SEO_DESCRIPTION_MAX_LENGTH)}...</p>
                       <div className={styles.hashtags}>
                         {seo.hashtags?.slice(0, HASHTAGS_MAX_COUNT).map(tag => (
-                          <Badge key={tag} variant="default" className="bg-blue-100 text-blue-700" style={{ fontSize: 11 }}>
+                          <Badge key={tag} variant="default" className={`bg-blue-100 text-blue-700 ${styles.tagBadge}`}>
                             #{tag}
                           </Badge>
                         ))}
@@ -364,8 +353,8 @@ const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
           {/* 已导出文件 */}
           {exportedPaths.length > 0 && (
             <div className={styles.exportedSection}>
-              <CheckCircle style={{ color: '#5a9e6f' }} />
-              <span style={{ marginLeft: 8 }}>已导出 {exportedPaths.length} 个文件</span>
+              <CheckCircle className={styles.successIcon} />
+              <span className={styles.successText}>已导出 {exportedPaths.length} 个文件</span>
             </div>
           )}
         </div>

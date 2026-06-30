@@ -25,6 +25,31 @@ import { concurrentMap } from '@/shared/utils';
 
 const AMBER = '#c8956c';
 
+const statIconClassMap: Record<string, string> = {
+  '#c8956c': styles.statIconAmber,
+  '#5a9e6f': styles.statIconSuccess,
+  '#c49660': styles.statIconWarning,
+  '#5a9e9e': styles.statIconCyan,
+  '#6b8cce': styles.statIconBlue,
+};
+
+const activityDotClassMap: Record<string, string> = {
+  '#c8956c': styles.activityDotAmber,
+  '#5a9e6f': styles.activityDotSuccess,
+  '#c49660': styles.activityDotWarning,
+  '#5a9e9e': styles.activityDotCyan,
+  '#6b8cce': styles.activityDotBlue,
+};
+
+const workflowIconClassMap: Record<string, string> = {
+  '#c8956c': styles.workflowIconAmber,
+  '#d4a574': styles.workflowIconGold,
+  '#b8856a': styles.workflowIconWarm,
+  '#5a9e9e': styles.workflowIconCyan,
+  '#5a9e6f': styles.workflowIconSuccess,
+  '#6b8cce': styles.workflowIconBlue,
+};
+
 interface HomeProjectItem {
   id: string;
   name?: string;
@@ -248,15 +273,14 @@ const Home = () => {
       {/* ═══ Stats ═══ */}
       <Row gutter={[12, 12]} className={styles.statsRow}>
         {statsData.map((item, idx) => (
-          <Col key={idx} style={{ flex: '1 1 0' }}>
-            <Card className={styles.statsCard}>
-              <div className="flex items-center gap-3">
-                <div
-                  className={styles.statIcon}
-                  style={{ background: item.bg, color: item.color }}
-                >
-                  {item.icon}
-                </div>
+          <Col key={idx} className={styles.flexGrow}>
+              <Card className={styles.statsCard}>
+               <div className="flex items-center gap-3">
+                 <div
+                   className={`${styles.statIcon} ${statIconClassMap[item.color] || ''}`}
+                 >
+                   {item.icon}
+                 </div>
                 <div>
                   <div className={styles.statLabel}>{item.title}</div>
                   <div className={styles.statValue}>
@@ -274,11 +298,11 @@ const Home = () => {
       <Card className={styles.recentProjectsCard}>
         {projectsLoading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="animate-spin" style={{ color: 'var(--text-tertiary)' }} />
+            <Loader2 className={`animate-spin ${styles.textTertiary}`} />
           </div>
         ) : recentProjects.length === 0 ? (
           <div className="text-center py-8">
-            <p style={{ color: 'var(--text-tertiary)', marginBottom: 12 }}>
+            <p className={`${styles.textTertiary} ${styles.mb3}`}>
               暂无项目，开始你的第一次创作
             </p>
             <Button
@@ -314,18 +338,12 @@ const Home = () => {
                         {project.status === 'completed' ? '已完成' : '草稿'}
                       </Badge>
                     </div>
-                    <p
-                      className="text-xs truncate"
-                      style={{ color: 'var(--text-tertiary)' }}
-                    >
-                      {project.description || '无项目描述'}
-                    </p>
-                    <span
-                      className="text-[10px]"
-                      style={{ color: 'var(--text-disabled)' }}
-                    >
-                      {new Date(project.updatedAt).toLocaleDateString('zh-CN')}
-                    </span>
+                     <p className={`text-xs truncate ${styles.textTertiary}`}>
+                       {project.description || '无项目描述'}
+                     </p>
+                     <span className={`text-[10px] ${styles.textDisabled}`}>
+                       {new Date(project.updatedAt).toLocaleDateString('zh-CN')}
+                     </span>
                   </div>
                 </Card>
               </Col>
@@ -340,11 +358,8 @@ const Home = () => {
         <Col span={12}>
           <Card className={styles.workflowCard}>
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles size={14} style={{ color: AMBER }} />
-              <span
-                className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: 'var(--text-tertiary)' }}
-              >
+              <Sparkles size={14} className={styles.textTertiary} />
+              <span className={`${styles.textTertiary} ${styles.textXs} ${styles.fontSemibold} ${styles.trackingWider} ${styles.uppercase}`}>
                 创作流程
               </span>
             </div>
@@ -353,11 +368,7 @@ const Home = () => {
                 <Col span={6} key={idx}>
                   <div className={styles.workflowItem}>
                     <div
-                      className={styles.workflowIcon}
-                      style={{
-                        background: `${step.color}15`,
-                        color: step.color,
-                      }}
+                      className={`${styles.workflowIcon} ${workflowIconClassMap[step.color] || ''}`}
                     >
                       {step.icon}
                     </div>
@@ -370,11 +381,6 @@ const Home = () => {
             <div className="mt-5 flex justify-center">
               <Button
                 className="font-semibold"
-                style={{
-                  background: 'var(--gradient-hero)',
-                  border: 'none',
-                  color: '#fff',
-                }}
                 onClick={() => navigate('/project/new')}
               >
                 开始创作
@@ -388,11 +394,8 @@ const Home = () => {
         <Col span={12}>
           <Card className={styles.activitiesCard}>
             <div className="flex items-center gap-2 mb-4">
-              <Clock size={14} style={{ color: 'var(--text-tertiary)' }} />
-              <span
-                className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: 'var(--text-tertiary)' }}
-              >
+              <Clock size={14} className={styles.textTertiary} />
+              <span className={`${styles.textTertiary} ${styles.textXs} ${styles.fontSemibold} ${styles.trackingWider} ${styles.uppercase}`}>
                 最近动态
               </span>
             </div>
@@ -400,8 +403,7 @@ const Home = () => {
               {recentActivities.map((item, idx) => (
                 <div key={idx} className="flex items-start gap-3">
                   <div
-                    className={styles.activityDot}
-                    style={{ backgroundColor: item.color }}
+                    className={`${styles.activityDot} ${activityDotClassMap[item.color] || ''}`}
                   />
                   <div className="flex-1 min-w-0">
                     <div className={styles.activityTitle}>{item.title}</div>
@@ -425,14 +427,11 @@ const Home = () => {
 
       {/* ═══ AI Models ═══ */}
       <Card className={styles.aiModelsCard}>
-        <div className="flex items-center gap-2 mb-3">
-          <Rocket size={13} style={{ color: AMBER }} />
-          <span
-            className="text-xs font-medium"
-            style={{ color: 'var(--text-tertiary)' }}
-          >
-            支持的 AI 模型
-          </span>
+            <div className="flex items-center gap-2 mb-3">
+              <Rocket size={13} className={styles.textTertiary} />
+              <span className={`${styles.textTertiary} ${styles.textXs} ${styles.fontMedium}`}>
+                支持的 AI 模型
+              </span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {aiModels.map((m) => (

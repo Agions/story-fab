@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/tooltip';
 import { MoreHorizontal, Video, FolderOpen } from 'lucide-react';
 import type { ProjectView, ProjectUIStatus } from '../types';
+import styles from '../index.module.less';
 
 type ProjectUIStats = {
   scriptCount: number;
@@ -51,8 +52,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(({
   onOpen,  onDelete: _onDelete,onPreload, projectActions,
 }) => (
   <Card
-    className="cursor-pointer overflow-hidden"
-    style={{ padding: 16, height: '100%', display: 'flex', flexDirection: 'column' }}
+    className={`${styles.projectCardInner} cursor-pointer overflow-hidden`}
     onClick={onOpen}
   >
     <div className="flex justify-between items-start mb-3">
