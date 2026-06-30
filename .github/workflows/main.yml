@@ -15,42 +15,31 @@ env:
 jobs:
   typecheck:
     name: TypeScript Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          # Pin Node 20 LTS Iron — ubuntu-22.04 Runner image (default is ubuntu-24.04
+          # which has DNS/network regression causing npm 1m12s hang)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
       - name: Install dependencies
-        # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
-        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
-        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
-        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
-        # || 兜底: 检测 "npm error" 字符串, 强制 fail
-        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner
+        # (npm/cli#7006 confirmed: "Exit handler never called" 100% reproducible)
+        # Rewrite lockfile: tencentyun mirror (China-only) → npmjs.org (lockfile has 207 entries
+        # pinning to tencentyun, GH Runner DNS ENOTFOUND for this China-only mirror)
+        # --registry flag alone doesn't override hardcoded URLs in lockfile
         run: |
           set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
           npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
-          if grep -q "^npm error" /tmp/npm-ci.log; then
-            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
             exit 1
           fi
-        timeout-minutes: 5
+        timeout-minutes: 8
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
@@ -76,42 +65,31 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          # Pin Node 20 LTS Iron — ubuntu-22.04 Runner image (default is ubuntu-24.04
+          # which has DNS/network regression causing npm 1m12s hang)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
       - name: Install dependencies
-        # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
-        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
-        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
-        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
-        # || 兜底: 检测 "npm error" 字符串, 强制 fail
-        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner
+        # (npm/cli#7006 confirmed: "Exit handler never called" 100% reproducible)
+        # Rewrite lockfile: tencentyun mirror (China-only) → npmjs.org (lockfile has 207 entries
+        # pinning to tencentyun, GH Runner DNS ENOTFOUND for this China-only mirror)
+        # --registry flag alone doesn't override hardcoded URLs in lockfile
         run: |
           set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
           npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
-          if grep -q "^npm error" /tmp/npm-ci.log; then
-            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
             exit 1
           fi
-        timeout-minutes: 5
+        timeout-minutes: 8
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
@@ -134,42 +112,31 @@ jobs:
 
   coverage:
     name: Coverage Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
+          # Pin Node 20 LTS Iron — ubuntu-22.04 Runner image (default is ubuntu-24.04
+          # which has DNS/network regression causing npm 1m12s hang)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
       - name: Install dependencies
-        # npm install (not ci) tolerates lockfile drift; npm ci is stricter + 100% hang on GH Runner
-        # --prefer-offline: 优先使用 cache, 避免 GitHub Runner npm registry 慢响应触发
-        # "Exit handler never called" 1m12s hang (npm/cli#7006) — 100% 复现于 ubuntu-latest + Node 22
-        # npm prints error but exits 0 → node_modules incomplete → 后续 steps 失败
-        # || 兜底: 检测 "npm error" 字符串, 强制 fail
-        # timeout-minutes 短, hang 时 fail-fast 而不是静默 1m12s
+        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner
+        # (npm/cli#7006 confirmed: "Exit handler never called" 100% reproducible)
+        # Rewrite lockfile: tencentyun mirror (China-only) → npmjs.org (lockfile has 207 entries
+        # pinning to tencentyun, GH Runner DNS ENOTFOUND for this China-only mirror)
+        # --registry flag alone doesn't override hardcoded URLs in lockfile
         run: |
           set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
           npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
-          if grep -q "^npm error" /tmp/npm-ci.log; then
-            echo "::error::npm install reported errors (likely hang, node_modules incomplete)"
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
             exit 1
           fi
-        timeout-minutes: 5
+        timeout-minutes: 8
         env:
           # npm "Exit handler never called" bug 偶发, 关 telemetry/fund/audit
           NPM_CONFIG_FUND: 'false'
@@ -190,7 +157,7 @@ jobs:
   quality-gate:
     name: PR Quality Gate
     needs: [lint, typecheck, coverage]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
       - name: Download coverage report
@@ -255,27 +222,26 @@ jobs:
   build:
     name: Vite Build
     needs: [typecheck, lint]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
+      - name: Install dependencies
+        # Use npm 9.x (not 10.x) — npm 10 has known 1m12s hang on GH Runner
+        # Rewrite lockfile: tencentyun mirror → npmjs.org
+        run: |
+          set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
+            exit 1
+          fi
+        timeout-minutes: 8
       - name: Build
         run: npm run build
       - name: Bundle budget check
@@ -290,7 +256,7 @@ jobs:
   rust:
     name: Rust Check
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
       - name: Install Linux dependencies
@@ -300,21 +266,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
+      - name: Install dependencies
+        # Use npm 9.x + npmjs.org registry (see main typecheck/lint for full rationale)
+        run: |
+          set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
+            exit 1
+          fi
+        timeout-minutes: 8
       - name: Build frontend
         run: npm run build
       - name: Install Rust toolchain
@@ -342,7 +306,7 @@ jobs:
   rust-tests:
     name: Rust Tests (resilience)
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
       # P1 fix: cargo test --test resilience compiles the full src-tauri
@@ -359,21 +323,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          # Pin Node 20 LTS Iron — default npm 10.8.2 already installed
-          # 'cache: npm' was returning 675B (empty) — GH cache key collision
-          # Manually cache ~/.npm (download cache) + node_modules (avoid re-extract)
           node-version: '20'
-      - name: Cache npm + node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          # Cache key based on lockfile hash — invalidates when lock changes
-          key: ${{ runner.os }}-node20-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node20-npm-
-            ${{ runner.os }}-node-
+      - name: Install dependencies
+        # Use npm 9.x + npmjs.org registry (see main typecheck/lint for full rationale)
+        run: |
+          set -e
+          npm install -g npm@9 --silent
+          sed -i 's|http://mirrors.tencentyun.com/npm/|https://registry.npmjs.org/|g' package-lock.json
+          npm install --prefer-offline --no-audit --no-fund 2>&1 | tee /tmp/npm-ci.log
+          if grep -q "^npm ERR" /tmp/npm-ci.log; then
+            echo "::error::npm install reported errors"
+            exit 1
+          fi
+        timeout-minutes: 8
       - name: Build frontend
         run: npm run build
       - name: Install Rust toolchain
@@ -420,7 +382,7 @@ jobs:
   reports:
     name: Quality Reports
     needs: [lint, typecheck, coverage]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
     steps:
