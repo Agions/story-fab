@@ -287,14 +287,14 @@ jobs:
           toolchain: 1.88.0
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
       - name: Cargo check
+        env:
+          CARGO_TERM_VERBOSE: true
         run: |
           set -e
           cd src-tauri
           cargo --version && rustc --version
-          cargo check 2>&1
+          cargo check --locked 2>&1
       - name: Upload cargo report
         if: always()
         uses: actions/upload-artifact@v5
@@ -344,33 +344,38 @@ jobs:
           toolchain: 1.88.0
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
       # Run the integration tests for utils::resilience (panic hook +
       # ResourceLimiter). These live in src-tauri/tests/ as an independent
       # crate so they are not blocked by the 6 pre-existing lib-test errors
       # in ffmpeg_builder.rs / utils/mod.rs. See commit 839cca17.
       - name: Run resilience integration tests
+        env:
+          CARGO_TERM_VERBOSE: true
         run: |
           set -e
           cd src-tauri
           cargo --version && rustc --version
-          cargo test --test resilience --no-fail-fast 2>&1
+          cargo test --test resilience --locked --no-fail-fast 2>&1
       - name: Run crash recovery integration tests
+        env:
+          CARGO_TERM_VERBOSE: true
         run: |
           set -e
           cd src-tauri
-          cargo test --test crash_recovery --no-fail-fast 2>&1
+          cargo --version && rustc --version
+          cargo test --test crash_recovery --locked --no-fail-fast 2>&1
       # P2: pure-function integration tests for the audio-mixing pipeline
       # (`pcm_samples_from_wav` + `parse_has_audio`). These cover logic
       # that is not exercised by the GUI's ffmpeg smoke tests and can run
       # on a CI runner that has no ffmpeg binary installed.
       - name: Run audio mix integration tests
+        env:
+          CARGO_TERM_VERBOSE: true
         run: |
           set -e
           cd src-tauri
           cargo --version && rustc --version
-          cargo test --test audio_mix --no-fail-fast 2>&1
+          cargo test --test audio_mix --locked --no-fail-fast 2>&1
       - name: Upload test log
         if: always()
         uses: actions/upload-artifact@v5
