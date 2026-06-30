@@ -1,5 +1,23 @@
 import '@testing-library/jest-dom';
 
+// ─── jsdom localStorage polyfill ────────────────────────────────────────────
+// jsdom's localStorage may be a stub without setItem/removeItem in some environments.
+if (typeof globalThis.localStorage === 'undefined' || typeof globalThis.localStorage.setItem !== 'function') {
+  const store = new Map<string, string>();
+  const localStorage = {
+    getItem: (key: string) => store.get(key) ?? null,
+    setItem: (key: string, value: string) => { store.set(key, value); },
+    removeItem: (key: string) => { store.delete(key); },
+    clear: () => { store.clear(); },
+    get length() { return store.size; },
+    key: (index: number) => Array.from(store.keys())[index] ?? null,
+  };
+  Object.defineProperty(globalThis, 'localStorage', { value: localStorage, writable: true, configurable: true });
+  if (typeof globalThis.window !== 'undefined') {
+    Object.defineProperty(globalThis.window, 'localStorage', { value: localStorage, writable: true, configurable: true });
+  }
+}
+
 // ─── jsdom PointerEvent polyfill ─────────────────────────────────────────────
 // jsdom does not implement PointerEvent; base-ui Checkbox relies on it.
 // Adding the constructor to globalThis enables testing-library/user-event clicks.

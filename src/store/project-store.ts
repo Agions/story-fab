@@ -1,6 +1,6 @@
 import { createPersistedStore } from './create-persisted-store';
 import { createJSONStorage } from 'zustand/middleware';
-import type { Project, ProjectStatus } from '@/types';
+import type { Project } from '@/types';
 import { filterProjects, sortProjects, type ProjectFilter, type ProjectSortBy, type SortOrder } from '@/shared/utils/project-utils';
 
 interface ProjectState {
