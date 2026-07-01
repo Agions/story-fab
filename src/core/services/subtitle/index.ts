@@ -8,15 +8,17 @@
  * - subtitleService.ts: 字幕格式处理、翻译和渲染
  */
 
+import type { SubtitleStyle, SubtitleTrack } from '@/types';
+
 // 导出字幕服务
 export {
   SubtitleService,
   subtitleService,
-  type SubtitleStyle,
-  type SubtitleTrack,
   type SubtitleExtractOptions,
   type SubtitleTranslateOptions,
 } from './subtitle-service';
+
+export { SubtitleStyle, SubtitleTrack };
 
 // 导出 Whisper 服务
 export {

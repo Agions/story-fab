@@ -9,8 +9,7 @@
  */
 
 import { formatSrtTime } from '../../../shared/utils/formatting';
-import type { SubtitleEntry } from '@/types';
-import type { SubtitleStyle } from './subtitle-service';
+import type { SubtitleEntry, SubtitleStyle } from '@/types';
 
 /** 字幕轨道类型（共享） */
 export interface SubtitleTrack {

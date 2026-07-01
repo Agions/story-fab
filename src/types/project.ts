@@ -38,16 +38,7 @@ export interface ProjectData {
   updatedAt?: string;
 }
 
-export interface SubtitleStyle {
-  fontFamily: string;
-  fontSize: number;
-  color: string;
-  backgroundColor: string;
-  outline: boolean;
-  outlineColor: string;
-  position: string;
-  alignment: string;
-}
+export type { SubtitleStyle } from './subtitle';
 
 // ─── 用户 ───
 

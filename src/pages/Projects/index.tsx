@@ -9,7 +9,6 @@ import { StatusFilterBar } from './components/status-filter-bar';
 import { ProjectCard } from './components/project-card';
 import { useProjectList, statusConfig, getProjectUIStatus } from '../../hooks/use-project-list';
 import { formatRelativeDate } from '../../shared/utils/formatting';
-import { preloadProjectEditPage, preloadAIVideoEditorPage } from '../../core/utils/route-preload';
 import type { ProjectView } from './types';
 import React from 'react';
 import { Edit3, Trash2, Play, Download } from 'lucide-react';
@@ -104,7 +103,7 @@ const ProjectManager: React.FC = () => {
                   navigate(`/project/${project.id}`);
                 }}
                 onDelete={() => setDeleteConfirmId(project.id)}
-                onPreload={() => { void preloadProjectEditPage(); void preloadAIVideoEditorPage(); }}
+                 onPreload={() => { void import('../../pages/ProjectEdit/index'); void import('../../pages/AIVideoEditor/index'); }}
                 projectActions={projectActions}
               />
             );
@@ -132,8 +131,8 @@ const ProjectManager: React.FC = () => {
               addRecentProject(projectId);
               navigate(`/editor/${projectId}`);
             }}
-            onPreloadProject={() => { void preloadProjectEditPage(); }}
-            onPreloadEditor={() => { void preloadAIVideoEditorPage(); }}
+            onPreloadProject={() => { void import('../../pages/ProjectEdit/index'); }}
+            onPreloadEditor={() => { void import('../../pages/AIVideoEditor/index'); }}
             projectActions={projectActions}
           />
         </Suspense>

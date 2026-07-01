@@ -9,34 +9,15 @@
  */
 
 import { logger } from '@/shared/utils/logging';
-import type { SubtitleEntry, VideoInfo } from '@/types';
+import type { SubtitleEntry, VideoInfo, SubtitleStyle, SubtitleTrack } from '@/types';
 import { whisperService, type WhisperProgress } from './whisper-service';
 import { trackToSRT, trackToVTT, trackToASS } from './subtitle-formatters';
 import { AppError } from '@/core/errors';
 import { invoke, TauriCommand } from '@/core/tauri';
 
-// ============================================
+// ============================================================
 // 类型定义
-// ============================================
-
-export interface SubtitleStyle {
-  fontFamily: string;
-  fontSize: number;
-  color: string;
-  backgroundColor: string;
-  outline: boolean;
-  outlineColor: string;
-  position: 'top' | 'bottom' | 'center';
-  alignment: 'left' | 'center' | 'right';
-  opacity: number;
-}
-
-export interface SubtitleTrack {
-  id: string;
-  language: string;
-  entries: SubtitleEntry[];
-  style?: SubtitleStyle;
-}
+// ============================================================
 
 export interface SubtitleExtractOptions {
   language?: string;
@@ -45,12 +26,8 @@ export interface SubtitleExtractOptions {
 
 export interface SubtitleTranslateOptions {
   targetLanguage: string;
-  provider?: 'mymemory';
+  provider?: string;
 }
-
-// ============================================
-// 默认样式
-// ============================================
 
 const DEFAULT_SUBTITLE_STYLE: SubtitleStyle = {
   fontFamily: 'Arial, sans-serif',

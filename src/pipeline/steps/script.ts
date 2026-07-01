@@ -4,7 +4,7 @@
  */
 
 import type { PipelineStep, PipelineDataContext } from '../engine';
-import type { AnalysisResult, Script, ScriptSegment, ScriptStylePreset } from '@/types';
+import type { AnalysisResult, Script, ScriptSegment } from '@/types';
 import type { ModelProvider } from '@/types';
 import {
   generateScriptWithModel,
@@ -14,9 +14,9 @@ import {
 import { resolveLegacyModel } from '@/core/services/ai/ai-model-adapter';
 
 export interface ScriptStepConfig {
-  style?: ScriptStylePreset;
-  provider?: string;
-  apiKey?: string;
+  style?: ScriptGenerationSettings['style'];
+  provider?: ModelProvider;
+  apiKey: string;
 }
 
 export const createScriptStep = (
@@ -37,9 +37,7 @@ export const createScriptStep = (
   async execute(analysis: AnalysisResult, ctx: PipelineDataContext): Promise<Script> {
     const { style = 'informative', apiKey, provider = 'openai' } = config;
 
-    const model = resolveLegacyModel(provider as ModelProvider);
-    // Map EmotionAnalysis[] → AnalysisEmotion[] (drop confidence, rename emotion→type)
-    // AnalysisInput.emotions only accepts string[] | { type, intensity }[]
+    const model = resolveLegacyModel(provider);
     const analysisInput: AnalysisInput = {
       keyMoments: analysis.scenes?.map(s => ({
         timestamp: s.startTime,
@@ -53,8 +51,8 @@ export const createScriptStep = (
       })),
       summary: `共 ${analysis.stats?.sceneCount ?? 0} 个场景`,
     };
-    const scriptText = await generateScriptWithModel(model, apiKey!, analysisInput, {
-      style: style as ScriptGenerationSettings['style'],
+    const scriptText = await generateScriptWithModel(model, apiKey, analysisInput, {
+      style,
     });
 
     const segments = parseScriptSegments(scriptText, analysis);
