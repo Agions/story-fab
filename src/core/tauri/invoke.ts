@@ -122,17 +122,7 @@ export interface BridgeOptions {
 
 /**
  * 类型安全的 Tauri invoke
- * @param command 命令名称（使用 TauriCommand 常量）
- * @param args 命令参数（自动类型检查）
- * @param options 可选配置
- * @returns 命令执行结果（自动类型推断）
- *
- * @example
- * ```typescript
- * // 自动推断返回类型为 VideoInfo
- * const videoInfo = await invoke(TauriCommand.ANALYZE_VIDEO, { path: '/tmp/video.mp4' });
- * // TypeScript 知道 videoInfo 是 VideoInfo 类型！
- * ```
+ * 自动推断输入和输出类型
  */
 export async function invoke<C extends TauriCommandName>(
   command: C,
@@ -140,7 +130,7 @@ export async function invoke<C extends TauriCommandName>(
   options?: BridgeOptions,
 ): Promise<TauriCommandOutput<C>> {
   const { retries = 0, signal } = options ?? {};
-  return executeWithRetry(command, args, retries, signal);
+  return executeWithRetry(command, args as Record<string, unknown>, retries, signal);
 }
 
 async function executeWithRetry<C extends TauriCommandName>(

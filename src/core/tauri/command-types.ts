@@ -3,6 +3,9 @@
  *
  * 为所有 48 个 Tauri 命令提供类型安全的输入/输出定义
  * Phase 3 Task 1: Tauri invoke 泛型化
+ *
+ * 注意：字段名使用 camelCase 以匹配 TypeScript 代码约定
+ * Tauri 会自动在 TS 和 Rust 之间转换命名
  */
 
 import type { VideoInfo } from '@/types';
@@ -21,7 +24,7 @@ type CommandNameToDefs = {
   run_ffprobe: { input: { path: string }; output: Record<string, unknown> };
 
   detect_highlights: { input: { videoPath: string; threshold?: number; minDurationMs?: number }; output: Array<{ startMs: number; endMs: number; score: number; reason: string }> };
-  detect_zcr_bursts: { input: { audioPath: string }; output: Array<{ timestamp: number; intensity: number }> };
+  detect_zcr_bursts: { input: { videoPath: string }; output: Array<{ timestamp: number; intensity: number }> };
   detect_smart_segments: { input: { videoPath: string }; output: Array<{ startMs: number; endMs: number; type: string }> };
 
   export_video: { input: { inputPath: string; outputPath: string; format: string; resolution?: string; frameRate?: number; videoCodec?: string; audioCodec?: string; crf?: number; subtitleEnabled?: boolean; subtitlePath?: string; burnSubtitles?: boolean }; output: { outputPath: string; duration: number; fileSize: number } };
@@ -76,13 +79,13 @@ type CommandNameToDefs = {
 
   extract_key_frames: { input: { videoPath: string; maxFrames?: number }; output: Array<{ path: string; timestamp: number; description: string }> };
   generate_thumbnail: { input: { videoPath: string; timestamp: number; outputPath: string }; output: { path: string } };
-};
+}
 
 // 提取所有命令名称的联合类型
 export type TauriCommandName = keyof CommandNameToDefs;
 
-// 提取每个命令的输入类型
-export type TauriCommandInput<C extends TauriCommandName> = CommandNameToDefs[C]['input'];
+// 提取每个命令的输入类型（如果 void 则为 undefined）
+export type TauriCommandInput<C extends TauriCommandName> = CommandNameToDefs[C]['input'] extends void ? undefined : CommandNameToDefs[C]['input'];
 
 // 提取每个命令的输出类型
 export type TauriCommandOutput<C extends TauriCommandName> = CommandNameToDefs[C]['output'];
