@@ -1,10 +1,11 @@
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
+import type { TauriCommandName, TauriCommandInput, TauriCommandOutput } from './command-types';
 
 // ============================================================
 // 命令名称常量（与 Rust 端保持一致）
 // ============================================================
 export const TauriCommand = {
-  CHECK_FFMPEG:             'check_ffmpeg',
+  CHECK_FFMPEG:             'check_ffmpg',
   ANALYZE_VIDEO:            'analyze_video',
   GET_EXPORT_DIR:          'get_export_dir',
   RUN_FFPROBE:             'run_ffprobe',
@@ -67,6 +68,7 @@ export const TauriCommand = {
   GENERATE_THUMBNAIL:    'generate_thumbnail',
 } as const;
 
+// 命令名称类型（从常量值推导）
 export type TauriCommand = typeof TauriCommand[keyof typeof TauriCommand];
 
 // ============================================================
@@ -118,12 +120,35 @@ export interface BridgeOptions {
 // 核心调用函数
 // ============================================================
 
-async function executeWithRetry<C extends string>(
+/**
+ * 类型安全的 Tauri invoke
+ * @param command 命令名称（使用 TauriCommand 常量）
+ * @param args 命令参数（自动类型检查）
+ * @param options 可选配置
+ * @returns 命令执行结果（自动类型推断）
+ *
+ * @example
+ * ```typescript
+ * // 自动推断返回类型为 VideoInfo
+ * const videoInfo = await invoke(TauriCommand.ANALYZE_VIDEO, { path: '/tmp/video.mp4' });
+ * // TypeScript 知道 videoInfo 是 VideoInfo 类型！
+ * ```
+ */
+export async function invoke<C extends TauriCommandName>(
   command: C,
-  args: Record<string, unknown>,
+  args: TauriCommandInput<C>,
+  options?: BridgeOptions,
+): Promise<TauriCommandOutput<C>> {
+  const { retries = 0, signal } = options ?? {};
+  return executeWithRetry(command, args, retries, signal);
+}
+
+async function executeWithRetry<C extends TauriCommandName>(
+  command: C,
+  args: TauriCommandInput<C>,
   retries: number,
   signal: AbortSignal | undefined,
-): Promise<unknown> {
+): Promise<TauriCommandOutput<C>> {
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -149,14 +174,31 @@ export async function rawInvoke<C extends string>(
   command: C,
   args?: Record<string, unknown>,
 ): Promise<unknown> {
-  return executeWithRetry(command, args ?? {}, 0, undefined);
+  return executeRawWithRetry(command, args ?? {}, 0, undefined);
 }
 
-export async function invoke<C extends TauriCommand>(
+async function executeRawWithRetry<C extends string>(
   command: C,
-  args?: Record<string, unknown>,
-  options?: BridgeOptions,
+  args: Record<string, unknown>,
+  retries: number,
+  signal: AbortSignal | undefined,
 ): Promise<unknown> {
-  const { retries = 0, signal } = options ?? {};
-  return executeWithRetry(command, args ?? {}, retries, signal);
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    if (signal?.aborted) {
+      throw TauriBridgeError.fromInvoke(command as TauriCommand, new Error('Request aborted'));
+    }
+
+    try {
+      return await tauriInvoke(command, args);
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 500));
+      }
+    }
+  }
+
+  throw TauriBridgeError.fromInvoke(command as TauriCommand, lastError);
 }

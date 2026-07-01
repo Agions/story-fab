@@ -121,7 +121,7 @@ export class ExportService extends BaseService {
       async () => {
         logger.info('[ExportService] 取消导出:', { exportId: this.currentExportId });
         try {
-          await invoke(TauriCommand.CANCEL_EXPORT, { exportId: this.currentExportId });
+          await invoke(TauriCommand.CANCEL_EXPORT, { exportId: this.currentExportId! });
         } catch (error) {
           logger.warn('[ExportService] 取消导出失败:', { error });
         } finally {
