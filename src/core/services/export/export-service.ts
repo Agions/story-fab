@@ -2,8 +2,10 @@
  * 导出服务
  * 支持多种格式的音视频导出
  * 集成 Tauri 后端进行实际视频处理
+ * 继承 BaseService 统一错误处理（Phase 2）
  */
 
+import { BaseService } from '../providers/base-service';
 import { invoke, TauriCommand } from '../../tauri';
 import { logger } from '@/shared/utils/logging';
 
@@ -50,16 +52,20 @@ export function mergeExportConfig(
   };
 }
 
-export class ExportService {
+export class ExportService extends BaseService {
   private currentExportId: string | null = null;
-  private config: ExportConfig | null = null;
+  private exportConfig: ExportConfig | null = null;
+
+  constructor() {
+    super('ExportService', { timeout: 600_000, retries: 1 }); // 10 分钟超时
+  }
 
   setConfig(config: Partial<ExportConfig>): void {
-    this.config = mergeExportConfig(config, null);
+    this.exportConfig = mergeExportConfig(config, null);
   }
 
   getConfig(): ExportConfig | null {
-    return this.config;
+    return this.exportConfig;
   }
 
   async exportVideo(
@@ -68,62 +74,63 @@ export class ExportService {
     config: Partial<ExportConfig>,
     _onProgress?: (percent: number) => void
   ): Promise<ExportResult> {
-    const fullConfig = mergeExportConfig(config, this.config);
+    const fullConfig = mergeExportConfig(config, this.exportConfig);
 
     const exportId = crypto.randomUUID();
     this.currentExportId = exportId;
 
-    logger.info('[ExportService] 开始导出:', {
-      exportId,
-      input: inputPath,
-      output: outputPath,
-      format: fullConfig.format,
-    });
+    return this.executeRequest(
+      async () => {
+        const result = await invoke(
+          TauriCommand.EXPORT_VIDEO,
+          {
+            inputPath,
+            outputPath,
+            format: fullConfig.format,
+            resolution: fullConfig.resolution,
+            frameRate: fullConfig.frameRate,
+            videoCodec: fullConfig.encoder.videoCodec,
+            audioCodec: fullConfig.audioCodec,
+            crf: fullConfig.encoder.crf ?? 23,
+            subtitleEnabled: fullConfig.subtitleEnabled,
+            subtitlePath: fullConfig.subtitlePath,
+            burnSubtitles: fullConfig.burnSubtitles,
+          }
+        ) as { outputPath: string; duration: number; fileSize: number };
 
-    try {
-      const result = await invoke(
-        TauriCommand.EXPORT_VIDEO,
-        {
-          inputPath,
-          outputPath,
+        logger.info('[ExportService] 导出完成:', { exportId, result });
+
+        return {
+          outputPath: result.outputPath,
+          duration: result.duration,
+          fileSize: result.fileSize,
           format: fullConfig.format,
-          resolution: fullConfig.resolution,
-          frameRate: fullConfig.frameRate,
-          videoCodec: fullConfig.encoder.videoCodec,
-          audioCodec: fullConfig.audioCodec,
-          crf: fullConfig.encoder.crf ?? 23,
-          subtitleEnabled: fullConfig.subtitleEnabled,
-          subtitlePath: fullConfig.subtitlePath,
-          burnSubtitles: fullConfig.burnSubtitles,
-        }
-      ) as { outputPath: string; duration: number; fileSize: number };
-
-      logger.info('[ExportService] 导出完成:', { exportId, result });
-
-      return {
-        outputPath: result.outputPath,
-        duration: result.duration,
-        fileSize: result.fileSize,
-        format: fullConfig.format,
-      };
-    } catch (error) {
-      logger.error('[ExportService] 导出失败:', { exportId, error });
-      throw error;
-    } finally {
+        };
+      },
+      '导出视频',
+      { loadingMessage: `正在导出视频 (${fullConfig.format})...` }
+    ).finally(() => {
       this.currentExportId = null;
-    }
+    });
   }
 
   async cancelExport(): Promise<void> {
-    if (this.currentExportId) {
-      logger.info('[ExportService] 取消导出:', { exportId: this.currentExportId });
-      try {
-        await invoke(TauriCommand.CANCEL_EXPORT, { exportId: this.currentExportId });
-      } catch (error) {
-        logger.warn('[ExportService] 取消导出失败:', { error });
-      }
-      this.currentExportId = null;
-    }
+    if (!this.currentExportId) return;
+
+    return this.executeRequest(
+      async () => {
+        logger.info('[ExportService] 取消导出:', { exportId: this.currentExportId });
+        try {
+          await invoke(TauriCommand.CANCEL_EXPORT, { exportId: this.currentExportId });
+        } catch (error) {
+          logger.warn('[ExportService] 取消导出失败:', { error });
+        } finally {
+          this.currentExportId = null;
+        }
+      },
+      '取消导出',
+      { showLoading: false }
+    );
   }
 
   getExportPresets(): Record<string, Partial<ExportConfig>> {
