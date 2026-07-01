@@ -3,13 +3,12 @@
  *
  * - Initial poll every 2s
  * - After 3 consecutive failures: delay = min(2000 * 2^failCount, 16000)
- * - Stop after 5 consecutive failures + toast notification
+ * - Stop after 5 consecutive failures (return error state)
  * - Auto-stop when state === 'done' or state === 'idle' (non-initial)
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getCommentaryStatus } from '@/core/services/commentary';
-import { toast } from '@/components/ui/sonner';
 import { logger } from '@/shared/utils/logging';
 import type { DirectorStatusResponse, DirectorState } from '@/types';
 
@@ -88,7 +87,6 @@ export function useDirectorStatus(sessionId: string | null): UseDirectorStatusRe
         if (failures >= MAX_FAILURES) {
           stoppedRef.current = true;
           clearPolling();
-          toast.error('导演状态查询失败，请检查网络或重启');
           setError('连续失败，已停止轮询');
           return;
         }

@@ -31,7 +31,8 @@ export interface AIScriptDraft {
   modelUsed?: string;
 }
 
-// 向后兼容
+// 向后兼容别名（用于渐进迁移）
+// TODO: 在 v3.0 版本中完全移除这些别名
 export type Script = AIScriptDraft;
 export type ScriptSegment = CoreScriptSegment;
 export type LegacyAIModelType = AIModelType;

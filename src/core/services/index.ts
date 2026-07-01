@@ -15,10 +15,10 @@ export { scriptGenerationService } from './ai/script-service';
 export { sceneCommentaryAlignmentService, SceneCommentaryAlignmentService } from './ai/scene-commentary-service';
 export { resolveLegacyModel, getLegacyModelCompatMap } from './ai/ai-model-adapter';
 
-// AI 剪辑批处理（aiClip/ — 原 ai/batch/，现提升到 services/ 一级）
-export { aiClipService, AIClipService } from './aiClip';
-export { analyzeVideo } from './aiClip/analyzer';
-export { batchProcess } from './aiClip/batch-processor';
+// AI 剪辑批处理（ai-clip/ — 原 ai/batch/，现提升到 services/ 一级）
+export { aiClipService, AIClipService } from './ai-clip';
+export { analyzeVideo } from './ai-clip/analyzer';
+export { batchProcess } from './ai-clip/batch-processor';
 
 // 剪辑 pipeline（pipeline/clip-pipeline/ — 原 ai/pipeline/，现提升到 services/ 一级）
 export { clipWorkflowService, ClipWorkflowService } from './pipeline/clip-pipeline/clip-workflow';

@@ -16,9 +16,9 @@ export { voiceSynthesisService } from '@/core/services/ai/voice-synthesis-servic
 export { resolveLegacyModel, getLegacyModelCompatMap } from '@/core/services/ai/ai-model-adapter';
 
 // ─── AI 剪辑批处理 ───
-export { aiClipService } from '@/core/services/aiClip';
-export { analyzeVideo } from '@/core/services/aiClip/analyzer';
-export { batchProcess } from '@/core/services/aiClip/batch-processor';
+export { aiClipService } from '@/core/services/ai-clip';
+export { analyzeVideo } from '@/core/services/ai-clip/analyzer';
+export { batchProcess } from '@/core/services/ai-clip/batch-processor';
 
 // ─── LLM Providers ───
 export { BaseService, ServiceError } from '@/core/services/providers/base-service';

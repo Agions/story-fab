@@ -2,9 +2,9 @@
 SPDX-License-Identifier: MIT
 -->
 
-# StoryFab
+# StoryFab <img src="assets/logo-icon.svg" width="48" height="48" align="right" />
 
-> 开源 AI 影视解说创作工坊 · 本地优先 · Tauri 2 + React 18 + Rust
+> 🎬 开源 AI 影视解说创作工坊 · 本地优先 · 隐私安全 · 全链路自动化
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Tauri 2](https://img.shields.io/badge/Tauri-2.x-FFC131?logo=tauri&logoColor=black)](https://tauri.app/)
@@ -13,217 +13,280 @@ SPDX-License-Identifier: MIT
 [![Rust 1.77+](https://img.shields.io/badge/Rust-1.77+-DEA584?logo=rust&logoColor=black)](https://www.rust-lang.org/)
 [![Version](https://img.shields.io/badge/version-2.2.0-brightgreen.svg)](CHANGELOG.md)
 
-[更新日志](CHANGELOG.md) · [文档站](https://agions.github.io/story-fab/)
+[📖 在线文档](https://agions.github.io/story-fab/) · [🔄 更新日志](CHANGELOG.md)
 
 ---
 
-## 这是什么
+## ✨ 为什么选择 StoryFab？
 
-StoryFab 把「素材 → 高光拆条 → 解说文案 → TTS 配音 → 字幕烧录」全链路放在**本地桌面应用**里。视频、字幕草稿、解说文案 100% 不离开设备。
+StoryFab 是一款革命性的桌面视频创作工具，将 **AI 智能分析**、**自动化解说生成** 和 **本地化处理** 完美结合。无论是直播回放、电影解说还是短视频创作，StoryFab 都能帮助您高效完成。
 
-| 工作模式 | 适用场景 | 核心能力 |
-| --- | --- | --- |
-| **剪辑模式** | 直播回放、会议记录、游戏集锦 | AI 高光检测 + 多比例导出 |
-| **解说模式** | 短剧、电影、综艺 | 5 步 Agent Pipeline 生成解说视频 |
+### 🎯 核心优势
 
-**核心原则**：Whisper 离线转字幕、Edge TTS / Azure TTS 本地合成、FFmpeg 本地渲染——**零云端依赖**。
-
----
-
-## 特性
-
-- 🎬 **两种工作模式** — 剪辑模式（高光拆条）+ 解说模式（5 步 Agent Pipeline）
-- 🤖 **10 家 LLM Provider** — OpenAI、Anthropic、Google、Alibaba（Qwen）、Zhipu（智谱）、iFlytek（讯飞）、DeepSeek、Moonshot（Kimi）、Local、Custom
-- 🗣️ **2 套 TTS 引擎** — Edge TTS（免费几十种音色）+ Azure TTS（需 API 密钥）
-- 🎙️ **本地 Whisper** — `faster-whisper` 离线转写，6 档模型（tiny / base / small / medium / large-v2 / large-v3）
-- 🎞️ **多比例导出** — 9:16、1:1、16:9、4:5、21:9，硬字幕烧录 + 软字幕双轨
-- 🧠 **Director Agent** — 多轮对话式策划，节奏 / 停顿 / 语气可控
-- 🔒 **100% 本地** — 原始视频、字幕、脚本不上传任何云端
-- ⚡ **GPU 加速渲染** — FFmpeg NVENC / VideoToolbox 硬编
+| 特性 | 传统方案 | StoryFab |
+|------|----------|----------|
+| **隐私保护** | 视频上传云端 | ✅ 100% 本地处理 |
+| **AI 解说** | 手动编写脚本 | ✅ 5步Agent Pipeline自动生成 |
+| **字幕生成** | 在线转写服务 | ✅ 本地Whisper离线转写 |
+| **配音合成** | 付费配音员 | ✅ Edge TTS + Azure TTS多种音色 |
+| **工作流** | 多软件切换 | ✅ 一站式完成全链路 |
+| **成本** | 订阅制收费 | ✅ 完全开源免费 |
 
 ---
 
-## 快速开始
+## 🚀 快速开始
 
-### 下载安装
+### 📦 下载安装
 
-前往 [Releases](https://github.com/Agions/story-fab/releases) 下载对应平台安装包：
+支持 Windows、macOS、Linux 三大平台，选择对应架构下载即可：
 
-| 平台 | 架构 | 安装包 |
-| --- | --- | --- |
-| Windows | x64 | `StoryFab_*_x64-setup.exe` |
-| macOS | Apple Silicon | `StoryFab_*_aarch64.dmg` |
-| macOS | Intel | `StoryFab_*_x64.dmg` |
-| Linux | x64 | `StoryFab_*_amd64.AppImage` |
+| 平台 | 架构 | 下载链接 |
+|------|------|----------|
+| **Windows** | x64 | [下载安装包](https://github.com/Agions/story-fab/releases) |
+| **macOS** | Apple Silicon | [下载DMG](https://github.com/Agions/story-fab/releases) |
+| **macOS** | Intel | [下载DMG](https://github.com/Agions/story-fab/releases) |
+| **Linux** | x64 | [下载AppImage](https://github.com/Agions/story-fab/releases) |
 
-**首次启动**会自动下载 FFmpeg 和 Whisper 二进制到本地配置目录。
+> 💡 **首次启动**会自动下载 FFmpeg 和 Whisper 二进制，请确保网络连接正常。
 
-### 从源码构建
+### 🔨 从源码构建
 
-前置依赖：Node.js ≥ 18、npm、Rust ≥ 1.77、FFmpeg。
+适合开发者自定义功能或参与贡献：
 
 ```bash
+# 1️⃣ 克隆仓库
 git clone https://github.com/Agions/story-fab.git
 cd story-fab
+
+# 2️⃣ 安装依赖
 npm install
-npm run tauri -- dev        # 开发模式（Vite + Tauri 热重载）
-npm run tauri -- build      # 生产构建
+
+# 3️⃣ 启动开发模式（热重载）
+npm run tauri -- dev
+
+# 4️⃣ 生产构建
+npm run tauri -- build
 ```
+
+**前置要求：**
+- Node.js ≥ 18
+- npm / pnpm
+- Rust ≥ 1.77 ([安装指南](https://www.rust-lang.org/tools/install))
+- FFmpeg
 
 ---
 
-## 架构概览
+## 🎬 工作模式
 
+StoryFab 提供两种专业工作流，满足不同创作场景：
+
+### 📝 剪辑模式
+**适用场景**：直播回放、会议记录、游戏集锦、教学视频
+
+**核心能力：**
+- 🤖 AI 自动识别高光时刻
+- ✂️ 智能切片和剪辑
+- 📐 多比例导出（9:16 / 1:1 / 16:9 / 4:5 / 21:9）
+- 🎞️ 硬字幕烧录 + 软字幕双轨
+
+**典型工作流：**
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  前端   React 18 · TypeScript 5 · Vite 6 · TailwindCSS 4       │
-│           Zustand (5 store) · shadcn/ui · MultiTrackTimeline    │
-└────────────────────────────┬────────────────────────────────────┘
-                             │  Tauri 2 IPC (61 个 invoke 命令)
-┌────────────────────────────┴────────────────────────────────────┐
-│  后端   Rust 1.77+ · Tauri 2 · tokio                            │
-│   ├─ ffmpeg-sidecar    转码 / 硬字幕烧录 / 裁剪                 │
-│   ├─ whisper-rs        离线语音转字幕（faster-whisper）         │
-│   ├─ llm-providers     10 家 LLM（统一 `call_llm` 入口）        │
-│   ├─ tts-providers     Edge TTS · Azure TTS                    │
-│   └─ commentary        Director → Visual → Narration → Timing → Overlay │
-└─────────────────────────────────────────────────────────────────┘
+导入视频 → AI高光检测 → 手动微调 → 选择比例 → 导出成片
 ```
 
-详细架构：[docs/dev/architecture.md](docs/dev/architecture.md)
+### 🎭 解说模式
+**适用场景**：短剧解说、电影影评、综艺节目、游戏剧情
+
+**核心能力：**
+- 🧠 **Director Agent** - 多轮对话式节奏策划
+- 📝 **Visual Agent** - 智能分镜设计
+- ✍️ **Narration Agent** - 自动生成解说文案
+- ⏱️ **Timing Agent** - 精准控制节奏和停顿
+- 🎤 **TTS 配音** - Edge TTS / Azure TTS 合成
+- 🎬 一键生成完整解说视频
+
+**典型工作流：**
+```
+导入视频 → Director策划 → 5步Agent Pipeline → TTS配音 → 字幕烧录 → 导出
+```
+
+👉 [了解更多解说模式 →](docs/guide/commentary-mode.md)
 
 ---
 
-## 项目结构
+## 🌟 核心特性
 
-```
-story-fab/
-├── src/                   # 前端源码（React 18 + TS 5）
-│   ├── components/        # React 组件（按 PascalCase 业务目录）
-│   ├── core/              # 核心业务层（双服务层：core/services + services）
-│   │   ├── pipeline/      # Pipeline 编排（解说模式 5 步）
-│   │   ├── services/      # 业务服务（13 个子目录，editor/ 内含 storage.ts）
-│   │   ├── tauri/         # Tauri IPC 桥接
-│   │   ├── interfaces/    # 业务接口
-│   │   └── types/         # 全局类型
-│   ├── pages/             # 路由页面（9 个懒加载）
-│   ├── hooks/             # 自定义 React hooks
-│   ├── store/             # Zustand 状态（5 个 store）
-│   └── shared/            # 跨层共享工具 / 类型 / 常量
-├── src-tauri/             # Rust 后端
-│   └── src/
-│       ├── commands/      # Tauri IPC 命令（61 个，按域分组）
-│       ├── llm/           # LLM Provider（含 providers/ 子目录）
-│       ├── render/        # FFmpeg 渲染
-│       └── subtitle/      # Whisper 字幕
-├── docs/                  # VitePress 文档站
-│   ├── guide/             # 用户指南
-│   ├── dev/               # 开发文档 + ADR
-│   └── reference/         # 参考文档
-├── assets/                # 品牌资源（logo SVG）
-├── scripts/               # 校验脚本（lint / check-antd / check-naming）
-└── .github/workflows/     # CI/CD
-```
+### 🤖 10+ 家 LLM 提供商
+支持全球主流 AI 模型，灵活切换：
+- **国际**：OpenAI (GPT-4o)、Anthropic (Claude 3.5)、Google (Gemini)
+- **国产**：Alibaba (Qwen)、ZhipuAI (GLM)、iFlytek (Spark)、DeepSeek、Moonshot (Kimi)
+- **本地**：Ollama 本地部署 + Custom API 自定义接入
 
-详细目录说明：[docs/dev/project-structure.md](docs/dev/project-structure.md)
+### 🗣️ 专业 TTS 配音
+- **Edge TTS**：微软 Edge 免费引擎，几十种音色
+- **Azure TTS**：企业级语音服务，高质量输出
+
+### 🎙️ 本地 Whisper 转写
+- 基于 `faster-whisper` 的离线字幕生成
+- 6 档模型可选（tiny / base / small / medium / large-v2 / large-v3）
+- 完全离线运行，视频不上传云端
+
+### ⚡ GPU 加速渲染
+- FFmpeg NVENC（NVIDIA）/ VideoToolbox（macOS）硬件编码
+- 硬字幕烧录 + 软字幕多语言轨道
+- 支持自定义分辨率、码率、格式
+
+### 🔒 隐私至上
+- 所有视频处理在本地完成
+- 原始素材、字幕、脚本永不上传
+- 离线也可使用核心功能（TTS 需联网）
 
 ---
 
-## 开发命令
+## 🏗️ 技术架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  前端层    React 18 · TypeScript 5 · Vite 6 · TailwindCSS 4 │
+│            Zustand (5 stores) · shadcn/ui · MultiTrackTimeline│
+└───────────────────────────┬─────────────────────────────────┘
+                            │  Tauri 2 IPC (61 个命令)
+┌───────────────────────────┴─────────────────────────────────┐
+│  Rust 后端    Tauri 2 · tokio · 1.77+                      │
+│  ├─ ffmpeg-sidecar   转码/渲染/烧字幕                       │
+│  ├─ whisper-rs       离线语音转字幕 (faster-whisper)         │
+│  ├─ llm-providers    10家LLM统一调用入口                      │
+│  ├─ tts-providers    Edge TTS · Azure TTS                   │
+│  └─ commentary       5步Agent Pipeline解说引擎                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+📊 **项目规模：**
+- 📁 41+ 前端组件目录
+- 🔧 61 个 Tauri IPC 命令
+- 🧠 13 个业务服务模块
+- 📝 27,000+ 行 Rust 代码
+
+👉 [深入架构 →](docs/dev/architecture.md)
+
+---
+
+## 📚 文档导航
+
+### 🎓 用户指南
+
+- [安装指南](docs/guide/installation.md) - 下载、安装、配置
+- [快速开始](docs/guide/quick-start.md) - 5分钟上手
+- [剪辑模式](docs/guide/commentary-mode.md) - AI高光检测与导出
+- [解说模式](docs/guide/ai-analysis.md) - Director Agent深度解析
+- [脚本生成](docs/guide/script-generation.md) - AI文案创作
+- [导出设置](docs/guide/export.md) - 多格式导出配置
+- [高级配置](docs/guide/configuration.md) - LLM/TTS/Whisper配置
+- [快捷键](docs/guide/keyboard-shortcuts.md) - 提升效率
+
+### 🛠️ 开发者文档
+
+- [系统架构](docs/dev/architecture.md) - 技术架构深度解析
+- [项目结构](docs/dev/project-structure.md) - 代码组织说明
+- [解说工作流](docs/dev/commentary.md) - 5步Pipeline实现细节
+- [AI服务](docs/dev/ai-services.md) - LLM/TTS/Whisper集成
+- [Tauri命令](docs/dev/tauri-commands.md) - IPC接口完整列表
+- [构建发布](docs/dev/build-release.md) - CI/CD指南
+
+### 📖 参考资料
+
+- [配置参考](docs/reference/config.md) - 完整配置项说明
+- [常见问题](docs/reference/faq.md) - 问题排查与解答
+
+---
+
+## 🛠️ 开发命令
 
 ```bash
-# 前端
-npm run dev                  # Vite 开发服务器（端口 1430）
+# 前端开发
+npm run dev                  # Vite开发服务器 (端口 1430)
 npm run build                # 生产构建
-npm run build:budget         # Bundle 预算校验
-npm run build:ci             # 构建 + 预算校验
-npm run build:prod           # 生产模式构建
-npm run preview              # 预览生产构建
-npm run test                 # Vitest 单元测试（watch 模式）
-npm run test:run             # Vitest 一次性跑（CI 风格）
-npm run test:coverage        # 覆盖率
-npm run test:ui              # Vitest 交互式 UI
-npm run test:ci              # 覆盖率 + CI 报告
-npm run lint                 # ESLint（src/, max-warnings 200）
-npm run lint:fix             # ESLint 自动修复
-npm run format               # Prettier 格式化
-npm run format:check         # Prettier 检查
-npm run type-check           # tsc --noEmit
-npm run clean                # 删除 dist/
+npm run test                 # 运行测试
 
-# Tauri
-npm run tauri -- dev            # 启动桌面应用开发
-npm run tauri -- build          # 桌面应用生产构建
+# Tauri桌面应用
+npm run tauri -- dev         # 启动桌面应用
+npm run tauri -- build       # 构建桌面应用
 
-# 文档
-npm run docs:dev             # VitePress 文档开发
-npm run docs:build           # VitePress 构建静态站点
-npm run docs:preview         # 预览文档站
+# 文档站
+npm run docs:dev            # VitePress开发模式
+npm run docs:build          # 构建静态文档
 
-# 验证（CI 同样执行）
-npm run verify:antd          # 禁止 antd 引用
-npm run verify:naming        # 命名规范校验
-npm run verify:all           # 一键运行所有验证
+# 代码质量
+npm run lint                # ESLint检查
+npm run format              # Prettier格式化
+npm run type-check          # TypeScript类型检查
 ```
 
 ---
 
-## 命名规范
+## 🤝 贡献指南
 
-| 实体 | 规则 | 示例 |
-| --- | --- | --- |
-| React 组件（业务） | PascalCase 文件 + 目录 | `VideoEditor/index.tsx` |
-| React 组件（通用） | kebab-case 目录 | `components/ui/button.tsx` |
-| Hook | camelCase + `use` 前缀 | `useProjectList.ts` |
-| 工具函数 | camelCase | `formatTime.ts` |
-| 业务目录（`pages/`、`components/` 等） | PascalCase | `pages/VideoEditor/` |
-| 顶级目录（`core/`、`services/` 等） | kebab-case | `core/services/` |
-| 常量 | SCREAMING_SNAKE_CASE | `MODEL_PROVIDERS` |
+我们欢迎所有形式的贡献！无论是新功能、Bug修复、文档改进还是问题反馈。
 
-校验脚本：`npm run verify:naming`（`scripts/check-naming.mjs`）。
+### 📋 贡献流程
 
----
+1. **Fork 本仓库**
+2. **创建特性分支** (`git checkout -b feature/AmazingFeature`)
+3. **提交更改** (`git commit -m 'feat: add amazing feature'`)
+4. **推送到分支** (`git push origin feature/AmazingFeature`)
+5. **开启 Pull Request**
 
-## 文档导航
+### 📝 提交规范
 
-### 用户指南
+我们遵循 [Conventional Commits](https://www.conventional-commits.org/) 规范：
 
-- [用户指南首页](docs/guide/index.md)
-- [安装指南](docs/guide/installation.md)
-- [快速开始](docs/guide/quick-start.md)
-- [解说模式](docs/guide/commentary-mode.md)
-- [AI 分析](docs/guide/ai-analysis.md)
-- [脚本生成](docs/guide/script-generation.md)
-- [导出](docs/guide/export.md)
-- [配置](docs/guide/configuration.md)
-- [键盘快捷键](docs/guide/keyboard-shortcuts.md)
+- `feat:` ✨ 新功能
+- `fix:` 🐛 Bug修复
+- `docs:` 📝 文档更新
+- `refactor:` ♻️ 代码重构
+- `perf:` ⚡ 性能优化
+- `test:` ✅ 测试相关
+- `chore:` 🔧 构建/工具链
+- `style:` 💄 代码格式
 
-### 开发文档
+### 🔌 新增 LLM / TTS Provider？
 
-- [系统架构](docs/dev/architecture.md)
-- [项目结构](docs/dev/project-structure.md)
-- [解说工作流](docs/dev/commentary.md)
-- [AI 服务](docs/dev/ai-services.md)
-- [Tauri 命令](docs/dev/tauri-commands.md)
-- [构建与发布](docs/dev/build-release.md)
-
-### 参考
-
-- [配置参考](docs/reference/config.md)
-- [常见问题](docs/reference/faq.md)
+参考 [AI服务开发指南](docs/dev/ai-services.md)，在 `src/core/services/providers/` 下实现对应 trait 即可。
 
 ---
 
-## 贡献
+## 🗺️ 路线图
 
-Fork → 分支 → 提交（遵循 [Conventional Commits](https://www.conventionalcommits.org/)）→ PR。
-
-提交类型：`feat` / `fix` / `docs` / `refactor` / `perf` / `test` / `chore` / `style`。
-
-新增 LLM / TTS Provider：实现 `core/services/providers/` 下的对应 trait，详见 [dev/ai-services.md](docs/dev/ai-services.md)。
+- [x] v2.0 - Tauri 2 迁移 + 解说模式重构
+- [x] v2.1 - 新增 4 家国产 LLM 提供商
+- [x] v2.2 - Director Agent 多轮对话优化
+- [ ] v2.3 - 多轨道时间线编辑器
+- [ ] v2.4 - 插件系统 + 自定义工作流
+- [ ] v2.5 - 团队协作功能（可选云端同步）
 
 ---
 
-## 许可证
+## 📄 许可证
 
-[MIT](LICENSE)
+本项目基于 [MIT](LICENSE) 协议开源。
+
+---
+
+## 🙏 致谢
+
+感谢所有贡献者和支持者！
+
+- [Tauri](https://tauri.app/) - 跨平台桌面应用框架
+- [FFmpeg](https://ffmpeg.org/) - 音视频处理
+- [faster-whisper](https://github.com/SYSTRAN/faster-whisper) - 离线语音识别
+- [React](https://react.dev/) + [Vite](https://vitejs.dev/) - 前端框架
+
+---
+
+<div align="center">
+
+**Star ⭐ 如果 StoryFab 对你有帮助！**
+
+[GitHub](https://github.com/Agions/story-fab) · [文档](https://agions.github.io/story-fab/) · [问题反馈](https://github.com/Agions/story-fab/issues)
+
+</div>

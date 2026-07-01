@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 128" width="512" height="128" role="img" aria-label="StoryFab Horizontal Logo">
+  <title>StoryFab - AI影视解说创作工坊</title>
+  <defs>
+    <linearGradient id="logoTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="logoShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#7C3AED" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Icon -->
+  <g transform="translate(0 16)">
+    <!-- Rounded square background -->
+    <rect width="96" height="96" rx="20" fill="#0B0F1F" filter="url(#logoShadow)"/>
+
+    <!-- Film strip -->
+    <rect x="16" y="44" width="64" height="12" rx="2" fill="url(#logoTextGrad)" opacity="0.9"/>
+
+    <!-- Film perforations -->
+    <rect x="22" y="47" width="5" height="6" rx="1" fill="#0B0F1F"/>
+    <rect x="32" y="47" width="5" height="6" rx="1" fill="#0B0F1F"/>
+    <rect x="42" y="47" width="5" height="6" rx="1" fill="#0B0F1F"/>
+    <rect x="52" y="47" width="5" height="6" rx="1" fill="#0B0F1F"/>
+    <rect x="62" y="47" width="5" height="6" rx="1" fill="#0B0F1F"/>
+
+    <!-- Center: SF monogram -->
+    <g transform="translate(48 48)">
+      <!-- S -->
+      <path d="M -14 -11
+               C -14 -17 -9 -19 -5 -19
+               C -1 -19 4 -17 4 -11
+               C 4 -5 -4 -3 -8 0
+               C -12 3 -14 5 -14 11
+               C -14 17 -9 19 -5 19
+               C -1 19 5 17 8 13"
+            fill="none" stroke="url(#logoTextGrad)" stroke-width="4.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- F -->
+      <path d="M 7 -19 L 7 19 M 7 -19 L 20 -19 M 7 -1 L 17 -1"
+            fill="none" stroke="#F8FAFC" stroke-width="4.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Play indicator -->
+    <circle cx="76" cy="76" r="3" fill="#EC4899"/>
+  </g>
+
+  <!-- Text: StoryFab -->
+  <g transform="translate(108 82)">
+    <text x="0" y="0" font-family="'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="42" font-weight="700" fill="#F8FAFC">
+      Story<tspan fill="url(#logoTextGrad)">Fab</tspan>
+    </text>
+  </g>
+
+  <!-- Tagline -->
+  <g transform="translate(108 104)">
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="400" fill="#94A3B8" letter-spacing="0.5">
+      AI影视解说创作工坊 · 本地优先 · 全链路处理
+    </text>
+  </g>
+</svg>

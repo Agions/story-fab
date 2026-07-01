@@ -11,7 +11,7 @@ import {
   Clock,
   Video,
 } from 'lucide-react';
-import type { AIClipConfig } from '../../../core/services/aiClip';
+import type { AIClipConfig } from '../../../core/services/ai-clip';
 import type { VideoInfo } from '@/types';
 import styles from '@/components/AIClip/AIClip.module.less';
 

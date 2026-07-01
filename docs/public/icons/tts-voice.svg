@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="TTS Voice Icon">
+  <title>智能配音</title>
+  <defs>
+    <linearGradient id="ttsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#0B0F1F"/>
+  <!-- Sound waves -->
+  <path d="M 20 32 Q 24 24 32 24 Q 40 24 44 32 Q 40 40 32 40 Q 24 40 20 32" fill="none" stroke="url(#ttsGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 24 32 Q 27 27 32 27 Q 37 27 40 32 Q 37 37 32 37 Q 27 37 24 32" fill="none" stroke="#EC4899" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <!-- Sound dots -->
+  <circle cx="16" cy="32" r="2" fill="#F59E0B"/>
+  <circle cx="48" cy="32" r="2" fill="#F59E0B"/>
+  <circle cx="14" cy="32" r="1.5" fill="#F59E0B" opacity="0.6"/>
+  <circle cx="50" cy="32" r="1.5" fill="#F59E0B" opacity="0.6"/>
+</svg>

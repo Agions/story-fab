@@ -11,7 +11,7 @@ import {
   TestTube,
   CheckCircle,
 } from 'lucide-react';
-import type { ClipAnalysisResult } from '../../../core/services/aiClip';
+import type { ClipAnalysisResult } from '../../../core/services/ai-clip';
 import { SegmentTimelineCard } from './segment-timeline-card';
 import styles from '@/components/AIClip/AIClip.module.less';
 
