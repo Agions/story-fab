@@ -1,218 +1,28 @@
 /**
  * Commentary Mode Service — AI 影视解说核心服务
  *
- * 封装 Tauri Commentary Mode 命令，提供：
- * - Director Agent 状态管理
- * - 解说脚本生成（LLM）
- * - 解说配音合成（TTS）
+ * 已拆分为 4 个独立服务（2026-07-01 Phase 2 重构）：
+ * - session.service.ts: Director Agent 会话管理
+ * - script.service.ts: 脚本生成（LLM）
+ * - audio.service.ts: 配音合成（TTS）
+ * - voice-catalog.service.ts: 音色目录
  *
- * 遵循"最优方案"架构设计
+ * 本文件作为统一导出入口，保持向后兼容性。
+ * 新代码请直接导入对应子服务。
  */
 
-import { tauri } from '@/core/tauri';
-import type {
-  ScriptStylePreset,
-  CommentarySegment,
-  DirectorPlan,
-  DirectorStatusResponse,
-  PlanModifications,
-  SynthesizeResult,
-  CommentaryScriptOutput,
-} from '@/types';
+// ─── 统一导出所有子服务 ──────────────────────────────────────────────────
+
+export * from './session.service';
+export * from './script.service';
+export * from './audio.service';
+export * from './voice-catalog.service';
+
+// ─── 向后兼容的类型导出 ──────────────────────────────────────────────────
+
 export type {
   ScriptStylePreset,
   CommentarySegment,
   CommentaryScriptOutput,
+  VoiceInfo,
 } from '@/types';
-import type { VoiceInfo as CanonicalVoiceInfo } from '@/types/voice';
-export type { VoiceInfo as VoiceCatalogInfo } from '@/types/voice';
-
-/** 音色信息（commentary 上下文专用，style/description required） */
-export interface VoiceInfo extends CanonicalVoiceInfo {
-  style: string;
-  description: string;
-}
-
-// ─── Director Agent ─────────────────────────────────────────────────────
-
-/**
- * 创建 Commentary Director 会话
- * @param sessionId 会话 ID（建议使用项目 ID）
- * @param style 风格预设
- */
-export async function createCommentarySession(
-  sessionId: string,
-  style?: ScriptStylePreset,
-): Promise<string> {
-  return tauri.createSession(sessionId, style);
-}
-
-/**
- * 获取 Director 状态
- */
-export async function getCommentaryStatus(
-  sessionId: string,
-): Promise<DirectorStatusResponse> {
-  return tauri.getStatus(sessionId) as Promise<DirectorStatusResponse>;
-}
-
-/**
- * 开始分析视频
- * @param sessionId 会话 ID
- * @param videoPath 视频路径
- * @param subtitles 字幕内容（SRT 格式）
- * @param targetDurationSecs 目标解说时长（秒）
- */
-export async function startCommentaryAnalysis(
-  sessionId: string,
-  videoPath: string,
-  subtitles: string,
-  targetDurationSecs?: number,
-): Promise<void> {
-  return tauri.startAnalysis(sessionId, videoPath, subtitles, targetDurationSecs);
-}
-
-/**
- * 生成 Director Plan
- */
-export async function generateCommentaryPlan(
-  sessionId: string,
-  style?: ScriptStylePreset,
-  targetDurationSecs?: number,
-): Promise<DirectorPlan> {
-  return tauri.generatePlan(sessionId, style, targetDurationSecs) as Promise<DirectorPlan>;
-}
-
-/**
- * 确认 Plan 并开始渲染
- */
-export async function approveCommentaryPlan(
-  sessionId: string,
-): Promise<string> {
-  return tauri.approvePlan(sessionId);
-}
-
-/**
- * 用户修正 Plan
- */
-export async function reviseCommentaryPlan(
-  sessionId: string,
-  modifications: PlanModifications,
-): Promise<DirectorPlan> {
-  return tauri.revisePlan(sessionId, modifications) as Promise<DirectorPlan>;
-}
-
-/**
- * 渲染完成回调
- */
-export async function completeCommentaryRender(
-  sessionId: string,
-  outputPath: string,
-): Promise<string> {
-  return tauri.completeRender(sessionId, outputPath);
-}
-
-/**
- * 销毁 Director 会话（释放内存）
- */
-export async function destroyCommentarySession(
-  sessionId: string,
-): Promise<void> {
-  return tauri.destroySession(sessionId);
-}
-
-// ─── Script Generator ────────────────────────────────────────────────────
-
-/** 脚本生成输入 */
-export interface GenerateScriptInput {
-  subtitles: string;
-  durationSecs?: number;
-  targetDurationSecs?: number;
-  style?: ScriptStylePreset;
-  summary?: string;
-  highlights?: string[];
-  angle?: string;
-  provider?: 'openai' | 'google' | 'deepseek' | 'qwen' | 'anthropic';
-  model?: string;
-  apiKey: string;
-  baseUrl?: string;
-  systemPromptExtra?: string;
-}
-
-/**
- * 生成解说脚本（调用 LLM）
- */
-export async function generateCommentaryScript(
-  input: GenerateScriptInput,
-): Promise<CommentaryScriptOutput> {
-  return tauri.generateScript(input) as Promise<CommentaryScriptOutput>;
-}
-
-// ─── Commentary Synthesizer ─────────────────────────────────────────────
-
-/**
- * 合成单条解说音频（调用 Edge TTS）
- */
-export async function synthesizeCommentaryAudio(
-  text: string,
-  voice: string,
-  speed?: number,
-  format?: 'mp3' | 'wav' | 'ogg',
-  outputPath?: string,
-): Promise<SynthesizeResult> {
-  return tauri.synthesizeAudio(text, voice, speed ?? 1.0, format, outputPath) as Promise<SynthesizeResult>;
-}
-
-/**
- * 估算 TTS 音频时长（通过真实合成 + ffprobe 获取精确时长）
- */
-export async function estimateTTSDuration(
-  text: string,
-  voice: string,
-  speed?: number,
-): Promise<number> {
-  return tauri.estimateTTSDuration(text, voice, speed ?? 1.0);
-}
-
-/**
- * 获取推荐音色列表
- * @param style 过滤风格（可选）
- */
-export async function listCommentaryVoices(
-  style?: ScriptStylePreset,
-): Promise<VoiceInfo[]> {
-  return tauri.listVoices(style) as Promise<VoiceInfo[]>;
-}
-
-// ─── 便捷工厂函数 ───────────────────────────────────────────────────────
-
-/**
- * 快速生成解说脚本 + 配音
- * 适用于简单一次性场景
- */
-export async function quickCommentary(
-  subtitles: string,
-  apiKey: string,
-  style?: ScriptStylePreset,
-  voice?: string,
-): Promise<{
-  script: CommentaryScriptOutput;
-  audioFiles: SynthesizeResult[];
-}> {
-  // 1. 生成脚本
-  const script = await generateCommentaryScript({
-    subtitles,
-    style,
-    apiKey,
-    provider: 'openai',
-  });
-
-  // 2. 批量合成音频
-  const audioFiles = await Promise.all(
-    script.segments.map((seg: CommentarySegment) =>
-      synthesizeCommentaryAudio(seg.text, voice ?? 'zh-CN-XiaoxiaoNeural'),
-    ),
-  );
-
-  return { script, audioFiles };
-}
