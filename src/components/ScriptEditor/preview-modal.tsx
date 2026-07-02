@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog';
+import VideoPlayer from '../VideoPlayer/video-player';
 import styles from '@/components/ScriptEditor/ScriptEditor.module.less';
 
 interface PreviewModalProps {
@@ -32,12 +33,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
               <p>正在生成预览...</p>
             </div>
           ) : (
-            <video
-              src={previewSrc}
-              controls
-              autoPlay
-              className={styles.previewVideo}
-            />
+            <VideoPlayer src={previewSrc} autoPlay />
           )}
         </div>
       </DialogContent>

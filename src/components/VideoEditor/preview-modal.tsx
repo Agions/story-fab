@@ -7,6 +7,7 @@ import {
   DialogFooter,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
+import VideoPlayer from '../VideoPlayer/video-player';
 import { ScriptSegment } from '@/types';
 import { formatTime } from '@/shared';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
@@ -39,12 +40,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
         ) : previewUrl ? (
           <div className={styles.previewContainer}>
-            <video
-              controls
-              autoPlay
-              src={previewUrl}
-              className={styles.previewVideo}
-            />
+            <VideoPlayer src={previewUrl} autoPlay />
             {previewSegment && (
               <div className={styles.previewInfo}>
                 <p className="mb-1">
