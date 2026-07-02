@@ -51,7 +51,7 @@ const normalizeListedProject = (value: unknown): ProjectFileData | null => {
 const ensureAppDataDir = async (): Promise<void> => {
   const appDir = 'story-fab';
   try {
-    const dirPath = await tauri.checkAppDataDir();
+    const dirPath = await tauri.checkAppDataDirectory();
     logger.info('Rust目录检查成功', { dirPath });
     return;
   } catch (rustError) {
@@ -101,7 +101,7 @@ export const saveProjectToFile = async (projectId: string, project: object): Pro
   });
   const projectPath = `story-fab/${normalizedProjectId}.json`;
   try {
-    await tauri.saveProject(normalizedProjectId, projectData);
+    await tauri.saveProjectFile(normalizedProjectId, projectData);
     emitProjectsChanged();
     logger.info('文件写入成功 (通过Rust函数)', { projectPath });
     return;
@@ -129,7 +129,7 @@ const loadProjectFromFile = async <T = ProjectFileData>(projectId: string): Prom
   for (const candidateId of candidates) {
     try {
       try {
-        const content = await tauri.loadProject(candidateId);
+        const content = await tauri.loadProjectFile(candidateId);
         return JSON.parse(content) as T;
       } catch (rustError) {
         lastError = rustError;
@@ -195,7 +195,7 @@ export const loadProjectWithRetry = async <T = ProjectFileData>(
 export const listProjects = async (): Promise<ProjectFileData[]> => {
   try {
     try {
-      const projects = await tauri.listProjects();
+      const projects = await tauri.listProjectFiles();
       const normalized = (Array.isArray(projects) ? projects : [])
         .map(normalizeListedProject)
         .filter((item): item is ProjectFileData => item !== null);
@@ -235,7 +235,7 @@ export const deleteProject = async (projectId: string): Promise<boolean> => {
   try {
     const normalizedProjectId = normalizeProjectId(projectId || '');
     if (!normalizedProjectId) return false;
-    await tauri.deleteProject(normalizedProjectId);
+    await tauri.deleteProjectFile(normalizedProjectId);
     emitProjectsChanged();
     logger.info('项目删除成功', { projectId });
     return true;

@@ -223,24 +223,14 @@ export class VisionService {
         windowMs: options.windowMs,
       });
 
-      return (
-        rawSegments as Array<{
-          start_ms: number;
-          end_ms: number;
-          score: number;
-          reason: string;
-          audio_score?: number;
-          scene_score?: number;
-          motion_score?: number;
-        }>
-      ).map((h) => ({
-        startTime: h.start_ms / 1000,
-        endTime: h.end_ms / 1000,
+      return rawSegments.map((h) => ({
+        startTime: h.startMs / 1000,
+        endTime: h.endMs / 1000,
         score: h.score,
         reason: h.reason as string,
-        audioScore: h.audio_score,
-        sceneScore: h.scene_score,
-        motionScore: h.motion_score,
+        audioScore: h.audioScore,
+        sceneScore: h.sceneScore,
+        motionScore: h.motionScore,
       }));
     } catch (error) {
       logger.info('[VisionService] detectHighlights failed:', error);

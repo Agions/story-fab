@@ -120,19 +120,11 @@ export const useVideoProcessingController = ({
         });
         const outputPath = saveHandle.name;
 
-        const audioParams = { volume: audioVolume / 100, process: audioProcess !== 'none' };
-
-        await tauri.cutVideo({
+        await tauri.renderAutonomousCut(
           inputPath,
+          segmentsToProcess.map((s) => ({ start: s.startTime, end: s.endTime })),
           outputPath,
-          segments: segmentsToProcess.map((s) => ({ start: s.startTime, end: s.endTime })),
-          quality: videoQuality,
-          format: exportFormat,
-          transition: transitionType,
-          transitionDuration,
-          audioParams,
-          addSubtitles: useSubtitles,
-        });
+        );
 
         if (onProcessingComplete) {
           onProcessingComplete(outputPath);
@@ -144,10 +136,7 @@ export const useVideoProcessingController = ({
         throw error;
       }
     },
-    [
-      videoPath, exportFormat, videoQuality, audioVolume, audioProcess,
-      transitionType, transitionDuration, useSubtitles, onProcessingComplete,
-    ],
+    [videoPath, exportFormat, onProcessingComplete],
   );
 
   const startBatchProcessing = useCallback(async () => {

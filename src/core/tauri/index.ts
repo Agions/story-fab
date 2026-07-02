@@ -8,7 +8,6 @@ import { fileOperations } from './methods/file-operations';
 import { project } from './methods/project';
 import { aiScript } from './methods/ai-script';
 import { commentary } from './methods/commentary';
-import { videoOperations } from './methods/video-operations';
 
 // ─── Tauri API Surface ─────────────────────────────────────────────────────────
 // Explicitly declared so TypeScript knows every method without relying on inference
@@ -16,7 +15,8 @@ export const tauri = {
   // FFmpeg / Video analysis
   checkFFmpeg: videoAnalysis.checkFFmpeg,
   analyzeVideo: videoAnalysis.analyzeVideo,
-  runFfprobe: videoAnalysis.runFfprobe,
+  runFFprobe: videoAnalysis.runFFprobe,
+  getExportDir: project.getExportDir,
 
   // Highlight detection
   detectHighlights: highlightDetection.detectHighlights,
@@ -25,41 +25,40 @@ export const tauri = {
 
   // Render / Transcode
   transcodeWithCrop: renderTranscode.transcodeWithCrop,
-  autonomousRender: renderTranscode.autonomousRender,
+  renderAutonomousCut: renderTranscode.renderAutonomousCut,
   generatePreview: renderTranscode.generatePreview,
   cutVideo: renderTranscode.cutVideo,
-  exportVideo: renderTranscode.exportVideo,
-  extractSubtitle: subtitleAsr.extractSubtitle,
-  burnSubtitle: subtitleAsr.burnSubtitle,
+  cancelExport: renderTranscode.cancelExport,
+
+  // Subtitles / ASR
+  extractSubtitles: subtitleAsr.extractSubtitles,
+  burnInSubtitles: subtitleAsr.burnInSubtitles,
   transcribeAudio: subtitleAsr.transcribeAudio,
-  listWhisperModels: subtitleAsr.listWhisperModels,
-  checkFasterWhisper: subtitleAsr.checkFasterWhisper,
-  downloadWhisperModel: subtitleAsr.downloadWhisperModel,
-  getWhisperLanguages: subtitleAsr.getWhisperLanguages,
 
   // TTS
   synthesizeSpeech: tts.synthesizeSpeech,
   listTTSBackends: tts.listTTSBackends,
   checkTTSAvailable: tts.checkTTSAvailable,
-  mixAudio: mixAudio,
+  mixAudio: mixAudio.mixAudio,
+  getAudioDuration: mixAudio.getAudioDuration,
 
   // File operations
   readTextFile: fileOperations.readTextFile,
   writeTextFile: fileOperations.writeTextFile,
   deleteFile: fileOperations.deleteFile,
+  fileExists: fileOperations.fileExists,
   cleanTempFile: fileOperations.cleanTempFile,
   openFile: fileOperations.openFile,
-  getFileSize: fileOperations.getFileSize,
   voiceDiscovery: fileOperations.voiceDiscovery,
+  getFileSize: fileOperations.getFileSize,
 
   // Project
-  getExportDir: project.getExportDir,
-  saveProject: project.saveProject,
-  loadProject: project.loadProject,
-  deleteProject: project.deleteProject,
-  listProjects: project.listProjects,
+  saveProjectFile: project.saveProjectFile,
+  loadProjectFile: project.loadProjectFile,
+  deleteProjectFile: project.deleteProjectFile,
+  listProjectFiles: project.listProjectFiles,
   listAppDataFiles: project.listAppDataFiles,
-  checkAppDataDir: project.checkAppDataDir,
+  checkAppDataDirectory: project.checkAppDataDirectory,
 
   // AI Script
   generateNarrationScript: aiScript.generateNarrationScript,
@@ -79,11 +78,6 @@ export const tauri = {
   synthesizeAudio: commentary.synthesizeAudio,
   estimateTTSDuration: commentary.estimateTTSDuration,
   listVoices: commentary.listVoices,
-  cancelExport: commentary.cancelExport,
-
-  // Video operations (from VideoAnalyzer direct invoke)
-  extractKeyFrames: videoOperations.extractKeyFrames,
-  generateThumbnail: videoOperations.generateThumbnail,
 } as const;
 
 export default tauri;

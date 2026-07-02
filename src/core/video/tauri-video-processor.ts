@@ -23,8 +23,8 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
   // ---------- FFmpeg ----------
 
   protected async doCheckStatus(): Promise<FFmpegStatus> {
-    const result = await invoke(TauriCommand.CHECK_FFMPEG, {}) as [boolean, string | null];
-    return { installed: result[0], version: result[1] || undefined };
+    const result = await invoke(TauriCommand.CHECK_FFMPEG, undefined);
+    return { installed: result.installed, version: result.version || undefined };
   }
 
   protected async doGetHardwareAcceleration(): Promise<string | null> {
@@ -35,7 +35,16 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
   // ---------- Analysis ----------
 
   protected async doAnalyze(videoPath: string): Promise<VideoMetadata> {
-    return await invoke(TauriCommand.ANALYZE_VIDEO, { path: videoPath }) as Promise<VideoMetadata>;
+    const info = await invoke(TauriCommand.ANALYZE_VIDEO, { path: videoPath });
+    return {
+      duration: info.duration,
+      width: info.width,
+      height: info.height,
+      fps: info.fps,
+      codec: info.format,
+      bitrate: 0,
+      fileSize: info.size,
+    };
   }
 
   // ---------- Extraction ----------
@@ -84,23 +93,40 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
         inputPath,
         outputPath,
         segments: segments.map(s => ({ start: s.start, end: s.end })),
-        useHwAccel: options?.transcode?.hwAccel ?? false,
-      }) as string;
+      });
     } finally {
       unlisten?.();
     }
   }
 
   protected async doPreview(inputPath: string, segment: SimpleVideoSegment): Promise<string> {
-    return await invoke(TauriCommand.GENERATE_PREVIEW, {
+    return invoke(TauriCommand.GENERATE_PREVIEW, {
       inputPath,
-      segment: {
-        start: segment.start,
-        end: segment.end,
-      },
-    }) as string;
+      segment: { start: segment.start, end: segment.end },
+    });
+  }
+
+  // ---------- Export ----------
+
+  protected async doExport(
+    inputPath: string,
+    outputPath: string,
+    format: string,
+    options?: { resolution?: string; frameRate?: number; videoCodec?: string; audioCodec?: string; crf?: number; subtitleEnabled?: boolean; subtitlePath?: string; burnSubtitles?: boolean }
+  ): Promise<string> {
+    const result = await invoke(TauriCommand.EXPORT_VIDEO, {
+      inputPath,
+      outputPath,
+      format,
+      ...options,
+    });
+    return (result as { outputPath: string }).outputPath;
+  }
+
+  protected async doCancelExport(exportId: string): Promise<void> {
+    await invoke(TauriCommand.CANCEL_EXPORT, { exportId });
   }
 }
 
-// 单例
+/** 默认视频处理器单例（Tauri 平台实现） */
 export const videoProcessor = new TauriVideoProcessor();

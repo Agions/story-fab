@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress, ProgressTrack, ProgressIndicator } from '@/components/ui/progress';
 import { Video } from 'lucide-react';
 import { tauri } from '@/core/tauri';
+import { videoProcessor } from '@/core/video';
 
 import type { VideoAnalysis, KeyMoment, Emotion } from '@/types';
 import VideoSelector from '@/components/VideoSelector/video-selector';
@@ -54,7 +55,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
       setProgress(10);
 
-      const videoMetadata = await (tauri.analyzeVideo(selectedVideoUrl) as Promise<AnalyzeVideoResult>).catch(err => {
+      const videoMetadata = await (tauri.analyzeVideo(selectedVideoUrl) as Promise<AnalyzeVideoResult>).catch((err: unknown) => {
         logger.error('视频分析失败:', { error: err });
         throw new AppError('APP_VIDEO_ANALYZE_FAILED', `视频分析失败: ${err}`, {
           originalError: err,
@@ -65,14 +66,14 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
       setProgress(40);
 
       const keyFrameCount = Math.min(5, Math.ceil(videoMetadata.duration / 60));
-      const keyFrames = await tauri.extractKeyFrames(selectedVideoUrl, keyFrameCount).catch(err => {
+      const keyFrames = await videoProcessor.extractKeyFrames(selectedVideoUrl, { maxFrames: keyFrameCount }).catch((err: unknown) => {
         logger.error('提取关键帧失败:', { error: err });
         return [];
       });
 
       setProgress(70);
 
-      const thumbnail = await tauri.generateThumbnail(selectedVideoUrl).catch(err => {
+      const thumbnail = await videoProcessor.generateThumbnail(selectedVideoUrl).catch((err: unknown) => {
         logger.error('生成缩略图失败:', { error: err });
         return '';
       });

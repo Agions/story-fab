@@ -24,7 +24,7 @@ export async function synthesizeCommentaryAudio(
   format?: 'mp3' | 'wav' | 'ogg',
   outputPath?: string,
 ): Promise<SynthesizeResult> {
-  return tauri.synthesizeAudio(text, voice, speed ?? 1.0, format, outputPath) as Promise<SynthesizeResult>;
+  return tauri.synthesizeAudio(text, voice, speed ?? 1.0, format ?? 'mp3', outputPath) as Promise<SynthesizeResult>;
 }
 
 /**

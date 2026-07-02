@@ -90,7 +90,6 @@ export class SubtitleService extends BaseService {
         }
       },
       'Whisper 转录',
-      { loadingMessage: '正在使用 Whisper 转录...' }
     );
   }
 
@@ -275,7 +274,6 @@ export class SubtitleService extends BaseService {
         }
       },
       '生成字幕文件',
-      { showLoading: false }
     );
   }
 
@@ -350,7 +348,6 @@ export class SubtitleService extends BaseService {
         };
       },
       '翻译字幕',
-      { loadingMessage: `正在翻译字幕为 ${targetLanguage}...` }
     );
   }
 
@@ -447,7 +444,6 @@ export class SubtitleService extends BaseService {
         return result.outputPath;
       },
       '烧录字幕',
-      { showLoading: false }
     );
   }
 

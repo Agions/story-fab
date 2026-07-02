@@ -95,7 +95,7 @@ export async function reviseCommentaryPlan(
   sessionId: string,
   modifications: PlanModifications,
 ): Promise<DirectorPlan> {
-  return tauri.revisePlan(sessionId, modifications) as Promise<DirectorPlan>;
+  return tauri.revisePlan(sessionId, modifications as unknown as Record<string, unknown>) as Promise<DirectorPlan>;
 }
 
 /**

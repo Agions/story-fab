@@ -199,22 +199,22 @@ async function detectSilenceSegments(
       minDurationMs: 500,
       maxDurationMs: 30000,
     })) as Array<{
-      start_ms: number;
-      end_ms: number;
-      segment_type: string;
-      duration_ms: number;
-      silence_ratio?: number;
+      startMs: number;
+      endMs: number;
+      segmentType: string;
+      durationMs: number;
+      silenceRatio?: number;
     }>;
 
     // 把原始 segments（包含 suggested_speed 等 Rust 字段）抛给上层
     onRawSegments?.(rustSegments as RustRawSegment[]);
 
     return rustSegments
-      .filter((seg) => seg.segment_type === 'Silence' || (seg.silence_ratio ?? 0) > 0.3)
+      .filter((seg) => seg.segmentType === 'Silence' || (seg.silenceRatio ?? 0) > 0.3)
       .map((seg) => ({
-        start: msToSeconds(seg.start_ms),
-        end: msToSeconds(seg.end_ms),
-        duration: msToSeconds(seg.duration_ms),
+        start: msToSeconds(seg.startMs),
+        end: msToSeconds(seg.endMs),
+        duration: msToSeconds(seg.durationMs),
       }));
   } catch (error) {
     // Rust 失败时返回空，不阻断主流程

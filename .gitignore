@@ -17,6 +17,7 @@ src-tauri/bundle/
 # IDE
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 *~

@@ -9,8 +9,8 @@ import { BaseService } from '../providers/base-service';
 import { invoke, TauriCommand } from '../../tauri';
 import { logger } from '@/shared/utils/logging';
 
-import type { ExportConfig, ExportResult, ExportFormat } from '../../export/types';
-import { EXPORT_PRESETS, FORMAT_INFO } from '../../export/types';
+import type { ExportConfig, ExportResult, ExportFormat } from '@/types';
+import { EXPORT_PRESETS, FORMAT_INFO } from '@/types';
 export type { ExportResult };
 
 export const FORMAT_MIME_TYPES: Record<string, string> = {
@@ -108,7 +108,6 @@ export class ExportService extends BaseService {
         };
       },
       '导出视频',
-      { loadingMessage: `正在导出视频 (${fullConfig.format})...` }
     ).finally(() => {
       this.currentExportId = null;
     });
@@ -129,7 +128,6 @@ export class ExportService extends BaseService {
         }
       },
       '取消导出',
-      { showLoading: false }
     );
   }
 

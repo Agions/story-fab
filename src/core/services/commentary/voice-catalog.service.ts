@@ -21,5 +21,7 @@ import type {
 export async function listCommentaryVoices(
   style?: ScriptStylePreset,
 ): Promise<VoiceInfo[]> {
-  return tauri.listVoices(style) as Promise<VoiceInfo[]>;
+  const voices = (await tauri.listVoices()) as VoiceInfo[];
+  if (!style) return voices;
+  return voices.filter((v) => v.style === style);
 }

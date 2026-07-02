@@ -18,27 +18,19 @@ export const highlightDetection = {
     } = {},
   ) {
     return invoke(TauriCommand.DETECT_HIGHLIGHTS, {
-      video_path: videoPath,
+      videoPath,
       ...options,
     });
   },
 
   /**
    * 基于 ZCR 爆点的检测
-   *
-   * Backed by an async Tauri command running on a dedicated blocking thread
-   * (see src-tauri commands/ai/detection.rs) — the Tauri main thread and
-   * Tokio worker pool stay responsive while ffmpeg decodes the audio PCM.
-   *
-   * Pass `onProgress` to receive `{ stage, percent }` updates emitted on the
-   * `detect-zcr-progress` event channel. The returned unlisten function
-   * detaches the listener — callers should invoke it on completion.
    */
   async detectZCRBursts(
     videoPath: string,
     options: { threshold?: number; minDurationMs?: number; topN?: number } = {},
     onProgress?: (progress: ZCRProgress) => void,
-  ): Promise<Array<{ start_ms: number; end_ms: number; score: number }>> {
+  ): Promise<Array<{ startMs: number; endMs: number; score: number }>> {
     let unlisten: UnlistenFn | null = null;
     if (onProgress) {
       unlisten = await listen<ZCRProgress>('detect-zcr-progress', (event) => {
@@ -47,9 +39,9 @@ export const highlightDetection = {
     }
     try {
       return (await invoke(TauriCommand.DETECT_ZCR_BURSTS, {
-        video_path: videoPath,
+        videoPath,
         ...options,
-      })) as Promise<Array<{ start_ms: number; end_ms: number; score: number }>>;
+      })) as Array<{ startMs: number; endMs: number; score: number }>;
     } finally {
       if (unlisten) unlisten();
     }
@@ -61,7 +53,7 @@ export const highlightDetection = {
     options: Record<string, unknown> = {},
   ) {
     return invoke(TauriCommand.DETECT_SMART_SEGMENTS, {
-      video_path: videoPath,
+      videoPath,
       ...options,
     });
   },

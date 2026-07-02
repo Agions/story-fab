@@ -211,7 +211,7 @@ export class VoiceSynthesisService {
         backend: config.backend,
       };
 
-      const outputPath = await tauri.synthesizeSpeech(input as unknown as Record<string, unknown>);
+      const outputPath = await tauri.synthesizeSpeech(input);
 
       onProgress?.({ stage: 'encoding', progress: 90, message: '编码完成...' });
       onProgress?.({ stage: 'done', progress: 100 });

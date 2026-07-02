@@ -157,14 +157,14 @@ export class ASRService extends BaseService {
 
   /** 将 ZCR burst 转换为峰值格式（毫秒→秒，归一化强度） */
   private _convertBurstsToPeaks(
-    bursts: Array<{ start_ms: number; end_ms: number; score: number }>,
+    bursts: Array<{ startMs: number; endMs: number; score: number }>,
     threshold: number,
     minInterval: number
   ): Array<{ timestamp: number; intensity: number }> {
     const peaks: Array<{ timestamp: number; intensity: number }> = [];
 
     for (const burst of bursts) {
-      const midMs = (burst.start_ms + burst.end_ms) / 2;
+      const midMs = (burst.startMs + burst.endMs) / 2;
       const intensity = Math.min((burst.score - 1) / (burst.score + 0.001), 1);
 
       if (intensity >= (threshold - 0.3)) {

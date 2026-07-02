@@ -202,7 +202,7 @@ export class AudioVideoSyncService {
   }
 
   private async ffprobeOutput(args: string[]): Promise<string> {
-    return await tauri.runFfprobe(args);
+    return await tauri.runFFprobe(args);
   }
 
   /**

@@ -1,11 +1,11 @@
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
-import type { TauriCommandName, TauriCommandInput, TauriCommandOutput } from './command-types';
+import type { TauriCommandName, TauriCommandOutput } from './command-types';
 
 // ============================================================
 // 命令名称常量（与 Rust 端保持一致）
 // ============================================================
 export const TauriCommand = {
-  CHECK_FFMPEG:             'check_ffmpg',
+  CHECK_FFMPEG:             'check_ffmpeg',
   ANALYZE_VIDEO:            'analyze_video',
   GET_EXPORT_DIR:          'get_export_dir',
   RUN_FFPROBE:             'run_ffprobe',
@@ -23,10 +23,6 @@ export const TauriCommand = {
   SUBTITLE_EXTRACT:        'subtitle_extract',
   SUBTITLE_BURN_IN:        'subtitle_burn_in',
   TRANSCRIBE_AUDIO:        'transcribe_audio',
-  LIST_WHISPER_MODELS:     'list_whisper_models',
-  CHECK_FASTER_WHISPER:    'check_faster_whisper',
-  DOWNLOAD_WHISPER_MODEL:  'download_whisper_model',
-  GET_WHISPER_LANGUAGES:   'get_whisper_supported_languages',
 
   SYNTHESIZE_SPEECH:       'synthesize_speech',
   LIST_TTS_BACKENDS:       'list_tts_backends',
@@ -64,12 +60,40 @@ export const TauriCommand = {
   ANALYZE_VIDEO_FOR_NARRATION: 'analyze_video_for_narration',
   LIST_AVAILABLE_MODELS:       'list_available_models',
 
-  EXTRACT_KEY_FRAMES:    'extract_key_frames',
-  GENERATE_THUMBNAIL:    'generate_thumbnail',
+  // Commentary Director
+  CREATE_DIRECTOR_SESSION:     'create_director_session',
+  GET_DIRECTOR_STATUS:         'get_director_status',
+  START_DIRECTOR_ANALYSIS:     'start_director_analysis',
+  GENERATE_DIRECTOR_PLAN:      'generate_director_plan',
+  APPROVE_DIRECTOR_PLAN:       'approve_director_plan',
+  REVISE_DIRECTOR_PLAN:        'revise_director_plan',
+  COMPLETE_DIRECTOR_RENDER:    'complete_director_render',
+  DESTROY_DIRECTOR_SESSION:    'destroy_director_session',
+
+  // Commentary Script Generator
+  GENERATE_COMMENTARY_SCRIPT:  'generate_commentary_script',
+
+  // Commentary Synthesizer
+  SYNTHESIZE_COMMENTARY_AUDIO: 'synthesize_commentary_audio',
+  ESTIMATE_TTS_DURATION:       'estimate_tts_duration',
+  LIST_COMMENTARY_VOICES:      'list_commentary_voices',
+
+  // Auto-save
+  AUTO_SAVE_PROJECT:       'auto_save_project',
+  CLEAR_AUTOSAVE:          'clear_autosave',
+  LIST_RECOVERABLE_PROJECTS: 'list_recoverable_projects',
+  RECOVER_AUTOSAVE:        'recover_autosave',
+  PREVIEW_AUTOSAVE:        'preview_autosave',
+
+  // Crash recovery
+  LIST_CRASHES:            'list_crashes',
+  READ_CRASH:              'read_crash',
+  DELETE_CRASH:            'delete_crash',
+  CLEAR_CRASHES:           'clear_crashes',
 } as const;
 
-// 命令名称类型（从常量值推导）
-export type TauriCommand = typeof TauriCommand[keyof typeof TauriCommand];
+// 命令名称类型（与 command-types.ts 中的 TauriCommandName 保持一致）
+export type TauriCommand = TauriCommandName;
 
 // ============================================================
 // 错误类型
@@ -117,32 +141,48 @@ export interface BridgeOptions {
 }
 
 // ============================================================
+// Helpers
+// ============================================================
+
+function normalizeArgs(
+  args: Record<string, unknown> | undefined,
+): Record<string, unknown> {
+  if (args && Object.keys(args).length > 0) return args;
+  return {};
+}
+
+// ============================================================
 // 核心调用函数
 // ============================================================
 
 /**
  * 类型安全的 Tauri invoke
  * 自动推断输入和输出类型
+ *
+ * @param command 命令名称
+ * @param args 命令参数（建议使用命令特定的参数类型）
+ * @param options 可选配置
+ * @returns 命令执行结果
  */
 export async function invoke<C extends TauriCommandName>(
   command: C,
-  args: TauriCommandInput<C>,
+  args: Record<string, unknown> = {},
   options?: BridgeOptions,
 ): Promise<TauriCommandOutput<C>> {
   const { retries = 0, signal } = options ?? {};
-  return executeWithRetry(command, args as Record<string, unknown>, retries, signal);
+  return executeWithRetry(command, normalizeArgs(args), retries, signal);
 }
 
 async function executeWithRetry<C extends TauriCommandName>(
   command: C,
-  args: TauriCommandInput<C>,
+  args: Record<string, unknown>,
   retries: number,
   signal: AbortSignal | undefined,
 ): Promise<TauriCommandOutput<C>> {
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
-    if (signal?.aborted) {
+    if (signal && signal.aborted) {
       throw TauriBridgeError.fromInvoke(command as TauriCommand, new Error('Request aborted'));
     }
 
@@ -160,35 +200,9 @@ async function executeWithRetry<C extends TauriCommandName>(
 }
 
 /** Raw invoke without TauriCommand restriction — for commentary/Rust-only commands */
-export async function rawInvoke<C extends string>(
+export async function rawInvoke<C extends TauriCommandName>(
   command: C,
   args?: Record<string, unknown>,
-): Promise<unknown> {
-  return executeRawWithRetry(command, args ?? {}, 0, undefined);
-}
-
-async function executeRawWithRetry<C extends string>(
-  command: C,
-  args: Record<string, unknown>,
-  retries: number,
-  signal: AbortSignal | undefined,
-): Promise<unknown> {
-  let lastError: unknown;
-
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    if (signal?.aborted) {
-      throw TauriBridgeError.fromInvoke(command as TauriCommand, new Error('Request aborted'));
-    }
-
-    try {
-      return await tauriInvoke(command, args);
-    } catch (error) {
-      lastError = error;
-      if (attempt < retries) {
-        await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 500));
-      }
-    }
-  }
-
-  throw TauriBridgeError.fromInvoke(command as TauriCommand, lastError);
+): Promise<TauriCommandOutput<C>> {
+  return executeWithRetry(command, normalizeArgs(args), 0, undefined);
 }

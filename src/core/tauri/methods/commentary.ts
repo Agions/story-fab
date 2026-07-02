@@ -1,143 +1,64 @@
-import { rawInvoke } from '../invoke';
+import { invoke, TauriCommand } from '../invoke';
+import type { DirectorPlan, DirectorStatusResponse } from '@/types';
 
-// Typed commentary module — all commands are Rust commentary layer only
-export const commentary: {
-  createSession(sessionId: string, style?: string): Promise<string>;
-  getStatus(sessionId: string): Promise<unknown>;
-  startAnalysis(sessionId: string, videoPath: string, subtitles: string, targetDurationSecs?: number): Promise<void>;
-  generatePlan(sessionId: string, style?: string, targetDurationSecs?: number): Promise<unknown>;
-  approvePlan(sessionId: string): Promise<string>;
-  revisePlan(sessionId: string, modifications: unknown): Promise<unknown>;
-  completeRender(sessionId: string, outputPath: string): Promise<string>;
-  destroySession(sessionId: string): Promise<void>;
-  generateScript(input: {
-    subtitles: string; durationSecs?: number; targetDurationSecs?: number; style?: string;
-    summary?: string; highlights?: string[]; angle?: string;
-    provider?: 'openai' | 'google' | 'deepseek' | 'qwen' | 'anthropic';
-    model?: string; apiKey: string; baseUrl?: string; systemPromptExtra?: string;
-  }): Promise<unknown>;
-  synthesizeAudio(text: string, voice: string, speed?: number, format?: 'mp3' | 'wav' | 'ogg', outputPath?: string): Promise<unknown>;
-  estimateTTSDuration(text: string, voice: string, speed?: number): Promise<number>;
-  listVoices(style?: string): Promise<unknown[]>;
-  cancelExport(exportId: string): Promise<void>;
-} = {
-  // ─── Director Agent ─────────────────────────────────────────────────────
-
+export const commentary = {
   /** 创建 Commentary Director 会话 */
   async createSession(sessionId: string, style?: string): Promise<string> {
-    return rawInvoke('create_director_session', { sessionId, style }) as Promise<string>;
+    return invoke(TauriCommand.CREATE_DIRECTOR_SESSION, { sessionId, style }) as Promise<string>;
   },
 
   /** 获取 Director 状态 */
-  async getStatus(sessionId: string): Promise<unknown> {
-    return rawInvoke('get_director_status', { sessionId });
+  async getStatus(sessionId: string): Promise<DirectorStatusResponse> {
+    return invoke(TauriCommand.GET_DIRECTOR_STATUS, { sessionId }) as Promise<DirectorStatusResponse>;
   },
 
   /** 开始分析视频 */
-  async startAnalysis(
-    sessionId: string,
-    videoPath: string,
-    subtitles: string,
-    targetDurationSecs?: number,
-  ): Promise<void> {
-    return rawInvoke('start_director_analysis', {
-      sessionId,
-      videoPath,
-      subtitles,
-      targetDurationSecs,
-    }) as Promise<void>;
+  async startAnalysis(sessionId: string, videoPath: string, subtitles: string, targetDurationSecs?: number): Promise<void> {
+    await invoke(TauriCommand.START_DIRECTOR_ANALYSIS, { sessionId, videoPath, subtitles, targetDurationSecs });
   },
 
   /** 生成 Director Plan */
-  async generatePlan(
-    sessionId: string,
-    style?: string,
-    targetDurationSecs?: number,
-  ): Promise<unknown> {
-    return rawInvoke('generate_director_plan', {
-      sessionId,
-      style,
-      targetDurationSecs,
-    });
+  async generatePlan(sessionId: string, style?: string, targetDurationSecs?: number): Promise<DirectorPlan> {
+    return invoke(TauriCommand.GENERATE_DIRECTOR_PLAN, { sessionId, style, targetDurationSecs }) as unknown as Promise<DirectorPlan>;
   },
 
   /** 确认 Plan 并开始渲染 */
   async approvePlan(sessionId: string): Promise<string> {
-    return rawInvoke('approve_director_plan', { sessionId }) as Promise<string>;
+    return invoke(TauriCommand.APPROVE_DIRECTOR_PLAN, { sessionId }) as Promise<string>;
   },
 
   /** 用户修正 Plan */
-  async revisePlan(sessionId: string, modifications: unknown): Promise<unknown> {
-    return rawInvoke('revise_director_plan', { sessionId, modifications });
+  async revisePlan(sessionId: string, modifications: Record<string, unknown>): Promise<DirectorPlan> {
+    return invoke(TauriCommand.REVISE_DIRECTOR_PLAN, { sessionId, modifications }) as unknown as Promise<DirectorPlan>;
   },
 
   /** 渲染完成回调 */
   async completeRender(sessionId: string, outputPath: string): Promise<string> {
-    return rawInvoke('complete_director_render', { sessionId, outputPath }) as Promise<string>;
+    return invoke(TauriCommand.COMPLETE_DIRECTOR_RENDER, { sessionId, outputPath }) as Promise<string>;
   },
 
   /** 销毁 Director 会话 */
   async destroySession(sessionId: string): Promise<void> {
-    return rawInvoke('destroy_director_session', { sessionId }) as Promise<void>;
+    await invoke(TauriCommand.DESTROY_DIRECTOR_SESSION, { sessionId });
   },
-
-  // ─── Script Generator ────────────────────────────────────────────────────
 
   /** 生成解说脚本 */
-  async generateScript(input: {
-    subtitles: string;
-    durationSecs?: number;
-    targetDurationSecs?: number;
-    style?: string;
-    summary?: string;
-    highlights?: string[];
-    angle?: string;
-    provider?: 'openai' | 'google' | 'deepseek' | 'qwen' | 'anthropic';
-    model?: string;
-    apiKey: string;
-    baseUrl?: string;
-    systemPromptExtra?: string;
-  }): Promise<unknown> {
-    return rawInvoke('generate_commentary_script', { input });
+  async generateScript(input: { subtitles: string; style?: string; apiKey: string; provider?: string }) {
+    return invoke(TauriCommand.GENERATE_COMMENTARY_SCRIPT, input);
   },
 
-  // ─── Commentary Synthesizer ─────────────────────────────────────────────
-
-  /** 合成单条解说音频 */
-  async synthesizeAudio(
-    text: string,
-    voice: string,
-    speed?: number,
-    format?: 'mp3' | 'wav' | 'ogg',
-    outputPath?: string,
-  ): Promise<unknown> {
-    return rawInvoke('synthesize_commentary_audio', {
-      text,
-      voice,
-      speed: speed ?? 1.0,
-      format,
-      outputPath,
-    });
+  /** 合成音频 */
+  async synthesizeAudio(text: string, voice: string, speed: number, format: string, outputPath?: string): Promise<{ audioPath: string; durationSecs: number }> {
+    return invoke(TauriCommand.SYNTHESIZE_COMMENTARY_AUDIO, { text, voice, speed, format, outputPath }) as Promise<{ audioPath: string; durationSecs: number }>;
   },
 
-  /** 估算 TTS 音频时长 */
-  async estimateTTSDuration(text: string, voice: string, speed?: number): Promise<number> {
-    return rawInvoke('estimate_tts_duration', {
-      text,
-      voice,
-      speed: speed ?? 1.0,
-    }) as Promise<number>;
+  /** 估算 TTS 时长 */
+  async estimateTTSDuration(text: string, voice: string, speed: number): Promise<number> {
+    return invoke(TauriCommand.ESTIMATE_TTS_DURATION, { text, voice, speed }) as Promise<number>;
   },
 
-  /** 获取推荐音色列表 */
-  async listVoices(style?: string): Promise<unknown[]> {
-    return rawInvoke('list_commentary_voices', { style }) as Promise<unknown[]>;
-  },
-
-  // ─── Export Cancellation ──────────────────────────────────────────────────
-
-  /** 取消正在进行的导出 */
-  async cancelExport(exportId: string): Promise<void> {
-    return rawInvoke('cancel_export', { export_id: exportId }) as Promise<void>;
+  /** 列出可用音色 */
+  async listVoices(): Promise<Array<{ id: string; name: string; gender: string; style: string; description: string }>> {
+    return invoke(TauriCommand.LIST_COMMENTARY_VOICES, undefined) as Promise<Array<{ id: string; name: string; gender: string; style: string; description: string }>>;
   },
 };

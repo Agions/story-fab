@@ -4,7 +4,7 @@
  * 优点：本地推理，准确率高，支持中文/英文，断网可用
  */
 import { logger } from '../../../../shared/utils/logging';
-import { tauri } from '../../../tauri';
+import { whisperService } from '../../subtitle/whisper-service';
 import type { VideoInfo } from '@/types';
 import type { ASRResult, ASRSegment, ASROptions, RustWhisperSegment } from '../asr-types';
 import type { IASRProvider } from './types';
@@ -23,10 +23,10 @@ export class RustWhisperASRProvider implements IASRProvider {
         language: opts.language,
       });
 
-      const whisperResult = await tauri.transcribeAudio(
+      const whisperResult = await whisperService.transcribe(
         videoInfo.path,
         opts.model,
-        opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : undefined,
+        opts.language === 'zh_cn' ? 'zh' : opts.language === 'en_us' ? 'en' : 'auto',
       );
 
       if (!whisperResult || !whisperResult.segments || whisperResult.segments.length === 0) {

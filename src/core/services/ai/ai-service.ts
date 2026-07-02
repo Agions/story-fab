@@ -101,7 +101,6 @@ export class AIService extends BaseService {
         };
       },
       '生成脚本',
-      { loadingMessage: '正在生成脚本...' }
     );
   }
 
@@ -145,7 +144,6 @@ export class AIService extends BaseService {
         return { summary: response.content, scenes, keyframes, createdAt: new Date().toISOString() };
       },
       '分析视频',
-      { loadingMessage: '正在分析视频...' }
     );
   }
 
@@ -162,7 +160,6 @@ export class AIService extends BaseService {
         return response.content;
       },
       '优化脚本',
-      { loadingMessage: '正在优化脚本...' }
     );
   }
 
@@ -179,7 +176,6 @@ export class AIService extends BaseService {
         return response.content;
       },
       '翻译脚本',
-      { loadingMessage: '正在翻译脚本...' }
     );
   }
 

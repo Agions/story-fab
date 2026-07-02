@@ -61,7 +61,7 @@ export async function mixTtsWithVideo(
   });
 
   try {
-    const result = await tauri.mixAudio.mix({
+    const result = await tauri.mixAudio({
       videoPath,
       ttsAudioPath,
       outputPath,

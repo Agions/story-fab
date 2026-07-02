@@ -24,18 +24,18 @@ import { suggestTransitions, type TransitionType } from '../video/transition-sug
 // Rust wire format
 // ============================================
 
-/** Shape returned by Rust `detect_smart_segments` (snake_case) */
+/** Shape returned by Rust `detect_smart_segments` (camelCase over the Tauri bridge) */
 export interface RustRawSegment {
-  start_ms: number;
-  end_ms: number;
-  segment_type: string;
-  duration_ms: number;
+  startMs: number;
+  endMs: number;
+  segmentType: string;
+  durationMs: number;
   confidence: number;
-  is_scene_change?: boolean;
-  peak_energy?: number;
-  silence_ratio?: number;
+  isSceneChange?: boolean;
+  peakEnergy?: number;
+  silenceRatio?: number;
   /** Rust populates this when computing speed from energy ratio. */
-  suggested_speed?: number;
+  suggestedSpeed?: number;
 }
 
 /** Normalized segment type set (must match SegmentType in highlight.types.ts) */
@@ -74,15 +74,15 @@ function normalizeType(raw: string | undefined | null): NormalizedType {
  */
 export function enrichSegment(raw: RustRawSegment): SmartVideoSegment {
   return {
-    startMs: raw.start_ms,
-    endMs: raw.end_ms,
-    segmentType: normalizeType(raw.segment_type),
-    durationMs: raw.duration_ms,
+    startMs: raw.startMs,
+    endMs: raw.endMs,
+    segmentType: normalizeType(raw.segmentType),
+    durationMs: raw.durationMs,
     confidence: raw.confidence,
-    isSceneChange: raw.is_scene_change,
-    peakEnergy: raw.peak_energy,
-    silenceRatio: raw.silence_ratio,
-    suggestedSpeed: raw.suggested_speed,
+    isSceneChange: raw.isSceneChange,
+    peakEnergy: raw.peakEnergy,
+    silenceRatio: raw.silenceRatio,
+    suggestedSpeed: raw.suggestedSpeed,
   };
 }
 

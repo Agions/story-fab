@@ -18,8 +18,7 @@ interface TranscodeCropOptions {
 
 export const transcodeWithCrop = async (options: TranscodeCropOptions): Promise<string> => {
   try {
-    const result = await tauri.transcodeWithCrop(options);
-    return result;
+    return await tauri.transcodeWithCrop(options);
   } catch (error) {
     logger.error('transcodeWithCrop 失败:', error);
     throw error;

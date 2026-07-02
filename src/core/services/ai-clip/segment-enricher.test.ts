@@ -7,10 +7,10 @@ import {
 } from './segment-enricher';
 
 const raw = (over: Partial<RustRawSegment>): RustRawSegment => ({
-  start_ms: 0,
-  end_ms: 1000,
-  segment_type: 'content',
-  duration_ms: 1000,
+  startMs: 0,
+  endMs: 1000,
+  segmentType: 'content',
+  durationMs: 1000,
   confidence: 0.8,
   ...over,
 });
@@ -19,15 +19,15 @@ describe('segmentEnricher', () => {
   describe('enrichSegment — single', () => {
     it('maps snake_case Rust fields → camelCase TS fields', () => {
       const out = enrichSegment(raw({
-        start_ms: 100,
-        end_ms: 2500,
-        segment_type: 'Action',
-        duration_ms: 2400,
+        startMs: 100,
+        endMs: 2500,
+        segmentType: 'Action',
+        durationMs: 2400,
         confidence: 0.9,
-        is_scene_change: true,
-        peak_energy: 0.7,
-        silence_ratio: 0.1,
-        suggested_speed: 2.0,
+        isSceneChange: true,
+        peakEnergy: 0.7,
+        silenceRatio: 0.1,
+        suggestedSpeed: 2.0,
       }));
       expect(out.startMs).toBe(100);
       expect(out.endMs).toBe(2500);
@@ -41,15 +41,15 @@ describe('segmentEnricher', () => {
     });
 
     it('normalizes PascalCase and snake_case types', () => {
-      expect(enrichSegment(raw({ segment_type: 'Dialogue' })).segmentType).toBe('dialogue');
-      expect(enrichSegment(raw({ segment_type: 'silence' })).segmentType).toBe('silence');
-      expect(enrichSegment(raw({ segment_type: 'Transition' })).segmentType).toBe('transition');
+      expect(enrichSegment(raw({ segmentType: 'Dialogue' })).segmentType).toBe('dialogue');
+      expect(enrichSegment(raw({ segmentType: 'silence' })).segmentType).toBe('silence');
+      expect(enrichSegment(raw({ segmentType: 'Transition' })).segmentType).toBe('transition');
     });
 
     it('falls back to content for unknown / missing type', () => {
-      expect(enrichSegment(raw({ segment_type: 'unknown_thing' })).segmentType).toBe('content');
-      expect(enrichSegment(raw({ segment_type: '' })).segmentType).toBe('content');
-      expect(enrichSegment(raw({ segment_type: undefined as unknown as string })).segmentType).toBe('content');
+      expect(enrichSegment(raw({ segmentType: 'unknown_thing' })).segmentType).toBe('content');
+      expect(enrichSegment(raw({ segmentType: '' })).segmentType).toBe('content');
+      expect(enrichSegment(raw({ segmentType: undefined as unknown as string })).segmentType).toBe('content');
     });
   });
 
@@ -60,9 +60,9 @@ describe('segmentEnricher', () => {
 
     it('produces a suggestion for every input segment', () => {
       const input: RustRawSegment[] = [
-        raw({ segment_type: 'Action', start_ms: 0, end_ms: 1000 }),
-        raw({ segment_type: 'Dialogue', start_ms: 1000, end_ms: 3000 }),
-        raw({ segment_type: 'Silence', start_ms: 3000, end_ms: 3300 }),
+        raw({ segmentType: 'Action', startMs: 0, endMs: 1000 }),
+        raw({ segmentType: 'Dialogue', startMs: 1000, endMs: 3000 }),
+        raw({ segmentType: 'Silence', startMs: 3000, endMs: 3300 }),
       ];
       const out = enrichSegments(input);
       expect(out).toHaveLength(3);
@@ -72,11 +72,11 @@ describe('segmentEnricher', () => {
       }
     });
 
-    it('preserves Rust suggested_speed field', () => {
+    it('preserves Rust suggestedSpeed field', () => {
       const input: RustRawSegment[] = [
-        raw({ suggested_speed: 4.0 }),
-        raw({ suggested_speed: 1.0, start_ms: 1000, end_ms: 2000 }),
-        raw({ suggested_speed: 6.0, start_ms: 2000, end_ms: 3000 }),
+        raw({ suggestedSpeed: 4.0 }),
+        raw({ suggestedSpeed: 1.0, startMs: 1000, endMs: 2000 }),
+        raw({ suggestedSpeed: 6.0, startMs: 2000, endMs: 3000 }),
       ];
       const out = enrichSegments(input);
       expect(out[0].suggestedSpeed).toBe(4.0);
@@ -84,8 +84,8 @@ describe('segmentEnricher', () => {
       expect(out[2].suggestedSpeed).toBe(6.0);
     });
 
-    it('passes through missing suggested_speed as undefined', () => {
-      const out = enrichSegments([raw({ suggested_speed: undefined })]);
+    it('passes through missing suggestedSpeed as undefined', () => {
+      const out = enrichSegments([raw({ suggestedSpeed: undefined })]);
       expect(out[0].suggestedSpeed).toBeUndefined();
     });
   });
@@ -100,10 +100,10 @@ describe('segmentEnricher', () => {
 
     it('counts segments by speed bucket', () => {
       const input: RustRawSegment[] = [
-        raw({ suggested_speed: 1.0 }),
-        raw({ suggested_speed: 1.0, start_ms: 1000, end_ms: 2000 }),
-        raw({ suggested_speed: 2.0, start_ms: 2000, end_ms: 3000 }),
-        raw({ suggested_speed: 6.0, start_ms: 3000, end_ms: 4000 }),
+        raw({ suggestedSpeed: 1.0 }),
+        raw({ suggestedSpeed: 1.0, startMs: 1000, endMs: 2000 }),
+        raw({ suggestedSpeed: 2.0, startMs: 2000, endMs: 3000 }),
+        raw({ suggestedSpeed: 6.0, startMs: 3000, endMs: 4000 }),
       ];
       const sum = summarizeSpeeds(enrichSegments(input));
       expect(sum.total).toBe(4);
@@ -114,9 +114,9 @@ describe('segmentEnricher', () => {
 
     it('identifies the fastest speed bucket', () => {
       const input: RustRawSegment[] = [
-        raw({ suggested_speed: 2.0 }),
-        raw({ suggested_speed: 6.0, start_ms: 1000, end_ms: 2000 }),
-        raw({ suggested_speed: 6.0, start_ms: 2000, end_ms: 3000 }),
+        raw({ suggestedSpeed: 2.0 }),
+        raw({ suggestedSpeed: 6.0, startMs: 1000, endMs: 2000 }),
+        raw({ suggestedSpeed: 6.0, startMs: 2000, endMs: 3000 }),
       ];
       const sum = summarizeSpeeds(enrichSegments(input));
       expect(sum.fastestSpeed).toBe(6);
@@ -125,9 +125,9 @@ describe('segmentEnricher', () => {
 
     it('counts transition types', () => {
       const input: RustRawSegment[] = [
-        raw({ segment_type: 'Action' }),
-        raw({ segment_type: 'Dialogue', start_ms: 1000, end_ms: 2000 }),
-        raw({ segment_type: 'Dialogue', start_ms: 2000, end_ms: 3000 }),
+        raw({ segmentType: 'Action' }),
+        raw({ segmentType: 'Dialogue', startMs: 1000, endMs: 2000 }),
+        raw({ segmentType: 'Dialogue', startMs: 2000, endMs: 3000 }),
       ];
       const sum = summarizeSpeeds(enrichSegments(input));
       expect(sum.transitionCounts.fade).toBeGreaterThanOrEqual(1);

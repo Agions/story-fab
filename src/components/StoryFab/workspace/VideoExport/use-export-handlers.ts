@@ -177,10 +177,11 @@ export function useExportHandlers({
 
       setters.progressStage('正在编码...');
 
-      await tauri.autonomousRender({
-        input_path: state.synthesisData.finalVideoUrl ?? '',
-        output_path: outputPath,
-      });
+      await tauri.renderAutonomousCut(
+        state.synthesisData.finalVideoUrl ?? '',
+        [],
+        outputPath,
+      );
 
       setters.progress(100);
       setters.progressStage('导出完成');
@@ -237,10 +238,11 @@ export function useExportHandlers({
         };
         onExportSettingsChange(exportConfig);
 
-        await tauri.autonomousRender({
-          input_path: state.synthesisData.finalVideoUrl ?? '',
-          output_path: outputPath,
-        });
+        await tauri.renderAutonomousCut(
+          state.synthesisData.finalVideoUrl ?? '',
+          [],
+          outputPath,
+        );
 
         setters.progress(Math.round(((i + 1) / selectedPlatforms.length) * 100));
       }
