@@ -4,7 +4,7 @@
  * 使用 rAF 优化性能，避免每帧都触发状态更新
  */
 import { useCallback, useRef } from 'react';
-import type { TimelineTrack, TimelineClip, DragType } from '../../../core/types/timeline';
+import type { TimelineTrack, TimelineClip, DragType } from '@/types';
 import { MIN_CLIP_DURATION } from '../constants';
 import { snapToBoundary } from '../timeline-snap';
 

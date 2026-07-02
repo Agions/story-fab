@@ -3,7 +3,7 @@
  * 单一职责：根据其他 clip 边界和总时长计算吸附点
  */
 import { SNAP_THRESHOLD_PX } from './constants';
-import type { TimelineTrack } from '../../core/types/timeline';
+import type { TimelineTrack } from '@/types';
 
 /**
  * 计算所有可吸附的时间点

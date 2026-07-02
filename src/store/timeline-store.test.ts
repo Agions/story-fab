@@ -6,7 +6,7 @@ import { useWorkspaceStore as useTimelineStore, __resetTrackHistoryForTest } fro
 
 // 独立的 createHistory 实例用于单元测试（验证模块行为与 store 一致）
 import { createHistory } from './create-history';
-import type { TimelineTrack } from '../core/types/timeline';
+import type { TimelineTrack } from '@/types';
 const _testHistory = createHistory<TimelineTrack[]>({ maxSize: 19 });
 
 describe('timelineStore', () => {

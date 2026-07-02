@@ -3,7 +3,7 @@
  * 单一职责：封装轨道的增删改 + mute/lock/visible 切换
  */
 import { useCallback } from 'react';
-import type { TimelineTrack } from '../../../core/types/timeline';
+import type { TimelineTrack } from '@/types';
 import { generateId } from '@/shared/utils';
 import { DEFAULT_TRACK_HEIGHT, TRACK_COLORS } from '../constants';
 

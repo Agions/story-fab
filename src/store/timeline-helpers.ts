@@ -7,7 +7,7 @@
  * - 纯函数集合，无副作用，便于单测
  * - 所有函数都返回新的 tracks 数组（不可变更新）
  */
-import type { TimelineTrack, TimelineClip, AnimationKeyframe } from '../core/types/timeline';
+import type { TimelineTrack, TimelineClip, AnimationKeyframe } from '@/types';
 
 /**
  * 更新指定 clip 的数据

@@ -15,4 +15,4 @@ export type {
   TrackType,
   DragType,
   DragState,
-} from '../../core/types/timeline';
+} from '@/types';

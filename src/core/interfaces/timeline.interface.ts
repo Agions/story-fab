@@ -13,7 +13,7 @@ import type {
   TimelineTool,
   ClipProperties,
   TrackType,
-} from '../types/timeline';
+} from '@/types';
 
 // ============================================================
 // 时间线状态接口
