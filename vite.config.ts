@@ -33,7 +33,6 @@ export default defineConfig({
     alias: {
       '@/': path.resolve(__dirname, './src'),
       '@/types': path.resolve(__dirname, './src/types'),
-      '@/services': path.resolve(__dirname, './src/services'),
       '@/core': path.resolve(__dirname, './src/core'),
       '@/store': path.resolve(__dirname, './src/store'),
       '@/shared': path.resolve(__dirname, './src/shared'),
