@@ -9,7 +9,7 @@ import { Badge } from '../ui/badge';
 import { validateApiKey } from '@/core/services/providers/api-key-service';
 import { notify } from '@/shared';
 import { MODEL_PROVIDERS } from '../../core/config/ai-models-config';
-import { PROVIDER_NAMES } from '@/shared/constants/providers';
+import { PROVIDER_NAMES } from '@/core/config/provider-names';
 import type { ModelProvider } from '@/types';
 import { Key, Eye, EyeOff, Trash2, Check, X, Loader2 } from 'lucide-react';
 
