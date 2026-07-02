@@ -35,7 +35,7 @@ import {
 // =========================================
 // AIService
 // =========================================
-export class AIService extends BaseService {
+class AIService extends BaseService {
   private abortControllers = new Map<string, AbortController>();
 
   constructor() {

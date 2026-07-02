@@ -22,7 +22,7 @@ import type { IASRProvider } from './providers/types';
  * ASR 服务（编排器）
  * 单一职责：管理 Provider 链，按优先级依次尝试直到成功
  */
-export class ASRService extends BaseService {
+class ASRService extends BaseService {
   /** Provider 链：按优先级排序 */
   private readonly _providers: IASRProvider[];
 
