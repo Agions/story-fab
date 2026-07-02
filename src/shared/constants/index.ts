@@ -33,7 +33,7 @@ export {
 // ─── AI / Video 配置常量 ───────────────────────────────────────────
 
 // AI 服务配置
-export { AI_CONFIG, AI_PROVIDERS, WORKFLOW_MODES } from '@/core/constants/ai-config';
+export { AI_CONFIG, AI_PROVIDERS, WORKFLOW_MODES } from '@/shared/constants/ai-config';
 
 // 视频配置
 export {
@@ -41,7 +41,7 @@ export {
   EXPORT_FORMATS,
   QUALITY_PRESETS,
   ENCODER_PRESETS,
-} from '@/core/constants/video-config';
+} from '@/shared/constants/video-config';
 
 // ─── 独立常量（本地定义）────────────────────────────────────────────────────
 
