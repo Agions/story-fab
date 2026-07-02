@@ -28,6 +28,7 @@ export const tauri = {
   renderAutonomousCut: renderTranscode.renderAutonomousCut,
   generatePreview: renderTranscode.generatePreview,
   cutVideo: renderTranscode.cutVideo,
+  exportVideo: renderTranscode.exportVideo,
   cancelExport: renderTranscode.cancelExport,
 
   // Subtitles / ASR

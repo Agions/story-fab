@@ -6,6 +6,23 @@ export const renderTranscode = {
     await invoke(TauriCommand.CANCEL_EXPORT, { exportId });
   },
 
+  /** 导出视频（重新编码，可选烧录字幕），返回输出路径/时长/大小 */
+  async exportVideo(input: {
+    inputPath: string;
+    outputPath: string;
+    format?: string;
+    resolution?: string;
+    frameRate?: number;
+    videoCodec?: string;
+    audioCodec?: string;
+    crf?: number;
+    subtitleEnabled?: boolean;
+    subtitlePath?: string;
+    burnSubtitles?: boolean;
+  }): Promise<{ outputPath: string; duration: number; fileSize: number }> {
+    return invoke(TauriCommand.EXPORT_VIDEO, input);
+  },
+
   /** 转码并裁剪视频（按目标宽高比裁剪，可选裁剪时间段与画质） */
   async transcodeWithCrop(input: {
     inputPath: string;

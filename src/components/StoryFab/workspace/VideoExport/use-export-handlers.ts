@@ -17,6 +17,28 @@ import {
   type Updater,
 } from './use-export-handlers.reducer';
 
+/** 画质档位 → x264 CRF（越低画质越高）。ultra 视作 high，custom 取默认。 */
+const QUALITY_CRF: Record<string, number> = { low: 28, medium: 23, high: 18, ultra: 18 };
+const crfForQuality = (quality: string): number => QUALITY_CRF[quality] ?? 23;
+
+/** 将导出配置映射为 export_video 命令入参 */
+function buildExportInput(
+  inputPath: string,
+  outputPath: string,
+  config: ExportSettings,
+): Parameters<typeof tauri.exportVideo>[0] {
+  return {
+    inputPath,
+    outputPath,
+    format: config.format,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    crf: crfForQuality(config.quality),
+    subtitleEnabled: config.includeSubtitles,
+    burnSubtitles: config.burnSubtitles ?? false,
+  };
+}
+
 interface UseExportHandlersProps {
   state: {
     synthesisData?: { finalVideoUrl?: string };
@@ -177,10 +199,8 @@ export function useExportHandlers({
 
       setters.progressStage('正在编码...');
 
-      await tauri.renderAutonomousCut(
-        state.synthesisData.finalVideoUrl ?? '',
-        [],
-        outputPath,
+      await tauri.exportVideo(
+        buildExportInput(state.synthesisData.finalVideoUrl ?? '', outputPath, config),
       );
 
       setters.progress(100);
@@ -238,10 +258,8 @@ export function useExportHandlers({
         };
         onExportSettingsChange(exportConfig);
 
-        await tauri.renderAutonomousCut(
-          state.synthesisData.finalVideoUrl ?? '',
-          [],
-          outputPath,
+        await tauri.exportVideo(
+          buildExportInput(state.synthesisData.finalVideoUrl ?? '', outputPath, exportConfig),
         );
 
         setters.progress(Math.round(((i + 1) / selectedPlatforms.length) * 100));
