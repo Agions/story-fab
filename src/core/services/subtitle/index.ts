@@ -26,6 +26,5 @@ export {
   whisperService,
   type WhisperSegment,
   type WhisperResult,
-  type WhisperModelInfo,
   type WhisperProgress,
 } from './whisper-service';

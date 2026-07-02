@@ -26,13 +26,6 @@ export interface WhisperResult {
   segments: WhisperSegment[];
 }
 
-export interface WhisperModelInfo {
-  name: string;
-  size: string;
-  is_downloaded: boolean;
-  path?: string;
-}
-
 export interface WhisperProgress {
   stage: string;
   progress: number;
@@ -54,41 +47,6 @@ export class WhisperService {
       return await invoke<boolean>('check_faster_whisper');
     } catch {
       return false;
-    }
-  }
-
-  /**
-   * 获取 Whisper 模型列表
-   */
-  async listModels(): Promise<WhisperModelInfo[]> {
-    try {
-      const { invoke } = await import('@tauri-apps/api/core');
-      return await invoke<WhisperModelInfo[]>('list_whisper_models');
-    } catch (error) {
-      logger.error('[Whisper] 获取模型列表失败:', error);
-      return [];
-    }
-  }
-
-  /**
-   * 下载指定大小的 Whisper 模型
-   * @param modelSize 模型大小 (tiny/base/small/medium/large-v2/large-v3)
-   */
-  async downloadModel(modelSize: string): Promise<void> {
-    const { invoke } = await import('@tauri-apps/api/core');
-    await invoke<string>('download_whisper_model', { modelSize });
-  }
-
-  /**
-   * 获取支持的语言列表
-   */
-  async getSupportedLanguages(): Promise<Array<{ code: string; name: string }>> {
-    try {
-      const { invoke } = await import('@tauri-apps/api/core');
-      return await invoke<Array<{ code: string; name: string }>>('get_whisper_supported_languages');
-    } catch (error) {
-      logger.error('[Whisper] 获取语言列表失败:', error);
-      return [];
     }
   }
 
