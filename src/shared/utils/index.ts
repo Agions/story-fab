@@ -7,7 +7,7 @@
  */
 
 import { notify } from './notify';
-import { AppError } from '@/core/errors';
+import { AppError } from '@/shared/errors';
 export * from './notify';
 
 // Time formatting & timestamps
