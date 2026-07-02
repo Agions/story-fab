@@ -41,9 +41,8 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
       width: info.width,
       height: info.height,
       fps: info.fps,
-      codec: info.format,
-      bitrate: 0,
-      fileSize: info.size,
+      codec: info.codec,
+      bitrate: info.bitrate,
     };
   }
 

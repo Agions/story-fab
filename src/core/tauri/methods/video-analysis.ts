@@ -1,5 +1,5 @@
 import { invoke, TauriCommand } from '../invoke';
-import type { VideoInfo } from '@/types';
+import type { VideoMetadataResult } from '@/types';
 
 export const videoAnalysis = {
   /** 检查 FFmpeg 是否已安装 */
@@ -8,7 +8,7 @@ export const videoAnalysis = {
   },
 
   /** 分析视频，返回元数据 */
-  async analyzeVideo(path: string): Promise<VideoInfo> {
+  async analyzeVideo(path: string): Promise<VideoMetadataResult> {
     return invoke(TauriCommand.ANALYZE_VIDEO, { path });
   },
 

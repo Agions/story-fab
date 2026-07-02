@@ -44,6 +44,16 @@ export interface VideoMetadata {
   audioSampleRate?: number;
 }
 
+/** Raw output of the `analyze_video` Tauri command (Rust VideoMetadataResult). */
+export interface VideoMetadataResult {
+  duration: number;
+  width: number;
+  height: number;
+  fps: number;
+  codec: string;
+  bitrate: number;
+}
+
 // ─── 视频分段 ───
 
 export interface VideoSegment {

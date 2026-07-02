@@ -8,7 +8,7 @@
  * Tauri 会自动在 TS 和 Rust 之间转换命名
  */
 
-import type { VideoInfo } from '@/types';
+import type { VideoMetadataResult } from '@/types';
 import type { SubtitleTrack } from '@/types';
 import type { CommentaryScriptOutput } from '@/types';
 
@@ -88,7 +88,7 @@ export type TauriCommandName =
 
 type CommandNameToDefs = {
   check_ffmpeg: { input: Record<string, never>; output: { installed: boolean; version?: string } };
-  analyze_video: { input: { path: string }; output: VideoInfo };
+  analyze_video: { input: { path: string }; output: VideoMetadataResult };
   get_export_dir: { input: Record<string, never>; output: string };
   run_ffprobe: { input: { args: string[] }; output: string };
 

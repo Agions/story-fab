@@ -25,14 +25,6 @@ interface VideoAnalyzerProps {
   onAnalysisComplete: (analysis: VideoAnalysis) => void;
 }
 
-interface AnalyzeVideoResult {
-  title?: string;
-  duration: number;
-  width: number;
-  height: number;
-  fps: number;
-}
-
 const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
   projectId,
   videoUrl,
@@ -55,7 +47,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
       setProgress(10);
 
-      const videoMetadata = await (tauri.analyzeVideo(selectedVideoUrl) as Promise<AnalyzeVideoResult>).catch((err: unknown) => {
+      const videoMetadata = await tauri.analyzeVideo(selectedVideoUrl).catch((err: unknown) => {
         logger.error('视频分析失败:', { error: err });
         throw new AppError('APP_VIDEO_ANALYZE_FAILED', `视频分析失败: ${err}`, {
           originalError: err,
@@ -97,7 +89,7 @@ const VideoAnalyzer: React.FC<VideoAnalyzerProps> = ({
 
       const analysis: VideoAnalysis = {
         id: crypto.randomUUID(),
-        title: videoMetadata.title || `项目_${projectId}`,
+        title: `项目_${projectId}`,
         duration: videoMetadata.duration,
         keyMoments,
         emotions: emotions.map((e, i) => ({ timestamp: i * 5, type: e.type, intensity: 0.8 })),
