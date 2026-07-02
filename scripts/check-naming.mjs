@@ -6,9 +6,12 @@
  * 详细规则见 docs/NAMING_AND_MODULARIZATION.md
  *
  * 检查项：
- *  1. 文件名 — React 组件 PascalCase, Hook use 前缀, 工具 camelCase
+ *  1. 文件名 — React 组件 kebab-case, Hook use 前缀, 工具 camelCase
  *  2. 目录名 — PascalCase (业务), kebab-case (顶级)
  *  3. 禁止的目录名 (util / helper / common / misc / tmp / temp)
+ *
+ * 说明：组件文件统一使用 kebab-case（如 video-editor.tsx），与代码库
+ *      已落地的约定一致；hooks 以 use 开头，入口文件 main/App 例外。
  *
  * @author Agions <1051736049@qq.com>
  */
@@ -61,12 +64,6 @@ const RESET = '\x1b[0m';
 
 const violations = [];
 
-function isPascalCase(s) {
-  return /^[A-Z][A-Za-z0-9]*$/.test(s);
-}
-function isCamelCase(s) {
-  return /^[a-z][A-Za-z0-9]*$/.test(s);
-}
 function isKebabCase(s) {
   return /^[a-z][a-z0-9-]*$/.test(s);
 }
@@ -117,12 +114,12 @@ for (const dir of SCAN_DIRS) {
     if (COMPONENT_EXTS.includes(ext)) {
       // 例外: 入口文件 main.tsx / App.tsx
       if (base === 'main' || base === 'App') continue;
-      // .tsx 视为组件 — PascalCase
-      if (!isPascalCase(base) && !base.startsWith('use')) {
+      // .tsx 视为组件 — kebab-case (hooks 以 use 开头例外)
+      if (!isKebabCase(base) && !base.startsWith('use')) {
         violations.push({
           level: 'warn',
           path: rel,
-          msg: `组件文件 "${fname}" 建议使用 PascalCase (e.g. VideoEditor.tsx) — 例外: hooks 以 use 开头`,
+          msg: `组件文件 "${fname}" 建议使用 kebab-case (e.g. video-editor.tsx) — 例外: hooks 以 use 开头`,
         });
       }
     }
