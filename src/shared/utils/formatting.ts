@@ -20,9 +20,6 @@ export function formatTime(seconds: number): string {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Alias for AI service compatibility
-export const formatTimestamp = formatTime;
-
 /**
  * 格式化时长 (秒 -> m:ss 或 h:mm:ss)
  */
@@ -250,8 +247,3 @@ const subtitleTime = (seconds: number, sep: string): string => {
  * Format seconds as SRT timecode (HH:MM:SS,mmm)
  */
 export const formatSrtTime = (seconds: number): string => subtitleTime(seconds, ',');
-
-/**
- * Format seconds as VTT timecode (HH:MM:SS.mmm)
- */
-export const formatVttTime = (seconds: number): string => subtitleTime(seconds, '.');

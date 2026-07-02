@@ -15,11 +15,6 @@ export const getFileSizeBytes = async (path: string): Promise<number> => {
   }
 };
 
-export const getFileSizeMb = async (path: string): Promise<number> => {
-  const bytes = await getFileSizeBytes(path);
-  return bytes / (1024 * 1024);
-};
-
 export async function checkFFmpeg(): Promise<{ installed: boolean; version?: string }> {
   try {
     const result = await tauri.checkFFmpeg();
