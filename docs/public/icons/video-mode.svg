@@ -1,13 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Video Mode Icon">
-  <title>剪辑模式</title>
-  <defs>
-    <linearGradient id="videoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#7C3AED"/>
-      <stop offset="100%" stop-color="#EC4899"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="12" fill="#0B0F1F"/>
-  <rect x="12" y="18" width="40" height="28" rx="3" fill="url(#videoGrad)" opacity="0.9"/>
-  <polygon points="28,30 28,34 36,32" fill="#F8FAFC"/>
-  <circle cx="32" cy="50" r="3" fill="#F59E0B"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" aria-label="Video Mode Icon" role="img" viewBox="0 0 64 64"><title>剪辑模式</title><defs><linearGradient id="videoGrad" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#EC4899"/></linearGradient></defs><rect width="64" height="64" fill="#0B0F1F" rx="12"/><rect width="40" height="28" x="12" y="18" fill="url(#videoGrad)" opacity=".9" rx="3"/><polygon fill="#F8FAFC" points="28 30 28 34 36 32"/><circle cx="32" cy="50" r="3" fill="#F59E0B"/></svg>
