@@ -7,7 +7,8 @@
  * - 本文件仅包含组件逻辑和 UI
  * - 6 useState → 1 useReducer (AIVisualizer.reducer.ts)
  */
-import React, { useReducer, useEffect, memo } from 'react';
+import React, { useEffect, memo } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { useStoryFab } from './context/storyfab-provider';
 import { visionService } from '@/core/services/ai/vision-service';
 import { notify } from '@/shared';
@@ -30,7 +31,7 @@ const CheckIcon = () => (
 const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
   const { state, setAnalysis, goToNextStep, dispatch } = useStoryFab();
   const timeout = useTimeout();
-  const [s, dispatchLocal] = useReducer(aiVisualizerReducer, initialAIVisualizerState);
+  const { state: s, dispatch: dispatchLocal } = createReducerHook(aiVisualizerReducer, initialAIVisualizerState);
   const {
     analyzing,
     progress,

@@ -1,5 +1,5 @@
-import React from 'react';
-import { useReducer, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { Slider } from '../ui/slider';
 import { Button } from '../ui/button';
 import { formatTime } from '../../shared/utils/formatting';
@@ -43,7 +43,7 @@ function VideoPlayer({
 }: VideoPlayerProps): React.ReactElement {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [state, dispatch] = useReducer(videoPlayerReducer, initialVideoPlayerState);
+  const { state, dispatch } = createReducerHook(videoPlayerReducer, initialVideoPlayerState);
   const { isPlaying, currentTime, duration, volume, showVolumeSlider } = state;
 
   useEffect(() => {

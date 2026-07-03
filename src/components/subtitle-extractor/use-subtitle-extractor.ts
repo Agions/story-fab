@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useReducer } from 'react';
+import { useCallback, useMemo } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import {
   initialSubtitleExtractorState,
   subtitleExtractorReducer,
@@ -26,7 +27,7 @@ interface UseSubtitleExtractorResult {
 }
 
 export function useSubtitleExtractor(): UseSubtitleExtractorResult {
-  const [state, dispatch] = useReducer(subtitleExtractorReducer, initialSubtitleExtractorState);
+  const { state, dispatch } = createReducerHook(subtitleExtractorReducer, initialSubtitleExtractorState);
 
   const setFormat = useCallback((format: SubtitleFormat) => dispatch({ type: 'SET_FORMAT', format }), []);
   const setTranslate = useCallback((translate: boolean) => dispatch({ type: 'SET_TRANSLATE', translate }), []);

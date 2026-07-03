@@ -14,7 +14,8 @@
  * - 五种风格预设：幽默 / 严肃 / 接地气 / 悬疑 / 温情
  */
 
-import React, { useReducer, useCallback, memo } from 'react';
+import React, { useCallback, memo } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -96,7 +97,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
   disabled = false,
 }) => {
   // ── UI 状态 (5 useState → 1 useReducer) ───────────────────────────────
-  const [state, dispatch] = useReducer(commentaryPanelReducer, initialCommentaryPanelState);
+  const { state, dispatch } = createReducerHook(commentaryPanelReducer, initialCommentaryPanelState);
   const { activeTab, planConfirmOpen, apiKey, selectedStyle } = state;
 
   // ── Hooks ────────────────────────────────────────────────────────────

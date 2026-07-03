@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useReducer } from 'react';
+import { useCallback, useMemo } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import type { RepurposingClip, PipelineStage } from '@/core/services/pipeline/clip-pipeline/pipeline';
 import type { SocialPlatform, AspectRatio } from './clip-rippling-config';
 import {
@@ -25,7 +26,7 @@ interface UseClipRipplingResult {
 }
 
 export function useClipRippling(): UseClipRipplingResult {
-  const [state, dispatch] = useReducer(clipRipplingReducer, initialClipRipplingState);
+  const { state, dispatch } = createReducerHook(clipRipplingReducer, initialClipRipplingState);
 
   const setPlatform = useCallback((platform: SocialPlatform) => dispatch({ type: 'SET_PLATFORM', platform }), []);
   const setSelectedFormats = useCallback(

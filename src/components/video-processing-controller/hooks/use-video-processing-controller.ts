@@ -2,7 +2,8 @@
  * useVideoProcessingController hook — 14 useState 集中化入口
  * 来源: refactor/video-processing-usereducer (v3.4 §A2 范式)
  */
-import { useReducer, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import { tauri } from '@/core/tauri';
@@ -47,7 +48,7 @@ export const useVideoProcessingController = ({
   segments,
   onProcessingComplete,
 }: UseVideoProcessingControllerArgs) => {
-  const [state, dispatch] = useReducer(videoProcessingReducer, initialVideoProcessingState);
+  const { state, dispatch } = createReducerHook(videoProcessingReducer, initialVideoProcessingState);
   const setters = useMemo(() => makeSetters(dispatch), []);
   const {
     videoQuality, exportFormat, transitionType, transitionDuration,

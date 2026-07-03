@@ -2,7 +2,8 @@
  * useOriginalEditor hook — 12 useState 集中化入口
  * 来源: refactor/original-editor-usereducer (v3.4 §A2 范式)
  */
-import { useReducer, useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import type { ScriptSegment } from '@/types';
 import type { SimpleVideoSegment } from '@/core/video';
@@ -50,7 +51,7 @@ export const useOriginalEditor = ({
   onSave,
   onExport,
 }: UseOriginalEditorArgs) => {
-  const [state, dispatch] = useReducer(
+  const { state, dispatch } = createReducerHook(
     originalEditorReducer,
     initialOriginalEditorState(initialSegments),
   );

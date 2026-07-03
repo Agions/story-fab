@@ -3,8 +3,8 @@ import {
   scriptDetailReducer,
   initialScriptDetailState,
   type ScriptDetailState,
-  type ScriptDetailProject,
 } from './use-script-detail.reducer';
+import type { DetailProjectWithScripts } from '@/types';
 import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
 
 // ---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ const makeState = (overrides: Partial<ScriptDetailState> = {}): ScriptDetailStat
   ...overrides,
 });
 
-const makeProject = (overrides: Partial<ScriptDetailProject> = {}): ScriptDetailProject => ({
+const makeProject = (overrides: Partial<DetailProjectWithScripts> = {}): DetailProjectWithScripts => ({
   id: 'proj-1',
   name: 'Test Project',
   updatedAt: '2025-01-01T00:00:00Z',

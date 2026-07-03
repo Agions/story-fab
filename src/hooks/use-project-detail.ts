@@ -6,7 +6,6 @@ import {
   initialProjectDetailState,
   projectDetailReducer,
   type ProjectDetailState,
-  type ProjectDetailProject,
 } from './use-project-detail.reducer';
 
 interface UseProjectDetailResult {
@@ -86,5 +85,5 @@ export function useProjectDetail(): UseProjectDetailResult {
 }
 
 // Re-export types for consumer convenience
-export type { ProjectDetailState, ProjectDetailProject };
+export type { ProjectDetailState };
 export { initialProjectDetailState };

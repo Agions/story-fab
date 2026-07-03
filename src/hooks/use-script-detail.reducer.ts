@@ -1,8 +1,9 @@
 import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
+import type { DetailProjectWithScripts } from '@/types';
 
 export interface ScriptDetailState {
   loading: boolean;
-  project: ScriptDetailProject | null;
+  project: DetailProjectWithScripts | null;
   script: Script | null;
   segments: ScriptSegment[];
   loadError: string;
@@ -13,22 +14,9 @@ export interface ScriptDetailState {
   deleteConfirmOpen: boolean;
 }
 
-export interface ScriptDetailProject {
-  id: string;
-  name: string;
-  description?: string;
-  status?: string;
-  createdAt?: string;
-  updatedAt: string;
-  scripts?: Script[];
-  videoPath?: string;
-  videos?: Array<{ path?: string }>;
-  videoUrl?: string;
-}
-
 type ScriptDetailAction =
   | { type: 'SET_LOADING'; loading: boolean }
-  | { type: 'SET_PROJECT'; project: ScriptDetailProject | null }
+  | { type: 'SET_PROJECT'; project: ScriptDetailState['project'] }
   | { type: 'SET_SCRIPT'; script: Script | null }
   | { type: 'SET_SEGMENTS'; segments: ScriptSegment[] }
   | { type: 'SET_LOAD_ERROR'; loadError: string }

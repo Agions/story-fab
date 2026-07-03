@@ -2,7 +2,8 @@
  * VideoExport handlers — split from VideoExport.tsx
  * 14 useState 集中化入口 (v3.4 §A2 范式)
  */
-import { useReducer, useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
@@ -96,7 +97,7 @@ export function useExportHandlers({
   onExportSettingsChange,
   onComplete,
 }: UseExportHandlersProps): ExportHandlers {
-  const [ehState, dispatch] = useReducer(
+  const { state: ehState, dispatch } = createReducerHook(
     exportHandlersReducer,
     initialExportHandlersState({ exportSettings: state.exportSettings }),
   );

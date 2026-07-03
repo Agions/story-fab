@@ -1,5 +1,6 @@
 import { logger } from '@/shared/utils/logging';
-import React, { useReducer, useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, Trash2, PlayCircle } from 'lucide-react';
@@ -42,7 +43,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
   onVideoRemove,
   loading = false
 }) => {
-  const [state, dispatch] = useReducer(videoSelectorReducer, {
+  const { state, dispatch } = createReducerHook(videoSelectorReducer, {
     ...initialVideoSelectorState,
     videoPath: initialVideoPath || null,
   });

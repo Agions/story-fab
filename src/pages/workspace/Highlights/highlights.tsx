@@ -8,7 +8,8 @@
  * - bg-base: #08080a | accent: #c8956c | cyan: #5a9e9e
  */
 import { MS_PER_SECOND } from '@/shared/utils';
-import React, { useReducer, useCallback } from 'react';
+import React, { useCallback } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { Slider } from '@/components/ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
 import { visionService } from '@/core/services/ai/vision-service';
@@ -37,7 +38,7 @@ interface HighlightsProps {
 }
 
 const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _defaultExpanded = false }) => {
-  const [state, dispatch] = useReducer(highlightsReducer, initialHighlightsState);
+  const { state, dispatch } = createReducerHook(highlightsReducer, initialHighlightsState);
   const { highlights, detected, loading, error, threshold, topN } = state;
   const setPlayheadMs = useWorkspaceStore((s) => s.setPlayheadMs);
 

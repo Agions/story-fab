@@ -1,26 +1,15 @@
 import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/types';
 import type { VideoAnalysis } from '@/types';
+import type { DetailProjectWithAIScripts } from '@/types';
 
 export interface ProjectDetailState {
   activeStep: string;
-  project: (ProjectDetailProject & { scripts?: AIScriptDraft[]; analysis?: VideoAnalysis; extractedSubtitles?: unknown }) | null;
+  project: (DetailProjectWithAIScripts & { analysis?: VideoAnalysis; extractedSubtitles?: unknown }) | null;
   activeScript: AIScriptDraft | null;
   aiLoading: boolean;
   drawerVisible: boolean;
   deleteConfirmOpen: boolean;
-}
-
-export interface ProjectDetailProject {
-  id: string;
-  name: string;
-  description?: string;
-  status?: string;
-  createdAt?: string;
-  updatedAt: string;
-  videoPath?: string;
-  videos?: Array<{ path?: string }>;
-  videoUrl?: string;
 }
 
 type ProjectDetailAction =

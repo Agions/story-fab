@@ -67,3 +67,31 @@ export interface ApiResponse<T = unknown> {
 }
 
 export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+// ─── Detail-page project type (unified base) ─────────────────────────────────
+// Replaces the duplicated base fields previously defined in both:
+//   hooks/use-project-detail.reducer.ts  → ProjectDetailProject
+//   hooks/use-script-detail.reducer.ts   → ScriptDetailProject
+// Each consumer augments with its own `scripts` shape via intersection types.
+
+export interface DetailProject {
+  id: string;
+  name: string;
+  description?: string;
+  status?: string;
+  createdAt?: string;
+  updatedAt: string;
+  videoPath?: string;
+  videos?: Array<{ path?: string }>;
+  videoUrl?: string;
+}
+
+// Consumer-specific augmentations (kept narrow — only where actually needed)
+
+export interface DetailProjectWithAIScripts extends DetailProject {
+  scripts?: import('@/core/services/ai/script-service').AIScriptDraft[];
+}
+
+export interface DetailProjectWithScripts extends DetailProject {
+  scripts?: import('@/core/services/ai/script-service').AIScriptDraft[];
+}
