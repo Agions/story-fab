@@ -145,20 +145,31 @@ StoryFab 提供两种专业工作流，满足不同创作场景：
 
 ## 🏗️ 技术架构
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  前端层    React 18 · TypeScript 5 · Vite 6 · TailwindCSS 4 │
-│            Zustand (5 stores) · shadcn/ui · MultiTrackTimeline│
-└───────────────────────────┬─────────────────────────────────┘
-                            │  Tauri 2 IPC (61 个命令)
-┌───────────────────────────┴─────────────────────────────────┐
-│  Rust 后端    Tauri 2 · tokio · 1.77+                      │
-│  ├─ ffmpeg-sidecar   转码/渲染/烧字幕                       │
-│  ├─ whisper-rs       离线语音转字幕 (faster-whisper)         │
-│  ├─ llm-providers    10家LLM统一调用入口                      │
-│  ├─ tts-providers    Edge TTS · Azure TTS                   │
-│  └─ commentary       5步Agent Pipeline解说引擎                │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+  subgraph Frontend["前端层 — React 18 + TypeScript 5 + Vite 6"]
+    F1[Zustand Stores]
+    F2[shadcn/ui]
+    F3[MultiTrackTimeline]
+  end
+  subgraph IPC["Tauri 2 IPC — 61 个命令"]
+    I1[invoke.ts]
+  end
+  subgraph Backend["Rust 后端 — tokio + 1.77+"]
+    B1[ffmpeg-sidecar]
+    B2[whisper-rs]
+    B3[llm-providers]
+    B4[tts-providers]
+    B5[commentary engine]
+  end
+  F1 --> I1
+  F2 --> I1
+  F3 --> I1
+  I1 --> B1
+  I1 --> B2
+  I1 --> B3
+  I1 --> B4
+  I1 --> B5
 ```
 
 📊 **项目规模：**
@@ -252,6 +263,16 @@ npm run type-check          # TypeScript类型检查
 ### 🔌 新增 LLM / TTS Provider？
 
 参考 [AI服务开发指南](docs/dev/ai-services.md)，在 `src/core/services/providers/` 下实现对应 trait 即可。
+
+## 📜 行为准则
+
+本项目遵循 [Contributor Covenant](https://www.contributor-covenant.org/) 行为准则。
+请保持尊重、包容的交流态度。
+
+## 🔒 安全策略
+
+发现安全漏洞？请发送邮件至 `agions@qq.com`，而非公开 Issue。
+我们会在 48 小时内响应。
 
 ---
 
