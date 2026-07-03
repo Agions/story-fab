@@ -18,7 +18,7 @@ import type { ScriptSegment } from '@/types';
 import { useScriptDetail } from '@/hooks/use-script-detail';
 import styles from '@/pages/ScriptDetail/index.module.less';
 
-const loadScriptEditor = () => import('../../components/ScriptEditor');
+const loadScriptEditor = () => import('../../components/script-editor');
 const ScriptEditor = lazy(loadScriptEditor);
 
 interface ProjectWithScripts extends ProjectFileLike<Script, { path?: string }> {

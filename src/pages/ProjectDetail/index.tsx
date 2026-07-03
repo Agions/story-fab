@@ -23,11 +23,11 @@ import type { VideoAnalysis } from '@/types';
 import { useProjectDetail } from '@/hooks/use-project-detail';
 import styles from '@/pages/ProjectDetail/index.module.less';
 
-const loadVideoInfo = () => import('@/components/VideoInfo');
-const loadScriptEditor = () => import('@/components/ScriptEditor');
-const loadVideoProcessingController = () => import('@/components/VideoProcessingController/video-processing-controller');
-const loadVideoAnalyzer = () => import('@/components/VideoAnalyzer/video-analyzer');
-const loadSubtitleExtractor = () => import('@/components/SubtitleExtractor');
+const loadVideoInfo = () => import('@/components/video-info');
+const loadScriptEditor = () => import('@/components/script-editor');
+const loadVideoProcessingController = () => import('@/components/video-processing-controller/video-processing-controller');
+const loadVideoAnalyzer = () => import('@/components/video-analyzer/video-analyzer');
+const loadSubtitleExtractor = () => import('@/components/subtitle-extractor');
 
 const VideoInfo = lazy(loadVideoInfo);
 const ScriptEditor = lazy(loadScriptEditor);

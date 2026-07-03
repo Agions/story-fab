@@ -6,7 +6,7 @@ import { Card } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 
 import { cn } from '@/shared/utils/cn';
-import ScriptEditor from '@/components/ScriptEditor';
+import ScriptEditor from '@/components/script-editor';
 import type { ScriptSegment } from '@/types';
 import styles from '@/pages/ProjectEdit/index.module.less';
 

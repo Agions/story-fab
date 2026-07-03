@@ -15,7 +15,7 @@ import { useWorkspaceStore } from '../../stores/workspace-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/pages/workspace/function-mode-map';
-import styles from '@/components/VideoEditor/VideoEditor.module.less';
+import styles from '@/components/video-editor/VideoEditor.module.less';
 
 const Workspace = lazy(() => import('@/pages/workspace/workspace'));
 const ProjectSetup = lazy(() => import('@/pages/workspace/project-setup'));
@@ -25,7 +25,7 @@ const ScriptWriting = lazy(() => import('@/pages/workspace/script-writing'));
 const VideoComposing = lazy(() => import('@/pages/workspace/video-composing'));
 const VideoExport = lazy(() => import('@/pages/workspace/VideoExport'));
 const ClipRippling = lazy(() => import('@/pages/workspace/clip-rippling'));
-const CommentaryPanel = lazy(() => import('@/components/CommentaryPanel'));
+const CommentaryPanel = lazy(() => import('@/components/commentary-panel'));
 
 // 三个核心功能配置
 const AI_FUNCTIONS = [
