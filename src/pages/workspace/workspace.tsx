@@ -18,7 +18,7 @@ import {
   Download,
   Bolt,
 } from 'lucide-react';
-import { useStoryFab, type storyfabStep, STORYFAB_STEPS } from '../context';
+import { useStoryFab, type storyfabStep, STORYFAB_STEPS } from '@/components/StoryFab/context';
 import styles from './workspace.module.less';
 import StepList from './step-list';
 

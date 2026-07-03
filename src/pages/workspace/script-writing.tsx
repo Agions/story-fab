@@ -10,7 +10,7 @@
  */
 
 import React, { useState, memo, useCallback } from 'react';
-import { useStoryFab } from '../context';
+import { useStoryFab } from '@/components/StoryFab/context';
 import { notify } from '@/shared';
 import { useScriptGeneration } from './hooks/use-script-generation';
 import {
@@ -21,7 +21,7 @@ import {
   COMMENTARY_STYLES,
   type ScriptGenerateProps,
 } from './script-config';
-import type { storyfabAction } from '../types';
+import type { storyfabAction } from '@/core/types/storyfab';
 import type { ScriptData } from '@/types';
 
 // 导入子组件

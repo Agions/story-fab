@@ -12,26 +12,26 @@
  */
 
 import React, { useCallback, memo, useMemo } from 'react';
-import { useStoryFab } from '../context';
-import { Button } from '../../ui/button';
-import { Progress } from '../../ui/progress';
-import { Badge } from '../../ui/badge';
-import { Checkbox } from '../../ui/checkbox';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../ui/select';
+import { useStoryFab } from '@/components/StoryFab/context';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { notify } from '@/shared';
-import { formatTime } from '../../../shared/utils/formatting';
+import { formatTime } from '@/shared/utils/formatting';
 import {
   Zap,
   CheckCircle,
   Download,
 } from 'lucide-react';
 import { tauri } from '@/core/tauri';
-import { motion } from '../../common/motion-shim';
-import { ClipRepurposingPipeline } from '../../../core/services/pipeline/clip-pipeline/pipeline';
+import { motion } from '@/components/common/motion-shim';
+import { ClipRepurposingPipeline } from '@/core/services/pipeline/clip-pipeline/pipeline';
 import type { VideoInfo, VideoAnalysis } from '@/types';
 import type {
   RepurposingOptions,
-} from '../../../core/services/pipeline/clip-pipeline/pipeline';
+} from '@/core/services/pipeline/clip-pipeline/pipeline';
 import { transcodeWithCrop } from '@/core/services/export/transcode-crop-service';
 import styles from './ClipRippling.module.less';
 import {

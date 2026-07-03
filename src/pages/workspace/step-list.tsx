@@ -4,7 +4,7 @@
  */
 import React, { memo } from 'react';
 import { Plus, Video, Cloud, Download, Check, Bolt, Brain, Eye, PenTool, Mic } from 'lucide-react';
-import type { storyfabStep, storyfabMode } from '../context';
+import type { storyfabStep, storyfabMode } from '@/components/StoryFab/context';
 import styles from './workspace.module.less';
 
 // ============================================================================

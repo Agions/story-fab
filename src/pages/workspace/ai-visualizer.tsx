@@ -8,16 +8,16 @@
  * - 6 useState → 1 useReducer (AIVisualizer.reducer.ts)
  */
 import React, { useReducer, useEffect, memo } from 'react';
-import { useStoryFab } from '../context';
-import { visionService } from '../../../core/services/ai/vision-service';
+import { useStoryFab } from '@/components/StoryFab/context';
+import { visionService } from '@/core/services/ai/vision-service';
 import { notify } from '@/shared';
-import { useTimeout } from '../../../hooks/use-timeout';
+import { useTimeout } from '@/hooks/use-timeout';
 import { logger } from '@/shared/utils/logging';
 import type { AIAnalyzeProps, Scene } from '@/types';
 import styles from './AIVisualizer.module.less';
 import { Highlights } from './Highlights/highlights';
 import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysis-tasks';
-import { formatTime } from '../../../shared/utils/formatting';
+import { formatTime } from '@/shared/utils/formatting';
 import { aiVisualizerReducer, initialAIVisualizerState } from './ai-visualizer.reducer';
 
 // 检查图标

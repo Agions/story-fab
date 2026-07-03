@@ -14,7 +14,7 @@ import type { ScriptData, AIModel, AIModelSettings, ModelProvider } from '@/type
 import { AI_MODELS as CORE_AI_MODELS, DEFAULT_MODEL_ID } from '@/core/config/ai-models-config';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { getAllApiKeys } from '@/core/services/auth/api-key-service';
-import type { storyfabState } from '../../types';
+import type { storyfabState } from '@/core/types/storyfab';
 import { notify } from '@/shared';
 import {
   getAvailableModelsFromApiKeys,

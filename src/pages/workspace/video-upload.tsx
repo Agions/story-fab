@@ -9,7 +9,7 @@
  * - 本文件仅包含上传组件逻辑和 UI
  */
 import React, { useReducer, useCallback, useRef, useEffect, memo } from 'react';
-import { useStoryFab } from '../context';
+import { useStoryFab } from '@/components/StoryFab/context';
 import { logger } from '@/shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
 import { MAX_FILE_SIZE } from '@/shared/constants';

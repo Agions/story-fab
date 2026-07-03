@@ -4,7 +4,7 @@
  */
 
 import type { ScriptData } from '@/types';
-import type { storyfabFeatureType } from '../types';
+import type { storyfabFeatureType } from '@/core/types/storyfab';
 
 // 文案风格选项
 export const SCRIPT_STYLES = [

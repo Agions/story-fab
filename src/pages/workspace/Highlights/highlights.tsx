@@ -11,9 +11,9 @@ import { MS_PER_SECOND } from '@/shared/utils';
 import React, { useReducer, useCallback } from 'react';
 import { Slider } from '../../../ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
-import { visionService } from '../../../../core/services/ai/vision-service';
-import { useWorkspaceStore } from '../../../../store/workspace-store';
-import { notify } from '../../../../shared/utils/notify';
+import { visionService } from '@/core/services/ai/vision-service';
+import { useWorkspaceStore } from '@/store/workspace-store';
+import { notify } from '@/shared/utils/notify';
 import type { VideoInfo } from '@/types';
 import {
   highlightsReducer,

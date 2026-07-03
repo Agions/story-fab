@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useReducer } from 'react';
-import type { RepurposingClip, PipelineStage } from '../../../core/services/pipeline/clip-pipeline/pipeline';
+import type { RepurposingClip, PipelineStage } from '@/core/services/pipeline/clip-pipeline/pipeline';
 import type { SocialPlatform, AspectRatio } from './clip-rippling-config';
 import {
   initialClipRipplingState,

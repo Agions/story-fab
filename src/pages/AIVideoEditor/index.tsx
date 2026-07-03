@@ -14,17 +14,17 @@ import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useWorkspaceStore } from '../../store/workspace-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
-import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/components/StoryFab/workspace/function-mode-map';
+import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/pages/workspace/function-mode-map';
 import styles from '@/components/VideoEditor/VideoEditor.module.less';
 
-const Workspace = lazy(() => import('@/components/StoryFab/workspace/workspace'));
-const ProjectSetup = lazy(() => import('@/components/StoryFab/workspace/project-setup'));
-const VideoUpload = lazy(() => import('@/components/StoryFab/workspace/video-upload'));
-const AIVisualizer = lazy(() => import('@/components/StoryFab/workspace/ai-visualizer'));
-const ScriptWriting = lazy(() => import('@/components/StoryFab/workspace/script-writing'));
-const VideoComposing = lazy(() => import('@/components/StoryFab/workspace/video-composing'));
-const VideoExport = lazy(() => import('@/components/StoryFab/workspace/VideoExport'));
-const ClipRippling = lazy(() => import('@/components/StoryFab/workspace/clip-rippling'));
+const Workspace = lazy(() => import('@/pages/workspace/workspace'));
+const ProjectSetup = lazy(() => import('@/pages/workspace/project-setup'));
+const VideoUpload = lazy(() => import('@/pages/workspace/video-upload'));
+const AIVisualizer = lazy(() => import('@/pages/workspace/ai-visualizer'));
+const ScriptWriting = lazy(() => import('@/pages/workspace/script-writing'));
+const VideoComposing = lazy(() => import('@/pages/workspace/video-composing'));
+const VideoExport = lazy(() => import('@/pages/workspace/VideoExport'));
+const ClipRippling = lazy(() => import('@/pages/workspace/clip-rippling'));
 const CommentaryPanel = lazy(() => import('@/components/CommentaryPanel'));
 
 // 三个核心功能配置
