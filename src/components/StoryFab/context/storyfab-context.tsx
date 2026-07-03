@@ -9,4 +9,4 @@ export {
 } from './storyfab-provider';
 
 export type { StoryFabContextType } from './storyfab-provider';
-export type { storyfabAction, storyfabState, storyfabStep, storyfabFeatureType } from '../types';
+export type { storyfabAction, storyfabState, storyfabStep, storyfabFeatureType } from '@/core/types/storyfab';

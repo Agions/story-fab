@@ -8,7 +8,7 @@
 
 | Task | Description | Status | Commits |
 |------|-------------|--------|---------|
-| A1 | Move StoryFab workspace to pages/, types to core/ | pending | — |
+| A1 | Move StoryFab workspace to pages/, types to core/ | in_review | 0adea6e |
 | A2 | Move workflow modes to core/pipeline/types/ | pending | — |
 | A3 | Rename store/ to stores/ | pending | — |
 | A4 | Convert React Context to Zustand stores | pending | — |

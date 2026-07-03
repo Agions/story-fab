@@ -3,9 +3,9 @@
  * 从 AIEditorContext.tsx 提取的 Provider 组件
  */
 import React, { createContext, useContext, useReducer, ReactNode, useMemo, useCallback } from 'react';
-import type { storyfabState, storyfabStep, storyfabFeatureType, storyfabAction, storyfabMode } from '../types/workflow';
-import { initialState, getNextStep, getPrevStep, getTotalSteps } from '../types/workflow';
-import { storyFabReducer } from '../types/workflow.reducer';
+import type { storyfabState, storyfabStep, storyfabFeatureType, storyfabAction, storyfabMode } from '@/core/types/storyfab';
+import { initialState, getNextStep, getPrevStep, getTotalSteps } from '@/core/types/storyfab';
+import { storyFabReducer } from '@/core/types/storyfab';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/types';
 
 // 上下文类型
