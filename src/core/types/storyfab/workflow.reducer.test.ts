@@ -3,7 +3,7 @@
  * 覆盖核心 action 的状态转换逻辑
  */
 import { describe, it, expect } from 'vitest';
-import { storyFabReducer } from './workflow.reducer';
+import { storyFabReducer } from './workflow';
 import { initialState } from './workflow';
 import type { StoryFabState } from './workflow';
 

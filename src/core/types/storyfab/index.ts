@@ -17,4 +17,4 @@ export {
   DEFAULT_VOICE_SETTINGS,
   DEFAULT_SYNTHESIS_SETTINGS,
 } from './workflow';
-export { storyFabReducer } from './workflow.reducer';
+export { storyFabReducer } from './workflow';
