@@ -4,12 +4,13 @@ import {
   initialScriptDetailState,
   scriptDetailReducer,
   type ScriptDetailState,
+  type ScriptDetailProject,
 } from './use-script-detail.reducer';
 
 interface UseScriptDetailResult {
   state: ScriptDetailState;
   setLoading: (loading: boolean) => void;
-  setProject: (project: ScriptDetailState['project']) => void;
+  setProject: (project: ScriptDetailProject | null) => void;
   setScript: (script: Script | null) => void;
   setSegments: (segments: ScriptSegment[]) => void;
   setLoadError: (loadError: string) => void;
@@ -27,8 +28,8 @@ export function useScriptDetail(): UseScriptDetailResult {
 
   const setLoading = useCallback((loading: boolean) => dispatch({ type: 'SET_LOADING', loading }), []);
   const setProject = useCallback(
-    (project: ScriptDetailState['project']) => dispatch({ type: 'SET_PROJECT', project }),
-    [dispatch],
+    (project: ScriptDetailProject | null) => dispatch({ type: 'SET_PROJECT', project }),
+    [],
   );
   const setScript = useCallback(
     (script: Script | null) => dispatch({ type: 'SET_SCRIPT', script }),
@@ -99,5 +100,5 @@ export function useScriptDetail(): UseScriptDetailResult {
   );
 }
 
-export type { ScriptDetailState };
+export type { ScriptDetailState, ScriptDetailProject };
 export { initialScriptDetailState };
