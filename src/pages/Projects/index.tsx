@@ -103,7 +103,7 @@ const ProjectManager: React.FC = () => {
                   navigate(`/project/${project.id}`);
                 }}
                 onDelete={() => setDeleteConfirmId(project.id)}
-                 onPreload={() => { void import('../../pages/ProjectEdit/index'); void import('../../pages/AIVideoEditor/index'); }}
+                 onPreload={() => { void import('../../pages/ProjectEdit/index'); void import('../../pages/workspace/index'); }}
                 projectActions={projectActions}
               />
             );
@@ -132,7 +132,7 @@ const ProjectManager: React.FC = () => {
               navigate(`/editor/${projectId}`);
             }}
             onPreloadProject={() => { void import('../../pages/ProjectEdit/index'); }}
-            onPreloadEditor={() => { void import('../../pages/AIVideoEditor/index'); }}
+            onPreloadEditor={() => { void import('../../pages/workspace/index'); }}
             projectActions={projectActions}
           />
         </Suspense>

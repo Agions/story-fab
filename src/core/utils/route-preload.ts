@@ -21,7 +21,7 @@ export const preloadProjectDetailPage = (): Promise<unknown> =>
   runOnce('page:project-detail', () => import('../../pages/ProjectDetail/index'));
 
 export const preloadAIVideoEditorPage = (): Promise<unknown> =>
-  runOnce('page:ai-video-editor', () => import('../../pages/AIVideoEditor/index'));
+  runOnce('page:ai-video-editor', () => import('../../pages/workspace/index'));
 
 export const preloadSettingsPage = (): Promise<unknown> =>
   runOnce('page:settings', () => import('../../pages/Settings/index'));

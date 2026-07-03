@@ -8,14 +8,14 @@ import {
   User,
   Scissors,
 } from 'lucide-react';
-import { StoryFabProvider, useStoryFab } from '../workspace/context/storyfab-provider';
+import { StoryFabProvider, useStoryFab } from './context/storyfab-provider';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useWorkspaceStore } from '../../stores/workspace-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/pages/workspace/function-mode-map';
-import styles from '@/components/video-editor/VideoEditor.module.less';
+import styles from '@/components/video-editor/video-editor.module.less';
 
 const Workspace = lazy(() => import('@/pages/workspace/workspace'));
 const ProjectSetup = lazy(() => import('@/pages/workspace/project-setup'));
@@ -73,7 +73,6 @@ const AIVideoEditorContent: React.FC = () => {
   const { state, goToNextStep, setFeature } = useStoryFab();
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
-  // Avoids N separate selector calls (each triggers re-render)
   const previewPlaying = useWorkspaceStore(s => s.previewPlaying);
   const setPreviewPlaying = useWorkspaceStore(s => s.setPreviewPlaying);
   const timelineActions = useWorkspaceStore(
@@ -240,7 +239,7 @@ const AIVideoEditorContent: React.FC = () => {
   );
 };
 
-const AIVideoEditor: React.FC = () => {
+const AIVideoEditor = () => {
   return (
     <StoryFabProvider>
       <AIVideoEditorContent />

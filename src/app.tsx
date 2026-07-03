@@ -13,14 +13,18 @@ const loadProjects = () => import('./pages/Projects/index');
 const loadProjectEdit = () => import('./pages/ProjectEdit/index');
 const loadProjectDetail = () => import('./pages/ProjectDetail/index');
 const loadScriptDetail = () => import('./pages/ScriptDetail/index');
-const loadWorkspace = () => import('./pages/AIVideoEditor/index');
 const loadSettings = () => import('./pages/Settings/index');
 const Home = lazy(loadHome);
 const Projects = lazy(loadProjects);
 const ProjectEdit = lazy(loadProjectEdit);
 const ProjectDetail = lazy(loadProjectDetail);
 const ScriptDetail = lazy(loadScriptDetail);
-const Workspace = lazy(loadWorkspace);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
+const WorkspacePage: React.LazyExoticComponent<React.ComponentType<any>> =
+  lazy(async () => {
+    const mod = await import('./pages/workspace/index');
+    return { default: (mod as any).default };
+  });
 const Settings = lazy(loadSettings);
 
 // 加载占位符 - 骨架屏
@@ -36,7 +40,6 @@ const App: React.FC = () => {
       void loadProjects();
       void loadProjectEdit();
       void loadSettings();
-      void loadWorkspace();
     };
 
     const idleRequest = (window as Window & {
@@ -69,10 +72,10 @@ const App: React.FC = () => {
                 <Route path="/project/edit/:projectId" element={<ProjectEdit />} />
                 <Route path="/project/:projectId" element={<ProjectDetail />} />
                 <Route path="/project/:projectId/script/:scriptId" element={<ScriptDetail />} />
-                <Route path="/workspace" element={<Workspace />} />
-                <Route path="/workspace/:projectId" element={<Workspace />} />
-                <Route path="/editor" element={<Workspace />} />
-                <Route path="/editor/:projectId" element={<Workspace />} />
+                <Route path="/workspace" element={<WorkspacePage />} />
+                <Route path="/workspace/:projectId" element={<WorkspacePage />} />
+                <Route path="/editor" element={<WorkspacePage />} />
+                <Route path="/editor/:projectId" element={<WorkspacePage />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
