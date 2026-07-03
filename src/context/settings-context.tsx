@@ -5,7 +5,7 @@
  * 底层统一使用 appStore 的 userSettings 状态
  */
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useAppStore } from '@/store/app-store';
+import { useAppStore } from '@/stores/app-store';
 
 interface SettingsContextValue {
   settings: {

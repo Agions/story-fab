@@ -11,7 +11,7 @@ import {
 import { StoryFabProvider, useStoryFab } from '@/components/StoryFab/context';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
-import { useWorkspaceStore } from '../../store/workspace-store';
+import { useWorkspaceStore } from '../../stores/workspace-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/pages/workspace/function-mode-map';

@@ -27,7 +27,7 @@ import {
   getAvailableModelsFromApiKeys,
   resolveDefaultModelId,
 } from '../../core/utils/model-availability';
-import { useModelStore } from '@/store';
+import { useModelStore } from '@/stores';
 import { notify } from '@/shared';
 import { useSecureApiKeys } from '@/hooks/use-secure-api-keys';
 import { PROJECT_SAVE_BEHAVIOR_KEY, type ProjectSaveBehavior } from '../../shared/constants/constants';

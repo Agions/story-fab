@@ -8,7 +8,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../components/ui/tooltip';
 import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scissors, LayoutDashboard } from 'lucide-react';
 
-import { useModelStore } from '@/store';
+import { useModelStore } from '@/stores';
 import { saveProjectToFile, loadProjectWithRetry, deleteProject } from '@/core/services/project/project-file-service';
 import { getApiKey } from '@/core/services/auth/api-key-service';
 import { useSettings } from '@/context/settings-context';
