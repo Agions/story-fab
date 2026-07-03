@@ -2,20 +2,33 @@
 
 **Status:** Completed
 
-**Commit:** `0adea6e` — `refactor(A1): move StoryFab workspace to pages/, types to core/`
+**Commits:**
+- `0adea6e` — `refactor(A1): move StoryFab workspace to pages/, types to core/` (initial move)
+- `36012dc` — `fix(A1): correct remaining import paths after workspace/types move` (import fixes)
 
 ## What was done
 
-- 8 `.module.less` files were already git-moved via prior operations and committed as part of this commit.
-- Deleted old directories:
+- All `.ts`/`.tsx` and `.module.less` files moved from `src/components/StoryFab/workspace/` to `src/pages/workspace/`
+- 3 type files (`workflow.ts`, `workflow.reducer.ts`, `workflow.reducer.test.ts`) moved from `src/components/StoryFab/types/` to `src/core/types/storyfab/`
+- `.module.less` files renamed to lowercase (kebab-case) during move
+- Subdirectory contents (`components/`, `config/`, `Highlights/`, `hooks/`, `VideoExport/`) correctly placed without nesting
+- Import paths updated:
+  - `src/components/StoryFab/context/` files updated to import from `@/core/types/storyfab`
+  - `src/components/StoryFab/index.ts` updated to re-export from new paths
+  - `src/core/types/storyfab/index.ts` barrel updated to re-export `getTotalSteps` and `storyFabReducer`
+  - Moved workspace files with stale `../../..` relative imports corrected to `../..` or `@/` aliases
+  - `src/pages/workspace/Highlights/highlights.tsx` `Slider` import corrected to `@/components/ui/slider`
+  - `src/pages/workspace/ai-visualizer.tsx` dynamic `asr-service` import path corrected
+- Old empty directories deleted:
   - `src/components/StoryFab/workspace`
   - `src/components/StoryFab/types`
-- Verified no remaining imports reference:
-  - `src/components/StoryFab/workspace`
-  - `src/components/StoryFab/types`
-- Ran vitest: **35 test files, 697 tests — all passed**.
+- `src/components/StoryFab/` kept (still contains `context/` and `index.ts`)
+
+## Verification
+
+- `npx tsc --noEmit` — **passes with no errors**
+- `npx vitest run` — **41 test files, 854 tests — all passed**
 
 ## Concerns
 
-- `src/components/StoryFab/context/` and `src/components/StoryFab/index.ts` still reference the moved types. These files are slated for deletion in Task B1, so type errors from these paths are expected and ignored for now.
-- No functional code changes were made, only file reorganization.
+- None. All import paths resolved and type-check passes.
