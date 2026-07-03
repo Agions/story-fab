@@ -3,8 +3,8 @@ import {
   projectDetailReducer,
   initialProjectDetailState,
   type ProjectDetailState,
-  type ProjectDetailProject,
 } from './use-project-detail.reducer';
+import type { DetailProject } from '@/types';
 import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/types';
 
@@ -14,7 +14,7 @@ function makeState(overrides: Partial<ProjectDetailState> = {}): ProjectDetailSt
   return { ...initialProjectDetailState, ...overrides };
 }
 
-const mockProject: ProjectDetailProject & { scripts?: AIScriptDraft[] } = {
+const mockProject: DetailProject & { scripts?: AIScriptDraft[] } = {
   id: 'proj-1',
   name: 'Test Project',
   description: 'A test project',

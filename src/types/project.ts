@@ -67,3 +67,20 @@ export interface ApiResponse<T = unknown> {
 }
 
 export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+// ─── Detail-page project type (unified) ─────────────────────────────────────────
+// Replaces the duplicated ProjectDetailProject / ScriptDetailProject interfaces
+// previously defined in hooks/*.reducer.ts
+
+export interface DetailProject {
+  id: string;
+  name: string;
+  description?: string;
+  status?: string;
+  createdAt?: string;
+  updatedAt: string;
+  videoPath?: string;
+  videos?: Array<{ path?: string }>;
+  videoUrl?: string;
+  scripts?: unknown[];
+}
