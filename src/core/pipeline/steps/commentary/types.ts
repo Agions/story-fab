@@ -9,7 +9,7 @@
  */
 
 import type { ScriptSegment, Scene, VideoAnalysis, OriginalOverlayPlanItem } from '@/types';
-import type { WorkflowMode } from '@/core/workflow/feature-blueprint';
+import type { WorkflowMode } from '@/core/pipeline/types/workflow-modes';
 
 // ============================================================
 // Pipeline 共享 Context (贯穿所有 step)
