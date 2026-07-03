@@ -199,10 +199,3 @@ async function executeWithRetry<C extends TauriCommandName>(
   throw TauriBridgeError.fromInvoke(command as TauriCommand, lastError);
 }
 
-/** Raw invoke without TauriCommand restriction — for commentary/Rust-only commands */
-export async function rawInvoke<C extends TauriCommandName>(
-  command: C,
-  args?: Record<string, unknown>,
-): Promise<TauriCommandOutput<C>> {
-  return executeWithRetry(command, normalizeArgs(args), 0, undefined);
-}
