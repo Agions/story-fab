@@ -1,4 +1,5 @@
 import { logger } from '@/shared/utils/logging';
+import { isTauriEnv } from '@/shared/utils/platform';
 import React, { useRef, useCallback, useEffect } from 'react';
 import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,12 +10,12 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { tauri } from '@/core/tauri';
 import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
 import { notify } from '@/shared';
-import { VIDEO_FORMATS } from '@/shared/constants';
+import { VIDEO_EXTENSIONS } from '@/shared/constants';
 import {
   videoSelectorReducer,
   initialVideoSelectorState,
 } from './video-selector.reducer';
-import styles from './VideoSelector.module.less';
+import styles from './video-selector.module.less';
 
 interface VideoSelectorProps {
   initialVideoPath?: string;
@@ -23,13 +24,7 @@ interface VideoSelectorProps {
   loading?: boolean;
 }
 
-// 检测是否在 Tauri 环境中
-const isTauri = (): boolean => {
-  return typeof window !== 'undefined' && '__TAURI__' in window;
-};
-
-// 支持的视频格式
-const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map(f => `.${f}`);
+// 支持的视频格式（已从 @/shared/constants 导入 VIDEO_EXTENSIONS）
 
 /**
  * 视频选择器组件
@@ -73,9 +68,9 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
 
   // 处理视频文件（通用逻辑）
   const processVideoFile = useCallback(async (fileOrPath: string, file?: File) => {
-    const isTauriEnv = isTauri();
+    const runningInTauri = isTauriEnv();
 
-    if (isTauriEnv) {
+    if (runningInTauri) {
       // Tauri: fileOrPath 是真实路径
       const filePath = fileOrPath;
       dispatch({ type: 'SET_VIDEO_PATH', videoPath: filePath });
@@ -182,7 +177,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
     e.stopPropagation();
     dispatch({ type: 'SET_IS_DRAGGING', isDragging: false });
 
-    if (isTauri()) {
+    if (isTauriEnv()) {
       // Tauri 环境下优先用对话框
       handleSelectVideoTauri();
       return;
@@ -196,7 +191,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
 
   // 选择视频（自动判断环境）
   const handleSelectVideo = () => {
-    if (isTauri()) {
+    if (isTauriEnv()) {
       handleSelectVideoTauri();
     } else {
       fileInputRef.current?.click();
@@ -217,7 +212,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
   const handlePlayVideo = async () => {
     if (!videoPath) return;
 
-    if (isTauri()) {
+    if (isTauriEnv()) {
       try {
         await tauri.openFile(videoPath);
       } catch (error) {
@@ -262,7 +257,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
             <Upload className={styles.uploadIcon} />
             <p>点击选择视频文件</p>
             <p className={styles.uploadTip}>
-              支持 {VIDEO_EXTENSIONS.map(e => e.slice(1).toUpperCase()).join(', ')} 格式
+              支持 {VIDEO_EXTENSIONS.map((e: string) => e.slice(1).toUpperCase()).join(', ')} 格式
             </p>
             <p className={styles.uploadTip} style={{ marginTop: 4 }}>
               或拖拽文件到此处
@@ -307,7 +302,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
                   onClick={handlePlayVideo}
                 >
                   <PlayCircle className="mr-1 size-4" />
-                  {isTauri() ? '在播放器中打开' : '新窗口播放'}
+                  {isTauriEnv() ? '在播放器中打开' : '新窗口播放'}
                 </Button>
               </div>
             </div>

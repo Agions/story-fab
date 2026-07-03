@@ -4,7 +4,7 @@ import {
   initialScriptDetailState,
   type ScriptDetailState,
 } from './use-script-detail.reducer';
-import type { DetailProjectWithScripts } from '@/types';
+import type { DetailProjectWithAIScripts } from '@/types';
 import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
 
 // ---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ const makeState = (overrides: Partial<ScriptDetailState> = {}): ScriptDetailStat
   ...overrides,
 });
 
-const makeProject = (overrides: Partial<DetailProjectWithScripts> = {}): DetailProjectWithScripts => ({
+const makeProject = (overrides: Partial<DetailProjectWithAIScripts> = {}): DetailProjectWithAIScripts => ({
   id: 'proj-1',
   name: 'Test Project',
   updatedAt: '2025-01-01T00:00:00Z',
@@ -257,9 +257,9 @@ describe('scriptDetailReducer', () => {
     });
   });
 
-  // ---- RESET_FOR_LOAD ----
-  describe('RESET_FOR_LOAD', () => {
-    it('resets data fields and sets loading to true', () => {
+  // ---- RESET ----
+  describe('RESET', () => {
+    it('resets data fields and sets loading to true (same as load)', () => {
       const state = makeState({
         loading: false,
         project: makeProject(),
@@ -268,7 +268,7 @@ describe('scriptDetailReducer', () => {
         loadError: 'some error',
       });
 
-      const next = scriptDetailReducer(state, { type: 'RESET_FOR_LOAD' });
+      const next = scriptDetailReducer(state, { type: 'RESET' });
 
       expect(next.project).toBeNull();
       expect(next.script).toBeNull();
@@ -286,64 +286,13 @@ describe('scriptDetailReducer', () => {
         deleteConfirmOpen: true,
       });
 
-      const next = scriptDetailReducer(state, { type: 'RESET_FOR_LOAD' });
+      const next = scriptDetailReducer(state, { type: 'RESET' });
 
       expect(next.reloadToken).toBe(4);
       expect(next.isSaving).toBe(true);
       expect(next.isExporting).toBe(true);
       expect(next.isDeleting).toBe(true);
       expect(next.deleteConfirmOpen).toBe(true);
-    });
-  });
-
-  // ---- RESET_FOR_RELOAD ----
-  describe('RESET_FOR_RELOAD', () => {
-    it('resets data fields and sets loading to true', () => {
-      const state = makeState({
-        loading: false,
-        project: makeProject(),
-        script: makeScript(),
-        segments: [makeSegment()],
-        loadError: 'network error',
-      });
-
-      const next = scriptDetailReducer(state, { type: 'RESET_FOR_RELOAD' });
-
-      expect(next.project).toBeNull();
-      expect(next.script).toBeNull();
-      expect(next.segments).toEqual([]);
-      expect(next.loadError).toBe('');
-      expect(next.loading).toBe(true);
-    });
-
-    it('preserves non-reset fields (e.g. isSaving, reloadToken)', () => {
-      const state = makeState({
-        reloadToken: 2,
-        isSaving: false,
-        isExporting: true,
-      });
-
-      const next = scriptDetailReducer(state, { type: 'RESET_FOR_RELOAD' });
-
-      expect(next.reloadToken).toBe(2);
-      expect(next.isSaving).toBe(false);
-      expect(next.isExporting).toBe(true);
-    });
-
-    it('produces the same result as RESET_FOR_LOAD (identical reset shape)', () => {
-      const state = makeState({
-        project: makeProject(),
-        script: makeScript(),
-        segments: [makeSegment()],
-        loadError: 'err',
-        loading: false,
-      });
-
-      const load = scriptDetailReducer(state, { type: 'RESET_FOR_LOAD' });
-      const reload = scriptDetailReducer(state, { type: 'RESET_FOR_RELOAD' });
-
-      // Same shape (but not same reference)
-      expect(load).toEqual(reload);
     });
   });
 });

@@ -15,7 +15,7 @@ import { notify } from '@/shared';
 import { useTimeout } from '@/hooks/use-timeout';
 import { logger } from '@/shared/utils/logging';
 import type { AIAnalyzeProps, Scene } from '@/types';
-import styles from './AIVisualizer.module.less';
+import styles from '././ai-visualizer.module.less';
 import { Highlights } from './Highlights/highlights';
 import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysis-tasks';
 import { formatTime } from '@/shared/utils/formatting';

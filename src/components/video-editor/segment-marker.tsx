@@ -3,7 +3,7 @@ import { Tooltip } from '../ui/tooltip';
 
 import { ScriptSegment } from '@/types';
 import { formatTime } from '@/shared';
-import styles from '@/components/video-editor/VideoEditor.module.less';
+import styles from '././video-editor.module.less';
 
 interface SegmentStyleProps {
   left: string;

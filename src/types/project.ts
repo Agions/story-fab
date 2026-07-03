@@ -91,7 +91,3 @@ export interface DetailProject {
 export interface DetailProjectWithAIScripts extends DetailProject {
   scripts?: import('@/core/services/ai/script-service').AIScriptDraft[];
 }
-
-export interface DetailProjectWithScripts extends DetailProject {
-  scripts?: import('@/core/services/ai/script-service').AIScriptDraft[];
-}

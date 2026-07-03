@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import type { TimelineTrack, TimelineClip, DragType } from './types';
 import { TRACK_COLORS } from './constants';
-import styles from '@/components/timeline/Timeline.module.less';
+import styles from '@/components/timeline/timeline.module.less';
 
 interface ClipRendererProps {
   clip: TimelineClip;

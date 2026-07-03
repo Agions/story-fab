@@ -16,6 +16,12 @@ export const VIDEO_FORMATS = {
   output: ['mp4', 'mov', 'webm', 'avi'],
 };
 
+/** Pre-computed input extensions with dot prefix, e.g. ['.mp4', '.mov', ...] */
+export const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map((f) => `.${f}`);
+
+/** Comma-separated accept string for file input elements */
+export const VIDEO_ACCEPT_STRING = VIDEO_EXTENSIONS.join(',');
+
 export const IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'];
 
 export const AUDIO_FORMATS = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a', 'wma'];

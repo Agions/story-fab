@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
 import type { CommentarySegment } from '@/core/services/commentary';
 import { formatDuration } from '@/core/video';
-import styles from './CommentaryPanel.module.less';
+import styles from '././commentary-panel.module.less';
 
 interface Props {
   segments: CommentarySegment[];

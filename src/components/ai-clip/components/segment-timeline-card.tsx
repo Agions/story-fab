@@ -21,7 +21,7 @@ import { formatTime } from '@/shared/utils/formatting';
 import type { SmartVideoSegment } from '../../../core/video/highlight.types';
 import { summarizeSpeeds } from '../../../core/services/ai-clip/segment-enricher';
 import type { TransitionType } from '../../../core/services/video/transition-suggestion';
-import styles from '../AIClip.module.less';
+import styles from '././../ai-clip.module.less';
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   action:      <Zap size={12} />,

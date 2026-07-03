@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import styles from '../VideoComposing.module.less';
+import styles from '././../video-composing.module.less';
 import { EFFECT_STYLES, type SynthesizeConfig } from '../compose-config';
 
 // ============================================

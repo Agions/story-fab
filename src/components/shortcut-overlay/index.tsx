@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import styles from './ShortcutOverlay.module.less';
+import styles from '././shortcut-overlay.module.less';
 
 export interface ShortcutOverlayProps {
   open: boolean;

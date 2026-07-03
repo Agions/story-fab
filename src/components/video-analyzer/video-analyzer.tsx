@@ -11,7 +11,7 @@ import type { VideoAnalysis, KeyMoment, Emotion } from '@/types';
 import VideoSelector from '@/components/video-selector/video-selector';
 import { notify } from '@/shared';
 import { AppError } from '@/core/errors';
-import styles from './VideoAnalyzer.module.less';
+import styles from '././video-analyzer.module.less';
 
 const Title = ({ level = 4, children }: { level?: number; children: React.ReactNode }) => {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;

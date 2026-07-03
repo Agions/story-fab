@@ -10,7 +10,7 @@ import {
 import type { ClipSegment } from '../../../core/services/ai-clip';
 import type { VideoInfo } from '@/types';
 import { formatTime } from '../../../shared/utils/formatting';
-import styles from '@/components/ai-clip/AIClip.module.less';
+import styles from '././../ai-clip.module.less';
 
 interface PreviewStepProps {
   videoInfo: VideoInfo;

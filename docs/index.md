@@ -11,10 +11,10 @@ hero:
   actions:
     - theme: brand
       text: 快速开始
-      link: /guide/quick-start
+      link: /getting-started/quick-start
     - theme: alt
       text: 解说模式
-      link: /guide/commentary-mode
+      link: /features/commentary-mode
 
 features:
   - title: 剪辑模式
@@ -39,7 +39,7 @@ features:
 
 把长视频 → 高光片段 + 解说词 + TTS 配音 + 字幕烧录，全链路在桌面应用内完成。
 
-- [安装指南](/guide/installation)
-- [快速开始](/guide/quick-start)
-- [系统架构](/dev/architecture)
+- [安装指南](/getting-started/installation)
+- [快速开始](/getting-started/quick-start)
+- [系统架构](/developer/architecture)
 - [更新日志](/CHANGELOG)

@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import styles from '../ScriptWriting.module.less';
+import styles from '././../script-writing.module.less';
 
 const ALIGNMENT_GATE_THRESHOLD = {
   minConfidence: 0.8,

@@ -1,9 +1,9 @@
 import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
-import type { DetailProjectWithScripts } from '@/types';
+import type { DetailProjectWithAIScripts } from '@/types';
 
 export interface ScriptDetailState {
   loading: boolean;
-  project: DetailProjectWithScripts | null;
+  project: DetailProjectWithAIScripts | null;
   script: Script | null;
   segments: ScriptSegment[];
   loadError: string;
@@ -25,8 +25,7 @@ type ScriptDetailAction =
   | { type: 'SET_IS_EXPORTING'; isExporting: boolean }
   | { type: 'SET_IS_DELETING'; isDeleting: boolean }
   | { type: 'SET_DELETE_CONFIRM_OPEN'; open: boolean }
-  | { type: 'RESET_FOR_LOAD' }
-  | { type: 'RESET_FOR_RELOAD' };
+  | { type: 'RESET' };
 
 export const initialScriptDetailState: ScriptDetailState = {
   loading: true,
@@ -66,9 +65,7 @@ export function scriptDetailReducer(
       return { ...state, isDeleting: action.isDeleting };
     case 'SET_DELETE_CONFIRM_OPEN':
       return { ...state, deleteConfirmOpen: action.open };
-    case 'RESET_FOR_LOAD':
-      return { ...state, project: null, script: null, segments: [], loadError: '', loading: true };
-    case 'RESET_FOR_RELOAD':
+    case 'RESET':
       return { ...state, project: null, script: null, segments: [], loadError: '', loading: true };
     default:
       return state;

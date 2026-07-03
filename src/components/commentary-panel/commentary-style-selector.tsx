@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/shared/utils/cn';
 import type { ScriptStylePreset } from '@/core/services/commentary';
-import styles from './CommentaryPanel.module.less';
+import styles from '././commentary-panel.module.less';
 
 const STYLE_OPTIONS: Array<{
   value: ScriptStylePreset;

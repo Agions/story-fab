@@ -15,8 +15,8 @@ import SegmentTable from './segment-table';
 import SegmentEditForm from './segment-edit-form';
 import PreviewModal from './preview-modal';
 import AIModal from './ai-modal';
-import { useOriginalEditor } from './hooks/use-original-editor';
-import styles from '@/components/script-editor/ScriptEditor.module.less';
+import { useScriptEditor } from '@/hooks/use-script-editor';
+import styles from '././script-editor.module.less';
 
 interface OriginalEditorProps {
   videoPath: string;
@@ -42,7 +42,7 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
     handleDeleteSegment, confirmDelete, handlePreviewSegment,
     handleSave, handleAIImprove, handleExportClick,
     exportMenuItems,
-  } = useOriginalEditor({ videoPath, initialSegments, onSave, onExport });
+  } = useScriptEditor({ videoPath, initialSegments, onSave, onExport });
 
   return (
     <div className={styles.scriptEditor}>

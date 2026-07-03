@@ -19,7 +19,7 @@ import {
   workflowEditorReducer,
   initialWorkflowEditorState,
 } from './workflow-editor.reducer';
-import styles from '@/components/script-editor/ScriptEditor.module.less';
+import styles from '././script-editor.module.less';
 
 interface WorkflowEditorProps {
   script: ScriptData;

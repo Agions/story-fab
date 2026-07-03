@@ -14,8 +14,8 @@ import {
   type TransitionValue,
   type AudioProcessValue,
 } from '@/components/video-processing-controller/constants';
-import { useVideoProcessingController } from './hooks/use-video-processing-controller';
-import styles from '@/components/video-processing-controller/VideoProcessingController.module.less';
+import { useVideoProcessingController } from '@/hooks/use-video-processing';
+import styles from '@/components/video-processing-controller/video-processing-controller.module.less';
 
 interface VideoProcessingControllerProps {
   videoPath: string;

@@ -10,7 +10,7 @@ import { Button } from '../ui/button';
 import VideoPlayer from '@/components/video-player/video-player';
 import { ScriptSegment } from '@/types';
 import { formatTime } from '@/shared';
-import styles from '@/components/video-editor/VideoEditor.module.less';
+import styles from '././video-editor.module.less';
 
 interface PreviewModalProps {
   open: boolean;

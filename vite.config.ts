@@ -34,7 +34,8 @@ export default defineConfig({
       '@/': path.resolve(__dirname, './src'),
       '@/types': path.resolve(__dirname, './src/types'),
       '@/core': path.resolve(__dirname, './src/core'),
-      '@/store': path.resolve(__dirname, './src/store'),
+      '@/store': path.resolve(__dirname, './src/stores'),
+      '@/stores': path.resolve(__dirname, './src/stores'),
       '@/shared': path.resolve(__dirname, './src/shared'),
       '@/shared/constants': path.resolve(__dirname, './src/shared/constants'),
       '@/components': path.resolve(__dirname, './src/components'),
@@ -48,11 +49,17 @@ export default defineConfig({
     target: 'esnext',
     minify: 'esbuild',
     sourcemap: false,
-    chunkSizeWarningLimit: 600,
+    reportCompressedSize: false,
+    chunkSizeWarningLimit: 500,
     cssCodeSplit: true,
     assetsInlineLimit: 4096,
     assetsDir: 'assets',
     rollupOptions: {
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false,
+      },
       output: {
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
@@ -69,7 +76,7 @@ export default defineConfig({
           // Tauri
           if (/node_modules\/@tauri-apps\//.test(id)) return 'vendor-tauri'
 
-          // shadcn/ui base — @base-ui/react (Radix-style headless primitives)
+          // shadcn/ui base — split into smaller chunks
           if (/node_modules\/@base-ui\//.test(id)) return 'vendor-ui-base'
           if (/node_modules\/class-variance-authority\//.test(id)) return 'vendor-ui-base'
           if (/node_modules\/clsx\//.test(id) || /node_modules\/tailwind-merge\//.test(id)) return 'vendor-ui-base'
@@ -77,14 +84,13 @@ export default defineConfig({
           // Utilities
           if (/node_modules\/dayjs\//.test(id)) return 'vendor-dayjs'
 
-          // Icon libraries — large tree-shakeable exports, benefit from isolated chunk
+          // Icon libraries
           if (/node_modules\/lucide-react\//.test(id)) return 'vendor-icons'
 
           // Animation / UI utilities
           if (/node_modules\/vaul\//.test(id)) return 'vendor-motion'
 
           // No catch-all — every node_modules module must have an explicit chunk above.
-          // If you hit this, add a new explicit rule before the fallback.
           return null
         },
       },

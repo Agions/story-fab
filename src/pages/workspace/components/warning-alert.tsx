@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import styles from '../VideoComposing.module.less';
+import styles from '././../video-composing.module.less';
 
 // ============================================
 // 类型定义

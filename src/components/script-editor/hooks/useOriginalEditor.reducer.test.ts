@@ -5,7 +5,7 @@ import {
   initialOriginalEditorState,
   type OriginalEditorState,
   type OriginalEditorAction,
-} from './use-original-editor.reducer';
+} from '@/hooks/use-script-editor.reducer';
 
 const makeSegment = (overrides: Partial<ScriptSegment> = {}): ScriptSegment => ({
   id: 'seg-default',

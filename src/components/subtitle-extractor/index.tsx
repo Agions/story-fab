@@ -36,9 +36,9 @@ import { notify } from '@/shared';
 import { subtitleService } from '@/core/services/subtitle/subtitle-service';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import type { SubtitleEntry } from '@/types';
-import styles from './index.module.less';
+import styles from '././index.module.less';
 import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';
-import { useSubtitleExtractor, type SubtitleSegment } from './use-subtitle-extractor';
+import { useSubtitleExtraction, type SubtitleSegment } from '@/hooks/use-subtitle-extraction';
 
 interface SubtitleExtractorProps {
   projectId: string;
@@ -70,7 +70,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     startEdit,
     cancelEdit,
     resetForExtract,
-  } = useSubtitleExtractor();
+  } = useSubtitleExtraction();
 
   const { format, translate, isExtracting, progress, extractedSubtitles, editingId, editingText, activeSubId, videoDuration } = state;
 

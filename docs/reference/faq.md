@@ -52,4 +52,4 @@ title: 常见问题
 
 **如何报告 Bug？** GitHub Issues，附上日志文件和复现步骤。
 
-**如何添加新 LLM Provider？** 实现 `src/core/services/providers/` 下的对应 trait，详见 `docs/dev/ai-services.md`。
+**如何添加新 LLM Provider？** 实现 `src/core/services/providers/` 下的对应 trait，详见 `docs/developer/ai-services.md`。

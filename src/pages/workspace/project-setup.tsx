@@ -9,7 +9,7 @@ import type { ProjectData } from '@/types';
 import { saveProjectToFile } from '@/core/services/project/project-file-service';
 import { notify } from '@/shared';
 import { useSettingsStore } from '@/stores/settings-store';
-import styles from './ProjectSetup.module.less';
+import styles from '././project-setup.module.less';
 
 interface ProjectCreateProps {
   onNext?: () => void;

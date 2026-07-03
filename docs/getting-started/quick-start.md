@@ -52,7 +52,7 @@ title: 快速开始
 
 ## 下一步
 
-- [解说模式详解](/guide/commentary-mode)
-- [脚本生成](/guide/script-generation)
-- [快捷键完整列表](/guide/keyboard-shortcuts)
-- [导出设置](/guide/export)
+- [解说模式详解](/features/commentary-mode)
+- [脚本生成](/features/script-generation)
+- [快捷键完整列表](/configuration/keyboard-shortcuts)
+- [导出设置](/features/export)

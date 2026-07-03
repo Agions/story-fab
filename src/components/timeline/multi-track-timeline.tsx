@@ -47,7 +47,7 @@ import { useTrackActions } from './hooks/use-track-actions';
 import { useClipActions } from './hooks/use-clip-actions';
 import { useTimelineDrag } from './hooks/use-timeline-drag';
 
-import styles from '@/components/timeline/Timeline.module.less';
+import styles from '@/components/timeline/timeline.module.less';
 
 // ============================================
 // MultiTrackTimeline 主组件

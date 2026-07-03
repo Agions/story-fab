@@ -4,7 +4,7 @@
  */
 import React, { memo } from 'react';
 import { useStoryFab } from '../context';
-import styles from '../VideoExport.module.less';
+import styles from '../video-export.module.less';
 import { useExportHandlers } from './use-export-handlers';
 import { NoSynthesisAlert } from './no-synthesis-alert';
 import { ExportCompleteCard } from './export-complete-card';

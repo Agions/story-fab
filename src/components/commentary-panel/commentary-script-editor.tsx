@@ -24,7 +24,7 @@ import {
   initialSegmentRowState,
   initialScriptEditorState,
 } from './commentary-script-editor.reducer';
-import styles from './CommentaryPanel.module.less';
+import styles from '././commentary-panel.module.less';
 
 interface Props {
   script: CommentaryScriptOutput | null;

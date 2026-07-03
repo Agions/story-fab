@@ -14,7 +14,7 @@ import {
 
 import type { TimelineTrack } from './types';
 import { TRACK_COLORS } from './constants';
-import styles from '@/components/timeline/Timeline.module.less';
+import styles from '@/components/timeline/timeline.module.less';
 
 interface TrackHeaderProps {
   track: TimelineTrack;

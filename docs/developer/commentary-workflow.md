@@ -281,6 +281,6 @@ interface ScriptSegment {
 
 ## 相关文档
 
-- 用户视角: [guide/commentary-mode.md](../guide/commentary-mode.md)
+- 用户视角: [commentary-mode.md](../features/commentary-mode.md)
 - LLM Provider 添加: [ai-services.md](ai-services.md)
 - IPC 命令: [tauri-commands.md](tauri-commands.md)

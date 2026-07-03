@@ -15,7 +15,7 @@ import {
 import { useAIClipAssistant } from './hooks/use-ai-clip-assistant';
 import { ConfigStep, AnalyzeStep, SuggestionsStep, PreviewStep } from '@/components/ai-clip/components';
 import type { AIClipAssistantProps } from './types';
-import styles from '@/components/ai-clip/AIClip.module.less';
+import styles from '././ai-clip.module.less';
 
 const CLIP_STEPS = [
   { title: '配置', icon: <Settings size={14} /> },

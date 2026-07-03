@@ -12,7 +12,7 @@ import { formatRelativeDate } from '../../shared/utils/formatting';
 import type { ProjectView } from './types';
 import React from 'react';
 import { Edit3, Trash2, Play, Download } from 'lucide-react';
-import styles from './index.module.less';
+import styles from '././index.module.less';
 
 const loadProjectsListView = () => import('./components/projects-list-view');
 const ProjectsListView = React.lazy(loadProjectsListView);

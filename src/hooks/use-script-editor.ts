@@ -1,9 +1,10 @@
 /**
- * useOriginalEditor hook — 12 useState 集中化入口
+ * useScriptEditor hook — segment editor集中化入口
  * 来源: refactor/original-editor-usereducer (v3.4 §A2 范式)
  */
 import { useMemo, useCallback, useEffect } from 'react';
 import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createAutoSetters } from '@/shared/hooks/useAutoSetters';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import type { ScriptSegment } from '@/types';
 import type { SimpleVideoSegment } from '@/core/video';
@@ -13,49 +14,27 @@ import { logger } from '@/shared/utils/logging';
 import {
   initialOriginalEditorState,
   originalEditorReducer,
-  type OriginalEditorAction,
-  type OriginalEditorState,
   type SegmentFormValues,
-  type Updater,
-} from './use-original-editor.reducer';
+} from './use-script-editor.reducer';
 
-type Setter<K extends keyof OriginalEditorState> = (
-  updater: Updater<OriginalEditorState[K]>,
-) => void;
-type OriginalEditorSetters = { [K in keyof OriginalEditorState]: Setter<K> };
-
-const makeSetters = (
-  dispatch: React.Dispatch<OriginalEditorAction>,
-): OriginalEditorSetters => {
-  return Object.fromEntries(
-    (Object.keys(initialOriginalEditorState([])) as (keyof OriginalEditorState)[]).map(
-      (key) => [
-        key,
-        (updater: Updater<OriginalEditorState[typeof key]>) =>
-          dispatch({ type: 'update', key, updater: updater as Updater<unknown> }),
-      ],
-    ),
-  ) as OriginalEditorSetters;
-};
-
-interface UseOriginalEditorArgs {
+interface UseScriptEditorArgs {
   videoPath: string;
   initialSegments?: ScriptSegment[];
   onSave: (segments: ScriptSegment[]) => void;
   onExport?: (format: string) => void;
 }
 
-export const useOriginalEditor = ({
+export const useScriptEditor = ({
   videoPath,
   initialSegments = [],
   onSave,
   onExport,
-}: UseOriginalEditorArgs) => {
+}: UseScriptEditorArgs) => {
   const { state, dispatch } = createReducerHook(
     originalEditorReducer,
     initialOriginalEditorState(initialSegments),
   );
-  const setters = useMemo(() => makeSetters(dispatch), []);
+  const setters = createAutoSetters(dispatch, initialOriginalEditorState(initialSegments));
   const {
     segments, editingIndex, formValues, formError,
     previewVisible, previewSrc, previewLoading,

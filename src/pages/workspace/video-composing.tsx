@@ -24,7 +24,7 @@ import { SynthesizeProgress } from './components/synthesize-progress';
 import { WarningAlert } from './components/warning-alert';
 import { CompleteNotice } from './components/complete-notice';
 
-import styles from './VideoComposing.module.less';
+import styles from '././video-composing.module.less';
 
 // ============================================
 // 类型定义

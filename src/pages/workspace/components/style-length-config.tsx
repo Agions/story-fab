@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import styles from '../ScriptWriting.module.less';
+import styles from '././../script-writing.module.less';
 import { SCRIPT_STYLES, SCRIPT_LENGTHS } from '../script-config';
 
 // ============================================

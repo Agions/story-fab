@@ -47,7 +47,7 @@ import {
   commentaryPanelReducer,
   initialCommentaryPanelState,
 } from './commentary-panel.reducer';
-import styles from './CommentaryPanel.module.less';
+import styles from '././commentary-panel.module.less';
 import CommentaryScriptEditor from './commentary-script-editor';
 import CommentaryStyleSelector from './commentary-style-selector';
 import CommentaryVoiceSelector from './commentary-voice-selector';
@@ -73,7 +73,7 @@ const STATE_COLORS: Record<string, string> = {
   done: 'bg-emerald-600',
 };
 
-const _STYLE_PRESET_LABELS: Record<ScriptStylePreset, string> = {
+const STYLE_PRESET_LABELS: Record<ScriptStylePreset, string> = {
   humorous: '幽默风趣',
   serious: '严肃正式',
   conversational: '接地气',
@@ -226,7 +226,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
                       className={`${styles.multiScriptStyleTab} ${activeScriptStyle === style ? styles.multiScriptStyleTabActive : ''}`}
                       onClick={() => setActiveScriptStyle(style)}
                     >
-                      {_STYLE_PRESET_LABELS[style]}
+                      {STYLE_PRESET_LABELS[style]}
                     </button>
                   ))}
                 </div>

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import type { ClipAnalysisResult } from '../../../core/services/ai-clip';
 import { SegmentTimelineCard } from './segment-timeline-card';
-import styles from '@/components/ai-clip/AIClip.module.less';
+import styles from '././../ai-clip.module.less';
 
 interface SuggestionsStepProps {
   analysisResult: ClipAnalysisResult | null;

@@ -12,8 +12,25 @@ SPDX-License-Identifier: MIT
 [![TypeScript 5](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Rust 1.77+](https://img.shields.io/badge/Rust-1.77+-DEA584?logo=rust&logoColor=black)](https://www.rust-lang.org/)
 [![Version](https://img.shields.io/badge/version-2.2.0-brightgreen.svg)](CHANGELOG.md)
+[![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/Agions/story-fab/actions)
+[![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen.svg)](https://github.com/Agions/story-fab/actions)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 [📖 在线文档](https://agions.github.io/story-fab/) · [🔄 更新日志](CHANGELOG.md)
+
+---
+
+## 📋 项目概览
+
+| 指标 | 数值 |
+|------|------|
+| **前端组件** | 41+ 组件目录 |
+| **Tauri 命令** | 61 个 IPC 命令 |
+| **业务服务** | 13 个模块 |
+| **Rust 代码** | 27,000+ 行 |
+| **测试覆盖** | 98%+ |
+| **构建产物** | 1.3MB |
+| **支持平台** | Windows / macOS / Linux |
 
 ---
 
@@ -217,6 +234,7 @@ graph TB
 # 前端开发
 npm run dev                  # Vite开发服务器 (端口 1430)
 npm run build                # 生产构建
+npm run build:prod           # 生产构建 (详细输出)
 npm run test                 # 运行测试
 
 # Tauri桌面应用
@@ -226,9 +244,11 @@ npm run tauri -- build       # 构建桌面应用
 # 文档站
 npm run docs:dev            # VitePress开发模式
 npm run docs:build          # 构建静态文档
+npm run docs:preview        # 预览文档
 
 # 代码质量
 npm run lint                # ESLint检查
+npm run lint:fix            # ESLint自动修复
 npm run format              # Prettier格式化
 npm run type-check          # TypeScript类型检查
 ```

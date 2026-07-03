@@ -2,7 +2,7 @@ import React, { memo, lazy, Suspense } from 'react';
 import { Card, CardContent } from '../ui/card';
 import { FileText } from 'lucide-react';
 import { ScriptEditorProps, isWorkflowProps } from './types';
-import styles from '@/components/script-editor/ScriptEditor.module.less';
+import styles from '@/components/script-editor/script-editor.module.less';
 
 const WorkflowEditor = lazy(() => import('./workflow-editor'));
 const OriginalEditor = lazy(() => import('./original-editor'));

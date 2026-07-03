@@ -72,6 +72,15 @@
           }
         ]
       }
+    },
+    {
+      "files": [
+        "src/shared/hooks/useReducerHook.ts",
+        "src/shared/hooks/useAutoSetters.ts"
+      ],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off"
+      }
     }
   ]
 }

@@ -8,14 +8,10 @@
  * - 职责单一，便于维护和测试
  */
 
-import { VIDEO_FORMATS } from '@/shared/constants';
+import { VIDEO_EXTENSIONS } from '@/shared/constants';
 
-// ============================================
-// 常量
-// ============================================
-
-/** 支持的视频扩展名 */
-export const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map((f) => `.${f}`);
+// Re-export for consumers that import from this config module
+export { VIDEO_EXTENSIONS };
 
 /** 模拟上传分块大小（1 MB） */
 export const CHUNK_SIZE = 1024 * 1024;

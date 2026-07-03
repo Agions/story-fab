@@ -19,7 +19,7 @@ import {
   videoUploadReducer,
   initialVideoUploadState,
 } from './video-upload.reducer';
-import styles from './VideoUpload.module.less';
+import styles from '././video-upload.module.less';
 
 import {
   VIDEO_EXTENSIONS,

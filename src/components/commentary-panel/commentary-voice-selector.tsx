@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Play, Pause } from 'lucide-react';
 import { cn } from '@/shared/utils/cn';
 import type { VoiceInfo } from '@/core/services/commentary';
-import styles from './CommentaryPanel.module.less';
+import styles from '././commentary-panel.module.less';
 
 interface Props {
   voices: VoiceInfo[];

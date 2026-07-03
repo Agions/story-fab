@@ -21,7 +21,7 @@ import {
 import { useStoryFab } from './context/storyfab-provider';
 import type { StoryFabStep } from '@/core/types/storyfab';
 import { STORYFAB_STEPS } from '@/core/types/storyfab';
-import styles from './workspace.module.less';
+import styles from '././workspace.module.less';
 import StepList from './step-list';
 
 // ============================================================================

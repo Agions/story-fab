@@ -33,7 +33,7 @@ import type {
   RepurposingOptions,
 } from '@/core/services/pipeline/clip-pipeline/pipeline';
 import { transcodeWithCrop } from '@/core/services/export/transcode-crop-service';
-import styles from './ClipRippling.module.less';
+import styles from '././clip-rippling.module.less';
 import {
   MIN_CLIP_DURATION_SECONDS,
   MAX_CLIP_DURATION_SECONDS,

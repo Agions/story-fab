@@ -36,7 +36,7 @@ import { ScriptEditorPanel } from './components/script-editor-panel';
 import { ScriptStatsBar } from './components/script-stats-bar';
 import { GenerationProgress } from './components/generation-progress';
 
-import styles from './ScriptWriting.module.less';
+import styles from '././script-writing.module.less';
 
 // ============================================
 // 功能配置（提取为模块级常量，避免每次渲染重建）

@@ -14,7 +14,7 @@ import {
 import {
   Tooltip, TooltipTrigger, TooltipContent, TooltipProvider,
 } from '@/components/ui/tooltip';
-import styles from './layout.module.less';
+import styles from '././layout.module.less';
 
 interface LayoutProps {
   children: React.ReactNode;

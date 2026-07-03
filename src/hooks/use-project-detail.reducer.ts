@@ -23,7 +23,7 @@ type ProjectDetailAction =
   | { type: 'SET_DRAWER_VISIBLE'; visible: boolean }
   | { type: 'SET_DELETE_CONFIRM_OPEN'; open: boolean };
 
-const computeFullText = (segments: ScriptSegment[]): string =>
+const computeFullScriptText = (segments: ScriptSegment[]): string =>
   segments.map((s) => s.content ?? '').join('\n\n');
 
 export const initialProjectDetailState: ProjectDetailState = {
@@ -54,7 +54,7 @@ export function projectDetailReducer(
       const updatedScript: AIScriptDraft = {
         ...action.activeScript,
         content: action.segments as AIScriptDraft['content'],
-        fullText: computeFullText(action.segments),
+        fullText: computeFullScriptText(action.segments),
         updatedAt: new Date().toISOString(),
       };
       return { ...state, activeScript: updatedScript };

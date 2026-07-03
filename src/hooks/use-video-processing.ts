@@ -2,8 +2,9 @@
  * useVideoProcessingController hook — 14 useState 集中化入口
  * 来源: refactor/video-processing-usereducer (v3.4 §A2 范式)
  */
-import { useMemo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createAutoSetters } from '@/shared/hooks/useAutoSetters';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import { tauri } from '@/core/tauri';
@@ -12,30 +13,8 @@ import type { VideoSegment } from '@/types';
 import {
   initialVideoProcessingState,
   videoProcessingReducer,
-  type VideoProcessingAction,
-  type VideoProcessingState,
-  type Updater,
   type CustomQualitySettings,
-} from './use-video-processing-controller.reducer';
-
-type Setter<K extends keyof VideoProcessingState> = (
-  updater: Updater<VideoProcessingState[K]>,
-) => void;
-type VideoProcessingSetters = { [K in keyof VideoProcessingState]: Setter<K> };
-
-const makeSetters = (
-  dispatch: React.Dispatch<VideoProcessingAction>,
-): VideoProcessingSetters => {
-  return Object.fromEntries(
-    (Object.keys(initialVideoProcessingState) as (keyof VideoProcessingState)[]).map(
-      (key) => [
-        key,
-        (updater: Updater<VideoProcessingState[typeof key]>) =>
-          dispatch({ type: 'update', key, updater: updater as Updater<unknown> }),
-      ],
-    ),
-  ) as VideoProcessingSetters;
-};
+} from './use-video-processing.reducer';
 
 interface UseVideoProcessingControllerArgs {
   videoPath: string;
@@ -49,7 +28,7 @@ export const useVideoProcessingController = ({
   onProcessingComplete,
 }: UseVideoProcessingControllerArgs) => {
   const { state, dispatch } = createReducerHook(videoProcessingReducer, initialVideoProcessingState);
-  const setters = useMemo(() => makeSetters(dispatch), []);
+  const setters = createAutoSetters(dispatch, initialVideoProcessingState);
   const {
     videoQuality, exportFormat, transitionType, transitionDuration,
     audioProcess, audioVolume, useSubtitles,

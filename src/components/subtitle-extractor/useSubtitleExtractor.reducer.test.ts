@@ -4,7 +4,7 @@ import {
   initialSubtitleExtractorState,
   type SubtitleExtractorState,
   type SubtitleSegment,
-} from './use-subtitle-extractor.reducer';
+} from '@/hooks/use-subtitle-extraction.reducer';
 
 function makeState(overrides: Partial<SubtitleExtractorState> = {}): SubtitleExtractorState {
   return { ...initialSubtitleExtractorState, ...overrides };

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { Slider } from '../ui/slider';
 import { Button } from '../ui/button';
@@ -13,7 +13,8 @@ import {
   videoPlayerReducer,
   initialVideoPlayerState,
 } from './video-player.reducer';
-import styles from '@/components/video-player/VideoPlayer.module.less';
+import { useVideoKeyboardShortcuts } from '@/hooks/use-video-keyboard-shortcuts';
+import styles from '././video-player.module.less';
 
 interface VideoPlayerProps {
   src: string;
@@ -82,74 +83,8 @@ function VideoPlayer({
     };
   }, [onTimeUpdate, onEnded]);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Skip if focus is inside an input/textarea
-      const tag = (e.target as HTMLElement).tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return;
-
-      const video = videoRef.current;
-      if (!video) return;
-
-      const SEEK_STEP = 5;   // seconds for arrow keys
-      const SEEK_LONG = 10;  // seconds for J/L keys
-
-      switch (e.key) {
-        case ' ':
-        case 'k':
-        case 'K':
-          e.preventDefault();
-          togglePlay();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          video.currentTime = Math.max(0, video.currentTime - SEEK_STEP);
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          video.currentTime = Math.min(video.duration, video.currentTime + SEEK_STEP);
-          break;
-        case 'j':
-        case 'J':
-          e.preventDefault();
-          video.currentTime = Math.max(0, video.currentTime - SEEK_LONG);
-          break;
-        case 'l':
-        case 'L':
-          e.preventDefault();
-          video.currentTime = Math.min(video.duration, video.currentTime + SEEK_LONG);
-          break;
-        case 'm':
-        case 'M':
-          e.preventDefault();
-          video.muted = !video.muted;
-          break;
-        case 'f':
-        case 'F':
-          e.preventDefault();
-          toggleFullscreen();
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          video.volume = Math.min(1, video.volume + 0.1);
-          dispatch({ type: 'SET_VOLUME', volume: video.volume });
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          video.volume = Math.max(0, video.volume - 0.1);
-          dispatch({ type: 'SET_VOLUME', volume: video.volume });
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const togglePlay = () => {
+  // Action callbacks (defined before useVideoKeyboardShortcuts to avoid TDZ)
+  const togglePlay = useCallback(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
     if (videoElement.paused) {
@@ -157,7 +92,40 @@ function VideoPlayer({
     } else {
       videoElement.pause();
     }
-  };
+  }, [videoRef]);
+
+  const toggleFullscreen = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      container.requestFullscreen();
+    }
+  }, [containerRef]);
+
+  // Keyboard shortcuts
+  useVideoKeyboardShortcuts({
+    videoRef,
+    onTogglePlay: togglePlay,
+    onToggleFullscreen: toggleFullscreen,
+    onSeek: (seconds) => {
+      const video = videoRef.current;
+      if (!video) return;
+      video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + seconds));
+    },
+    onVolumeChange: (delta) => {
+      const video = videoRef.current;
+      if (!video) return;
+      video.volume = Math.max(0, Math.min(1, video.volume + delta));
+      dispatch({ type: 'SET_VOLUME', volume: video.volume });
+    },
+    onToggleMute: () => {
+      const video = videoRef.current;
+      if (!video) return;
+      video.muted = !video.muted;
+    },
+  });
 
   const handleSliderChange = (value: number | readonly number[]) => {
     const videoElement = videoRef.current;
@@ -173,17 +141,6 @@ function VideoPlayer({
     const val = Array.isArray(value) ? value[0] : value;
     videoElement.volume = val;
     dispatch({ type: 'SET_VOLUME', volume: val });
-  };
-
-  const toggleFullscreen = () => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      container.requestFullscreen();
-    }
   };
 
   return (

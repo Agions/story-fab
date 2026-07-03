@@ -3,7 +3,7 @@
  * 来源: refactor/video-processing-usereducer (v3.4 §A2 范式)
  * 模式: 1 hook + 1 .reducer.ts + makeSetter<K> + Updater<T>
  */
-import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from '../constants';
+import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from '../components/video-processing-controller/constants';
 
 export interface BatchItem {
   id: string;

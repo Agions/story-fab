@@ -6,7 +6,7 @@ import { Edit3, Play, Trash2 } from 'lucide-react';
 import { formatDuration } from '@/core/video';
 import type { ScriptSegment } from '@/types';
 import { getTypeLabel } from './types';
-import styles from '@/components/script-editor/ScriptEditor.module.less';
+import styles from '././script-editor.module.less';
 
 interface SegmentTableProps {
   segments: ScriptSegment[];

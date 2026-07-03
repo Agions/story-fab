@@ -1,6 +1,6 @@
 import { logger } from '@/shared/utils/logging';
 import React, { Component, ReactNode } from 'react';
-import styles from './error-boundary.module.less';
+import styles from '././error-boundary.module.less';
 
 interface Props {
   children: ReactNode;

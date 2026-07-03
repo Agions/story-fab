@@ -63,8 +63,8 @@ export function useScriptDetail(): UseScriptDetailResult {
     (open: boolean) => dispatch({ type: 'SET_DELETE_CONFIRM_OPEN', open }),
     [dispatch],
   );
-  const resetForLoad = useCallback(() => dispatch({ type: 'RESET_FOR_LOAD' }), [dispatch]);
-  const resetForReload = useCallback(() => dispatch({ type: 'RESET_FOR_RELOAD' }), [dispatch]);
+  const resetForLoad = useCallback(() => dispatch({ type: 'RESET' }), [dispatch]);
+  const resetForReload = useCallback(() => dispatch({ type: 'RESET' }), [dispatch]);
 
   return useMemo(
     () => ({

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { formatTimecodeMs } from '@/shared/utils';
-import styles from '@/components/timeline/Timeline.module.less';
+import styles from '@/components/timeline/timeline.module.less';
 
 interface TimeRulerProps {
   duration: number;
