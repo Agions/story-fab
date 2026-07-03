@@ -92,4 +92,14 @@ export const colors = {
   glassBg:     'rgba(17, 17, 20, 0.85)',
   glassBorder: 'rgba(255, 255, 255, 0.06)',
   glassBlur:   'blur(10px)',
+
+  /* ═══ Brand (Logo) Palette ═══ */
+  brand: {
+    purple:      '#7C3AED',
+    pink:        '#EC4899',
+    amber:       '#F59E0B',
+    gold:        '#d4a574',
+    darkBg:      '#0B0F1F',
+    darkBgLight: '#1A1F3A',
+  } as const,
 } as const;
