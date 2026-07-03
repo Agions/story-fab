@@ -1,10 +1,10 @@
 // story-fab Workflow — re-exports for convenient imports
 export type {
-  storyfabFeatureType,
-  storyfabStep,
-  storyfabState,
-  storyfabAction,
-  storyfabMode,
+  StoryFabFeatureType,
+  StoryFabStep,
+  StoryFabState,
+  StoryFabAction,
+  StoryFabMode,
   SemanticSegment,
 } from './workflow';
 export {

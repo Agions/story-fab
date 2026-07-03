@@ -4,7 +4,7 @@
  */
 import React, { memo } from 'react';
 import { Plus, Video, Cloud, Download, Check, Bolt, Brain, Eye, PenTool, Mic } from 'lucide-react';
-import type { storyfabStep, storyfabMode } from '@/core/types/storyfab';
+import type { StoryFabStep, StoryFabMode } from '@/core/types/storyfab';
 import styles from './workspace.module.less';
 
 // ============================================================================
@@ -12,16 +12,16 @@ import styles from './workspace.module.less';
 // ============================================================================
 
 interface StepConfig {
-  key: storyfabStep;
+  key: StoryFabStep;
   title: string;
   icon: React.ReactNode;
 }
 
 interface StepListProps {
-  mode: storyfabMode;
-  currentStep: storyfabStep;
-  stepStatus: Record<storyfabStep, boolean>;
-  onStepClick: (step: storyfabStep) => void;
+  mode: StoryFabMode;
+  currentStep: StoryFabStep;
+  stepStatus: Record<StoryFabStep, boolean>;
+  onStepClick: (step: StoryFabStep) => void;
   activeStepRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -48,7 +48,7 @@ const COMMENTARY_STEPS_CONFIG: StepConfig[] = [
   { key: 'video-export', title: '导出', icon: <Download /> },
 ];
 
-const STEP_ORDER: Record<storyfabMode, readonly storyfabStep[]> = {
+const STEP_ORDER: Record<StoryFabMode, readonly StoryFabStep[]> = {
   clip: ['project-create', 'video-upload', 'ai-analyze', 'clip-repurpose', 'video-export'],
   commentary: ['project-create', 'video-upload', 'ai-analyze', 'semantic-segment', 'director-review', 'script-generate', 'voice-synth', 'video-export'],
 };
@@ -57,20 +57,20 @@ const STEP_ORDER: Record<storyfabMode, readonly storyfabStep[]> = {
 // 辅助函数
 // ============================================================================
 
-const getStepsConfig = (mode: storyfabMode): StepConfig[] => {
+const getStepsConfig = (mode: StoryFabMode): StepConfig[] => {
   return mode === 'clip' ? CLIP_STEPS_CONFIG : COMMENTARY_STEPS_CONFIG;
 };
 
 const isStepCompleted = (
-  step: storyfabStep,
-  stepStatus: Record<storyfabStep, boolean>
+  step: StoryFabStep,
+  stepStatus: Record<StoryFabStep, boolean>
 ): boolean => stepStatus[step];
 
 const isStepAccessible = (
-  step: storyfabStep,
-  currentStep: storyfabStep,
-  stepStatus: Record<storyfabStep, boolean>,
-  mode: storyfabMode
+  step: StoryFabStep,
+  currentStep: StoryFabStep,
+  stepStatus: Record<StoryFabStep, boolean>,
+  mode: StoryFabMode
 ): boolean => {
   // 已完成的步骤可以点击跳转
   if (stepStatus[step]) return true;

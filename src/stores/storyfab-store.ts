@@ -6,11 +6,11 @@
  */
 import { create } from 'zustand';
 import type {
-  storyfabState,
-  storyfabStep,
-  storyfabFeatureType,
-  storyfabMode,
-  storyfabAction,
+  StoryFabState,
+  StoryFabStep,
+  StoryFabFeatureType,
+  StoryFabMode,
+  StoryFabAction,
 } from '@/core/types/storyfab';
 import {
   initialState,
@@ -22,12 +22,12 @@ import { storyFabReducer } from '@/core/types/storyfab';
 import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/types';
 
 interface StoryFabStore {
-  state: storyfabState;
+  state: StoryFabState;
   // Actions
-  dispatch: (action: storyfabAction) => void;
-  setMode: (mode: storyfabMode) => void;
-  setStep: (step: storyfabStep) => void;
-  setFeature: (feature: storyfabFeatureType) => void;
+  dispatch: (action: StoryFabAction) => void;
+  setMode: (mode: StoryFabMode) => void;
+  setStep: (step: StoryFabStep) => void;
+  setFeature: (feature: StoryFabFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
   setPlaying: (playing: boolean) => void;
@@ -45,7 +45,7 @@ interface StoryFabStore {
   goToNextStep: () => void;
   goToPrevStep: () => void;
   reset: () => void;
-  resetStep: (step: storyfabStep) => void;
+  resetStep: (step: StoryFabStep) => void;
   // Computed
   canProceed: () => boolean;
   completedSteps: number;

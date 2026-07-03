@@ -7,9 +7,9 @@ import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type storyfabFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
+export type StoryFabFeatureType = 'smartClip' | 'voiceover' | 'subtitle' | 'effect' | 'none';
 
-export type storyfabStep =
+export type StoryFabStep =
   | 'project-create'
   | 'video-upload'
   | 'ai-analyze'
@@ -21,7 +21,7 @@ export type storyfabStep =
   | 'voice-synth'
   | 'video-export';
 
-export type storyfabMode = 'clip' | 'commentary';
+export type StoryFabMode = 'clip' | 'commentary';
 
 export interface SemanticSegment {
   id: string;
@@ -31,9 +31,9 @@ export interface SemanticSegment {
   description?: string;
 }
 
-export interface storyfabState {
-  mode: storyfabMode;
-  currentStep: storyfabStep;
+export interface StoryFabState {
+  mode: StoryFabMode;
+  currentStep: StoryFabStep;
   stepStatus: {
     'project-create': boolean;
     'video-upload': boolean;
@@ -46,7 +46,7 @@ export interface storyfabState {
     'voice-synth': boolean;
     'video-export': boolean;
   };
-  selectedFeature: storyfabFeatureType;
+  selectedFeature: StoryFabFeatureType;
   project: ProjectData | null;
   currentVideo: VideoInfo | null;
   analysis: VideoAnalysis | null;
@@ -83,12 +83,12 @@ export interface storyfabState {
   semanticSegments: SemanticSegment[];
 }
 
-// storyfabAction discriminated union
-export type storyfabAction =
-  | { type: 'SET_MODE'; payload: storyfabMode }
-  | { type: 'SET_STEP'; payload: storyfabStep }
-  | { type: 'SET_STEP_COMPLETE'; payload: { step: storyfabStep; complete: boolean } }
-  | { type: 'SET_FEATURE'; payload: storyfabFeatureType }
+// StoryFabAction discriminated union
+export type StoryFabAction =
+  | { type: 'SET_MODE'; payload: StoryFabMode }
+  | { type: 'SET_STEP'; payload: StoryFabStep }
+  | { type: 'SET_STEP_COMPLETE'; payload: { step: StoryFabStep; complete: boolean } }
+  | { type: 'SET_FEATURE'; payload: StoryFabFeatureType }
   | { type: 'SET_PROJECT'; payload: ProjectData | null }
   | { type: 'SET_VIDEO'; payload: VideoInfo | null }
   | { type: 'SET_ANALYSIS'; payload: VideoAnalysis | null }
@@ -110,7 +110,7 @@ export type storyfabAction =
   | { type: 'SET_DURATION'; payload: number }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' }
-  | { type: 'RESET_STEP'; payload: storyfabStep };
+  | { type: 'RESET_STEP'; payload: StoryFabStep };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -163,7 +163,7 @@ export const DEFAULT_SYNTHESIS_SETTINGS = {
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 
-export const initialState: storyfabState = {
+export const initialState: StoryFabState = {
   mode: 'clip',
   currentStep: 'project-create',
   stepStatus: { ...INITIAL_STEP_STATUS },
@@ -199,22 +199,22 @@ export const initialState: storyfabState = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function getStepsForMode(mode: storyfabMode): readonly storyfabStep[] {
+export function getStepsForMode(mode: StoryFabMode): readonly StoryFabStep[] {
   return mode === 'clip' ? CLIP_STEPS : COMMENTARY_STEPS;
 }
 
-export function getNextStep(currentStep: storyfabStep, mode: storyfabMode = 'clip'): storyfabStep {
+export function getNextStep(currentStep: StoryFabStep, mode: StoryFabMode = 'clip'): StoryFabStep {
   const steps = getStepsForMode(mode);
   const currentIndex = steps.indexOf(currentStep);
   return currentIndex < steps.length - 1 ? steps[currentIndex + 1] : currentStep;
 }
 
-export function getPrevStep(currentStep: storyfabStep, mode: storyfabMode = 'clip'): storyfabStep {
+export function getPrevStep(currentStep: StoryFabStep, mode: StoryFabMode = 'clip'): StoryFabStep {
   const steps = getStepsForMode(mode);
   const currentIndex = steps.indexOf(currentStep);
   return currentIndex > 0 ? steps[currentIndex - 1] : currentStep;
 }
 
-export function getTotalSteps(mode: storyfabMode): number {
+export function getTotalSteps(mode: StoryFabMode): number {
   return getStepsForMode(mode).length;
 }

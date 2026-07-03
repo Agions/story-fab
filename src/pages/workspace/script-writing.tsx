@@ -21,7 +21,7 @@ import {
   COMMENTARY_STYLES,
   type ScriptGenerateProps,
 } from './script-config';
-import type { storyfabAction } from '@/core/types/storyfab';
+import type { StoryFabAction } from '@/core/types/storyfab';
 import type { ScriptData } from '@/types';
 
 // 导入子组件
@@ -315,7 +315,7 @@ export default ScriptGenerate;
 /**
  * 前置步骤提示
  */
-const PrerequisiteStep: React.FC<{ dispatch: (action: storyfabAction) => void }> = ({ dispatch }) => {
+const PrerequisiteStep: React.FC<{ dispatch: (action: StoryFabAction) => void }> = ({ dispatch }) => {
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepTitle}>

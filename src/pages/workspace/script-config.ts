@@ -4,7 +4,7 @@
  */
 
 import type { ScriptData } from '@/types';
-import type { storyfabFeatureType } from '@/core/types/storyfab';
+import type { StoryFabFeatureType } from '@/core/types/storyfab';
 
 // 文案风格选项
 export const SCRIPT_STYLES = [
@@ -66,6 +66,6 @@ export interface ScriptGenerateProps {
   onNext?: () => void;
   setNarrationScript?: (data: ScriptData) => void;
   setRemixScript?: (data: ScriptData) => void;
-  setFeature?: (feature: storyfabFeatureType) => void;
+  setFeature?: (feature: StoryFabFeatureType) => void;
   goToNextStep?: () => void;
 }

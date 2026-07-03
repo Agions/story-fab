@@ -19,7 +19,7 @@ import {
   Bolt,
 } from 'lucide-react';
 import { useStoryFab } from './context/storyfab-provider';
-import type { storyfabStep } from '@/core/types/storyfab';
+import type { StoryFabStep } from '@/core/types/storyfab';
 import { STORYFAB_STEPS } from '@/core/types/storyfab';
 import styles from './workspace.module.less';
 import StepList from './step-list';
@@ -28,10 +28,10 @@ import StepList from './step-list';
 // 类型定义
 // ============================================================================
 
-export type { storyfabStep };
+export type { StoryFabStep };
 
 interface StepConfig {
-  key: storyfabStep;
+  key: StoryFabStep;
   title: string;
   icon: React.ReactNode;
 }
@@ -55,18 +55,18 @@ const STEPS: StepConfig[] = [
 ];
 
 // 正确的顺序映射（按照任务描述的视觉顺序）
-const STEP_ORDER: readonly storyfabStep[] = STORYFAB_STEPS;
+const STEP_ORDER: readonly StoryFabStep[] = STORYFAB_STEPS;
 
 // ============================================================================
 // 辅助函数
 // ============================================================================
 
-const getStepIndex = (step: storyfabStep): number => STEP_ORDER.indexOf(step);
+const getStepIndex = (step: StoryFabStep): number => STEP_ORDER.indexOf(step);
 
 const isStepAccessible = (
-  step: storyfabStep,
-  currentStep: storyfabStep,
-  stepStatus: Record<storyfabStep, boolean>
+  step: StoryFabStep,
+  currentStep: StoryFabStep,
+  stepStatus: Record<StoryFabStep, boolean>
 ): boolean => {
   // 已完成的步骤可以点击跳转
   if (stepStatus[step]) return true;
@@ -108,7 +108,7 @@ const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
     }
   }, [currentStep]);
 
-  const handleStepClick = (step: storyfabStep) => {
+  const handleStepClick = (step: StoryFabStep) => {
     if (isStepAccessible(step, currentStep, stepStatus)) {
       setStep(step);
     }
