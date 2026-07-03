@@ -181,3 +181,12 @@ export interface PlanModifications {
   segmentMode?: import('./script').SegmentMode;
   recommendedVoice?: string;
 }
+
+// ─── Overlay / 解说叠加 ──────────────────────────────────────────────
+
+export interface OriginalOverlayPlanItem {
+  sceneId: string;
+  startTime: number;
+  endTime: number;
+  reason: 'motion' | 'emotion' | 'transition' | 'anchor';
+}

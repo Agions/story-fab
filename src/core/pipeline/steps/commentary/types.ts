@@ -8,9 +8,8 @@
  * - 中间结果可被 UI 单独展示
  */
 
-import type { ScriptSegment, Scene, VideoAnalysis } from '@/types';
+import type { ScriptSegment, Scene, VideoAnalysis, OriginalOverlayPlanItem } from '@/types';
 import type { WorkflowMode } from '@/core/workflow/feature-blueprint';
-import type { OriginalOverlayPlanItem } from '@/core/services/ai/scene-commentary-service';
 
 // ============================================================
 // Pipeline 共享 Context (贯穿所有 step)
