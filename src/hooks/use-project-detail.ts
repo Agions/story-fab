@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useReducer } from 'react';
+import { useCallback, useMemo } from 'react';
+import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/types';
 import {
@@ -22,38 +23,38 @@ interface UseProjectDetailResult {
 }
 
 export function useProjectDetail(): UseProjectDetailResult {
-  const [state, dispatch] = useReducer(projectDetailReducer, initialProjectDetailState);
+  const { state, dispatch } = createReducerHook(projectDetailReducer, initialProjectDetailState);
 
-  const setActiveStep = useCallback((step: string) => dispatch({ type: 'SET_ACTIVE_STEP', step }), []);
+  const setActiveStep = useCallback((step: string) => dispatch({ type: 'SET_ACTIVE_STEP', step }), [dispatch]);
   const setProject = useCallback(
     (project: ProjectDetailState['project']) => dispatch({ type: 'SET_PROJECT', project }),
-    [],
+    [dispatch],
   );
   const updateProject = useCallback(
     (project: NonNullable<ProjectDetailState['project']>) => dispatch({ type: 'UPDATE_PROJECT', project }),
-    [],
+    [dispatch],
   );
   const setActiveScript = useCallback(
     (script: AIScriptDraft | null) => dispatch({ type: 'SET_ACTIVE_SCRIPT', script }),
-    [],
+    [dispatch],
   );
   const updateActiveScript = useCallback(
     (script: AIScriptDraft) => dispatch({ type: 'UPDATE_ACTIVE_SCRIPT', script }),
-    [],
+    [dispatch],
   );
   const updateActiveScriptFromSegments = useCallback(
     (segments: ScriptSegment[], activeScript: AIScriptDraft) =>
       dispatch({ type: 'UPDATE_ACTIVE_SCRIPT_FROM_SEGMENTS', segments, activeScript }),
-    [],
+    [dispatch],
   );
-  const setAiLoading = useCallback((loading: boolean) => dispatch({ type: 'SET_AI_LOADING', loading }), []);
+  const setAiLoading = useCallback((loading: boolean) => dispatch({ type: 'SET_AI_LOADING', loading }), [dispatch]);
   const setDrawerVisible = useCallback(
     (visible: boolean) => dispatch({ type: 'SET_DRAWER_VISIBLE', visible }),
-    [],
+    [dispatch],
   );
   const setDeleteConfirmOpen = useCallback(
     (open: boolean) => dispatch({ type: 'SET_DELETE_CONFIRM_OPEN', open }),
-    [],
+    [dispatch],
   );
 
   return useMemo(
