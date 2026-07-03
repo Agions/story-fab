@@ -11,7 +11,7 @@
  */
 
 import React, { memo } from 'react';
-import { useStoryFab } from '@/components/StoryFab/context';
+import { useStoryFab } from './context/storyfab-provider';
 import { useVideoSynthesize } from './hooks/use-video-synthesize';
 import { notify } from '@/shared';
 import { TAB_OPTIONS, type ComposingTab } from './compose-config';

@@ -10,7 +10,7 @@
  */
 
 import React, { useState, memo, useCallback } from 'react';
-import { useStoryFab } from '@/components/StoryFab/context';
+import { useStoryFab } from './context/storyfab-provider';
 import { notify } from '@/shared';
 import { useScriptGeneration } from './hooks/use-script-generation';
 import {

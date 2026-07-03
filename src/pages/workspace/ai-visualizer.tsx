@@ -8,7 +8,7 @@
  * - 6 useState → 1 useReducer (AIVisualizer.reducer.ts)
  */
 import React, { useReducer, useEffect, memo } from 'react';
-import { useStoryFab } from '@/components/StoryFab/context';
+import { useStoryFab } from './context/storyfab-provider';
 import { visionService } from '@/core/services/ai/vision-service';
 import { notify } from '@/shared';
 import { useTimeout } from '@/hooks/use-timeout';

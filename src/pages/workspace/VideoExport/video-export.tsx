@@ -3,7 +3,7 @@
  * Split into: exportConfig.ts (constants), useExportHandlers.ts (state/logic), VideoExport.tsx (render)
  */
 import React, { memo } from 'react';
-import { useStoryFab } from '@/components/StoryFab/context';
+import { useStoryFab } from '../context';
 import styles from '../VideoExport.module.less';
 import { useExportHandlers } from './use-export-handlers';
 import { NoSynthesisAlert } from './no-synthesis-alert';

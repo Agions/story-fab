@@ -4,7 +4,7 @@
  * 流转到: VideoUpload
  */
 import React, { useState, memo } from 'react';
-import { useStoryFab } from '@/components/StoryFab/context';
+import { useStoryFab } from './context/storyfab-provider';
 import type { ProjectData } from '@/types';
 import { saveProjectToFile } from '@/core/services/project/project-file-service';
 import { notify } from '@/shared';

@@ -1,4 +1,4 @@
-import type { storyfabFeatureType } from '@/components/StoryFab/context';
+import type { storyfabFeatureType } from '@/core/types/storyfab';
 
 export type AIFunctionType = 'video-narration' | 'first-person' | 'remix';
 export type AIFunctionTabKey = 'commentary-first' | 'commentary' | 'mix';

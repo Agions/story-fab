@@ -8,7 +8,7 @@ import {
   User,
   Scissors,
 } from 'lucide-react';
-import { StoryFabProvider, useStoryFab } from '@/components/StoryFab/context';
+import { StoryFabProvider, useStoryFab } from '../workspace/context/storyfab-provider';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
 import { useWorkspaceStore } from '../../stores/workspace-store';

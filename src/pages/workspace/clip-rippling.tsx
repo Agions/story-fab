@@ -12,7 +12,7 @@
  */
 
 import React, { useCallback, memo, useMemo } from 'react';
-import { useStoryFab } from '@/components/StoryFab/context';
+import { useStoryFab } from './context/storyfab-provider';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
