@@ -92,8 +92,6 @@ export interface ImageFile extends FileInfo {
 
 // ============ 项目类型 ============
 
-export type { Project, ProjectStatus } from '@/types';
-
 export type ProjectUIStatus = 'draft' | 'processing' | 'completed';
 
 export type ProjectView = {
