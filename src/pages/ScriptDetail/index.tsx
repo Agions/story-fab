@@ -7,7 +7,7 @@ import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { ArrowLeft, Save, Trash2, Download, Bot, Loader2 } from 'lucide-react';
-import { useSettings } from '@/context/settings-context';
+import { useSettingsStore } from '@/stores/settings-store';
 import { notify } from '@/shared';
 import { saveProjectToFile, loadProjectWithRetry, listProjects } from '@/core/services/project/project-file-service';
 import { exportScriptToFile } from '@/core/services/export/script-export-service';
@@ -37,7 +37,7 @@ interface ProjectWithScripts extends ProjectFileLike<Script, { path?: string }> 
 const ScriptDetail: React.FC = () => {
   const { projectId, scriptId } = useParams<{ projectId: string; scriptId: string }>();
   const navigate = useNavigate();
-  const { addRecentProject } = useSettings();
+  const { addRecentProject } = useSettingsStore();
 
   // All UI/data state centralized in reducer
   const {

@@ -8,7 +8,7 @@
 
 - Created `src/core/pipeline/types/` directory
 - Moved `src/workflow/feature-blueprint.ts` → `src/core/pipeline/types/workflow-modes.ts` (git mv)
-- Updated import in `src/core/pipeline/steps/commentary/types.ts` to use new path
+- Updated import in `src/core/pipeline/steps/commentary/types.ts`
 - Verified zero imports of `core/workflow` remain
 - Type check: 0 errors
 - Tests: 697 passed

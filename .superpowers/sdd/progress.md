@@ -9,9 +9,9 @@
 | Task | Description | Status | Commits |
 |------|-------------|--------|---------|
 | A1 | Move StoryFab workspace to pages/, types to core/ | completed | 0adea6e, 36012dc |
-| A2 | Move workflow modes to core/pipeline/types/ | pending | — |
-| A3 | Rename store/ to stores/ | pending | — |
-| A4 | Convert React Context to Zustand stores | pending | — |
+| A2 | Move workflow modes to core/pipeline/types/ | completed | bc3b205 |
+| A3 | Rename store/ to stores/ | completed | 8e7a5a0 |
+| A4 | Convert React Context to Zustand stores | in_progress | — |
 | A5 | Rename 14 CamelCase component dirs | pending | — |
 | A6 | Fix circular import in shared/utils/index.ts | pending | — |
 | A7 | Rename cssmodule.d.ts → css-modules.d.ts | pending | — |

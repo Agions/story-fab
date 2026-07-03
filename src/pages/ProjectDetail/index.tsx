@@ -11,7 +11,7 @@ import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scisso
 import { useModelStore } from '@/stores';
 import { saveProjectToFile, loadProjectWithRetry, deleteProject } from '@/core/services/project/project-file-service';
 import { getApiKey } from '@/core/services/auth/api-key-service';
-import { useSettings } from '@/context/settings-context';
+import { useSettingsStore } from '@/stores/settings-store';
 import { notify } from '@/shared';
 import { generateScriptWithModel, parseGeneratedScript } from '@/core/services/ai/script-service';
 import { resolveLegacyModel } from '@/core/services/ai/ai-model-adapter';
@@ -75,7 +75,7 @@ const MENU_ITEMS = [
 const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const { addRecentProject } = useSettings();
+  const { addRecentProject } = useSettingsStore();
   const selectedAIModel = useModelStore(s => s.selectedAIModel);
   const aiModelsSettings = useModelStore(s => s.aiModelsSettings);
 

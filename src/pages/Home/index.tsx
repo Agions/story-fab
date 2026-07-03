@@ -9,7 +9,7 @@ import {
   Video, Plus, Play, Rocket, Zap, FileText, Clock, CheckCircle, ArrowRight,
   FlaskConical, Scissors, Download, Folder, Loader2, Sparkles,
 } from 'lucide-react';
-import { useSettings } from '@/context/settings-context';
+import { useSettingsStore } from '@/stores/settings-store';
 import { getFileSizeBytes } from '@/core/services/file/file-info-service';
 import { listProjects, PROJECTS_CHANGED_EVENT } from '@/core/services/project/project-file-service';
 import { preloadProjectEditPage, preloadProjectsPage } from '../../core/utils/route-preload';
@@ -79,7 +79,7 @@ const aiModels = [
 
 const Home = () => {
   const navigate = useNavigate();
-  const { settings } = useSettings();
+  const { settings } = useSettingsStore();
   const [projects, setProjects] = useState<HomeProjectItem[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
 
