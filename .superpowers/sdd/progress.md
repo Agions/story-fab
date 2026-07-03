@@ -15,8 +15,8 @@
 | A5 | Rename 14 CamelCase component dirs | completed | cf9bfba |
 | A6 | Fix circular import in shared/utils/index.ts | completed | N/A (no issue found) |
 | A7 | Rename cssmodule.d.ts → css-modules.d.ts | completed | 1bef4aa |
-| B1 | Delete empty StoryFab/, workflow/, context/ | partial | 1b25e0a |
-| B2 | Remove unused barrel exports | skipped | — |
+| B1 | Delete empty StoryFab/, workflow/, context/ | completed | 0970392, 40f6635 |
+| B2 | Remove unused barrel exports | completed | N/A (no significant dead exports) |
 | C1 | Rewrite README.md | completed | bbc7eff |
 | D1 | Expand theme palette with brand tokens | completed | 8899e91 |
 | D2 | Fix index.html favicon references | completed | 8899e91 |
@@ -24,7 +24,7 @@
 
 ## Final State
 
-- 13 commits on feature/refactoring-phase-1
+- 16 commits on feature/refactoring-phase-1
 - 0 type errors
 - 697 tests passing
 - All 4 phases completed
