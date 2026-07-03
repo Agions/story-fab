@@ -2,7 +2,6 @@
  * StoryFab Provider — compatibility layer
  *
  * Wraps the Zustand store and provides the same API as the old useReducer context.
- * This avoids changing all 11 consumer files.
  */
 import React, { ReactNode, useRef, useCallback } from 'react';
 import { useStoryFabStore } from '@/stores/storyfab-store';
@@ -10,7 +9,7 @@ import { useStoryFabStore } from '@/stores/storyfab-store';
 // Re-export the store for direct usage
 export { useStoryFabStore } from '@/stores/storyfab-store';
 
-// Context for backward compatibility (some components may still use useContext)
+// Context retained for backward compatibility (deprecated — use useStoryFabStore directly)
 export const StoryFabContext = React.createContext<ReturnType<typeof useStoryFabStore> | undefined>(undefined);
 
 interface StoryFabProviderProps {
@@ -18,23 +17,17 @@ interface StoryFabProviderProps {
 }
 
 export const StoryFabProvider: React.FC<StoryFabProviderProps> = ({ children }) => {
-  const store = useStoryFabStore();
-
-  return (
-    <StoryFabContext.Provider value={store}>
-      {children}
-    </StoryFabContext.Provider>
-  );
+  return <>{children}</>;
 };
 
 /**
  * Compatibility hook — same API as old useStoryFab
+ * Wraps the Zustand store with blob-URL cleanup.
  */
 export const useStoryFab = () => {
   const store = useStoryFabStore();
   const state = store.state;
 
-  // Blob URL cleanup ref
   const videoBlobUrlRef = useRef<string | null>(null);
 
   const revokeVideoBlobUrl = useCallback(() => {

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { StoryFabProvider, useStoryFab } from './context/storyfab-provider';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
-import KeyboardShortcutsHelp from '@/components/common/KeyboardShortcutsHelp';
+import KeyboardShortcutsHelp from '@/components/common/keyboard-shortcuts-help';
 import { useWorkspaceStore } from '../../stores/workspace-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
