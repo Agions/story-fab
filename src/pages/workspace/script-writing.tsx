@@ -42,7 +42,7 @@ import {
   EmptyState,
 } from './components';
 
-import { FUNCTION_CONFIG } from './function-config';
+import { FUNCTION_CONFIG } from './edit-step/function-config';
 import styles from '././script-writing.module.less';
 
 // ============================================

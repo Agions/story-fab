@@ -5,7 +5,7 @@
 import React, { memo } from 'react';
 import { Plus, Video, Cloud, Download, Check, Bolt, Brain, Eye, PenTool, Mic } from 'lucide-react';
 import type { StoryFabStep, StoryFabMode } from '@/core/types/storyfab';
-import styles from '././workspace.module.less';
+import styles from '../workspace.module.less';
 
 // ============================================================================
 // 类型定义

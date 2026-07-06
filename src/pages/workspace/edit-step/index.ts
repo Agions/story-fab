@@ -5,3 +5,8 @@ export {
   SCRIPT_LENGTHS,
   type ScriptGenerateProps,
 } from './script-config';
+export {
+  videoUploadReducer,
+  initialVideoUploadState,
+  type VideoUploadState,
+} from './video-upload.reducer';

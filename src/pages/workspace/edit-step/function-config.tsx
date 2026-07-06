@@ -3,8 +3,8 @@
  *
  * 集中管理，避免每次渲染重建。
  */
-import type { AIFunctionType } from './shared/function-mode-map';
-import type { FunctionMode } from './components/function-mode-selector';
+import type { AIFunctionType } from '../shared/function-mode-map';
+import type { FunctionMode } from '../components/function-mode-selector';
 
 export const FUNCTION_CONFIG: Record<AIFunctionType, FunctionMode> = {
   'video-narration': {

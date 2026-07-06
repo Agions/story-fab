@@ -19,7 +19,7 @@ import {
   videoUploadReducer,
   initialVideoUploadState,
 } from './video-upload.reducer';
-import styles from '././video-upload.module.less';
+import styles from './video-upload.module.less';
 
 import {
   VIDEO_EXTENSIONS,
@@ -28,7 +28,7 @@ import {
   UPLOAD_DELAY_MIN_MS,
   UPLOAD_DELAY_RANGE_MS,
   chunkStore,
-} from './config/video-upload-config';
+} from '../config/video-upload-config';
 
 interface VideoUploadProps {
   onNext?: () => void;

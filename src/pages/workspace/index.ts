@@ -6,14 +6,14 @@
  * @see docs/architecture-audit-2026.md P3 step⑥
  */
 export { default as Workspace } from './workspace';
-export { default as ProjectSetup } from './project-setup';
-export { default as VideoUpload } from './video-upload';
+export { default as ProjectSetup } from './edit-step/project-setup';
+export { default as VideoUpload } from './edit-step/video-upload';
 export { default as AIVisualizer } from './ai-visualizer';
 export { default as ScriptWriting } from './script-writing';
 export { default as VideoComposing } from './video-composing';
-export { default as ClipRippling } from './clip-rippling';
+export { default as ClipRippling } from './assemble/clip-rippling';
 export { default as VideoExport } from './VideoExport';
-export { default as StepList } from './step-list';
+export { default as StepList } from './edit-step/step-list';
 export { Highlights, type Highlight, type HighlightsProps } from './Highlights/highlights';
 
 // 导出类型

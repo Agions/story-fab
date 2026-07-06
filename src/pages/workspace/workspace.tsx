@@ -22,7 +22,7 @@ import { useStoryFabStore } from '@/stores';
 import type { StoryFabStep } from '@/core/types/storyfab';
 import { STORYFAB_STEPS } from '@/core/types/storyfab';
 import styles from '././workspace.module.less';
-import StepList from './step-list';
+import StepList from './edit-step/step-list';
 
 // ============================================================================
 // 类型定义
