@@ -15,11 +15,11 @@ import { notify } from '@/shared';
 import { useTimeout } from '@/hooks/use-timeout';
 import { logger } from '@/shared/utils/logging';
 import type { AIAnalyzeProps, Scene } from '@/types';
-import styles from '././ai-visualizer.module.less';
+import styles from './ai-visualizer.module.less';
 import { Highlights } from './Highlights/highlights';
-import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysis-tasks';
+import { ANALYSIS_TASKS, TASK_ICONS } from '../config/analysis-tasks';
 import { formatTime } from '@/shared/utils/formatting';
-import { aiVisualizerReducer, initialAIVisualizerState } from './assemble/ai-visualizer.reducer';
+import { aiVisualizerReducer, initialAIVisualizerState } from './ai-visualizer.reducer';
 
 // 检查图标
 const CheckIcon = () => (
@@ -157,7 +157,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         dispatchLocal({ type: 'SET_CURRENT_TASK_KEY', currentTaskKey: 'asr' });
         timeout.set(() => dispatchLocal({ type: 'APPEND_VISIBLE_TASK', taskKey: 'asr' }), 100);
         try {
-          const { asrService } = await import('../../core/services/asr/asr-service');
+          const { asrService } = await import('../../../core/services/asr/asr-service');
           const asrResult = await asrService.recognizeSpeech(state.currentVideo, { language: 'zh_cn' });
           if (asrResult && asrResult.text) {
             dispatchLocal({ type: 'APPEND_COMPLETED_TASK', taskKey: 'asr_done' });

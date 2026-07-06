@@ -3,7 +3,7 @@
  * 单一职责：展示进度环、阶段标签、ETA 和取消按钮
  */
 import React from 'react';
-import styles from '../video-export.module.less';
+import styles from './video-export.module.less';
 
 interface ExportProgress {
   /** 0-100 */

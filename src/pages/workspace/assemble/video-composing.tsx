@@ -12,19 +12,19 @@
 
 import React, { memo } from 'react';
 import { useStoryFabStore } from '@/stores';
-import { useVideoSynthesize } from './hooks/use-video-synthesize';
+import { useVideoSynthesize } from '../hooks/use-video-synthesize';
 import { notify } from '@/shared';
-import { TAB_OPTIONS, type ComposingTab } from './shared/compose-config';
+import { TAB_OPTIONS, type ComposingTab } from '../shared/compose-config';
 
 // 导入子组件
-import { VoiceSettingsPanel } from './components/voice-settings-panel';
-import { SubtitleSettingsPanel } from './components/subtitle-settings-panel';
-import { EffectSettingsPanel } from './components/effect-settings-panel';
-import { SynthesizeProgress } from './components/synthesize-progress';
-import { WarningAlert } from './components/warning-alert';
-import { CompleteNotice } from './components/complete-notice';
+import { VoiceSettingsPanel } from '../components/voice-settings-panel';
+import { SubtitleSettingsPanel } from '../components/subtitle-settings-panel';
+import { EffectSettingsPanel } from '../components/effect-settings-panel';
+import { SynthesizeProgress } from '../components/synthesize-progress';
+import { WarningAlert } from '../components/warning-alert';
+import { CompleteNotice } from '../components/complete-notice';
 
-import styles from '././video-composing.module.less';
+import styles from './video-composing.module.less';
 
 // ============================================
 // 类型定义

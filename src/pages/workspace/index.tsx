@@ -20,10 +20,10 @@ import styles from '@/components/video-editor/video-editor.module.less';
 const Workspace = lazy(() => import('@/pages/workspace/workspace'));
 const ProjectSetup = lazy(() => import('@/pages/workspace/edit-step/project-setup'));
 const VideoUpload = lazy(() => import('@/pages/workspace/edit-step/video-upload'));
-const AIVisualizer = lazy(() => import('@/pages/workspace/ai-visualizer'));
-const ScriptWriting = lazy(() => import('@/pages/workspace/script-writing'));
-const VideoComposing = lazy(() => import('@/pages/workspace/video-composing'));
-const VideoExport = lazy(() => import('@/pages/workspace/VideoExport'));
+const AIVisualizer = lazy(() => import('@/pages/workspace/assemble/ai-visualizer'));
+const ScriptWriting = lazy(() => import('@/pages/workspace/edit-step/script-writing'));
+const VideoComposing = lazy(() => import('@/pages/workspace/assemble/video-composing'));
+const VideoExport = lazy(() => import('@/pages/workspace/export/VideoExport'));
 const ClipRippling = lazy(() => import('@/pages/workspace/assemble/clip-rippling'));
 const CommentaryPanel = lazy(() => import('@/components/commentary-panel'));
 

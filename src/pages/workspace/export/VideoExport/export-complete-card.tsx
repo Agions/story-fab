@@ -3,7 +3,7 @@
  * 单一职责：展示导出完成信息和下载/预览/分享按钮
  */
 import React from 'react';
-import styles from '../video-export.module.less';
+import styles from './video-export.module.less';
 
 interface ExportCompleteMeta {
   format: string;

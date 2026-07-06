@@ -12,25 +12,25 @@
 import React, { useState, memo, useCallback } from 'react';
 import { useStoryFabStore } from '@/stores';
 import { notify } from '@/shared';
-import { useScriptGeneration } from './hooks/use-script-generation';
+import { useScriptGeneration } from '../hooks/use-script-generation';
 import {
   FUNCTION_TO_FEATURE,
   type AIFunctionType,
-} from './shared/function-mode-map';
+} from '../shared/function-mode-map';
 import {
   type ScriptGenerateProps,
-} from './edit-step/script-config';
+} from './script-config';
 
 // 导入子组件
 import {
   FunctionModeSelector,
   useSyncFunctionType,
-} from './components/function-mode-selector';
-import { StyleLengthConfig } from './components/style-length-config';
-import { CommentaryStyleSelector } from './components/commentary-style-selector';
-import { ScriptEditorPanel } from './components/script-editor-panel';
-import { ScriptStatsBar } from './components/script-stats-bar';
-import { GenerationProgress } from './components/generation-progress';
+} from '../components/function-mode-selector';
+import { StyleLengthConfig } from '../components/style-length-config';
+import { CommentaryStyleSelector } from '../components/commentary-style-selector';
+import { ScriptEditorPanel } from '../components/script-editor-panel';
+import { ScriptStatsBar } from '../components/script-stats-bar';
+import { GenerationProgress } from '../components/generation-progress';
 import {
   PrerequisiteStep,
   ConfigHeader,
@@ -40,10 +40,10 @@ import {
   GenerateSection,
   ScriptPreviewModal,
   EmptyState,
-} from './components';
+} from '../components';
 
-import { FUNCTION_CONFIG } from './edit-step/function-config';
-import styles from '././script-writing.module.less';
+import { FUNCTION_CONFIG } from './function-config';
+import styles from './script-writing.module.less';
 
 // ============================================
 // 主组件
@@ -240,11 +240,11 @@ export default ScriptGenerate;
 // 子组件（已提取到 components/ 目录）
 // ============================================
 
-export { default as PrerequisiteStep } from './components/prerequisite-step';
-export { default as ConfigHeader } from './components/config-header';
-export { default as FunctionFeatures } from './components/function-features';
-export { default as FunctionExample } from './components/function-example';
-export { default as EditorHeader } from './components/editor-header';
-export { default as GenerateSection } from './components/generate-section';
-export { default as ScriptPreviewModal } from './components/script-preview-modal';
-export { default as EmptyState } from './components/empty-state';
+export { default as PrerequisiteStep } from '../components/prerequisite-step';
+export { default as ConfigHeader } from '../components/config-header';
+export { default as FunctionFeatures } from '../components/function-features';
+export { default as FunctionExample } from '../components/function-example';
+export { default as EditorHeader } from '../components/editor-header';
+export { default as GenerateSection } from '../components/generate-section';
+export { default as ScriptPreviewModal } from '../components/script-preview-modal';
+export { default as EmptyState } from '../components/empty-state';
