@@ -52,21 +52,21 @@ function VideoPlayer({
     if (!videoElement) return;
 
     const handleTimeUpdate = () => {
-      dispatch({ type: 'SET_CURRENT_TIME', currentTime: videoElement.currentTime });
+      dispatch({ type: 'SET_CURRENT_TIME', payload: videoElement.currentTime });
       onTimeUpdate?.(videoElement.currentTime);
     };
 
     const handleDurationChange = () => {
-      dispatch({ type: 'SET_DURATION', duration: videoElement.duration });
+      dispatch({ type: 'SET_DURATION', payload: videoElement.duration });
     };
 
     const handleEnded = () => {
-      dispatch({ type: 'SET_IS_PLAYING', isPlaying: false });
+      dispatch({ type: 'SET_IS_PLAYING', payload: false });
       onEnded?.();
     };
 
-    const handlePlay = () => dispatch({ type: 'SET_IS_PLAYING', isPlaying: true });
-    const handlePause = () => dispatch({ type: 'SET_IS_PLAYING', isPlaying: false });
+    const handlePlay = () => dispatch({ type: 'SET_IS_PLAYING', payload: true });
+    const handlePause = () => dispatch({ type: 'SET_IS_PLAYING', payload: false });
 
     videoElement.addEventListener('timeupdate', handleTimeUpdate);
     videoElement.addEventListener('durationchange', handleDurationChange);
@@ -118,7 +118,7 @@ function VideoPlayer({
       const video = videoRef.current;
       if (!video) return;
       video.volume = Math.max(0, Math.min(1, video.volume + delta));
-      dispatch({ type: 'SET_VOLUME', volume: video.volume });
+      dispatch({ type: 'SET_VOLUME', payload: video.volume });
     },
     onToggleMute: () => {
       const video = videoRef.current;
@@ -132,7 +132,7 @@ function VideoPlayer({
     if (!videoElement) return;
     const val = Array.isArray(value) ? value[0] : value;
     videoElement.currentTime = val;
-    dispatch({ type: 'SET_CURRENT_TIME', currentTime: val });
+    dispatch({ type: 'SET_CURRENT_TIME', payload: val });
   };
 
   const handleVolumeChange = (value: number | readonly number[]) => {
@@ -140,7 +140,7 @@ function VideoPlayer({
     if (!videoElement) return;
     const val = Array.isArray(value) ? value[0] : value;
     videoElement.volume = val;
-    dispatch({ type: 'SET_VOLUME', volume: val });
+    dispatch({ type: 'SET_VOLUME', payload: val });
   };
 
   return (
@@ -183,8 +183,8 @@ function VideoPlayer({
           <div className={styles.rightControls}>
             <div
               className={styles.volumeControl}
-              onMouseEnter={() => dispatch({ type: 'SET_SHOW_VOLUME_SLIDER', showVolumeSlider: true })}
-              onMouseLeave={() => dispatch({ type: 'SET_SHOW_VOLUME_SLIDER', showVolumeSlider: false })}
+              onMouseEnter={() => dispatch({ type: 'SET_SHOW_VOLUME_SLIDER', payload: true })}
+              onMouseLeave={() => dispatch({ type: 'SET_SHOW_VOLUME_SLIDER', payload: false })}
             >
               <Button variant="ghost" className={styles.controlButton}>
                 <Volume2 />

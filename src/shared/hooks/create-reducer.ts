@@ -8,24 +8,33 @@
  *        抽象自动推导 reducer / actionTypes 常量；
  *        默认 default 分支 -> 返回 state 不变。
  *
- * 调用方：dispatch({ type: 'SET_VIDEO_PATH', payload: '...' })
+ * 支持两种 action 形状（向下兼容）：
+ *   ① payload 包装：{ type: 'SET_X'; payload: T }  —— 新代码推荐
+ *   ② flat 字段：  { type: 'SET_X'; x: T }        —— 既有代码兼容
  *
- * 本工具面向「纯 setter」类 reducer；业务上仍有个别跨 action 需特化处理
- * （如 RESET 返回 baseState、UPDATE_ACTIVE_SCRIPT_FROM_SEGMENTS 含副作用），
- * 由各 reducer 自行编写 action 类型副分支 + reducer 内部预检查。
+ * 调用方：dispatch({ type: 'SET_IS_PLAYING', payload: true })
+ *    或：dispatch({ type: 'SET_IS_PLAYING', isPlaying: true })
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- 工厂本身就是 any 类型，业务层经 handlers 收敛给严格类型 */
 
-export type HandlerMap<S, Keys extends string = string> = {
-  [K in Keys]: (state: S, payload: any) => S;
+/** 单个 handler 签名：state + 业务 payload（any 由业务 map 收敛） */
+type Handler<S> = (state: S, payload: any) => S;
+
+/**
+ * 业务 handler map。
+ * 键 = action.type 字符串；值 = (state, payload) => nextState。
+ *
+ * 对「flat 字段」风格：payload 是 action 自身（含 type 外所有字段）。
+ * 对「payload 包装」风格：payload 是 action.payload。
+ * 两种风格由调用方在 handler 内自行解构，工厂不强制。
+ */
+export type HandlerMap<S> = {
+  [actionType: string]: Handler<S>;
 };
 
-export type CreateReducerResult<
-  S,
-  HM extends HandlerMap<S, keyof HM & string>,
-> = [
-  reducer: (state: S, action: { type: keyof HM; payload: any }) => S,
+export type CreateReducerResult<S, HM extends HandlerMap<S>> = [
+  reducer: (state: S, action: { type: keyof HM & string; payload: any }) => S,
   initialState: S,
   actionTypes: { [K in keyof HM]: K },
 ];
@@ -37,10 +46,7 @@ export type CreateReducerResult<
  * @param initialState 初始状态
  * @returns [reducer, initialState, actionType 常量对象]
  */
-export function createReducer<
-  S,
-  HM extends HandlerMap<S, keyof HM & string>,
->(
+export function createReducer<S, HM extends HandlerMap<S>>(
   _module: string,
   handlers: HM,
   initialState: S,
@@ -53,7 +59,10 @@ export function createReducer<
     {} as { [K in keyof HM]: K },
   );
 
-  const reducer = (state: S, action: { type: keyof HM; payload: any }): S => {
+  const reducer = (
+    state: S,
+    action: { type: keyof HM & string; payload: any },
+  ): S => {
     const handler = handlers[action.type];
     if (!handler) return state;
     return handler(state, action.payload);

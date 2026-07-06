@@ -1,17 +1,14 @@
 /**
- * VideoPlayer Reducer — 状态机化 useState 集合
+ * VideoPlayer Reducer — 视频播放器状态机 (A 类纯 setter，payload 包装风格)
+ *
+ * 改造前: 55 LoC 同构 switch 样板
+ * 改造后: 32 LoC —— 用 createReducer 工厂 + handler map 自动生成。
  *
  * 5 个 useState → 1 个 reducer:
- * - isPlaying: 播放/暂停状态
- * - currentTime: 当前播放时间 (秒)
- * - duration: 总时长 (秒)
- * - volume: 音量 0-1
- * - showVolumeSlider: 音量滑块悬停显示
- *
- * 设计点:
- * - 直接 dispatch SET_* 模式 (同 AIVisualizer/VideoSelector 风格, 无 setter 包装工厂)
- * - 5 个独立 action 即可: 5 个 useState 关联度低, 不需要复合 action
+ * - isPlaying / currentTime / duration / volume / showVolumeSlider
  */
+import { createReducer } from '@/shared/hooks/create-reducer';
+
 export interface VideoPlayerState {
   isPlaying: boolean;
   currentTime: number;
@@ -19,13 +16,6 @@ export interface VideoPlayerState {
   volume: number;
   showVolumeSlider: boolean;
 }
-
-type VideoPlayerAction =
-  | { type: 'SET_IS_PLAYING'; isPlaying: boolean }
-  | { type: 'SET_CURRENT_TIME'; currentTime: number }
-  | { type: 'SET_DURATION'; duration: number }
-  | { type: 'SET_VOLUME'; volume: number }
-  | { type: 'SET_SHOW_VOLUME_SLIDER'; showVolumeSlider: boolean };
 
 export const initialVideoPlayerState: VideoPlayerState = {
   isPlaying: false,
@@ -35,22 +25,28 @@ export const initialVideoPlayerState: VideoPlayerState = {
   showVolumeSlider: false,
 };
 
-export function videoPlayerReducer(
-  state: VideoPlayerState,
-  action: VideoPlayerAction,
-): VideoPlayerState {
-  switch (action.type) {
-    case 'SET_IS_PLAYING':
-      return { ...state, isPlaying: action.isPlaying };
-    case 'SET_CURRENT_TIME':
-      return { ...state, currentTime: action.currentTime };
-    case 'SET_DURATION':
-      return { ...state, duration: action.duration };
-    case 'SET_VOLUME':
-      return { ...state, volume: action.volume };
-    case 'SET_SHOW_VOLUME_SLIDER':
-      return { ...state, showVolumeSlider: action.showVolumeSlider };
-    default:
-      return state;
-  }
-}
+/**
+ * action 统一 payload 包装。
+ * 字段名：SET_IS_PLAYING → payload: boolean; SET_CURRENT_TIME → payload: number ...
+ */
+export type VideoPlayerAction =
+  | { type: 'SET_IS_PLAYING'; payload: boolean }
+  | { type: 'SET_CURRENT_TIME'; payload: number }
+  | { type: 'SET_DURATION'; payload: number }
+  | { type: 'SET_VOLUME'; payload: number }
+  | { type: 'SET_SHOW_VOLUME_SLIDER'; payload: boolean };
+
+const handlers = {
+  SET_IS_PLAYING: (s: VideoPlayerState, v: boolean) => ({ ...s, isPlaying: v }),
+  SET_CURRENT_TIME: (s: VideoPlayerState, v: number) => ({ ...s, currentTime: v }),
+  SET_DURATION: (s: VideoPlayerState, v: number) => ({ ...s, duration: v }),
+  SET_VOLUME: (s: VideoPlayerState, v: number) => ({ ...s, volume: v }),
+  SET_SHOW_VOLUME_SLIDER: (s: VideoPlayerState, v: boolean) => ({ ...s, showVolumeSlider: v }),
+};
+
+export const [videoPlayerReducer] =
+  createReducer<VideoPlayerState, typeof handlers>(
+    'VIDEO_PLAYER',
+    handlers,
+    initialVideoPlayerState,
+  );
