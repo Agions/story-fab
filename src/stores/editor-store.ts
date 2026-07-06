@@ -1,9 +1,23 @@
+/**
+ * EditorStore — 时间线 + 剪辑 + 播放 + 素材工作态
+ *
+ * 承接原 workspaceStore 全部字段 + storyFabStore 播放态（isPlaying / currentTime）。
+ * 视频资产（video 字段）真源在 ProjectStore；EditorStore 通过 subscribe 投影。
+ *
+ * 设计选择：
+ *  - 时间线撤销/重做（trackHistory）保留模块级单实例（与原行为兼容）。
+ *  - 持久化 key 沿用原 `StoryFab-workspace`（避免用户丢失已缓存的设置）。
+ *  - 播放态采用单一 `isPlaying` 命名，原 storyFabStore.isPlaying 与
+ *    workspaceStore.previewPlaying 统一收口于此。
+ */
 import { createPersistedStore } from './create-persisted-store';
 import { createJSONStorage } from 'zustand/middleware';
 import { createHistory } from './create-history';
 import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '@/types';
 
-// Inlined from editor-types.ts (single-consumer module, dead EditorState/EditorActions/EditorStore removed)
+// ─── 素材工作态 shape（原 workspace 内声明的精简副本）────────────────────────
+// 长期应合并到 @/types/video 与 @/types/script，本次保留以控制改动范围。
+
 export interface VideoData {
   id: string;
   url: string;
@@ -34,6 +48,10 @@ export const ZOOM_MAX = 10;
 export const VOLUME_MIN = 0;
 export const VOLUME_MAX = 1;
 
+const MAX_HISTORY_SIZE = 19;
+const trackHistory = createHistory<TimelineTrack[]>({ maxSize: MAX_HISTORY_SIZE });
+export const __resetTrackHistoryForTest = () => trackHistory.clear();
+
 import {
   updateClipInTracks,
   addKeyframeToClip,
@@ -41,18 +59,25 @@ import {
   updateKeyframeInClip,
 } from './timeline-helpers';
 
-export interface WorkspaceState {
+export interface EditorStore {
+  // ── 媒体工作态 ──
   video: VideoData | null;
   script: ScriptData | null;
   voice: VoiceData | null;
-  activePanel: EditorPanel;
-  previewPlaying: boolean;
+
+  // ── 播放态 ──
+  isPlaying: boolean;
   currentTime: number;
   volume: number;
   muted: boolean;
+
+  // ── UI 工作态 ──
+  activePanel: EditorPanel;
   selection: TimelineSelection;
   zoom: number;
   scrollPosition: number;
+
+  // ── 时间线工作态 ──
   timelineTracks: TimelineTrack[];
   playheadMs: number;
   timelineDuration: number;
@@ -63,11 +88,14 @@ export interface WorkspaceState {
   selectedMultipleIds?: string[];
   inPointMs?: number;
   outPointMs?: number;
+
+  // ── action creators (保持与 workspace-store 接口兼容) ──
   setVideo: (video: VideoData | null) => void;
   setScript: (script: ScriptData | null) => void;
   setVoice: (voice: VoiceData | null) => void;
   setActivePanel: (panel: EditorPanel) => void;
-  setPreviewPlaying: (playing: boolean) => void;
+  setIsPlaying: (playing: boolean) => void;
+  setPreviewPlaying: (playing: boolean) => void; // @deprecated 兼容 alias
   setCurrentTime: (time: number) => void;
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
@@ -76,6 +104,7 @@ export interface WorkspaceState {
   setZoom: (zoom: number) => void;
   setScrollPosition: (position: number) => void;
   reset: () => void;
+
   setPlayheadMs: (ms: number) => void;
   setTimelineTracks: (tracks: TimelineTrack[]) => void;
   addTimelineTrack: (type: TrackType, name?: string) => string;
@@ -103,17 +132,12 @@ export interface WorkspaceState {
   canRedoTrack: () => boolean;
 }
 
-const MAX_HISTORY_SIZE = 19;
-const trackHistory = createHistory<TimelineTrack[]>({ maxSize: MAX_HISTORY_SIZE });
-
-export const __resetTrackHistoryForTest = () => trackHistory.clear();
-
 const initialEditorState = {
   video: null as VideoData | null,
   script: null as ScriptData | null,
   voice: null as VoiceData | null,
   activePanel: 'video' as EditorPanel,
-  previewPlaying: false,
+  isPlaying: false,
   currentTime: 0,
   volume: 1,
   muted: false,
@@ -135,9 +159,9 @@ const initialTimelineState = {
   outPointMs: undefined as number | undefined,
 };
 
-export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
+export const useEditorStore = createPersistedStore<EditorStore>({
   name: 'StoryFab-workspace',
-  devtoolsName: 'WorkspaceStore',
+  devtoolsName: 'EditorStore',
   storage: createJSONStorage(() => localStorage),
   partialize: (state) => ({
     video: state.video,
@@ -155,7 +179,8 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
     setScript: (script) => set({ script }),
     setVoice: (voice) => set({ voice }),
     setActivePanel: (activePanel) => set({ activePanel }),
-    setPreviewPlaying: (previewPlaying) => set({ previewPlaying }),
+    setIsPlaying: (isPlaying) => set({ isPlaying }),
+    setPreviewPlaying: (previewPlaying) => set({ isPlaying: previewPlaying }),
     setCurrentTime: (currentTime) => set({ currentTime }),
     setVolume: (volume) => set({ volume: Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, volume)) }),
     setMuted: (muted) => set({ muted }),
@@ -163,10 +188,7 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
     clearSelection: () => set({ selection: { segmentId: undefined, multipleIds: [] } }),
     setZoom: (zoom) => set({ zoom: Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom)) }),
     setScrollPosition: (scrollPosition) => set({ scrollPosition }),
-    reset: () => set({
-      ...initialEditorState,
-      ...initialTimelineState,
-    }),
+    reset: () => set({ ...initialEditorState, ...initialTimelineState }),
 
     setPlayheadMs: (ms) => set({ playheadMs: Math.max(0, ms) }),
     setTimelineTracks: (tracks) => {
@@ -205,7 +227,7 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
     updateTimelineTrack: (trackId, updates) =>
       set((s) => ({
         timelineTracks: s.timelineTracks.map((t) =>
-          t.id === trackId ? { ...t, ...updates } : t
+          t.id === trackId ? { ...t, ...updates } : t,
         ),
       })),
 
@@ -215,7 +237,7 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
       trackHistory.save(get().timelineTracks);
       set((s) => ({
         timelineTracks: s.timelineTracks.map((t) =>
-          t.id === trackId ? { ...t, clips: [...t.clips, clip] } : t
+          t.id === trackId ? { ...t, clips: [...t.clips, clip] } : t,
         ),
         selectedClipId: id,
         selectedTrackId: trackId,
@@ -237,9 +259,7 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
 
     updateClip: (clipId, updates) => {
       trackHistory.save(get().timelineTracks);
-      set((s) => ({
-        timelineTracks: updateClipInTracks(s.timelineTracks, clipId, updates),
-      }));
+      set((s) => ({ timelineTracks: updateClipInTracks(s.timelineTracks, clipId, updates) }));
     },
 
     moveClip: (clipId, targetTrackId, newStartMs, newEndMs, skipHistory) => {
@@ -274,7 +294,7 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
                     },
                   ],
                 }
-              : t
+              : t,
           ),
         };
       });
@@ -309,24 +329,18 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
       trackHistory.save(get().timelineTracks);
       const id = crypto.randomUUID();
       const keyframe: AnimationKeyframe = { ...kfData, id };
-      set((s) => ({
-        timelineTracks: addKeyframeToClip(s.timelineTracks, clipId, keyframe),
-      }));
+      set((s) => ({ timelineTracks: addKeyframeToClip(s.timelineTracks, clipId, keyframe) }));
       return id;
     },
 
     removeKeyframe: (clipId, keyframeId) => {
       trackHistory.save(get().timelineTracks);
-      set((s) => ({
-        timelineTracks: removeKeyframeFromClip(s.timelineTracks, clipId, keyframeId),
-      }));
+      set((s) => ({ timelineTracks: removeKeyframeFromClip(s.timelineTracks, clipId, keyframeId) }));
     },
 
     updateKeyframe: (clipId, keyframeId, updates) => {
       trackHistory.save(get().timelineTracks);
-      set((s) => ({
-        timelineTracks: updateKeyframeInClip(s.timelineTracks, clipId, keyframeId, updates),
-      }));
+      set((s) => ({ timelineTracks: updateKeyframeInClip(s.timelineTracks, clipId, keyframeId, updates) }));
     },
 
     setTimelineSelection: (clipId, trackId) =>
@@ -342,7 +356,9 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
       const allClipIds = get().timelineTracks.flatMap((t) => t.clips.map((c) => c.id));
       if (allClipIds.length === 0) return;
       const [firstId, ...restIds] = allClipIds;
-      const firstTrack = get().timelineTracks.find((t) => t.clips.some((c) => c.id === firstId));
+      const firstTrack = get().timelineTracks.find((t) =>
+        t.clips.some((c) => c.id === firstId),
+      );
       set({
         selectedClipId: firstId,
         selectedTrackId: firstTrack?.id,
@@ -366,3 +382,9 @@ export const useWorkspaceStore = createPersistedStore<WorkspaceState>({
     canRedoTrack: () => trackHistory.canRedo(),
   }),
 });
+
+/**
+ * 兼容别名 — 过渡期保留 useWorkspaceStore。
+ * @deprecated 使用 useEditorStore
+ */
+export const useWorkspaceStore = useEditorStore;

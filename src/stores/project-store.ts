@@ -1,10 +1,18 @@
 /**
- * StoryFab Store — Zustand v5
+ * ProjectStore — 项目元数据 / 模式 / 步骤 / 产物状态
  *
- * Replaces the useReducer-based StoryFab context.
- * Provides the same API: useStoryFabStore() with state and actions.
+ * 承接原 storyFabStore.state 的全部字段。
+ * 视频资产（currentVideo / duration）真源，EditorStore 通过 subscribe 投影。
+ *
+ * 设计选择：
+ *  - 保留 StoryFab reducer 协议（SET_MODE / SET_STEP / ...）作为状态机核心，
+ *    避免一次性重写 reducer 触发回归；复合 action（updateVideo、resetStep 等）
+ *    以 action creator 形式包在 store action 上。
+ *  - 持久化：当前无 persist（与原 storyFabStore 一致），项目数据由
+ *    project-file-service 项目管理。
  */
 import { create } from 'zustand';
+import type { VideoInfo, VideoAnalysis, ProjectData, ExportSettings } from '@/types';
 import type {
   StoryFabState,
   StoryFabStep,
@@ -19,41 +27,52 @@ import {
   getTotalSteps,
 } from '@/core/types/storyfab';
 import { storyFabReducer } from '@/core/types/storyfab';
-import type { VideoInfo, VideoAnalysis, ScriptData, ProjectData, ExportSettings } from '@/types';
 
-interface StoryFabStore {
+/** 派生初始状态（每次调用返回新对象，避免共享引用） */
+const createInitialState = (): StoryFabState => ({
+  ...initialState,
+  project: initialState.project ? { ...initialState.project } : null,
+  analysis: null,
+});
+
+export interface ProjectStore {
+  // ── 状态机核心（沿用 storyFab 状态形）──
   state: StoryFabState;
-  // Actions
+
+  // ── action creators（保留 dispatch 过渡期）──
   dispatch: (action: StoryFabAction) => void;
+
+  // ── 元数据 setter（与 storyFab 当前签名兼容）──
   setMode: (mode: StoryFabMode) => void;
   setStep: (step: StoryFabStep) => void;
   setFeature: (feature: StoryFabFeatureType) => void;
   setProject: (project: ProjectData | null) => void;
   setVideo: (video: VideoInfo | null) => void;
-  setPlaying: (playing: boolean) => void;
-  setCurrentTime: (time: number) => void;
   setAnalysis: (analysis: VideoAnalysis | null) => void;
   setOcrSubtitle: (data: Array<{ startTime: number; endTime: number; text: string }> | null) => void;
   setAsrSubtitle: (data: Array<{ startTime: number; endTime: number; text: string; speaker?: string }> | null) => void;
-  setNarrationScript: (script: ScriptData | null) => void;
-  setRemixScript: (script: ScriptData | null) => void;
+  setNarrationScript: (script: import('@/types').ScriptData | null) => void;
+  setRemixScript: (script: import('@/types').ScriptData | null) => void;
   setVoice: (audioUrl: string | null, settings?: { voiceId?: string; speed?: number; volume?: number }) => void;
   setSynthesis: (videoUrl: string | null, settings?: { syncAudioVideo?: boolean; addSubtitles?: boolean; addWatermark?: boolean }) => void;
   setExportSettings: (settings: ExportSettings | null) => void;
   setDuration: (duration: number) => void;
+
+  // ── 复合 action ──
   updateVideo: (updates: Partial<VideoInfo>) => void;
   goToNextStep: () => void;
   goToPrevStep: () => void;
   reset: () => void;
   resetStep: (step: StoryFabStep) => void;
-  // Computed
+
+  // ── 派生（getter）──
   canProceed: () => boolean;
-  completedSteps: number;
-  totalSteps: number;
+  get completedSteps(): number;
+  get totalSteps(): number;
 }
 
-export const useStoryFabStore = create<StoryFabStore>((set, get) => ({
-  state: initialState,
+export const useProjectStore = create<ProjectStore>((set, get) => ({
+  state: createInitialState(),
 
   dispatch: (action) => {
     set((s) => ({ state: storyFabReducer(s.state, action) }));
@@ -64,8 +83,6 @@ export const useStoryFabStore = create<StoryFabStore>((set, get) => ({
   setFeature: (feature) => get().dispatch({ type: 'SET_FEATURE', payload: feature }),
   setProject: (project) => get().dispatch({ type: 'SET_PROJECT', payload: project }),
   setVideo: (video) => get().dispatch({ type: 'SET_VIDEO', payload: video }),
-  setPlaying: (playing) => get().dispatch({ type: 'SET_PLAYING', payload: playing }),
-  setCurrentTime: (time) => get().dispatch({ type: 'SET_CURRENT_TIME', payload: time }),
   setAnalysis: (analysis) => get().dispatch({ type: 'SET_ANALYSIS', payload: analysis }),
   setOcrSubtitle: (data) => get().dispatch({ type: 'SET_OCR_SUBTITLE', payload: data }),
   setAsrSubtitle: (data) => get().dispatch({ type: 'SET_ASR_SUBTITLE', payload: data }),
@@ -85,17 +102,19 @@ export const useStoryFabStore = create<StoryFabStore>((set, get) => ({
 
   goToNextStep: () => {
     const { state } = get();
-    const nextStep = getNextStep(state.currentStep, state.mode);
-    get().dispatch({ type: 'SET_STEP', payload: nextStep });
+    const next = getNextStep(state.currentStep, state.mode);
+    get().dispatch({ type: 'SET_STEP', payload: next });
   },
 
   goToPrevStep: () => {
     const { state } = get();
-    const prevStep = getPrevStep(state.currentStep, state.mode);
-    get().dispatch({ type: 'SET_STEP', payload: prevStep });
+    const prev = getPrevStep(state.currentStep, state.mode);
+    get().dispatch({ type: 'SET_STEP', payload: prev });
   },
 
-  reset: () => get().dispatch({ type: 'RESET' }),
+  reset: () => {
+    set({ state: createInitialState() });
+  },
 
   resetStep: (step) => get().dispatch({ type: 'RESET_STEP', payload: step }),
 
@@ -112,3 +131,10 @@ export const useStoryFabStore = create<StoryFabStore>((set, get) => ({
     return getTotalSteps(get().state.mode);
   },
 }));
+
+/**
+ * 兼容别名 — 过渡期保留 useStoryFabStore。
+ * 消费者迁移完 useStoryFabStore 后删除此 alias。
+ * @deprecated 使用 useProjectStore
+ */
+export const useStoryFabStore = useProjectStore;

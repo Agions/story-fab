@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { notify } from '@/shared';
 import { subtitleService } from '@/core/services/subtitle/subtitle-service';
-import { useWorkspaceStore } from '@/stores/workspace-store';
+import { useWorkspaceStore } from '@/stores';
 import type { SubtitleEntry } from '@/types';
 import styles from '././index.module.less';
 import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';
@@ -48,7 +48,7 @@ interface SubtitleExtractorProps {
 
 const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoUrl, onExtracted }) => {
   const playheadMs = useWorkspaceStore(state => state.playheadMs);
-  const previewPlaying = useWorkspaceStore(state => state.previewPlaying);
+  const previewPlaying = useWorkspaceStore(state => state.isPlaying);
   const setPlayheadMs = useWorkspaceStore(state => state.setPlayheadMs);
   const setPreviewPlaying = useWorkspaceStore(state => state.setPreviewPlaying);
   const videoRef = useRef<HTMLVideoElement>(null);

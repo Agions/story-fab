@@ -13,7 +13,7 @@ import { createReducerHook } from '@/shared/hooks/useReducerHook';
 import { Slider } from '@/components/ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
 import { visionService } from '@/core/services/ai/vision-service';
-import { useWorkspaceStore } from '@/stores/workspace-store';
+import { useWorkspaceStore } from '@/stores';
 import { notify } from '@/shared/utils/notify';
 import type { VideoInfo } from '@/types';
 import {

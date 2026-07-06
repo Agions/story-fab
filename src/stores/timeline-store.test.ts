@@ -2,7 +2,7 @@
  * timelineStore 单元测试
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useWorkspaceStore as useTimelineStore, __resetTrackHistoryForTest } from './workspace-store';
+import { useWorkspaceStore as useTimelineStore, __resetTrackHistoryForTest } from './editor-store';
 
 // 独立的 createHistory 实例用于单元测试（验证模块行为与 store 一致）
 import { createHistory } from './create-history';
