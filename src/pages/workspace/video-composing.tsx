@@ -14,7 +14,7 @@ import React, { memo } from 'react';
 import { useStoryFabStore } from '@/stores';
 import { useVideoSynthesize } from './hooks/use-video-synthesize';
 import { notify } from '@/shared';
-import { TAB_OPTIONS, type ComposingTab } from './compose-config';
+import { TAB_OPTIONS, type ComposingTab } from './shared/compose-config';
 
 // 导入子组件
 import { VoiceSettingsPanel } from './components/voice-settings-panel';

@@ -19,7 +19,7 @@ import styles from '././ai-visualizer.module.less';
 import { Highlights } from './Highlights/highlights';
 import { ANALYSIS_TASKS, TASK_ICONS } from './config/analysis-tasks';
 import { formatTime } from '@/shared/utils/formatting';
-import { aiVisualizerReducer, initialAIVisualizerState } from './ai-visualizer.reducer';
+import { aiVisualizerReducer, initialAIVisualizerState } from './assemble/ai-visualizer.reducer';
 
 // 检查图标
 const CheckIcon = () => (

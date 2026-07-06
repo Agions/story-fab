@@ -16,9 +16,9 @@ import { mixTtsWithVideo } from '@/core/services/video/audio-mix-service';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import { useTimeout } from '@/hooks/use-timeout';
-import { EFFECT_PRESET_MAP } from '../compose-config';
-import type { SynthesizeConfig } from '../compose-config';
-import { DEFAULT_SYNTHESIZE_CONFIG } from '../compose-config';
+import { EFFECT_PRESET_MAP } from '../shared/compose-config';
+import type { SynthesizeConfig } from '../shared/compose-config';
+import { DEFAULT_SYNTHESIZE_CONFIG } from '../shared/compose-config';
 
 // ============================================
 // Hook 状态类型

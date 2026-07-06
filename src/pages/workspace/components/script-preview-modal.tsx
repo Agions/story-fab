@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import type { ScriptData } from '@/types';
-import { COMMENTARY_STYLES } from '../script-config';
+import { COMMENTARY_STYLES } from '../edit-step/script-config';
 import styles from '././../script-writing.module.less';
 
 interface ScriptPreviewModalProps {

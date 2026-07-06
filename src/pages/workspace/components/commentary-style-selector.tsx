@@ -9,7 +9,7 @@
 
 import React from 'react';
 import styles from '././../script-writing.module.less';
-import { COMMENTARY_STYLES } from '../script-config';
+import { COMMENTARY_STYLES } from '../edit-step/script-config';
 
 // ============================================
 // 类型定义

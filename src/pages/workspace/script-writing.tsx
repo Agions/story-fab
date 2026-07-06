@@ -16,10 +16,10 @@ import { useScriptGeneration } from './hooks/use-script-generation';
 import {
   FUNCTION_TO_FEATURE,
   type AIFunctionType,
-} from './function-mode-map';
+} from './shared/function-mode-map';
 import {
   type ScriptGenerateProps,
-} from './script-config';
+} from './edit-step/script-config';
 
 // 导入子组件
 import {

@@ -1,5 +1,5 @@
 import type { RepurposingClip, PipelineStage } from '@/core/services/pipeline/clip-pipeline/pipeline';
-import type { SocialPlatform, AspectRatio } from './clip-rippling-config';
+import type { SocialPlatform, AspectRatio } from './shared/clip-rippling-config';
 
 export interface ClipRipplingState {
   platform: SocialPlatform;

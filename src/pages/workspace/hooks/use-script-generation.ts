@@ -21,7 +21,7 @@ import {
   resolveDefaultModelId,
 } from '@/core/utils/model-availability';
 import { useTimeout } from '@/hooks/use-timeout';
-import { FUNCTION_TO_FEATURE, type AIFunctionType } from '../function-mode-map';
+import { FUNCTION_TO_FEATURE, type AIFunctionType } from '../shared/function-mode-map';
 
 // ============================================
 // 类型定义

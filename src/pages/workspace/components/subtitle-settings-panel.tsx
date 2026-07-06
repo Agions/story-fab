@@ -9,7 +9,7 @@
 
 import React from 'react';
 import styles from '././../video-composing.module.less';
-import { SUBTITLE_POSITIONS, type SynthesizeConfig } from '../compose-config';
+import { SUBTITLE_POSITIONS, type SynthesizeConfig } from '../shared/compose-config';
 
 // ============================================
 // 类型定义
