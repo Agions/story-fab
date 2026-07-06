@@ -7,8 +7,8 @@
 export { useAppStore } from './app-store';
 export { useWorkspaceStore } from './workspace-store';
 
-// AI 模型相关状态
-export { useModelStore } from './model-store';
+// 用户偏好持久层 (原 model-store)
+export { useSettingsStore, useModelStore } from './settings-store';
 
 // Workspace 状态机（已迁移至 Zustand）
 export { useStoryFabStore } from './storyfab-store';
