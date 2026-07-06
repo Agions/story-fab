@@ -27,3 +27,22 @@ export function createAutoSetters<State extends object, Key extends keyof State 
   }
   return setters as { [K in keyof State]: Setter<State[K]> };
 }
+
+/**
+ * Generic reducer for the `{ type: 'update'; key; updater }` action shape.
+ * Use with `createAutoSetters` to eliminate per-file reducer boilerplate.
+ */
+export function genericUpdateReducer<State extends object>(
+  state: State,
+  action: { type: 'update'; key: keyof State; updater: Updater<unknown> },
+): State {
+  if (action.type === 'update') {
+    const current = state[action.key];
+    const next =
+      typeof action.updater === 'function'
+        ? (action.updater as (prev: typeof current) => typeof current)(current)
+        : action.updater;
+    return { ...state, [action.key]: next };
+  }
+  return state;
+}

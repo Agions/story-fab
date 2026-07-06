@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '../../components/ui/skeleton';
 import { Plus } from 'lucide-react';
-import { useSettingsStore } from '../../stores/settings-store';
+import { useAppStore } from '@/stores/app-store';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import { ProjectsToolbar } from './components/projects-toolbar';
 import { StatusFilterBar } from './components/status-filter-bar';
@@ -19,7 +19,7 @@ const ProjectsListView = React.lazy(loadProjectsListView);
 
 const ProjectManager: React.FC = () => {
   const navigate = useNavigate();
-  const { settings, addRecentProject } = useSettingsStore();
+  const { userSettings: settings, addRecentProject } = useAppStore();
   
   const {
     viewMode,

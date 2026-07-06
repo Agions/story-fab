@@ -16,9 +16,6 @@ export {
   generateScriptWithOpenAI,
   analyzeKeyFramesWithAI,
   type AIScriptDraft,
-  type Script,
-  type ScriptSegment,
-  type LegacyAIModelType,
   type AnalysisInput,
   type ScriptGenerationSettings,
 } from './script/script-generation-service';

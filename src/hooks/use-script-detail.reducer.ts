@@ -1,10 +1,11 @@
-import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
+import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { DetailProjectWithAIScripts } from '@/types';
+import type { ScriptSegment } from '@/types';
 
 export interface ScriptDetailState {
   loading: boolean;
   project: DetailProjectWithAIScripts | null;
-  script: Script | null;
+  script: AIScriptDraft | null;
   segments: ScriptSegment[];
   loadError: string;
   reloadToken: number;
@@ -17,7 +18,7 @@ export interface ScriptDetailState {
 type ScriptDetailAction =
   | { type: 'SET_LOADING'; loading: boolean }
   | { type: 'SET_PROJECT'; project: ScriptDetailState['project'] }
-  | { type: 'SET_SCRIPT'; script: Script | null }
+  | { type: 'SET_SCRIPT'; script: AIScriptDraft | null }
   | { type: 'SET_SEGMENTS'; segments: ScriptSegment[] }
   | { type: 'SET_LOAD_ERROR'; loadError: string }
   | { type: 'INCREMENT_RELOAD_TOKEN' }

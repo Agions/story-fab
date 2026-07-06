@@ -2,8 +2,38 @@ import { createPersistedStore } from './create-persisted-store';
 import { createJSONStorage } from 'zustand/middleware';
 import { createHistory } from './create-history';
 import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '@/types';
-import type { VideoData, ScriptData, VoiceData, EditorPanel, TimelineSelection } from './editor-types';
-import { DEFAULT_ZOOM, ZOOM_MIN, ZOOM_MAX, VOLUME_MIN, VOLUME_MAX, DEFAULT_SNAP_THRESHOLD_MS } from './editor-types';
+
+// Inlined from editor-types.ts (single-consumer module, dead EditorState/EditorActions/EditorStore removed)
+export interface VideoData {
+  id: string;
+  url: string;
+  duration: number;
+}
+
+export interface ScriptData {
+  id: string;
+  content: string;
+}
+
+export interface VoiceData {
+  id: string;
+  url: string;
+}
+
+export type EditorPanel = 'video' | 'script' | 'voice' | 'subtitles' | 'settings';
+
+export interface TimelineSelection {
+  segmentId?: string;
+  multipleIds: string[];
+}
+
+export const DEFAULT_SNAP_THRESHOLD_MS = 100;
+export const DEFAULT_ZOOM = 1;
+export const ZOOM_MIN = 0.1;
+export const ZOOM_MAX = 10;
+export const VOLUME_MIN = 0;
+export const VOLUME_MAX = 1;
+
 import {
   updateClipInTracks,
   addKeyframeToClip,

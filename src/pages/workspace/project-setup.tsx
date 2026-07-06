@@ -4,11 +4,11 @@
  * 流转到: VideoUpload
  */
 import React, { useState, memo } from 'react';
-import { useStoryFab } from './context/storyfab-provider';
+import { useStoryFabStore } from '@/stores';
 import type { ProjectData } from '@/types';
 import { saveProjectToFile } from '@/core/services/project/project-file-service';
 import { notify } from '@/shared';
-import { useSettingsStore } from '@/stores/settings-store';
+import { useAppStore } from '@/stores/app-store';
 import styles from '././project-setup.module.less';
 
 interface ProjectCreateProps {
@@ -75,8 +75,8 @@ const createDefaultProjectName = () => {
 };
 
 const ProjectCreate: React.FC<ProjectCreateProps> = memo(({ onNext }) => {
-  const { state, setProject, goToNextStep } = useStoryFab();
-  const { addRecentProject } = useSettingsStore();
+  const { state, setProject, goToNextStep } = useStoryFabStore();
+  const { addRecentProject } = useAppStore();
   const [loading, setLoading] = useState(false);
   const [selectedMode, setSelectedMode] = useState<string>('first-person');
   const [projectName, setProjectName] = useState<string>(() => createDefaultProjectName());

@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { createReducerHook } from '@/shared/hooks/useReducerHook';
-import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
+import type { AIScriptDraft } from '@/core/services/ai/script-service';
+import type { ScriptSegment } from '@/types';
 import {
   initialScriptDetailState,
   scriptDetailReducer,
@@ -11,7 +12,7 @@ interface UseScriptDetailResult {
   state: ScriptDetailState;
   setLoading: (loading: boolean) => void;
   setProject: (project: ScriptDetailState['project']) => void;
-  setScript: (script: Script | null) => void;
+  setScript: (script: AIScriptDraft | null) => void;
   setSegments: (segments: ScriptSegment[]) => void;
   setLoadError: (loadError: string) => void;
   incrementReloadToken: () => void;
@@ -32,7 +33,7 @@ export function useScriptDetail(): UseScriptDetailResult {
     [dispatch],
   );
   const setScript = useCallback(
-    (script: Script | null) => dispatch({ type: 'SET_SCRIPT', script }),
+    (script: AIScriptDraft | null) => dispatch({ type: 'SET_SCRIPT', script }),
     [dispatch],
   );
   const setSegments = useCallback(

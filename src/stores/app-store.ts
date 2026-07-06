@@ -13,11 +13,13 @@ export interface AppState {
   isAuthenticated: boolean;
   sidebarCollapsed: boolean;
   theme: 'light' | 'dark';
+  isDarkMode: boolean;
   notifications: number;
   autoSave: boolean;
   userSettings: UserSettings;
   setUser: (user: User | null) => void;
   setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
   toggleSidebar: () => void;
   logout: () => void;
   setNotifications: (count: number) => void;
@@ -33,6 +35,13 @@ const defaultSettings: UserSettings = {
   recentProjects: [],
 };
 
+const applyThemeClass = (theme: 'light' | 'dark') => {
+  if (typeof document !== 'undefined') {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+  }
+};
+
 export const useAppStore = createPersistedStore<AppState>({
   name: 'StoryFab-app',
   devtoolsName: 'AppStore',
@@ -43,16 +52,24 @@ export const useAppStore = createPersistedStore<AppState>({
     userSettings: state.userSettings,
     autoSave: state.autoSave,
   }),
-  state: (set) => ({
+  state: (set, get) => ({
     user: null,
     isAuthenticated: false,
     sidebarCollapsed: false,
     theme: 'light',
+    isDarkMode: false,
     notifications: 0,
     autoSave: true,
     userSettings: defaultSettings,
     setUser: (user) => set({ user, isAuthenticated: !!user }),
-    setTheme: (theme) => set({ theme }),
+    setTheme: (theme) => {
+      applyThemeClass(theme);
+      set({ theme, isDarkMode: theme === 'dark' });
+    },
+    toggleTheme: () => {
+      const next = get().theme === 'dark' ? 'light' : 'dark';
+      get().setTheme(next);
+    },
     toggleSidebar: () =>
       set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
     logout: () => set({
@@ -74,7 +91,7 @@ export const useAppStore = createPersistedStore<AppState>({
           recentProjects: [
             projectId,
             ...state.userSettings.recentProjects.filter((id) => id !== projectId),
-          ].slice(0, 10),
+          ].slice(0, 50),
         },
       })),
   }),

@@ -16,7 +16,7 @@ import {
   Info,
   Lock,
 } from 'lucide-react';
-import { useThemeStore } from '@/stores/theme-store';
+import { useAppStore } from '@/stores/app-store';
 import useLocalStorage from '../../hooks/use-local-storage';
 import ApiKeysPanel from '../../components/settings/api-keys-panel';
 import ModelSettingsPanel from '../../components/settings/model-settings-panel';
@@ -35,7 +35,7 @@ import packageJson from '../../../package.json';
 import styles from '@/pages/Settings/index.module.less';
 
 const Settings: React.FC = () => {
-  const { isDarkMode, toggleTheme } = useThemeStore();
+  const { isDarkMode, toggleTheme } = useAppStore();
 
   const [activeTab, setActiveTab] = useState('models');
   const [isLoading, setIsLoading] = useState(true);

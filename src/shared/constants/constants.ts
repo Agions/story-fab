@@ -1,57 +1,11 @@
 /**
- * 项目核心常量（单一来源）
- * 所有业务常量定义在这里，src/constants/index.ts 和 src/shared/constants/settings.ts 重导出
+ * 项目核心常量（精简至实际使用的导出）
  */
 
-export const APP = {
-  name: 'story-fab',
-  version: '2.0.0',
-  description: 'AI 驱动的专业视频内容创作平台',
-  author: 'Agions',
-  website: 'https://github.com/Agions/story-fab',
-};
+// 视频格式（仅保留被引用的 VIDEO_EXTENSIONS）
+export const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv'];
 
-export const VIDEO_FORMATS = {
-  input: ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv'],
-  output: ['mp4', 'mov', 'webm', 'avi'],
-};
-
-/** Pre-computed input extensions with dot prefix, e.g. ['.mp4', '.mov', ...] */
-export const VIDEO_EXTENSIONS = VIDEO_FORMATS.input.map((f) => `.${f}`);
-
-/** Comma-separated accept string for file input elements */
-export const VIDEO_ACCEPT_STRING = VIDEO_EXTENSIONS.join(',');
-
-export const IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'];
-
-export const AUDIO_FORMATS = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a', 'wma'];
-
-export const FILE_LIMITS = {
-  maxFileSize: 2 * 1024 * 1024 * 1024, // 2GB
-  maxVideoSize: 10 * 1024 * 1024 * 1024, // 10GB
-  maxAudioSize: 200 * 1024 * 1024, // 200MB
-  maxImageSize: 20 * 1024 * 1024, // 20MB
-};
-
-export const VIDEO_PARAMS = {
-  defaultBitrate: '8M',
-  defaultFPS: 30,
-  defaultResolution: '1920x1080',
-};
-
-export const AI_FEATURES = {
-  autoEditing: true,
-  autoSubtitle: true,
-  smartCrop: true,
-  voiceClone: false,
-};
-
-export const VOICE_OPTIONS = [
-  { value: 'zh-CN-XiaoxiaoNeural', label: 'xiaoxiao' },
-  { value: 'zh-CN-YunxiNeural', label: 'yunxi' },
-  { value: 'zh-CN-YunyangNeural', label: 'yunyang' },
-];
-
+// 脚本风格/长度（被 style-length-config 和 script-config 使用）
 export const SCRIPT_STYLES = ['humorous', 'serious', 'casual', 'professional', 'emotional'];
 
 export const SCRIPT_LENGTHS = [
@@ -60,59 +14,20 @@ export const SCRIPT_LENGTHS = [
   { value: 'long', label: '长 (3min+)', min: 180, max: 600 },
 ];
 
+// 转场/音效/配音选项（被 effect-settings-panel 和 voice-settings-panel 使用）
 export const EFFECT_STYLES = ['fade', 'slide', 'zoom', 'cut', 'dissolve'];
 
-export const PROJECT_TEMPLATES = [
-  { id: 'blank', name: '空白项目', description: '从零开始创作' },
-  { id: 'vlog', name: 'Vlog', description: '个人生活记录' },
-  { id: 'tutorial', name: '教程', description: '知识讲解类视频' },
-  { id: 'review', name: '评测', description: '产品评测类视频' },
+export const VOICE_OPTIONS = [
+  { value: 'zh-CN-XiaoxiaoNeural', label: 'xiaoxiao' },
+  { value: 'zh-CN-YunxiNeural', label: 'yunxi' },
+  { value: 'zh-CN-YunyangNeural', label: 'yunyang' },
 ];
 
-export const HOTKEYS = {
-  save: { key: 's', ctrl: true },
-  undo: { key: 'z', ctrl: true },
-  redo: { key: 'y', ctrl: true },
-  delete: { key: 'Delete' },
-  selectAll: { key: 'a', ctrl: true },
-};
-
-export const STORAGE_KEYS = {
-  projects: 'storyfab_projects',
-  settings: 'storyfab_settings',
-  recent: 'storyfab_recent',
-  cache: 'storyfab_cache',
-  timeline: 'storyfab_timeline',
-  auth: 'storyfab_auth',
-  projectSaveBehavior: 'storyfab_project_save_behavior',
-  projectAutoSave: 'storyfab_project_autosave',
-  authToken: 'storyfab_auth_token',  // Added for auth token storage
-  // Legacy keys for backward compatibility
-  legacy: {
-    token: 'storyfab_legacy_token',
-    projects: 'storyfab_legacy_projects',
-  },
-};
-
-export const API_ENDPOINTS = {
-  base: '/api',
-  upload: '/api/upload',
-  project: '/api/project',
-};
-
-export const ERROR_MESSAGES = {
-  uploadFailed: '文件上传失败',
-  processingFailed: '处理失败',
-  networkError: '网络错误',
-};
-
-export const SUCCESS_MESSAGES = {
-  saved: '保存成功',
-  uploaded: '上传成功',
-  processed: '处理完成',
-};
-
+// 持久化键（被 ProjectEdit/ScriptDetail hooks 使用）
 export const PROJECT_SAVE_BEHAVIOR_KEY = 'project_save_behavior';
 export const PROJECT_AUTO_SAVE_KEY = 'project_autosave_enabled';
+
+// 文件大小限制（被 video-upload 使用）
+export const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
 
 export type ProjectSaveBehavior = 'stay' | 'detail';

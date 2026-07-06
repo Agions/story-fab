@@ -18,7 +18,7 @@ import {
   Download,
   Bolt,
 } from 'lucide-react';
-import { useStoryFab } from './context/storyfab-provider';
+import { useStoryFabStore } from '@/stores';
 import type { StoryFabStep } from '@/core/types/storyfab';
 import { STORYFAB_STEPS } from '@/core/types/storyfab';
 import styles from '././workspace.module.less';
@@ -83,7 +83,7 @@ const isStepAccessible = (
 // ============================================================================
 
 const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
-  const { state, setStep } = useStoryFab();
+  const { state, setStep } = useStoryFabStore();
   const { currentStep, stepStatus } = state;
   const activeStepRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);

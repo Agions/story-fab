@@ -4,6 +4,8 @@
  * 模式: 1 hook + 1 .reducer.ts + makeSetter<K> + Updater<T>
  */
 import type { ScriptSegment } from '@/types';
+import type { Updater } from '@/shared/hooks/useAutoSetters';
+import { genericUpdateReducer } from '@/shared/hooks/useAutoSetters';
 
 export interface SegmentFormValues {
   start: number;
@@ -48,25 +50,10 @@ export const initialOriginalEditorState = (
   totalDuration: 0,
 });
 
-export type Updater<T> = T | ((prev: T) => T);
-
 export type OriginalEditorAction = {
   type: 'update';
   key: keyof OriginalEditorState;
   updater: Updater<unknown>;
 };
 
-export const originalEditorReducer = (
-  state: OriginalEditorState,
-  action: OriginalEditorAction,
-): OriginalEditorState => {
-  if (action.type === 'update') {
-    const current = state[action.key];
-    const next =
-      typeof action.updater === 'function'
-        ? (action.updater as (prev: typeof current) => typeof current)(current)
-        : action.updater;
-    return { ...state, [action.key]: next };
-  }
-  return state;
-};
+export const originalEditorReducer = genericUpdateReducer<OriginalEditorState>;

@@ -7,13 +7,13 @@ import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { ArrowLeft, Save, Trash2, Download, Bot, Loader2 } from 'lucide-react';
-import { useSettingsStore } from '@/stores/settings-store';
+import { useAppStore } from '@/stores/app-store';
 import { notify } from '@/shared';
 import { saveProjectToFile, loadProjectWithRetry, listProjects } from '@/core/services/project/project-file-service';
 import { exportScriptToFile } from '@/core/services/export/script-export-service';
 import { findProjectByScriptId, normalizeProjectFile } from '../../core/utils/project-file';
 import type { ProjectFileLike } from '../../core/utils/project-file';
-import type { Script } from '@/core/services/ai/script-service';
+import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/types';
 import { useScriptDetail } from '@/hooks/use-script-detail';
 import styles from '@/pages/ScriptDetail/index.module.less';
@@ -21,14 +21,14 @@ import styles from '@/pages/ScriptDetail/index.module.less';
 const loadScriptEditor = () => import('../../components/script-editor');
 const ScriptEditor = lazy(loadScriptEditor);
 
-interface ProjectWithScripts extends ProjectFileLike<Script, { path?: string }> {
+interface ProjectWithScripts extends ProjectFileLike<AIScriptDraft, { path?: string }> {
   id: string;
   name: string;
   description?: string;
   status?: string;
   createdAt?: string;
   updatedAt: string;
-  scripts?: Script[];
+  scripts?: AIScriptDraft[];
   videoPath?: string;
   videos?: Array<{ path?: string }>;
   videoUrl?: string;
@@ -37,7 +37,7 @@ interface ProjectWithScripts extends ProjectFileLike<Script, { path?: string }> 
 const ScriptDetail: React.FC = () => {
   const { projectId, scriptId } = useParams<{ projectId: string; scriptId: string }>();
   const navigate = useNavigate();
-  const { addRecentProject } = useSettingsStore();
+  const { addRecentProject } = useAppStore();
 
   // All UI/data state centralized in reducer
   const {
@@ -140,8 +140,8 @@ const ScriptDetail: React.FC = () => {
         content: segments,
         fullText: segments.map((segment) => (segment.content ?? '')).join('\n\n'),
         updatedAt: new Date().toISOString()
-      } as Script;
-      const updatedScripts: Script[] = (project.scripts ?? []).map((s) => s.id === script.id ? updatedScript : s);
+      } as AIScriptDraft;
+      const updatedScripts: AIScriptDraft[] = (project.scripts ?? []).map((s) => s.id === script.id ? updatedScript : s);
       const updatedProject = { ...project, scripts: updatedScripts, updatedAt: new Date().toISOString() };
       setProject(updatedProject);
       setScript(updatedScript);

@@ -9,13 +9,13 @@ import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import type { ExportSettings } from '@/types';
+import type { Updater } from '@/shared/hooks/useAutoSetters';
 import { PLATFORM_PRESETS } from './export-config';
 import {
   initialExportHandlersState,
   exportHandlersReducer,
   type ExportHandlersAction,
   type ExportHandlersState,
-  type Updater,
 } from './use-export-handlers.reducer';
 
 /** 画质档位 → x264 CRF（越低画质越高）。ultra 视作 high，custom 取默认。 */

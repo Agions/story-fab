@@ -17,7 +17,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import type { VideoMetadata } from '@/core/video';
 import { loadProjectWithRetry, saveProjectToFile } from '@/core/services/project/project-file-service';
 import { notify } from '@/shared';
-import { useSettingsStore } from '@/stores/settings-store';
+import { useAppStore } from '@/stores/app-store';
 
 import { logger } from '@/shared/utils/logging';
 
@@ -57,7 +57,7 @@ const ProjectEdit: React.FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { addRecentProject } = useSettingsStore();
+  const { addRecentProject } = useAppStore();
   // Replaces 17 individual useState calls with a single useReducer-backed hook
   // (see hooks/useProjectEditState.ts). Setter names match the original
   // useState setters, so all call sites below remain unchanged.

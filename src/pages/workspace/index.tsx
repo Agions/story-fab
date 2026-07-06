@@ -8,7 +8,7 @@ import {
   User,
   Scissors,
 } from 'lucide-react';
-import { StoryFabProvider, useStoryFab } from './context/storyfab-provider';
+import { useStoryFabStore } from '@/stores';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/keyboard-shortcuts-help';
 import { useWorkspaceStore } from '../../stores/workspace-store';
@@ -70,7 +70,7 @@ const AI_FUNCTIONS = [
 const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
   const [shortcutsHelpVisible, setShortcutsHelpVisible] = useState(false);
-  const { state, goToNextStep, setFeature } = useStoryFab();
+  const { state, goToNextStep, setFeature } = useStoryFabStore();
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
   const previewPlaying = useWorkspaceStore(s => s.previewPlaying);
@@ -240,11 +240,7 @@ const AIVideoEditorContent: React.FC = () => {
 };
 
 const AIVideoEditor = () => {
-  return (
-    <StoryFabProvider>
-      <AIVideoEditorContent />
-    </StoryFabProvider>
-  );
+  return <AIVideoEditorContent />;
 };
 
 export default AIVideoEditor;

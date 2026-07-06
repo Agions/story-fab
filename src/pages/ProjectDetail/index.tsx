@@ -11,13 +11,13 @@ import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scisso
 import { useModelStore } from '@/stores';
 import { saveProjectToFile, loadProjectWithRetry, deleteProject } from '@/core/services/project/project-file-service';
 import { getApiKey } from '@/core/services/auth/api-key-service';
-import { useSettingsStore } from '@/stores/settings-store';
+import { useAppStore } from '@/stores/app-store';
 import { notify } from '@/shared';
 import { generateScriptWithModel, parseGeneratedScript } from '@/core/services/ai/script-service';
 import { resolveLegacyModel } from '@/core/services/ai/ai-model-adapter';
 import { normalizeProjectFile } from '../../core/utils/project-file';
 import type { ProjectFileLike } from '../../core/utils/project-file';
-import type { Script } from '@/core/services/ai/script-service';
+import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/types';
 import type { VideoAnalysis } from '@/types';
 import { useProjectDetail } from '@/hooks/use-project-detail';
@@ -35,7 +35,7 @@ const VideoProcessingController = lazy(loadVideoProcessingController);
 const VideoAnalyzer = lazy(loadVideoAnalyzer);
 const SubtitleExtractor = lazy(loadSubtitleExtractor);
 
-interface ProjectData extends ProjectFileLike<Script, { path?: string }> {
+interface ProjectData extends ProjectFileLike<AIScriptDraft, { path?: string }> {
   id: string;
   name: string;
   description?: string;
@@ -45,7 +45,7 @@ interface ProjectData extends ProjectFileLike<Script, { path?: string }> {
   videoPath?: string;
   videos?: Array<{ path?: string }>;
   videoUrl?: string;
-  scripts?: Script[];
+  scripts?: AIScriptDraft[];
   analysis?: VideoAnalysis;
   extractedSubtitles?: unknown;
 }
@@ -75,7 +75,7 @@ const MENU_ITEMS = [
 const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const { addRecentProject } = useSettingsStore();
+  const { addRecentProject } = useAppStore();
   const selectedAIModel = useModelStore(s => s.selectedAIModel);
   const aiModelsSettings = useModelStore(s => s.aiModelsSettings);
 
@@ -181,7 +181,7 @@ const ProjectDetail: React.FC = () => {
     if (!project || createScriptLockRef.current) return;
     createScriptLockRef.current = true;
     try {
-      const newScript: Script = { id: crypto.randomUUID(), projectId: project.id, content: [], fullText: '', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      const newScript: AIScriptDraft = { id: crypto.randomUUID(), projectId: project.id, content: [], fullText: '', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
       const updatedProject = { ...project, scripts: [...(project.scripts || []), newScript], updatedAt: new Date().toISOString() };
       updateProject(updatedProject);
       setActiveScript(newScript);
@@ -233,7 +233,7 @@ const ProjectDetail: React.FC = () => {
     if (!project || !activeScript) return;
     const updatedProject: ProjectData = {
       ...project,
-      scripts: (project.scripts ?? []).map((script) => script.id === activeScript.id ? { ...activeScript, content: updatedSegments as Script['content'], fullText: updatedSegments.map((segment) => segment.content ?? '').join('\n\n'), updatedAt: new Date().toISOString() } : script),
+      scripts: (project.scripts ?? []).map((script) => script.id === activeScript.id ? { ...activeScript, content: updatedSegments as AIScriptDraft['content'], fullText: updatedSegments.map((segment) => segment.content ?? '').join('\n\n'), updatedAt: new Date().toISOString() } : script),
       updatedAt: new Date().toISOString(),
     };
     updateProject(updatedProject);

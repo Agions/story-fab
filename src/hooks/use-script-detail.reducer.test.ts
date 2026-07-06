@@ -5,7 +5,8 @@ import {
   type ScriptDetailState,
 } from './use-script-detail.reducer';
 import type { DetailProjectWithAIScripts } from '@/types';
-import type { Script, ScriptSegment } from '@/core/services/ai/script-service';
+import type { AIScriptDraft } from '@/core/services/ai/script-service';
+import type { ScriptSegment } from '@/types';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -23,11 +24,11 @@ const makeProject = (overrides: Partial<DetailProjectWithAIScripts> = {}): Detai
   ...overrides,
 });
 
-const makeScript = (overrides: Partial<Script> = {}): Script => ({
+const makeScript = (overrides: Partial<AIScriptDraft> = {}): AIScriptDraft => ({
   id: 'script-1',
   title: 'Test Script',
   ...overrides,
-} as Script);
+} as AIScriptDraft);
 
 const makeSegment = (overrides: Partial<ScriptSegment> = {}): ScriptSegment => ({
   id: 'seg-1',

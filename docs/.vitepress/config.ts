@@ -124,7 +124,6 @@ export default defineConfig({
       provider: 'local',
       options: {
         detailedView: true,
-        maxSuggestions: 10,
       },
     },
 

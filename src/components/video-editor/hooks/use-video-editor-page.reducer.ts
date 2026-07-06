@@ -5,6 +5,8 @@
  */
 import type { ScriptSegment } from '@/types';
 import type { ExportSettingsState } from '../export-settings';
+import type { Updater } from '@/shared/hooks/useAutoSetters';
+import { genericUpdateReducer } from '@/shared/hooks/useAutoSetters';
 
 export interface VideoEditorPageState {
   // player (3 — 保留丢弃 setter 兼容原 API)
@@ -59,25 +61,10 @@ export const initialVideoEditorPageState: VideoEditorPageState = {
   dragSegmentId: null,
 };
 
-export type Updater<T> = T | ((prev: T) => T);
-
 export type VideoEditorPageAction = {
   type: 'update';
   key: keyof VideoEditorPageState;
   updater: Updater<unknown>;
 };
 
-export const videoEditorPageReducer = (
-  state: VideoEditorPageState,
-  action: VideoEditorPageAction,
-): VideoEditorPageState => {
-  if (action.type === 'update') {
-    const current = state[action.key];
-    const next =
-      typeof action.updater === 'function'
-        ? (action.updater as (prev: typeof current) => typeof current)(current)
-        : action.updater;
-    return { ...state, [action.key]: next };
-  }
-  return state;
-};
+export const videoEditorPageReducer = genericUpdateReducer<VideoEditorPageState>;

@@ -10,7 +10,7 @@
  */
 
 import React, { useState, memo, useCallback } from 'react';
-import { useStoryFab } from './context/storyfab-provider';
+import { useStoryFabStore } from '@/stores';
 import { notify } from '@/shared';
 import { useScriptGeneration } from './hooks/use-script-generation';
 import {
@@ -122,7 +122,7 @@ const FUNCTION_CONFIG: Record<AIFunctionType, FunctionMode> = {
 // ============================================
 
 const ScriptGenerate: React.FC<ScriptGenerateProps> = memo((props) => {
-  const { state, setFeature, dispatch } = useStoryFab();
+  const { state, setFeature, dispatch } = useStoryFabStore();
   const {
     generating,
     progress,

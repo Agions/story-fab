@@ -4,6 +4,8 @@
  * 模式: 1 hook + 1 .reducer.ts + makeSetter<K> + Updater<T>
  */
 import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from '../components/video-processing-controller/constants';
+import type { Updater } from '@/shared/hooks/useAutoSetters';
+import { genericUpdateReducer } from '@/shared/hooks/useAutoSetters';
 
 export interface BatchItem {
   id: string;
@@ -61,25 +63,10 @@ export const initialVideoProcessingState: VideoProcessingState = {
   activePanels: ['basic'],
 };
 
-export type Updater<T> = T | ((prev: T) => T);
-
 export type VideoProcessingAction = {
   type: 'update';
   key: keyof VideoProcessingState;
   updater: Updater<unknown>;
 };
 
-export const videoProcessingReducer = (
-  state: VideoProcessingState,
-  action: VideoProcessingAction,
-): VideoProcessingState => {
-  if (action.type === 'update') {
-    const current = state[action.key];
-    const next =
-      typeof action.updater === 'function'
-        ? (action.updater as (prev: typeof current) => typeof current)(current)
-        : action.updater;
-    return { ...state, [action.key]: next };
-  }
-  return state;
-};
+export const videoProcessingReducer = genericUpdateReducer<VideoProcessingState>;

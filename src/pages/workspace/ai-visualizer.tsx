@@ -9,7 +9,7 @@
  */
 import React, { useEffect, memo } from 'react';
 import { createReducerHook } from '@/shared/hooks/useReducerHook';
-import { useStoryFab } from './context/storyfab-provider';
+import { useStoryFabStore } from '@/stores';
 import { visionService } from '@/core/services/ai/vision-service';
 import { notify } from '@/shared';
 import { useTimeout } from '@/hooks/use-timeout';
@@ -29,7 +29,7 @@ const CheckIcon = () => (
 );
 
 const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
-  const { state, setAnalysis, goToNextStep, dispatch } = useStoryFab();
+  const { state, setAnalysis, goToNextStep, dispatch } = useStoryFabStore();
   const timeout = useTimeout();
   const { state: s, dispatch: dispatchLocal } = createReducerHook(aiVisualizerReducer, initialAIVisualizerState);
   const {
