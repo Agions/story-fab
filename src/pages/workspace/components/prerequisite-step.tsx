@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import type { StoryFabAction } from '@/core/types/storyfab';
-import styles from '././../script-writing.module.less';
+import styles from './../script-writing.module.less';
 
 interface PrerequisiteStepProps {
   dispatch: (action: StoryFabAction) => void;

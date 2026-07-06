@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import styles from '././../video-composing.module.less';
+import styles from './../video-composing.module.less';
 import { SUBTITLE_POSITIONS, type SynthesizeConfig } from '../shared/compose-config';
 
 // ============================================

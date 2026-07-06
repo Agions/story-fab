@@ -2,7 +2,7 @@
  * 功能特点标签列表
  */
 import React from 'react';
-import styles from '././../script-writing.module.less';
+import styles from './../script-writing.module.less';
 
 interface FunctionFeaturesProps {
   features: string[];

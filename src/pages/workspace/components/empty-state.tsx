@@ -2,7 +2,7 @@
  * 空状态 — 暂无文案提示
  */
 import React from 'react';
-import styles from '././../script-writing.module.less';
+import styles from './../script-writing.module.less';
 
 const EmptyState: React.FC = () => {
   return (

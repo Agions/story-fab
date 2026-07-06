@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import type { ScriptData } from '@/types';
-import styles from '././../script-writing.module.less';
+import styles from './../script-writing.module.less';
 
 interface GenerateSectionProps {
   currentScript: ScriptData | null;

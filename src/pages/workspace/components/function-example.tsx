@@ -2,7 +2,7 @@
  * 示例文案展示
  */
 import React from 'react';
-import styles from '././../script-writing.module.less';
+import styles from './../script-writing.module.less';
 
 interface FunctionExampleProps {
   example: string;

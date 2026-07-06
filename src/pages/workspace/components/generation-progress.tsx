@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import styles from '././../script-writing.module.less';
+import styles from './../script-writing.module.less';
 
 // ============================================
 // 类型定义

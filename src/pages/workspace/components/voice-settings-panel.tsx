@@ -9,7 +9,7 @@
  */
 
 import React, { useState } from 'react';
-import styles from '././../video-composing.module.less';
+import styles from './../video-composing.module.less';
 import {
   VOICE_OPTIONS,
   VOICE_PRESETS,
