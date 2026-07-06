@@ -3,10 +3,10 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Grid3X3, List, Plus, Search } from 'lucide-react';
+import type { ProjectStatusFilter } from '@/types/project';
 import styles from '../index.module.less';
 
 type ViewMode = 'grid' | 'list';
-type ProjectStatusFilter = 'all' | 'draft' | 'processing' | 'completed';
 
 interface ProjectsToolbarProps {
   searchText: string;

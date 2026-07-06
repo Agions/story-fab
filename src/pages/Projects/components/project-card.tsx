@@ -19,20 +19,14 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip';
 import { MoreHorizontal, Video, FolderOpen } from 'lucide-react';
-import type { ProjectView, ProjectUIStatus } from '../types';
+import type { ProjectView, ProjectStatus, ProjectUIStats } from '@/types/project';
 import styles from '../index.module.less';
 
-type ProjectUIStats = {
-  scriptCount: number;
-  videoCount: number;
-  status: ProjectUIStatus;
-  progress: number;
-};
 
 interface ProjectCardProps {
   project: ProjectView;
   uiStatus: ProjectUIStats;
-  statusConfig: Record<ProjectUIStatus, { color: string; text: string }>;
+  statusConfig: Record<ProjectStatus, { color: string; text: string }>;
   formatDate: (d: string) => string;
   onOpen: () => void;
   onDelete: () => void;

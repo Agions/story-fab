@@ -1,11 +1,14 @@
 /**
- * projectStore 过滤和排序逻辑测试
+ * project-utils 过滤与排序逻辑测试
+ *
+ * 原 project-store.test.ts 实际只覆盖 filterProjects/sortProjects，
+ * 与 store 消费者无关，故迁移以让测试紧贴被测对象。
  */
 import { describe, it, expect } from 'vitest';
-import { filterProjects, sortProjects } from '@/shared/utils/project-utils';
+import { filterProjects, sortProjects } from './project-utils';
 import type { Project } from '@/types';
 
-// 测试数据：每个字段值都不同，避免意外的 tie-breaking
+// 每个字段值都不同，避免意外的 tie-breaking
 const mockProjects: Project[] = [
   { id: '1', title: 'Zebra',   status: 'draft',     createdAt: '1970-01-01T00:00:09.000Z', updatedAt: '1970-01-01T00:00:09.000Z', duration: 30,  size: 100, tags: ['animal'], starred: true  },
   { id: '2', title: 'Apple',   status: 'completed', createdAt: '1970-01-01T00:00:08.000Z', updatedAt: '1970-01-01T00:00:07.000Z', duration: 60,  size: 200, tags: ['fruit'], starred: false },

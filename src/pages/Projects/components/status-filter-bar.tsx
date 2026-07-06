@@ -1,19 +1,18 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-
-type ProjectUIStatus = 'draft' | 'processing' | 'completed';
+import type { ProjectStatusFilter } from '@/types/project';
 
 interface StatusFilter {
   label: string;
   value: number;
   color: string;
-  filter: ProjectUIStatus | 'all';
+  filter: ProjectStatusFilter;
 }
 
 interface StatusFilterBarProps {
   statusFilters: StatusFilter[];
-  currentFilter: ProjectUIStatus | 'all';
-  onFilterChange: (filter: ProjectUIStatus | 'all') => void;
+  currentFilter: ProjectStatusFilter;
+  onFilterChange: (filter: ProjectStatusFilter) => void;
 }
 
 export const StatusFilterBar = React.memo<StatusFilterBarProps>(({

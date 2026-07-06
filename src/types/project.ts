@@ -5,7 +5,16 @@
 
 // ─── 项目状态 ───
 
+/**
+ * 项目状态。
+ *
+ * 历史上一度存在一个并行的 ProjectUIStatus（缺 'failed'）。
+ * 现统一为单一枚举；UI 端点无需此类型时仍可直接引用 ProjectStatus。
+ */
 export type ProjectStatus = 'draft' | 'processing' | 'completed' | 'failed';
+
+/** @deprecated Use {@link ProjectStatus}. Provided for back-compat only. */
+export type ProjectUIStatus = ProjectStatus;
 
 // ─── 项目模型 ───
 
@@ -23,6 +32,12 @@ export interface Project {
   updatedAt: string;
 }
 
+/**
+ * 项目在主页面（项目列表、工作台、详情）中流通的视图模型。
+ *
+ * 过去曾分散为 ProjectView（shared/types）、ProjectDetailProject、Project、ProjectData 四种。
+ * 现融为唯一「ProjectData」：同一类型的 shape 与字段含义全程一致。
+ */
 export interface ProjectData {
   id: string;
   name: string;
@@ -36,9 +51,41 @@ export interface ProjectData {
   status?: string;
   createdAt?: string;
   updatedAt?: string;
+  videoPath?: string;
+}
+
+/** 卡片/列表所需的展示统计。推演自 ProjectData，但独立类型以保证 UI 侧语义。 */
+export interface ProjectUIStats {
+  scriptCount: number;
+  videoCount: number;
+  status: ProjectStatus;
+  progress: number;
+}
+
+/**
+ * 项目卡片/列表展示视图。
+ *
+ * 曾是 `shared/types/ProjectView`，现收口。
+ * 与 {@link ProjectData} 的关键差异：视图层 `createdAt / updatedAt` 必填 string
+ * （asProjectView 强制补全），而数据层这些字段可选。
+ */
+export interface ProjectView {
+  id: string;
+  name: string;
+  description?: string;
+  status: ProjectStatus;
+  createdAt: string;
+  updatedAt: string;
+  scripts?: unknown[];
+  videos?: unknown[];
+  videoPath?: string;
 }
 
 export type { SubtitleStyle } from './subtitle';
+
+// ─── 项目 UI 状态过滤 ───
+// 与 {@link ProjectStatus 完全一致；仅能在 UI 过滤场景补一个 'all' 占位。
+export type ProjectStatusFilter = 'all' | ProjectStatus;
 
 // ─── 用户 ───
 

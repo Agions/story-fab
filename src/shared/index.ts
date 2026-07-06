@@ -17,8 +17,5 @@ export * from '@/shared/utils';
 
 // Hooks
 
-// 类型
-export * from '@/shared/types';
-
 // 常量
 export * from '@/shared/constants';

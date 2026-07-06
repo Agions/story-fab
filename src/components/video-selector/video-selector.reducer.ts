@@ -1,17 +1,12 @@
 /**
- * VideoSelector Reducer — 状态机化 useState 集合
+ * VideoSelector Reducer — 视频选择状态机
  *
  * 5 个 useState → 1 个 reducer:
  * - videoPath: 当前选中视频路径 / 文件名
- * - videoSrc: 视频预览 src (convertFileSrc 或 blob:)
- * - metadata: 视频元信息 (duration/width/height/fps/codec/bitrate)
+ * - videoSrc:  视频预览 src (convertFileSrc 或 blob:)
+ * - metadata:  视频元信息 (duration/width/height/fps/codec/bitrate)
  * - isAnalyzing: 是否正在分析中
  * - isDragging: 拖拽 UI 高亮
- *
- * 设计点:
- * - Object.fromEntries 工厂: 5 个 setter 一次性生成 + 0 any pass lint
- * - updater 形式 100% 兼容 (prev => ...) —— Pitfall 23 模式
- * - 复合 action RESET: handleRemoveVideo 4 setter → 1 dispatch
  */
 import type { VideoMetadata } from '@/core/video';
 

@@ -5,7 +5,6 @@
 
 // 导出各个 store
 export { useAppStore } from './app-store';
-export { useProjectStore } from './project-store';
 export { useWorkspaceStore } from './workspace-store';
 
 // AI 模型相关状态

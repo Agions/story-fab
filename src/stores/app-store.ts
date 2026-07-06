@@ -1,37 +1,26 @@
 import { createPersistedStore } from './create-persisted-store';
 import { createJSONStorage } from 'zustand/middleware';
-import type { User } from '@/types';
 
 export interface UserSettings {
-  compactMode: boolean;
-  language: string;
+  /** 最近打开的项目 ID 列表（新 → 旧，限 50） */
   recentProjects: string[];
 }
 
 export interface AppState {
-  user: User | null;
-  isAuthenticated: boolean;
   sidebarCollapsed: boolean;
   theme: 'light' | 'dark';
+  /** 派生自 theme === 'dark'（保持向后兼容，不直接 set） */
   isDarkMode: boolean;
-  notifications: number;
   autoSave: boolean;
   userSettings: UserSettings;
-  setUser: (user: User | null) => void;
   setTheme: (theme: 'light' | 'dark') => void;
   toggleTheme: () => void;
   toggleSidebar: () => void;
-  logout: () => void;
-  setNotifications: (count: number) => void;
-  clearNotifications: () => void;
-  updateUserSettings: (settings: Partial<UserSettings>) => void;
   setAutoSave: (autoSave: boolean) => void;
   addRecentProject: (projectId: string) => void;
 }
 
 const defaultSettings: UserSettings = {
-  compactMode: false,
-  language: 'zh-CN',
   recentProjects: [],
 };
 
@@ -53,15 +42,11 @@ export const useAppStore = createPersistedStore<AppState>({
     autoSave: state.autoSave,
   }),
   state: (set, get) => ({
-    user: null,
-    isAuthenticated: false,
     sidebarCollapsed: false,
     theme: 'light',
     isDarkMode: false,
-    notifications: 0,
     autoSave: true,
     userSettings: defaultSettings,
-    setUser: (user) => set({ user, isAuthenticated: !!user }),
     setTheme: (theme) => {
       applyThemeClass(theme);
       set({ theme, isDarkMode: theme === 'dark' });
@@ -72,17 +57,6 @@ export const useAppStore = createPersistedStore<AppState>({
     },
     toggleSidebar: () =>
       set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
-    logout: () => set({
-      user: null,
-      isAuthenticated: false,
-      notifications: 0,
-    }),
-    setNotifications: (count) => set({ notifications: count }),
-    clearNotifications: () => set({ notifications: 0 }),
-    updateUserSettings: (settings) =>
-      set((state) => ({
-        userSettings: { ...state.userSettings, ...settings },
-      })),
     setAutoSave: (autoSave) => set({ autoSave }),
     addRecentProject: (projectId) =>
       set((state) => ({

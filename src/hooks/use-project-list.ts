@@ -7,12 +7,21 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { logger } from '@/shared/utils/logging';
 import { notify } from '@/shared';
 import { listProjects, deleteProject as deleteProjectFile, PROJECTS_CHANGED_EVENT } from '@/core/services/project/project-file-service';
-import type { ProjectUIStatus, ProjectUIStats, ProjectView } from '@/shared/types';
+import type {
+  ProjectStatus,
+  ProjectUIStatus,
+  ProjectUIStats,
+  ProjectView,
+  ProjectStatusFilter,
+} from '@/types/project';
 
-export type { ProjectUIStatus, ProjectUIStats, ProjectView };
-
-// 类型：项目状态过滤器
-export type ProjectStatusFilter = 'all' | ProjectUIStatus;
+export type {
+  ProjectStatus,
+  ProjectUIStatus,
+  ProjectUIStats,
+  ProjectView,
+  ProjectStatusFilter,
+};
 
 // 转换函数：将记录转换为 ProjectView
 const asProjectView = (record: Record<string, unknown>): ProjectView => ({
@@ -27,12 +36,17 @@ const asProjectView = (record: Record<string, unknown>): ProjectView => ({
   videoPath: typeof record.videoPath === 'string' ? record.videoPath : '',
 });
 
-// 状态配置
-export const statusConfig: Record<ProjectUIStatus, { color: string; text: string }> = {
-  draft: { color: 'secondary', text: '草稿' },
-  processing: { color: 'default', text: '制作中' },
-  completed: { color: 'success', text: '已完成' },
-};
+// 状态配置 — 所有合法 status 都应有一个显示配置，'failed' 等价于 'draft' 视图色
+function buildStatusConfig(): Record<ProjectStatus, { color: string; text: string }> {
+  return {
+    draft: { color: 'secondary', text: '草稿' },
+    processing: { color: 'default', text: '制作中' },
+    completed: { color: 'success', text: '已完成' },
+    failed: { color: 'destructive', text: '失败' },
+  };
+}
+
+export const statusConfig: Record<ProjectStatus, { color: string; text: string }> = buildStatusConfig();
 
 // 计算项目 UI 状态
 export function getProjectUIStatus(project: ProjectView): ProjectUIStats {
