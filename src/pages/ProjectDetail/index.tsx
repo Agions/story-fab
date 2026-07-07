@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '../../components/ui/drawer';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../components/ui/tooltip';
 import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scissors, LayoutDashboard } from 'lucide-react';
+import { withErrorBoundary } from '@/components/common/error-boundary';
 
 import { useSettingsStore } from '@/stores';
 import { saveProjectToFile, loadProjectWithRetry, deleteProject } from '@/core/services/project/project-file-service';
@@ -358,4 +359,4 @@ const ProjectDetail: React.FC = () => {
   );
 };
 
-export default ProjectDetail;
+export default withErrorBoundary(ProjectDetail, { name: 'ProjectDetail' });

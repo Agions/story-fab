@@ -21,6 +21,7 @@ import {
 import { useProjectStore } from '@/stores';
 import type { StoryFabStep } from '@/core/types/storyfab';
 import { STORYFAB_STEPS } from '@/core/types/storyfab';
+import { ErrorBoundary } from '@/components/common/error-boundary';
 import styles from './workspace.module.less';
 import StepList from './edit-step/step-list';
 
@@ -134,10 +135,12 @@ const Workspace: React.FC<WorkspaceProps> = memo(({ children }) => {
         />
       </aside>
 
-      {/* 右侧：内容区 */}
+      {/* 右侧：内容区 (错误边界隔离 — 单步崩溃不丢整体工作态) */}
       <main className={styles.contentArea} ref={contentRef}>
         <div className={styles.contentCard}>
-          {children}
+          <ErrorBoundary name={`step-${currentStep}`}>
+            {children}
+          </ErrorBoundary>
         </div>
       </main>
     </div>

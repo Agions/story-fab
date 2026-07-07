@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Steps } from '@/components/ui/steps';
 import { Video, Edit, CheckCircle } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { withErrorBoundary } from '@/components/common/error-boundary';
 
 import type { VideoMetadata } from '@/core/video';
 import { loadProjectWithRetry, saveProjectToFile } from '@/core/services/project/project-file-service';
@@ -369,4 +370,4 @@ const ProjectEdit: React.FC = () => {
   );
 };
 
-export default ProjectEdit;
+export default withErrorBoundary(ProjectEdit, { name: 'ProjectEdit' });

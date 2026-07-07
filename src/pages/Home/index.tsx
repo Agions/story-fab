@@ -1,6 +1,7 @@
 import { logger } from '@/shared/utils/logging';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { withErrorBoundary } from '@/components/common/error-boundary';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Row, Col } from '../../components/ui/grid';
@@ -445,4 +446,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withErrorBoundary(Home, { name: 'Home' });

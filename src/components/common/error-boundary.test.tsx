@@ -52,9 +52,34 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
     expect(logger.error).toHaveBeenCalledWith(
-      'ErrorBoundary caught an error:',
-      expect.objectContaining({ error: expect.any(Error) })
+      '[ErrorBoundary] 渲染异常',
+      expect.objectContaining({ error: 'Test error' })
     );
+  });
+
+  it('should include name in log label when provided', () => {
+    render(
+      <ErrorBoundary name="TestComp">
+        <Thrower shouldThrow />
+      </ErrorBoundary>
+    );
+    expect(logger.error).toHaveBeenCalledWith(
+      '[TestComp] 渲染异常',
+      expect.objectContaining({ error: 'Test error' })
+    );
+  });
+
+  it('should support function fallback receiving error + reset', async () => {
+    const fallback = vi.fn((_: Error, __: () => void) => (
+      <div data-testid="fn-fallback">fn</div>
+    ));
+    render(
+      <ErrorBoundary fallback={fallback}>
+        <Thrower shouldThrow />
+      </ErrorBoundary>
+    );
+    expect(screen.getByTestId('fn-fallback')).toBeInTheDocument();
+    expect(fallback).toHaveBeenCalled();
   });
 
   it('should reset error state when reset button is clicked', async () => {
