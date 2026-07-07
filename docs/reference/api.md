@@ -18,7 +18,7 @@ description: 'StoryFab 核心 API 接口文档'
 
 ## 🔧 Tauri Commands
 
-Tauri Commands 是前端与 Rust 后端通信的接口，共 61 个命令。
+Tauri Commands 是前端与 Rust 后端通信的接口，共 50 个命令。
 
 ### 视频处理
 

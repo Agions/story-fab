@@ -1,11 +1,11 @@
 ---
 title: 系统架构
-description: StoryFab v2.2.0 整体架构 · 前后端 + 双服务层 + 解说模式 5 步 Pipeline
+description: StoryFab v2.2.0 整体架构 · 前后端 + 解说模式 5 步 Pipeline + 一键成片
 ---
 
 # 系统架构
 
-StoryFab 是 Tauri 2 桌面应用:前端 React 18 + TypeScript,后端 Rust 1.77+。所有处理在本地完成,原始数据零上传。
+StoryFab 是 Tauri 2 桌面应用:前端 React 18 + TypeScript 5,后端 Rust 1.77+。所有处理在本地完成,原始数据零上传。
 
 ## 技术栈
 
@@ -13,10 +13,10 @@ StoryFab 是 Tauri 2 桌面应用:前端 React 18 + TypeScript,后端 Rust 1.77+
 | --- | --- |
 | 前端框架 | React 18、TypeScript 5、Vite 6、TailwindCSS 4 |
 | UI 组件 | Base UI (`@base-ui/react`)、shadcn 风格 + Radix UI |
-| 状态管理 | Zustand (5 个 store) |
-| 路由 | React Router v6 (9 个懒加载页面) |
+| 状态管理 | Zustand (4 个 store + history) |
+| 路由 | React Router v6 (7 个页面,全部懒加载) |
 | 桌面框架 | Tauri 2.x、Rust 1.77+、tokio |
-| AI 能力 | `faster-whisper` (6 档模型) + 10 LLM Provider + 2 TTS Provider |
+| AI 能力 | `faster-whisper` (离线 ASR) + 10 LLM Provider + 多 TTS Provider |
 | 媒体处理 | FFmpeg (转码 / 烧字幕 / 裁剪,GPU 加速) |
 
 ---
@@ -26,37 +26,28 @@ StoryFab 是 Tauri 2 桌面应用:前端 React 18 + TypeScript,后端 Rust 1.77+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  前端   React 18 · TypeScript 5 · Vite 6 · TailwindCSS 4       │
-│           Zustand (5 store) · Base UI · MultiTrackTimeline      │
+│           Zustand (4 store) · Base UI · MultiTrackTimeline      │
 └────────────────────────────┬────────────────────────────────────┘
-                             │  Tauri 2 IPC (61 个 invoke 命令)
+                             │  Tauri 2 IPC (50 个 invoke 命令)
 ┌────────────────────────────┴────────────────────────────────────┐
 │  后端   Rust 1.77+ · Tauri 2 · tokio                            │
 │   ├─ ffmpeg-sidecar     转码 / 硬字幕烧录 / 裁剪                │
 │   ├─ whisper-rs         faster-whisper 离线语音转字幕           │
 │   ├─ llm-providers      10 家 LLM (统一 `call_llm` 入口)        │
-│   ├─ tts-providers      Edge TTS · Azure TTS                   │
+│   ├─ tts-providers      Edge TTS · Azure TTS 等                │
 │   └─ commentary         Director → Visual → Narration → Timing → Overlay │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 双服务层 (ADR-101)
-
-`src/services/` 与 `src/core/services/` 职责严格分离:
-
-| 层 | 路径 | 职责 | 依赖 |
-| --- | --- | --- | --- |
-| **shim 层** | `src/services/` | 薄包装,封装 Tauri IPC `invoke` | 只能调 `core/tauri` |
-| **业务层** | `src/core/services/` | 纯业务逻辑,可独立测试 | 无 Tauri 依赖 |
-
-**依赖方向**(严格单向):
+## 依赖方向 (严格单向)
 
 ```
 view → hook → store → service (core) → backend
 ```
 
-任何反向引用视为架构违规。`src/services/README.md` 记录完整边界说明。
+任何反向引用视为架构违规。
 
 ---
 
@@ -96,7 +87,25 @@ view → hook → store → service (core) → backend
 - `CompositeCommentaryPipeline` — 编排器
 - `commentary.test.ts` — 单元测试覆盖
 
-详细流程: [commentary.md](commentary.md)
+详细流程: [commentary-workflow.md](commentary-workflow.md)
+
+---
+
+## 一键成片 Pipeline (FullPipeline)
+
+新增端到端「一键成片」模式 — 串联 7 个步骤,用户只需选择素材 + 风格 + 点击生成。
+
+实现位置: `src/core/pipeline/steps/full-pipeline.ts`
+
+```
+分析 → 拆条 → 文案 → 配音 → 字幕 → 合成 → 导出
+```
+
+特性:
+- AsyncGenerator 模式 — 实时 yield 进度事件
+- 单步可重试 / 跳过,错误不中断整体流程
+- `cancel()` 支持用户中断
+- 预留 facade payload 对齐位 (未来按真实 Tauri API 调整)
 
 ---
 
@@ -109,23 +118,23 @@ src/
 ├── components/              React 组件
 │   ├── ui/                  Base UI 基座 (kebab-case 目录)
 │   ├── common/              通用业务组件
-│   ├── AIClip/              AI 智能拆条组件
-│   ├── CommentaryPanel/     解说编辑面板
-│   ├── ScriptEditor/        脚本编辑器
-│   ├── Timeline/            时间轴
-│   ├── VideoEditor/         视频编辑器
-│   └── ...                  其他业务组件 (PascalCase 目录)
+│   ├── ai-clip/             AI 智能拆条组件
+│   ├── commentary-panel/    解说编辑面板
+│   ├── script-editor/       脚本编辑器
+│   ├── timeline/            时间轴
+│   ├── video-editor/        视频编辑器
+│   └── video-info/          视频信息面板
 ├── core/                    核心业务层
 │   ├── pipeline/            Pipeline 编排
 │   │   └── steps/
-│   │       └── commentary/  5 步 Agent 实现
-│   ├── services/            业务服务 (13 个子目录)
-│   │   ├── ai/              LLM 调用层
-│   │   ├── aiClip/          AI 拆条
+│   │       ├── commentary/  5 步 Agent 实现
+│   │       └── full-pipeline.ts  一键成片入口
+│   ├── services/            业务服务 (12 个子目录)
+│   │   ├── ai/              LLM 调用层 + 视觉/语音/脚本
+│   │   ├── ai-clip/         AI 拆条
 │   │   ├── asr/             Whisper 集成 (含 providers/ 子目录)
 │   │   ├── auth/            认证
 │   │   ├── commentary/      解说模式入口
-│   │   ├── editor/          时间轴编辑 (含 storage.ts / clip / effect / media / timeline 等)
 │   │   ├── export/          渲染 + 转码
 │   │   ├── file/            文件元数据
 │   │   ├── pipeline/        剪辑模式流水线
@@ -134,65 +143,65 @@ src/
 │   │   ├── subtitle/        字幕 + 对齐
 │   │   └── video/           视频元数据 (含 audioMix / transition-suggestion)
 │   ├── tauri/               IPC 桥接
-│   │   ├── TauriBridge.ts   invoke 入口
-│   │   └── methods/         按域分组的方法
-│   ├── interfaces/          业务接口
-│   ├── types/               全局类型
+│   │   ├── invoke.ts        invoke 入口
+│   │   ├── methods/         按域分组的方法
+│   │   └── command-types.ts 命令名常量
 │   ├── config/              配置项
-│   ├── constants/           内部常量
+│   │   └── ai-models/       AI 模型提供者元数据 + 动态目录
+│   ├── types/               全局类型 (storyfab 域)
 │   ├── errors/              错误处理 (AppError)
 │   ├── utils/               工具
-│   └── workflow/            状态机
-├── pages/                   路由页面 (9 个, 全部懒加载)
+│   └── video/               视频处理抽象
+├── pages/                   路由页面 (7 个, 全部懒加载)
 │   ├── Home/
-│   ├── Dashboard/
 │   ├── Projects/
 │   ├── ProjectDetail/
 │   ├── ProjectEdit/
 │   ├── ScriptDetail/
-│   ├── VideoEditor/
-│   ├── AIVideoEditor/
-│   └── Settings/
-├── hooks/                   自定义 React hooks
-├── store/                   Zustand 状态
-│   ├── appStore             全局应用状态
-│   ├── projectStore         项目 CRUD
-│   ├── editorStore          当前编辑上下文
-│   ├── timelineStore        时间轴轨道与片段
-│   └── modelStore           AI 模型配置
+│   ├── Settings/
+│   └── workspace/           工作台 (子包三分: edit-step/assemble/export/shared)
+├── hooks/                   全局 React hooks
+├── stores/                  Zustand 状态
+│   ├── app-store.ts         运行时外观 (主题/侧边栏/最近项目)
+│   ├── project-store.ts     项目元数据 + 步骤状态机
+│   ├── editor-store.ts      时间线/剪辑/播放
+│   ├── settings-store.ts    用户偏好持久层
+│   ├── timeline-store.ts    时间轴 (测试用)
+│   └── create-history.ts    撤销/重做栈
 ├── shared/                  跨层共享
 │   ├── constants/
-│   ├── utils/
-│   └── types/
-├── providers/               React Provider
-├── context/                 Context
-└── styles/                  全局样式
+│   ├── errors/
+│   ├── hooks/
+│   ├── types/
+│   └── utils/
+├── types/                   全局类型 (统一 @/types)
+└── providers/                React Provider
 ```
 
 ### Zustand Stores
 
 | Store | 职责 |
 | --- | --- |
-| `appStore` | 全局应用状态 (主题、设置) |
-| `projectStore` | 项目列表、CRUD |
-| `editorStore` | 当前编辑上下文 (含 track undo/redo) |
-| `timelineStore` | 时间轴轨道与片段 |
-| `modelStore` | AI 模型配置 |
+| `useAppStore` | 运行时外观 (主题、侧边栏、最近项目、autoSave) |
+| `useProjectStore` | 项目元数据 + 步骤状态机 (project/mode/step/video/script/voice/synthesis) |
+| `useEditorStore` | 时间线轨道/剪辑/播放 (含 undo/redo) |
+| `useSettingsStore` | 用户偏好持久层 (AI 选择 + 密钥) |
 
-Store 边界详见 `src/store/README.md`。
+Store 边界:
+- `useAppStore` / `useSettingsStore`: 设备级,跨项目
+- `useProjectStore`: 项目级元数据
+- `useEditorStore`: 工作态 (按项目切换)
 
 ### 路由
 
 | 路由 | 组件 | 懒加载 |
 | --- | --- | --- |
 | `/` | Home | 是 |
-| `/dashboard` | Dashboard | 是 |
 | `/projects` | Projects | 是 |
 | `/projects/:id` | ProjectDetail | 是 |
 | `/projects/:id/edit` | ProjectEdit | 是 |
 | `/scripts/:id` | ScriptDetail | 是 |
-| `/editor/:id` | VideoEditor | 是 |
-| `/ai-editor/:id` | AIVideoEditor | 是 |
+| `/editor/:id` | Workspace | 是 |
 | `/settings` | Settings | 是 |
 
 ---
@@ -204,25 +213,11 @@ src-tauri/
 ├── src/
 │   ├── main.rs                  Tauri 入口
 │   ├── lib.rs                   库入口
-│   ├── commands/                IPC 命令 (按域分组, 61 个命令)
-│   │   ├── ai/                  TTS / 模型列表
-│   │   ├── auto_save/           自动保存与崩溃恢复
+│   ├── commands/                IPC 命令 (按域分组, 50 个命令)
 │   │   ├── commentary/          解说模式后端
-│   │   │   ├── commentary_synthesizer/
-│   │   │   ├── director/        Director Agent
-│   │   │   ├── script_generator/
-│   │   │   └── synthesizer/     TTS 合成
 │   │   ├── project/             项目管理
 │   │   └── render/              渲染 + 智能拆条
-│   │       ├── autonomous_cut/      自动拆条
-│   │       └── autonomous_cut_impl/  自动拆条实现
 │   ├── llm/                     LLM Provider
-│   │   ├── anthropic.rs
-│   │   ├── deepseek_qwen.rs
-│   │   ├── gemini.rs
-│   │   ├── openai.rs
-│   │   ├── router.rs
-│   │   └── providers/           按域分组实现
 │   ├── render/                  FFmpeg 渲染
 │   ├── subtitle/                Whisper 字幕
 │   ├── video/                   视频元数据 + 抽帧
@@ -233,14 +228,11 @@ src-tauri/
 │   ├── types.rs                 全局类型
 │   └── lib.rs                   库入口
 ├── tests/                       Rust 集成测试
-│   ├── resilience.rs            panic hook + 资源限额
-│   ├── crash_recovery.rs        崩溃恢复
-│   └── audio_mix.rs             音频混音纯函数
 ├── capabilities/                Tauri 权限配置
 └── icons/                       应用图标
 ```
 
-### 关键 IPC 命令 (代表性)
+### 关键 IPC 命令 (代表性,共 50 个)
 
 | 域 | 命令 | 用途 |
 | --- | --- | --- |
@@ -255,19 +247,17 @@ src-tauri/
 | project | `analyze_video` | 视频元数据 |
 | ai | `synthesize_speech` | TTS 语音合成 |
 
-完整 61 个命令: [tauri-commands.md](tauri-commands.md)
+完整命令列表: [tauri-commands.md](tauri-commands.md)
 
 ### 二进制管理
 
 首次启动自动下载 FFmpeg / Whisper 二进制到 `<config-dir>/bin/`,可通过环境变量覆盖:
 
 ```bash
-export CUTDECK_FFMPEG_PATH=/custom/path/ffmpeg       # FFmpeg 路径 (旧名前缀)
-export CUTDECK_EDGE_TTS_PATH=/custom/path/edge-tts   # Edge TTS 路径 (旧名前缀)
-export STORYFAB_RESOURCE_PERMITS=200                 # 进程资源限额
+export STORYFAB_FFMPEG_PATH=/custom/path/ffmpeg
+export STORYFAB_EDGE_TTS_PATH=/custom/path/edge-tts
+export STORYFAB_RESOURCE_PERMITS=200
 ```
-
-> 注: `CUTDECK_` 前缀是项目前身命名残留,保留以保持向后兼容。
 
 ### 错误处理
 
@@ -291,7 +281,7 @@ export STORYFAB_RESOURCE_PERMITS=200                 # 进程资源限额
 2. **状态层边界**: view → hook → store → service → backend,单向依赖
 3. **类型驱动**: 核心数据流用 TypeScript interface 串联,编译时捕获错误
 4. **渐进式渲染**: 渲染任务可暂停 / 恢复 / 重试,从失败点继续
-5. **状态机迁移**: 18 个组件迁移到 useReducer 状态机 (消除 141 个 useState, +469 tests)
+5. **状态机迁移**: 17 个组件迁移到 useReducer 状态机 + createReducer 工厂 (统一范式)
 
 ---
 
@@ -301,7 +291,7 @@ export STORYFAB_RESOURCE_PERMITS=200                 # 进程资源限额
 # 前端
 npm run type-check       # tsc --noEmit
 npm run lint             # ESLint
-npm run test             # Vitest 单元测试
+npm run test             # Vitest 单元测试 (721 tests)
 npm run verify:all       # 一键运行所有 verify
 
 # 后端

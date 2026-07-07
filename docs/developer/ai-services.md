@@ -33,8 +33,9 @@ interface IAIService {
 
 1. 创建 `xxx.ts` 实现 `IAIService`
 2. 在 `index.ts` 注册
-3. 在 `src/core/config/aiModels.config.ts` 加配置
-4. 在 UI 设置页加 API 密钥输入
+3. 在 `src/core/config/ai-models/providers.ts` 加配置
+4. 在 `src/core/config/ai-models/catalog.ts` 加模型列表
+5. 在 UI 设置页加 API 密钥输入
 
 ## Whisper
 
