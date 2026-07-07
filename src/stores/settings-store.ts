@@ -42,9 +42,3 @@ export const useSettingsStore = createPersistedStore<SettingsState>({
       })),
   }),
 });
-
-/**
- * 兼容别名 — 保留 useModelStore 6 个月过渡期。
- * @deprecated 使用 useSettingsStore
- */
-export const useModelStore = useSettingsStore;

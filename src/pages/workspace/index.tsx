@@ -11,7 +11,7 @@ import {
 import { useStoryFabStore } from '@/stores';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/keyboard-shortcuts-help';
-import { useWorkspaceStore } from '../../stores/workspace-store';
+import { useEditorStore } from '../../stores/workspace-store';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/pages/workspace/shared/function-mode-map';
@@ -73,9 +73,9 @@ const AIVideoEditorContent: React.FC = () => {
   const { state, goToNextStep, setFeature } = useStoryFabStore();
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
-  const previewPlaying = useWorkspaceStore(s => s.previewPlaying);
-  const setPreviewPlaying = useWorkspaceStore(s => s.setPreviewPlaying);
-  const timelineActions = useWorkspaceStore(
+  const previewPlaying = useEditorStore(s => s.previewPlaying);
+  const setPreviewPlaying = useEditorStore(s => s.setPreviewPlaying);
+  const timelineActions = useEditorStore(
     useShallow((s) => ({
       playheadMs: s.playheadMs,
       selectedClipId: s.selectedClipId,

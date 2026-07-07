@@ -11,7 +11,7 @@
  */
 
 import React, { memo } from 'react';
-import { useStoryFabStore } from '@/stores';
+import { useProjectStore } from '@/stores';
 import { useVideoSynthesize } from '../hooks/use-video-synthesize';
 import { notify } from '@/shared';
 import { TAB_OPTIONS, type ComposingTab } from '../shared/compose-config';
@@ -39,7 +39,7 @@ interface VideoSynthesizeProps {
 // ============================================
 
 const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
-  const { state, setSynthesis, goToNextStep, dispatch } = useStoryFabStore();
+  const { state, setSynthesis, goToNextStep, dispatch } = useProjectStore();
   const { synthesizing, progress, config, updateConfig, synthesize, timeout } = useVideoSynthesize();
 
   // 当前激活的标签页

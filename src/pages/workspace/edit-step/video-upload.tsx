@@ -10,7 +10,7 @@
  */
 import React, { useCallback, useRef, useEffect, memo } from 'react';
 import { createReducerHook } from '@/shared/hooks/useReducerHook';
-import { useStoryFabStore } from '@/stores';
+import { useProjectStore } from '@/stores';
 import { logger } from '@/shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
 import { MAX_FILE_SIZE } from '@/shared/constants';
@@ -35,7 +35,7 @@ interface VideoUploadProps {
 }
 
 const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
-  const { state, setVideo, goToNextStep } = useStoryFabStore();
+  const { state, setVideo, goToNextStep } = useProjectStore();
   const { state: local, dispatch } = createReducerHook(videoUploadReducer, initialVideoUploadState);
   const { uploading, uploadProgress, dragActive, uploadStatus, currentFile } = local;
   // ref 镜像 uploadStatus — async setInterval 回调需要读到最新值

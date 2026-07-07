@@ -13,4 +13,4 @@ export { useProjectStore, useStoryFabStore } from './project-store';
 export { useEditorStore, useWorkspaceStore } from './editor-store';
 
 // ── 用户偏好持久层 (原 model-store) ──
-export { useSettingsStore, useModelStore } from './settings-store';
+export { useSettingsStore } from './settings-store';

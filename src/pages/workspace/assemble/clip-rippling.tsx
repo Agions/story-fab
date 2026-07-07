@@ -12,7 +12,7 @@
  */
 
 import React, { useCallback, memo, useMemo } from 'react';
-import { useStoryFabStore } from '@/stores';
+import { useProjectStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -55,7 +55,7 @@ interface ClipRepurposeProps {
 }
 
 const ClipRepurpose: React.FC<ClipRepurposeProps> = memo(({ onNext }) => {
-  const { state: storyState } = useStoryFabStore();
+  const { state: storyState } = useProjectStore();
   const { currentVideo, analysis } = storyState;
   const videoPath = currentVideo?.path ?? '';
   const videoInfo = useMemo<VideoInfo>(() => (

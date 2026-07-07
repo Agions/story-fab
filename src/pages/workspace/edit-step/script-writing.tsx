@@ -10,7 +10,7 @@
  */
 
 import React, { useState, memo, useCallback } from 'react';
-import { useStoryFabStore } from '@/stores';
+import { useProjectStore } from '@/stores';
 import { notify } from '@/shared';
 import { useScriptGeneration } from '../hooks/use-script-generation';
 import {
@@ -50,7 +50,7 @@ import styles from './script-writing.module.less';
 // ============================================
 
 const ScriptGenerate: React.FC<ScriptGenerateProps> = memo((props) => {
-  const { state, setFeature, dispatch } = useStoryFabStore();
+  const { state, setFeature, dispatch } = useProjectStore();
   const {
     generating,
     progress,

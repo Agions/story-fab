@@ -8,7 +8,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../components/ui/tooltip';
 import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scissors, LayoutDashboard } from 'lucide-react';
 
-import { useModelStore } from '@/stores';
+import { useSettingsStore } from '@/stores';
 import { saveProjectToFile, loadProjectWithRetry, deleteProject } from '@/core/services/project/project-file-service';
 import { getApiKey } from '@/core/services/auth/api-key-service';
 import { useAppStore } from '@/stores/app-store';
@@ -76,8 +76,8 @@ const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { addRecentProject } = useAppStore();
-  const selectedAIModel = useModelStore(s => s.selectedAIModel);
-  const aiModelsSettings = useModelStore(s => s.aiModelsSettings);
+  const selectedAIModel = useSettingsStore(s => s.selectedAIModel);
+  const aiModelsSettings = useSettingsStore(s => s.aiModelsSettings);
 
   // Loading/legacy placeholders (kept as useState — non-migratable side-effect carriers)
   const [, setLoading] = useState(true);
