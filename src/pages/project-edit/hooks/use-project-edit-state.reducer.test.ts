@@ -6,9 +6,9 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   projectEditReducer,
   createInitialProjectEditState,
-} from './use-project-edit-state.reducer';
-import type { ProjectEditState } from './use-project-edit-state.reducer';
-import { createAutoSetters } from '@/shared/hooks/useAutoSetters';
+} from './use-project-edit-state-reducer';
+import type { ProjectEditState } from './use-project-edit-state-reducer';
+import { createAutoSetters } from '@/shared/hooks/use-auto-setters';
 
 const makeState = (overrides?: Partial<ProjectEditState>): ProjectEditState => ({
   formName: 'Test Project',

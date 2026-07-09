@@ -6,7 +6,7 @@ import {
   initialScriptEditorState,
   SegmentRowState,
   ScriptEditorState,
-} from './commentary-script-editor.reducer';
+} from './commentary-script-editor-reducer';
 
 // ─── SegmentRow reducer ────────────────────────────────────────────
 

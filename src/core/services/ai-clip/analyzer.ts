@@ -23,7 +23,7 @@ import type {
   ClipAnalysisResult,
   Keyframe,
 } from './types';
-import type { SmartVideoSegment } from '../../video/highlight.types';
+import type { SmartVideoSegment } from '../../video/highlight-types';
 import { enrichSegments, type RustRawSegment } from './segment-enricher';
 
 // 导入工具函数

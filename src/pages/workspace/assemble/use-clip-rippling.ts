@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import type { RepurposingClip, PipelineStage } from '@/core/services/pipeline/clip-pipeline/pipeline';
 import type { SocialPlatform, AspectRatio } from '../shared/clip-rippling-config';
 import {
   initialClipRipplingState,
   clipRipplingReducer,
   type ClipRipplingState,
-} from './clip-rippling.reducer';
+} from './clip-rippling-reducer';
 
 interface UseClipRipplingResult {
   state: ClipRipplingState;

@@ -1,6 +1,6 @@
 import { logger } from '@/shared/utils/logging';
 import React, { useEffect, useCallback, memo } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import { Card } from '../ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
 import { Button } from '../ui/button';
@@ -18,7 +18,7 @@ import { notify } from '@/shared';
 import {
   workflowEditorReducer,
   initialWorkflowEditorState,
-} from './workflow-editor.reducer';
+} from './workflow-editor-reducer';
 import styles from '././script-editor.module.less';
 
 interface WorkflowEditorProps {

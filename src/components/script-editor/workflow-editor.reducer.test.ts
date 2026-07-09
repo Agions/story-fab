@@ -4,7 +4,7 @@ import {
   initialWorkflowEditorState,
   type WorkflowEditorState,
   type WorkflowEditorAction,
-} from './workflow-editor.reducer';
+} from './workflow-editor-reducer';
 
 // ── Test helpers ──────────────────────────────────────────────
 

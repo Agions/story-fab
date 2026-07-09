@@ -4,8 +4,8 @@ import {
   initialVideoEditorPageState,
   type VideoEditorPageState,
   type VideoEditorPageAction,
-} from './use-video-editor-page.reducer';
-import type { Updater } from '@/shared/hooks/useAutoSetters';
+} from './use-video-editor-page-reducer';
+import type { Updater } from '@/shared/hooks/use-auto-setters';
 import type { ScriptSegment } from '@/types';
 
 // ── helpers ──────────────────────────────────────────────────

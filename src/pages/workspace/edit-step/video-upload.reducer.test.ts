@@ -3,7 +3,7 @@ import {
   videoUploadReducer,
   initialVideoUploadState,
   type VideoUploadState,
-} from './video-upload.reducer';
+} from './video-upload-reducer';
 
 function makeState(overrides: Partial<VideoUploadState> = {}): VideoUploadState {
   return { ...initialVideoUploadState, ...overrides };

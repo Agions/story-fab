@@ -6,7 +6,7 @@ import {
   findRule,
   type TransitionType,
 } from './transition-suggestion';
-import type { SmartVideoSegment } from '../../video/highlight.types';
+import type { SmartVideoSegment } from '../../video/highlight-types';
 
 const seg = (over: Partial<SmartVideoSegment>): SmartVideoSegment => ({
   startMs: 0,

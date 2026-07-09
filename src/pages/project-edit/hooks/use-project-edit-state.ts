@@ -27,7 +27,7 @@ import {
   PROJECT_SAVE_BEHAVIOR_KEY,
   type ProjectSaveBehavior,
 } from '@/shared/constants/constants';
-import { createAutoSetters, type Setter } from '@/shared/hooks/useAutoSetters';
+import { createAutoSetters, type Setter } from '@/shared/hooks/use-auto-setters';
 import { createDefaultProjectName, type ProjectData } from '../project-edit-utils';
 import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment } from '@/types';
@@ -35,7 +35,7 @@ import {
   createInitialProjectEditState,
   projectEditReducer,
   type ProjectEditState,
-} from './use-project-edit-state.reducer';
+} from './use-project-edit-state-reducer';
 
 interface UseProjectEditStateOptions {
   /** Override the default project name (typically passed from outside so

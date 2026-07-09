@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { createReducerHook } from './useReducerHook';
+import { createReducerHook } from './use-reducer-hook';
 
 type State = { count: number; name: string };
 type Action = { type: 'INC' } | { type: 'SET_NAME'; name: string };

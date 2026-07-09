@@ -3,20 +3,20 @@
  * 14 useState 集中化入口 (v3.4 §A2 范式)
  */
 import { useMemo, useCallback, useEffect } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import type { ExportSettings } from '@/types';
-import type { Updater } from '@/shared/hooks/useAutoSetters';
+import type { Updater } from '@/shared/hooks/use-auto-setters';
 import { PLATFORM_PRESETS } from './export-config';
 import {
   initialExportHandlersState,
   exportHandlersReducer,
   type ExportHandlersAction,
   type ExportHandlersState,
-} from './use-export-handlers.reducer';
+} from './use-export-handlers-reducer';
 
 /** 画质档位 → x264 CRF（越低画质越高）。ultra 视作 high，custom 取默认。 */
 const QUALITY_CRF: Record<string, number> = { low: 28, medium: 23, high: 18, ultra: 18 };

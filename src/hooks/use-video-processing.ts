@@ -3,8 +3,8 @@
  * 来源: refactor/video-processing-usereducer (v3.4 §A2 范式)
  */
 import { useCallback } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
-import { createAutoSetters } from '@/shared/hooks/useAutoSetters';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { createAutoSetters } from '@/shared/hooks/use-auto-setters';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
 import { tauri } from '@/core/tauri';
@@ -14,7 +14,7 @@ import {
   initialVideoProcessingState,
   videoProcessingReducer,
   type CustomQualitySettings,
-} from './use-video-processing.reducer';
+} from './use-video-processing-reducer';
 
 interface UseVideoProcessingControllerArgs {
   videoPath: string;

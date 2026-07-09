@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import { Slider } from '../ui/slider';
 import { Button } from '../ui/button';
 import { formatTime } from '../../shared/utils/formatting';
@@ -12,7 +12,7 @@ import {
 import {
   videoPlayerReducer,
   initialVideoPlayerState,
-} from './video-player.reducer';
+} from '../video-player-reducer';
 import { useVideoKeyboardShortcuts } from '@/hooks/use-video-keyboard-shortcuts';
 import styles from '././video-player.module.less';
 

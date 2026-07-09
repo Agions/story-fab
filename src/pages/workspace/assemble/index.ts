@@ -9,11 +9,11 @@ export {
   aiVisualizerReducer,
   initialAIVisualizerState,
   type AIVisualizerState,
-} from './ai-visualizer.reducer';
+} from './ai-visualizer-reducer';
 export {
   clipRipplingReducer,
   initialClipRipplingState,
   type ClipRipplingState,
   type ClipRipplingAction,
-} from './clip-rippling.reducer';
+} from './clip-rippling-reducer';
 export { useClipRippling } from './use-clip-rippling';

@@ -5,8 +5,8 @@
  */
 import type { ScriptSegment } from '@/types';
 import type { ExportSettingsState } from '../export-settings';
-import type { Updater } from '@/shared/hooks/useAutoSetters';
-import { genericUpdateReducer } from '@/shared/hooks/useAutoSetters';
+import type { Updater } from '@/shared/hooks/use-auto-setters';
+import { genericUpdateReducer } from '@/shared/hooks/use-auto-setters';
 
 export interface VideoEditorPageState {
   // player (3 — 保留丢弃 setter 兼容原 API)

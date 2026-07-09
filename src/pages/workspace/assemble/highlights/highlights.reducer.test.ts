@@ -2,8 +2,8 @@
  * highlightsReducer 测试
  */
 import { describe, it, expect } from 'vitest';
-import { highlightsReducer, initialHighlightsState } from './highlights.reducer';
-import type { HighlightsState, Highlight } from './highlights.reducer';
+import { highlightsReducer, initialHighlightsState } from './highlights-reducer';
+import type { HighlightsState, Highlight } from './highlights-reducer';
 
 const makeState = (overrides?: Partial<HighlightsState>): HighlightsState => ({
   ...initialHighlightsState,

@@ -15,7 +15,7 @@
  */
 
 import React, { useCallback, memo } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,7 +46,7 @@ import { useCommentaryVoice } from '@/hooks/use-commentary-voice';
 import {
   commentaryPanelReducer,
   initialCommentaryPanelState,
-} from './commentary-panel.reducer';
+} from './commentary-panel-reducer';
 import styles from '././commentary-panel.module.less';
 import CommentaryScriptEditor from './commentary-script-editor';
 import CommentaryStyleSelector from './commentary-style-selector';

@@ -19,7 +19,7 @@
  *   }
  */
 export * from './types';
-export * from './highlight.types';
+export * from './highlight-types';
 export * from './ivideo-processor';
 export { BaseVideoProcessor, VideoProcessingError, normalizeVideoError } from './base-video-processor';
 export { videoProcessor, TauriVideoProcessor } from './tauri-video-processor';

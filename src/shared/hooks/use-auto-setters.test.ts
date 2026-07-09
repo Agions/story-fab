@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createAutoSetters, type Setter } from './useAutoSetters';
+import { createAutoSetters, type Setter } from './use-auto-setters';
 
 describe('createAutoSetters', () => {
   // ── basic structure ─────────────────────────────────────────────────────────

@@ -17,7 +17,7 @@
  * the UI components (AIClip).
  */
 
-import type { SmartVideoSegment } from '../../video/highlight.types';
+import type { SmartVideoSegment } from '../../video/highlight-types';
 import { suggestTransitions, type TransitionType } from '../video/transition-suggestion';
 
 // ============================================

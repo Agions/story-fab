@@ -8,7 +8,7 @@
  * updater setter signatures.
  *
  * Consolidation: the reducer now reuses the shared `genericUpdateReducer`
- * from `@/shared/hooks/useAutoSetters` and the auto-setters factory
+ * from `@/shared/hooks/use-auto-setters` and the auto-setters factory
  * (see `use-project-edit-state.ts`). All bespoke action/setter boilerplate
  * and the local updater alias have been removed — this is the DRY win from
  * Pass 3 of the reducer-consolidation step.
@@ -17,7 +17,7 @@ import type { ProjectData } from '../project-edit-utils';
 import type { ProjectSaveBehavior } from '@/shared/constants/constants';
 import type { VideoMetadata } from '@/core/video';
 import type { ScriptSegment } from '@/types';
-import { genericUpdateReducer } from '@/shared/hooks/useAutoSetters';
+import { genericUpdateReducer } from '@/shared/hooks/use-auto-setters';
 
 /** All page state in one shape. Fields grouped loosely by domain. */
 export interface ProjectEditState {

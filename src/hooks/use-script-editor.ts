@@ -3,8 +3,8 @@
  * 来源: refactor/original-editor-usereducer (v3.4 §A2 范式)
  */
 import { useMemo, useCallback, useEffect } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
-import { createAutoSetters } from '@/shared/hooks/useAutoSetters';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { createAutoSetters } from '@/shared/hooks/use-auto-setters';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import type { ScriptSegment } from '@/types';
 import type { SimpleVideoSegment } from '@/core/video';
@@ -15,7 +15,7 @@ import {
   initialOriginalEditorState,
   originalEditorReducer,
   type SegmentFormValues,
-} from './use-script-editor.reducer';
+} from './use-script-editor-reducer';
 
 interface UseScriptEditorArgs {
   videoPath: string;

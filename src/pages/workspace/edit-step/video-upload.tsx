@@ -9,7 +9,7 @@
  * - 本文件仅包含上传组件逻辑和 UI
  */
 import React, { useCallback, useRef, useEffect, memo } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import { useProjectStore } from '@/stores';
 import { logger } from '@/shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
@@ -18,7 +18,7 @@ import type { VideoInfo } from '@/types';
 import {
   videoUploadReducer,
   initialVideoUploadState,
-} from './video-upload.reducer';
+} from './video-upload-reducer';
 import styles from './video-upload.module.less';
 
 import {

@@ -8,7 +8,7 @@
  * - 6 useState → 1 useReducer (AIVisualizer.reducer.ts)
  */
 import React, { useEffect, memo } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import { useProjectStore } from '@/stores';
 import { visionService } from '@/core/services/ai/vision-service';
 import { notify } from '@/shared';
@@ -19,7 +19,7 @@ import styles from './ai-visualizer.module.less';
 import { Highlights } from './highlights/highlights';
 import { ANALYSIS_TASKS, TASK_ICONS } from '../config/analysis-tasks';
 import { formatTime } from '@/shared/utils/formatting';
-import { aiVisualizerReducer, initialAIVisualizerState } from './ai-visualizer.reducer';
+import { aiVisualizerReducer, initialAIVisualizerState } from './ai-visualizer-reducer';
 
 // 检查图标
 const CheckIcon = () => (

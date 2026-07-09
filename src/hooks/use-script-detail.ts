@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/types';
 import {
   initialScriptDetailState,
   scriptDetailReducer,
   type ScriptDetailState,
-} from './use-script-detail.reducer';
+} from './use-script-detail-reducer';
 
 interface UseScriptDetailResult {
   state: ScriptDetailState;

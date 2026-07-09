@@ -9,7 +9,7 @@
  */
 import { MS_PER_SECOND } from '@/shared/utils';
 import React, { useCallback } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import { Slider } from '@/components/ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
 import { visionService } from '@/core/services/ai/vision-service';
@@ -20,7 +20,7 @@ import {
   highlightsReducer,
   initialHighlightsState,
   type Highlight,
-} from './highlights.reducer';
+} from './highlights-reducer';
 import styles from './highlights.module.less';
 import { formatTime } from '@/shared/utils/formatting';
 

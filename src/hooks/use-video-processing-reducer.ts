@@ -4,8 +4,8 @@
  * 模式: 1 hook + 1 .reducer.ts + createAutoSetters + Updater<T>
  */
 import type { QualityValue, FormatValue, TransitionValue, AudioProcessValue } from '../components/video-processing-controller/constants';
-import type { Updater } from '@/shared/hooks/useAutoSetters';
-import { genericUpdateReducer } from '@/shared/hooks/useAutoSetters';
+import type { Updater } from '@/shared/hooks/use-auto-setters';
+import { genericUpdateReducer } from '@/shared/hooks/use-auto-setters';
 
 export interface BatchItem {
   id: string;

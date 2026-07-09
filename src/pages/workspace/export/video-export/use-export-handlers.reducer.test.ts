@@ -3,7 +3,7 @@ import {
   exportHandlersReducer,
   initialExportHandlersState,
   type ExportHandlersState,
-} from './use-export-handlers.reducer';
+} from './use-export-handlers-reducer';
 
 function makeState(overrides: Partial<ExportHandlersState> = {}): ExportHandlersState {
   return { ...initialExportHandlersState({}), ...overrides };

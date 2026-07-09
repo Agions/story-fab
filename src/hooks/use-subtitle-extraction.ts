@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { createReducerHook } from '@/shared/hooks/useReducerHook';
+import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
 import {
   initialSubtitleExtractorState,
   subtitleExtractorReducer,
   type SubtitleExtractorState,
   type SubtitleFormat,
   type SubtitleSegment,
-} from './use-subtitle-extraction.reducer';
+} from './use-subtitle-extraction-reducer';
 
 interface UseSubtitleExtractionResult {
   state: SubtitleExtractorState;

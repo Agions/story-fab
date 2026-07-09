@@ -23,7 +23,7 @@ import {
   scriptEditorReducer,
   initialSegmentRowState,
   initialScriptEditorState,
-} from './commentary-script-editor.reducer';
+} from './commentary-script-editor-reducer';
 import styles from '././commentary-panel.module.less';
 
 interface Props {

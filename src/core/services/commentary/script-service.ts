@@ -14,7 +14,7 @@ import type {
   CommentarySegment,
   CommentaryScriptOutput,
 } from '@/types';
-import { synthesizeCommentaryAudio } from './audio.service';
+import { synthesizeCommentaryAudio } from './audio-service';
 
 // ─── Script Generation Input/Output ──────────────────────────────────────
 

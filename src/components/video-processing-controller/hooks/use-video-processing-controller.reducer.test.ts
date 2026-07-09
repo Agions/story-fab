@@ -2,8 +2,8 @@
  * videoProcessingReducer 测试
  */
 import { describe, it, expect } from 'vitest';
-import { videoProcessingReducer, initialVideoProcessingState } from '@/hooks/use-video-processing.reducer';
-import type { VideoProcessingState, CustomQualitySettings, VideoProcessingAction } from '@/hooks/use-video-processing.reducer';
+import { videoProcessingReducer, initialVideoProcessingState } from '@/hooks/use-video-processing-reducer';
+import type { VideoProcessingState, CustomQualitySettings, VideoProcessingAction } from '@/hooks/use-video-processing-reducer';
 
 const makeState = (overrides?: Partial<VideoProcessingState>): VideoProcessingState => ({
   ...initialVideoProcessingState,
