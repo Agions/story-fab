@@ -1,6 +1,6 @@
 // Video metadata extraction via ffprobe
 
-use crate::utils::{cmd_err, parse_fraction};
+use crate::utils::{cmd_err, err_msg, parse_fraction};
 use std::process::Command;
 
 /// Extract full metadata (streams, format, duration, etc.) from a video file
@@ -13,7 +13,7 @@ pub fn probe_metadata(path: &str, ffprobe_path: &str) -> Result<serde_json::Valu
             path,
         ])
         .output()
-        .map_err(|e| format!("运行 ffprobe 失败: {}", e))?;
+        .map_err(|e| err_msg("运行 ffprobe 失败", e))?;
 
     if !output.status.success() {
         return Err(cmd_err("ffprobe 失败", &output));

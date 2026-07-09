@@ -1,6 +1,6 @@
 use crate::binary::{ffmpeg_binary, ffprobe_binary};
 use crate::types::{FFmpegCheckResult, VideoMetadataResult};
-use crate::utils::{cmd_err, cmd_first_line, parse_fraction};
+use crate::utils::{cmd_err, cmd_first_line, err_msg, parse_fraction};
 use serde_json::Value;
 
 /// Extract a string from a JSON value, or None.
@@ -49,7 +49,7 @@ pub async fn analyze_video(path: String) -> Result<VideoMetadataResult, String> 
         .arg(&path)
         .output()
         .await
-        .map_err(|e| format!("运行ffprobe失败: {e}"))?;
+        .map_err(|e| err_msg("运行ffprobe失败", e))?;
 
     if !output.status.success() {
         return Err(cmd_err("ffprobe命令执行失败", &output));

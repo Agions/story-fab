@@ -1,16 +1,15 @@
 // Video processor core — delegates to submodules
 // Submodules: metadata, keyframes, thumbnail, ffmpeg_cmd, mix_audio, audio_duration
 
-use crate::binary::{ffmpeg_binary, ffprobe_binary, HwAccel};
+use crate::binary::{ffmpeg_binary, HwAccel};
 use crate::utils::{cmd_err, cmd_first_line, format_time, write_concat_file};
-use crate::video::{extract_keyframes_impl, generate_thumbnail_impl, probe_metadata};
+use crate::video::{extract_keyframes_impl, generate_thumbnail_impl};
 use std::path::PathBuf;
 use std::process::Command;
 
 /// High-level facade over FFmpeg/FFprobe for the video-related Tauri commands.
 pub struct VideoProcessor {
     ffmpeg_path: String,
-    ffprobe_path: String,
 }
 
 impl VideoProcessor {
@@ -18,7 +17,6 @@ impl VideoProcessor {
     pub fn new() -> Self {
         Self {
             ffmpeg_path: ffmpeg_binary(),
-            ffprobe_path: ffprobe_binary(),
         }
     }
 
@@ -33,8 +31,13 @@ impl VideoProcessor {
     }
 
     /// Probe media metadata (duration, streams, etc.) for `path` via FFprobe.
+    ///
+    /// Routed through the in-process
+    /// [`crate::utils::media_cache::probe_metadata_cached`] cache so repeated
+    /// probes of the same (unmodified) file skip the ffprobe process. The
+    /// returned metadata is identical to a fresh probe.
     pub fn get_metadata(&self, path: &str) -> Result<serde_json::Value, String> {
-        probe_metadata(path, &self.ffprobe_path)
+        crate::utils::probe_metadata_cached(std::path::Path::new(path))
     }
 
     /// Extract up to `max_frames` keyframe thumbnails from `path` using the

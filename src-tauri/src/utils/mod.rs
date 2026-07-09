@@ -9,12 +9,16 @@
 
 mod audio;
 mod concat;
+mod error;
+mod media_cache;
 mod process;
 pub mod resilience; // pub so commands::crash_recovery can reach crash_dir_path
 mod time;
 
 pub use audio::pcm_samples_from_wav;
 pub use concat::write_concat_file;
+pub use error::{err_msg, AppResult};
+pub use media_cache::{probe_duration_cached, probe_metadata_cached};
 pub use process::{cmd_err, cmd_first_line, parse_scdet_output};
 pub use resilience::{
     crash_dir_path, install_panic_hook, resource_error_to_user_message, ResourceError,

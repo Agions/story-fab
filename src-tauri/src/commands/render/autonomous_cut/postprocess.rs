@@ -54,17 +54,13 @@ pub fn pick_overlay_layout_for_marker(_marker: &AutonomousOverlayMarker) -> Over
     OverlayLayout::BottomRight // default
 }
 
-/// Probe video duration via ffprobe
+/// Probe video duration via ffprobe (cached).
+///
+/// Routed through [`crate::utils::media_cache::probe_duration_cached`]; the
+/// cached `duration` comes from the same `format=duration` field as the
+/// legacy raw-ffprobe probe, so the returned value is identical.
 pub fn probe_duration(input_path: &str) -> Result<f64, String> {
-    let ffprobe_bin = crate::binary::ffprobe_binary();
-    let output = Command::new(&ffprobe_bin)
-        .args(["-v", "error", "-show_entries", "format=duration",
-               "-of", "default=noprint_wrappers=1:nokey=1", input_path])
-        .output()
-        .map_err(|e| format!("探测时长失败: {e}"))?;
-    if !output.status.success() { return Err("ffprobe 失败".to_string()); }
-    let s = String::from_utf8_lossy(&output.stdout);
-    s.trim().parse().map_err(|e| format!("解析时长失败: {e}"))
+    crate::utils::probe_duration_cached(std::path::Path::new(input_path))
 }
 
 /// Render a single time segment synchronously (used for single-segment case)

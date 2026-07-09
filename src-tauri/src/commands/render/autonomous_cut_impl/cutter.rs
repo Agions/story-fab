@@ -5,7 +5,6 @@ use crate::binary::{ffmpeg_binary, hw_accel, HwAccel};
 use crate::types::AutonomousRenderSegment;
 use crate::utils::cmd_err;
 use std::path::PathBuf;
-use std::process::Command;
 use std::sync::Arc;
 use tokio::process::Command as TokioCommand;
 use tokio::sync::Semaphore;
@@ -66,18 +65,11 @@ pub async fn cut_segments_parallel(
 
 /// 从时间点推测输出文件名
 pub fn probe_duration(input_path: &str) -> Result<f64, String> {
-    let ffprobe_bin = crate::binary::ffprobe_binary();
-    let output = Command::new(&ffprobe_bin)
-        .args(["-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input_path])
-        .output()
-        .map_err(|e| format!("探测时长失败: {e}"))?;
-
-    if !output.status.success() {
-        return Err(format!("ffprobe 失败: {:?}", output.stderr));
-    }
-
-    let s = String::from_utf8_lossy(&output.stdout);
-    s.trim().parse().map_err(|e| format!("解析时长失败: {e}"))
+    // Routed through the in-process metadata cache so repeated probes of the
+    // same (unmodified) segment skip the ffprobe process. The cached `duration`
+    // is parsed from the same `format=duration` field, so the value is
+    // identical to the legacy raw-ffprobe probe.
+    crate::utils::probe_duration_cached(std::path::Path::new(input_path))
 }
 
 /// 追加 -ss / -t 时间参数

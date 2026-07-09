@@ -1,6 +1,6 @@
 use tauri::{AppHandle, Emitter, State};
 
-use crate::binary::{ffmpeg_binary, ffprobe_binary};
+use crate::binary::ffmpeg_binary;
 use crate::commands::render::ffmpeg_builder::quality_preset;
 use crate::types::{ExportVideoInput, TranscodeCropInput};
 use crate::utils::{cmd_err, resource_error_to_user_message, ResourceLimiter};
@@ -166,13 +166,11 @@ pub async fn export_video(
 }
 
 fn get_duration_of_file(path: &str) -> Option<f64> {
-    let ffprobe = ffprobe_binary();
-    let output = std::process::Command::new(&ffprobe)
-        .args(["-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", path])
-        .output()
-        .ok()?;
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    stdout.trim().parse().ok()
+    // Routed through the in-process metadata cache so repeated probes of the
+    // same (unmodified) output file skip the ffprobe process. The cached
+    // `duration` is parsed from the same `format=duration` field, so the
+    // returned value is identical to the legacy raw-ffprobe probe.
+    crate::utils::probe_duration_cached(std::path::Path::new(path)).ok()
 }
 
 #[derive(Debug, serde::Serialize)]
