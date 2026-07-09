@@ -1,0 +1,246 @@
+classDiagram
+    %% === Pipeline Layer (new) ===
+    class CommentaryPipelineInput {
+        +String session_id
+        +String video_path
+        +String subtitles
+        +Option~String~ style
+        +Option~f64~ target_duration_secs
+        +String api_key
+        +Option~String~ provider
+        +Option~String~ model
+        +Option~String~ base_url
+        +Option~String~ voice
+        +Option~f32~ speed
+        +Option~bool~ auto_approve
+    }
+
+    class CommentaryPipelineOutput {
+        +DirectorPlan director_plan
+        +ScriptGeneratorOutput script
+        +Vec~AudioSegmentResult~ audio_segments
+        +f64 total_audio_duration_secs
+    }
+
+    class AudioSegmentResult {
+        +String text
+        +String audio_path
+        +f64 duration_secs
+        +usize segment_index
+    }
+
+    class PipelineStage {
+        <<enumeration>>
+        Director
+        Script
+        Synthesize
+        +Display
+    }
+
+    class PipelineProgressPayload {
+        +String stage
+        +f64 progress
+        +Option~String~ message
+    }
+
+    class PipelineErrorPayload {
+        +String stage
+        +String error
+    }
+
+    class PipelineOrchestrator {
+        -AppHandle app
+        -CommentaryPipelineInput input
+        +run() CommentaryPipelineOutput
+        -run_director_phase() Result~DirectorPlan, String~
+        -run_script_phase(director_plan) Result~ScriptGeneratorOutput, String~
+        -run_synthesize_phase(segments, voice, speed) Result~Vec~AudioSegmentResult~, String~
+        -emit_progress(stage, progress, message)
+        -emit_error(stage, error)
+        -parse_style_for_director(style_opt) ScriptStylePreset
+        -parse_style_for_script(style_opt) ScriptStyle
+    }
+
+    class RunCommentaryPipelineCmd {
+        <<tauri::command>>
+        +run_commentary_pipeline(app: AppHandle, input: CommentaryPipelineInput) Result~CommentaryPipelineOutput, String~
+    }
+
+    %% === Existing: Director Layer ===
+    class DirectorStateMachine {
+        +String session_id
+        +DirectorState state
+        +Option~DirectorPlan~ plan
+        +Option~ScriptGeneratorOutput~ script
+        +Option~VideoAnalysisResult~ analysis
+        +ScriptStylePreset style
+        +Option~String~ error
+        +i64 created_at
+        +i64 updated_at
+    }
+
+    class DirectorState {
+        <<enumeration>>
+        Idle
+        Analyzing
+        Planning
+        Ready
+        Rendering
+        Done
+        +Display
+        +progress_for_state() f64
+    }
+
+    class DirectorPlan {
+        +String id
+        +String summary
+        +String angle
+        +Option~String~ target_audience
+        +f64 target_duration_secs
+        +usize estimated_segments
+        +SegmentMode segment_mode
+        +String recommended_voice
+        +Vec~String~ key_points
+        +Vec~String~ warnings
+        +f64 confidence
+    }
+
+    class DirectorCommands {
+        <<tauri::command>>
+        +create_director_session(session_id, style) Result~String, String~
+        +get_director_status(session_id) Result~DirectorStatusResponse, String~
+        +start_director_analysis(session_id, video_path, subtitles, target_duration) Result~(), String~
+        +generate_director_plan(session_id, style, target_duration) Result~DirectorPlan, String~
+        +approve_director_plan(session_id) Result~String, String~
+        +revise_director_plan(session_id, modifications) Result~DirectorPlan, String~
+        +complete_director_render(session_id, output_path) Result~String, String~
+        +destroy_director_session(session_id) Result~(), String~
+    }
+
+    class DirectorStates {
+        <<static>>
+        +DIRECTOR_STATES: Lazy~Mutex~HashMap~
+        +get_state(session_id) DirectorStateMachine
+        +update_state_from(session_id, machine)
+        +clear_state(session_id)
+        +default_voice_for_style(style) String
+    }
+
+    %% === Existing: Script Generator Layer ===
+    class ScriptGeneratorInput {
+        +String subtitles
+        +Option~f64~ duration_secs
+        +Option~f64~ target_duration_secs
+        +Option~ScriptStyle~ style
+        +Option~String~ summary
+        +Option~Vec~String~~ highlights
+        +Option~String~ angle
+        +Option~String~ provider
+        +Option~String~ model
+        +Option~String~ api_key
+        +Option~String~ base_url
+        +Option~String~ system_prompt_extra
+    }
+
+    class ScriptGeneratorOutput {
+        +String full_script
+        +Vec~ScriptSegment~ segments
+        +f64 estimated_duration_secs
+        +String model_used
+        +String provider
+    }
+
+    class ScriptSegment {
+        +f64 start_time
+        +f64 end_time
+        +String text
+        +Option~String~ emotion
+    }
+
+    class ScriptStyle {
+        <<enumeration>>
+        Humorous
+        Serious
+        Conversational
+        Suspense
+        Warm
+        +Display
+    }
+
+    class GenerateCommentaryScriptCmd {
+        <<tauri::command>>
+        +generate_commentary_script(input: ScriptGeneratorInput) Result~ScriptGeneratorOutput, String~
+    }
+
+    %% === Existing: Synthesizer Layer ===
+    class SynthesizeResult {
+        +String audio_path
+        +f64 duration_secs
+    }
+
+    class SynthesizeCommentaryAudioCmd {
+        <<tauri::command>>
+        +synthesize_commentary_audio(text, voice, speed, format, output_path) Result~SynthesizeResult, String~
+        +estimate_tts_duration(text, voice, speed) Result~f64, String~
+        +list_commentary_voices(style) Vec~VoiceInfo~
+    }
+
+    class CommentarySynthesizer {
+        +synthesize(text, voice, speed, format) Result~SynthesizeResult, String~
+        +synthesize_batch(segments) Vec~Result~SynthesizeResult, String~~
+        +estimate_duration(text, voice, speed) Result~f64, String~
+    }
+
+    %% === Relationships ===
+
+    %% Pipeline uses Director
+    PipelineOrchestrator ..> DirectorCommands : calls directly
+    PipelineOrchestrator ..> DirectorStates : reads state via get_state
+    PipelineOrchestrator ..> DirectorPlan : produces
+    PipelineOrchestrator ..> PipelineStage : emits events with
+    PipelineOrchestrator ..> PipelineProgressPayload : emits
+    PipelineOrchestrator ..> PipelineErrorPayload : emits on error
+
+    %% Pipeline uses Script Generator
+    PipelineOrchestrator ..> GenerateCommentaryScriptCmd : calls directly
+    PipelineOrchestrator ..> ScriptGeneratorInput : constructs
+    PipelineOrchestrator ..> ScriptGeneratorOutput : produces
+    PipelineOrchestrator ..> ScriptStyle : maps input.style to
+
+    %% Pipeline uses Synthesizer
+    PipelineOrchestrator ..> SynthesizeCommentaryAudioCmd : calls directly
+    PipelineOrchestrator ..> CommentarySynthesizer : uses internally
+    PipelineOrchestrator ..> SynthesizeResult : aggregates into AudioSegmentResult
+    PipelineOrchestrator ..> AudioSegmentResult : produces
+
+    %% Pipeline I/O
+    CommentaryPipelineInput --> PipelineOrchestrator : drives
+    PipelineOrchestrator --> CommentaryPipelineOutput : returns
+    CommentaryPipelineOutput *-- AudioSegmentResult
+    CommentaryPipelineOutput *-- DirectorPlan
+    CommentaryPipelineOutput *-- ScriptGeneratorOutput
+
+    %% Director internal
+    DirectorCommands --> DirectorStateMachine : reads/writes
+    DirectorStateMachine *-- DirectorState
+    DirectorStateMachine *-- DirectorPlan
+    DirectorStates ..> DirectorStateMachine : manages global HashMap
+
+    %% Script internal
+    GenerateCommentaryScriptCmd --> ScriptGeneratorInput : reads
+    GenerateCommentaryScriptCmd --> ScriptGeneratorOutput : produces
+    ScriptGeneratorOutput *-- ScriptSegment
+
+    %% Synthesizer internal
+    SynthesizeCommentaryAudioCmd --> CommentarySynthesizer : delegates to
+    CommentarySynthesizer --> SynthesizeResult : produces
+
+    %% Style enums are equivalent (pipeline maps between them)
+    ScriptStyle -- PipelineOrchestrator : maps from input.style
+    ScriptStylePreset -- PipelineOrchestrator : maps to for director phase
+    ScriptStylePreset -- DirectorStateMachine : stored as field
+
+    %% Tauri command registration
+    RunCommentaryPipelineCmd ..> PipelineOrchestrator : wraps
+    RunCommentaryPipelineCmd ..> CommentaryPipelineInput : reads
+    RunCommentaryPipelineCmd ..> CommentaryPipelineOutput : returns

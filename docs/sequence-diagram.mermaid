@@ -1,0 +1,86 @@
+sequenceDiagram
+    actor Frontend
+    participant TauriIPC as Tauri IPC
+    participant Pipeline as PipelineOrchestrator
+    participant Director as Director Commands
+    participant DirectorState as Director State (HashMap)
+    participant Script as Script Generator
+    participant Synthesizer as CommentarySynthesizer
+
+    Frontend->>TauriIPC: invoke('run_commentary_pipeline', input)
+    TauriIPC->>Pipeline: run_commentary_pipeline(app, input)
+
+    %% Director Phase
+    Pipeline->>Pipeline: emit_progress("director", 0.0, "开始 Director 阶段")
+    Pipeline->>Frontend: pipeline-progress { stage: "director", progress: 0.0 }
+
+    Pipeline->>Director: create_director_session(session_id, style_opt)
+    Director->>DirectorState: get_state(session_id) → create if absent
+    DirectorState-->>Director: DirectorStateMachine { state: Idle }
+    Director->>DirectorState: update_state_from(session_id, { state: Idle })
+    Director-->>Pipeline: Ok(session_id)
+
+    Pipeline->>Director: start_director_analysis(session_id, video_path, subtitles, target_duration)
+    Director->>DirectorState: update_state_from(session_id, { state: Analyzing })
+    Director-->>Pipeline: Ok(())
+    Pipeline->>Pipeline: emit_progress("director", 0.2, "正在分析视频...")
+    Pipeline->>Frontend: pipeline-progress { stage: "director", progress: 0.2 }
+
+    Pipeline->>Director: generate_director_plan(session_id, style_opt, target_duration)
+    Director->>DirectorState: get_state(session_id)
+    DirectorState-->>Director: machine { analysis: None, ... }
+    Director->>Director: build_plan(style, target_duration, &None) → DirectorPlan
+    Director->>DirectorState: update_state_from(session_id, { state: Ready, plan: Some(plan) })
+    Director-->>Pipeline: Ok(DirectorPlan { ... })
+
+    Pipeline->>Director: approve_director_plan(session_id)
+    Director->>DirectorState: update_state_from(session_id, { state: Rendering })
+    Director-->>Pipeline: Ok("渲染已启动")
+    Pipeline->>Pipeline: emit_progress("director", 1.0, "Director Plan 已确认")
+    Pipeline->>Frontend: pipeline-progress { stage: "director", progress: 1.0 }
+
+    %% Script Phase
+    Pipeline->>Pipeline: emit_progress("script", 0.0, "开始生成解说脚本...")
+    Pipeline->>Frontend: pipeline-progress { stage: "script", progress: 0.0 }
+
+    Pipeline->>Script: generate_commentary_script(ScriptGeneratorInput { ... })
+    Note right of Script: subtitles, style, target_duration,<br/>summary from director_plan,<br/>angle from director_plan,<br/>highlights from key_points,<br/>api_key, provider, model, base_url
+    Script->>Script: build_system_prompt(style, summary, angle)
+    Script->>Script: build_user_prompt(subtitles, highlights, style)
+    Script->>Script: call_llm_provider(provider, model, api_key, base_url, ...)
+    Script->>Script: parse_script_output(full_script, style, estimated)
+    Script-->>Pipeline: Ok(ScriptGeneratorOutput { full_script, segments, ... })
+
+    Pipeline->>Pipeline: emit_progress("script", 1.0, "脚本生成完成")
+    Pipeline->>Frontend: pipeline-progress { stage: "script", progress: 1.0 }
+
+    %% Synthesize Phase
+    Pipeline->>Pipeline: emit_progress("synthesize", 0.0, "开始合成音频...")
+    Pipeline->>Frontend: pipeline-progress { stage: "synthesize", progress: 0.0 }
+
+    loop for each segment in script.segments
+        Pipeline->>Synthesizer: synthesize_commentary_audio(text, voice, speed, "mp3", None)
+        Synthesizer->>Synthesizer: write text to tmp file
+        Synthesizer->>Synthesizer: spawn edge-tts --file ... --voice ... --rate ... --write-media ...
+        Synthesizer->>Synthesizer: compute duration_secs from file size
+        Synthesizer-->>Pipeline: Ok(SynthesizeResult { audio_path, duration_secs })
+        Pipeline->>Pipeline: accumulate AudioSegmentResult
+        Pipeline->>Frontend: pipeline-progress { stage: "synthesize", progress: i/N }
+    end
+
+    Pipeline->>Pipeline: emit_progress("synthesize", 1.0, "音频合成完成")
+    Pipeline->>Frontend: pipeline-progress { stage: "synthesize", progress: 1.0 }
+
+    %% Complete
+    Pipeline->>Pipeline: aggregate CommentaryPipelineOutput
+    Pipeline->>Frontend: pipeline-complete { director_plan, script, audio_segments, total_audio_duration_secs }
+    Pipeline-->>TauriIPC: Ok(CommentaryPipelineOutput)
+    TauriIPC-->>Frontend: resolve(output)
+
+    %% Error branch (shown separately)
+    Note over Pipeline,Frontend: 错误分支：任一阶段 Err
+    Pipeline->>Pipeline: emit_error(stage_name, error_string)
+    Pipeline->>Frontend: pipeline-error { stage, error }
+    Pipeline->>Director: destroy_director_session(session_id)
+    Pipeline-->>TauriIPC: Err(error_string)
+    TauriIPC-->>Frontend: reject(error)
