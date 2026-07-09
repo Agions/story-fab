@@ -5,10 +5,7 @@
 //! - 多风格预设：幽默 / 严肃 / 接地气 / 悬疑 / 温情
 //! - Coherence 机制：保证多段解说风格和情节连贯
 
-pub mod anthropic_call;
 pub mod client;
-pub mod gemini_call;
-pub mod openai_call;
 pub mod parsing;
 pub mod prompts;
 pub mod providers;
@@ -43,14 +40,19 @@ pub async fn generate_commentary_script(
         style,
     );
 
+    // Delegate to the canonical, shared LLM scheduler (Stage 5b dedup of the
+    // earlier `providers::call_llm` duplicate). The HTTP client is shared via
+    // the script_generator client singleton.
+    let client = providers::get_http_client();
     let base_url = input.base_url.as_deref();
-    let full_script = providers::call_llm(
+    let full_script = providers::call_llm_provider(
         provider,
-        &model,
+        Some(model.as_str()),
         &api_key,
         base_url,
         &system_prompt,
         &user_prompt,
+        client,
     ).await?;
 
     let estimated = input.target_duration_secs
