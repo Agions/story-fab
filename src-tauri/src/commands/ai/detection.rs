@@ -13,7 +13,7 @@ use super::types::{DetectZCRBurstsInput, ZCRBurstResult};
 const ZCR_PROGRESS_EVENT: &str = "detect-zcr-progress";
 
 #[tauri::command]
-pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::highlight::HighlightSegment>, String> {
+pub async fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::highlight::HighlightSegment>, String> {
     if input.video_path.trim().is_empty() {
         return Err("视频路径不能为空".to_string());
     }
@@ -26,7 +26,7 @@ pub fn detect_highlights(input: DetectHighlightsInput) -> Result<Vec<crate::high
         detect_scene: input.detect_scene,
         scene_threshold: input.scene_threshold.map(|v| v as f32),
     };
-    let highlights = crate::highlight::combiner::get_highlights(&input.video_path, &options);
+    let highlights = crate::highlight::combiner::get_highlights(&input.video_path, &options).await;
     Ok(highlights)
 }
 
@@ -66,7 +66,7 @@ pub async fn detect_zcr_bursts(
 }
 
 #[tauri::command]
-pub fn detect_smart_segments(
+pub async fn detect_smart_segments(
     input: DetectSmartSegmentsInput,
 ) -> Result<Vec<crate::segment::VideoSegment>, String> {
     if input.video_path.trim().is_empty() {
@@ -81,6 +81,6 @@ pub fn detect_smart_segments(
         detect_dialogue: input.detect_dialogue,
         detect_transitions: input.detect_transitions,
     };
-    let segments = segmenter.smart_segment(&input.video_path, &options);
+    let segments = segmenter.smart_segment(&input.video_path, &options).await;
     Ok(segments)
 }

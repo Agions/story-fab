@@ -11,6 +11,7 @@ use crate::utils::{cmd_err, chrono_like_timestamp, parse_scdet_output};
 use std::process::Command;
 
 /// Smart video segmenter — orchestrates scene + audio energy analysis
+#[derive(Clone)]
 pub struct SmartSegmenter {
     ffmpeg_path: String,
     ffprobe_path: String,
@@ -24,7 +25,7 @@ impl SmartSegmenter {
         }
     }
 
-    pub fn smart_segment(&self, video_path: &str, options: &Opt) -> Vec<VideoSegment> {
+    pub async fn smart_segment(&self, video_path: &str, options: &Opt) -> Vec<VideoSegment> {
         let opts = options.clone();
         let min_duration_ms = opts.min_ms();
         let max_duration_ms = opts.max_ms();
@@ -46,19 +47,35 @@ impl SmartSegmenter {
             }
         };
 
+        let opts = options.clone();
+        let audio_path_for_energy = audio_path.clone();
+        let video_path_for_scene = video_path.to_string();
+        let segmenter_clone = self.clone();
+
         let energy_seg = EnergySeg::new();
-        let energy_data = match energy_seg.compute_energy_profile(&audio_path, 500) {
-            Ok(d) => d,
-            Err(e) => {
-                log::warn!("Failed to compute energy profile: {}", e);
+
+        let energy_handle = tauri::async_runtime::spawn_blocking(move || {
+            EnergySeg::new().compute_energy_profile(&audio_path_for_energy, 500)
+        });
+        let scene_opts = opts.clone();
+        let scene_handle = tauri::async_runtime::spawn_blocking(move || {
+            segmenter_clone.detect_scene_changes(&video_path_for_scene, scene_opts.scene_thresh())
+        });
+
+        let (energy_result, scene_result) = tokio::join!(energy_handle, scene_handle);
+
+        let energy_data = match energy_result {
+            Ok(Ok(d)) => d,
+            _ => {
+                log::warn!("Failed to compute energy profile");
+                let _ = std::fs::remove_file(&audio_path);
                 let seg = SceneSegmenter::new();
                 return seg.scene_based_segmentation(video_path, duration_ms, &opts);
             }
         };
 
-        let scene_threshold = opts.scene_thresh();
         let scene_changes = if opts.detect_transitions.unwrap_or(true) {
-            self.detect_scene_changes(video_path, scene_threshold)
+            scene_result.unwrap_or_default()
         } else {
             Vec::new()
         };

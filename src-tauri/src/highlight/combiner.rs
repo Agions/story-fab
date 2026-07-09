@@ -3,13 +3,14 @@
 
 use crate::highlight::types::{HighlightOptions, HighlightSegment};
 use crate::highlight::audio_analysis::HighlightDetector as AudioDetector;
+use crate::highlight::audio_analysis::HighlightDetector;
 use crate::highlight::scene_detect::SceneDetector;
 use std::process::Command;
 use crate::binary::resolve_binary_path;
 use crate::utils::chrono_like_timestamp;
 
 /// Get combined highlights from both audio energy and scene change analysis
-pub fn get_highlights(
+pub async fn get_highlights(
     video_path: &str,
     options: &HighlightOptions,
 ) -> Vec<HighlightSegment> {
@@ -18,21 +19,42 @@ pub fn get_highlights(
     let min_duration_ms = opts.min_duration_ms.unwrap_or(500) as u64;
 
     let audio_detector = AudioDetector::new();
-    let scene_detector = SceneDetector::new();
+
+    // 1. Audio extraction (must be sequential — needed by audio branch)
+    let audio_path = match extract_audio_path(video_path, &audio_detector) {
+        Ok(p) => p,
+        Err(_) => return Vec::new(),
+    };
+
+    let opts = options.clone();
+    let audio_path_for_audio = audio_path.clone();
+    let video_path_for_scene = video_path.to_string();
+
+    let audio_opts = opts.clone();
+    let audio_handle = tauri::async_runtime::spawn_blocking(move || {
+        HighlightDetector::new().detect_audio_highlights(&audio_path_for_audio, &audio_opts)
+    });
+    let scene_opts = opts.clone();
+    let scene_handle = tauri::async_runtime::spawn_blocking(move || {
+        SceneDetector::new().detect_scene_changes(&video_path_for_scene, &scene_opts)
+    });
+
+    let (audio_result, scene_result) = tokio::join!(audio_handle, scene_handle);
 
     let mut all_segments: Vec<HighlightSegment> = Vec::new();
 
-    // 1. Audio-based highlights
-    if let Ok(audio_path) = extract_audio_path(video_path, &audio_detector) {
-        let audio_segments = audio_detector.detect_audio_highlights(&audio_path, &opts);
-        all_segments.extend(audio_segments);
-        let _ = std::fs::remove_file(&audio_path);
+    // Fall back to empty vec if the spawned task panicked or was cancelled
+    if let Ok(segments) = audio_result {
+        all_segments.extend(segments);
     }
 
-    // 2. Scene change highlights
+    let _ = std::fs::remove_file(&audio_path);
+
+    let opts = options.clone();
     if opts.detect_scene.unwrap_or(true) {
-        let scene_segments = scene_detector.detect_scene_changes(video_path, &opts);
-        all_segments.extend(scene_segments);
+        if let Ok(segments) = scene_result {
+            all_segments.extend(segments);
+        }
     }
 
     if all_segments.is_empty() {
