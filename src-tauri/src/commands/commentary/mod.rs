@@ -1,6 +1,7 @@
 //! Commentary 子模块统一导出
 
 pub mod director;
+pub mod pipeline;
 pub mod script_generator;
 pub mod synthesizer;
 
@@ -24,4 +25,10 @@ pub use crate::commands::commentary::synthesizer::commands::{
 pub use crate::commands::commentary::synthesizer::struct_file::CommentarySynthesizer;
 pub use crate::commands::commentary::synthesizer::types::{
     SynthesizeOptions, SynthesizeResult, VoiceInfo,
+};
+// Pipeline re-exports
+pub use crate::commands::commentary::pipeline::{
+    run_commentary_pipeline, AudioSegmentResult, CommentaryPipelineInput,
+    CommentaryPipelineOutput, PipelineErrorPayload, PipelineProgressPayload,
+    PipelineStage,
 };

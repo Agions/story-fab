@@ -138,6 +138,8 @@ pub fn run() {
             commentary::synthesizer::commands::synthesize_commentary_audio,
             commentary::synthesizer::commands::estimate_tts_duration,
             commentary::synthesizer::commands::list_commentary_voices,
+            // Pipeline Orchestration (O2) — single-command Director + Script + TTS
+            commentary::pipeline::commands::run_commentary_pipeline,
             // Crash recovery (P0-3 companion): surface panic-hook crash
             // reports to the frontend so users can see / share them.
             commands::crash_recovery::list_crashes,
