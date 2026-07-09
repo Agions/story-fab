@@ -2,7 +2,7 @@
  * 配置卡片头部 — 齿轮图标 + 标题
  */
 import React from 'react';
-import styles from './../script-writing.module.less';
+import styles from './../../edit-step/script-writing.module.less';
 
 const ConfigHeader: React.FC = () => {
   return (

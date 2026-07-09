@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import styles from './../script-writing.module.less';
+import styles from './../../edit-step/script-writing.module.less';
 import { FEATURE_TO_FUNCTION, type AIFunctionType } from '../shared/function-mode-map';
 
 // ============================================

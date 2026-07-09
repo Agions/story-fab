@@ -54,7 +54,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
     } else {
       dispatchLocal({ type:'SET_VISIBLE_TASKS', payload: [] });
     }
-  }, [analyzing, timeout]);
+  }, [analyzing, timeout, dispatchLocal]);
 
   // 切换配置
   const toggleConfig = (key: string) => {

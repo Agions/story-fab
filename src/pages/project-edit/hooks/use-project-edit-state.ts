@@ -93,7 +93,7 @@ export function useProjectEditState(
 
   const [state, dispatch] = useReducer(projectEditReducer, initial);
 
-  const setters = useMemo(() => createAutoSetters(dispatch, initial), [dispatch]);
+  const setters = useMemo(() => createAutoSetters(dispatch, initial), [dispatch, initial]);
 
   return {
     ...state,

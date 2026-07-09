@@ -72,7 +72,7 @@ const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _de
       dispatch({ type:'DETECT_FAILURE', payload: msg });
       notify.error(err, `高光检测失败: ${msg}`);
     }
-  }, [videoInfo, threshold, topN]);
+  }, [videoInfo, threshold, topN, dispatch]);
 
   const handleSeek = useCallback((h: Highlight) => {
     setPlayheadMs(h.startTime * MS_PER_SECOND);

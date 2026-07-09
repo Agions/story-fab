@@ -47,15 +47,15 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
     dispatch({
       type:'SYNC_FROM_SCRIPT', payload: { content: script.content || '',
       title: script.title || '', } });
-  }, [script]);
+  }, [script, dispatch]);
 
   const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     dispatch({ type:'SET_EDITED_CONTENT', payload: e.target.value });
-  }, []);
+  }, [dispatch]);
 
   const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type:'SET_EDITED_TITLE', payload: e.target.value });
-  }, []);
+  }, [dispatch]);
 
   const handleSave = useCallback(() => {
     const updatedScript: ScriptData = {
@@ -80,7 +80,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
       logger.error('AI 优化脚本失败:', { error });
       notify.error(error, 'AI 优化脚本失败');
     }
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className={styles.scriptEditor}>

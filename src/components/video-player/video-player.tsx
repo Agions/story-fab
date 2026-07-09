@@ -81,7 +81,7 @@ function VideoPlayer({
       videoElement.removeEventListener('play', handlePlay);
       videoElement.removeEventListener('pause', handlePause);
     };
-  }, [onTimeUpdate, onEnded]);
+  }, [onTimeUpdate, onEnded, dispatch]);
 
   // Action callbacks (defined before useVideoKeyboardShortcuts to avoid TDZ)
   const togglePlay = useCallback(() => {

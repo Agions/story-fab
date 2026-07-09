@@ -120,7 +120,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
 
       video.src = blobUrl;
     }
-  }, [onVideoSelect]);
+  }, [onVideoSelect, dispatch]);
 
   // Tauri 选择视频
   const handleSelectVideoTauri = async () => {
