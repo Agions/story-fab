@@ -1,10 +1,11 @@
-//! Segment classification and speed derivation — split from smart_segmenter.rs
+//! Segment classification and speed derivation — split from smart_segmenter.rs.
 
-
+/// Classifies video segments and derives suggested playback speeds.
 pub struct SegmentClassifier;
 
 impl SegmentClassifier {
-    /// Classify a segment as action/dialogue/transition/content
+    /// Classify a segment as action/dialogue/transition/content.
+    /// Returns `(label, confidence)`.
     pub fn classify_segment(
         seg: &(u64, u64),
         scene_changes: &[u64],
@@ -69,6 +70,7 @@ impl SegmentClassifier {
         }
     }
 
+    /// Returns `true` if a scene change occurs within ±500 ms of `time_ms`.
     pub fn is_scene_at(scene_changes: &[u64], time_ms: u64) -> bool {
         scene_changes.iter().any(|&sc| {
             (sc >= time_ms && sc <= time_ms) || (sc.saturating_sub(500) <= time_ms && sc + 500 >= time_ms)

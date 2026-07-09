@@ -1,8 +1,8 @@
-//! Hardware acceleration detection and encoding configuration
+//! Hardware acceleration detection and encoding configuration.
 
 use std::path::Path;
 
-/// Hardware acceleration backend detected on the system
+/// Hardware acceleration backend detected on the system.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HwAccel {
     /// NVIDIA GPU via NVENC/NVDEC (Linux/Windows)
@@ -18,6 +18,7 @@ pub enum HwAccel {
 }
 
 impl HwAccel {
+    /// Human-readable name of this hardware acceleration backend.
     pub fn name(self) -> &'static str {
         match self {
             HwAccel::Nvidia => "NVIDIA NVENC/NVDEC",
@@ -28,6 +29,7 @@ impl HwAccel {
         }
     }
 
+    /// FFmpeg decoder name for this backend, if hardware decoding is supported.
     pub fn video_decoder(self) -> Option<&'static str> {
         match self {
             HwAccel::Nvidia => Some("h264_cuvid"),
@@ -38,6 +40,7 @@ impl HwAccel {
         }
     }
 
+    /// FFmpeg H.264 encoder name for this backend (falls back to `libx264` on CPU).
     pub fn h264_encoder(self) -> &'static str {
         match self {
             HwAccel::Nvidia => "h264_nvenc",
@@ -48,6 +51,7 @@ impl HwAccel {
         }
     }
 
+    /// FFmpeg HEVC/H.265 encoder name for this backend (falls back to `libx265` on CPU).
     pub fn hevc_encoder(self) -> &'static str {
         match self {
             HwAccel::Nvidia => "hevc_nvenc",
@@ -58,10 +62,12 @@ impl HwAccel {
         }
     }
 
+    /// Audio encoder name used for all backends (AAC).
     pub fn audio_encoder(self) -> &'static str {
         "aac"
     }
 
+    /// Optional FFmpeg input device name for this backend.
     pub fn input_device(self) -> Option<&'static str> {
         match self {
             HwAccel::AmdVaapi => Some("vaapi"),
@@ -70,6 +76,7 @@ impl HwAccel {
         }
     }
 
+    /// Extra FFmpeg input arguments required to enable this backend's accelerator.
     pub fn hwaccel_input_args(self) -> Vec<&'static str> {
         match self {
             HwAccel::AmdVaapi => vec!["-vaapi_device", "/dev/dri/renderD128"],
@@ -119,8 +126,11 @@ pub fn detect_hw_accel() -> HwAccel {
         return HwAccel::VideoToolbox;
     }
 
-    log::info!("[StoryFab] No GPU detected — using CPU encoding");
-    HwAccel::Cpu
+    #[cfg(not(target_os = "macos"))]
+    {
+        log::info!("[StoryFab] No GPU detected — using CPU encoding");
+        HwAccel::Cpu
+    }
 }
 
 /// Returns the globally detected hardware acceleration backend.

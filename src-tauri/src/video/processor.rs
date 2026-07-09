@@ -7,12 +7,14 @@ use crate::video::{extract_keyframes_impl, generate_thumbnail_impl, probe_metada
 use std::path::PathBuf;
 use std::process::Command;
 
+/// High-level facade over FFmpeg/FFprobe for the video-related Tauri commands.
 pub struct VideoProcessor {
     ffmpeg_path: String,
     ffprobe_path: String,
 }
 
 impl VideoProcessor {
+    /// Create a new processor, resolving the bundled FFmpeg/FFprobe binaries.
     pub fn new() -> Self {
         Self {
             ffmpeg_path: ffmpeg_binary(),
@@ -20,6 +22,9 @@ impl VideoProcessor {
         }
     }
 
+    /// Check whether FFmpeg is installed and return its version line.
+    /// Returns `(installed, version_line)` where `version_line` is `None` if
+    /// FFmpeg could not be executed.
     pub fn check_installed(&self) -> (bool, Option<String>) {
         match Command::new(&self.ffmpeg_path).arg("-version").output() {
             Ok(out) if out.status.success() => (true, cmd_first_line(&out)),
@@ -27,14 +32,19 @@ impl VideoProcessor {
         }
     }
 
+    /// Probe media metadata (duration, streams, etc.) for `path` via FFprobe.
     pub fn get_metadata(&self, path: &str) -> Result<serde_json::Value, String> {
         probe_metadata(path, &self.ffprobe_path)
     }
 
+    /// Extract up to `max_frames` keyframe thumbnails from `path` using the
+    /// given `scene_threshold` (0–1). Returns paths to generated images.
     pub fn extract_keyframes(&self, path: &str, max_frames: u32, scene_threshold: f64) -> Result<Vec<String>, String> {
         extract_keyframes_impl(path, max_frames, scene_threshold, &self.ffmpeg_path)
     }
 
+    /// Cut a single `[start, end]` segment from `input` to `output`.
+    /// When `hw_accel` is `None`, hardware acceleration is auto-detected.
     pub fn cut_video_segment(
         &self,
         input: &str,
@@ -73,6 +83,9 @@ impl VideoProcessor {
         Ok(())
     }
 
+    /// Concatenate `inputs` (in order) into a single `output` video.
+    /// A single input is copied directly; multiple inputs are joined via a
+    /// generated concat list (kept on disk transiently).
     pub async fn concat_segments(&self, inputs: &[PathBuf], output: &str) -> Result<(), String> {
         if inputs.is_empty() {
             return Err("没有输入片段".to_string());
@@ -104,26 +117,9 @@ impl VideoProcessor {
         Ok(())
     }
 
+    /// Generate a single thumbnail image of `path` at the given `time` (seconds).
     pub fn generate_thumbnail(&self, path: &str, time: f64) -> Result<String, String> {
         generate_thumbnail_impl(path, time, &self.ffmpeg_path)
-    }
-
-    pub fn detect_hw_accel(&self) -> Option<String> {
-        let output = Command::new(&self.ffmpeg_path)
-            .arg("-encoders")
-            .output()
-            .ok()?;
-
-        let s = &String::from_utf8_lossy(&output.stdout);
-        if s.contains("h264_nvenc") {
-            Some("nvenc".to_string())
-        } else if s.contains("h264_qsv") {
-            Some("qsv".to_string())
-        } else if s.contains("h264_videotoolbox") {
-            Some("videotoolbox".to_string())
-        } else {
-            None
-        }
     }
 }
 

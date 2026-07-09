@@ -1,3 +1,9 @@
+//! Shared DTO (data-transfer-object) types for the Tauri command handlers.
+//!
+//! These structs form the cross-command JSON contract between the frontend
+//! (`src/core/tauri`) and the backend command handlers. Field names are
+//! serialized as camelCase.
+
 use serde::{Deserialize, Serialize};
 
 // ─── AI Director ────────────────────────────────────────────────────────────

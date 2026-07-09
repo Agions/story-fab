@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
+/// A single transcribed word with timing and confidence.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WhisperWord {
@@ -11,6 +12,7 @@ pub struct WhisperWord {
     pub probability: f32,
 }
 
+/// A transcribed subtitle segment containing one or more words.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubtitleSegment {
@@ -22,6 +24,7 @@ pub struct SubtitleSegment {
     pub words: Vec<WhisperWord>,
 }
 
+/// Full transcription result for an audio/video source.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubtitleResult {
@@ -31,15 +34,7 @@ pub struct SubtitleResult {
     pub segments: Vec<SubtitleSegment>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WhisperModelInfo {
-    pub name: String,
-    pub size: String,
-    pub is_downloaded: bool,
-    pub path: Option<String>,
-}
-
+/// Progress update emitted during a transcription job.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TranscribeProgress {
@@ -48,12 +43,3 @@ pub struct TranscribeProgress {
     pub current_segment: Option<u32>,
     pub total_segments: Option<u32>,
 }
-
-pub const WHISPER_LANGS: &[(&str, &str)] = &[
-    ("auto", "自动检测"),
-    ("zh", "中文"), ("en", "英语"), ("ja", "日语"), ("ko", "韩语"),
-    ("fr", "法语"), ("de", "德语"), ("es", "西班牙语"),
-    ("pt", "葡萄牙语"), ("it", "意大利语"), ("ru", "俄语"),
-    ("ar", "阿拉伯语"), ("hi", "印地语"), ("id", "印尼语"),
-    ("ms", "马来语"), ("th", "泰语"), ("vi", "越南语"),
-];

@@ -1,7 +1,8 @@
-// Video processing module — split from video_processor.rs
-// Submodules: processor, metadata, keyframes, thumbnail,
-//            ffmpeg_cmd, mix_audio, audio_duration
-
+//! Video processing module — split from video_processor.rs.
+//!
+//! Public surface: [`VideoProcessor`] (processor), FFmpeg command builders
+//! (ffmpeg_cmd), audio mixing (mix_audio) and duration probing
+//! (audio_duration). Internal helpers: metadata, keyframes, thumbnail.
 mod metadata;
 mod keyframes;
 mod thumbnail;

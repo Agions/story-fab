@@ -1,6 +1,7 @@
-// Highlight detection module — split from highlight_detector.rs
-// Files: types.rs, audio_analysis.rs, scene_detect.rs, combiner.rs, energy.rs, zcr.rs, mod.rs
-
+//! Highlight detection module — split from highlight_detector.rs.
+//!
+//! Internal analysis stages (types, audio_analysis, scene_detect, energy, zcr)
+//! feed the public [`get_highlights`] combiner.
 mod types;
 mod audio_analysis;
 mod scene_detect;
