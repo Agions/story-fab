@@ -9,7 +9,7 @@ export interface UseReducerHookResult<S, A> {
  * Creates a reusable reducer hook that wraps useReducer with useCallback dispatch
  * and useMemo memoization, eliminating ~20 lines of boilerplate per hook.
  */
-export function createReducerHook<S, A>(
+export function useReducerHookFactory<S, A>(
   reducer: (state: S, action: A) => S,
   initialState: S,
 ): UseReducerHookResult<S, A> {

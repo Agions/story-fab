@@ -9,7 +9,7 @@
  * - 本文件仅包含上传组件逻辑和 UI
  */
 import React, { useCallback, useRef, useEffect, memo } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { useProjectStore } from '@/stores';
 import { logger } from '@/shared/utils/logging';
 import { formatDuration, formatFileSize, notify } from '@/shared';
@@ -36,7 +36,7 @@ interface VideoUploadProps {
 
 const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
   const { state, setVideo, goToNextStep } = useProjectStore();
-  const { state: local, dispatch } = createReducerHook(videoUploadReducer, initialVideoUploadState);
+  const { state: local, dispatch } = useReducerHookFactory(videoUploadReducer, initialVideoUploadState);
   const { uploading, uploadProgress, dragActive, uploadStatus, currentFile } = local;
   // ref 镜像 uploadStatus — async setInterval 回调需要读到最新值
   // ref 保持宽 string 类型, 兼容 setInterval 内对 'cancelled' | 'error' 的死代码判等
@@ -178,7 +178,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
     } finally {
       dispatch({ type:'SET_UPLOADING', payload: false });
     }
-  }, [setVideo]);
+  }, [setVideo, dispatch]);
 
   // 暂停/继续
   const handlePauseResume = () => {

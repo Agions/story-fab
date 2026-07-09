@@ -3,7 +3,7 @@
  * 来源: refactor/video-processing-usereducer (v3.4 §A2 范式)
  */
 import { useCallback } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { createAutoSetters } from '@/shared/hooks/use-auto-setters';
 import { notify } from '@/shared';
 import { logger } from '@/shared/utils/logging';
@@ -27,7 +27,7 @@ export const useVideoProcessingController = ({
   segments,
   onProcessingComplete,
 }: UseVideoProcessingControllerArgs) => {
-  const { state, dispatch } = createReducerHook(videoProcessingReducer, initialVideoProcessingState);
+  const { state, dispatch } = useReducerHookFactory(videoProcessingReducer, initialVideoProcessingState);
   const setters = createAutoSetters(dispatch, initialVideoProcessingState);
   const {
     videoQuality, exportFormat, transitionType, transitionDuration,

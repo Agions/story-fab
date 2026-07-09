@@ -9,7 +9,7 @@
  */
 import { MS_PER_SECOND } from '@/shared/utils';
 import React, { useCallback } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { Slider } from '@/components/ui/slider';
 import { Zap, Crosshair, Lightbulb } from 'lucide-react';
 import { visionService } from '@/core/services/ai/vision-service';
@@ -38,7 +38,7 @@ interface HighlightsProps {
 }
 
 const Highlights: React.FC<HighlightsProps> = ({ videoInfo, defaultExpanded: _defaultExpanded = false }) => {
-  const { state, dispatch } = createReducerHook(highlightsReducer, initialHighlightsState);
+  const { state, dispatch } = useReducerHookFactory(highlightsReducer, initialHighlightsState);
   const { highlights, detected, loading, error, threshold, topN } = state;
   const setPlayheadMs = useEditorStore((s) => s.setPlayheadMs);
 

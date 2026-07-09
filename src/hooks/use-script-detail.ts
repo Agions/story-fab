@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/types';
 import {
@@ -25,7 +25,7 @@ interface UseScriptDetailResult {
 }
 
 export function useScriptDetail(): UseScriptDetailResult {
-  const { state, dispatch } = createReducerHook(scriptDetailReducer, initialScriptDetailState);
+  const { state, dispatch } = useReducerHookFactory(scriptDetailReducer, initialScriptDetailState);
 
   const setLoading = useCallback((loading: boolean) => dispatch({ type:'SET_LOADING', payload: loading }), [dispatch]);
   const setProject = useCallback(

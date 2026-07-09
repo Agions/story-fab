@@ -3,7 +3,7 @@
  * 来源: refactor/original-editor-usereducer (v3.4 §A2 范式)
  */
 import { useMemo, useCallback, useEffect } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { createAutoSetters } from '@/shared/hooks/use-auto-setters';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import type { ScriptSegment } from '@/types';
@@ -30,7 +30,7 @@ export const useScriptEditor = ({
   onSave,
   onExport,
 }: UseScriptEditorArgs) => {
-  const { state, dispatch } = createReducerHook(
+  const { state, dispatch } = useReducerHookFactory(
     originalEditorReducer,
     initialOriginalEditorState(initialSegments),
   );

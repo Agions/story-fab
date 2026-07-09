@@ -1,7 +1,7 @@
 import { logger } from '@/shared/utils/logging';
 import { isTauriEnv } from '@/shared/utils/platform';
 import React, { useRef, useCallback, useEffect } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, Trash2, PlayCircle } from 'lucide-react';
@@ -39,7 +39,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
   onVideoRemove,
   loading = false
 }) => {
-  const { state, dispatch } = createReducerHook(videoSelectorReducer, {
+  const { state, dispatch } = useReducerHookFactory(videoSelectorReducer, {
     ...initialVideoSelectorState,
     videoPath: initialVideoPath || null,
   });

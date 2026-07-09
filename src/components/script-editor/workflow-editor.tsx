@@ -1,6 +1,6 @@
 import { logger } from '@/shared/utils/logging';
 import React, { useEffect, useCallback, memo } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { Card } from '../ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
 import { Button } from '../ui/button';
@@ -40,7 +40,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
   onSave,
   onScriptUpdate,
 }) => {
-  const { state, dispatch } = createReducerHook(workflowEditorReducer, initialWorkflowEditorState);
+  const { state, dispatch } = useReducerHookFactory(workflowEditorReducer, initialWorkflowEditorState);
   const { activeTab, editedContent, editedTitle, aiModalVisible } = state;
 
   useEffect(() => {

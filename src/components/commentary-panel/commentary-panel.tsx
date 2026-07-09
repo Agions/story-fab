@@ -15,7 +15,7 @@
  */
 
 import React, { useCallback, memo } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -97,7 +97,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
   disabled = false,
 }) => {
   // ── UI 状态 (5 useState → 1 useReducer) ───────────────────────────────
-  const { state, dispatch } = createReducerHook(commentaryPanelReducer, initialCommentaryPanelState);
+  const { state, dispatch } = useReducerHookFactory(commentaryPanelReducer, initialCommentaryPanelState);
   const { activeTab, planConfirmOpen, apiKey, selectedStyle } = state;
 
   // ── Hooks ────────────────────────────────────────────────────────────

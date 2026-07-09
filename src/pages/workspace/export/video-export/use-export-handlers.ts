@@ -3,7 +3,7 @@
  * 14 useState 集中化入口 (v3.4 §A2 范式)
  */
 import { useMemo, useCallback, useEffect } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { tauri } from '@/core/tauri';
 import { notify } from '@/shared';
@@ -97,11 +97,11 @@ export function useExportHandlers({
   onExportSettingsChange,
   onComplete,
 }: UseExportHandlersProps): ExportHandlers {
-  const { state: ehState, dispatch } = createReducerHook(
+  const { state: ehState, dispatch } = useReducerHookFactory(
     exportHandlersReducer,
     initialExportHandlersState({ exportSettings: state.exportSettings }),
   );
-  const setters = useMemo(() => makeSetters(dispatch, ehState), [ehState]);
+  const setters = useMemo(() => makeSetters(dispatch, ehState), [dispatch, ehState]);
   const {
     exporting, progress, progressStage, etaSeconds,
     exported, exportedFile, exportError,

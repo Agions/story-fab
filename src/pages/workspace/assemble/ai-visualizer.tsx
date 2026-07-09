@@ -8,7 +8,7 @@
  * - 6 useState → 1 useReducer (AIVisualizer.reducer.ts)
  */
 import React, { useEffect, memo } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import { useProjectStore } from '@/stores';
 import { visionService } from '@/core/services/ai/vision-service';
 import { notify } from '@/shared';
@@ -31,7 +31,7 @@ const CheckIcon = () => (
 const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
   const { state, setAnalysis, goToNextStep, dispatch } = useProjectStore();
   const timeout = useTimeout();
-  const { state: s, dispatch: dispatchLocal } = createReducerHook(aiVisualizerReducer, initialAIVisualizerState);
+  const { state: s, dispatch: dispatchLocal } = useReducerHookFactory(aiVisualizerReducer, initialAIVisualizerState);
   const {
     analyzing,
     progress,

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { createReducerHook } from '@/shared/hooks/use-reducer-hook';
+import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
 import type { AIScriptDraft } from '@/core/services/ai/script-service';
 import type { ScriptSegment } from '@/types';
 import {
@@ -22,7 +22,7 @@ interface UseProjectDetailResult {
 }
 
 export function useProjectDetail(): UseProjectDetailResult {
-  const { state, dispatch } = createReducerHook(projectDetailReducer, initialProjectDetailState);
+  const { state, dispatch } = useReducerHookFactory(projectDetailReducer, initialProjectDetailState);
 
   const setActiveStep = useCallback((step: string) => dispatch({ type:'SET_ACTIVE_STEP', payload: step }), [dispatch]);
   const setProject = useCallback(
