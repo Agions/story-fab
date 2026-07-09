@@ -94,3 +94,64 @@ export interface GenerateScriptInput {
   baseUrl?: string;
   systemPromptExtra?: string;
 }
+
+// ─── Pipeline Orchestration ─────────────────────────────────────────────
+
+export interface CommentaryPipelineInput {
+  videoPath: string;
+  subtitles: string;
+  style?: string;
+  provider?: string;
+  model?: string;
+  apiKey: string;
+  baseUrl?: string;
+  systemPromptExtra?: string;
+  voice?: string;
+  speed?: number;
+  format?: string;
+  autoApprove?: boolean;
+}
+
+export interface DirectorPlanResult {
+  pacingFactor: number;
+  beatCount: number;
+  preferredTransition: string;
+  confidence: number;
+}
+
+export interface CommentaryScriptResult {
+  fullScript: string;
+  segments: Array<{ startTime: number; endTime: number; text: string; emotion?: string }>;
+  estimatedDurationSecs: number;
+  modelUsed: string;
+  provider: string;
+}
+
+export interface AudioSegmentResult {
+  text: string;
+  audioPath: string;
+  durationSecs: number;
+  segmentIndex: number;
+}
+
+export interface CommentaryPipelineOutput {
+  directorPlan: DirectorPlanResult;
+  script: CommentaryScriptResult;
+  audioSegments: AudioSegmentResult[];
+  totalAudioDurationSecs: number;
+}
+
+export interface PipelineProgressEvent {
+  stage: 'director' | 'script' | 'synthesize';
+  message: string;
+  percent: number;
+}
+
+export interface PipelineCompleteEvent {
+  totalDurationMs: number;
+}
+
+export interface PipelineErrorEvent {
+  stage: string;
+  error: string;
+}

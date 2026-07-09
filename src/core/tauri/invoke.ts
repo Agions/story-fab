@@ -1,5 +1,12 @@
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
-import type { TauriCommandName, TauriCommandOutput } from './command-types';
+import type {
+  TauriCommandName,
+  TauriCommandOutput,
+} from './command-types';
+import type {
+  CommentaryPipelineInput,
+  CommentaryPipelineOutput,
+} from '@/types';
 
 // ============================================================
 // 命令名称常量（与 Rust 端保持一致）
@@ -69,6 +76,9 @@ export const TauriCommand = {
   SYNTHESIZE_COMMENTARY_AUDIO: 'synthesize_commentary_audio',
   ESTIMATE_TTS_DURATION:       'estimate_tts_duration',
   LIST_COMMENTARY_VOICES:      'list_commentary_voices',
+
+  // Commentary Pipeline Orchestrator
+  RUN_COMMENTARY_PIPELINE:     'run_commentary_pipeline',
 
   // Auto-save
   AUTO_SAVE_PROJECT:       'auto_save_project',
@@ -163,6 +173,20 @@ export async function invoke<C extends TauriCommandName>(
 ): Promise<TauriCommandOutput<C>> {
   const { retries = 0, signal } = options ?? {};
   return executeWithRetry(command, normalizeArgs(args), retries, signal);
+}
+
+/**
+ * 一键执行解说流水线（导演规划 + 脚本生成 + 配音合成）
+ */
+export async function runCommentaryPipeline(
+  input: CommentaryPipelineInput,
+): Promise<CommentaryPipelineOutput> {
+  const payload: CommentaryPipelineInput = {
+    ...input,
+    autoApprove: true,
+  };
+
+  return invoke(TauriCommand.RUN_COMMENTARY_PIPELINE, payload as unknown as Record<string, unknown>) as Promise<CommentaryPipelineOutput>;
 }
 
 async function executeWithRetry<C extends TauriCommandName>(

@@ -33,6 +33,7 @@ import {
   Mic,
   Volume2,
   Loader2,
+  Zap,
 } from 'lucide-react';
 import {
   generateCommentaryPlan,
@@ -43,6 +44,7 @@ import { useDirectorStatus } from '@/hooks/use-director-status';
 import { useCommentarySession } from '@/hooks/use-commentary-session';
 import { useCommentaryScript } from '@/hooks/use-commentary-script';
 import { useCommentaryVoice } from '@/hooks/use-commentary-voice';
+import { useCommentaryPipeline } from '@/hooks/use-commentary-pipeline';
 import {
   commentaryPanelReducer,
   initialCommentaryPanelState,
@@ -117,6 +119,7 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
     isGenerating,
     generate,
     multiGenerate,
+    setScript,
     setMultiStyleMode,
     setSelectedStyles,
     setActiveScriptStyle,
@@ -130,6 +133,13 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
     previewVoice,
     isPreviewing,
   } = useCommentaryVoice();
+
+  const {
+    run: runPipeline,
+    progress: pipelineProgress,
+    error: pipelineError,
+    isRunning: isPipelineRunning,
+  } = useCommentaryPipeline();
 
   // ── 脚本生成 ──────────────────────────────────────────────────────────
   const handleGenerateScript = useCallback(async () => {
@@ -182,6 +192,35 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
     setMultiStyleMode(!multiStyleMode);
   }, [multiStyleMode, setMultiStyleMode]);
 
+  // ── 一键流水线 ────────────────────────────────────────────────────────
+  const handleRunPipeline = useCallback(async () => {
+    if (!videoPath || !subtitles.trim() || !apiKey.trim()) {
+      toast.error('请先填写视频路径、字幕和 API Key');
+      return;
+    }
+
+    const output = await runPipeline({
+      videoPath,
+      subtitles,
+      style: selectedStyle,
+      provider: 'openai',
+      apiKey,
+      voice: selectedVoice,
+      speed: 1.0,
+      format: 'mp3',
+      autoApprove: true,
+    });
+
+    if (output) {
+      // 更新脚本状态
+      setScript(output.script);
+      toast.success(
+        `流水线完成！脚本已生成，音频总时长 ${Math.round(output.totalAudioDurationSecs)} 秒 🎉`,
+      );
+      dispatch({ type: 'SET_ACTIVE_TAB', payload: 'script' });
+    }
+  }, [videoPath, subtitles, apiKey, selectedStyle, selectedVoice, runPipeline, setScript, dispatch]);
+
   // ── 渲染 ─────────────────────────────────────────────────────────────
   return (
     <div className={styles.commentaryPanel}>
@@ -198,11 +237,28 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
       </CardHeader>
 
       <CardContent className={styles.content}>
-        {/* 进度条 */}
+        {/* 进度条 — Director 状态 */}
         {currentState !== 'idle' && currentState !== 'done' && (
           <div className={styles.progressWrapper}>
             <Progress value={progressPct * 100} className={styles.progressBar} />
             <span className={styles.progressLabel}>{Math.round(progressPct * 100)}%</span>
+          </div>
+        )}
+
+        {/* 进度条 — Pipeline 流水线 */}
+        {isPipelineRunning && pipelineProgress && (
+          <div className={styles.progressWrapper}>
+            <Progress value={pipelineProgress.percent} className={styles.progressBar} />
+            <span className={styles.progressLabel}>
+              {pipelineProgress.stage}: {pipelineProgress.message} ({Math.round(pipelineProgress.percent)}%)
+            </span>
+          </div>
+        )}
+
+        {/* 错误提示 — Pipeline */}
+        {pipelineError && (
+          <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
+            <strong>流水线错误 [{pipelineError.stage}]:</strong> {pipelineError.error}
           </div>
         )}
 
@@ -324,6 +380,17 @@ const CommentaryPanel: React.FC<CommentaryPanelProps> = ({
           >
             <Sparkles size={14} />
             {multiStyleMode ? '退出批量' : '多风格'}
+          </Button>
+
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleRunPipeline}
+            disabled={disabled || isPipelineRunning || isGenerating || !subtitles.trim() || !apiKey.trim()}
+            className="bg-amber-500 hover:bg-amber-600 text-white"
+          >
+            {isPipelineRunning ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+            一键生成解说+配音
           </Button>
 
           {script && !multiStyleMode && (

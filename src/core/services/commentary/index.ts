@@ -17,6 +17,7 @@ export * from './session-service';
 export * from './script-service';
 export * from './audio-service';
 export * from './voice-catalog-service';
+export * from './pipeline-service';
 
 // ─── 向后兼容的类型导出 ──────────────────────────────────────────────────
 

@@ -80,7 +80,8 @@ export type TauriCommandName =
   | 'list_crashes'
   | 'read_crash'
   | 'delete_crash'
-  | 'clear_crashes';
+  | 'clear_crashes'
+  | 'run_commentary_pipeline';
 
 // ============================================================
 // 辅助类型：将命令字符串值映射到对应的输入/输出类型
@@ -159,6 +160,9 @@ type CommandNameToDefs = {
   synthesize_commentary_audio: { input: { text: string; voice: string; speed: number; format?: string; outputPath?: string }; output: { audioPath: string; durationSecs: number } };
   estimate_tts_duration: { input: { text: string; voice: string; speed: number }; output: number };
   list_commentary_voices: { input: { style?: string }; output: Array<{ id: string; name: string; gender: string; style: string; description: string }> };
+
+  // Commentary Pipeline Orchestrator
+  run_commentary_pipeline: { input: { videoPath: string; subtitles: string; style?: string; provider?: string; model?: string; apiKey: string; baseUrl?: string; systemPromptExtra?: string; voice?: string; speed?: number; format?: string; autoApprove?: boolean }; output: { directorPlan: { pacingFactor: number; beatCount: number; preferredTransition: string; confidence: number }; script: { fullScript: string; segments: Array<{ startTime: number; endTime: number; text: string; emotion?: string }>; estimatedDurationSecs: number; modelUsed: string; provider: string }; audioSegments: Array<{ text: string; audioPath: string; durationSecs: number; segmentIndex: number }>; totalAudioDurationSecs: number } };
 
   // Auto-save
   auto_save_project: { input: { projectId: string; content: string }; output: Record<string, never> };

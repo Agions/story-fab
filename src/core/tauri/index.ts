@@ -76,6 +76,7 @@ export const tauri = {
   synthesizeAudio: commentary.synthesizeAudio,
   estimateTTSDuration: commentary.estimateTTSDuration,
   listVoices: commentary.listVoices,
+  runCommentaryPipeline: commentary.runCommentaryPipeline,
 } as const;
 
 export default tauri;

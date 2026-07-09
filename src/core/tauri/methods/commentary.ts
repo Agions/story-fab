@@ -1,5 +1,10 @@
 import { invoke, TauriCommand } from '../invoke';
-import type { DirectorPlan, DirectorStatusResponse } from '@/types';
+import type {
+  DirectorPlan,
+  DirectorStatusResponse,
+  CommentaryPipelineInput,
+  CommentaryPipelineOutput,
+} from '@/types';
 
 export const commentary = {
   /** 创建 Commentary Director 会话 */
@@ -60,5 +65,15 @@ export const commentary = {
   /** 列出可用音色 */
   async listVoices(): Promise<Array<{ id: string; name: string; gender: string; style: string; description: string }>> {
     return invoke(TauriCommand.LIST_COMMENTARY_VOICES, undefined) as Promise<Array<{ id: string; name: string; gender: string; style: string; description: string }>>;
+  },
+
+  // ─── Pipeline Orchestrator ──────────────────────────────────────────
+
+  /** 一键执行解说流水线 */
+  async runCommentaryPipeline(input: CommentaryPipelineInput): Promise<CommentaryPipelineOutput> {
+    return invoke(
+      TauriCommand.RUN_COMMENTARY_PIPELINE,
+      input as unknown as Record<string, unknown>,
+    ) as Promise<CommentaryPipelineOutput>;
   },
 };
