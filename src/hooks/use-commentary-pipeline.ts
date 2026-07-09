@@ -17,6 +17,7 @@ import {
   onPipelineComplete,
   onPipelineError,
 } from '@/core/services/commentary/pipeline-service';
+import { logger } from '@/shared/utils/logging';
 import type {
   CommentaryPipelineInput,
   CommentaryPipelineOutput,
@@ -71,7 +72,7 @@ export function useCommentaryPipeline(): UseCommentaryPipelineResult {
         });
         const unlistenComplete = await onPipelineComplete((e) => {
           // 流水线成功完成，记录最终状态
-          console.log(`[Pipeline] Complete in ${e.totalDurationMs}ms`);
+          logger.info(`[Pipeline] Complete in ${e.totalDurationMs}ms`);
         });
         const unlistenError = await onPipelineError((e) => {
           setError(e);

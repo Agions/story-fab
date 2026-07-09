@@ -29,8 +29,6 @@ use tokio::fs as tokio_fs;
 
 use crate::utils::resilience::crash_dir_path;
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 /// Lightweight summary returned by `list_crashes`. The full body is
 /// fetched on-demand by `read_crash` so the list stays cheap.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -132,30 +130,27 @@ pub async fn list_crashes(app: AppHandle) -> Result<Vec<CrashSummary>, String> {
 
         // Best-effort preview — first 200 chars of payload + location.
         // Failures here are non-fatal; the UI can still show the file by name.
-        let preview: Option<String> = match tokio_fs::read_to_string(&path).await {
-            Ok(body) => serde_json::from_str::<serde_json::Value>(&body)
-                .ok()
-                .map(|v| {
-                    let payload = v
-                        .get("payload")
-                        .and_then(|p| p.as_str())
-                        .unwrap_or("<no payload>");
-                    let location = v
-                        .get("location")
-                        .and_then(|l| l.as_str())
-                        .unwrap_or("<unknown>");
-                    // Truncate payload to keep list view compact.
-                    let first_line = payload.lines().next().unwrap_or("");
-                    let truncated = if first_line.chars().count() > 120 {
-                        let cut: String = first_line.chars().take(120).collect();
-                        format!("{cut}…")
-                    } else {
-                        first_line.to_string()
-                    };
-                    format!("{truncated} @ {location}")
-                }),
-            Err(_) => None,
-        };
+        let mut preview: Option<String> = None;
+        if let Ok(body) = std::fs::read_to_string(&path) {
+            if let Ok(value) = serde_json::from_str::<serde_json::Value>(&body) {
+                let payload = value
+                    .get("payload")
+                    .and_then(|p| p.as_str())
+                    .unwrap_or("<no payload>");
+                let location = value
+                    .get("location")
+                    .and_then(|l| l.as_str())
+                    .unwrap_or("<unknown>");
+                let first_line = payload.lines().next().unwrap_or("");
+                let truncated = if first_line.chars().count() > 120 {
+                    let cut: String = first_line.chars().take(120).collect();
+                    format!("{cut}…")
+                } else {
+                    first_line.to_string()
+                };
+                preview = Some(format!("{truncated} @ {location}"));
+            }
+        }
 
         summaries.push(CrashSummary {
             filename,

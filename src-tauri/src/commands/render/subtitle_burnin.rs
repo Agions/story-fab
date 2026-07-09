@@ -122,7 +122,7 @@ pub fn build_subtitle_filter(sub_path: &str, style: Option<&SubtitleStyle>) -> S
 }
 
 /// Style options for subtitle burn-in.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SubtitleStyle {
     pub font: Option<String>,
     pub fontsize: Option<i32>,
@@ -131,6 +131,55 @@ pub struct SubtitleStyle {
     pub back_colour: Option<String>,
     pub bold: Option<bool>,
     pub italic: Option<bool>,
+}
+
+/// Builder for subtitle burn-in operations.
+pub struct SubtitleBurninBuilder<'a> {
+    input_path: &'a str,
+    output_path: &'a str,
+    sub_path: &'a str,
+    style: Option<SubtitleStyle>,
+}
+
+impl<'a> SubtitleBurninBuilder<'a> {
+    pub fn new(input_path: &'a str, output_path: &'a str, sub_path: &'a str) -> Self {
+        Self {
+            input_path,
+            output_path,
+            sub_path,
+            style: None,
+        }
+    }
+
+    pub fn style(mut self, style: SubtitleStyle) -> Self {
+        self.style = Some(style);
+        self
+    }
+
+    pub fn build(self) -> Result<(), String> {
+        let mut cmd = Command::new(ffmpeg_binary());
+        cmd.arg("-y")
+            .arg("-i").arg(self.input_path);
+
+        let filter = build_subtitle_filter(self.sub_path, self.style.as_ref());
+        cmd.arg("-vf").arg(&filter);
+
+        let enc = crate::binary::hw_accel();
+        let enc_str = if enc == crate::binary::HwAccel::Cpu {
+            "libx264".to_string()
+        } else {
+            enc.h264_encoder().to_string()
+        };
+        cmd.args(["-c:v", &enc_str, "-preset", "fast", "-crf", "23"]);
+        cmd.args(["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart"]);
+        cmd.arg(self.output_path);
+
+        let output = cmd.output().map_err(|e| format!("字幕烧入失败: {}", e))?;
+        if !output.status.success() {
+            return Err(cmd_err("字幕烧入失败", &output));
+        }
+        Ok(())
+    }
 }
 
 #[cfg(test)]

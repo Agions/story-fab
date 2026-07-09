@@ -5,12 +5,114 @@ use crate::commands::render::ffmpeg_builder::quality_preset;
 use crate::types::{ExportVideoInput, TranscodeCropInput};
 use crate::utils::{cmd_err, resource_error_to_user_message, ResourceLimiter};
 
+const TRANSCODE_PROGRESS_EVENT: &str = "transcode-with-crop-progress";
+
+/// Builder for FFmpeg transcode commands.
+pub struct TranscodeBuilder<'a> {
+    input_path: &'a str,
+    output_path: &'a str,
+    aspect: Option<&'a str>,
+    quality: Option<&'a str>,
+    start_time: Option<f64>,
+    end_time: Option<f64>,
+    video_codec: Option<&'a str>,
+    crf: Option<u8>,
+    audio_codec: Option<&'a str>,
+}
+
+impl<'a> TranscodeBuilder<'a> {
+    pub fn new(input_path: &'a str, output_path: &'a str) -> Self {
+        Self {
+            input_path,
+            output_path,
+            aspect: None,
+            quality: None,
+            start_time: None,
+            end_time: None,
+            video_codec: None,
+            crf: None,
+            audio_codec: None,
+        }
+    }
+
+    pub fn aspect(mut self, aspect: &'a str) -> Self {
+        self.aspect = Some(aspect);
+        self
+    }
+
+    pub fn quality(mut self, quality: &'a str) -> Self {
+        self.quality = Some(quality);
+        self
+    }
+
+    pub fn time_range(mut self, start: f64, end: f64) -> Self {
+        self.start_time = Some(start);
+        self.end_time = Some(end);
+        self
+    }
+
+    pub fn video_codec(mut self, codec: &'a str) -> Self {
+        self.video_codec = Some(codec);
+        self
+    }
+
+    pub fn crf(mut self, crf: u8) -> Self {
+        self.crf = Some(crf);
+        self
+    }
+
+    pub fn audio_codec(mut self, codec: &'a str) -> Self {
+        self.audio_codec = Some(codec);
+        self
+    }
+
+    pub fn build(self) -> Result<(), String> {
+        let mut cmd = std::process::Command::new(ffmpeg_binary());
+        cmd.arg("-y").arg("-hide_banner");
+
+        if let (Some(s), Some(e)) = (self.start_time, self.end_time) {
+            cmd.arg("-ss").arg(s.to_string());
+            cmd.arg("-t").arg((e - s).max(0.1).to_string());
+        }
+
+        cmd.arg("-i").arg(self.input_path);
+
+        if let Some(aspect) = self.aspect {
+            let vf_filter = match aspect {
+                "9:16" => "scale=1080:1920:force_original_aspect_ratio=decrease,crop=1080:1920:(iw-1080)/2:(ih-1920)/2,setsar=1",
+                "1:1" => "scale='min(iw\\,ih):min(iw\\,ih)',crop='min(iw\\,ih):min(iw\\,ih)',setsar=1",
+                "16:9" => "scale=1920:1080:force_original_aspect_ratio=decrease,crop=1920:1080:(iw-1920)/2:(ih-1080)/2,setsar=1",
+                _ => return Err("不支持的宽高比，仅支持 9:16、1:1、16:9".to_string()),
+            };
+            cmd.arg("-vf").arg(vf_filter);
+        }
+
+        let enc = self.video_codec.unwrap_or_else(|| {
+            let hw = crate::binary::hw_accel();
+            if hw == crate::binary::HwAccel::Cpu { "libx264" } else { hw.h264_encoder() }
+        });
+
+        let (crf, preset) = quality_preset(self.quality.unwrap_or("medium"));
+        let crf_val = self.crf.unwrap_or(crf);
+        cmd.args(["-c:v", enc, "-crf", &crf_val.to_string(), "-preset", preset]);
+
+        let audio = self.audio_codec.unwrap_or("aac");
+        cmd.args(["-c:a", audio, "-b:a", "192k", "-movflags", "+faststart"]);
+        cmd.arg(self.output_path);
+
+        let output = cmd.output().map_err(|e| format!("FFmpeg 执行失败: {e}"))?;
+        if output.status.success() {
+            Ok(())
+        } else {
+            Err(cmd_err("转码失败", &output))
+        }
+    }
+}
+
 /// Tauri event channel for transcode progress. Emits `{ stage, percent }`
 /// payloads before/after the blocking ffmpeg invocation. The `spawn_blocking`
 /// hop keeps the Tauri main thread and Tokio worker pool responsive while
 /// the multi-minute encode runs (see Tauri discussion #10329).
-const TRANSCODE_PROGRESS_EVENT: &str = "transcode-with-crop-progress";
-
 #[tauri::command]
 pub async fn transcode_with_crop(
     app: AppHandle,

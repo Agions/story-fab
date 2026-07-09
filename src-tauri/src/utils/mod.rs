@@ -5,24 +5,29 @@
 //!   process.rs      — cmd_first_line, cmd_err, parse_scdet_output
 //!   concat.rs       — write_concat_file
 //!   audio.rs        — pcm_samples_from_wav
-//!   resilience.rs   — panic hook + ResourceLimiter (process-wide Semaphore)
+//!   panic_hook.rs   — install_panic_hook, panic_payload_to_string
+//!   semaphore.rs    — ResourceLimiter, ResourceError
+//!   crash_recovery.rs — list/read/delete/clear crash reports
 
 mod audio;
 mod concat;
+mod crash_recovery;
 mod error;
 mod media_cache;
+mod panic_hook;
 mod process;
-pub mod resilience; // pub so commands::crash_recovery can reach crash_dir_path
+pub mod resilience;
+mod semaphore;
 mod time;
 
 pub use audio::pcm_samples_from_wav;
 pub use concat::write_concat_file;
 pub use error::{err_msg, AppResult};
 pub use media_cache::{probe_duration_cached, probe_metadata_cached};
+pub use panic_hook::install_panic_hook;
 pub use process::{cmd_err, cmd_first_line, parse_scdet_output};
-pub use resilience::{
-    crash_dir_path, install_panic_hook, resource_error_to_user_message, ResourceError,
-    ResourceLimiter,
+pub use semaphore::{
+    resource_error_to_user_message, ResourceError, ResourceLimiter,
 };
 pub use time::{chrono_like_timestamp, format_srt_time, format_time, parse_fraction};
 

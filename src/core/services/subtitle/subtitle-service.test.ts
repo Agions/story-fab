@@ -17,7 +17,7 @@ import type { ASRResult, ASRSegment } from '../asr/asr-types';
 // jsdom 可能未实现 crypto.randomUUID，而 SubtitleService 在生成 track / videoInfo id 时会调用。
 // 这里补一个最小 polyfill，保证测试环境确定可跑（不影响被测试代码的真实行为）。
 if (typeof globalThis.crypto?.randomUUID !== 'function') {
-  const target: any = globalThis.crypto ?? globalThis;
+  const target = globalThis.crypto ?? globalThis;
   Object.defineProperty(target, 'randomUUID', {
     value: () => `uuid-${Math.random().toString(36).slice(2, 10)}`,
     configurable: true,
@@ -112,7 +112,7 @@ describe('extractSubtitles (ASR path)', () => {
     expect(track.entries[0].text).toBe('短句一 短句二');
     expect(track.entries[0].endTime).toBe(0.4);
     // 质量分级标签被附加
-    expect(['high', 'medium', 'low']).toContain((track.entries[0] as any).quality);
+    expect(['high', 'medium', 'low']).toContain(track.entries[0].quality!);
   });
 
   it('truncates entries beyond maxDuration', async () => {

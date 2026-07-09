@@ -1,285 +1,37 @@
 /**
  * 步骤2: 上传视频 — AI Cinema Studio Redesign
- * 数据输入: project (从 ProjectCreate 来)
- * 数据输出: video (VideoInfo) + duration/width/height
- * 流转到: AIAnalyze
  *
  * 重构说明：
- * - 上传配置已提取到 config/videoUploadConfig.ts
- * - 本文件仅包含上传组件逻辑和 UI
+ * - 组件已拆分为 VideoUploadDropzone / VideoUploadPreview / VideoUploadProgress / VideoUploadMetaForm
+ * - 业务逻辑提取到 useVideoUpload hook
+ * - 本文件仅保留组合逻辑，控制在 250 行以内
  */
-import React, { useCallback, useRef, useEffect, memo } from 'react';
-import { useReducerHookFactory } from '@/shared/hooks/use-reducer-hook';
-import { useProjectStore } from '@/stores';
-import { logger } from '@/shared/utils/logging';
-import { formatDuration, formatFileSize, notify } from '@/shared';
-import { MAX_FILE_SIZE } from '@/shared/constants';
-import type { VideoInfo } from '@/types';
-import {
-  videoUploadReducer,
-  initialVideoUploadState,
-} from './video-upload-reducer';
-import styles from './video-upload.module.less';
 
-import {
-  VIDEO_EXTENSIONS,
-  CHUNK_SIZE,
-  PAUSE_CHECK_INTERVAL_MS,
-  UPLOAD_DELAY_MIN_MS,
-  UPLOAD_DELAY_RANGE_MS,
-  chunkStore,
-} from '../config/video-upload-config';
+import React, { memo } from 'react';
+import { useVideoUpload } from './use-video-upload';
+import VideoUploadDropzone from './video-upload-dropzone';
+import VideoUploadPreview from './video-upload-preview';
+import VideoUploadProgress from './video-upload-progress';
+import VideoUploadMetaForm from './video-upload-meta-form';
+import styles from './video-upload.module.less';
 
 interface VideoUploadProps {
   onNext?: () => void;
 }
 
 const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
-  const { state, setVideo, goToNextStep } = useProjectStore();
-  const { state: local, dispatch } = useReducerHookFactory(videoUploadReducer, initialVideoUploadState);
-  const { uploading, uploadProgress, dragActive, uploadStatus, currentFile } = local;
-  // ref 镜像 uploadStatus — async setInterval 回调需要读到最新值
-  // ref 保持宽 string 类型, 兼容 setInterval 内对 'cancelled' | 'error' 的死代码判等
-  const uploadStatusRef = useRef<string>('idle');
-  useEffect(() => {
-    uploadStatusRef.current = uploadStatus;
-  }, [uploadStatus]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const pauseIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // 使用 ref 存储不变的回调引用，避免 handleUpload 依赖项过多导致的不必要重渲染
-  const goToNextStepRef = useRef(goToNextStep);
-  const onNextRef = useRef(onNext);
-
-  // 当 goToNextStep 或 onNext 变化时更新 ref（但不触发 handleUpload 重创建）
-  useEffect(() => {
-    goToNextStepRef.current = goToNextStep;
-    onNextRef.current = onNext;
-  }, [goToNextStep, onNext]);
-
-  // 组件卸载时清理 interval
-  useEffect(() => {
-    return () => {
-      if (pauseIntervalRef.current !== null) {
-        clearInterval(pauseIntervalRef.current);
-        pauseIntervalRef.current = null;
-      }
-    };
-  }, []);
-
-  // 验证文件
-  const validateFile = (file: File): { valid: boolean; error?: string } => {
-    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-    if (!VIDEO_EXTENSIONS.includes(ext)) {
-      return { valid: false, error: `不支持的视频格式: ${ext}` };
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      return { valid: false, error: '视频文件不能超过 2GB' };
-    }
-    return { valid: true };
-  };
-
-  // 处理文件上传
-  const handleUpload = useCallback(async (file: File) => {
-    const validation = validateFile(file);
-    if (!validation.valid) {
-      notify.error(null, validation.error || '文件校验失败');
-      return;
-    }
-
-    dispatch({ type:'START_UPLOAD', payload: file });
-
-    const uploadId = `upload_${Date.now()}`;
-    chunkStore.clear(uploadId);
-
-    try {
-      const chunkSize = CHUNK_SIZE;
-      const totalChunks = Math.ceil(file.size / chunkSize);
-
-      for (let i = 0; i < totalChunks; i++) {
-        if (uploadStatusRef.current === 'paused') {
-          await new Promise<void>((resolve, reject) => {
-            // Track whether the interval is still active so we can clear it on cancel/error
-            let active = true;
-            const checkResume = setInterval(() => {
-              if (!active) return;
-              if (uploadStatusRef.current === 'cancelled' || uploadStatusRef.current === 'error') {
-                active = false;
-                clearInterval(checkResume);
-                if (pauseIntervalRef.current === checkResume) {
-                  pauseIntervalRef.current = null;
-                }
-                reject(new Error('Upload cancelled or errored while paused'));
-                return;
-              }
-              if (uploadStatusRef.current === 'uploading') {
-                active = false;
-                clearInterval(checkResume);
-                if (pauseIntervalRef.current === checkResume) {
-                  pauseIntervalRef.current = null;
-                }
-                resolve();
-              }
-            }, PAUSE_CHECK_INTERVAL_MS);
-            pauseIntervalRef.current = checkResume;
-          });
-        }
-
-        const chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
-        chunkStore.addChunk(uploadId, chunk, i);
-
-        const progress = Math.min(((i + 1) / totalChunks) * 100, 100);
-        dispatch({ type:'SET_UPLOAD_PROGRESS', payload: progress });
-
-        await new Promise(r => setTimeout(r, UPLOAD_DELAY_MIN_MS + Math.random() * UPLOAD_DELAY_RANGE_MS));
-      }
-
-      const videoInfo = await new Promise<VideoInfo>((resolve, reject) => {
-        const video = document.createElement('video');
-        video.preload = 'metadata';
-
-        video.onloadedmetadata = () => {
-          URL.revokeObjectURL(video.src);
-          resolve({
-            id: `video_${Date.now()}`,
-            path: URL.createObjectURL(file),
-            name: file.name,
-            duration: video.duration,
-            width: video.videoWidth,
-            height: video.videoHeight,
-            fps: 30,
-            format: file.name.split('.').pop() || 'mp4',
-            size: file.size,
-            thumbnail: '',
-            createdAt: new Date().toISOString(),
-          });
-        };
-
-        video.onerror = () => {
-          URL.revokeObjectURL(video.src);
-          reject(new Error('无法读取视频文件'));
-        };
-
-        video.src = URL.createObjectURL(file);
-      });
-
-      dispatch({ type:'COMPLETE_UPLOAD', payload: undefined });
-      setVideo(videoInfo);
-      notify.success('视频上传成功');
-
-      if (onNextRef.current) {
-        onNextRef.current();
-      } else {
-        setTimeout(() => goToNextStepRef.current(), 500);
-      }
-    } catch (error) {
-      notify.error(error, '视频处理失败，请重试');
-      logger.error('VideoUpload error:', { error });
-    } finally {
-      dispatch({ type:'SET_UPLOADING', payload: false });
-    }
-  }, [setVideo, dispatch]);
-
-  // 暂停/继续
-  const handlePauseResume = () => {
-    if (uploadStatus === 'uploading') {
-      notify.info('上传已暂停');
-    } else if (uploadStatus === 'paused') {
-      notify.info('继续上传中...');
-    }
-    dispatch({ type:'TOGGLE_PAUSE', payload: undefined });
-  };
-
-  // 删除视频
-  const handleDelete = () => {
-    setVideo(null);
-    dispatch({ type:'RESET', payload: undefined });
-    chunkStore.clear('current');
-  };
-
-  // 拖拽事件
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    dispatch({ type:'SET_DRAG_ACTIVE', payload: true });
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    dispatch({ type:'SET_DRAG_ACTIVE', payload: false });
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    dispatch({ type:'SET_DRAG_ACTIVE', payload: false });
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleUpload(files[0]);
-    }
-  };
-
-  // 点击选择
-  const handleClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      handleUpload(files[0]);
-    }
-  };
+  const { projectState, state, goToNextStep, handleDelete } = useVideoUpload(onNext);
+  const { uploadStatus } = state;
 
   // === 已上传视频显示 ===
-  if (state.currentVideo) {
+  if (projectState.currentVideo) {
     return (
       <div className={styles.stepContent}>
         <div className={styles.stepTitle}>
           <h2>已上传视频</h2>
           <p>视频已成功上传，可以继续下一步进行 AI 分析</p>
         </div>
-
-        <div className={styles.videoCard}>
-          <div className={styles.videoPreview}>
-            <video src={state.currentVideo.path} controls />
-            <div className={styles.videoOverlay}>
-              <button className={styles.playBtn} aria-label="播放预览">
-                <svg className={styles.playBtnSvg} viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div className={styles.videoDetails}>
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>文件名</div>
-              <div className={styles.detailValue} style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {state.currentVideo.name}
-              </div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>时长</div>
-              <div className={styles.detailValue}>{formatDuration(state.currentVideo.duration)}</div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>分辨率</div>
-              <div className={styles.detailValue}>{state.currentVideo.width}×{state.currentVideo.height}</div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>格式</div>
-              <div className={styles.detailValue}>{state.currentVideo.format.toUpperCase()}</div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>大小</div>
-              <div className={styles.detailValue}>{formatFileSize(state.currentVideo.size)}</div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>帧率</div>
-              <div className={styles.detailValue}>{state.currentVideo.fps} fps</div>
-            </div>
-          </div>
-        </div>
-
+        <VideoUploadPreview />
         <div className={styles.videoActions} style={{ paddingTop: 20 }}>
           <button className={`${styles.actionBtn} ${styles.actionBtnDanger}`} onClick={handleDelete}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -303,72 +55,14 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
   }
 
   // === 上传中显示进度 ===
-  if (uploading || uploadStatus === 'completed') {
-    const uploadedBytes = currentFile ? (currentFile.size * uploadProgress) / 100 : 0;
+  if (uploadStatus === 'uploading' || uploadStatus === 'completed') {
     return (
       <div className={styles.stepContent}>
         <div className={styles.stepTitle}>
           <h2>上传进度</h2>
           <p>{uploadStatus === 'completed' ? '上传完成，正在准备视频...' : '正在上传视频，请稍候'}</p>
         </div>
-
-        <div className={styles.videoCard}>
-          <div className={styles.progressSection}>
-            <div className={styles.progressHeader}>
-              <div className={styles.progressFileIcon}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8.5A1.5 1.5 0 014.5 7h11A1.5 1.5 0 0117 8.5v7a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 013 15.5v-7z" />
-                </svg>
-              </div>
-              <div className={styles.progressInfo}>
-                <div className={styles.progressFileName}>{currentFile?.name}</div>
-                <div className={styles.progressMeta}>
-                  {formatFileSize(uploadedBytes)} / {formatFileSize(currentFile?.size ?? 0)}
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.progressTrack}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${uploadProgress}%` }}
-              />
-            </div>
-
-            <div className={styles.progressFooter}>
-              <div className={styles.progressPercent}>{Math.round(uploadProgress)}%</div>
-              <div className={styles.progressStatus}>
-                {uploadStatus === 'completed' ? '处理中...' : uploadStatus === 'paused' ? '已暂停' : '上传中...'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {uploadStatus !== 'completed' && (
-          <div className={styles.videoActions}>
-            <button
-              className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
-              onClick={handlePauseResume}
-            >
-              {uploadStatus === 'paused' ? (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5,3 19,12 5,21" />
-                  </svg>
-                  继续上传
-                </>
-              ) : (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="4" width="4" height="16" />
-                    <rect x="14" y="4" width="4" height="16" />
-                  </svg>
-                  暂停上传
-                </>
-              )}
-            </button>
-          </div>
-        )}
+        <VideoUploadProgress />
       </div>
     );
   }
@@ -380,80 +74,26 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
         <h2>上传视频</h2>
         <p>支持多种视频格式，时长建议 1-30 分钟</p>
       </div>
-
-      {!state.stepStatus['project-create'] ? (
-        <div style={{
-          padding: '24px',
-          background: 'rgba(200, 149, 108, 0.05)',
-          border: '1px solid rgba(200, 149, 108, 0.15)',
-          borderRadius: '12px',
-          fontFamily: 'Figtree, sans-serif',
-          color: 'rgba(255, 255, 255, 0.6)',
-          textAlign: 'center',
-        }}>
-          请先创建项目，再上传视频
+      <VideoUploadDropzone />
+      <div className={styles.hintAlert}>
+        <div className={styles.hintAlertHeader}>
+          <svg className={styles.hintIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4M12 8h.01" />
+          </svg>
+          上传说明
         </div>
-      ) : (
-        <>
-          <div
-            className={`${styles.uploadZone} ${dragActive ? styles.dragActive : ''}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={handleClick}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && handleClick()}
-            aria-label="点击或拖拽上传视频"
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              className={styles.hiddenInput}
-              accept={VIDEO_EXTENSIONS.join(',')}
-              onChange={handleFileChange}
-            />
-
-            <div className={styles.uploadIcon}>
-              <svg className={styles.uploadIconSvg} viewBox="0 0 56 56" fill="none">
-                <rect x="8" y="16" width="40" height="28" rx="4" stroke="currentColor" strokeWidth="2.5" />
-                <path d="M20 22l8-6 8 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M28 16v18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M14 36l4 4 8-8 8 8 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
-                <circle cx="38" cy="24" r="3" fill="currentColor" opacity="0.6" />
-              </svg>
-            </div>
-
-            <p className={styles.uploadPrimary}>点击或拖拽视频文件到此处上传</p>
-            <p className={styles.uploadSecondary}>也可以点击选择文件</p>
-
-            <div className={styles.formatHint}>
-              <span className={styles.formatDot} />
-              支持 MP4 / MOV / AVI / MKV
-            </div>
-          </div>
-
-          <div className={styles.hintAlert}>
-            <div className={styles.hintAlertHeader}>
-              <svg className={styles.hintIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4M12 8h.01" />
-              </svg>
-              上传说明
-            </div>
-            <ul className={styles.hintList}>
-              <li>请上传清晰的视频文件以获得最佳分析效果</li>
-              <li>视频时长建议 1-30 分钟</li>
-              <li>上传后系统将自动分析视频内容</li>
-              <li>支持断点续传，大文件上传更稳定</li>
-            </ul>
-          </div>
-        </>
-      )}
+        <ul className={styles.hintList}>
+          <li>请上传清晰的视频文件以获得最佳分析效果</li>
+          <li>视频时长建议 1-30 分钟</li>
+          <li>上传后系统将自动分析视频内容</li>
+          <li>支持断点续传，大文件上传更稳定</li>
+        </ul>
+      </div>
+      <VideoUploadMetaForm />
     </div>
   );
 });
 
 VideoUpload.displayName = 'VideoUpload';
 export default VideoUpload;
-

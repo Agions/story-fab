@@ -30,16 +30,6 @@ impl VideoProcessor {
         }
     }
 
-    /// Probe media metadata (duration, streams, etc.) for `path` via FFprobe.
-    ///
-    /// Routed through the in-process
-    /// [`crate::utils::media_cache::probe_metadata_cached`] cache so repeated
-    /// probes of the same (unmodified) file skip the ffprobe process. The
-    /// returned metadata is identical to a fresh probe.
-    pub fn get_metadata(&self, path: &str) -> Result<serde_json::Value, String> {
-        crate::utils::probe_metadata_cached(std::path::Path::new(path))
-    }
-
     /// Extract up to `max_frames` keyframe thumbnails from `path` using the
     /// given `scene_threshold` (0–1). Returns paths to generated images.
     pub fn extract_keyframes(&self, path: &str, max_frames: u32, scene_threshold: f64) -> Result<Vec<String>, String> {

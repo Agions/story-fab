@@ -35,7 +35,18 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@/': path.resolve(__dirname, './src'),
+      '@/types': path.resolve(__dirname, './src/types'),
+      '@/core': path.resolve(__dirname, './src/core'),
+      '@/store': path.resolve(__dirname, './src/stores'),
+      '@/stores': path.resolve(__dirname, './src/stores'),
+      '@/shared': path.resolve(__dirname, './src/shared'),
+      '@/shared/constants': path.resolve(__dirname, './src/shared/constants'),
+      '@/components': path.resolve(__dirname, './src/components'),
+      '@/context': path.resolve(__dirname, './src/context'),
+      '@/pages': path.resolve(__dirname, './src/pages'),
+      '@/hooks': path.resolve(__dirname, './src/hooks'),
+      '@/styles': path.resolve(__dirname, './src/styles'),
     },
   },
 });

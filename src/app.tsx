@@ -20,10 +20,10 @@ const ProjectEdit = lazy(loadProjectEdit);
 const ProjectDetail = lazy(loadProjectDetail);
 const ScriptDetail = lazy(loadScriptDetail);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
-const WorkspacePage: React.LazyExoticComponent<React.ComponentType<any>> =
+const WorkspacePage: React.LazyExoticComponent<React.ComponentType<unknown>> =
   lazy(async () => {
     const mod = await import('./pages/workspace/index');
-    return { default: (mod as any).default };
+    return { default: (mod as unknown as { default: React.ComponentType<unknown> }).default };
   });
 const Settings = lazy(loadSettings);
 
