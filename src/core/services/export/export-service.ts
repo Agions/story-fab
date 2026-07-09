@@ -6,7 +6,7 @@
  */
 
 import { BaseService } from '../providers/base-service';
-import { invoke, TauriCommand } from '../../tauri';
+import { tauri } from '../../tauri';
 import { logger } from '@/shared/utils/logging';
 
 import type { ExportConfig, ExportResult, ExportFormat } from '@/types';
@@ -81,22 +81,19 @@ export class ExportService extends BaseService {
 
     return this.executeRequest(
       async () => {
-        const result = await invoke(
-          TauriCommand.EXPORT_VIDEO,
-          {
-            inputPath,
-            outputPath,
-            format: fullConfig.format,
-            resolution: fullConfig.resolution,
-            frameRate: fullConfig.frameRate,
-            videoCodec: fullConfig.encoder.videoCodec,
-            audioCodec: fullConfig.audioCodec,
-            crf: fullConfig.encoder.crf ?? 23,
-            subtitleEnabled: fullConfig.subtitleEnabled,
-            subtitlePath: fullConfig.subtitlePath,
-            burnSubtitles: fullConfig.burnSubtitles,
-          }
-        ) as { outputPath: string; duration: number; fileSize: number };
+        const result = await tauri.exportVideo({
+          inputPath,
+          outputPath,
+          format: fullConfig.format,
+          resolution: fullConfig.resolution,
+          frameRate: fullConfig.frameRate,
+          videoCodec: fullConfig.encoder.videoCodec,
+          audioCodec: fullConfig.audioCodec,
+          crf: fullConfig.encoder.crf ?? 23,
+          subtitleEnabled: fullConfig.subtitleEnabled,
+          subtitlePath: fullConfig.subtitlePath,
+          burnSubtitles: fullConfig.burnSubtitles,
+        }) as { outputPath: string; duration: number; fileSize: number };
 
         logger.info('[ExportService] 导出完成:', { exportId, result });
 
@@ -120,7 +117,7 @@ export class ExportService extends BaseService {
       async () => {
         logger.info('[ExportService] 取消导出:', { exportId: this.currentExportId });
         try {
-          await invoke(TauriCommand.CANCEL_EXPORT, { exportId: this.currentExportId! });
+          await tauri.cancelExport(this.currentExportId!);
         } catch (error) {
           logger.warn('[ExportService] 取消导出失败:', { error });
         } finally {

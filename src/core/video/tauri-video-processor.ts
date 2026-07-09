@@ -7,7 +7,7 @@
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
 
 import { BaseVideoProcessor } from './base-video-processor';
-import { invoke, TauriCommand } from '../tauri';
+import { tauri } from '../tauri';
 import type {
   VideoMetadata,
   KeyFrame,
@@ -23,7 +23,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
   // ---------- FFmpeg ----------
 
   protected async doCheckStatus(): Promise<FFmpegStatus> {
-    const result = await invoke(TauriCommand.CHECK_FFMPEG, undefined);
+    const result = await tauri.checkFFmpeg();
     return { installed: result.installed, version: result.version || undefined };
   }
 
@@ -35,7 +35,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
   // ---------- Analysis ----------
 
   protected async doAnalyze(videoPath: string): Promise<VideoMetadata> {
-    const info = await invoke(TauriCommand.ANALYZE_VIDEO, { path: videoPath });
+    const info = await tauri.analyzeVideo(videoPath);
     return {
       duration: info.duration,
       width: info.width,
@@ -88,21 +88,18 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
     }
 
     try {
-      return await invoke(TauriCommand.CUT_VIDEO, {
+      return await tauri.cutVideo(
         inputPath,
         outputPath,
-        segments: segments.map(s => ({ start: s.start, end: s.end })),
-      });
+        segments.map(s => ({ start: s.start, end: s.end })),
+      );
     } finally {
       unlisten?.();
     }
   }
 
   protected async doPreview(inputPath: string, segment: SimpleVideoSegment): Promise<string> {
-    return invoke(TauriCommand.GENERATE_PREVIEW, {
-      inputPath,
-      segment: { start: segment.start, end: segment.end },
-    });
+    return tauri.generatePreview(inputPath, { start: segment.start, end: segment.end });
   }
 
   // ---------- Export ----------
@@ -113,7 +110,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
     format: string,
     options?: { resolution?: string; frameRate?: number; videoCodec?: string; audioCodec?: string; crf?: number; subtitleEnabled?: boolean; subtitlePath?: string; burnSubtitles?: boolean }
   ): Promise<string> {
-    const result = await invoke(TauriCommand.EXPORT_VIDEO, {
+    const result = await tauri.exportVideo({
       inputPath,
       outputPath,
       format,
@@ -123,7 +120,7 @@ export class TauriVideoProcessor extends BaseVideoProcessor {
   }
 
   protected async doCancelExport(exportId: string): Promise<void> {
-    await invoke(TauriCommand.CANCEL_EXPORT, { exportId });
+    await tauri.cancelExport(exportId);
   }
 }
 

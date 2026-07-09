@@ -1,10 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import {
-  formatDuration,
-  formatResolution,
-  formatBitrate,
-  formatFileSize,
-} from './formatters';
+import { formatResolution, formatBitrate } from './formatters';
+import { formatDuration, formatFileSize } from '@/shared/utils/formatting';
 
 describe('video formatters', () => {
   describe('formatDuration', () => {

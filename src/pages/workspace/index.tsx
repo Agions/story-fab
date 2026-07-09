@@ -23,7 +23,7 @@ const VideoUpload = lazy(() => import('@/pages/workspace/edit-step/video-upload'
 const AIVisualizer = lazy(() => import('@/pages/workspace/assemble/ai-visualizer'));
 const ScriptWriting = lazy(() => import('@/pages/workspace/edit-step/script-writing'));
 const VideoComposing = lazy(() => import('@/pages/workspace/assemble/video-composing'));
-const VideoExport = lazy(() => import('@/pages/workspace/export/VideoExport'));
+const VideoExport = lazy(() => import('@/pages/workspace/export/video-export'));
 const ClipRippling = lazy(() => import('@/pages/workspace/assemble/clip-rippling'));
 const CommentaryPanel = lazy(() => import('@/components/commentary-panel'));
 

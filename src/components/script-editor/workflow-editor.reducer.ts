@@ -12,7 +12,12 @@
  *   (不强制复合 setFieldValue, 因为 2 字段简单, 主组件 2 处 set 调用清楚)
  * - Dialog 受控保留: aiModalVisible 必须暴露 setter 给 Dialog onOpenChange 用
  * - SYNC_FROM_SCRIPT 复合 action: 替代原 useEffect 顶部 2 行 setEditedContent/setEditedTitle
+ *
+ * 改造: 用 createReducer 工厂 + handler map 自动生成。
+ * action 统一 payload 包装: { type: 'SET_X'; payload: T }。
  */
+import { createReducer } from '@/shared/hooks/create-reducer';
+
 export interface WorkflowEditorState {
   activeTab: string;
   editedContent: string;
@@ -21,11 +26,11 @@ export interface WorkflowEditorState {
 }
 
 export type WorkflowEditorAction =
-  | { type: 'SET_ACTIVE_TAB'; activeTab: string }
-  | { type: 'SET_EDITED_CONTENT'; editedContent: string }
-  | { type: 'SET_EDITED_TITLE'; editedTitle: string }
-  | { type: 'SET_AI_MODAL_VISIBLE'; aiModalVisible: boolean }
-  | { type: 'SYNC_FROM_SCRIPT'; content: string; title: string };
+  | { type: 'SET_ACTIVE_TAB'; payload: string }
+  | { type: 'SET_EDITED_CONTENT'; payload: string }
+  | { type: 'SET_EDITED_TITLE'; payload: string }
+  | { type: 'SET_AI_MODAL_VISIBLE'; payload: boolean }
+  | { type: 'SYNC_FROM_SCRIPT'; payload: { content: string; title: string } };
 
 export const initialWorkflowEditorState: WorkflowEditorState = {
   activeTab: 'content',
@@ -34,26 +39,20 @@ export const initialWorkflowEditorState: WorkflowEditorState = {
   aiModalVisible: false,
 };
 
-export function workflowEditorReducer(
-  state: WorkflowEditorState,
-  action: WorkflowEditorAction,
-): WorkflowEditorState {
-  switch (action.type) {
-    case 'SET_ACTIVE_TAB':
-      return { ...state, activeTab: action.activeTab };
-    case 'SET_EDITED_CONTENT':
-      return { ...state, editedContent: action.editedContent };
-    case 'SET_EDITED_TITLE':
-      return { ...state, editedTitle: action.editedTitle };
-    case 'SET_AI_MODAL_VISIBLE':
-      return { ...state, aiModalVisible: action.aiModalVisible };
-    case 'SYNC_FROM_SCRIPT':
-      return {
-        ...state,
-        editedContent: action.content,
-        editedTitle: action.title,
-      };
-    default:
-      return state;
-  }
-}
+const handlers = {
+  SET_ACTIVE_TAB: (s: WorkflowEditorState, v: string) => ({ ...s, activeTab: v }),
+  SET_EDITED_CONTENT: (s: WorkflowEditorState, v: string) => ({ ...s, editedContent: v }),
+  SET_EDITED_TITLE: (s: WorkflowEditorState, v: string) => ({ ...s, editedTitle: v }),
+  SET_AI_MODAL_VISIBLE: (s: WorkflowEditorState, v: boolean) => ({ ...s, aiModalVisible: v }),
+  SYNC_FROM_SCRIPT: (s: WorkflowEditorState, p: { content: string; title: string }) => ({
+    ...s,
+    editedContent: p.content,
+    editedTitle: p.title,
+  }),
+};
+
+export const [workflowEditorReducer] = createReducer<WorkflowEditorState, typeof handlers>(
+  'WORKFLOW_EDITOR',
+  handlers,
+  initialWorkflowEditorState,
+);

@@ -17,7 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Check, Wand2 } from 'lucide-react';
 import type { CommentaryScriptOutput, CommentarySegment } from '@/core/services/commentary';
-import { formatDuration } from '@/core/video';
+import { formatDuration } from '@/shared/utils/formatting';
 import {
   segmentRowReducer,
   scriptEditorReducer,
@@ -50,7 +50,7 @@ const SegmentRow: React.FC<{
   const { editing, text } = state;
 
   const handleBlur = useCallback(() => {
-    dispatch({ type: 'COMMIT_EDIT' });
+    dispatch({ type:'COMMIT_EDIT', payload: undefined });
     if (text !== segment.text) {
       onChange?.(index, text);
     }
@@ -65,7 +65,7 @@ const SegmentRow: React.FC<{
       {editing ? (
         <Textarea
           value={text}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => dispatch({ type: 'SET_TEXT', text: e.target.value })}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => dispatch({ type:'SET_TEXT', payload: e.target.value })}
           onBlur={handleBlur}
           className={styles.segmentTextarea}
           rows={2}
@@ -73,7 +73,7 @@ const SegmentRow: React.FC<{
       ) : (
         <p
           className={styles.segmentText}
-          onClick={() => dispatch({ type: 'START_EDIT', initialText: segment.text })}
+          onClick={() => dispatch({ type:'START_EDIT', payload: segment.text })}
           title="点击编辑"
         >
           {segment.text}
@@ -115,12 +115,12 @@ const CommentaryScriptEditor: React.FC<Props> = ({
   const handleCopy = useCallback(() => {
     if (!script?.fullScript) return;
     navigator.clipboard.writeText(script.fullScript);
-    dispatch({ type: 'MARK_COPIED' });
+    dispatch({ type:'MARK_COPIED', payload: undefined });
     if (resetTimeoutRef.current !== null) {
       clearTimeout(resetTimeoutRef.current);
     }
     resetTimeoutRef.current = setTimeout(() => {
-      dispatch({ type: 'RESET_COPIED' });
+      dispatch({ type:'RESET_COPIED', payload: undefined });
       resetTimeoutRef.current = null;
     }, 2000);
   }, [script]);

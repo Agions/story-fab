@@ -4,11 +4,8 @@
  * 
  * 本文件作为 video 模块的格式化工具层：
  * - formatResolution / formatBitrate: 视频特有，保留原实现在此
- * - formatDuration / formatFileSize: 从 shared/utils/formatting 重导出（统一来源）
+ * - formatDuration / formatFileSize: 统一来源为 @/shared/utils/formatting（不再在此重导出）
  */
-
-// Re-export common formatters from shared utils (single source of truth)
-export { formatDuration, formatFileSize } from '../../shared/utils/formatting';
 
 export const formatResolution = (width: number, height: number): string => {
   if (width === 3840 && height === 2160) return `${width}x${height} (4K UHD)`;

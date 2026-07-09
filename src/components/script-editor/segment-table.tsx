@@ -3,7 +3,7 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/tooltip';
 import { Edit3, Play, Trash2 } from 'lucide-react';
-import { formatDuration } from '@/core/video';
+import { formatDuration } from '@/shared/utils/formatting';
 import type { ScriptSegment } from '@/types';
 import { getTypeLabel } from './types';
 import styles from '././script-editor.module.less';

@@ -40,8 +40,6 @@ export function sortProjects(projects: Project[], sortBy: ProjectSortBy, order: 
   });
 }
 
-export { formatFileSize as formatProjectSize, formatDuration as formatProjectDuration } from './formatting';
-
 /**
  * 更新项目
  */

@@ -8,8 +8,12 @@
  * - selectedStyle: 当前选中风格预设
  *
  * 清理说明: reviseOpen 死代码已移除 (原 _reviseOpen 0 引用, 2026-06-16 cleanup)
+ *
+ * 改造: 用 createReducer 工厂 + handler map 自动生成。
+ * action 统一 payload 包装: { type: 'SET_X'; payload: T }。
  */
 import type { ScriptStylePreset } from '@/core/services/commentary';
+import { createReducer } from '@/shared/hooks/create-reducer';
 
 export type CommentaryTab = 'script' | 'style' | 'voice' | 'timeline';
 
@@ -20,11 +24,11 @@ export interface CommentaryPanelState {
   selectedStyle: ScriptStylePreset;
 }
 
-type CommentaryPanelAction =
-  | { type: 'SET_ACTIVE_TAB'; activeTab: CommentaryTab }
-  | { type: 'SET_PLAN_CONFIRM_OPEN'; planConfirmOpen: boolean }
-  | { type: 'SET_API_KEY'; apiKey: string }
-  | { type: 'SET_SELECTED_STYLE'; selectedStyle: ScriptStylePreset };
+export type CommentaryPanelAction =
+  | { type: 'SET_ACTIVE_TAB'; payload: CommentaryTab }
+  | { type: 'SET_PLAN_CONFIRM_OPEN'; payload: boolean }
+  | { type: 'SET_API_KEY'; payload: string }
+  | { type: 'SET_SELECTED_STYLE'; payload: ScriptStylePreset };
 
 export const initialCommentaryPanelState: CommentaryPanelState = {
   activeTab: 'script',
@@ -33,20 +37,15 @@ export const initialCommentaryPanelState: CommentaryPanelState = {
   selectedStyle: 'conversational',
 };
 
-export function commentaryPanelReducer(
-  state: CommentaryPanelState,
-  action: CommentaryPanelAction,
-): CommentaryPanelState {
-  switch (action.type) {
-    case 'SET_ACTIVE_TAB':
-      return { ...state, activeTab: action.activeTab };
-    case 'SET_PLAN_CONFIRM_OPEN':
-      return { ...state, planConfirmOpen: action.planConfirmOpen };
-    case 'SET_API_KEY':
-      return { ...state, apiKey: action.apiKey };
-    case 'SET_SELECTED_STYLE':
-      return { ...state, selectedStyle: action.selectedStyle };
-    default:
-      return state;
-  }
-}
+const handlers = {
+  SET_ACTIVE_TAB: (s: CommentaryPanelState, v: CommentaryTab) => ({ ...s, activeTab: v }),
+  SET_PLAN_CONFIRM_OPEN: (s: CommentaryPanelState, v: boolean) => ({ ...s, planConfirmOpen: v }),
+  SET_API_KEY: (s: CommentaryPanelState, v: string) => ({ ...s, apiKey: v }),
+  SET_SELECTED_STYLE: (s: CommentaryPanelState, v: ScriptStylePreset) => ({ ...s, selectedStyle: v }),
+};
+
+export const [commentaryPanelReducer] = createReducer<CommentaryPanelState, typeof handlers>(
+  'COMMENTARY_PANEL',
+  handlers,
+  initialCommentaryPanelState,
+);

@@ -12,7 +12,12 @@
  * - START_UPLOAD 复合 action: 替代 handleUpload 顶部 5 行 setter (uploading + uploadProgress 0 + uploadStatus 'uploading' + currentFile + 后续状态)
  * - HANDLE_DELETE 复合 action: 替代 handleDelete 4 行 setter (uploadProgress 0 + uploadStatus 'idle' + currentFile null)
  * - TOGGLE_PAUSE 复合 action: handlePauseResume 切换 'uploading' ↔ 'paused'
+ *
+ * 改造: 用 createReducer 工厂 + handler map 自动生成。
+ * action 统一 payload 包装: { type: 'SET_X'; payload: T }。
  */
+import { createReducer } from '@/shared/hooks/create-reducer';
+
 type UploadStatus = 'idle' | 'uploading' | 'paused' | 'completed';
 
 export interface VideoUploadState {
@@ -23,16 +28,16 @@ export interface VideoUploadState {
   currentFile: File | null;
 }
 
-type VideoUploadAction =
-  | { type: 'SET_UPLOADING'; uploading: boolean }
-  | { type: 'SET_UPLOAD_PROGRESS'; uploadProgress: number }
-  | { type: 'SET_DRAG_ACTIVE'; dragActive: boolean }
-  | { type: 'SET_UPLOAD_STATUS'; uploadStatus: UploadStatus }
-  | { type: 'SET_CURRENT_FILE'; currentFile: File | null }
-  | { type: 'START_UPLOAD'; file: File }
-  | { type: 'TOGGLE_PAUSE' }
-  | { type: 'COMPLETE_UPLOAD' }
-  | { type: 'RESET' };
+export type VideoUploadAction =
+  | { type: 'SET_UPLOADING'; payload: boolean }
+  | { type: 'SET_UPLOAD_PROGRESS'; payload: number }
+  | { type: 'SET_DRAG_ACTIVE'; payload: boolean }
+  | { type: 'SET_UPLOAD_STATUS'; payload: UploadStatus }
+  | { type: 'SET_CURRENT_FILE'; payload: File | null }
+  | { type: 'START_UPLOAD'; payload: File }
+  | { type: 'TOGGLE_PAUSE'; payload: undefined }
+  | { type: 'COMPLETE_UPLOAD'; payload: undefined }
+  | { type: 'RESET'; payload: undefined };
 
 export const initialVideoUploadState: VideoUploadState = {
   uploading: false,
@@ -42,49 +47,39 @@ export const initialVideoUploadState: VideoUploadState = {
   currentFile: null,
 };
 
-export function videoUploadReducer(
-  state: VideoUploadState,
-  action: VideoUploadAction,
-): VideoUploadState {
-  switch (action.type) {
-    case 'SET_UPLOADING':
-      return { ...state, uploading: action.uploading };
-    case 'SET_UPLOAD_PROGRESS':
-      return { ...state, uploadProgress: action.uploadProgress };
-    case 'SET_DRAG_ACTIVE':
-      return { ...state, dragActive: action.dragActive };
-    case 'SET_UPLOAD_STATUS':
-      return { ...state, uploadStatus: action.uploadStatus };
-    case 'SET_CURRENT_FILE':
-      return { ...state, currentFile: action.currentFile };
-    case 'START_UPLOAD':
-      return {
-        ...state,
-        uploading: true,
-        uploadProgress: 0,
-        uploadStatus: 'uploading',
-        currentFile: action.file,
-      };
-    case 'TOGGLE_PAUSE':
-      return {
-        ...state,
-        uploadStatus: state.uploadStatus === 'uploading' ? 'paused' : 'uploading',
-      };
-    case 'COMPLETE_UPLOAD':
-      return {
-        ...state,
-        uploadProgress: 100,
-        uploadStatus: 'completed',
-      };
-    case 'RESET':
-      return {
-        ...state,
-        uploading: false,
-        uploadProgress: 0,
-        uploadStatus: 'idle',
-        currentFile: null,
-      };
-    default:
-      return state;
-  }
-}
+const handlers = {
+  SET_UPLOADING: (s: VideoUploadState, v: boolean) => ({ ...s, uploading: v }),
+  SET_UPLOAD_PROGRESS: (s: VideoUploadState, v: number) => ({ ...s, uploadProgress: v }),
+  SET_DRAG_ACTIVE: (s: VideoUploadState, v: boolean) => ({ ...s, dragActive: v }),
+  SET_UPLOAD_STATUS: (s: VideoUploadState, v: UploadStatus) => ({ ...s, uploadStatus: v }),
+  SET_CURRENT_FILE: (s: VideoUploadState, v: File | null) => ({ ...s, currentFile: v }),
+  START_UPLOAD: (s: VideoUploadState, v: File): VideoUploadState => ({
+    ...s,
+    uploading: true,
+    uploadProgress: 0,
+    uploadStatus: 'uploading',
+    currentFile: v,
+  }),
+  TOGGLE_PAUSE: (s: VideoUploadState): VideoUploadState => ({
+    ...s,
+    uploadStatus: s.uploadStatus === 'uploading' ? 'paused' : 'uploading',
+  }),
+  COMPLETE_UPLOAD: (s: VideoUploadState): VideoUploadState => ({
+    ...s,
+    uploadProgress: 100,
+    uploadStatus: 'completed',
+  }),
+  RESET: (s: VideoUploadState): VideoUploadState => ({
+    ...s,
+    uploading: false,
+    uploadProgress: 0,
+    uploadStatus: 'idle',
+    currentFile: null,
+  }),
+};
+
+export const [videoUploadReducer] = createReducer<VideoUploadState, typeof handlers>(
+  'VIDEO_UPLOAD',
+  handlers,
+  initialVideoUploadState,
+);

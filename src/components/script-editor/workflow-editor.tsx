@@ -13,7 +13,7 @@ import {
   Clock,
 } from 'lucide-react';
 import type { ScriptData, Scene, ScriptSegment } from '@/types';
-import { formatDuration } from '@/core/video';
+import { formatDuration } from '@/shared/utils/formatting';
 import { notify } from '@/shared';
 import {
   workflowEditorReducer,
@@ -45,18 +45,16 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
 
   useEffect(() => {
     dispatch({
-      type: 'SYNC_FROM_SCRIPT',
-      content: script.content || '',
-      title: script.title || '',
-    });
+      type:'SYNC_FROM_SCRIPT', payload: { content: script.content || '',
+      title: script.title || '', } });
   }, [script]);
 
   const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    dispatch({ type: 'SET_EDITED_CONTENT', editedContent: e.target.value });
+    dispatch({ type:'SET_EDITED_CONTENT', payload: e.target.value });
   }, []);
 
   const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'SET_EDITED_TITLE', editedTitle: e.target.value });
+    dispatch({ type:'SET_EDITED_TITLE', payload: e.target.value });
   }, []);
 
   const handleSave = useCallback(() => {
@@ -74,7 +72,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
   const handleAIImprove = useCallback(async () => {
     try {
       notify.info('正在使用 AI 优化脚本...');
-      dispatch({ type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: false });
+      dispatch({ type:'SET_AI_MODAL_VISIBLE', payload: false });
       setTimeout(() => {
         notify.success('脚本优化完成');
       }, 2000);
@@ -90,7 +88,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold">脚本编辑</h3>
           <div className="flex gap-2">
-            <Button variant="outline"  onClick={() => dispatch({ type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: true })}>
+            <Button variant="outline"  onClick={() => dispatch({ type:'SET_AI_MODAL_VISIBLE', payload: true })}>
               <Edit size={14} className="mr-1" />
               AI优化
             </Button>
@@ -101,7 +99,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => dispatch({ type: 'SET_ACTIVE_TAB', activeTab: v })}>
+        <Tabs value={activeTab} onValueChange={(v) => dispatch({ type:'SET_ACTIVE_TAB', payload: v })}>
           <TabsList>
             <TabsTrigger value="content">脚本内容</TabsTrigger>
             <TabsTrigger value="segments">片段列表</TabsTrigger>
@@ -178,7 +176,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
       </Card>
 
       {/* AI 优化模态框 */}
-      <Dialog open={aiModalVisible} onOpenChange={(open) => !open && dispatch({ type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: false })}>
+      <Dialog open={aiModalVisible} onOpenChange={(open) => !open && dispatch({ type:'SET_AI_MODAL_VISIBLE', payload: false })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>AI 优化脚本</DialogTitle>
@@ -186,7 +184,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
           <p className="text-sm text-muted-foreground">使用 AI 优化脚本将会根据视频内容和当前脚本，生成更加专业的表达和结构。</p>
           <p className="text-sm text-muted-foreground">点击确定开始优化。</p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => dispatch({ type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: false })}>取消</Button>
+            <Button variant="outline" onClick={() => dispatch({ type:'SET_AI_MODAL_VISIBLE', payload: false })}>取消</Button>
             <Button className="bg-[--accent-primary] hover:bg-[--accent-primary-hover] text-white" onClick={handleAIImprove}>确定</Button>
           </DialogFooter>
         </DialogContent>

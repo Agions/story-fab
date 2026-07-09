@@ -87,7 +87,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
       return;
     }
 
-    dispatch({ type: 'START_UPLOAD', file });
+    dispatch({ type:'START_UPLOAD', payload: file });
 
     const uploadId = `upload_${Date.now()}`;
     chunkStore.clear(uploadId);
@@ -129,7 +129,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
         chunkStore.addChunk(uploadId, chunk, i);
 
         const progress = Math.min(((i + 1) / totalChunks) * 100, 100);
-        dispatch({ type: 'SET_UPLOAD_PROGRESS', uploadProgress: progress });
+        dispatch({ type:'SET_UPLOAD_PROGRESS', payload: progress });
 
         await new Promise(r => setTimeout(r, UPLOAD_DELAY_MIN_MS + Math.random() * UPLOAD_DELAY_RANGE_MS));
       }
@@ -163,7 +163,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
         video.src = URL.createObjectURL(file);
       });
 
-      dispatch({ type: 'COMPLETE_UPLOAD' });
+      dispatch({ type:'COMPLETE_UPLOAD', payload: undefined });
       setVideo(videoInfo);
       notify.success('视频上传成功');
 
@@ -176,7 +176,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
       notify.error(error, '视频处理失败，请重试');
       logger.error('VideoUpload error:', { error });
     } finally {
-      dispatch({ type: 'SET_UPLOADING', uploading: false });
+      dispatch({ type:'SET_UPLOADING', payload: false });
     }
   }, [setVideo]);
 
@@ -187,30 +187,30 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
     } else if (uploadStatus === 'paused') {
       notify.info('继续上传中...');
     }
-    dispatch({ type: 'TOGGLE_PAUSE' });
+    dispatch({ type:'TOGGLE_PAUSE', payload: undefined });
   };
 
   // 删除视频
   const handleDelete = () => {
     setVideo(null);
-    dispatch({ type: 'RESET' });
+    dispatch({ type:'RESET', payload: undefined });
     chunkStore.clear('current');
   };
 
   // 拖拽事件
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    dispatch({ type: 'SET_DRAG_ACTIVE', dragActive: true });
+    dispatch({ type:'SET_DRAG_ACTIVE', payload: true });
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    dispatch({ type: 'SET_DRAG_ACTIVE', dragActive: false });
+    dispatch({ type:'SET_DRAG_ACTIVE', payload: false });
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    dispatch({ type: 'SET_DRAG_ACTIVE', dragActive: false });
+    dispatch({ type:'SET_DRAG_ACTIVE', payload: false });
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleUpload(files[0]);

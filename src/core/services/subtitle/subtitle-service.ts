@@ -14,7 +14,7 @@ import type { SubtitleEntry, VideoInfo, SubtitleStyle, SubtitleTrack } from '@/t
 import { whisperService, type WhisperProgress } from './whisper-service';
 import { trackToSRT, trackToVTT, trackToASS } from './subtitle-formatters';
 import { AppError } from '@/core/errors';
-import { invoke, TauriCommand } from '@/core/tauri';
+import { tauri } from '@/core/tauri';
 
 // ============================================================
 // 类型定义
@@ -67,12 +67,6 @@ export class SubtitleService extends BaseService {
     return this.executeRequest(
       async () => {
         logger.info('[SubtitleService] Whisper 转录:', { audioPath, modelSize, language });
-
-        const available = await whisperService.checkFasterWhisper();
-        if (!available) {
-          logger.warn('[SubtitleService] faster-whisper 未安装，fallback 到 ASR');
-          return this.extractSubtitles(audioPath, { language });
-        }
 
         try {
           const result = await whisperService.transcribe(audioPath, modelSize, language, onProgress);
@@ -358,10 +352,7 @@ export class SubtitleService extends BaseService {
     const langCode = this.normalizeLangCode(targetLang);
 
     try {
-      const translated = await invoke(
-        TauriCommand.TRANSLATE_TEXT,
-        { text, fromLang: 'en', toLang: langCode }
-      ) as string;
+      const translated = await tauri.translateText(text, 'en', langCode);
       if (!translated) {
         throw new AppError('APP_TRANSLATE_EMPTY', 'Translation returned empty result', {
           userMessage: '翻译结果为空',
@@ -425,8 +416,7 @@ export class SubtitleService extends BaseService {
           output: outputPath,
         });
 
-        const { invoke } = await import('@tauri-apps/api/core');
-        const result = await invoke<{ outputPath: string }>('export_video', {
+        const result = await tauri.exportVideo({
           inputPath: videoPath,
           outputPath,
           format: 'mp4',

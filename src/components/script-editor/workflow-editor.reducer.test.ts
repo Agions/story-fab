@@ -29,16 +29,14 @@ describe('workflowEditorReducer', () => {
   describe('SET_ACTIVE_TAB', () => {
     it('sets activeTab to a new value', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_ACTIVE_TAB',
-        activeTab: 'segments',
+        type:'SET_ACTIVE_TAB', payload: 'segments',
       });
       expect(state.activeTab).toBe('segments');
     });
 
     it('sets activeTab to scenes', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_ACTIVE_TAB',
-        activeTab: 'scenes',
+        type:'SET_ACTIVE_TAB', payload: 'scenes',
       });
       expect(state.activeTab).toBe('scenes');
     });
@@ -46,16 +44,14 @@ describe('workflowEditorReducer', () => {
     it('sets activeTab to content', () => {
       const stateWithTab = { ...baseState, activeTab: 'segments' };
       const state = workflowEditorReducer(stateWithTab, {
-        type: 'SET_ACTIVE_TAB',
-        activeTab: 'content',
+        type:'SET_ACTIVE_TAB', payload: 'content',
       });
       expect(state.activeTab).toBe('content');
     });
 
     it('does not mutate other state fields', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_ACTIVE_TAB',
-        activeTab: 'segments',
+        type:'SET_ACTIVE_TAB', payload: 'segments',
       });
       expect(state.editedContent).toBe(baseState.editedContent);
       expect(state.editedTitle).toBe(baseState.editedTitle);
@@ -67,8 +63,7 @@ describe('workflowEditorReducer', () => {
   describe('SET_EDITED_CONTENT', () => {
     it('sets editedContent to a new value', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_EDITED_CONTENT',
-        editedContent: 'Hello world',
+        type:'SET_EDITED_CONTENT', payload: 'Hello world',
       });
       expect(state.editedContent).toBe('Hello world');
     });
@@ -76,8 +71,7 @@ describe('workflowEditorReducer', () => {
     it('handles empty string', () => {
       const stateWithContent = { ...baseState, editedContent: 'some text' };
       const state = workflowEditorReducer(stateWithContent, {
-        type: 'SET_EDITED_CONTENT',
-        editedContent: '',
+        type:'SET_EDITED_CONTENT', payload: '',
       });
       expect(state.editedContent).toBe('');
     });
@@ -85,16 +79,14 @@ describe('workflowEditorReducer', () => {
     it('handles multiline content', () => {
       const multiline = 'Line 1\nLine 2\nLine 3';
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_EDITED_CONTENT',
-        editedContent: multiline,
+        type:'SET_EDITED_CONTENT', payload: multiline,
       });
       expect(state.editedContent).toBe(multiline);
     });
 
     it('does not mutate other state fields', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_EDITED_CONTENT',
-        editedContent: 'new content',
+        type:'SET_EDITED_CONTENT', payload: 'new content',
       });
       expect(state.activeTab).toBe(baseState.activeTab);
       expect(state.editedTitle).toBe(baseState.editedTitle);
@@ -106,8 +98,7 @@ describe('workflowEditorReducer', () => {
   describe('SET_EDITED_TITLE', () => {
     it('sets editedTitle to a new value', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_EDITED_TITLE',
-        editedTitle: 'My Title',
+        type:'SET_EDITED_TITLE', payload: 'My Title',
       });
       expect(state.editedTitle).toBe('My Title');
     });
@@ -115,8 +106,7 @@ describe('workflowEditorReducer', () => {
     it('handles empty string', () => {
       const stateWithTitle = { ...baseState, editedTitle: 'old title' };
       const state = workflowEditorReducer(stateWithTitle, {
-        type: 'SET_EDITED_TITLE',
-        editedTitle: '',
+        type:'SET_EDITED_TITLE', payload: '',
       });
       expect(state.editedTitle).toBe('');
     });
@@ -124,16 +114,14 @@ describe('workflowEditorReducer', () => {
     it('handles unicode characters', () => {
       const title = '标题 🎬 Story';
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_EDITED_TITLE',
-        editedTitle: title,
+        type:'SET_EDITED_TITLE', payload: title,
       });
       expect(state.editedTitle).toBe(title);
     });
 
     it('does not mutate other state fields', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_EDITED_TITLE',
-        editedTitle: 'new title',
+        type:'SET_EDITED_TITLE', payload: 'new title',
       });
       expect(state.activeTab).toBe(baseState.activeTab);
       expect(state.editedContent).toBe(baseState.editedContent);
@@ -145,8 +133,7 @@ describe('workflowEditorReducer', () => {
   describe('SET_AI_MODAL_VISIBLE', () => {
     it('sets aiModalVisible to true', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_AI_MODAL_VISIBLE',
-        aiModalVisible: true,
+        type:'SET_AI_MODAL_VISIBLE', payload: true,
       });
       expect(state.aiModalVisible).toBe(true);
     });
@@ -154,16 +141,14 @@ describe('workflowEditorReducer', () => {
     it('sets aiModalVisible to false', () => {
       const stateWithModal = { ...baseState, aiModalVisible: true };
       const state = workflowEditorReducer(stateWithModal, {
-        type: 'SET_AI_MODAL_VISIBLE',
-        aiModalVisible: false,
+        type:'SET_AI_MODAL_VISIBLE', payload: false,
       });
       expect(state.aiModalVisible).toBe(false);
     });
 
     it('does not mutate other state fields', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SET_AI_MODAL_VISIBLE',
-        aiModalVisible: true,
+        type:'SET_AI_MODAL_VISIBLE', payload: true,
       });
       expect(state.activeTab).toBe(baseState.activeTab);
       expect(state.editedContent).toBe(baseState.editedContent);
@@ -175,10 +160,8 @@ describe('workflowEditorReducer', () => {
   describe('SYNC_FROM_SCRIPT', () => {
     it('sets both editedContent and editedTitle', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SYNC_FROM_SCRIPT',
-        content: 'Script content here',
-        title: 'Script title',
-      });
+        type:'SYNC_FROM_SCRIPT', payload: { content: 'Script content here',
+        title: 'Script title', } });
       expect(state.editedContent).toBe('Script content here');
       expect(state.editedTitle).toBe('Script title');
     });
@@ -190,20 +173,16 @@ describe('workflowEditorReducer', () => {
         editedTitle: 'old title',
       };
       const state = workflowEditorReducer(dirtyState, {
-        type: 'SYNC_FROM_SCRIPT',
-        content: 'new content',
-        title: 'new title',
-      });
+        type:'SYNC_FROM_SCRIPT', payload: { content: 'new content',
+        title: 'new title', } });
       expect(state.editedContent).toBe('new content');
       expect(state.editedTitle).toBe('new title');
     });
 
     it('handles empty content and title', () => {
       const state = workflowEditorReducer(baseState, {
-        type: 'SYNC_FROM_SCRIPT',
-        content: '',
-        title: '',
-      });
+        type:'SYNC_FROM_SCRIPT', payload: { content: '',
+        title: '', } });
       expect(state.editedContent).toBe('');
       expect(state.editedTitle).toBe('');
     });
@@ -215,10 +194,8 @@ describe('workflowEditorReducer', () => {
         aiModalVisible: true,
       };
       const state = workflowEditorReducer(stateWithExtras, {
-        type: 'SYNC_FROM_SCRIPT',
-        content: 'synced',
-        title: 'synced title',
-      });
+        type:'SYNC_FROM_SCRIPT', payload: { content: 'synced',
+        title: 'synced title', } });
       expect(state.activeTab).toBe('scenes');
       expect(state.aiModalVisible).toBe(true);
     });
@@ -244,15 +221,13 @@ describe('workflowEditorReducer', () => {
       };
       const frozen = { ...original };
 
-      workflowEditorReducer(original, { type: 'SET_ACTIVE_TAB', activeTab: 'segments' });
-      workflowEditorReducer(original, { type: 'SET_EDITED_CONTENT', editedContent: 'mutated' });
-      workflowEditorReducer(original, { type: 'SET_EDITED_TITLE', editedTitle: 'mutated' });
-      workflowEditorReducer(original, { type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: true });
+      workflowEditorReducer(original, { type:'SET_ACTIVE_TAB', payload: 'segments' });
+      workflowEditorReducer(original, { type:'SET_EDITED_CONTENT', payload: 'mutated' });
+      workflowEditorReducer(original, { type:'SET_EDITED_TITLE', payload: 'mutated' });
+      workflowEditorReducer(original, { type:'SET_AI_MODAL_VISIBLE', payload: true });
       workflowEditorReducer(original, {
-        type: 'SYNC_FROM_SCRIPT',
-        content: 'synced',
-        title: 'synced',
-      });
+        type:'SYNC_FROM_SCRIPT', payload: { content: 'synced',
+        title: 'synced', } });
 
       expect(original.activeTab).toBe(frozen.activeTab);
       expect(original.editedContent).toBe(frozen.editedContent);
@@ -262,11 +237,11 @@ describe('workflowEditorReducer', () => {
 
     it('returns a new object reference for every action', () => {
       const actions: WorkflowEditorAction[] = [
-        { type: 'SET_ACTIVE_TAB', activeTab: 'segments' },
-        { type: 'SET_EDITED_CONTENT', editedContent: 'x' },
-        { type: 'SET_EDITED_TITLE', editedTitle: 'x' },
-        { type: 'SET_AI_MODAL_VISIBLE', aiModalVisible: true },
-        { type: 'SYNC_FROM_SCRIPT', content: 'x', title: 'x' },
+        { type:'SET_ACTIVE_TAB', payload: 'segments' },
+        { type:'SET_EDITED_CONTENT', payload: 'x' },
+        { type:'SET_EDITED_TITLE', payload: 'x' },
+        { type:'SET_AI_MODAL_VISIBLE', payload: true },
+        { type:'SYNC_FROM_SCRIPT', payload: { content: 'x', title: 'x' } },
       ];
 
       for (const action of actions) {

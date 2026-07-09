@@ -73,23 +73,21 @@ describe('scriptDetailReducer', () => {
   describe('SET_LOADING', () => {
     it('sets loading to true', () => {
       const next = scriptDetailReducer(makeState({ loading: false }), {
-        type: 'SET_LOADING',
-        loading: true,
+        type:'SET_LOADING', payload: true,
       });
       expect(next.loading).toBe(true);
     });
 
     it('sets loading to false', () => {
       const next = scriptDetailReducer(makeState({ loading: true }), {
-        type: 'SET_LOADING',
-        loading: false,
+        type:'SET_LOADING', payload: false,
       });
       expect(next.loading).toBe(false);
     });
 
     it('preserves other state fields', () => {
       const state = makeState({ loading: false, reloadToken: 5 });
-      const next = scriptDetailReducer(state, { type: 'SET_LOADING', loading: true });
+      const next = scriptDetailReducer(state, { type:'SET_LOADING', payload: true });
       expect(next.reloadToken).toBe(5);
     });
   });
@@ -98,13 +96,13 @@ describe('scriptDetailReducer', () => {
   describe('SET_PROJECT', () => {
     it('sets a project', () => {
       const project = makeProject();
-      const next = scriptDetailReducer(makeState(), { type: 'SET_PROJECT', project });
+      const next = scriptDetailReducer(makeState(), { type:'SET_PROJECT', payload: project });
       expect(next.project).toBe(project);
     });
 
     it('sets project to null', () => {
       const state = makeState({ project: makeProject() });
-      const next = scriptDetailReducer(state, { type: 'SET_PROJECT', project: null });
+      const next = scriptDetailReducer(state, { type:'SET_PROJECT', payload: null });
       expect(next.project).toBeNull();
     });
   });
@@ -113,13 +111,13 @@ describe('scriptDetailReducer', () => {
   describe('SET_SCRIPT', () => {
     it('sets a script', () => {
       const script = makeScript();
-      const next = scriptDetailReducer(makeState(), { type: 'SET_SCRIPT', script });
+      const next = scriptDetailReducer(makeState(), { type:'SET_SCRIPT', payload: script });
       expect(next.script).toBe(script);
     });
 
     it('sets script to null', () => {
       const state = makeState({ script: makeScript() });
-      const next = scriptDetailReducer(state, { type: 'SET_SCRIPT', script: null });
+      const next = scriptDetailReducer(state, { type:'SET_SCRIPT', payload: null });
       expect(next.script).toBeNull();
     });
   });
@@ -128,7 +126,7 @@ describe('scriptDetailReducer', () => {
   describe('SET_SEGMENTS', () => {
     it('sets segments', () => {
       const segments = [makeSegment({ id: 'a' }), makeSegment({ id: 'b' })];
-      const next = scriptDetailReducer(makeState(), { type: 'SET_SEGMENTS', segments });
+      const next = scriptDetailReducer(makeState(), { type:'SET_SEGMENTS', payload: segments });
       expect(next.segments).toBe(segments);
       expect(next.segments).toHaveLength(2);
     });
@@ -136,7 +134,7 @@ describe('scriptDetailReducer', () => {
     it('replaces existing segments', () => {
       const state = makeState({ segments: [makeSegment({ id: 'old' })] });
       const segments = [makeSegment({ id: 'new' })];
-      const next = scriptDetailReducer(state, { type: 'SET_SEGMENTS', segments });
+      const next = scriptDetailReducer(state, { type:'SET_SEGMENTS', payload: segments });
       expect(next.segments).toEqual(segments);
     });
   });
@@ -145,15 +143,14 @@ describe('scriptDetailReducer', () => {
   describe('SET_LOAD_ERROR', () => {
     it('sets an error message', () => {
       const next = scriptDetailReducer(makeState(), {
-        type: 'SET_LOAD_ERROR',
-        loadError: 'Network failure',
+        type:'SET_LOAD_ERROR', payload: 'Network failure',
       });
       expect(next.loadError).toBe('Network failure');
     });
 
     it('clears an error message with empty string', () => {
       const state = makeState({ loadError: 'Previous error' });
-      const next = scriptDetailReducer(state, { type: 'SET_LOAD_ERROR', loadError: '' });
+      const next = scriptDetailReducer(state, { type:'SET_LOAD_ERROR', payload: '' });
       expect(next.loadError).toBe('');
     });
   });
@@ -162,21 +159,19 @@ describe('scriptDetailReducer', () => {
   describe('INCREMENT_RELOAD_TOKEN', () => {
     it('increments reloadToken from 0', () => {
       const next = scriptDetailReducer(makeState({ reloadToken: 0 }), {
-        type: 'INCREMENT_RELOAD_TOKEN',
-      });
+        type:'INCREMENT_RELOAD_TOKEN', payload: undefined});
       expect(next.reloadToken).toBe(1);
     });
 
     it('increments reloadToken from a positive value', () => {
       const next = scriptDetailReducer(makeState({ reloadToken: 7 }), {
-        type: 'INCREMENT_RELOAD_TOKEN',
-      });
+        type:'INCREMENT_RELOAD_TOKEN', payload: undefined});
       expect(next.reloadToken).toBe(8);
     });
 
     it('preserves all other state fields', () => {
       const state = makeState({ reloadToken: 3, loading: true, isSaving: true });
-      const next = scriptDetailReducer(state, { type: 'INCREMENT_RELOAD_TOKEN' });
+      const next = scriptDetailReducer(state, { type:'INCREMENT_RELOAD_TOKEN', payload: undefined });
       expect(next.loading).toBe(true);
       expect(next.isSaving).toBe(true);
     });
@@ -186,16 +181,14 @@ describe('scriptDetailReducer', () => {
   describe('SET_IS_SAVING', () => {
     it('sets isSaving to true', () => {
       const next = scriptDetailReducer(makeState({ isSaving: false }), {
-        type: 'SET_IS_SAVING',
-        isSaving: true,
+        type:'SET_IS_SAVING', payload: true,
       });
       expect(next.isSaving).toBe(true);
     });
 
     it('sets isSaving to false', () => {
       const next = scriptDetailReducer(makeState({ isSaving: true }), {
-        type: 'SET_IS_SAVING',
-        isSaving: false,
+        type:'SET_IS_SAVING', payload: false,
       });
       expect(next.isSaving).toBe(false);
     });
@@ -205,16 +198,14 @@ describe('scriptDetailReducer', () => {
   describe('SET_IS_EXPORTING', () => {
     it('sets isExporting to true', () => {
       const next = scriptDetailReducer(makeState({ isExporting: false }), {
-        type: 'SET_IS_EXPORTING',
-        isExporting: true,
+        type:'SET_IS_EXPORTING', payload: true,
       });
       expect(next.isExporting).toBe(true);
     });
 
     it('sets isExporting to false', () => {
       const next = scriptDetailReducer(makeState({ isExporting: true }), {
-        type: 'SET_IS_EXPORTING',
-        isExporting: false,
+        type:'SET_IS_EXPORTING', payload: false,
       });
       expect(next.isExporting).toBe(false);
     });
@@ -224,16 +215,14 @@ describe('scriptDetailReducer', () => {
   describe('SET_IS_DELETING', () => {
     it('sets isDeleting to true', () => {
       const next = scriptDetailReducer(makeState({ isDeleting: false }), {
-        type: 'SET_IS_DELETING',
-        isDeleting: true,
+        type:'SET_IS_DELETING', payload: true,
       });
       expect(next.isDeleting).toBe(true);
     });
 
     it('sets isDeleting to false', () => {
       const next = scriptDetailReducer(makeState({ isDeleting: true }), {
-        type: 'SET_IS_DELETING',
-        isDeleting: false,
+        type:'SET_IS_DELETING', payload: false,
       });
       expect(next.isDeleting).toBe(false);
     });
@@ -243,16 +232,14 @@ describe('scriptDetailReducer', () => {
   describe('SET_DELETE_CONFIRM_OPEN', () => {
     it('opens delete confirm dialog', () => {
       const next = scriptDetailReducer(makeState({ deleteConfirmOpen: false }), {
-        type: 'SET_DELETE_CONFIRM_OPEN',
-        open: true,
+        type:'SET_DELETE_CONFIRM_OPEN', payload: true,
       });
       expect(next.deleteConfirmOpen).toBe(true);
     });
 
     it('closes delete confirm dialog', () => {
       const next = scriptDetailReducer(makeState({ deleteConfirmOpen: true }), {
-        type: 'SET_DELETE_CONFIRM_OPEN',
-        open: false,
+        type:'SET_DELETE_CONFIRM_OPEN', payload: false,
       });
       expect(next.deleteConfirmOpen).toBe(false);
     });
@@ -269,7 +256,7 @@ describe('scriptDetailReducer', () => {
         loadError: 'some error',
       });
 
-      const next = scriptDetailReducer(state, { type: 'RESET' });
+      const next = scriptDetailReducer(state, { type:'RESET', payload: undefined });
 
       expect(next.project).toBeNull();
       expect(next.script).toBeNull();
@@ -287,7 +274,7 @@ describe('scriptDetailReducer', () => {
         deleteConfirmOpen: true,
       });
 
-      const next = scriptDetailReducer(state, { type: 'RESET' });
+      const next = scriptDetailReducer(state, { type:'RESET', payload: undefined });
 
       expect(next.reloadToken).toBe(4);
       expect(next.isSaving).toBe(true);

@@ -10,7 +10,7 @@ import {
   Plus,
 } from 'lucide-react';
 import type { ScriptSegment } from '@/types';
-import { formatDuration } from '@/core/video';
+import { formatDuration } from '@/shared/utils/formatting';
 import SegmentTable from './segment-table';
 import SegmentEditForm from './segment-edit-form';
 import PreviewModal from './preview-modal';

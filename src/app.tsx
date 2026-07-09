@@ -8,12 +8,12 @@ const AppProvider = lazy(loadAppProvider);
 const Layout = lazy(loadLayout);
 
 // 懒加载页面组件 - 优化首屏加载
-const loadHome = () => import('./pages/Home/index');
-const loadProjects = () => import('./pages/Projects/index');
-const loadProjectEdit = () => import('./pages/ProjectEdit/index');
-const loadProjectDetail = () => import('./pages/ProjectDetail/index');
-const loadScriptDetail = () => import('./pages/ScriptDetail/index');
-const loadSettings = () => import('./pages/Settings/index');
+const loadHome = () => import('./pages/home/index');
+const loadProjects = () => import('./pages/projects/index');
+const loadProjectEdit = () => import('./pages/project-edit/index');
+const loadProjectDetail = () => import('./pages/project-detail/index');
+const loadScriptDetail = () => import('./pages/script-detail/index');
+const loadSettings = () => import('./pages/settings/index');
 const Home = lazy(loadHome);
 const Projects = lazy(loadProjects);
 const ProjectEdit = lazy(loadProjectEdit);

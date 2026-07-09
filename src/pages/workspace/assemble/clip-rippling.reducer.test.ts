@@ -27,16 +27,14 @@ describe('clipRipplingReducer', () => {
   describe('SET_PLATFORM', () => {
     it('sets the platform to a new value', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_PLATFORM',
-        platform: 'tiktok',
+        type:'SET_PLATFORM', payload: 'tiktok',
       });
       expect(state.platform).toBe('tiktok');
     });
 
     it('does not mutate other state fields', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_PLATFORM',
-        platform: 'youtube_shorts',
+        type:'SET_PLATFORM', payload: 'youtube_shorts',
       });
       expect(state.selectedFormats).toBe(baseState.selectedFormats);
       expect(state.targetCount).toBe(baseState.targetCount);
@@ -53,8 +51,7 @@ describe('clipRipplingReducer', () => {
       ];
       for (const platform of platforms) {
         const state = clipRipplingReducer(baseState, {
-          type: 'SET_PLATFORM',
-          platform,
+          type:'SET_PLATFORM', payload: platform,
         });
         expect(state.platform).toBe(platform);
       }
@@ -66,16 +63,14 @@ describe('clipRipplingReducer', () => {
     it('replaces the selected formats array', () => {
       const formats: AspectRatio[] = ['16:9', '1:1'];
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_SELECTED_FORMATS',
-        selectedFormats: formats,
+        type:'SET_SELECTED_FORMATS', payload: formats,
       });
       expect(state.selectedFormats).toEqual(formats);
     });
 
     it('handles empty array', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_SELECTED_FORMATS',
-        selectedFormats: [],
+        type:'SET_SELECTED_FORMATS', payload: [],
       });
       expect(state.selectedFormats).toEqual([]);
     });
@@ -85,8 +80,7 @@ describe('clipRipplingReducer', () => {
   describe('TOGGLE_SELECTED_FORMAT', () => {
     it('adds a format that is not currently selected', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'TOGGLE_SELECTED_FORMAT',
-        format: '16:9',
+        type:'TOGGLE_SELECTED_FORMAT', payload: '16:9',
       });
       expect(state.selectedFormats).toContain('16:9');
       // original formats should still be there
@@ -96,8 +90,7 @@ describe('clipRipplingReducer', () => {
 
     it('removes a format that is currently selected', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'TOGGLE_SELECTED_FORMAT',
-        format: '9:16',
+        type:'TOGGLE_SELECTED_FORMAT', payload: '9:16',
       });
       expect(state.selectedFormats).not.toContain('9:16');
       expect(state.selectedFormats).toContain('1:1');
@@ -105,12 +98,10 @@ describe('clipRipplingReducer', () => {
 
     it('toggling twice returns to original state', () => {
       const once = clipRipplingReducer(baseState, {
-        type: 'TOGGLE_SELECTED_FORMAT',
-        format: '16:9',
+        type:'TOGGLE_SELECTED_FORMAT', payload: '16:9',
       });
       const twice = clipRipplingReducer(once, {
-        type: 'TOGGLE_SELECTED_FORMAT',
-        format: '16:9',
+        type:'TOGGLE_SELECTED_FORMAT', payload: '16:9',
       });
       expect(twice.selectedFormats).toEqual(baseState.selectedFormats);
     });
@@ -120,16 +111,14 @@ describe('clipRipplingReducer', () => {
   describe('SET_TARGET_COUNT', () => {
     it('sets target count', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_TARGET_COUNT',
-        targetCount: 10,
+        type:'SET_TARGET_COUNT', payload: 10,
       });
       expect(state.targetCount).toBe(10);
     });
 
     it('allows zero target count', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_TARGET_COUNT',
-        targetCount: 0,
+        type:'SET_TARGET_COUNT', payload: 0,
       });
       expect(state.targetCount).toBe(0);
     });
@@ -139,8 +128,7 @@ describe('clipRipplingReducer', () => {
   describe('SET_RUNNING', () => {
     it('sets running to true', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_RUNNING',
-        running: true,
+        type:'SET_RUNNING', payload: true,
       });
       expect(state.running).toBe(true);
     });
@@ -148,8 +136,7 @@ describe('clipRipplingReducer', () => {
     it('sets running to false', () => {
       const runningState = { ...baseState, running: true };
       const state = clipRipplingReducer(runningState, {
-        type: 'SET_RUNNING',
-        running: false,
+        type:'SET_RUNNING', payload: false,
       });
       expect(state.running).toBe(false);
     });
@@ -159,8 +146,7 @@ describe('clipRipplingReducer', () => {
   describe('SET_PROGRESS', () => {
     it('sets progress value', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_PROGRESS',
-        progress: 42,
+        type:'SET_PROGRESS', payload: 42,
       });
       expect(state.progress).toBe(42);
     });
@@ -168,16 +154,14 @@ describe('clipRipplingReducer', () => {
     it('handles progress of 0', () => {
       const stateWithProgress = { ...baseState, progress: 50 };
       const state = clipRipplingReducer(stateWithProgress, {
-        type: 'SET_PROGRESS',
-        progress: 0,
+        type:'SET_PROGRESS', payload: 0,
       });
       expect(state.progress).toBe(0);
     });
 
     it('handles progress of 100', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_PROGRESS',
-        progress: 100,
+        type:'SET_PROGRESS', payload: 100,
       });
       expect(state.progress).toBe(100);
     });
@@ -194,8 +178,7 @@ describe('clipRipplingReducer', () => {
       ];
       for (const stage of stages) {
         const state = clipRipplingReducer(baseState, {
-          type: 'SET_STAGE',
-          stage,
+          type:'SET_STAGE', payload: stage,
         });
         expect(state.stage).toBe(stage);
       }
@@ -204,8 +187,7 @@ describe('clipRipplingReducer', () => {
     it('sets stage to empty string', () => {
       const stateWithStage = { ...baseState, stage: 'scoring' as PipelineStage | '' };
       const state = clipRipplingReducer(stateWithStage, {
-        type: 'SET_STAGE',
-        stage: '',
+        type:'SET_STAGE', payload: '',
       });
       expect(state.stage).toBe('');
     });
@@ -216,8 +198,7 @@ describe('clipRipplingReducer', () => {
     it('replaces results array', () => {
       const clips = [makeClip(), makeClip({ clip: { id: 'clip-2' } as RepurposingClip['clip'] })];
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_RESULTS',
-        results: clips,
+        type:'SET_RESULTS', payload: clips,
       });
       expect(state.results).toHaveLength(2);
       expect(state.results).toBe(clips);
@@ -226,8 +207,7 @@ describe('clipRipplingReducer', () => {
     it('handles empty results', () => {
       const stateWithResults = { ...baseState, results: [makeClip()] };
       const state = clipRipplingReducer(stateWithResults, {
-        type: 'SET_RESULTS',
-        results: [],
+        type:'SET_RESULTS', payload: [],
       });
       expect(state.results).toEqual([]);
     });
@@ -238,8 +218,7 @@ describe('clipRipplingReducer', () => {
     it('replaces selected clips set', () => {
       const clips = new Set(['a', 'b', 'c']);
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_SELECTED_CLIPS',
-        selectedClips: clips,
+        type:'SET_SELECTED_CLIPS', payload: clips,
       });
       expect(state.selectedClips).toBe(clips);
       expect(state.selectedClips.size).toBe(3);
@@ -251,8 +230,7 @@ describe('clipRipplingReducer', () => {
         selectedClips: new Set(['x']),
       };
       const state = clipRipplingReducer(stateWithClips, {
-        type: 'SET_SELECTED_CLIPS',
-        selectedClips: new Set(),
+        type:'SET_SELECTED_CLIPS', payload: new Set(),
       });
       expect(state.selectedClips.size).toBe(0);
     });
@@ -262,8 +240,7 @@ describe('clipRipplingReducer', () => {
   describe('TOGGLE_CLIP', () => {
     it('adds an id that is not in the set', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'TOGGLE_CLIP',
-        id: 'clip-42',
+        type:'TOGGLE_CLIP', payload: 'clip-42',
       });
       expect(state.selectedClips.has('clip-42')).toBe(true);
     });
@@ -274,8 +251,7 @@ describe('clipRipplingReducer', () => {
         selectedClips: new Set(['clip-42']),
       };
       const state = clipRipplingReducer(stateWithClip, {
-        type: 'TOGGLE_CLIP',
-        id: 'clip-42',
+        type:'TOGGLE_CLIP', payload: 'clip-42',
       });
       expect(state.selectedClips.has('clip-42')).toBe(false);
     });
@@ -286,8 +262,7 @@ describe('clipRipplingReducer', () => {
         selectedClips: new Set(['clip-1', 'clip-2']),
       };
       const state = clipRipplingReducer(stateWithClips, {
-        type: 'TOGGLE_CLIP',
-        id: 'clip-1',
+        type:'TOGGLE_CLIP', payload: 'clip-1',
       });
       expect(state.selectedClips.has('clip-1')).toBe(false);
       expect(state.selectedClips.has('clip-2')).toBe(true);
@@ -295,12 +270,10 @@ describe('clipRipplingReducer', () => {
 
     it('toggling the same id twice returns to original state', () => {
       const once = clipRipplingReducer(baseState, {
-        type: 'TOGGLE_CLIP',
-        id: 'clip-new',
+        type:'TOGGLE_CLIP', payload: 'clip-new',
       });
       const twice = clipRipplingReducer(once, {
-        type: 'TOGGLE_CLIP',
-        id: 'clip-new',
+        type:'TOGGLE_CLIP', payload: 'clip-new',
       });
       expect(twice.selectedClips.size).toBe(0);
     });
@@ -310,8 +283,7 @@ describe('clipRipplingReducer', () => {
   describe('SET_EXPORTING', () => {
     it('sets exporting to true', () => {
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_EXPORTING',
-        exporting: true,
+        type:'SET_EXPORTING', payload: true,
       });
       expect(state.exporting).toBe(true);
     });
@@ -319,8 +291,7 @@ describe('clipRipplingReducer', () => {
     it('sets exporting to false', () => {
       const stateExporting = { ...baseState, exporting: true };
       const state = clipRipplingReducer(stateExporting, {
-        type: 'SET_EXPORTING',
-        exporting: false,
+        type:'SET_EXPORTING', payload: false,
       });
       expect(state.exporting).toBe(false);
     });
@@ -331,8 +302,7 @@ describe('clipRipplingReducer', () => {
     it('replaces exported paths', () => {
       const paths = ['/tmp/out1.mp4', '/tmp/out2.mp4'];
       const state = clipRipplingReducer(baseState, {
-        type: 'SET_EXPORTED_PATHS',
-        exportedPaths: paths,
+        type:'SET_EXPORTED_PATHS', payload: paths,
       });
       expect(state.exportedPaths).toEqual(paths);
     });
@@ -343,8 +313,7 @@ describe('clipRipplingReducer', () => {
         exportedPaths: ['/tmp/a.mp4'],
       };
       const state = clipRipplingReducer(stateWithPaths, {
-        type: 'SET_EXPORTED_PATHS',
-        exportedPaths: [],
+        type:'SET_EXPORTED_PATHS', payload: [],
       });
       expect(state.exportedPaths).toEqual([]);
     });
@@ -361,7 +330,7 @@ describe('clipRipplingReducer', () => {
         exportedPaths: ['/tmp/export.mp4'],
         selectedClips: new Set(['clip-1']),
       };
-      const state = clipRipplingReducer(dirtyState, { type: 'RESET_RUN' });
+      const state = clipRipplingReducer(dirtyState, { type:'RESET_RUN', payload: undefined });
 
       expect(state.running).toBe(true);
       expect(state.progress).toBe(0);
@@ -382,7 +351,7 @@ describe('clipRipplingReducer', () => {
         exporting: true,
         exportedPaths: ['/tmp/a.mp4'],
       };
-      const state = clipRipplingReducer(dirtyState, { type: 'RESET_RUN' });
+      const state = clipRipplingReducer(dirtyState, { type:'RESET_RUN', payload: undefined });
 
       expect(state.platform).toBe('tiktok');
       expect(state.selectedFormats).toEqual(['16:9']);
@@ -393,7 +362,7 @@ describe('clipRipplingReducer', () => {
     });
 
     it('sets running to true even if it was already true', () => {
-      const state = clipRipplingReducer(baseState, { type: 'RESET_RUN' });
+      const state = clipRipplingReducer(baseState, { type:'RESET_RUN', payload: undefined });
       expect(state.running).toBe(true);
     });
   });
@@ -424,11 +393,11 @@ describe('clipRipplingReducer', () => {
       };
       const frozen = { ...original };
 
-      clipRipplingReducer(original, { type: 'SET_PLATFORM', platform: 'tiktok' });
-      clipRipplingReducer(original, { type: 'SET_TARGET_COUNT', targetCount: 99 });
-      clipRipplingReducer(original, { type: 'SET_PROGRESS', progress: 50 });
-      clipRipplingReducer(original, { type: 'TOGGLE_CLIP', id: 'new' });
-      clipRipplingReducer(original, { type: 'TOGGLE_SELECTED_FORMAT', format: '16:9' });
+      clipRipplingReducer(original, { type:'SET_PLATFORM', payload: 'tiktok' });
+      clipRipplingReducer(original, { type:'SET_TARGET_COUNT', payload: 99 });
+      clipRipplingReducer(original, { type:'SET_PROGRESS', payload: 50 });
+      clipRipplingReducer(original, { type:'TOGGLE_CLIP', payload: 'new' });
+      clipRipplingReducer(original, { type:'TOGGLE_SELECTED_FORMAT', payload: '16:9' });
 
       expect(original.platform).toBe(frozen.platform);
       expect(original.targetCount).toBe(frozen.targetCount);

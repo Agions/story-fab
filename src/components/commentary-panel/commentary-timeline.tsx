@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
 import type { CommentarySegment } from '@/core/services/commentary';
-import { formatDuration } from '@/core/video';
+import { formatDuration } from '@/shared/utils/formatting';
 import styles from '././commentary-panel.module.less';
 
 interface Props {

@@ -107,7 +107,7 @@ class AnalysisReportService {
   ): string {
     const parts: string[] = [];
 
-    parts.push(`视频时长 ${this.formatDuration(videoInfo.duration)}，`);
+    parts.push(`视频时长 ${formatDurationChinese(videoInfo.duration)}，`);
     parts.push(`分辨率 ${videoInfo.width}x${videoInfo.height}，`);
     parts.push(`包含 ${Object.keys(sceneTypes).length} 种场景类型，`);
 
@@ -131,13 +131,6 @@ class AnalysisReportService {
     }
 
     return parts.join('');
-  }
-
-  /**
-   * 格式化时长
-   */
-  private formatDuration(seconds: number): string {
-    return formatDurationChinese(seconds);
   }
 
   /**

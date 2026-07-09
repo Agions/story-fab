@@ -8,7 +8,8 @@ import { Upload, Trash2, PlayCircle } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { tauri } from '@/core/tauri';
-import { videoProcessor, VideoMetadata, formatDuration, formatResolution } from '@/core/video';
+import { videoProcessor, VideoMetadata, formatResolution } from '@/core/video';
+import { formatDuration } from '@/shared/utils/formatting';
 import { notify } from '@/shared';
 import { VIDEO_EXTENSIONS } from '@/shared/constants';
 import {
@@ -73,28 +74,28 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
     if (runningInTauri) {
       // Tauri: fileOrPath 是真实路径
       const filePath = fileOrPath;
-      dispatch({ type: 'SET_VIDEO_PATH', videoPath: filePath });
-      dispatch({ type: 'SET_VIDEO_SRC', videoSrc: convertFileSrc(filePath) });
+      dispatch({ type:'SET_VIDEO_PATH', payload: filePath });
+      dispatch({ type:'SET_VIDEO_SRC', payload: convertFileSrc(filePath) });
 
-      dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: true });
+      dispatch({ type:'SET_IS_ANALYZING', payload: true });
       try {
         const videoMetadata = await videoProcessor.analyze(filePath);
-        dispatch({ type: 'SET_METADATA', metadata: videoMetadata });
+        dispatch({ type:'SET_METADATA', payload: videoMetadata });
         onVideoSelect(filePath, videoMetadata);
       } catch (error) {
         logger.error('分析视频失败:', { error });
         onVideoSelect(filePath);
       } finally {
-        dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: false });
+        dispatch({ type:'SET_IS_ANALYZING', payload: false });
       }
     } else {
       // Web: fileOrPath 是 blob URL，file 是原始 File 对象
       const blobUrl = fileOrPath;
-      dispatch({ type: 'SET_VIDEO_PATH', videoPath: file?.name || '视频文件' });
-      dispatch({ type: 'SET_VIDEO_SRC', videoSrc: blobUrl });
+      dispatch({ type:'SET_VIDEO_PATH', payload: file?.name || '视频文件' });
+      dispatch({ type:'SET_VIDEO_SRC', payload: blobUrl });
       blobUrlRef.current = blobUrl; // 跟踪 blob URL 以便清理
 
-      dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: true });
+      dispatch({ type:'SET_IS_ANALYZING', payload: true });
       const video = document.createElement('video');
       video.preload = 'metadata';
 
@@ -107,14 +108,14 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
           codec: file?.type || 'unknown',
           bitrate: video.duration > 0 && file ? Math.round((file.size * 8) / video.duration) : 0,
         };
-        dispatch({ type: 'SET_METADATA', metadata: webMetadata });
+        dispatch({ type:'SET_METADATA', payload: webMetadata });
         onVideoSelect(blobUrl, webMetadata);
-        dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: false });
+        dispatch({ type:'SET_IS_ANALYZING', payload: false });
       };
 
       video.onerror = () => {
         notify.error(null, '无法读取视频文件');
-        dispatch({ type: 'SET_IS_ANALYZING', isAnalyzing: false });
+        dispatch({ type:'SET_IS_ANALYZING', payload: false });
       };
 
       video.src = blobUrl;
@@ -163,19 +164,19 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch({ type: 'SET_IS_DRAGGING', isDragging: true });
+    dispatch({ type:'SET_IS_DRAGGING', payload: true });
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch({ type: 'SET_IS_DRAGGING', isDragging: false });
+    dispatch({ type:'SET_IS_DRAGGING', payload: false });
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch({ type: 'SET_IS_DRAGGING', isDragging: false });
+    dispatch({ type:'SET_IS_DRAGGING', payload: false });
 
     if (isTauriEnv()) {
       // Tauri 环境下优先用对话框
@@ -204,7 +205,7 @@ const VideoSelector: React.FC<VideoSelectorProps> = ({
       URL.revokeObjectURL(blobUrlRef.current);
       blobUrlRef.current = null;
     }
-    dispatch({ type: 'RESET' });
+    dispatch({ type:'RESET', payload: undefined });
     onVideoRemove?.();
   };
 

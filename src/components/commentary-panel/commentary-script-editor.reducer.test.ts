@@ -18,8 +18,7 @@ describe('segmentRowReducer', () => {
   describe('SET_EDITING', () => {
     it('sets editing to true', () => {
       const result = segmentRowReducer(initialSegmentRowState, {
-        type: 'SET_EDITING',
-        editing: true,
+        type:'SET_EDITING', payload: true,
       });
       expect(result).toEqual({ editing: true, text: '' });
     });
@@ -27,15 +26,14 @@ describe('segmentRowReducer', () => {
     it('sets editing to false', () => {
       const state: SegmentRowState = { editing: true, text: 'hello' };
       const result = segmentRowReducer(state, {
-        type: 'SET_EDITING',
-        editing: false,
+        type:'SET_EDITING', payload: false,
       });
       expect(result).toEqual({ editing: false, text: 'hello' });
     });
 
     it('preserves text when toggling editing', () => {
       const state: SegmentRowState = { editing: false, text: 'preserved' };
-      const result = segmentRowReducer(state, { type: 'SET_EDITING', editing: true });
+      const result = segmentRowReducer(state, { type:'SET_EDITING', payload: true });
       expect(result.text).toBe('preserved');
     });
   });
@@ -43,22 +41,21 @@ describe('segmentRowReducer', () => {
   describe('SET_TEXT', () => {
     it('updates text', () => {
       const result = segmentRowReducer(initialSegmentRowState, {
-        type: 'SET_TEXT',
-        text: 'new text',
+        type:'SET_TEXT', payload: 'new text',
       });
       expect(result).toEqual({ editing: false, text: 'new text' });
     });
 
     it('preserves editing flag', () => {
       const state: SegmentRowState = { editing: true, text: 'old' };
-      const result = segmentRowReducer(state, { type: 'SET_TEXT', text: 'new' });
+      const result = segmentRowReducer(state, { type:'SET_TEXT', payload: 'new' });
       expect(result.editing).toBe(true);
       expect(result.text).toBe('new');
     });
 
     it('handles empty text', () => {
       const state: SegmentRowState = { editing: true, text: 'something' };
-      const result = segmentRowReducer(state, { type: 'SET_TEXT', text: '' });
+      const result = segmentRowReducer(state, { type:'SET_TEXT', payload: '' });
       expect(result.text).toBe('');
     });
   });
@@ -66,8 +63,7 @@ describe('segmentRowReducer', () => {
   describe('START_EDIT', () => {
     it('enters editing mode and sets initial text', () => {
       const result = segmentRowReducer(initialSegmentRowState, {
-        type: 'START_EDIT',
-        initialText: 'segment text',
+        type:'START_EDIT', payload: 'segment text',
       });
       expect(result).toEqual({ editing: true, text: 'segment text' });
     });
@@ -75,16 +71,14 @@ describe('segmentRowReducer', () => {
     it('overwrites existing text with initialText', () => {
       const state: SegmentRowState = { editing: false, text: 'old text' };
       const result = segmentRowReducer(state, {
-        type: 'START_EDIT',
-        initialText: 'fresh',
+        type:'START_EDIT', payload: 'fresh',
       });
       expect(result).toEqual({ editing: true, text: 'fresh' });
     });
 
     it('handles empty initialText', () => {
       const result = segmentRowReducer(initialSegmentRowState, {
-        type: 'START_EDIT',
-        initialText: '',
+        type:'START_EDIT', payload: '',
       });
       expect(result).toEqual({ editing: true, text: '' });
     });
@@ -93,19 +87,19 @@ describe('segmentRowReducer', () => {
   describe('COMMIT_EDIT', () => {
     it('exits editing mode', () => {
       const state: SegmentRowState = { editing: true, text: 'edited text' };
-      const result = segmentRowReducer(state, { type: 'COMMIT_EDIT' });
+      const result = segmentRowReducer(state, { type:'COMMIT_EDIT', payload: undefined });
       expect(result.editing).toBe(false);
     });
 
     it('preserves text after commit', () => {
       const state: SegmentRowState = { editing: true, text: 'committed' };
-      const result = segmentRowReducer(state, { type: 'COMMIT_EDIT' });
+      const result = segmentRowReducer(state, { type:'COMMIT_EDIT', payload: undefined });
       expect(result.text).toBe('committed');
     });
 
     it('works when already not editing (no-op on editing flag)', () => {
       const state: SegmentRowState = { editing: false, text: 'idle' };
-      const result = segmentRowReducer(state, { type: 'COMMIT_EDIT' });
+      const result = segmentRowReducer(state, { type:'COMMIT_EDIT', payload: undefined });
       expect(result).toEqual({ editing: false, text: 'idle' });
     });
   });
@@ -130,8 +124,7 @@ describe('scriptEditorReducer', () => {
   describe('SET_COPIED', () => {
     it('sets copied to true', () => {
       const result = scriptEditorReducer(initialScriptEditorState, {
-        type: 'SET_COPIED',
-        copied: true,
+        type:'SET_COPIED', payload: true,
       });
       expect(result).toEqual({ copied: true });
     });
@@ -139,8 +132,7 @@ describe('scriptEditorReducer', () => {
     it('sets copied to false', () => {
       const state: ScriptEditorState = { copied: true };
       const result = scriptEditorReducer(state, {
-        type: 'SET_COPIED',
-        copied: false,
+        type:'SET_COPIED', payload: false,
       });
       expect(result).toEqual({ copied: false });
     });
@@ -149,14 +141,13 @@ describe('scriptEditorReducer', () => {
   describe('MARK_COPIED', () => {
     it('sets copied to true', () => {
       const result = scriptEditorReducer(initialScriptEditorState, {
-        type: 'MARK_COPIED',
-      });
+        type:'MARK_COPIED', payload: undefined});
       expect(result).toEqual({ copied: true });
     });
 
     it('keeps copied true if already true', () => {
       const state: ScriptEditorState = { copied: true };
-      const result = scriptEditorReducer(state, { type: 'MARK_COPIED' });
+      const result = scriptEditorReducer(state, { type:'MARK_COPIED', payload: undefined });
       expect(result.copied).toBe(true);
     });
   });
@@ -164,14 +155,13 @@ describe('scriptEditorReducer', () => {
   describe('RESET_COPIED', () => {
     it('sets copied to false', () => {
       const state: ScriptEditorState = { copied: true };
-      const result = scriptEditorReducer(state, { type: 'RESET_COPIED' });
+      const result = scriptEditorReducer(state, { type:'RESET_COPIED', payload: undefined });
       expect(result).toEqual({ copied: false });
     });
 
     it('keeps copied false if already false', () => {
       const result = scriptEditorReducer(initialScriptEditorState, {
-        type: 'RESET_COPIED',
-      });
+        type:'RESET_COPIED', payload: undefined});
       expect(result.copied).toBe(false);
     });
   });

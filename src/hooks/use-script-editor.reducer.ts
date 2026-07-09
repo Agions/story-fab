@@ -1,7 +1,7 @@
 /**
  * useOriginalEditor reducer — 集中 12 useState 状态机
  * 来源: refactor/original-editor-usereducer (v3.4 §A2 范式)
- * 模式: 1 hook + 1 .reducer.ts + makeSetter<K> + Updater<T>
+ * 模式: 1 hook + 1 .reducer.ts + createAutoSetters + Updater<T>
  */
 import type { ScriptSegment } from '@/types';
 import type { Updater } from '@/shared/hooks/useAutoSetters';

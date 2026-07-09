@@ -8,6 +8,7 @@
  */
 
 import { logger } from '@/shared/utils/logging';
+import { tauri } from '@/core/tauri';
 
 // ============================================
 // Whisper 类型定义
@@ -39,18 +40,6 @@ export interface WhisperProgress {
 
 export class WhisperService {
   /**
-   * 检查 faster-whisper 是否已安装
-   */
-  async checkFasterWhisper(): Promise<boolean> {
-    try {
-      const { invoke } = await import('@tauri-apps/api/core');
-      return await invoke<boolean>('check_faster_whisper');
-    } catch {
-      return false;
-    }
-  }
-
-  /**
    * 使用 Whisper 转录音频/视频
    * @param audioPath 音频或视频文件路径
    * @param modelSize 模型大小: tiny, base, small, medium, large-v2, large-v3
@@ -78,12 +67,7 @@ export class WhisperService {
     }
 
     try {
-      const { invoke } = await import('@tauri-apps/api/core');
-      const result = await invoke<WhisperResult>('transcribe_audio', {
-        audioPath,
-        modelSize,
-        language,
-      });
+      const result = await tauri.transcribeAudio({ audioPath, modelSize, language }) as unknown as WhisperResult;
 
       logger.info('[Whisper] 转录完成:', {
         language: result.language,

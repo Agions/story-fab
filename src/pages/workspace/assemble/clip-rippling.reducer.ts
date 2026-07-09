@@ -1,5 +1,6 @@
 import type { RepurposingClip, PipelineStage } from '@/core/services/pipeline/clip-pipeline/pipeline';
 import type { SocialPlatform, AspectRatio } from '../shared/clip-rippling-config';
+import { createReducer } from '@/shared/hooks/create-reducer';
 
 export interface ClipRipplingState {
   platform: SocialPlatform;
@@ -15,19 +16,19 @@ export interface ClipRipplingState {
 }
 
 export type ClipRipplingAction =
-  | { type: 'SET_PLATFORM'; platform: SocialPlatform }
-  | { type: 'SET_SELECTED_FORMATS'; selectedFormats: AspectRatio[] }
-  | { type: 'TOGGLE_SELECTED_FORMAT'; format: AspectRatio }
-  | { type: 'SET_TARGET_COUNT'; targetCount: number }
-  | { type: 'SET_RUNNING'; running: boolean }
-  | { type: 'SET_PROGRESS'; progress: number }
-  | { type: 'SET_STAGE'; stage: PipelineStage | '' }
-  | { type: 'SET_RESULTS'; results: RepurposingClip[] }
-  | { type: 'SET_SELECTED_CLIPS'; selectedClips: Set<string> }
-  | { type: 'TOGGLE_CLIP'; id: string }
-  | { type: 'SET_EXPORTING'; exporting: boolean }
-  | { type: 'SET_EXPORTED_PATHS'; exportedPaths: string[] }
-  | { type: 'RESET_RUN' };
+  | { type: 'SET_PLATFORM'; payload: SocialPlatform }
+  | { type: 'SET_SELECTED_FORMATS'; payload: AspectRatio[] }
+  | { type: 'TOGGLE_SELECTED_FORMAT'; payload: AspectRatio }
+  | { type: 'SET_TARGET_COUNT'; payload: number }
+  | { type: 'SET_RUNNING'; payload: boolean }
+  | { type: 'SET_PROGRESS'; payload: number }
+  | { type: 'SET_STAGE'; payload: PipelineStage | '' }
+  | { type: 'SET_RESULTS'; payload: RepurposingClip[] }
+  | { type: 'SET_SELECTED_CLIPS'; payload: Set<string> }
+  | { type: 'TOGGLE_CLIP'; payload: string }
+  | { type: 'SET_EXPORTING'; payload: boolean }
+  | { type: 'SET_EXPORTED_PATHS'; payload: string[] }
+  | { type: 'RESET_RUN'; payload: undefined };
 
 export const initialClipRipplingState: ClipRipplingState = {
   platform: 'douyin',
@@ -42,49 +43,43 @@ export const initialClipRipplingState: ClipRipplingState = {
   exportedPaths: [],
 };
 
-export function clipRipplingReducer(
-  state: ClipRipplingState,
-  action: ClipRipplingAction,
-): ClipRipplingState {
-  switch (action.type) {
-    case 'SET_PLATFORM':
-      return { ...state, platform: action.platform };
-    case 'SET_SELECTED_FORMATS':
-      return { ...state, selectedFormats: action.selectedFormats };
-    case 'TOGGLE_SELECTED_FORMAT': {
-      const exists = state.selectedFormats.includes(action.format);
-      return {
-        ...state,
-        selectedFormats: exists
-          ? state.selectedFormats.filter((f) => f !== action.format)
-          : [...state.selectedFormats, action.format],
-      };
-    }
-    case 'SET_TARGET_COUNT':
-      return { ...state, targetCount: action.targetCount };
-    case 'SET_RUNNING':
-      return { ...state, running: action.running };
-    case 'SET_PROGRESS':
-      return { ...state, progress: action.progress };
-    case 'SET_STAGE':
-      return { ...state, stage: action.stage };
-    case 'SET_RESULTS':
-      return { ...state, results: action.results };
-    case 'SET_SELECTED_CLIPS':
-      return { ...state, selectedClips: action.selectedClips };
-    case 'TOGGLE_CLIP': {
-      const next = new Set(state.selectedClips);
-      if (next.has(action.id)) next.delete(action.id);
-      else next.add(action.id);
-      return { ...state, selectedClips: next };
-    }
-    case 'SET_EXPORTING':
-      return { ...state, exporting: action.exporting };
-    case 'SET_EXPORTED_PATHS':
-      return { ...state, exportedPaths: action.exportedPaths };
-    case 'RESET_RUN':
-      return { ...state, running: true, progress: 0, results: [], exportedPaths: [] };
-    default:
-      return state;
-  }
-}
+const handlers = {
+  SET_PLATFORM: (s: ClipRipplingState, v: SocialPlatform) => ({ ...s, platform: v }),
+  SET_SELECTED_FORMATS: (s: ClipRipplingState, v: AspectRatio[]) => ({ ...s, selectedFormats: v }),
+  TOGGLE_SELECTED_FORMAT: (s: ClipRipplingState, v: AspectRatio) => {
+    const exists = s.selectedFormats.includes(v);
+    return {
+      ...s,
+      selectedFormats: exists
+        ? s.selectedFormats.filter((f) => f !== v)
+        : [...s.selectedFormats, v],
+    };
+  },
+  SET_TARGET_COUNT: (s: ClipRipplingState, v: number) => ({ ...s, targetCount: v }),
+  SET_RUNNING: (s: ClipRipplingState, v: boolean) => ({ ...s, running: v }),
+  SET_PROGRESS: (s: ClipRipplingState, v: number) => ({ ...s, progress: v }),
+  SET_STAGE: (s: ClipRipplingState, v: PipelineStage | '') => ({ ...s, stage: v }),
+  SET_RESULTS: (s: ClipRipplingState, v: RepurposingClip[]) => ({ ...s, results: v }),
+  SET_SELECTED_CLIPS: (s: ClipRipplingState, v: Set<string>) => ({ ...s, selectedClips: v }),
+  TOGGLE_CLIP: (s: ClipRipplingState, v: string) => {
+    const next = new Set(s.selectedClips);
+    if (next.has(v)) next.delete(v);
+    else next.add(v);
+    return { ...s, selectedClips: next };
+  },
+  SET_EXPORTING: (s: ClipRipplingState, v: boolean) => ({ ...s, exporting: v }),
+  SET_EXPORTED_PATHS: (s: ClipRipplingState, v: string[]) => ({ ...s, exportedPaths: v }),
+  RESET_RUN: (s: ClipRipplingState) => ({
+    ...s,
+    running: true,
+    progress: 0,
+    results: [],
+    exportedPaths: [],
+  }),
+};
+
+export const [clipRipplingReducer] = createReducer<ClipRipplingState, typeof handlers>(
+  'CLIP_RIPPLING',
+  handlers,
+  initialClipRipplingState,
+);

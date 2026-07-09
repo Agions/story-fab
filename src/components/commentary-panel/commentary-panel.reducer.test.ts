@@ -16,8 +16,7 @@ describe('commentaryPanelReducer', () => {
       'sets activeTab to %s',
       (tab) => {
         const result = commentaryPanelReducer(makeState(), {
-          type: 'SET_ACTIVE_TAB',
-          activeTab: tab,
+          type:'SET_ACTIVE_TAB', payload: tab,
         });
         expect(result.activeTab).toBe(tab);
       },
@@ -26,8 +25,7 @@ describe('commentaryPanelReducer', () => {
     it('preserves other state fields', () => {
       const prev = makeState({ apiKey: 'test-key', planConfirmOpen: true });
       const result = commentaryPanelReducer(prev, {
-        type: 'SET_ACTIVE_TAB',
-        activeTab: 'voice',
+        type:'SET_ACTIVE_TAB', payload: 'voice',
       });
       expect(result.apiKey).toBe('test-key');
       expect(result.planConfirmOpen).toBe(true);
@@ -37,16 +35,14 @@ describe('commentaryPanelReducer', () => {
   describe('SET_PLAN_CONFIRM_OPEN', () => {
     it('sets planConfirmOpen to true', () => {
       const result = commentaryPanelReducer(makeState(), {
-        type: 'SET_PLAN_CONFIRM_OPEN',
-        planConfirmOpen: true,
+        type:'SET_PLAN_CONFIRM_OPEN', payload: true,
       });
       expect(result.planConfirmOpen).toBe(true);
     });
 
     it('sets planConfirmOpen to false', () => {
       const result = commentaryPanelReducer(makeState({ planConfirmOpen: true }), {
-        type: 'SET_PLAN_CONFIRM_OPEN',
-        planConfirmOpen: false,
+        type:'SET_PLAN_CONFIRM_OPEN', payload: false,
       });
       expect(result.planConfirmOpen).toBe(false);
     });
@@ -54,8 +50,7 @@ describe('commentaryPanelReducer', () => {
     it('preserves other state fields', () => {
       const prev = makeState({ activeTab: 'timeline', apiKey: 'key-123' });
       const result = commentaryPanelReducer(prev, {
-        type: 'SET_PLAN_CONFIRM_OPEN',
-        planConfirmOpen: true,
+        type:'SET_PLAN_CONFIRM_OPEN', payload: true,
       });
       expect(result.activeTab).toBe('timeline');
       expect(result.apiKey).toBe('key-123');
@@ -65,16 +60,14 @@ describe('commentaryPanelReducer', () => {
   describe('SET_API_KEY', () => {
     it('sets apiKey to a non-empty string', () => {
       const result = commentaryPanelReducer(makeState(), {
-        type: 'SET_API_KEY',
-        apiKey: 'sk-abc123',
+        type:'SET_API_KEY', payload: 'sk-abc123',
       });
       expect(result.apiKey).toBe('sk-abc123');
     });
 
     it('sets apiKey to an empty string', () => {
       const result = commentaryPanelReducer(makeState({ apiKey: 'old-key' }), {
-        type: 'SET_API_KEY',
-        apiKey: '',
+        type:'SET_API_KEY', payload: '',
       });
       expect(result.apiKey).toBe('');
     });
@@ -82,8 +75,7 @@ describe('commentaryPanelReducer', () => {
     it('preserves other state fields', () => {
       const prev = makeState({ activeTab: 'style', selectedStyle: 'suspense' });
       const result = commentaryPanelReducer(prev, {
-        type: 'SET_API_KEY',
-        apiKey: 'new-key',
+        type:'SET_API_KEY', payload: 'new-key',
       });
       expect(result.activeTab).toBe('style');
       expect(result.selectedStyle).toBe('suspense');
@@ -95,8 +87,7 @@ describe('commentaryPanelReducer', () => {
       'sets selectedStyle to %s',
       (style) => {
         const result = commentaryPanelReducer(makeState(), {
-          type: 'SET_SELECTED_STYLE',
-          selectedStyle: style,
+          type:'SET_SELECTED_STYLE', payload: style,
         });
         expect(result.selectedStyle).toBe(style);
       },
@@ -105,8 +96,7 @@ describe('commentaryPanelReducer', () => {
     it('preserves other state fields', () => {
       const prev = makeState({ activeTab: 'voice', apiKey: 'some-key' });
       const result = commentaryPanelReducer(prev, {
-        type: 'SET_SELECTED_STYLE',
-        selectedStyle: 'warm',
+        type:'SET_SELECTED_STYLE', payload: 'warm',
       });
       expect(result.activeTab).toBe('voice');
       expect(result.apiKey).toBe('some-key');

@@ -3,7 +3,7 @@
 export { default as ClipRippling } from './clip-rippling';
 export { default as VideoComposing } from './video-composing';
 export { default as AIVisualizer } from './ai-visualizer';
-export { Highlights } from './Highlights/highlights';
+export { Highlights } from './highlights/highlights';
 
 export {
   aiVisualizerReducer,

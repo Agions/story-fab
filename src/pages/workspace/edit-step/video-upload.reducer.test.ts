@@ -12,14 +12,13 @@ function makeState(overrides: Partial<VideoUploadState> = {}): VideoUploadState 
 describe('videoUploadReducer', () => {
   describe('SET_UPLOADING', () => {
     it('sets uploading to true', () => {
-      const result = videoUploadReducer(makeState(), { type: 'SET_UPLOADING', uploading: true });
+      const result = videoUploadReducer(makeState(), { type:'SET_UPLOADING', payload: true });
       expect(result.uploading).toBe(true);
     });
 
     it('sets uploading to false', () => {
       const result = videoUploadReducer(makeState({ uploading: true }), {
-        type: 'SET_UPLOADING',
-        uploading: false,
+        type:'SET_UPLOADING', payload: false,
       });
       expect(result.uploading).toBe(false);
     });
@@ -28,24 +27,21 @@ describe('videoUploadReducer', () => {
   describe('SET_UPLOAD_PROGRESS', () => {
     it('sets upload progress', () => {
       const result = videoUploadReducer(makeState(), {
-        type: 'SET_UPLOAD_PROGRESS',
-        uploadProgress: 50,
+        type:'SET_UPLOAD_PROGRESS', payload: 50,
       });
       expect(result.uploadProgress).toBe(50);
     });
 
     it('sets progress to 0', () => {
       const result = videoUploadReducer(makeState({ uploadProgress: 80 }), {
-        type: 'SET_UPLOAD_PROGRESS',
-        uploadProgress: 0,
+        type:'SET_UPLOAD_PROGRESS', payload: 0,
       });
       expect(result.uploadProgress).toBe(0);
     });
 
     it('sets progress to 100', () => {
       const result = videoUploadReducer(makeState(), {
-        type: 'SET_UPLOAD_PROGRESS',
-        uploadProgress: 100,
+        type:'SET_UPLOAD_PROGRESS', payload: 100,
       });
       expect(result.uploadProgress).toBe(100);
     });
@@ -54,16 +50,14 @@ describe('videoUploadReducer', () => {
   describe('SET_DRAG_ACTIVE', () => {
     it('sets dragActive to true', () => {
       const result = videoUploadReducer(makeState(), {
-        type: 'SET_DRAG_ACTIVE',
-        dragActive: true,
+        type:'SET_DRAG_ACTIVE', payload: true,
       });
       expect(result.dragActive).toBe(true);
     });
 
     it('sets dragActive to false', () => {
       const result = videoUploadReducer(makeState({ dragActive: true }), {
-        type: 'SET_DRAG_ACTIVE',
-        dragActive: false,
+        type:'SET_DRAG_ACTIVE', payload: false,
       });
       expect(result.dragActive).toBe(false);
     });
@@ -74,8 +68,7 @@ describe('videoUploadReducer', () => {
       'sets uploadStatus to %s',
       (status) => {
         const result = videoUploadReducer(makeState(), {
-          type: 'SET_UPLOAD_STATUS',
-          uploadStatus: status,
+          type:'SET_UPLOAD_STATUS', payload: status,
         });
         expect(result.uploadStatus).toBe(status);
       },
@@ -86,8 +79,7 @@ describe('videoUploadReducer', () => {
     it('sets currentFile to a file', () => {
       const file = new File(['data'], 'video.mp4', { type: 'video/mp4' });
       const result = videoUploadReducer(makeState(), {
-        type: 'SET_CURRENT_FILE',
-        currentFile: file,
+        type:'SET_CURRENT_FILE', payload: file,
       });
       expect(result.currentFile).toBe(file);
     });
@@ -95,8 +87,7 @@ describe('videoUploadReducer', () => {
     it('sets currentFile to null', () => {
       const file = new File(['data'], 'video.mp4', { type: 'video/mp4' });
       const result = videoUploadReducer(makeState({ currentFile: file }), {
-        type: 'SET_CURRENT_FILE',
-        currentFile: null,
+        type:'SET_CURRENT_FILE', payload: null,
       });
       expect(result.currentFile).toBeNull();
     });
@@ -106,7 +97,7 @@ describe('videoUploadReducer', () => {
     it('sets uploading, progress, status, and currentFile', () => {
       const file = new File(['data'], 'test.mp4', { type: 'video/mp4' });
       const prev = makeState({ uploading: false, uploadProgress: 42, uploadStatus: 'idle' });
-      const result = videoUploadReducer(prev, { type: 'START_UPLOAD', file });
+      const result = videoUploadReducer(prev, { type:'START_UPLOAD', payload: file });
 
       expect(result.uploading).toBe(true);
       expect(result.uploadProgress).toBe(0);
@@ -117,7 +108,7 @@ describe('videoUploadReducer', () => {
     it('preserves dragActive from previous state', () => {
       const file = new File(['data'], 'test.mp4', { type: 'video/mp4' });
       const prev = makeState({ dragActive: true });
-      const result = videoUploadReducer(prev, { type: 'START_UPLOAD', file });
+      const result = videoUploadReducer(prev, { type:'START_UPLOAD', payload: file });
       expect(result.dragActive).toBe(true);
     });
   });
@@ -125,29 +116,25 @@ describe('videoUploadReducer', () => {
   describe('TOGGLE_PAUSE', () => {
     it('toggles from uploading to paused', () => {
       const result = videoUploadReducer(makeState({ uploadStatus: 'uploading' }), {
-        type: 'TOGGLE_PAUSE',
-      });
+        type:'TOGGLE_PAUSE', payload: undefined});
       expect(result.uploadStatus).toBe('paused');
     });
 
     it('toggles from paused to uploading', () => {
       const result = videoUploadReducer(makeState({ uploadStatus: 'paused' }), {
-        type: 'TOGGLE_PAUSE',
-      });
+        type:'TOGGLE_PAUSE', payload: undefined});
       expect(result.uploadStatus).toBe('uploading');
     });
 
     it('toggles from idle to uploading', () => {
       const result = videoUploadReducer(makeState({ uploadStatus: 'idle' }), {
-        type: 'TOGGLE_PAUSE',
-      });
+        type:'TOGGLE_PAUSE', payload: undefined});
       expect(result.uploadStatus).toBe('uploading');
     });
 
     it('toggles from completed to uploading', () => {
       const result = videoUploadReducer(makeState({ uploadStatus: 'completed' }), {
-        type: 'TOGGLE_PAUSE',
-      });
+        type:'TOGGLE_PAUSE', payload: undefined});
       expect(result.uploadStatus).toBe('uploading');
     });
   });
@@ -155,7 +142,7 @@ describe('videoUploadReducer', () => {
   describe('COMPLETE_UPLOAD', () => {
     it('sets progress to 100 and status to completed', () => {
       const prev = makeState({ uploadProgress: 75, uploadStatus: 'uploading' });
-      const result = videoUploadReducer(prev, { type: 'COMPLETE_UPLOAD' });
+      const result = videoUploadReducer(prev, { type:'COMPLETE_UPLOAD', payload: undefined });
       expect(result.uploadProgress).toBe(100);
       expect(result.uploadStatus).toBe('completed');
     });
@@ -163,7 +150,7 @@ describe('videoUploadReducer', () => {
     it('preserves uploading and currentFile', () => {
       const file = new File(['data'], 'test.mp4', { type: 'video/mp4' });
       const prev = makeState({ uploading: true, currentFile: file });
-      const result = videoUploadReducer(prev, { type: 'COMPLETE_UPLOAD' });
+      const result = videoUploadReducer(prev, { type:'COMPLETE_UPLOAD', payload: undefined });
       expect(result.uploading).toBe(true);
       expect(result.currentFile).toBe(file);
     });
@@ -178,7 +165,7 @@ describe('videoUploadReducer', () => {
         uploadStatus: 'uploading',
         currentFile: file,
       });
-      const result = videoUploadReducer(prev, { type: 'RESET' });
+      const result = videoUploadReducer(prev, { type:'RESET', payload: undefined });
 
       expect(result.uploading).toBe(false);
       expect(result.uploadProgress).toBe(0);
@@ -188,7 +175,7 @@ describe('videoUploadReducer', () => {
 
     it('preserves dragActive', () => {
       const prev = makeState({ dragActive: true });
-      const result = videoUploadReducer(prev, { type: 'RESET' });
+      const result = videoUploadReducer(prev, { type:'RESET', payload: undefined });
       expect(result.dragActive).toBe(true);
     });
   });

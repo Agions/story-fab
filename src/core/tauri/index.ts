@@ -32,9 +32,8 @@ export const tauri = {
   cancelExport: renderTranscode.cancelExport,
 
   // Subtitles / ASR
-  extractSubtitles: subtitleAsr.extractSubtitles,
-  burnInSubtitles: subtitleAsr.burnInSubtitles,
   transcribeAudio: subtitleAsr.transcribeAudio,
+  translateText: subtitleAsr.translateText,
 
   // TTS
   synthesizeSpeech: tts.synthesizeSpeech,
@@ -45,9 +44,7 @@ export const tauri = {
 
   // File operations
   readTextFile: fileOperations.readTextFile,
-  writeTextFile: fileOperations.writeTextFile,
   deleteFile: fileOperations.deleteFile,
-  fileExists: fileOperations.fileExists,
   cleanTempFile: fileOperations.cleanTempFile,
   openFile: fileOperations.openFile,
   voiceDiscovery: fileOperations.voiceDiscovery,

@@ -6,19 +6,9 @@ export const fileOperations = {
     return invoke(TauriCommand.FILE_READ, { path }) as Promise<string>;
   },
 
-  /** 写入文本文件 */
-  async writeTextFile(path: string, content: string): Promise<void> {
-    await invoke(TauriCommand.FILE_WRITE, { path, content });
-  },
-
   /** 删除文件 */
   async deleteFile(path: string): Promise<boolean> {
     return invoke(TauriCommand.FILE_DELETE, { path }) as Promise<boolean>;
-  },
-
-  /** 检查文件是否存在 */
-  async fileExists(path: string): Promise<boolean> {
-    return invoke(TauriCommand.FILE_EXISTS, { path }) as Promise<boolean>;
   },
 
   /** 清理临时文件 */

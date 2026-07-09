@@ -12,16 +12,16 @@ const runOnce = (key: string, loader: () => Promise<unknown>): Promise<unknown> 
 };
 
 export const preloadProjectsPage = (): Promise<unknown> =>
-  runOnce('page:projects', () => import('../../pages/Projects/index'));
+  runOnce('page:projects', () => import('../../pages/projects/index'));
 
 export const preloadProjectEditPage = (): Promise<unknown> =>
-  runOnce('page:project-edit', () => import('../../pages/ProjectEdit/index'));
+  runOnce('page:project-edit', () => import('../../pages/project-edit/index'));
 
 export const preloadProjectDetailPage = (): Promise<unknown> =>
-  runOnce('page:project-detail', () => import('../../pages/ProjectDetail/index'));
+  runOnce('page:project-detail', () => import('../../pages/project-detail/index'));
 
 export const preloadAIVideoEditorPage = (): Promise<unknown> =>
   runOnce('page:ai-video-editor', () => import('../../pages/workspace/index'));
 
 export const preloadSettingsPage = (): Promise<unknown> =>
-  runOnce('page:settings', () => import('../../pages/Settings/index'));
+  runOnce('page:settings', () => import('../../pages/settings/index'));

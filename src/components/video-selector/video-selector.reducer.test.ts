@@ -40,24 +40,21 @@ describe('videoSelectorReducer', () => {
   describe('SET_VIDEO_PATH', () => {
     it('sets videoPath to a string value', () => {
       const next = videoSelectorReducer(initialVideoSelectorState, {
-        type: 'SET_VIDEO_PATH',
-        videoPath: '/videos/new.mp4',
+        type:'SET_VIDEO_PATH', payload: '/videos/new.mp4',
       });
       expect(next.videoPath).toBe('/videos/new.mp4');
     });
 
     it('sets videoPath to null', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_VIDEO_PATH',
-        videoPath: null,
+        type:'SET_VIDEO_PATH', payload: null,
       });
       expect(next.videoPath).toBeNull();
     });
 
     it('does not mutate other fields', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_VIDEO_PATH',
-        videoPath: '/other.mp4',
+        type:'SET_VIDEO_PATH', payload: '/other.mp4',
       });
       expect(next.videoSrc).toBe(populatedState.videoSrc);
       expect(next.metadata).toBe(populatedState.metadata);
@@ -70,24 +67,21 @@ describe('videoSelectorReducer', () => {
   describe('SET_VIDEO_SRC', () => {
     it('sets videoSrc to a string value', () => {
       const next = videoSelectorReducer(initialVideoSelectorState, {
-        type: 'SET_VIDEO_SRC',
-        videoSrc: 'blob:http://localhost/abc',
+        type:'SET_VIDEO_SRC', payload: 'blob:http://localhost/abc',
       });
       expect(next.videoSrc).toBe('blob:http://localhost/abc');
     });
 
     it('sets videoSrc to null', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_VIDEO_SRC',
-        videoSrc: null,
+        type:'SET_VIDEO_SRC', payload: null,
       });
       expect(next.videoSrc).toBeNull();
     });
 
     it('does not mutate other fields', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_VIDEO_SRC',
-        videoSrc: 'blob:x',
+        type:'SET_VIDEO_SRC', payload: 'blob:x',
       });
       expect(next.videoPath).toBe(populatedState.videoPath);
       expect(next.metadata).toBe(populatedState.metadata);
@@ -98,24 +92,21 @@ describe('videoSelectorReducer', () => {
   describe('SET_METADATA', () => {
     it('sets metadata to a VideoMetadata object', () => {
       const next = videoSelectorReducer(initialVideoSelectorState, {
-        type: 'SET_METADATA',
-        metadata: sampleMetadata,
+        type:'SET_METADATA', payload: sampleMetadata,
       });
       expect(next.metadata).toEqual(sampleMetadata);
     });
 
     it('sets metadata to null', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_METADATA',
-        metadata: null,
+        type:'SET_METADATA', payload: null,
       });
       expect(next.metadata).toBeNull();
     });
 
     it('does not mutate other fields', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_METADATA',
-        metadata: { ...sampleMetadata, duration: 99 },
+        type:'SET_METADATA', payload: { ...sampleMetadata, duration: 99 },
       });
       expect(next.videoPath).toBe(populatedState.videoPath);
       expect(next.videoSrc).toBe(populatedState.videoSrc);
@@ -126,24 +117,21 @@ describe('videoSelectorReducer', () => {
   describe('SET_IS_ANALYZING', () => {
     it('sets isAnalyzing to true', () => {
       const next = videoSelectorReducer(initialVideoSelectorState, {
-        type: 'SET_IS_ANALYZING',
-        isAnalyzing: true,
+        type:'SET_IS_ANALYZING', payload: true,
       });
       expect(next.isAnalyzing).toBe(true);
     });
 
     it('sets isAnalyzing to false', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_IS_ANALYZING',
-        isAnalyzing: false,
+        type:'SET_IS_ANALYZING', payload: false,
       });
       expect(next.isAnalyzing).toBe(false);
     });
 
     it('does not mutate other fields', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_IS_ANALYZING',
-        isAnalyzing: false,
+        type:'SET_IS_ANALYZING', payload: false,
       });
       expect(next.videoPath).toBe(populatedState.videoPath);
       expect(next.isDragging).toBe(populatedState.isDragging);
@@ -154,24 +142,21 @@ describe('videoSelectorReducer', () => {
   describe('SET_IS_DRAGGING', () => {
     it('sets isDragging to true', () => {
       const next = videoSelectorReducer(initialVideoSelectorState, {
-        type: 'SET_IS_DRAGGING',
-        isDragging: true,
+        type:'SET_IS_DRAGGING', payload: true,
       });
       expect(next.isDragging).toBe(true);
     });
 
     it('sets isDragging to false', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_IS_DRAGGING',
-        isDragging: false,
+        type:'SET_IS_DRAGGING', payload: false,
       });
       expect(next.isDragging).toBe(false);
     });
 
     it('does not mutate other fields', () => {
       const next = videoSelectorReducer(populatedState, {
-        type: 'SET_IS_DRAGGING',
-        isDragging: false,
+        type:'SET_IS_DRAGGING', payload: false,
       });
       expect(next.videoPath).toBe(populatedState.videoPath);
       expect(next.isAnalyzing).toBe(populatedState.isAnalyzing);
@@ -181,19 +166,18 @@ describe('videoSelectorReducer', () => {
   // ── RESET ──────────────────────────────────────────────────
   describe('RESET', () => {
     it('returns to initialVideoSelectorState', () => {
-      const next = videoSelectorReducer(populatedState, { type: 'RESET' });
+      const next = videoSelectorReducer(populatedState, { type:'RESET', payload: undefined });
       expect(next).toEqual(initialVideoSelectorState);
     });
 
     it('is a no-op when state is already initial', () => {
       const next = videoSelectorReducer(initialVideoSelectorState, {
-        type: 'RESET',
-      });
+        type:'RESET', payload: undefined});
       expect(next).toEqual(initialVideoSelectorState);
     });
 
     it('returns the initialVideoSelectorState constant (same reference)', () => {
-      const next = videoSelectorReducer(populatedState, { type: 'RESET' });
+      const next = videoSelectorReducer(populatedState, { type:'RESET', payload: undefined });
       expect(next).toBe(initialVideoSelectorState);
       expect(next).toEqual(initialVideoSelectorState);
     });
@@ -215,12 +199,12 @@ describe('videoSelectorReducer', () => {
   it('never mutates the input state object', () => {
     const snapshot = { ...initialVideoSelectorState };
     const actions: VideoSelectorAction[] = [
-      { type: 'SET_VIDEO_PATH', videoPath: '/x.mp4' },
-      { type: 'SET_VIDEO_SRC', videoSrc: 'blob:x' },
-      { type: 'SET_METADATA', metadata: sampleMetadata },
-      { type: 'SET_IS_ANALYZING', isAnalyzing: true },
-      { type: 'SET_IS_DRAGGING', isDragging: true },
-      { type: 'RESET' },
+      { type:'SET_VIDEO_PATH', payload: '/x.mp4' },
+      { type:'SET_VIDEO_SRC', payload: 'blob:x' },
+      { type:'SET_METADATA', payload: sampleMetadata },
+      { type:'SET_IS_ANALYZING', payload: true },
+      { type:'SET_IS_DRAGGING', payload: true },
+      { type:'RESET', payload: undefined },
     ];
     for (const action of actions) {
       videoSelectorReducer(initialVideoSelectorState, action);

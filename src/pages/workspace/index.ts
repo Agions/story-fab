@@ -12,9 +12,9 @@ export { default as AIVisualizer } from './assemble/ai-visualizer';
 export { default as ScriptWriting } from './edit-step/script-writing';
 export { default as VideoComposing } from './assemble/video-composing';
 export { default as ClipRippling } from './assemble/clip-rippling';
-export { default as VideoExport } from './export/VideoExport';
+export { default as VideoExport } from './export/video-export';
 export { default as StepList } from './edit-step/step-list';
-export { Highlights, type Highlight, type HighlightsProps } from './assemble/Highlights/highlights';
+export { Highlights, type Highlight, type HighlightsProps } from './assemble/highlights/highlights';
 
 // 导出类型
 export type { AIFunctionType } from './shared/function-mode-map';
@@ -22,5 +22,5 @@ export type { AIFunctionType } from './shared/function-mode-map';
 // ── 子包 re-export（新代码推荐入口）──
 export * as editStep from './edit-step';
 export * as assemble from './assemble';
-export * as export_ from './export/VideoExport';
+export * as export_ from './export/video-export';
 export * as shared from './shared';

@@ -20,8 +20,6 @@ export const TauriCommand = {
   GENERATE_PREVIEW:        'generate_preview',
   CUT_VIDEO:               'cut_video',
 
-  SUBTITLE_EXTRACT:        'subtitle_extract',
-  SUBTITLE_BURN_IN:        'subtitle_burn_in',
   TRANSCRIBE_AUDIO:        'transcribe_audio',
 
   SYNTHESIZE_SPEECH:       'synthesize_speech',
@@ -35,9 +33,7 @@ export const TauriCommand = {
   TRANSLATE_TEXT:          'translate_text',
 
   FILE_READ:               'read_text_file',
-  FILE_WRITE:              'write_text_file',
   FILE_DELETE:             'delete_file',
-  FILE_EXISTS:             'file_exists',
   CLEAN_TEMP_FILE:         'clean_temp_file',
   OPEN_FILE:               'open_file',
   VOICE_DISCOVERY:         'voice_discovery',
@@ -49,10 +45,6 @@ export const TauriCommand = {
   PROJECT_LIST:            'list_project_files',
   LIST_APP_DATA_FILES:     'list_app_data_files',
   CHECK_APP_DATA_DIR:      'check_app_data_directory',
-
-  WINDOW_MINIMIZE:         'window_minimize',
-  WINDOW_MAXIMIZE:         'window_maximize',
-  WINDOW_CLOSE:            'window_close',
 
   CANCEL_EXPORT:           'cancel_export',
 
