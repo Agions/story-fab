@@ -16,7 +16,7 @@ import type {
   KeyFrame,
   ExtractKeyFramesOptions,
   CutOptions,
-} from './types';
+} from '@/types';
 import { logger } from '@/shared/utils/logging';
 
 // ============================================

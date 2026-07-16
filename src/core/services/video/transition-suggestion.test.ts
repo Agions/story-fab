@@ -9,7 +9,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { suggestTransition, suggestTransitions, findRule, findRuleByType } from './transition-suggestion';
-import type { SmartVideoSegment } from '../../video/highlight-types';
+import type { SmartVideoSegment } from '@/types';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 

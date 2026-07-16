@@ -18,7 +18,7 @@ import { Badge } from '../../ui/badge';
 import { ScrollArea } from '../../ui/scroll-area';
 import { Gauge, Shuffle, Clock, Zap, MessageCircle, Eye, Pause, FileVideo } from 'lucide-react';
 import { formatTime } from '@/shared/utils/formatting';
-import type { SmartVideoSegment } from '../../../core/video/highlight-types';
+import type { SmartVideoSegment } from '@/types';
 import { summarizeSpeeds } from '../../../core/services/ai-clip/segment-enricher';
 import type { TransitionType } from '../../../core/services/video/transition-suggestion';
 import styles from '././../ai-clip.module.less';
