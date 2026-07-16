@@ -50,7 +50,15 @@ export const VOLUME_MAX = 1;
 
 const MAX_HISTORY_SIZE = 19;
 const trackHistory = createHistory<TimelineTrack[]>({ maxSize: MAX_HISTORY_SIZE });
-export const __resetTrackHistoryForTest = () => trackHistory.clear();
+
+/**
+ * 测试专用命名空间（PR-5.3）：
+ * 集中所有测试辅助函数，避免污染模块顶层 export。
+ * 命名约定 `__testing.<name>`：双下划线开头是 lint 警告，ESLint 已配置允许。
+ */
+export const __testing = {
+  resetTrackHistory: () => trackHistory.clear(),
+};
 
 import {
   updateClipInTracks,

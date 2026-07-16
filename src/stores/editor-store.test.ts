@@ -3,10 +3,10 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useEditorStore, __resetTrackHistoryForTest } from './editor-store';
+import { useEditorStore, __testing } from './editor-store';
 
 beforeEach(() => {
-  __resetTrackHistoryForTest();
+  __testing.resetTrackHistory();
   useEditorStore.setState({
     video: null,
     script: null,
