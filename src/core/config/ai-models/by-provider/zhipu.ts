@@ -1,0 +1,81 @@
+/**
+ * 智谱 AI (Zhipu) 模型目录（6 个）
+ *
+ * Stage 8 PR-3.1：从 catalog.ts 拆分而来。
+ */
+import type { AIModel } from '@/types';
+
+export const zhipuModels: AIModel[] = [
+  {
+    id: 'glm-5',
+    name: 'GLM-5',
+    provider: 'zhipu',
+    category: ['text', 'code', 'image'],
+    description: '智谱 AI 最新旗舰模型（2026），中文能力强，适合中文视频解说与素材分析。',
+    features: ['中文优化', '多模态', 'Agentic'],
+    tokenLimit: 128000,
+    contextWindow: 128000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'see open.bigmodel.cn' },
+  },
+  {
+    id: 'glm-5-turbo',
+    name: 'GLM-5 Turbo',
+    provider: 'zhipu',
+    category: ['text', 'code', 'image'],
+    description: '智谱 AI 高速版（2026），响应快，适合批量分析与低延迟任务。',
+    features: ['高速', '低成本', '中文优化'],
+    tokenLimit: 128000,
+    contextWindow: 128000,
+    isPro: false,
+    pricing: { input: 0, output: 0, unit: 'see open.bigmodel.cn' },
+  },
+  {
+    id: 'glm-5.1',
+    name: 'GLM-5.1',
+    provider: 'zhipu',
+    category: ['text', 'code', 'image'],
+    description: '智谱 AI 最新小版本（2026），能力微调，适合高效内容创作与分析。',
+    features: ['高效', '中文优化', '多模态'],
+    tokenLimit: 128000,
+    contextWindow: 128000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'see open.bigmodel.cn' },
+  },
+  {
+    id: 'glm-4.7',
+    name: 'GLM-4.7',
+    provider: 'zhipu',
+    category: ['text', 'code', 'image'],
+    description: '智谱 AI 高性能版本（2025），中文能力强，适合中文视频解说与素材分析。',
+    features: ['中文优化', '多模态', '高性能'],
+    tokenLimit: 128000,
+    contextWindow: 128000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'see open.bigmodel.cn' },
+  },
+  {
+    id: 'glm-4.6',
+    name: 'GLM-4.6',
+    provider: 'zhipu',
+    category: ['text', 'code', 'image'],
+    description: '智谱 AI 高性能版本（2025），适合内容分析与文案创作。',
+    features: ['中文优化', '多模态', '高性能'],
+    tokenLimit: 128000,
+    contextWindow: 128000,
+    isPro: true,
+    pricing: { input: 0, output: 0, unit: 'see open.bigmodel.cn' },
+  },
+  {
+    id: 'glm-4',
+    name: 'GLM-4',
+    provider: 'zhipu',
+    category: ['text', 'code', 'image'],
+    description: '智谱 AI 旗舰模型（2024-01），中文能力强，适合中文视频解说与素材分析。',
+    features: ['中文优化', '多模态', 'Agentic'],
+    tokenLimit: 128000,
+    contextWindow: 128000,
+    isPro: true,
+    pricing: { input: 0.1, output: 0.1, unit: '元/千tokens' },
+  },
+];
