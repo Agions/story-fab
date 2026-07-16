@@ -131,10 +131,3 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     return getTotalSteps(get().state.mode);
   },
 }));
-
-/**
- * 兼容别名 — 过渡期保留 useStoryFabStore。
- * 消费者迁移完 useStoryFabStore 后删除此 alias。
- * @deprecated 使用 useProjectStore
- */
-export const useStoryFabStore = useProjectStore;

@@ -143,7 +143,58 @@
 
 ---
 
-## 阶段 3：Core 服务归一 + barrel 整理（4 PRs · 3 天）
+## 阶段 3：Core 服务归一 + barrel 整理（4 PRs · 3 天） ✅ 已完成
+
+> 状态：4/4 PR 完成并推送。full test 65 文件 / 902 测试全绿。详见 [阶段 3 收口报告](#阶段-3-收口报告-2026-07-16)。
+
+### PR-3.1：ai-models catalog 按 provider 拆分 ✅
+- **Branch**：`refactor/s-08-pr-8-ai-models-split` → `6c53ca6`
+- **拆分**：catalog.ts 654 行 → 8 个 by-provider/*.ts + 65 行聚合器
+- **注意**：原本计划用 models/ 子目录，但 .gitignore 中 models/ 已被 AI 模型缓存占用，改用 by-provider/ 避免冲突
+- **测试**：9/9 ai-models-config + 902/902 全量
+- **Commit**：`refactor(config): split ai-models catalog by provider (8 files, 654→65 aggregator)`
+
+### PR-3.2：services barrel export 整理 ✅
+- **Branch**：`refactor/s-08-pr-9-services-barrel` → `37bfe87`
+- **调查结论**：barrel 本就 0 循环、0 重复（`madge` + grep 验证）
+- **新增**：`scripts/check-circular-deps.mjs`（自研纯 Node.js 实现，零依赖）
+- **package.json**：`verify:circular` 脚本 + `verify:all` 链入
+- **测试**：454 文件扫 0 循环
+- **Commit**：`refactor(ci): add verify:circular script for cycle detection in src/`
+
+### PR-3.3：Tauri methods 10 分桶去重 ✅
+- **Branch**：`refactor/s-08-pr-10-tauri-methods-dedupe` → `8f1c0d2`
+- **改动**：core/tauri/index.ts 的 47 个 `tauri.method = group.method` 手动 re-export 改用 spread
+- **保留**：1 个显式 re-export（getExportDir 跨桶复用）+ 6 个 project 显式（保持 section 注释）
+- **行数**：84 → 62（-22，-26%）
+- **约束**：10 个分桶方法名必须唯一（grep 验证 0 冲突）
+- **测试**：902/902 全量
+- **Commit**：`refactor(tauri): dedupe 47 manual method re-exports via spread`
+
+### PR-3.4：删除零引用 legacy + 迁移 useStoryFabStore ✅
+- **Branch**：`refactor/s-08-pr-11-remove-legacy` → `4b5f6f3`
+- **实际执行**：迁移 1 个 `useStoryFabStore` consumer（pages/workspace/index.tsx），删除 alias
+- **原 spec 列出 5 项删除目标调查结果**：
+  1. ❌ `ProjectStatus` 不是 alias，是规范类型（types/project.ts 定义，4 组件使用）
+  2. ❌ scene/object-detection-service 被新 vision/index.ts 内部使用
+  3. ❌ commentary/script-service.ts 的 1 个函数被 use-commentary-script.ts 使用
+  4. ❌ ai-visualizer mock 被 workspace 多测试使用
+  5. ❌ legacy/ 目录不存在
+- **测试**：902/902 全量
+- **Commit**：`refactor(stores): migrate useStoryFabStore to useProjectStore and remove alias`
+
+**阶段 3 收口报告（2026-07-16）**
+
+| 指标 | 计划 | 实际 |
+|---|---|---|
+| PR 数 | 4 | 4 ✅ |
+| 全量测试 | 全绿 | 65 文件 / 902 测试全绿 ✅ |
+| type-check | 干净 | 干净 ✅ |
+| lint | 干净 | 干净 ✅ |
+| verify:all | 通过 | 通过 ✅ |
+| catalog.ts 拆分 | 654→多文件 | 654→65 聚合器 + 8 provider ✅ |
+| IPC spread 化 | 47 个 | 47 个 ✅ |
+| 死代码清理 | 5 项 | 1 项（其他 4 项为误判，详见 PR-3.4） |
 
 > 目标：`ai-models/catalog.ts` (654 行) 拆分；services barrel export 整理；Tauri methods 10 分桶去重。
 
