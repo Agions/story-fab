@@ -23,10 +23,18 @@ export default defineConfig({
       exclude: ['node_modules', 'src/test', '**/*.d.ts', '**/*.config.*', '**/vite-env.d.ts'],
       include: ['src/**/*.{ts,tsx}'],
       thresholds: {
-        lines: 5,
-        functions: 5,
-        branches: 3,
-        statements: 5,
+        // Stage 8 PR-5.4：从 5% 提升到 15%。
+        // 真实覆盖率 ~19%（远低于 README 声明的 98% — 数据漂移）：
+        //   Statements  : 18.64% (1564/8389)
+        //   Branches    : 15.95% ( 782/4900)
+        //   Functions   : 20.23% ( 491/2426)
+        //   Lines      : 19.43% (1467/7550)
+        // TODO(Stage 9)：分批提升到 30% → 50% → 80%，每次都加新单测。
+        // 65 test files / 459 source files = 1:7 比例偏低，需补单元测试而非仅提门槛。
+        lines: 15,
+        functions: 15,
+        branches: 12,
+        statements: 15,
       },
     },
     mockReset: true,
