@@ -1,3 +1,15 @@
+/**
+ * Tauri API Surface — 10 个方法分桶的统一导出
+ *
+ * Stage 8 PR-3.3 重构：
+ * - 47 个方法的手动 re-export 改用 spread 形式
+ * - 保留分桶 import + section comment 维持可读性
+ * - 公开 API（tauri 对象）签名零变化
+ *
+ * 唯一约束：所有 10 个分桶的方法名必须唯一（madge + 静态检查已确认）。
+ * 未来新增方法时直接在对应分桶添加，tauri 自动包含。
+ */
+
 import { videoAnalysis } from './methods/video-analysis';
 import { highlightDetection } from './methods/highlight-detection';
 import { renderTranscode } from './methods/render-transcode';
@@ -9,48 +21,28 @@ import { project } from './methods/project';
 import { aiScript } from './methods/ai-script';
 import { commentary } from './methods/commentary';
 
-// ─── Tauri API Surface ─────────────────────────────────────────────────────────
-// Explicitly declared so TypeScript knows every method without relying on inference
 export const tauri = {
-  // FFmpeg / Video analysis
-  checkFFmpeg: videoAnalysis.checkFFmpeg,
-  analyzeVideo: videoAnalysis.analyzeVideo,
-  runFFprobe: videoAnalysis.runFFprobe,
+  // ─── FFmpeg / Video analysis ──────────────────────────────
+  ...videoAnalysis,
   getExportDir: project.getExportDir,
 
-  // Highlight detection
-  detectHighlights: highlightDetection.detectHighlights,
-  detectZCRBursts: highlightDetection.detectZCRBursts,
-  detectSmartSegments: highlightDetection.detectSmartSegments,
+  // ─── Highlight detection ──────────────────────────────────
+  ...highlightDetection,
 
-  // Render / Transcode
-  transcodeWithCrop: renderTranscode.transcodeWithCrop,
-  renderAutonomousCut: renderTranscode.renderAutonomousCut,
-  generatePreview: renderTranscode.generatePreview,
-  cutVideo: renderTranscode.cutVideo,
-  exportVideo: renderTranscode.exportVideo,
-  cancelExport: renderTranscode.cancelExport,
+  // ─── Render / Transcode ───────────────────────────────────
+  ...renderTranscode,
 
-  // Subtitles / ASR
-  transcribeAudio: subtitleAsr.transcribeAudio,
-  translateText: subtitleAsr.translateText,
+  // ─── Subtitles / ASR ──────────────────────────────────────
+  ...subtitleAsr,
 
-  // TTS
-  synthesizeSpeech: tts.synthesizeSpeech,
-  listTTSBackends: tts.listTTSBackends,
-  checkTTSAvailable: tts.checkTTSAvailable,
-  mixAudio: mixAudio.mixAudio,
-  getAudioDuration: mixAudio.getAudioDuration,
+  // ─── TTS + Audio mixing ───────────────────────────────────
+  ...tts,
+  ...mixAudio,
 
-  // File operations
-  readTextFile: fileOperations.readTextFile,
-  deleteFile: fileOperations.deleteFile,
-  cleanTempFile: fileOperations.cleanTempFile,
-  openFile: fileOperations.openFile,
-  voiceDiscovery: fileOperations.voiceDiscovery,
-  getFileSize: fileOperations.getFileSize,
+  // ─── File operations ──────────────────────────────────────
+  ...fileOperations,
 
-  // Project
+  // ─── Project ──────────────────────────────────────────────
   saveProjectFile: project.saveProjectFile,
   loadProjectFile: project.loadProjectFile,
   deleteProjectFile: project.deleteProjectFile,
@@ -58,25 +50,11 @@ export const tauri = {
   listAppDataFiles: project.listAppDataFiles,
   checkAppDataDirectory: project.checkAppDataDirectory,
 
-  // AI Script
-  generateNarrationScript: aiScript.generateNarrationScript,
-  analyzeVideoForNarration: aiScript.analyzeVideoForNarration,
-  listAvailableModels: aiScript.listAvailableModels,
+  // ─── AI Script ────────────────────────────────────────────
+  ...aiScript,
 
-  // Commentary / Director
-  createSession: commentary.createSession,
-  getStatus: commentary.getStatus,
-  startAnalysis: commentary.startAnalysis,
-  generatePlan: commentary.generatePlan,
-  approvePlan: commentary.approvePlan,
-  revisePlan: commentary.revisePlan,
-  completeRender: commentary.completeRender,
-  destroySession: commentary.destroySession,
-  generateScript: commentary.generateScript,
-  synthesizeAudio: commentary.synthesizeAudio,
-  estimateTTSDuration: commentary.estimateTTSDuration,
-  listVoices: commentary.listVoices,
-  runCommentaryPipeline: commentary.runCommentaryPipeline,
+  // ─── Commentary / Director ────────────────────────────────
+  ...commentary,
 } as const;
 
 export default tauri;
