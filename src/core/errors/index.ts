@@ -11,6 +11,9 @@ import { logger } from '@/shared/utils/logging';
 export { AppError } from '@/shared/errors';
 export type { AppErrorSeverity, AppErrorOptions } from '@/shared/errors';
 
+// 统一错误归一层（PR-5.2）
+export { normalizeError, isRetryable } from './normalize';
+
 /**
  * 统一错误处理：记录 + 转 AppError + 返回
  * 用法：catch (e) { throw handleError(e, 'APP_VIDEO_LOAD') }

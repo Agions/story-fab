@@ -14,6 +14,7 @@
  *   export default withErrorBoundary(MyComponent, { name: 'MyComponent' });
  */
 import { logger } from '@/shared/utils/logging';
+import { normalizeError } from '@/core/errors/normalize';
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 import styles from './error-boundary.module.less';
 
@@ -41,10 +42,21 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     const label = this.props.name ? `[${this.props.name}]` : '[ErrorBoundary]';
+    // 归一化为 AppError 保留分类上下文（PR-5.2）
+    const normalized = normalizeError(error, 'APP_RENDER_ERROR');
     logger.error(`${label} 渲染异常`, {
+      // 保留原字段以兼容旧测试
       error: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack,
+      // 新增归一化字段
+      normalized: {
+        code: normalized.code,
+        severity: normalized.severity,
+        userMessage: normalized.userMessage,
+        retryable: normalized.retryable,
+        context: normalized.context,
+      },
     });
     this.props.onError?.(error, errorInfo);
   }
