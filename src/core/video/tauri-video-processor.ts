@@ -16,7 +16,7 @@ import type {
   CutOptions,
   FFmpegStatus,
   ProcessingProgress,
-} from './types';
+} from '@/types';
 
 export class TauriVideoProcessor extends BaseVideoProcessor {
 

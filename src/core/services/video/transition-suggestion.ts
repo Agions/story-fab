@@ -21,7 +21,7 @@
  * 详见 docs/dev/tauri-commands.md § Rust-side Highlight Detection。
  */
 
-import type { SmartVideoSegment } from '../../video/highlight-types';
+import type { SmartVideoSegment } from '@/types';
 
 // ============================================
 // 公开类型

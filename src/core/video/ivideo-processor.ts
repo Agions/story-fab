@@ -11,7 +11,7 @@ import type {
   ExtractKeyFramesOptions,
   CutOptions,
   FFmpegStatus,
-} from './types';
+} from '@/types';
 
 export { VideoMetadata, KeyFrame, SimpleVideoSegment, ExtractKeyFramesOptions, CutOptions, FFmpegStatus };
 

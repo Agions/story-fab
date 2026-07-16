@@ -127,7 +127,7 @@ export interface ClipAnalysisResult {
    * "Smart Edit" panel renders this list.
    * Populated only when `detectSilence` is enabled in config.
    */
-  enrichedSegments?: import('../../video/highlight-types').SmartVideoSegment[];
+  enrichedSegments?: import('@/types').SmartVideoSegment[];
 }
 
 // 关键帧
