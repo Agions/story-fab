@@ -7,7 +7,7 @@
 export { useAppStore } from './app-store';
 
 // ── 项目元数据与步骤状态机 (原 storyfab-store) ──
-export { useProjectStore, useStoryFabStore } from './project-store';
+export { useProjectStore } from './project-store';
 
 // ── 编辑器运行时状态 (原 workspace-store) ──
 export { useEditorStore } from './editor-store';

@@ -8,7 +8,7 @@ import {
   User,
   Scissors,
 } from 'lucide-react';
-import { useStoryFabStore } from '@/stores';
+import { useProjectStore } from '@/stores';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/keyboard-shortcuts-help';
 import { useEditorStore } from '@/stores';
@@ -70,7 +70,7 @@ const AI_FUNCTIONS = [
 const AIVideoEditorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIFunctionTabKey>('commentary-first');
   const [shortcutsHelpVisible, setShortcutsHelpVisible] = useState(false);
-  const { state, goToNextStep, setFeature } = useStoryFabStore();
+  const { state, goToNextStep, setFeature } = useProjectStore();
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
   const isPlaying = useEditorStore(s => s.isPlaying);
