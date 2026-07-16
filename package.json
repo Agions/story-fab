@@ -30,6 +30,7 @@
     "docs:preview": "npx vitepress preview docs",
     "docs:jsdoc": "jsdoc -c jsdoc.json",
     "test:ci": "vitest run --coverage",
+    "bench": "vitest bench --run src/__bench__",
     "verify:antd": "node scripts/check-antd.mjs",
     "verify:naming": "node scripts/check-naming.mjs",
     "verify:all": "npm run verify:antd && npm run verify:naming"
