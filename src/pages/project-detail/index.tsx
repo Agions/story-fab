@@ -9,10 +9,9 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../
 import { Loader2, ArrowLeft, Delete, Settings, Eye, AudioLines, FileText, Scissors, LayoutDashboard } from 'lucide-react';
 import { withErrorBoundary } from '@/components/common/error-boundary';
 
-import { useSettingsStore } from '@/stores';
+import { useAppStore } from '@/stores/app-store';
 import { saveProjectToFile, loadProjectWithRetry, deleteProject } from '@/core/services/project/project-file-service';
 import { getApiKey } from '@/core/services/auth/api-key-service';
-import { useAppStore } from '@/stores/app-store';
 import { notify } from '@/shared';
 import { generateScriptWithModel, parseGeneratedScript } from '@/core/services/ai/script-service';
 import { resolveLegacyModel } from '@/core/services/ai/ai-model-adapter';
@@ -77,8 +76,8 @@ const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { addRecentProject } = useAppStore();
-  const selectedAIModel = useSettingsStore(s => s.selectedAIModel);
-  const aiModelsSettings = useSettingsStore(s => s.aiModelsSettings);
+  const selectedAIModel = useAppStore(s => s.aiSettings.selectedAIModel);
+  const aiModelsSettings = useAppStore(s => s.aiSettings.aiModelsSettings);
 
   // Loading/legacy placeholders (kept as useState — non-migratable side-effect carriers)
   const [, setLoading] = useState(true);

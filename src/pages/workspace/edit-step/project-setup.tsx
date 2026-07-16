@@ -10,6 +10,7 @@ import { saveProjectToFile } from '@/core/services/project/project-file-service'
 import { notify } from '@/shared';
 import { useAppStore } from '@/stores/app-store';
 import styles from './project-setup.module.less';
+import { ArrowRight, User, PenTool, Grid3x3, Plus } from 'lucide-react';
 
 interface ProjectCreateProps {
   onNext?: () => void;
@@ -21,40 +22,19 @@ const MODE_OPTIONS = [
     id: 'first-person',
     name: 'AI第一人称',
     desc: '以第一人称视角，像主播一样与观众互动',
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
-      </svg>
-    ),
+    icon: <User size={22} />,
   },
   {
     id: 'narration',
     name: 'AI解说',
     desc: '对视频内容进行专业解说，适合教程和科普',
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-      </svg>
-    ),
+    icon: <PenTool size={22} />,
   },
   {
     id: 'remix',
     name: 'AI混剪',
     desc: '自动识别精彩片段，生成节奏感强的混剪',
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="6" cy="6" r="3" />
-        <circle cx="18" cy="6" r="3" />
-        <circle cx="6" cy="18" r="3" />
-        <circle cx="18" cy="18" r="3" />
-        <line x1="6" y1="9" x2="6" y2="15" />
-        <line x1="18" y1="9" x2="18" y2="15" />
-        <line x1="9" y1="6" x2="15" y2="6" />
-        <line x1="9" y1="18" x2="15" y2="18" />
-      </svg>
-    ),
+    icon: <Grid3x3 size={22} />,
   },
 ];
 
@@ -186,9 +166,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = memo(({ onNext }) => {
 
           <button className={styles.nextBtn} onClick={goToNextStep}>
             下一步：上传视频
-            <svg className={styles.nextBtnArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <ArrowRight className={styles.nextBtnArrow} size={16} />
           </button>
         </div>
       </div>
@@ -268,10 +246,7 @@ const ProjectCreate: React.FC<ProjectCreateProps> = memo(({ onNext }) => {
           disabled={loading}
           aria-busy={loading}
         >
-          <svg className={styles.createBtnIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
+          <Plus className={styles.createBtnIcon} size={16} />
           <span className={styles.createBtnText}>{loading ? '创建中...' : '创建项目'}</span>
         </button>
       </div>

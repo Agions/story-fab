@@ -1,86 +1,138 @@
 sequenceDiagram
-    actor Frontend
-    participant TauriIPC as Tauri IPC
-    participant Pipeline as PipelineOrchestrator
-    participant Director as Director Commands
-    participant DirectorState as Director State (HashMap)
-    participant Script as Script Generator
-    participant Synthesizer as CommentarySynthesizer
+    %% ============================================================
+    %% VoiceSynthesisService.synthesize() — After BaseService adoption
+    %% ============================================================
+    participant Caller
+    participant VSS as VoiceSynthesisService<br/>(extends BaseService)
+    participant BS as BaseService.executeRequest()
+    participant Tauri as tauri facade
+    participant Logger
 
-    Frontend->>TauriIPC: invoke('run_commentary_pipeline', input)
-    TauriIPC->>Pipeline: run_commentary_pipeline(app, input)
+    Caller->>VSS: synthesize(text, options, onProgress)
+    VSS->>Caller: onProgress({ stage: 'queued', progress: 10 })
+    VSS->>Caller: onProgress({ stage: 'synthesizing', progress: 30 })
+    VSS->>BS: executeRequest(fn, '语音合成')
+    BS->>Tauri: tauri.synthesizeSpeech(input)
+    Tauri-->>BS: outputPath (string)
+    BS-->>VSS: outputPath
+    VSS->>Caller: onProgress({ stage: 'encoding', progress: 90 })
+    VSS->>Caller: onProgress({ stage: 'done', progress: 100 })
+    VSS->>Logger: logger.info('Synthesized:', {...})
+    VSS-->>Caller: SynthesisResult
 
-    %% Director Phase
-    Pipeline->>Pipeline: emit_progress("director", 0.0, "开始 Director 阶段")
-    Pipeline->>Frontend: pipeline-progress { stage: "director", progress: 0.0 }
+    Note over BS: On error:<br/>normalizeError() → logger.error() → throw ServiceError<br/>NO double-logging!
 
-    Pipeline->>Director: create_director_session(session_id, style_opt)
-    Director->>DirectorState: get_state(session_id) → create if absent
-    DirectorState-->>Director: DirectorStateMachine { state: Idle }
-    Director->>DirectorState: update_state_from(session_id, { state: Idle })
-    Director-->>Pipeline: Ok(session_id)
+    %% ============================================================
+    %% VisionService.extractKeyframes() — withFallback pattern
+    %% ============================================================
 
-    Pipeline->>Director: start_director_analysis(session_id, video_path, subtitles, target_duration)
-    Director->>DirectorState: update_state_from(session_id, { state: Analyzing })
-    Director-->>Pipeline: Ok(())
-    Pipeline->>Pipeline: emit_progress("director", 0.2, "正在分析视频...")
-    Pipeline->>Frontend: pipeline-progress { stage: "director", progress: 0.2 }
+    participant VS as VisionService
+    participant WF as withFallback()
 
-    Pipeline->>Director: generate_director_plan(session_id, style_opt, target_duration)
-    Director->>DirectorState: get_state(session_id)
-    DirectorState-->>Director: machine { analysis: None, ... }
-    Director->>Director: build_plan(style, target_duration, &None) → DirectorPlan
-    Director->>DirectorState: update_state_from(session_id, { state: Ready, plan: Some(plan) })
-    Director-->>Pipeline: Ok(DirectorPlan { ... })
+    Caller->>VS: extractKeyframes(videoInfo, { maxFrames: 20 })
+    VS->>WF: withFallback(detectAndSample, fallbackFn, '关键帧提取')
+    WF->>VS: detectAndSample()
+    VS->>VS: detectScenesAdvanced(...)
 
-    Pipeline->>Director: approve_director_plan(session_id)
-    Director->>DirectorState: update_state_from(session_id, { state: Rendering })
-    Director-->>Pipeline: Ok("渲染已启动")
-    Pipeline->>Pipeline: emit_progress("director", 1.0, "Director Plan 已确认")
-    Pipeline->>Frontend: pipeline-progress { stage: "director", progress: 1.0 }
-
-    %% Script Phase
-    Pipeline->>Pipeline: emit_progress("script", 0.0, "开始生成解说脚本...")
-    Pipeline->>Frontend: pipeline-progress { stage: "script", progress: 0.0 }
-
-    Pipeline->>Script: generate_commentary_script(ScriptGeneratorInput { ... })
-    Note right of Script: subtitles, style, target_duration,<br/>summary from director_plan,<br/>angle from director_plan,<br/>highlights from key_points,<br/>api_key, provider, model, base_url
-    Script->>Script: build_system_prompt(style, summary, angle)
-    Script->>Script: build_user_prompt(subtitles, highlights, style)
-    Script->>Script: call_llm_provider(provider, model, api_key, base_url, ...)
-    Script->>Script: parse_script_output(full_script, style, estimated)
-    Script-->>Pipeline: Ok(ScriptGeneratorOutput { full_script, segments, ... })
-
-    Pipeline->>Pipeline: emit_progress("script", 1.0, "脚本生成完成")
-    Pipeline->>Frontend: pipeline-progress { stage: "script", progress: 1.0 }
-
-    %% Synthesize Phase
-    Pipeline->>Pipeline: emit_progress("synthesize", 0.0, "开始合成音频...")
-    Pipeline->>Frontend: pipeline-progress { stage: "synthesize", progress: 0.0 }
-
-    loop for each segment in script.segments
-        Pipeline->>Synthesizer: synthesize_commentary_audio(text, voice, speed, "mp3", None)
-        Synthesizer->>Synthesizer: write text to tmp file
-        Synthesizer->>Synthesizer: spawn edge-tts --file ... --voice ... --rate ... --write-media ...
-        Synthesizer->>Synthesizer: compute duration_secs from file size
-        Synthesizer-->>Pipeline: Ok(SynthesizeResult { audio_path, duration_secs })
-        Pipeline->>Pipeline: accumulate AudioSegmentResult
-        Pipeline->>Frontend: pipeline-progress { stage: "synthesize", progress: i/N }
+    alt Scene detection succeeds
+        VS-->>WF: keyframe array (sampled from scenes)
+        WF-->>VS: keyframe array
+        VS-->>Caller: keyframe array
+    else Scene detection fails
+        VS-->>WF: throw Error
+        WF->>Logger: logger.warn('关键帧提取 失败，使用降级方案:', error)
+        WF->>VS: fallbackFn()
+        VS-->>WF: time-based uniform keyframes
+        WF-->>VS: fallback keyframe array
+        VS-->>Caller: fallback keyframe array
     end
 
-    Pipeline->>Pipeline: emit_progress("synthesize", 1.0, "音频合成完成")
-    Pipeline->>Frontend: pipeline-progress { stage: "synthesize", progress: 1.0 }
+    %% ============================================================
+    %% AudioVideoSyncService.analyzeTimeline() — withFallback
+    %% ============================================================
 
-    %% Complete
-    Pipeline->>Pipeline: aggregate CommentaryPipelineOutput
-    Pipeline->>Frontend: pipeline-complete { director_plan, script, audio_segments, total_audio_duration_secs }
-    Pipeline-->>TauriIPC: Ok(CommentaryPipelineOutput)
-    TauriIPC-->>Frontend: resolve(output)
+    participant AVS as AudioVideoSyncService
 
-    %% Error branch (shown separately)
-    Note over Pipeline,Frontend: 错误分支：任一阶段 Err
-    Pipeline->>Pipeline: emit_error(stage_name, error_string)
-    Pipeline->>Frontend: pipeline-error { stage, error }
-    Pipeline->>Director: destroy_director_session(session_id)
-    Pipeline-->>TauriIPC: Err(error_string)
-    TauriIPC-->>Frontend: reject(error)
+    Caller->>AVS: analyzeTimeline(videoPath)
+    AVS->>WF: withFallback(ffprobeLogic, fallbackSegments(videoPath), 'FFprobe分析')
+    WF->>AVS: ffprobeLogic()
+
+    alt FFprobe succeeds
+        AVS->>AVS: getStreamIndex() → getKeyframes() → build segments
+        AVS-->>WF: { videoSegments, issues: [] }
+    else FFprobe fails
+        AVS-->>WF: throw Error
+        WF->>Logger: logger.warn('FFprobe 分析失败，使用默认分段:', error)
+        WF-->>AVS: fallbackSegments result
+    end
+    AVS-->>Caller: SyncTimeline
+
+    %% ============================================================
+    %% Tauri commentary.generatePlan() — Type guard pattern
+    %% ============================================================
+
+    participant CM as commentary methods
+    participant Invoke as invoke~C~()
+    participant TG as isDirectorPlan()
+    participant Rust as Rust Backend
+
+    Caller->>CM: generatePlan(sessionId, style, targetDurationSecs)
+    CM->>Invoke: invoke('generate_director_plan', {...})
+    Invoke->>Rust: Tauri IPC
+    Rust-->>Invoke: Record~string, unknown~
+    Invoke-->>CM: Record~string, unknown~
+    CM->>TG: isDirectorPlan(raw)
+
+    alt Valid DirectorPlan shape
+        TG-->>CM: true → narrowed to DirectorPlan
+        CM-->>Caller: DirectorPlan
+    else Invalid shape
+        TG-->>CM: false
+        CM->>CM: throw Error('Invalid DirectorPlan response')
+        CM-->>Caller: throws
+    end
+
+    %% ============================================================
+    %% WhisperService.transcribe() — Type guard for Rust response
+    %% ============================================================
+
+    participant WS as WhisperService
+    participant IW as isWhisperResult()
+
+    Caller->>WS: transcribe(audioPath, modelSize, language, onProgress)
+    WS->>Tauri: tauri.transcribeAudio({ audioPath, modelSize, language })
+    Tauri->>Rust: Tauri IPC
+    Rust-->>Tauri: raw response (WhisperResult-shaped)
+    Tauri-->>WS: raw response
+    WS->>IW: isWhisperResult(raw)
+
+    alt Valid WhisperResult
+        IW-->>WS: true → narrowed to WhisperResult
+        WS->>Logger: logger.info('转录完成:', {...})
+        WS-->>Caller: WhisperResult
+    else Invalid shape
+        IW-->>WS: false
+        WS->>WS: throw Error('转录返回数据格式异常')
+        WS-->>Caller: throws
+    end
+
+    %% ============================================================
+    %% ClipWorkflowService.runASR() — withFallback pattern
+    %% ============================================================
+
+    participant CWS as ClipWorkflowService
+    participant ASR as asrService
+
+    Caller->>CWS: runASR(videoInfo)
+    CWS->>WF: withFallback(() => asrService.recognizeSpeech(videoInfo), [], 'ASR识别')
+    WF->>ASR: recognizeSpeech(videoInfo)
+
+    alt ASR succeeds
+        ASR-->>WF: ASRResult with segments
+        WF-->>CWS: segments array
+    else ASR fails
+        ASR-->>WF: throw Error
+        WF->>Logger: logger.warn('ASR 识别 失败，使用降级方案:', error)
+        WF-->>CWS: [] (empty array)
+    end
+    CWS-->>Caller: ASRSegment[]

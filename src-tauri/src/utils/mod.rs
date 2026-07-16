@@ -7,11 +7,9 @@
 //!   audio.rs        — pcm_samples_from_wav
 //!   panic_hook.rs   — install_panic_hook, panic_payload_to_string
 //!   semaphore.rs    — ResourceLimiter, ResourceError
-//!   crash_recovery.rs — list/read/delete/clear crash reports
 
 mod audio;
 mod concat;
-mod crash_recovery;
 mod error;
 mod media_cache;
 mod panic_hook;

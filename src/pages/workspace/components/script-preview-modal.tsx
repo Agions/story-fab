@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import type { ScriptData } from '@/types';
+import { X } from 'lucide-react';
 import { COMMENTARY_STYLES } from '../edit-step/script-config';
 import styles from './../edit-step/script-writing.module.less';
 
@@ -29,10 +30,7 @@ const ScriptPreviewModal: React.FC<ScriptPreviewModalProps> = ({
         <div className={styles.scriptPreviewHeader}>
           <h3>脚本预览</h3>
           <button className={styles.scriptPreviewClose} onClick={onClose}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={20} />
           </button>
         </div>
         <div className={styles.scriptPreviewBody}>

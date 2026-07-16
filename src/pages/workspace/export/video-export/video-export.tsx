@@ -16,6 +16,7 @@ import {
   FPS_OPTIONS,
   PLATFORM_PRESETS,
 } from './export-config';
+import { Settings, FileText, AlertCircle, ChevronDown, Download, Zap } from 'lucide-react';
 
 interface VideoExportProps {
   onComplete?: () => void;
@@ -115,10 +116,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
         {/* Left: Settings panel */}
         <div className={styles.settingsCard}>
           <div className={styles.cardHeader}>
-            <svg className={styles.cardHeaderIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-            </svg>
+            <Settings className={styles.cardHeaderIcon} size={18} />
             <h3 className={styles.cardTitle}>导出配置</h3>
           </div>
 
@@ -159,11 +157,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
               )}
               {selectedPlatform && (
                 <div className={styles.platformTip}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
+                  <AlertCircle size={16} />
                   {PLATFORM_PRESETS.find(p => p.value === selectedPlatform)?.tips}
                 </div>
               )}
@@ -228,9 +222,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                       <option key={r.value} value={r.value}>{r.label} ({r.res})</option>
                     ))}
                   </select>
-                  <svg className={styles.optionArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
+                  <ChevronDown className={styles.optionArrow} size={14} />
                 </div>
               </div>
               <div className={styles.optionGroup}>
@@ -246,9 +238,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                       <option key={f.value} value={f.value}>{f.label}</option>
                     ))}
                   </select>
-                  <svg className={styles.optionArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
+                  <ChevronDown className={styles.optionArrow} size={14} />
                 </div>
               </div>
             </div>
@@ -286,12 +276,7 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
         {/* Right: Export info */}
         <div className={styles.infoCard}>
           <div className={styles.infoHeader}>
-            <svg className={styles.cardHeaderIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="16" y1="13" x2="8" y2="13" />
-              <line x1="16" y1="17" x2="8" y2="17" />
-            </svg>
+            <FileText className={styles.cardHeaderIcon} size={18} />
             <h3 className={styles.infoTitle}>导出信息</h3>
           </div>
 
@@ -333,21 +318,14 @@ const VideoExport: React.FC<VideoExportProps> = memo(({ onComplete }) => {
                 className={`${styles.exportBtn} ${styles.exportBtnPrimary}`}
                 onClick={batchMode ? handleBatchExport : handleExport}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
+                <Download size={16} />
                 {batchMode ? `批量导出 (${selectedPlatforms.length})` : '一键导出'}
               </button>
               <button
                 className={`${styles.exportBtn} ${styles.exportBtnSecondary}`}
                 onClick={handleExport}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="1" x2="12" y2="23" />
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
+                <Zap size={16} />
                 自定义导出
               </button>
             </div>

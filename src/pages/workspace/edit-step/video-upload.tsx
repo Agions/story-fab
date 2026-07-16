@@ -13,6 +13,8 @@ import VideoUploadDropzone from './video-upload-dropzone';
 import VideoUploadPreview from './video-upload-preview';
 import VideoUploadProgress from './video-upload-progress';
 import VideoUploadMetaForm from './video-upload-meta-form';
+import { TrashIcon } from '@/components/icons';
+import { ArrowRight, Info } from 'lucide-react';
 import styles from './video-upload.module.less';
 
 interface VideoUploadProps {
@@ -34,10 +36,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
         <VideoUploadPreview />
         <div className={styles.videoActions} style={{ paddingTop: 20 }}>
           <button className={`${styles.actionBtn} ${styles.actionBtnDanger}`} onClick={handleDelete}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="3,6 5,6 21,6" />
-              <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2" />
-            </svg>
+            <TrashIcon size={16} />
             删除视频
           </button>
           <button
@@ -45,9 +44,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
             onClick={goToNextStep}
           >
             下一步：AI 分析
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -77,10 +74,7 @@ const VideoUpload: React.FC<VideoUploadProps> = memo(({ onNext }) => {
       <VideoUploadDropzone />
       <div className={styles.hintAlert}>
         <div className={styles.hintAlertHeader}>
-          <svg className={styles.hintIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 16v-4M12 8h.01" />
-          </svg>
+          <Info className={styles.hintIcon} size={16} />
           上传说明
         </div>
         <ul className={styles.hintList}>

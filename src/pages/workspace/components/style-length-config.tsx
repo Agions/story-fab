@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { ChevronDown } from 'lucide-react';
 import styles from './../edit-step/script-writing.module.less';
 import { SCRIPT_STYLES, SCRIPT_LENGTHS } from '../edit-step/script-config';
 
@@ -54,17 +55,7 @@ export const StyleLengthConfig: React.FC<StyleLengthConfigProps> = ({
               </option>
             ))}
           </select>
-          <svg
-            className={styles.selectArrow}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+          <ChevronDown className={styles.selectArrow} size={14} />
         </div>
       </div>
 
@@ -84,17 +75,7 @@ export const StyleLengthConfig: React.FC<StyleLengthConfigProps> = ({
               </option>
             ))}
           </select>
-          <svg
-            className={styles.selectArrow}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+          <ChevronDown className={styles.selectArrow} size={14} />
         </div>
       </div>
     </div>

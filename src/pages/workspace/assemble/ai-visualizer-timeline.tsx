@@ -7,6 +7,7 @@ import { useAiVisualizer } from './use-ai-visualizer';
 import { Highlights } from './highlights/highlights';
 import { formatTime } from '@/shared/utils/formatting';
 import type { Scene } from '@/types';
+import { CheckMarkIcon, RefreshCwIcon, FilmIcon } from '@/components/icons';
 import styles from './ai-visualizer.module.less';
 
 const AiVisualizerTimeline: React.FC = () => {
@@ -20,9 +21,7 @@ const AiVisualizerTimeline: React.FC = () => {
     <div className={styles.completionCard}>
       <div className={styles.completionHeader}>
         <div className={styles.completionBadge}>
-          <svg className={styles.completionBadgeSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="20,6 9,17 4,12" />
-          </svg>
+          <CheckMarkIcon className={styles.completionBadgeSvg} size={16} />
         </div>
         <div>
           <h3 className={styles.completionTitle}>分析完成</h3>
@@ -47,12 +46,7 @@ const AiVisualizerTimeline: React.FC = () => {
 
       <div className={styles.sceneSection}>
         <h4 className={styles.sceneSectionTitle}>
-          <svg className={styles.sceneSectionIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
-            <line x1="7" y1="2" x2="7" y2="22" />
-            <line x1="17" y1="2" x2="17" y2="22" />
-            <line x1="2" y1="12" x2="22" y2="12" />
-          </svg>
+          <FilmIcon className={styles.sceneSectionIcon} size={16} />
           场景列表
         </h4>
         <ul className={styles.sceneList}>
@@ -77,10 +71,7 @@ const AiVisualizerTimeline: React.FC = () => {
 
       <div className={styles.actionBar}>
         <button className={`${styles.actionBtn} ${styles.actionBtnSecondary}`} onClick={handleReAnalyze}>
-          <svg className={styles.actionBtnSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M23 4v6h-6M1 20v-6h6" />
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-          </svg>
+          <RefreshCwIcon className={styles.actionBtnSvg} size={16} />
           重新分析
         </button>
       </div>

@@ -5,6 +5,7 @@
 import React from 'react';
 import { useVideoUpload } from './use-video-upload';
 import { VIDEO_EXTENSIONS } from '../config/video-upload-config';
+import { UploadCloudIcon } from '@/components/icons';
 import styles from './video-upload.module.less';
 
 const VideoUploadDropzone: React.FC = () => {
@@ -46,13 +47,7 @@ const VideoUploadDropzone: React.FC = () => {
       />
 
       <div className={styles.uploadIcon}>
-        <svg className={styles.uploadIconSvg} viewBox="0 0 56 56" fill="none">
-          <rect x="8" y="16" width="40" height="28" rx="4" stroke="currentColor" strokeWidth="2.5" />
-          <path d="M20 22l8-6 8 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M28 16v18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M14 36l4 4 8-8 8 8 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
-          <circle cx="38" cy="24" r="3" fill="currentColor" opacity="0.6" />
-        </svg>
+        <UploadCloudIcon size={56} className={styles.uploadIconSvg} />
       </div>
 
       <p className={styles.uploadPrimary}>点击或拖拽视频文件到此处上传</p>

@@ -15,6 +15,8 @@ import { whisperService, type WhisperProgress } from './whisper-service';
 import { trackToSRT, trackToVTT, trackToASS } from './subtitle-formatters';
 import { AppError } from '@/core/errors';
 import { tauri } from '@/core/tauri';
+import { ASR_LANG_CODES, TRANSLATION_LANG_NAMES, normalizeLangCode } from './language-codes';
+import { createMinimalVideoInfo } from '@/types/video-info';
 
 // ============================================================
 // 类型定义
@@ -102,28 +104,11 @@ export class SubtitleService extends BaseService {
 
     const { asrService } = await import('../asr/asr-service');
 
-    const langMap: Record<string, 'zh_cn' | 'en_us' | 'ja_jp' | 'ko_kr'> = {
-      'zh-CN': 'zh_cn',
-      en: 'en_us',
-      'ja-JP': 'ja_jp',
-      'ko-KR': 'ko_kr',
-    };
-
     try {
-      const videoInfo: VideoInfo = {
-        id: crypto.randomUUID(),
-        path: videoPath,
-        name: videoPath.split('/').pop() || 'video',
-        duration: 0,
-        size: 0,
-        format: '',
-        fps: 0,
-        width: 0,
-        height: 0,
-      };
+      const videoInfo: VideoInfo = createMinimalVideoInfo(videoPath);
 
       const asrResult = await asrService.recognizeSpeech(videoInfo, {
-        language: langMap[language] || 'zh_cn',
+        language: ASR_LANG_CODES[language] || 'zh_cn',
         enableTimestamp: true,
         enablePunctuation: true,
       });
@@ -290,24 +275,7 @@ export class SubtitleService extends BaseService {
           provider,
         });
 
-        const langMap: Record<string, string> = {
-          en: 'English',
-          'zh-CN': '中文',
-          'ja-JP': '日本語',
-          'ko-KR': '한국어',
-          es: 'Español',
-          fr: 'Français',
-          de: 'Deutsch',
-          ru: 'Русский',
-          pt: 'Português',
-          id: 'Bahasa Indonesia',
-          vi: 'Tiếng Việt',
-          th: 'ไทย',
-          ar: 'العربية',
-          it: 'Italiano',
-        };
-
-        const targetLangName = langMap[targetLanguage] || targetLanguage;
+        const targetLangName = TRANSLATION_LANG_NAMES[targetLanguage] || targetLanguage;
 
         // 分批翻译
         const BATCH_SIZE = 20;
@@ -349,7 +317,7 @@ export class SubtitleService extends BaseService {
    * 调用翻译 API
    */
   private async translateText(text: string, targetLang: string, _provider: string): Promise<string> {
-    const langCode = this.normalizeLangCode(targetLang);
+    const langCode = normalizeLangCode(targetLang);
 
     try {
       const translated = await tauri.translateText(text, 'en', langCode);
@@ -369,33 +337,6 @@ export class SubtitleService extends BaseService {
         originalError: error,
       });
     }
-  }
-
-  /**
-   * 标准化语言代码
-   */
-  private normalizeLangCode(lang: string): string {
-    const map: Record<string, string> = {
-      chinese: 'zh',
-      english: 'en',
-      japanese: 'ja',
-      korean: 'ko',
-      french: 'fr',
-      german: 'de',
-      spanish: 'es',
-      russian: 'ru',
-      portuguese: 'pt',
-      italian: 'it',
-      dutch: 'nl',
-      polish: 'pl',
-      vietnamese: 'vi',
-      thai: 'th',
-      arabic: 'ar',
-      hindi: 'hi',
-    };
-
-    const lower = lang.toLowerCase();
-    return map[lower] ?? lower;
   }
 
   /**

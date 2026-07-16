@@ -8,6 +8,7 @@ import { logger } from '@/shared/utils/logging';
 import { tauri } from '../../tauri';
 import { AppError } from '@/core/errors';
 import type { VideoInfo } from '@/types';
+import { createMinimalVideoInfo } from '@/types/video-info';
 import {
   DEFAULT_ASR_OPTIONS,
   type ASRResult,
@@ -44,17 +45,7 @@ class ASRService extends BaseService {
     duration: number,
     options?: ASROptions
   ): Promise<ASRResult> {
-    const videoInfo: VideoInfo = {
-      id: crypto.randomUUID(),
-      name: videoPath.split('/').pop() ?? videoPath,
-      path: videoPath,
-      duration,
-      width: 0,
-      height: 0,
-      size: 0,
-      fps: 0,
-      format: '',
-    };
+    const videoInfo: VideoInfo = { ...createMinimalVideoInfo(videoPath), duration };
     return await this.recognizeSpeech(videoInfo, options);
   }
 

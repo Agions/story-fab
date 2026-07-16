@@ -1,246 +1,236 @@
 classDiagram
-    %% === Pipeline Layer (new) ===
-    class CommentaryPipelineInput {
-        +String session_id
-        +String video_path
-        +String subtitles
-        +Option~String~ style
-        +Option~f64~ target_duration_secs
-        +String api_key
-        +Option~String~ provider
-        +Option~String~ model
-        +Option~String~ base_url
-        +Option~String~ voice
-        +Option~f32~ speed
-        +Option~bool~ auto_approve
+    %% ============================================================
+    %% Base Infrastructure Layer
+    %% ============================================================
+
+    class BaseService {
+        <<abstract>>
+        #name: string
+        #config: RequestConfig
+        +constructor(name: string, config: RequestConfig)
+        #executeRequest~T~(requestFn: () => Promise~T~, context?: string) Promise~T~
+        #retryRequest~T~(requestFn: () => Promise~T~, retries?: number, delayMs?: number, retryOn?: Function) Promise~T~
+        #handleError(error: unknown, context?: string) never
+        -normalizeError(error: unknown) ServiceError
     }
 
-    class CommentaryPipelineOutput {
-        +DirectorPlan director_plan
-        +ScriptGeneratorOutput script
-        +Vec~AudioSegmentResult~ audio_segments
-        +f64 total_audio_duration_secs
+    class ServiceError {
+        +message: string
+        +code?: string
+        +statusCode?: number
+        +originalError?: Error
+        +retryable?: boolean
     }
 
-    class AudioSegmentResult {
-        +String text
-        +String audio_path
-        +f64 duration_secs
-        +usize segment_index
+    class RequestConfig {
+        +timeout?: number
+        +retries?: number
+        +retryDelay?: number
+        +retryOn?: (error: ServiceError) => boolean
     }
 
-    class PipelineStage {
-        <<enumeration>>
-        Director
-        Script
-        Synthesize
-        +Display
+    BaseService --> ServiceError : throws
+    BaseService --> RequestConfig : uses
+
+    %% ============================================================
+    %% NEW: Shared Utilities
+    %% ============================================================
+
+    class WithFallback {
+        <<function>>
+        +withFallback~T,F~(fn: () => Promise~T~, fallback: F, context?: string) Promise~T|F~
     }
 
-    class PipelineProgressPayload {
-        +String stage
-        +f64 progress
-        +Option~String~ message
+    class TypeGuards {
+        <<function>>
+        +isDirectorPlan(value: unknown) boolean
+        +isDirectorStatusResponse(value: unknown) boolean
+        +isWhisperResult(value: unknown) boolean
+        +isTtsBackendArray(value: unknown) boolean
+        +isRecordOfStringUnknown(value: unknown) boolean
     }
 
-    class PipelineErrorPayload {
-        +String stage
-        +String error
+    %% ============================================================
+    %% Services (After Refactoring)
+    %% ============================================================
+
+    class VoiceSynthesisService {
+        -config: VoiceConfig
+        +constructor(config?: Partial~VoiceConfig~)
+        +getVoices() VoiceItem[]
+        +getChineseVoices() VoiceItem[]
+        +listBackends() Promise~TtsBackend[]~
+        +checkAvailable() Promise~boolean~
+        +preview(text: string) void
+        +synthesize(text: string, options?: Partial~VoiceConfig~, onProgress?: Function) Promise~SynthesisResult~
+        +synthesizeToBuffer(text: string, options?, onProgress?) Promise~{buffer, duration, contentType}~
+        +synthesizeAndSave(text: string, outputPath: string, options?, onProgress?) Promise~SynthesisResult~
+        +getConfig() VoiceConfig
+        +updateConfig(config: Partial~VoiceConfig~) void
     }
 
-    class PipelineOrchestrator {
-        -AppHandle app
-        -CommentaryPipelineInput input
-        +run() CommentaryPipelineOutput
-        -run_director_phase() Result~DirectorPlan, String~
-        -run_script_phase(director_plan) Result~ScriptGeneratorOutput, String~
-        -run_synthesize_phase(segments, voice, speed) Result~Vec~AudioSegmentResult~, String~
-        -emit_progress(stage, progress, message)
-        -emit_error(stage, error)
-        -parse_style_for_director(style_opt) ScriptStylePreset
-        -parse_style_for_script(style_opt) ScriptStyle
+    class AudioVideoSyncService {
+        -config: SyncConfig
+        +constructor(config?: Partial~SyncConfig~)
+        +analyzeSync(videoPath: string, audioPath?: string) Promise~SyncResult~
+        +autoSync(videoPath: string, audioPath?: string) Promise~SyncResult~
+        +setOffset(offsetMs: number) void
+        +getConfig() SyncConfig
+        +updateConfig(config: Partial~SyncConfig~) void
+        +exportTimeline(segments: TimelineSegment[]) SyncTimeline
+        -analyzeTimeline(videoPath: string) Promise~SyncTimeline~
+        -fallbackSegments(videoPath: string) Promise~SyncTimeline~
+        -detectIssues(timeline: SyncTimeline) Promise~SyncIssue[]
+        -calculateOffset(issues: SyncIssue[]) number
+        -calculateConfidence(issues: SyncIssue[]) number
+        -getStreamIndex(filePath: string, codec: string) Promise~number~
+        -getKeyframes(filePath: string) Promise~number[]~
+        -getDuration(filePath: string) Promise~number~
+        -ffprobeOutput(args: string[]) Promise~string~
     }
 
-    class RunCommentaryPipelineCmd {
-        <<tauri::command>>
-        +run_commentary_pipeline(app: AppHandle, input: CommentaryPipelineInput) Result~CommentaryPipelineOutput, String~
+    class VisionService {
+        +analyzeVideo(videoInfo: VideoInfo, options?: VideoAnalysisOptions) Promise~{scenes, objects, emotions}~
+        +detectScenesAdvanced(videoInfo: VideoInfo, options?: VideoAnalysisOptions) Promise~{scenes, objects, emotions}~
+        +extractKeyframes(videoInfo: VideoInfo, options?: {maxFrames?: number}) Promise~Keyframe[]~
+        +generateAnalysisReport(videoInfo: VideoInfo, scenes: Scene[], objects: ObjectDetection[], emotions: EmotionAnalysis[]) Promise~VideoAnalysis~
+        +detectHighlights(videoInfo: VideoInfo, options?: Partial~HighlightOptions~) Promise~HighlightSegment[]~
+        -optimizeScenes(scenes: Scene[], objects: ObjectDetection[], emotions: EmotionAnalysis[]) Scene[]
     }
 
-    %% === Existing: Director Layer ===
-    class DirectorStateMachine {
-        +String session_id
-        +DirectorState state
-        +Option~DirectorPlan~ plan
-        +Option~ScriptGeneratorOutput~ script
-        +Option~VideoAnalysisResult~ analysis
-        +ScriptStylePreset style
-        +Option~String~ error
-        +i64 created_at
-        +i64 updated_at
+    class ClipWorkflowService {
+        -config: ClipConfig
+        -_pipeline?: ClipRepurposingPipeline
+        +constructor(config?: Partial~ClipConfig~)
+        +processVideo(videoInfo: VideoInfo, scriptSegments?: ScriptSegment[]) Promise~ClipResult~
+        +processVideoWithPipeline(videoInfo: VideoInfo, analysis?: VideoAnalysis, pipelineOptions?: Partial~RepurposingOptions~, asrSegments?: ASRSegment[]) Promise~ClipResult~
+        +exportTimeline(segments: ClipSegment[]) object
+        +getExportSettings() ExportSettings
+        +optimizeQuality(segments: ClipSegment[]) ClipSegment[]
+        +getConfig() ClipConfig
+        +updateConfig(config: Partial~ClipConfig~) void
+        -analyzeVideo(videoInfo: VideoInfo) Promise~VideoAnalysis~
+        -generateClips(analysis: VideoAnalysis, sceneChanges: Array~{time: number}~, silenceSections: Array~{start, end}~, scriptSegments?: ScriptSegment[]) ClipSegment[]
+        -runASR(videoInfo: VideoInfo) Promise~ASRSegment[]~
     }
 
-    class DirectorState {
-        <<enumeration>>
-        Idle
-        Analyzing
-        Planning
-        Ready
-        Rendering
-        Done
-        +Display
-        +progress_for_state() f64
+    class AIService {
+        -abortControllers: Map~string, AbortController~
+        +constructor()
+        +generateText(model: AIModel, prompt: string, settings: AIModelSettings) Promise~string~
+        +generateScript(model: AIModel, settings: AIModelSettings, params: object) Promise~ScriptData~
+        +analyzeVideo(model: AIModel, settings: AIModelSettings, videoInfo: object) Promise~Partial~VideoAnalysis~~
+        +optimizeScript(model: AIModel, settings: AIModelSettings, script: string, optimization: string) Promise~string~
+        +translateScript(model: AIModel, settings: AIModelSettings, script: string, targetLanguage: string) Promise~string~
+        +getRecommendedModels(task: string) AIModel[]
+        +getModelInfo(modelId: string) AIModel | null
+        +getAllModels() AIModel[]
+        +getDomesticModels() AIModel[]
+        +cancelRequest(requestId: string) void
+        -callAPI(model: AIModel, settings: AIModelSettings, prompt: string) Promise~AIResponse~
     }
 
-    class DirectorPlan {
-        +String id
-        +String summary
-        +String angle
-        +Option~String~ target_audience
-        +f64 target_duration_secs
-        +usize estimated_segments
-        +SegmentMode segment_mode
-        +String recommended_voice
-        +Vec~String~ key_points
-        +Vec~String~ warnings
-        +f64 confidence
+    class WhisperService {
+        +transcribe(audioPath: string, modelSize?: string, language?: string, onProgress?: Function) Promise~WhisperResult~
+        +toSubtitleFormat(result: WhisperResult) {language: string, entries: Array~{id, startTime, endTime, text}~}
     }
 
-    class DirectorCommands {
-        <<tauri::command>>
-        +create_director_session(session_id, style) Result~String, String~
-        +get_director_status(session_id) Result~DirectorStatusResponse, String~
-        +start_director_analysis(session_id, video_path, subtitles, target_duration) Result~(), String~
-        +generate_director_plan(session_id, style, target_duration) Result~DirectorPlan, String~
-        +approve_director_plan(session_id) Result~String, String~
-        +revise_director_plan(session_id, modifications) Result~DirectorPlan, String~
-        +complete_director_render(session_id, output_path) Result~String, String~
-        +destroy_director_session(session_id) Result~(), String~
+    class VideoEffectService {
+        -config: EffectConfig
+        +constructor(config?: Partial~EffectConfig~)
+        +applyPreset(presetId: string) void
+        +getPresets(category?: string) EffectPreset[]
+        +getCSSFilter() string
+        +applyToVideoElement(video: HTMLVideoElement) void
+        +getConfig() EffectConfig
+        +updateConfig(config: Partial~EffectConfig~) void
+        +reset() void
     }
 
-    class DirectorStates {
-        <<static>>
-        +DIRECTOR_STATES: Lazy~Mutex~HashMap~
-        +get_state(session_id) DirectorStateMachine
-        +update_state_from(session_id, machine)
-        +clear_state(session_id)
-        +default_voice_for_style(style) String
+    %% ============================================================
+    %% Tauri Layer
+    %% ============================================================
+
+    class TauriCommentaryMethods {
+        +createSession(sessionId: string, style?: string) Promise~string~
+        +getStatus(sessionId: string) Promise~DirectorStatusResponse~
+        +startAnalysis(sessionId: string, videoPath: string, subtitles: string, targetDurationSecs?: number) Promise~void~
+        +generatePlan(sessionId: string, style?: string, targetDurationSecs?: number) Promise~DirectorPlan~
+        +approvePlan(sessionId: string) Promise~string~
+        +revisePlan(sessionId: string, modifications: Record~string, unknown~) Promise~DirectorPlan~
+        +completeRender(sessionId: string, outputPath: string) Promise~string~
+        +destroySession(sessionId: string) Promise~void~
+        +generateScript(input: object) Promise~unknown~
+        +synthesizeAudio(text: string, voice: string, speed: number, format: string, outputPath?: string) Promise~{audioPath, durationSecs}~
+        +estimateTTSDuration(text: string, voice: string, speed: number) Promise~number~
+        +listVoices() Promise~Voice[]~
+        +runCommentaryPipeline(input: CommentaryPipelineInput) Promise~CommentaryPipelineOutput~
     }
 
-    %% === Existing: Script Generator Layer ===
-    class ScriptGeneratorInput {
-        +String subtitles
-        +Option~f64~ duration_secs
-        +Option~f64~ target_duration_secs
-        +Option~ScriptStyle~ style
-        +Option~String~ summary
-        +Option~Vec~String~~ highlights
-        +Option~String~ angle
-        +Option~String~ provider
-        +Option~String~ model
-        +Option~String~ api_key
-        +Option~String~ base_url
-        +Option~String~ system_prompt_extra
+    class CommentarySessionService {
+        <<function module>>
+        +createCommentarySession(sessionId: string, style?: ScriptStylePreset) Promise~string~
+        +getCommentaryStatus(sessionId: string) Promise~DirectorStatusResponse~
+        +destroyCommentarySession(sessionId: string) Promise~void~
+        +startCommentaryAnalysis(sessionId: string, videoPath: string, subtitles: string, targetDurationSecs?: number) Promise~void~
+        +generateCommentaryPlan(sessionId: string, style?: ScriptStylePreset, targetDurationSecs?: number) Promise~DirectorPlan~
+        +approveCommentaryPlan(sessionId: string) Promise~string~
+        +reviseCommentaryPlan(sessionId: string, modifications: PlanModifications) Promise~DirectorPlan~
+        +completeCommentaryRender(sessionId: string, outputPath: string) Promise~string~
     }
 
-    class ScriptGeneratorOutput {
-        +String full_script
-        +Vec~ScriptSegment~ segments
-        +f64 estimated_duration_secs
-        +String model_used
-        +String provider
+    class TauriInvoke {
+        <<function>>
+        +invoke~C~(command: C, args?: Record~string, unknown~, options?: BridgeOptions) Promise~TauriCommandOutput~C~~
+        +runCommentaryPipeline(input: CommentaryPipelineInput) Promise~CommentaryPipelineOutput~
+        -executeWithRetry~C~(command: C, args: Record~string, unknown~, retries: number, signal?: AbortSignal) Promise~TauriCommandOutput~C~~
     }
 
-    class ScriptSegment {
-        +f64 start_time
-        +f64 end_time
-        +String text
-        +Option~String~ emotion
+    %% ============================================================
+    %% Pipeline Layer
+    %% ============================================================
+
+    class CompositeCommentaryPipeline {
+        <<function module>>
+        +createCommentaryPipeline() ChainPipeline~Start, End~
+        +runCommentaryPipeline(state: CommentaryPipelineState, options?: StepOptions) Promise~CommentaryPipelineResult~
     }
 
-    class ScriptStyle {
-        <<enumeration>>
-        Humorous
-        Serious
-        Conversational
-        Suspense
-        Warm
-        +Display
+    class ClipRepurposingPipeline {
+        +run(videoInfo: VideoInfo, analysis: VideoAnalysis, options?: RepurposingOptions, asrSegments?: ASRSegment[]) Promise~RepurposingResult~
     }
 
-    class GenerateCommentaryScriptCmd {
-        <<tauri::command>>
-        +generate_commentary_script(input: ScriptGeneratorInput) Result~ScriptGeneratorOutput, String~
-    }
+    %% ============================================================
+    %% Relationships
+    %% ============================================================
 
-    %% === Existing: Synthesizer Layer ===
-    class SynthesizeResult {
-        +String audio_path
-        +f64 duration_secs
-    }
+    BaseService <|-- VoiceSynthesisService : extends
+    BaseService <|-- AIService : extends (existing)
+    BaseService <|-- ASRService : extends (existing, not modified)
+    BaseService <|-- SubtitleService : extends (existing, not modified)
+    BaseService <|-- ExportService : extends (existing, not modified)
 
-    class SynthesizeCommentaryAudioCmd {
-        <<tauri::command>>
-        +synthesize_commentary_audio(text, voice, speed, format, output_path) Result~SynthesizeResult, String~
-        +estimate_tts_duration(text, voice, speed) Result~f64, String~
-        +list_commentary_voices(style) Vec~VoiceInfo~
-    }
+    WithFallback ..> AudioVideoSyncService : uses in analyzeTimeline()
+    WithFallback ..> VisionService : uses in extractKeyframes() & detectHighlights()
+    WithFallback ..> ClipWorkflowService : uses in runASR()
+    WithFallback ..> VoiceSynthesisService : uses in listBackends() & checkAvailable()
 
-    class CommentarySynthesizer {
-        +synthesize(text, voice, speed, format) Result~SynthesizeResult, String~
-        +synthesize_batch(segments) Vec~Result~SynthesizeResult, String~~
-        +estimate_duration(text, voice, speed) Result~f64, String~
-    }
+    TypeGuards ..> TauriCommentaryMethods : isDirectorPlan()
+    TypeGuards ..> CommentarySessionService : isDirectorPlan()
+    TypeGuards ..> WhisperService : isWhisperResult()
+    TypeGuards ..> VoiceSynthesisService : isTtsBackendArray()
 
-    %% === Relationships ===
+    TauriCommentaryMethods --> TauriInvoke : calls invoke~C~()
+    CommentarySessionService --> TauriCommentaryMethods : delegates to tauri.*
+    WhisperService --> TauriInvoke : calls tauri.transcribeAudio()
+    VoiceSynthesisService --> TauriInvoke : calls tauri.synthesizeSpeech()
 
-    %% Pipeline uses Director
-    PipelineOrchestrator ..> DirectorCommands : calls directly
-    PipelineOrchestrator ..> DirectorStates : reads state via get_state
-    PipelineOrchestrator ..> DirectorPlan : produces
-    PipelineOrchestrator ..> PipelineStage : emits events with
-    PipelineOrchestrator ..> PipelineProgressPayload : emits
-    PipelineOrchestrator ..> PipelineErrorPayload : emits on error
+    ClipWorkflowService --> ClipRepurposingPipeline : delegates heavy work
+    ClipWorkflowService --> VisionService : analyzeVideo()
+    ClipWorkflowService --> AIService : (indirect via pipeline)
 
-    %% Pipeline uses Script Generator
-    PipelineOrchestrator ..> GenerateCommentaryScriptCmd : calls directly
-    PipelineOrchestrator ..> ScriptGeneratorInput : constructs
-    PipelineOrchestrator ..> ScriptGeneratorOutput : produces
-    PipelineOrchestrator ..> ScriptStyle : maps input.style to
+    CompositeCommentaryPipeline --> CommentarySessionService : delegates to step logic
 
-    %% Pipeline uses Synthesizer
-    PipelineOrchestrator ..> SynthesizeCommentaryAudioCmd : calls directly
-    PipelineOrchestrator ..> CommentarySynthesizer : uses internally
-    PipelineOrchestrator ..> SynthesizeResult : aggregates into AudioSegmentResult
-    PipelineOrchestrator ..> AudioSegmentResult : produces
+    VideoEffectService : NO CHANGE — synchronous config only
 
-    %% Pipeline I/O
-    CommentaryPipelineInput --> PipelineOrchestrator : drives
-    PipelineOrchestrator --> CommentaryPipelineOutput : returns
-    CommentaryPipelineOutput *-- AudioSegmentResult
-    CommentaryPipelineOutput *-- DirectorPlan
-    CommentaryPipelineOutput *-- ScriptGeneratorOutput
-
-    %% Director internal
-    DirectorCommands --> DirectorStateMachine : reads/writes
-    DirectorStateMachine *-- DirectorState
-    DirectorStateMachine *-- DirectorPlan
-    DirectorStates ..> DirectorStateMachine : manages global HashMap
-
-    %% Script internal
-    GenerateCommentaryScriptCmd --> ScriptGeneratorInput : reads
-    GenerateCommentaryScriptCmd --> ScriptGeneratorOutput : produces
-    ScriptGeneratorOutput *-- ScriptSegment
-
-    %% Synthesizer internal
-    SynthesizeCommentaryAudioCmd --> CommentarySynthesizer : delegates to
-    CommentarySynthesizer --> SynthesizeResult : produces
-
-    %% Style enums are equivalent (pipeline maps between them)
-    ScriptStyle -- PipelineOrchestrator : maps from input.style
-    ScriptStylePreset -- PipelineOrchestrator : maps to for director phase
-    ScriptStylePreset -- DirectorStateMachine : stored as field
-
-    %% Tauri command registration
-    RunCommentaryPipelineCmd ..> PipelineOrchestrator : wraps
-    RunCommentaryPipelineCmd ..> CommentaryPipelineInput : reads
-    RunCommentaryPipelineCmd ..> CommentaryPipelineOutput : returns
+    note for VideoEffectService "100% synchronous<br/>in-memory config manipulation.<br/>No BaseService value."

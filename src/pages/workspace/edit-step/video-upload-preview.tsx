@@ -5,6 +5,7 @@
 import React from 'react';
 import { useVideoUpload } from './use-video-upload';
 import { formatDuration, formatFileSize } from '@/shared';
+import { Play } from 'lucide-react';
 import styles from './video-upload.module.less';
 
 const VideoUploadPreview: React.FC = () => {
@@ -20,9 +21,7 @@ const VideoUploadPreview: React.FC = () => {
         <video src={projectState.currentVideo.path} controls />
         <div className={styles.videoOverlay}>
           <button className={styles.playBtn} aria-label="播放预览">
-            <svg className={styles.playBtnSvg} viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z" />
-            </svg>
+            <Play className={styles.playBtnSvg} size={24} />
           </button>
         </div>
       </div>

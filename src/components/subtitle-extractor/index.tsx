@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { notify } from '@/shared';
 import { subtitleService } from '@/core/services/subtitle/subtitle-service';
-import { useWorkspaceStore } from '@/stores';
+import { useEditorStore } from '@/stores';
 import type { SubtitleEntry } from '@/types';
 import styles from '././index.module.less';
 import { formatTime, formatSrtTime, MS_PER_SECOND } from '@/shared/utils/formatting';
@@ -47,10 +47,10 @@ interface SubtitleExtractorProps {
 }
 
 const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoUrl, onExtracted }) => {
-  const playheadMs = useWorkspaceStore(state => state.playheadMs);
-  const previewPlaying = useWorkspaceStore(state => state.isPlaying);
-  const setPlayheadMs = useWorkspaceStore(state => state.setPlayheadMs);
-  const setPreviewPlaying = useWorkspaceStore(state => state.setPreviewPlaying);
+  const playheadMs = useEditorStore(state => state.playheadMs);
+  const isPlaying = useEditorStore(state => state.isPlaying);
+  const setPlayheadMs = useEditorStore(state => state.setPlayheadMs);
+  const setIsPlaying = useEditorStore(state => state.setIsPlaying);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // All UI/data state centralized in reducer
@@ -84,7 +84,7 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
     setPlayheadMs(video.currentTime * MS_PER_SECOND);
   }, [setPlayheadMs]);
 
-  const handleVideoEnded = useCallback(() => { setPreviewPlaying(false); }, [setPreviewPlaying]);
+  const handleVideoEnded = useCallback(() => { setIsPlaying(false); }, [setIsPlaying]);
 
   const handleVideoMetadata = useCallback(() => {
     const video = videoRef.current;
@@ -95,29 +95,29 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (previewPlaying) {
+    if (isPlaying) {
       video.pause();
-      setPreviewPlaying(false);
+      setIsPlaying(false);
     } else {
       video.play().catch((e) => {
         logger.warn('[SubtitleExtractor] 播放失败', e);
       });
-      setPreviewPlaying(true);
+      setIsPlaying(true);
     }
-  }, [previewPlaying, setPreviewPlaying]);
+  }, [isPlaying, setIsPlaying]);
 
   const seekTo = useCallback((timeSec: number) => {
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = timeSec;
     setPlayheadMs(timeSec * MS_PER_SECOND);
-    if (!previewPlaying) {
-      setPreviewPlaying(true);
+    if (!isPlaying) {
+      setIsPlaying(true);
       video.play().catch((e) => {
         logger.warn('[SubtitleExtractor] 播放失败', e);
       });
     }
-  }, [previewPlaying, setPreviewPlaying, setPlayheadMs]);
+  }, [isPlaying, setIsPlaying, setPlayheadMs]);
 
   const handleExtract = useCallback(async () => {
     if (!videoUrl) { notify.error(null, '未检测到视频源'); return; }
@@ -179,8 +179,8 @@ const SubtitleExtractor: React.FC<SubtitleExtractorProps> = ({ projectId, videoU
             )}
             {videoUrl && (
               <div className={styles.playerOverlay}>
-                <button className={styles.playBtn} onClick={togglePlay} aria-label={previewPlaying ? '暂停' : '播放'}>
-                  {previewPlaying ? <Pause size={40} /> : <Play size={40} />}
+                <button className={styles.playBtn} onClick={togglePlay} aria-label={isPlaying ? '暂停' : '播放'}>
+                  {isPlaying ? <Pause size={40} /> : <Play size={40} />}
                 </button>
               </div>
             )}

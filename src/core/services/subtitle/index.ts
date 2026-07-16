@@ -28,3 +28,6 @@ export {
   type WhisperResult,
   type WhisperProgress,
 } from './whisper-service';
+
+// 导出语言代码映射
+export { ASR_LANG_CODES, TRANSLATION_LANG_NAMES, LANG_NAME_TO_CODE, normalizeLangCode } from './language-codes';

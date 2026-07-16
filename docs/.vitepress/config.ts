@@ -1,47 +1,33 @@
-import { defineConfig } from 'vitepress';
+import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   base: '/story-fab/',
   title: 'StoryFab',
-  description: 'AI 影视解说创作工坊 · 本地优先 · 隐私安全 · 全链路自动化',
+  description: 'AI 影视解说创作工坊 · Tauri 2 + Svelte 5 + Rust · 本地优先 · 全链路自动化',
   lang: 'zh-CN',
   cleanUrls: true,
   lastUpdated: true,
   ignoreDeadLinks: true,
 
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
-    ['link', { rel: 'stylesheet', href: '/styles/custom.css' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     ['meta', { name: 'theme-color', content: '#0B0F1F' }],
     ['meta', { name: 'og:type', content: 'website' }],
     ['meta', { name: 'og:site_name', content: 'StoryFab 文档' }],
-    [
-      'meta',
-      {
-        name: 'description',
-        content: '本地优先的 AI 影视解说创作工具。剪辑模式 + 解说模式，全链路本地处理。',
-      },
-    ],
-    [
-      'meta',
-      {
-        name: 'keywords',
-        content: 'AI, 视频创作, 影视解说, Tauri, React, TypeScript, Rust, 本地处理, 隐私',
-      },
-    ],
+    ['meta', { name: 'description', content: '本地优先的 AI 影视解说创作工具。剪辑模式 + 解说模式，全链路本地处理。' }],
+    ['meta', { name: 'keywords', content: 'AI, 视频创作, 影视解说, Tauri 2, Svelte 5, Rust, FFmpeg, 本地处理, 隐私' }],
   ],
 
   themeConfig: {
-    logo: '/logo.svg',
+    logo: '/favicon.svg',
     siteTitle: 'StoryFab',
 
     nav: [
-      { text: '开始', link: '/getting-started/introduction' },
-      { text: '功能', link: '/features/commentary-mode' },
+      { text: '快速开始', link: '/getting-started/introduction' },
+      { text: '功能指南', link: '/features/commentary-mode' },
       { text: '配置', link: '/configuration/configuration' },
-      { text: '开发者', link: '/developer/architecture' },
-      { text: '参考', link: '/reference/api' },
-      { text: '更新日志', link: '/CHANGELOG' },
+      { text: 'FAQ', link: '/reference/faq' },
+      { text: '更新日志', link: '/changelog' },
       { text: 'GitHub', link: 'https://github.com/Agions/story-fab' },
     ],
 
@@ -50,9 +36,9 @@ export default defineConfig({
         {
           text: '开始使用',
           items: [
-            { text: '介绍', link: '/getting-started/introduction' },
+            { text: '产品介绍', link: '/getting-started/introduction' },
             { text: '安装指南', link: '/getting-started/installation' },
-            { text: '快速开始', link: '/getting-started/quick-start' },
+            { text: '快速上手', link: '/getting-started/quick-start' },
           ],
         },
       ],
@@ -63,7 +49,7 @@ export default defineConfig({
             { text: '剪辑模式', link: '/features/commentary-mode' },
             { text: '解说模式', link: '/features/ai-analysis' },
             { text: '脚本生成', link: '/features/script-generation' },
-            { text: '导出设置', link: '/features/export' },
+            { text: '导出与分发', link: '/features/export' },
           ],
         },
       ],
@@ -72,27 +58,7 @@ export default defineConfig({
           text: '配置',
           items: [
             { text: '高级配置', link: '/configuration/configuration' },
-            { text: '快捷键', link: '/configuration/keyboard-shortcuts' },
-          ],
-        },
-      ],
-      '/developer/': [
-        {
-          text: '架构',
-          items: [
-            { text: '系统架构', link: '/developer/architecture' },
-            { text: '项目结构', link: '/developer/project-structure' },
-          ],
-        },
-        {
-          text: '开发',
-          items: [
-            { text: '解说工作流', link: '/developer/commentary-workflow' },
-            { text: 'AI 服务', link: '/developer/ai-services' },
-            { text: 'Tauri 命令', link: '/developer/tauri-commands' },
-            { text: '测试指南', link: '/developer/testing' },
-            { text: '构建发布', link: '/developer/build-release' },
-            { text: '部署指南', link: '/developer/deployment' },
+            { text: '键盘快捷键', link: '/configuration/keyboard-shortcuts' },
           ],
         },
       ],
@@ -100,8 +66,6 @@ export default defineConfig({
         {
           text: '参考资料',
           items: [
-            { text: 'API 参考', link: '/reference/api' },
-            { text: '配置参考', link: '/reference/config' },
             { text: '常见问题', link: '/reference/faq' },
           ],
         },
@@ -131,6 +95,17 @@ export default defineConfig({
       level: [2, 3],
       label: '本页目录',
     },
+
+    docFooter: {
+      prev: '上一页',
+      next: '下一页',
+    },
+
+    lastUpdated: {
+      text: '最后更新于',
+    },
+
+    returnToTopLabel: '返回顶部',
   },
 
   markdown: {
@@ -142,4 +117,4 @@ export default defineConfig({
   vite: {
     server: { fs: { strict: false } },
   },
-});
+})

@@ -14,6 +14,8 @@ import AiVisualizerCanvas from './ai-visualizer-canvas';
 import AiVisualizerControls from './ai-visualizer-controls';
 import AiVisualizerTimeline from './ai-visualizer-timeline';
 import styles from './ai-visualizer.module.less';
+import { AlertCircleIcon } from '@/components/icons';
+import { ArrowRight } from 'lucide-react';
 import type { AIAnalyzeProps } from '@/types/analysis';
 
 const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
@@ -25,11 +27,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
       <div className={styles.stepContent}>
         <AiVisualizerHeader title="AI 智能分析" subtitle="请先上传视频，再进行 AI 分析" />
         <div className={styles.noVideoWarning}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+          <AlertCircleIcon size={32} />
           <p className={styles.noVideoHint}>请先上传视频，再进行 AI 分析</p>
         </div>
       </div>
@@ -45,9 +43,7 @@ const AIAnalyze: React.FC<AIAnalyzeProps> = memo(({ onNext }) => {
         <div className={styles.actionBar}>
           <button className={`${styles.actionBtn} ${styles.actionBtnPrimary}`} onClick={goToNextStep}>
             下一步：生成文案
-            <svg className={styles.actionBtnSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <ArrowRight className={styles.actionBtnSvg} size={16} />
           </button>
         </div>
       </div>

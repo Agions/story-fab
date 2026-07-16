@@ -95,7 +95,6 @@ export interface EditorStore {
   setVoice: (voice: VoiceData | null) => void;
   setActivePanel: (panel: EditorPanel) => void;
   setIsPlaying: (playing: boolean) => void;
-  setPreviewPlaying: (playing: boolean) => void; // @deprecated 兼容 alias
   setCurrentTime: (time: number) => void;
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
@@ -180,7 +179,6 @@ export const useEditorStore = createPersistedStore<EditorStore>({
     setVoice: (voice) => set({ voice }),
     setActivePanel: (activePanel) => set({ activePanel }),
     setIsPlaying: (isPlaying) => set({ isPlaying }),
-    setPreviewPlaying: (previewPlaying) => set({ isPlaying: previewPlaying }),
     setCurrentTime: (currentTime) => set({ currentTime }),
     setVolume: (volume) => set({ volume: Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, volume)) }),
     setMuted: (muted) => set({ muted }),
@@ -382,9 +380,3 @@ export const useEditorStore = createPersistedStore<EditorStore>({
     canRedoTrack: () => trackHistory.canRedo(),
   }),
 });
-
-/**
- * 兼容别名 — 过渡期保留 useWorkspaceStore。
- * @deprecated 使用 useEditorStore
- */
-export const useWorkspaceStore = useEditorStore;

@@ -16,7 +16,6 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-  TooltipProvider,
 } from '@/components/ui/tooltip';
 import { MoreHorizontal, Video, FolderOpen } from 'lucide-react';
 import type { ProjectView, ProjectStatus, ProjectUIStats } from '@/types/project';
@@ -98,22 +97,18 @@ export const ProjectCard = React.memo<ProjectCardProps>(({
 
     <div className="mt-auto flex justify-between items-center">
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="flex items-center gap-1">
-              <Video size={12} /> {uiStatus.videoCount}
-            </TooltipTrigger>
-            <TooltipContent>视频数</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="flex items-center gap-1">
-              <FolderOpen size={12} /> {uiStatus.scriptCount}
-            </TooltipTrigger>
-            <TooltipContent>脚本数</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger className="flex items-center gap-1">
+            <Video size={12} /> {uiStatus.videoCount}
+          </TooltipTrigger>
+          <TooltipContent>视频数</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger className="flex items-center gap-1">
+            <FolderOpen size={12} /> {uiStatus.scriptCount}
+          </TooltipTrigger>
+          <TooltipContent>脚本数</TooltipContent>
+        </Tooltip>
       </div>
       <span className="text-xs text-muted-foreground">{formatDate(project.updatedAt)}</span>
     </div>

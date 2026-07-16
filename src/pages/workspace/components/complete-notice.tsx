@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { CheckCircle2, PlayCircle, ArrowRight } from 'lucide-react';
 import styles from './../assemble/video-composing.module.less';
 
 // ============================================
@@ -53,18 +54,7 @@ export const CompleteNotice: React.FC<CompleteNoticeProps> = ({
       </div>
 
       <div className={styles.completeCard}>
-        <svg
-          className={styles.completeIcon}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-          <polyline points="22 4 12 14.01 9 11.01" />
-        </svg>
+        <CheckCircle2 className={styles.completeIcon} size={48} strokeWidth={1.5} />
         <h3 className={styles.completeTitle}>视频合成成功！</h3>
         <p className={styles.completeDesc}>{description}</p>
         <div className={styles.completeActions}>
@@ -72,17 +62,7 @@ export const CompleteNotice: React.FC<CompleteNoticeProps> = ({
             className={`${styles.completeBtn} ${styles.completeBtnSecondary}`}
             onClick={onPreview}
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <polygon points="10 8 16 12 10 16 10 8" />
-            </svg>
+            <PlayCircle size={16} />
             预览效果
           </button>
           <button
@@ -90,16 +70,7 @@ export const CompleteNotice: React.FC<CompleteNoticeProps> = ({
             onClick={onNext}
           >
             {nextButtonText}
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>

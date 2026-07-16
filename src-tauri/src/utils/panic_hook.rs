@@ -7,8 +7,6 @@ use std::path::PathBuf;
 use std::sync::Once;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use tauri::Manager;
-
 /// Install the process-wide panic hook. **Idempotent** — calling this
 /// twice (e.g. from test harnesses) is safe; only the first call wins.
 ///
@@ -73,20 +71,6 @@ fn panic_payload_to_string(payload: &dyn std::any::Any) -> String {
     } else {
         "<non-string panic payload>".to_string()
     }
-}
-
-/// Public version of [`crash_dir`] that resolves through a Tauri
-/// `AppHandle`'s `app_data_dir()` (so the location matches the rest of
-/// the app on every platform), and falls back to the platform default
-/// data dir if the Tauri resolution fails. Used by `crash_recovery` to
-/// list / read / delete crash reports.
-pub fn crash_dir_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
-    let base = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("无法获取 AppData 目录: {e}"))?;
-    let dir = base.join("crashes");
-    Ok(dir)
 }
 
 fn crash_dir() -> Option<PathBuf> {

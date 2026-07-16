@@ -5,6 +5,7 @@
 import React from 'react';
 import { useAiVisualizer } from './use-ai-visualizer';
 import { ANALYSIS_TASKS, TASK_ICONS } from '../config/analysis-tasks';
+import { CheckMarkIcon, NeuralNetworkIcon } from '@/components/icons';
 import styles from './ai-visualizer.module.less';
 
 interface AiVisualizerCanvasProps {
@@ -12,9 +13,7 @@ interface AiVisualizerCanvasProps {
 }
 
 const CheckIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={styles.checkIcon}>
-    <polyline points="20,6 9,17 4,12" />
-  </svg>
+  <CheckMarkIcon size={16} className={styles.checkIcon} />
 );
 
 const AiVisualizerCanvas: React.FC<AiVisualizerCanvasProps> = ({ onReAnalyze: _onReAnalyze }) => {
@@ -29,21 +28,7 @@ const AiVisualizerCanvas: React.FC<AiVisualizerCanvasProps> = ({ onReAnalyze: _o
   return (
     <div className={styles.analyzingCard}>
       <div className={styles.neuralViz}>
-        <svg className={styles.neuralLines} viewBox="0 0 280 120" preserveAspectRatio="none">
-          <line x1="14" y1="60" x2="45" y2="24" className={`${styles.neuralLine} ${completedTasks.includes('scene') ? styles.completed : ''}`} />
-          <line x1="14" y1="60" x2="45" y2="96" className={`${styles.neuralLine} ${completedTasks.includes('scene') ? styles.completed : ''}`} />
-          <line x1="45" y1="24" x2="112" y2="36" className={`${styles.neuralLine} ${completedTasks.includes('scene') ? styles.completed : ''}`} />
-          <line x1="45" y1="96" x2="112" y2="84" className={`${styles.neuralLine} ${completedTasks.includes('scene') ? styles.completed : ''}`} />
-          <line x1="45" y1="24" x2="112" y2="84" className={`${styles.neuralLine} ${completedTasks.includes('emotion') ? styles.completed : ''}`} />
-          <line x1="45" y1="96" x2="112" y2="36" className={`${styles.neuralLine} ${completedTasks.includes('emotion') ? styles.completed : ''}`} />
-          <line x1="112" y1="36" x2="179" y2="18" className={`${styles.neuralLine} ${completedTasks.includes('emotion') ? styles.completed : ''}`} />
-          <line x1="112" y1="84" x2="179" y2="60" className={`${styles.neuralLine} ${completedTasks.includes('emotion') ? styles.completed : ''}`} />
-          <line x1="112" y1="36" x2="179" y2="102" className={`${styles.neuralLine} ${completedTasks.includes('ocr') ? styles.completed : ''}`} />
-          <line x1="112" y1="84" x2="179" y2="102" className={`${styles.neuralLine} ${completedTasks.includes('ocr') ? styles.completed : ''}`} />
-          <line x1="179" y1="18" x2="246" y2="42" className={`${styles.neuralLine} ${completedTasks.includes('ocr') ? styles.completed : ''}`} />
-          <line x1="179" y1="60" x2="246" y2="78" className={`${styles.neuralLine} ${completedTasks.includes('ocr') ? styles.completed : ''}`} />
-          <line x1="179" y1="102" x2="246" y2="78" className={`${styles.neuralLine} ${completedTasks.includes('asr') ? styles.completed : ''}`} />
-        </svg>
+        <NeuralNetworkIcon size={280} className={styles.neuralLines} />
 
         <div className={styles.neuralNode} style={{ left: '0%', top: '50%' }} />
         <div className={`${styles.neuralNode} ${completedTasks.includes('scene') ? styles.completed : ''}`} style={{ left: '16%', top: '20%' }} />

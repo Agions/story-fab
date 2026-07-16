@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { Zap } from 'lucide-react';
 import styles from './../edit-step/script-writing.module.less';
 import { COMMENTARY_STYLES } from '../edit-step/script-config';
 
@@ -33,16 +34,7 @@ export const CommentaryStyleSelector: React.FC<CommentaryStyleSelectorProps> = (
   return (
     <div className={styles.commentaryStyleSection}>
       <span className={styles.commentaryStyleLabel}>
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
+        <Zap width={12} height={12} />
         解说风格
       </span>
       <div className={styles.commentaryStyleGrid}>

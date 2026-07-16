@@ -51,6 +51,9 @@ coverage/
 .DS_Store
 *.sublime-*
 
+# WorkBuddy workspace files (local only)
+.workbuddy/
+
 # Temporary files
 *.temp
 *.tmp

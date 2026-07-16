@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { FileText, Clock, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
 import styles from './../edit-step/script-writing.module.less';
 
 const ALIGNMENT_GATE_THRESHOLD = {
@@ -49,56 +50,21 @@ export const ScriptStatsBar: React.FC<ScriptStatsBarProps> = ({
       <div className={styles.scriptStats}>
         {/* 字数 */}
         <StatItem
-          icon={
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
-          }
+          icon={<FileText size={16} />}
           label="字数:"
           value={wordCount.toString()}
         />
 
         {/* 预计时长 */}
         <StatItem
-          icon={
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-          }
+          icon={<Clock size={16} />}
           label="预计:"
           value={`~${estimatedDuration}秒`}
         />
 
         {/* 风格 */}
         <StatItem
-          icon={
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-          }
+          icon={<Sparkles size={16} />}
           label="风格:"
           value={style}
         />
@@ -140,28 +106,13 @@ const AlignmentAlert: React.FC<{
         gate.passed ? styles.alertSuccess : styles.alertWarning
       }`}
     >
-      <svg
-        className={styles.alignmentIcon}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <span className={styles.alignmentIcon}>
         {gate.passed ? (
-          <>
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </>
+          <CheckCircle2 size={16} />
         ) : (
-          <>
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </>
+          <AlertCircle size={16} />
         )}
-      </svg>
+      </span>
       <div>
         <div className={styles.alignmentTitle}>
           {gate.passed ? '✓ 音画对齐通过' : '⚠ 音画对齐待优化'}

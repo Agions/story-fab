@@ -5,6 +5,8 @@
 import React from 'react';
 import { useVideoUpload } from './use-video-upload';
 import { formatFileSize } from '@/shared';
+import { FileVideoIcon } from '@/components/icons';
+import { Play, Pause } from 'lucide-react';
 import styles from './video-upload.module.less';
 
 const VideoUploadProgress: React.FC = () => {
@@ -22,9 +24,7 @@ const VideoUploadProgress: React.FC = () => {
       <div className={styles.progressSection}>
         <div className={styles.progressHeader}>
           <div className={styles.progressFileIcon}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8.5A1.5 1.5 0 014.5 7h11A1.5 1.5 0 0117 8.5v7a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 013 15.5v-7z" />
-            </svg>
+            <FileVideoIcon size={20} />
           </div>
           <div className={styles.progressInfo}>
             <div className={styles.progressFileName}>{currentFile?.name}</div>
@@ -57,17 +57,12 @@ const VideoUploadProgress: React.FC = () => {
           >
             {uploadStatus === 'paused' ? (
               <>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5,3 19,12 5,21" />
-                </svg>
+                <Play size={16} />
                 继续上传
               </>
             ) : (
               <>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="4" width="4" height="16" />
-                  <rect x="14" y="4" width="4" height="16" />
-                </svg>
+                <Pause size={16} />
                 暂停上传
               </>
             )}

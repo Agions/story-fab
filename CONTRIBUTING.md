@@ -118,6 +118,54 @@ npm test -- path/to/test.ts
 - Bug 修复应添加回归测试
 - 测试覆盖率不低于 90%
 
+## 🗄️ 状态管理
+
+StoryFab 使用 **Zustand v5** 进行全局状态管理，遵循单一数据源（SSOT）原则。
+
+### Store 架构
+
+| Store | 持久化 Key | 职责 |
+|-------|-----------|------|
+| `app-store` | `StoryFab-app` | 全局 UI 状态 + 应用设置 + AI 模型偏好 |
+| `editor-store` | `StoryFab-workspace` | 编辑器运行时状态（tool / viewport / selection / timelineTracks / playhead） |
+| `project-store` | 无（文件级） | 项目数据（currentProject / files / resources / mode / step） |
+| `timeline-store` | `StoryFab-timeline` | 时间轴状态（playhead / tracks / isPlaying） |
+
+### 核心约定
+
+1. **单一数据源**：每个状态域有且仅有一个 Owner Store。
+2. **细粒度 Selector**：组件必须使用细粒度 selector，禁止 `useAppStore()` 整树订阅。
+   ```tsx
+   // ✅ 好
+   const theme = useAppStore(s => s.theme);
+   
+   // ❌ 差
+   const { theme } = useAppStore();
+   ```
+3. **无隐式依赖**：Store 之间通过显式 subscribe 或 action 调用交互，禁止跨 Store 直接读写状态。
+4. **持久化策略**：
+   - `app-store`：partialize 包含 `theme` / `sidebarCollapsed` / `userSettings` / `autoSave` / `aiSettings`
+   - `editor-store`：partialize 包含 `video` / `zoom` / `volume` / `muted` / `snapEnabled` / `snapThreshold`
+   - `project-store`：无持久化，项目数据由 `project-file-service` 管理
+   - `timeline-store`：partialize 包含 `playheadMs` / `tracks` / `isPlaying`
+5. **DevTools**：所有 Store 均注册 devtools，支持时间旅行调试。
+
+### 添加新 Store 的步骤
+
+1. 在 `src/stores/` 下创建 `{store-name}.ts` 和 `{store-name}.test.ts`
+2. 使用 `createPersistedStore` 工厂创建 Store
+3. 在 `src/stores/index.ts` 中统一导出
+4. 在 `docs/stores-boundary.md` 中记录职责边界
+
+### 合并 Store 的步骤
+
+1. 在目标 Store 中扩展状态接口，添加新分区
+2. 迁移 action creators
+3. 更新 `partialize` 包含新分区
+4. 全局搜索替换旧 Store 引用为目标 Store selector
+5. 删除旧 Store 文件及其测试
+6. 将旧测试用例迁入目标 Store 测试文件
+
 ## 📝 代码规范
 
 ### TypeScript

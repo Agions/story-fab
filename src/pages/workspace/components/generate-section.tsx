@@ -2,6 +2,8 @@
  * 生成按钮区域 — 字数统计 + 重新生成 + 预览脚本按钮
  */
 import React from 'react';
+import { Eye } from 'lucide-react';
+import { RefreshCwIcon } from '@/components/icons';
 import type { ScriptData } from '@/types';
 import styles from './../edit-step/script-writing.module.less';
 
@@ -35,17 +37,7 @@ const GenerateSection: React.FC<GenerateSectionProps> = ({
           onClick={onRegenerate}
           disabled={generating}
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="23 4 23 10 17 10" />
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-          </svg>
+          <RefreshCwIcon strokeWidth={2.5} />
           重新生成
         </button>
       </div>
@@ -53,17 +45,7 @@ const GenerateSection: React.FC<GenerateSectionProps> = ({
       {/* 预览脚本按钮 */}
       {currentScript && (
         <button className={styles.previewScriptBtn} onClick={onPreview}>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
+          <Eye size={16} />
           预览脚本
         </button>
       )}

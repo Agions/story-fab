@@ -15,6 +15,7 @@ import { useProjectStore } from '@/stores';
 import { useVideoSynthesize } from '../hooks/use-video-synthesize';
 import { notify } from '@/shared';
 import { TAB_OPTIONS, type ComposingTab } from '../shared/compose-config';
+import { Play, Video, Zap, Mic, Subtitles } from 'lucide-react';
 
 // 导入子组件
 import { VoiceSettingsPanel } from '../components/voice-settings-panel';
@@ -191,16 +192,7 @@ const VideoSynthesize: React.FC<VideoSynthesizeProps> = memo(({ onNext }) => {
           onClick={handleSynthesize}
           disabled={!canProceed}
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-          </svg>
+          <Zap size={20} />
           开始合成视频
         </button>
       </div>
@@ -228,26 +220,13 @@ const PreviewSection: React.FC<{ videoPath?: string }> = ({ videoPath }) => {
             <video className={styles.previewVideo} src={videoPath} muted aria-label="视频预览" />
             <div className={styles.previewOverlay}>
               <button className={styles.playBtn} aria-label="播放预览">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
+                <Play size={24} fill="currentColor" />
               </button>
             </div>
           </>
         ) : (
           <div className={styles.previewPlaceholder}>
-            <svg
-              className={styles.previewPlaceholderIcon}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polygon points="23 7 16 12 23 17 23 7" />
-              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-            </svg>
+            <Video className={styles.previewPlaceholderIcon} size={24} strokeWidth={1.5} />
             <span className={styles.previewPlaceholderText}>视频预览</span>
           </div>
         )}
@@ -268,46 +247,9 @@ const TabButton: React.FC<{
 }> = ({ value, label, isActive, onClick }) => {
   // Tab 图标映射
   const iconMap: Record<ComposingTab, React.ReactNode> = {
-    voice: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-        <line x1="12" y1="19" x2="12" y2="23" />
-        <line x1="8" y1="23" x2="16" y2="23" />
-      </svg>
-    ),
-    subtitle: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="2" y="15" width="20" height="4" rx="1" />
-        <path d="M6 11h4M14 11h4M6 7h12" />
-      </svg>
-    ),
-    effect: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-      </svg>
-    ),
+    voice: <Mic size={18} />,
+    subtitle: <Subtitles size={18} />,
+    effect: <Zap size={18} />,
   };
 
   return (

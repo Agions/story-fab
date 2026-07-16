@@ -5,6 +5,7 @@
 import React from 'react';
 import { useAiVisualizer } from './use-ai-visualizer';
 import { ANALYSIS_TASKS } from '../config/analysis-tasks';
+import { PlayCircleIcon, CheckMarkIcon } from '@/components/icons';
 import styles from './ai-visualizer.module.less';
 
 const AiVisualizerControls: React.FC = () => {
@@ -26,9 +27,7 @@ const AiVisualizerControls: React.FC = () => {
               onKeyDown={(e) => e.key === 'Enter' && toggleConfig(task.key)}
             >
               <div className={styles.configCardCheckbox}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={styles.configCardCheckmark}>
-                  <polyline points="20,6 9,17 4,12" />
-                </svg>
+                <CheckMarkIcon size={16} className={styles.configCardCheckmark} />
               </div>
               <div className={styles.configCardIcon}>{task.icon}</div>
               <div className={styles.configCardInfo}>
@@ -46,9 +45,7 @@ const AiVisualizerControls: React.FC = () => {
           onClick={runAnalysis}
           disabled={selectedCount === 0}
         >
-          <svg className={styles.startButtonSvg} viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
-          </svg>
+          <PlayCircleIcon className={styles.startButtonSvg} size={20} />
           开始 AI 分析
         </button>
         <div className={styles.taskCount}>已选择 {selectedCount} 项分析任务</div>

@@ -1,32 +1,31 @@
 /**
  * OpenAI API 适配器
  */
-import type { RequestConfig, AIResponse } from './types';
-import { ServiceError } from './base-service';
+import type { AIResponse } from './types';
+import { callAIProvider, type ProviderConfig } from './shared';
 
-export async function callOpenAI(apiKey: string, config: RequestConfig): Promise<AIResponse> {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(config),
-  });
+const openaiConfig: ProviderConfig = {
+  buildUrl: () => 'https://api.openai.com/v1/chat/completions',
+  buildHeaders: (apiKey) => ({
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+  }),
+  buildBody: (_apiKey, config) => config,
+  errorMessage: 'OpenAI API 错误',
+  parseResponse: (data, config) => {
+    const d = data as {
+      choices?: Array<{ message?: { content?: string } }>;
+      usage?: AIResponse['usage'];
+      model?: string;
+    };
+    return {
+      content: d.choices?.[0]?.message?.content ?? '',
+      usage: d.usage,
+      model: d.model ?? config.model,
+    };
+  },
+};
 
-  if (!response.ok) {
-    throw new ServiceError(`OpenAI API 错误: ${response.status}`, 'API_ERROR', response.status);
-  }
-
-  const data = (await response.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
-    usage?: AIResponse['usage'];
-    model?: string;
-  };
-
-  return {
-    content: data.choices?.[0]?.message?.content ?? '',
-    usage: data.usage,
-    model: data.model ?? config.model,
-  };
+export async function callOpenAI(apiKey: string, config: Parameters<typeof callAIProvider>[1]): Promise<AIResponse> {
+  return callAIProvider(apiKey, config, openaiConfig);
 }

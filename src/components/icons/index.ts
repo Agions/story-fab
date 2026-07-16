@@ -1,0 +1,9 @@
+export { default as UploadCloudIcon } from './UploadCloudIcon';
+export { default as PlayCircleIcon } from './PlayCircleIcon';
+export { default as CheckMarkIcon } from './CheckMarkIcon';
+export { default as NeuralNetworkIcon } from './NeuralNetworkIcon';
+export { default as RefreshCwIcon } from './RefreshCwIcon';
+export { default as TrashIcon } from './TrashIcon';
+export { default as FileVideoIcon } from './FileVideoIcon';
+export { default as AlertCircleIcon } from './AlertCircleIcon';
+export { default as FilmIcon } from './FilmIcon';

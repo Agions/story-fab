@@ -141,13 +141,7 @@ class AudioVideoSyncService {
       // 提取关键帧时间点用于分段
       const keyframes = await this.getKeyframes(videoPath);
       if (keyframes.length === 0) {
-        // 没有关键帧数据，按固定长度分段
-        const duration = await this.getDuration(videoPath);
-        const segments = [];
-        for (let t = 0; t < duration; t += 30) {
-          segments.push({ start: t, end: Math.min(t + 30, duration) });
-        }
-        return { videoSegments: segments, issues: [] };
+        return this.fallbackSegments(videoPath);
       }
 
       // 按关键帧分段的简化逻辑
@@ -163,13 +157,18 @@ class AudioVideoSyncService {
       return { videoSegments, issues: [] };
     } catch (err) {
       logger.warn('[AudioVideoSync] FFprobe 分析失败，使用默认分段:', err);
-      const duration = await this.getDuration(videoPath);
-      const segments = [];
-      for (let t = 0; t < duration; t += 30) {
-        segments.push({ start: t, end: Math.min(t + 30, duration) });
-      }
-      return { videoSegments: segments, issues: [] };
+      return this.fallbackSegments(videoPath);
     }
+  }
+
+  /** 没有关键帧数据时按固定长度分段（fallback） */
+  private async fallbackSegments(videoPath: string): Promise<SyncTimeline> {
+    const duration = await this.getDuration(videoPath);
+    const segments = [];
+    for (let t = 0; t < duration; t += 30) {
+      segments.push({ start: t, end: Math.min(t + 30, duration) });
+    }
+    return { videoSegments: segments, issues: [] };
   }
 
   private async getStreamIndex(filePath: string, codec: 'v' | 'a'): Promise<number> {

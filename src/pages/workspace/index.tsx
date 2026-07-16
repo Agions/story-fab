@@ -11,7 +11,7 @@ import {
 import { useStoryFabStore } from '@/stores';
 import { useKeyboardShortcuts } from '../../hooks/use-keyboard-shortcuts';
 import KeyboardShortcutsHelp from '@/components/common/keyboard-shortcuts-help';
-import { useEditorStore } from '../../stores/workspace-store';
+import { useEditorStore } from '@/stores';
 import { useShallow } from 'zustand/react/shallow';
 import { notify } from '@/shared';
 import { TAB_TO_FEATURE, type AIFunctionTabKey } from '@/pages/workspace/shared/function-mode-map';
@@ -73,8 +73,8 @@ const AIVideoEditorContent: React.FC = () => {
   const { state, goToNextStep, setFeature } = useStoryFabStore();
 
   // ── Store selectors — use shallow equality for multi-field objects ──────────
-  const previewPlaying = useEditorStore(s => s.previewPlaying);
-  const setPreviewPlaying = useEditorStore(s => s.setPreviewPlaying);
+  const isPlaying = useEditorStore(s => s.isPlaying);
+  const setIsPlaying = useEditorStore(s => s.setIsPlaying);
   const timelineActions = useEditorStore(
     useShallow((s) => ({
       playheadMs: s.playheadMs,
@@ -94,10 +94,10 @@ const AIVideoEditorContent: React.FC = () => {
     enabled: true,
     preventDefault: true,
     onPlayPause: () => {
-      setPreviewPlaying(!previewPlaying);
+      setIsPlaying(!isPlaying);
     },
     onPause: () => {
-      setPreviewPlaying(false);
+      setIsPlaying(false);
     },
     onSeek: (delta) => {
       const newTime = Math.max(0, (timelineActions.playheadMs / 1000) + delta);
