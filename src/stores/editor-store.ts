@@ -9,8 +9,11 @@
  *  - 持久化 key 沿用原 `StoryFab-workspace`（避免用户丢失已缓存的设置）。
  *  - 播放态采用单一 `isPlaying` 命名，原 storyFabStore.isPlaying 与
  *    workspaceStore.previewPlaying 统一收口于此。
+ *  - 简单 setter（无 clamping / history / functional）通过 createSimpleSetters
+ *    工厂自动生成；带副作用的 setter 保持手写（Stage 8 PR-2.2 引入）。
  */
 import { createPersistedStore } from './create-persisted-store';
+import { createSimpleSetters } from './create-simple-setters';
 import { createJSONStorage } from 'zustand/middleware';
 import { createHistory } from './create-history';
 import type { TimelineTrack, TimelineClip, AnimationKeyframe, TrackType } from '@/types';
@@ -174,18 +177,28 @@ export const useEditorStore = createPersistedStore<EditorStore>({
     ...initialEditorState,
     ...initialTimelineState,
 
-    setVideo: (video) => set({ video }),
-    setScript: (script) => set({ script }),
-    setVoice: (voice) => set({ voice }),
-    setActivePanel: (activePanel) => set({ activePanel }),
-    setIsPlaying: (isPlaying) => set({ isPlaying }),
-    setCurrentTime: (currentTime) => set({ currentTime }),
+    // 9 个真正简单的 setter（无 clamping / history / functional）通过工厂生成。
+    // 带副作用的 setter 保持手写（见下方）：setVolume/setZoom/setPlayheadMs/setTimelineDuration
+    // （clamping）、setSelection（functional）、setInPoint/setOutPoint（get 依赖）。
+    ...createSimpleSetters(
+      {
+        setVideo: 'video',
+        setScript: 'script',
+        setVoice: 'voice',
+        setActivePanel: 'activePanel',
+        setIsPlaying: 'isPlaying',
+        setCurrentTime: 'currentTime',
+        setMuted: 'muted',
+        setScrollPosition: 'scrollPosition',
+        setSnapEnabled: 'snapEnabled',
+      },
+      set as (partial: Partial<EditorStore>) => void,
+    ),
+
     setVolume: (volume) => set({ volume: Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, volume)) }),
-    setMuted: (muted) => set({ muted }),
     setSelection: (selection) => set((s) => ({ selection: { ...s.selection, ...selection } })),
     clearSelection: () => set({ selection: { segmentId: undefined, multipleIds: [] } }),
     setZoom: (zoom) => set({ zoom: Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom)) }),
-    setScrollPosition: (scrollPosition) => set({ scrollPosition }),
     reset: () => set({ ...initialEditorState, ...initialTimelineState }),
 
     setPlayheadMs: (ms) => set({ playheadMs: Math.max(0, ms) }),

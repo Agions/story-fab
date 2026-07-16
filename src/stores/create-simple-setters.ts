@@ -30,18 +30,22 @@
 
 import type { StoreApi } from 'zustand';
 
-type SetState<S> = StoreApi<S>['setState'];
+/**
+ * 接受 Zustand set 函数（兼容 createPersistedStore 的包装 set 与裸 setState）。
+ * 工厂内部只用 `set({ key: value })` 的简单调用形式，因此只需要 Partial<S> 即可。
+ */
+type SimpleSet<S> = (partial: Partial<S>) => void;
 
 /**
  * 根据 action-name → state-key 映射生成对应的简单 setter。
  *
  * @param map action 名到 state 键的映射
- * @param set Zustand 的 set 函数
+ * @param set Zustand 的 set 函数（createPersistedStore 包装 或 裸 setState 均可）
  * @returns 与 map 同名的 setter 映射，类型按 state 字段推导
  */
 export function createSimpleSetters<S, M extends Record<string, keyof S & string>>(
   map: M,
-  set: SetState<S>,
+  set: SimpleSet<S>,
 ): { [A in keyof M]: (value: S[M[A]]) => void } {
   const setters: Record<string, (value: unknown) => void> = {};
   for (const actionName in map) {
@@ -50,3 +54,6 @@ export function createSimpleSetters<S, M extends Record<string, keyof S & string
   }
   return setters as { [A in keyof M]: (value: S[M[A]]) => void };
 }
+
+// 保留 StoreApi 导出，方便其他场景使用
+export type { StoreApi };

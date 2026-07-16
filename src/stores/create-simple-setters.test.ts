@@ -82,16 +82,18 @@ describe('createSimpleSetters', () => {
   it('works when action name differs from state key (e.g. setInPoint → inPointMs)', () => {
     interface S {
       playheadMs: number;
-      inPointMs: number | undefined;
+      inPointMs: number;
     }
     interface A {
-      setInPoint: (v: number | undefined) => void;
+      setInPoint: (v: number) => void;
     }
-    const store = create<S & A>((set) => ({
-      playheadMs: 0,
-      inPointMs: undefined,
-      ...createSimpleSetters({ setInPoint: 'inPointMs' }, set),
-    }));
+    const store = create<S & A>((set) => {
+      const initial: S = { playheadMs: 0, inPointMs: 0 };
+      return {
+        ...initial,
+        ...createSimpleSetters({ setInPoint: 'inPointMs' }, set),
+      };
+    });
 
     store.getState().setInPoint(500);
     expect(store.getState().inPointMs).toBe(500);
