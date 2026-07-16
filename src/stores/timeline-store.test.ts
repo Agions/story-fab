@@ -2,7 +2,7 @@
  * timelineStore 单元测试
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useEditorStore as useTimelineStore, __resetTrackHistoryForTest } from './editor-store';
+import { useEditorStore as useTimelineStore, __testing } from './editor-store';
 
 // 独立的 createHistory 实例用于单元测试（验证模块行为与 store 一致）
 import { createHistory } from './create-history';
@@ -12,7 +12,7 @@ const _testHistory = createHistory<TimelineTrack[]>({ maxSize: 19 });
 describe('timelineStore', () => {
   beforeEach(() => {
     // Reset 模块闭包内的 history 栈（createHistory 持有独立状态）
-    __resetTrackHistoryForTest();
+    __testing.resetTrackHistory();
     // Reset store state before each test
     useTimelineStore.setState({
       timelineTracks: [],
