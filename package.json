@@ -32,7 +32,8 @@
     "test:ci": "vitest run --coverage",
     "verify:antd": "node scripts/check-antd.mjs",
     "verify:naming": "node scripts/check-naming.mjs",
-    "verify:all": "npm run verify:antd && npm run verify:naming"
+    "verify:circular": "node scripts/check-circular-deps.mjs",
+    "verify:all": "npm run verify:antd && npm run verify:naming && npm run verify:circular"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
