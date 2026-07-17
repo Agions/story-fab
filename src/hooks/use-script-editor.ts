@@ -48,7 +48,11 @@ export const useScriptEditor = ({
       0,
     );
     setters.totalDuration(duration);
-  }, [segments, setters]);
+    // setters is intentionally omitted from deps — createAutoSetters returns a
+    // fresh closure object every render, and including it would re-fire this
+    // effect (and the totalDuration dispatch) on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [segments]);
 
   const setFieldValue = useCallback(
     (field: keyof SegmentFormValues, value: string | number | null) => {

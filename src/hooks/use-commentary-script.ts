@@ -181,6 +181,11 @@ export function useCommentaryScript(): UseCommentaryScriptResult {
   }, []);
 
   const updateSegment = useCallback((index: number, text: string) => {
+    // ScriptSegment uses `content` (not `text`) as the canonical field name —
+    // spreading and overriding `text` would silently no-op.
+    const applyContent = (seg: typeof text extends never ? never : { content?: string } & Record<string, unknown>, i: number) =>
+      i === index ? { ...seg, content: text } : seg;
+
     // Multi-style mode: update corresponding style's script
     if (multiStyleMode && activeScriptStyle) {
       // Capture activeScriptStyle into a const so TS knows it's defined in closures
@@ -191,9 +196,7 @@ export function useCommentaryScript(): UseCommentaryScriptResult {
         if (current) {
           next.set(styleKey, {
             ...current,
-            segments: current.segments.map((seg, i) =>
-              i === index ? { ...seg, text } : seg
-            ),
+            segments: current.segments.map((seg, i) => applyContent(seg, i)),
           });
         }
         return next;
@@ -203,18 +206,14 @@ export function useCommentaryScript(): UseCommentaryScriptResult {
         if (!prev) return prev;
         return {
           ...prev,
-          segments: prev.segments.map((seg, i) =>
-            i === index ? { ...seg, text } : seg
-          ),
+          segments: prev.segments.map((seg, i) => applyContent(seg, i)),
         };
       });
     } else {
       // Single-style mode
       setScript((prev) => {
         if (!prev) return prev;
-        const segments = prev.segments.map((seg, i) =>
-          i === index ? { ...seg, text } : seg
-        );
+        const segments = prev.segments.map((seg, i) => applyContent(seg, i));
         return { ...prev, segments };
       });
     }
