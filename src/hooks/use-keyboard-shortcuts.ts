@@ -114,10 +114,12 @@ function isMac(): boolean {
 function matchKey(e: KeyboardEvent, shortcut: ShortcutKey): boolean {
   if (shortcut.code && e.code !== shortcut.code) return false;
   if (shortcut.key && e.key !== shortcut.key) return false;
-  if (shortcut.ctrl && !e.ctrlKey) return false;
-  if (shortcut.meta && !e.metaKey) return false;
-  if (shortcut.shift && !e.shiftKey) return false;
-  if (shortcut.alt && !e.altKey) return false;
+  // 修饰键严格匹配：未指定则事件中也不允许出现，否则 { key:'z', meta:true }
+  // 会同时匹配 Cmd+Z 与 Cmd+Shift+Z，导致更具体的重做被撤销抢先命中。
+  if ((shortcut.ctrl ?? false) !== e.ctrlKey) return false;
+  if ((shortcut.meta ?? false) !== e.metaKey) return false;
+  if ((shortcut.shift ?? false) !== e.shiftKey) return false;
+  if ((shortcut.alt ?? false) !== e.altKey) return false;
   return true;
 }
 
